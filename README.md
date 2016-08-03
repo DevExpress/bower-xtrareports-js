@@ -19,8 +19,8 @@ Take a look at the [DevExpress Reporting web demos]
 
 ## License
 
-Familiarize yourself with a Commercial License.
+A Commercial license for DevExpress DXperience is required to use this bower package. Please visit [https://devexpress.com](https://devexpress.com) to buy a [license](https://www.devexpress.com/Support/LicensingFAQ.xml) if you do not own one yet. 
 
 ## Support
 
-In case of any questions regarding the use of DevExpress Reporting tools, please refer to our [Support Center](http://www.devexpress.com/Support/Center).
+Questions related to DevExpress Reporting tools then contact the DevExpress [Support Center](http://www.devexpress.com/Support/Center).
