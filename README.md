@@ -23,4 +23,4 @@ A Commercial license for DevExpress DXperience is required to use this bower pac
 
 ## Support
 
-Questions related to DevExpress Reporting tools then contact the DevExpress [Support Center](http://www.devexpress.com/Support/Center).
+If you have questions related to DevExpress Reporting tools then please contact the DevExpress [Support Center](http://www.devexpress.com/Support/Center).
