@@ -19,8 +19,8 @@ Take a look at the [DevExpress Reporting web demos]
 
 ## License
 
-Familiarize yourself with a Commercial License.
+Familiarize yourself with a [Commercial License](http://www.devexpress.com/Support/EULAs/NetComponents.xml).
 
 ## Support
 
-In case of any questions regarding the use of DevExpress Reporting tools, please refer to our [Support Center](http://www.devexpress.com/Support/Center).
+For any questions regarding the use of DevExpress Reporting tools, please refer to our [Support Center](https://www.devexpress.com/Support/Center).
