@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+/*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -1425,6 +1425,7 @@ var DevExpress;
         (function (Preview) {
             var ParameterHelper = (function () {
                 function ParameterHelper() {
+                    this._customizeParameterEditors = ko.observable();
                 }
                 ParameterHelper.prototype._isKnownEnumType = function (type) {
                     return !!this._knownEnums && this._knownEnums.some(function (knownEnumType) {
@@ -1444,7 +1445,7 @@ var DevExpress;
                     if (arguments.length > 0) {
                         this._knownEnums = knownEnums;
                         if (arguments.length > 1) {
-                            this._customizeParameterEditors = _customizeParameterEditors;
+                            this._customizeParameterEditors(_customizeParameterEditors);
                         }
                     }
                 };
@@ -1510,8 +1511,8 @@ var DevExpress;
                             return _this.createMultiValue(parameter);
                         };
                     }
-                    if (this._customizeParameterEditors) {
-                        this._customizeParameterEditors(parameter.getParameterDescriptor(), valueInfo);
+                    if (this._customizeParameterEditors()) {
+                        this._customizeParameterEditors()(parameter.getParameterDescriptor(), valueInfo);
                     }
                     return valueInfo;
                 };

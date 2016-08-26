@@ -1,4 +1,8 @@
-/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+/*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
+* http://www.devexpress.com
+* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+
+/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -2715,7 +2719,7 @@
   -moz-border-radius: 3px;
 }
 
-/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -2855,7 +2859,7 @@
   cursor: se-resize;
 }
 
-/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -8082,8 +8086,8 @@
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-control .dxrd-table-row-control .dxrd-table-cell-control {
   position: absolute;
   height: 100%;
-  overflow: hidden;
   line-height: 100%;
+  box-sizing: border-box;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-control {
   position: absolute;

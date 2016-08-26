@@ -1,4 +1,8 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+<!-- /*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
+* http://www.devexpress.com
+* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+ -->
+<!-- /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
  -->
@@ -20,7 +24,7 @@
                         <!-- ko if: displayName -->
                         <div class="dx-collectioneditor-header-text" data-bind="styleunit: { 'paddingLeft': padding }">
                             <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                            <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization(displayName)"></div>
+                            <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization(displayName), attr: { title: DevExpress.JS.Utils.getLocalization(displayName) }"></div>
                         </div>
                         <!-- /ko -->
                     </div>
@@ -68,10 +72,10 @@
                     <div class="dx-field-label dx-accordion-header" data-bind="styleunit: padding, css: { 'dx-accordion-empty': templateName === 'dx-emptyHeader' }">
                         <!-- ko if: isComplexEditor -->
                         <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                        <div class="dx-group-header-font" data-bind="text: localizationId ? (DevExpress.JS.Localization.localize(localizationId) || displayName) : DevExpress.JS.Utils.getLocalization(displayName)"></div>
+                        <div class="dx-group-header-font" data-bind="text: localizingDisplayName(), attr: { 'title': localizingDisplayName() }"></div>
                         <!-- /ko -->
                         <!-- ko if: !isComplexEditor -->
-                        <div class="propertygrid-editor-displayName" data-bind="text: localizationId ? (DevExpress.JS.Localization.localize(localizationId) || displayName) : DevExpress.JS.Utils.getLocalization(displayName), style: { fontWeight: isPropertyModified() ? 'Bold' : ''}"></div>
+                        <div class="propertygrid-editor-displayName" data-bind="text: localizingDisplayName(), attr: { 'title': localizingDisplayName() }, style: { fontWeight: isPropertyModified() ? 'Bold' : ''}"></div>
                         <!-- /ko -->
                     </div>
                     <div class="dx-field-value">
@@ -163,7 +167,7 @@
 </script>
 
 <script type="text/html" id="dx-date">
-    <div data-bind="dxDateBox: { value: value, closeOnValueChange: true, format: 'datetime', disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
+    <div data-bind="dxDateBox: { value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-guid">
@@ -485,7 +489,7 @@
         <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: 'True', text: 'Yes' }, { val: 'False', text: 'No' }], valueExpr: 'val', displayExpr: 'text', value: _value, onFocusOut: function() { isEditable(false); } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() === "date" -->
-        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, format: 'date', onFocusOut: function() { isEditable(false); } }"></div>
+        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: 'date', onFocusOut: function() { isEditable(false); } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() !== "string" && $data.specifics() !== "bool" && $data.specifics() !== "date" && $data.specifics() !== "guid" -->
         <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: { on: isEditable }, dxNumberBox: { value: _value, onFocusOut: function() { isEditable(false); } }"></div>
@@ -662,6 +666,7 @@
             showTitle: true,
             width: '95%',
             height: '95%',
+            minWidth: 650,
             title: DevExpress.JS.Utils.getLocalization('FormatString Editor'),
             visible: popupVisible,
             toolbarItems: buttonItems,
@@ -832,7 +837,7 @@
 </script>
 
 <script type="text/html" id="dxrd-toolbox-template-base">
-    <div class="dxrd-toolbox-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
+    <div class="dxrd-toolbox-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false }">
         <!-- ko foreach: toolboxItems -->
         <div class="dxrd-toolbox-item" data-bind="attr: { title: type }">
             <div class="dxrd-image-padding" data-bind="css: imageClassName, draggable: $root.toolboxDragHandler"></div>
@@ -1082,6 +1087,10 @@
     <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath }"></div>
 </script>
 
+<script type="text/html" id="dxrd-filterstringgroup">
+    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath }"></div>
+</script>
+
 <script type="text/html" id="dxrd-formatstring">
     <div data-bind="dxFormatEditor: { value: value, disabled: disabled, standardPatterns: DevExpress.JS.Widgets.formatStringStandardPatterns, customPatterns: DevExpress.Designer.Report.formatStringEditorCustomSet, actions: DevExpress.Designer.Report.FormatStringService.actions }"></div>
 </script>
@@ -1167,7 +1176,7 @@
 <script type="text/html" id="dxrd-colorpicker">
     <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled }"></div>
 </script>
-<!-- /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+<!-- /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
  -->
@@ -2251,14 +2260,19 @@
     <!-- /ko -->
     <!-- /ko -->
 </div>
-<div class="dxrd-control" data-bind="visible: !(selected() && focused()), styleunit: position, trackCursor: underCursor">
-    <!-- ko if: $data.controls-->
-    <!-- ko foreach: controls -->
-    <!-- ko template: { name: $data.selectiontemplate } -->
-    <!-- /ko -->
-    <!-- /ko -->
-    <!-- /ko -->
-</div></script>
+<div class="dxrd-control" data-bind="visible: !(selected() && focused()), styleunit: position, trackCursor: underCursor, style:{ overflow: isSelected() ? 'visible' : 'hidden'}">
+    <div class="dxrd-control-content-main" data-bind="styleunit: { 'top': contentSizes().top + (isIntersect() ? 1 : 0), 'left': contentSizes().left + (isIntersect()? 1 : 0), lineHeight: contentSizes().height, height: contentSizes().height, width: contentSizes().width }, style: css">
+        <!-- ko if: $data.controls-->
+        <!-- ko foreach: controls -->
+        <!-- ko template: { name: $data.selectiontemplate } -->
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+</div>
+
+
+</script>
 
 <script type='text/html' id='dxrd-control'>
 <div class="dxrd-control dxd-selectable" data-bind="styleunit: position, css: adorntemplate">
@@ -2848,7 +2862,7 @@
 
 <script type="text/html" id="dxrd-page-connectionstring">
     <div class="dxrd-wizard-page">
-        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: connectionStrings, selectedItems: selectedConnectionString, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false }">
+        <div class="dxrd-wizard-list" data-bind="dxList: { items: connectionStrings, selectedItems: selectedConnectionString, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false }">
             <div data-options="dxTemplate : { name: 'item' }">
                 <div data-bind="text: $data['description'] || $data['name']"></div>
             </div>
@@ -2892,7 +2906,7 @@
 
 <script type="text/html" id="dxrd-procedures-control">
     <div data-bind="text: DevExpress.Designer.getLocalization('Select a stored procedure:')"></div>
-    <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxList: { dataSource: storedProcedures, selectedItems: selectedProcedure, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false }">
+    <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxList: { items: storedProcedures, onContentReady: scrollActiveItem, selectedItems: selectedProcedure, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false }">
         <div data-options="dxTemplate : { name: 'item' }">
             <div data-bind="text: DevExpress.Designer.Report.Wizard.StoredProceduresQueryControl.generateStoredProcedureDisplayName($data)"></div>
         </div>
@@ -2996,7 +3010,7 @@
     <!-- ko foreach: rows -->
     <div class="dxrd-table-row-control" data-bind="styleunit: { 'top': position.top, 'height': position.height }">
         <!-- ko foreach: cells -->
-        <div class="dxrd-table-cell-control" data-bind="trackCursor: underCursor, styleunit: { 'left': position.left, 'width': position.width }">
+        <div class="dxrd-table-cell-control" data-bind="trackCursor: underCursor, styleunit: { 'left': position.left, 'width': position.width }, style:{ overflow: isSelected() ? 'visible' : 'hidden'}">
             <!-- ko foreach: controls -->
             <!-- ko template: { name: $data.selectiontemplate } -->
             <!-- /ko -->
@@ -3042,7 +3056,7 @@
     <div class="dxrd-table-row-control" data-bind="visible: isSelected(), css: { 'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-locked': locked }, resizable: { starting: $root.resizeHandler.starting, stopped: $root.resizeHandler.stopped, handles: 'n,s', disabled: !(selected() || focused()), zoom: $root.surface().zoom }, styleunit: { 'top': position.top, 'height': position.height }">
         <div class="dxrd-table-row-selection dxrd-table-row-selection-left" data-bind="visible: !DevExpress.Designer.DragDropHandler.started(), trackCursor: underCursor"></div>
         <!-- ko foreach: cells -->
-        <div class="dxrd-table-cell-control" data-bind="trackCursor: underCursor, event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: isSelected, css: { 'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-locked': locked }, resizable: { starting: $root.resizeHandler.starting, stopped: $root.resizeHandler.stopped, handles: 'e,w', disabled: !(selected() || focused()), zoom: $root.surface().zoom }, styleunit: { 'left': position.left, 'width': position.width }">
+        <div class="dxrd-table-cell-control" data-bind="trackCursor: underCursor, event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: isSelected, css: { 'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: { starting: $root.resizeHandler.starting, stopped: $root.resizeHandler.stopped, handles: 'e,w', disabled: !(selected() || focused()), zoom: $root.surface().zoom }, styleunit: { 'left': position.left, 'width': position.width }">
             <!-- ko if: $root.inlineTextEdit.visible() && selected() -->
             <!-- ko with: $root.inlineTextEdit-->
             <div class="inline-text-edit" data-bind="dxTextArea: { value: text, onKeyUp: keypressAction, valueChangeEvent: 'keyup' }"></div>
@@ -3084,21 +3098,23 @@
 </script>
 
 <script type='text/html' id='dxrd-table'>
-<div class="dxrd-table-control dxrd-control dxd-selectable" data-bind="styleunit: position, trackCursor: underCursor, style: css, css: adorntemplate">
-    <!-- ko foreach: rows -->
-    <div class="dxrd-table-row-control" data-bind="styleunit: { 'top': position.top, 'height': position.height }, style: css">
-        <!-- ko foreach: cells -->
-        <div class="dxrd-table-cell-control dxrd-control" data-bind="styleunit: { 'left': position.left, 'width': position.width }, trackCursor: underCursor, style: css, css: adorntemplate">
-            <div data-bind="zoom: _context.zoom, template: contenttemplate, styleunit: { 'lineHeight': position.lineHeight() / _context.zoom(), 'width': contentSizes().width / _context.zoom() }">
+<div class="dxrd-table-control dxrd-control dxd-selectable" data-bind="styleunit: position, trackCursor: underCursor, css: adorntemplate">
+    <div data-bind="style: css" style="width: 100%; height: 100%;">
+        <!-- ko foreach: rows -->
+        <div class="dxrd-table-row-control" data-bind="styleunit: { 'top': position.top, 'height': position.height }, style: css">
+            <!-- ko foreach: cells -->
+            <div class="dxrd-table-cell-control dxrd-control" data-bind="styleunit: { 'left': position.left, 'width': position.width }, trackCursor: underCursor, css: adorntemplate">
+                <div data-bind="zoom: _context.zoom, template: contenttemplate, styleunit: { 'lineHeight': position.lineHeight() / _context.zoom(), 'width': contentSizes().width / _context.zoom() }, style: css">
+                </div>
+                <!-- ko foreach: controls -->
+                <!-- ko template: { name: $data.template } -->
+                <!-- /ko -->
+                <!-- /ko -->
             </div>
-            <!-- ko foreach: controls -->
-            <!-- ko template: { name: $data.template } -->
-            <!-- /ko -->
             <!-- /ko -->
         </div>
         <!-- /ko -->
     </div>
-    <!-- /ko -->
 </div>
 </script>
 
@@ -3303,7 +3319,7 @@
                     <div class="dxrd-formatting-rule-checkbox" data-bind="dxCheckBox: { value: value().selected, disabled: editor.disabled }, dxAction: function(args) { args.jQueryEvent.stopPropagation(); }"></div>
                     <div class="dxrd-formatting-rule-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
                     <div class="dxrd-formatting-rule-displayName">
-                        <div class="propertygrid-editor-displayName" data-bind="text: value().name"></div>
+                        <div class="propertygrid-editor-displayName" data-bind="text: value().name, attr: { title: value().name }"></div>
                     </div>
                 </div>
                 <div class="dx-accordion-content">
@@ -3419,7 +3435,7 @@
         <div class="dxrd-group-header dx-accordion-header">
             <div data-bind="styleunit: {'paddingLeft': $parents[1].padding + DevExpress.JS.Widgets.propertiesGridEditorsPaddingLeft }">
                 <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization($parent.name)"></div>
+                <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization($parent.name), attr: { title: DevExpress.JS.Utils.getLocalization($parent.name) }"></div>
             </div>
         </div>
         <div class="dx-accordion-content">

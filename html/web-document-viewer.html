@@ -1,4 +1,8 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-07-26
+<!-- /*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
+* http://www.devexpress.com
+* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+ -->
+<!-- /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
  -->
@@ -20,7 +24,7 @@
                         <!-- ko if: displayName -->
                         <div class="dx-collectioneditor-header-text" data-bind="styleunit: { 'paddingLeft': padding }">
                             <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                            <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization(displayName)"></div>
+                            <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization(displayName), attr: { title: DevExpress.JS.Utils.getLocalization(displayName) }"></div>
                         </div>
                         <!-- /ko -->
                     </div>
@@ -68,10 +72,10 @@
                     <div class="dx-field-label dx-accordion-header" data-bind="styleunit: padding, css: { 'dx-accordion-empty': templateName === 'dx-emptyHeader' }">
                         <!-- ko if: isComplexEditor -->
                         <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                        <div class="dx-group-header-font" data-bind="text: localizationId ? (DevExpress.JS.Localization.localize(localizationId) || displayName) : DevExpress.JS.Utils.getLocalization(displayName)"></div>
+                        <div class="dx-group-header-font" data-bind="text: localizingDisplayName(), attr: { 'title': localizingDisplayName() }"></div>
                         <!-- /ko -->
                         <!-- ko if: !isComplexEditor -->
-                        <div class="propertygrid-editor-displayName" data-bind="text: localizationId ? (DevExpress.JS.Localization.localize(localizationId) || displayName) : DevExpress.JS.Utils.getLocalization(displayName), style: { fontWeight: isPropertyModified() ? 'Bold' : ''}"></div>
+                        <div class="propertygrid-editor-displayName" data-bind="text: localizingDisplayName(), attr: { 'title': localizingDisplayName() }, style: { fontWeight: isPropertyModified() ? 'Bold' : ''}"></div>
                         <!-- /ko -->
                     </div>
                     <div class="dx-field-value">
@@ -163,7 +167,7 @@
 </script>
 
 <script type="text/html" id="dx-date">
-    <div data-bind="dxDateBox: { value: value, closeOnValueChange: true, format: 'datetime', disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
+    <div data-bind="dxDateBox: { value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-guid">
@@ -485,7 +489,7 @@
         <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: 'True', text: 'Yes' }, { val: 'False', text: 'No' }], valueExpr: 'val', displayExpr: 'text', value: _value, onFocusOut: function() { isEditable(false); } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() === "date" -->
-        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, format: 'date', onFocusOut: function() { isEditable(false); } }"></div>
+        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: 'date', onFocusOut: function() { isEditable(false); } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() !== "string" && $data.specifics() !== "bool" && $data.specifics() !== "date" && $data.specifics() !== "guid" -->
         <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: { on: isEditable }, dxNumberBox: { value: _value, onFocusOut: function() { isEditable(false); } }"></div>
@@ -662,6 +666,7 @@
             showTitle: true,
             width: '95%',
             height: '95%',
+            minWidth: 650,
             title: DevExpress.JS.Utils.getLocalization('FormatString Editor'),
             visible: popupVisible,
             toolbarItems: buttonItems,
@@ -832,7 +837,7 @@
 </script>
 
 <script type="text/html" id="dxrd-toolbox-template-base">
-    <div class="dxrd-toolbox-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
+    <div class="dxrd-toolbox-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false }">
         <!-- ko foreach: toolboxItems -->
         <div class="dxrd-toolbox-item" data-bind="attr: { title: type }">
             <div class="dxrd-image-padding" data-bind="css: imageClassName, draggable: $root.toolboxDragHandler"></div>
@@ -1080,6 +1085,10 @@
 
 <script type="text/html" id="dxrd-filterstring">
     <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath }"></div>
+</script>
+
+<script type="text/html" id="dxrd-filterstringgroup">
+    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath }"></div>
 </script>
 
 <script type="text/html" id="dxrd-formatstring">
