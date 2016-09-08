@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
+/*! DevExpress HTML/JS Designer - v16.1.6 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -13,6 +13,8 @@ var DevExpress;
             Report.pageRange = { propertyName: "pageRange", modelName: "@PageRange", displayName: "Page Range", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
             Report.expotOptionsTitle = { propertyName: "title", modelName: "@Title", displayName: "Title", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "Document" };
             Report.tableLayout = { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
+            Report.allowURLsWithJSContent = { propertyName: "allowURLsWithJSContent", modelName: "@AllowURLsWithJSContent", displayName: "Allow URLs with JS Content", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
+            Report.useHRefHyperlinks = { propertyName: "useHRefHyperlinks", modelName: "@UseHRefHyperlinks", displayName: "Use HRef Hyperlinks", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
             Report.removeSecondarySymbols = { propertyName: "removeSecondarySymbols", modelName: "@RemoveSecondarySymbols", displayName: "Remove Secondary Symbols", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
             Report.characterSet = {
                 propertyName: "characterSet",
@@ -352,6 +354,8 @@ var DevExpress;
                 Report.pageRange,
                 Report.expotOptionsTitle,
                 Report.tableLayout,
+                Report.useHRefHyperlinks,
+                Report.allowURLsWithJSContent,
                 Report.removeSecondarySymbols
             ];
             var htmlExportOptionsSerializationInfo = [Report.htmlExportMode, Report.embedImagesInHTML].concat(htmlExportOptionsSerializationInfoBase);
@@ -382,6 +386,8 @@ var DevExpress;
                 Report.expotOptionsTitle,
                 Report.characterSet,
                 Report.tableLayout,
+                Report.useHRefHyperlinks,
+                Report.allowURLsWithJSContent,
                 Report.removeSecondarySymbols
             ];
             var mhtExportOptionsSerializationInfo = [Report.htmlExportMode].concat(mhtExportOptionsSerializationInfoBase);
@@ -998,7 +1004,7 @@ var DevExpress;
                         return;
                     }
                     this.actualResolution = newResolution;
-                    var imageResolution = Math.round(newResolution * devicePixelRatio);
+                    var imageResolution = Math.round(newResolution * (window["devicePixelRatio"] || 1));
                     this.imageSrc(Preview.HandlerUri + "?actionKey=getPage&unifier=" + Preview.generateGuid() + "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution })));
                 };
                 return PreviewPage;
@@ -1965,6 +1971,7 @@ var DevExpress;
                     this.onSizeChanged = ko.observable();
                     this.previewVisible = ko.observable(false);
                     this.canSwitchToDesigner = true;
+                    this.allowURLsWithJSContent = false;
                     Preview.HandlerUri = handlerUri || Preview.HandlerUri;
                     this.previewHandlersHelper = previewHandlersHelper || new Preview.PreviewHandlersHelper(this);
                     this.requestWrapper = previewRequestWrapper || new Preview.PreviewRequestWrapper();
@@ -2061,9 +2068,15 @@ var DevExpress;
                     }
                     else {
                         deffered.resolve(true);
-                        window.open(actionUri + "?actionKey=exportTo&arg=" + args, "_blank");
+                        this._safelyRunWindowOpen(actionUri + "?actionKey=exportTo&arg=" + args);
                     }
                     return deffered.promise();
+                };
+                ReportPreview.prototype._safelyRunWindowOpen = function (url, target) {
+                    if (target === void 0) { target = "_blank"; }
+                    var newWindow = window.open(url, target);
+                    target === "_blank" && newWindow && (newWindow.opener = null);
+                    return newWindow;
                 };
                 ReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
                     var _self = this;
@@ -2083,8 +2096,12 @@ var DevExpress;
                                 }
                             }
                             else {
-                                var _target = brick.navigation.target || '_blank';
-                                brick.navigation.url && window.open(brick.navigation.url, _target);
+                                var validateUrl = function (url) {
+                                    return _self.allowURLsWithJSContent || (typeof url === "string" && (url.toLocaleLowerCase().indexOf("javascript:") === -1));
+                                };
+                                if (brick.navigation.url && validateUrl(brick.navigation.url)) {
+                                    _self._safelyRunWindowOpen(brick.navigation.url, brick.navigation.target || "_blank");
+                                }
                             }
                         }
                     };
@@ -2193,7 +2210,7 @@ var DevExpress;
                 };
                 ReportPreview.prototype.getExportResult = function (operationId, printDisposition) {
                     var arg = encodeURIComponent(JSON.stringify({ id: operationId, printable: !!printDisposition }));
-                    window.open(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg, "_blank");
+                    this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
                 };
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
@@ -2429,8 +2446,10 @@ var DevExpress;
                 return Math.min(zoomHeight, zoomWidth);
             }
             Preview.updatePreviewZoomWithAutoFit = updatePreviewZoomWithAutoFit;
-            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl) {
+            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, applyBindings, allowURLsWithJSContent) {
                 if (previewVisible === void 0) { previewVisible = true; }
+                if (applyBindings === void 0) { applyBindings = true; }
+                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
                 if (localization) {
                     DevExpress.JS.Localization.addCultureInfo({
                         messages: localization
@@ -2444,6 +2463,7 @@ var DevExpress;
                 var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks && callbacks.customizeParameterEditors));
                 var exportModel = new Preview.ExportOptionsModel(reportPreview);
                 reportPreview.canSwitchToDesigner = !previewVisible;
+                reportPreview.allowURLsWithJSContent = !!allowURLsWithJSContent;
                 previewWrapper.initialize(reportPreview, parametersModel, searchModel);
                 var tabPanel = new DevExpress.Designer.TabPanel([
                     parametersModel.tabInfo,
@@ -2480,7 +2500,7 @@ var DevExpress;
                     { templateName: 'dxrdp-surface', model: designerModel.reportPreview },
                     { templateName: 'dxrd-right-panel-template-base', model: designerModel }
                 ];
-                if (element && !reportPreview.canSwitchToDesigner) {
+                if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
                     $(element).children().remove();
                     ko.applyBindings(designerModel, element);
                 }
@@ -2498,8 +2518,8 @@ var DevExpress;
                 return designerModel;
             }
             Preview.createPreview = createPreview;
-            function createAndInitPreviewModel(viewerModel, element, callbacks, rtl) {
-                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, rtl);
+            function createAndInitPreviewModel(viewerModel, element, callbacks, rtl, applyBindings) {
+                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, rtl, applyBindings, viewerModel.allowURLsWithJSContent);
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
                 }
@@ -2976,6 +2996,14 @@ var DevExpress;
                             subscription.dispose();
                         });
                     });
+                }
+            };
+            ko.bindingHandlers['dxReportViewer'] = {
+                init: function (element, valueAccessor) {
+                    $(element).children().remove();
+                    var templateHtml = $('#dxrd-designer').text(), $element = $(element).append(templateHtml), values = ko.unwrap(valueAccessor());
+                    ko.applyBindings(values, $element.children()[0]);
+                    return { controlsDescendantBindings: true };
                 }
             };
         })(Preview = Report.Preview || (Report.Preview = {}));

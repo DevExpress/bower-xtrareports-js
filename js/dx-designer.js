@@ -1,7 +1,3 @@
-/*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
-* http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
-
 /*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
@@ -387,9 +383,10 @@ var DevExpress;
                 if (val) {
                     if (val instanceof Date)
                         return val;
-                    var date = Globalize["parseDate"](val, { raw: "MM/dd/yyyy HH:mm:ss" });
+                    var enGlobalize = new window["Globalize"]("en");
+                    var date = enGlobalize["parseDate"](val, { raw: "MM/dd/yyyy HH:mm:ss" });
                     if (!date)
-                        date = Globalize["parseDate"](val, { raw: "yyyy-MM-dd" });
+                        date = enGlobalize["parseDate"](val, { raw: "yyyy-MM-dd" });
                     return date;
                 }
                 return null;

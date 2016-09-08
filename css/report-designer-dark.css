@@ -1,8 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.1 - 2016-08-26
-* http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
-
-/*! DevExpress HTML/JS Designer - v16.1.5 - 2016-08-26
+/*! DevExpress HTML/JS Designer - v16.1.6 - 2016-08-26
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -8119,6 +8115,10 @@
   display: inline-block;
   line-height: normal;
   vertical-align: middle;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-control-content-select-main {
+  position: absolute;
+  display: inline-block;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-cross-band {
   position: absolute;
