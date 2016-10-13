@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.6 - 2016-08-26
+/*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -15,6 +15,8 @@ var DevExpress;
             Report.tableLayout = { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
             Report.allowURLsWithJSContent = { propertyName: "allowURLsWithJSContent", modelName: "@AllowURLsWithJSContent", displayName: "Allow URLs with JS Content", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
             Report.useHRefHyperlinks = { propertyName: "useHRefHyperlinks", modelName: "@UseHRefHyperlinks", displayName: "Use HRef Hyperlinks", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
+            Report.exportWatermarks = { propertyName: "exportWatermarks", modelName: "@ExportWatermarks", displayName: "Export Watermarks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            Report.inlineCss = { propertyName: "inlineCss", modelName: "@InlineCss", displayName: "Inline Css", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             Report.removeSecondarySymbols = { propertyName: "removeSecondarySymbols", modelName: "@RemoveSecondarySymbols", displayName: "Remove Secondary Symbols", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
             Report.characterSet = {
                 propertyName: "characterSet",
@@ -23,7 +25,6 @@ var DevExpress;
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 defaultVal: "utf-8",
                 values: {
-                    "utf-8": "utf-8",
                     "windows-1256": "Arabic (Windows)",
                     "iso-8859-4": "Baltic (ISO)",
                     "windows-1257": "Baltic (Windows)",
@@ -34,6 +35,7 @@ var DevExpress;
                     "windows-1251": "Cyrillic (Windows)",
                     "iso-8859-15": "Latin 9 (ISO)",
                     "utf-7": "Unicode (UTF-7)",
+                    "utf-8": "Unicode (UTF-8)",
                     "iso-8859-1": "Western European (ISO)",
                     "windows-1252": "Western European (Windows)"
                 }
@@ -347,7 +349,22 @@ var DevExpress;
                     }
                 }
             ];
-            var imageExportOptionsSerializationInfo = [Report.imageExportMode].concat(imageExportOptionsSerializationInfoBase);
+            var imageExportOptionsSerializationInfo = [Report.imageExportMode, { propertyName: "retainBackgroundTransparency", modelName: "@RetainBackgroundTransparency", displayName: "Retain Background Transparency", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, {
+                propertyName: "textRenderingMode",
+                modelName: "@TextRenderingMode",
+                displayName: "Text Rendering Mode",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                defaultVal: "SystemDefault",
+                from: Designer.fromEnum,
+                values: {
+                    "SystemDefault": "SystemDefault",
+                    "SingleBitPerPixelGridFit": "SingleBitPerPixelGridFit",
+                    "SingleBitPerPixel": "SingleBitPerPixel",
+                    "AntiAliasGridFit": "AntiAliasGridFit",
+                    "AntiAlias": "AntiAlias",
+                    "ClearTypeGridFit": "ClearTypeGridFit"
+                }
+            }].concat(imageExportOptionsSerializationInfoBase);
             var htmlExportOptionsSerializationInfoBase = [
                 Report.pageBorderColor,
                 Report.pageBorderWidth,
@@ -356,9 +373,11 @@ var DevExpress;
                 Report.tableLayout,
                 Report.useHRefHyperlinks,
                 Report.allowURLsWithJSContent,
-                Report.removeSecondarySymbols
+                Report.removeSecondarySymbols,
+                Report.exportWatermarks,
+                Report.characterSet
             ];
-            var htmlExportOptionsSerializationInfo = [Report.htmlExportMode, Report.embedImagesInHTML].concat(htmlExportOptionsSerializationInfoBase);
+            var htmlExportOptionsSerializationInfo = [Report.htmlExportMode, Report.embedImagesInHTML, Report.inlineCss].concat(htmlExportOptionsSerializationInfoBase);
             var HtmlExportOptions = (function () {
                 function HtmlExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -374,7 +393,7 @@ var DevExpress;
                     return htmlExportOptionsSerializationInfo;
                 };
                 HtmlExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return ((name === "pageRange") || (name === "pageBorderWidth")) && this.htmlExportMode() === "SingleFile";
+                    return ((name === "pageRange") || (name === "pageBorderWidth") || (name === "exportWatermarks")) && this.htmlExportMode() === "SingleFile";
                 };
                 return HtmlExportOptions;
             })();
@@ -388,9 +407,10 @@ var DevExpress;
                 Report.tableLayout,
                 Report.useHRefHyperlinks,
                 Report.allowURLsWithJSContent,
-                Report.removeSecondarySymbols
+                Report.removeSecondarySymbols,
+                Report.exportWatermarks
             ];
-            var mhtExportOptionsSerializationInfo = [Report.htmlExportMode].concat(mhtExportOptionsSerializationInfoBase);
+            var mhtExportOptionsSerializationInfo = [Report.htmlExportMode, Report.inlineCss].concat(mhtExportOptionsSerializationInfoBase);
             var MhtExportOptions = (function () {
                 function MhtExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -428,11 +448,12 @@ var DevExpress;
                 return PdfExportDocumentOptions;
             })();
             Report.PdfExportDocumentOptions = PdfExportDocumentOptions;
+            var author = { propertyName: "author", modelName: "@Author", displayName: "Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, application = { propertyName: "application", modelName: "@Application", displayName: "Application", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, title = { propertyName: "title", modelName: "@Title", displayName: "Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, subject = { propertyName: "subject", modelName: "@Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
             var pdfExportDocumentOptionsSerializationInfo = [
-                { propertyName: "author", modelName: "@Author", displayName: "Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "application", modelName: "@Application", displayName: "Application", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "title", modelName: "@Title", displayName: "Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "subject", modelName: "@Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                author,
+                application,
+                title,
+                subject,
                 { propertyName: "keywords", modelName: "@Keywords", displayName: "Keywords", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
             ];
             var PdfPermissionsOptions = (function () {
@@ -558,7 +579,7 @@ var DevExpress;
                 },
                 Report.pageRange,
                 { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "pdfPasswordSecurityOptions", modelName: "PdfPasswordSecurityOptions", displayName: "Pdf Password Security Options", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                { propertyName: "pdfPasswordSecurityOptions", modelName: "PasswordSecurityOptions", displayName: "Pdf Password Security Options", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var RtfExportOptions = (function () {
                 function RtfExportOptions(model, serializer) {
@@ -580,11 +601,16 @@ var DevExpress;
                 return RtfExportOptions;
             })();
             Report.RtfExportOptions = RtfExportOptions;
-            var rtfExportOptionsSerializationInfo = [
+            var rtfExportOptionsSerializationInfoBase = [
                 Report.rtfExportMode,
                 Report.pageRange,
-                { propertyName: "exportWatermarks", modelName: "@ExportWatermarks", displayName: "Export Watermarks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+                Report.exportWatermarks
             ];
+            var rtfExportOptionsSerializationInfo = [
+                { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+            ].concat(rtfExportOptionsSerializationInfoBase);
             var TextExportOptions = (function () {
                 function TextExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -608,6 +634,49 @@ var DevExpress;
                 { propertyName: "separator", modelName: "@Separator", displayName: "Separator", defaultVal: "TAB", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 Report.textExportMode
             ];
+            var documentOptionsSerializationsInfo = [
+                author,
+                application,
+                title,
+                subject,
+                { propertyName: "tags", modelName: "@Tags", displayName: "Tags", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "category", modelName: "@Category", displayName: "Category", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "comments", modelName: "@Comments", displayName: "Comments", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "company", modelName: "@Company", displayName: "Company", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+            ];
+            var documentOptions = { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", info: documentOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var xlsExportOptionsSerializationInfoCommon = [
+                { propertyName: "rasterizeImages", modelName: "@RasterizeImages", displayName: "Rasterize Images", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "rasterizationResolution", modelName: "@RasterizationResolution", displayName: "Rasterization Resolution", defaultVal: 96, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "fitToPrintedPageHeight", modelName: "@FitToPrintedPageHeight", displayName: "Fit To Printed Page Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                {
+                    propertyName: "ignoreErrors",
+                    modelName: "@IgnoreErrors",
+                    displayName: "Ignore Errors",
+                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    defaultVal: "None",
+                    from: Designer.fromEnum,
+                    values: {
+                        "None": "None",
+                        "NumberStoredAsText": "Number Stored As Text"
+                    }
+                },
+                {
+                    propertyName: "rightToLeftDocument",
+                    modelName: "@RightToLeftDocument",
+                    displayName: "Right To Left Document",
+                    defaultVal: "Default",
+                    from: Designer.fromEnum,
+                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    values: {
+                        "True": "True",
+                        "False": "False",
+                        "Default": "Default"
+                    }
+                },
+                documentOptions
+            ];
             var xlsExportOptionsSerializationInfoBase = [
                 Report.xlsExportHyperlinks,
                 Report.pageRange,
@@ -630,7 +699,7 @@ var DevExpress;
                     }
                 }
             ];
-            var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoBase);
+            var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
             var XlsExportOptions = (function () {
                 function XlsExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -659,7 +728,7 @@ var DevExpress;
                 Report.xlsShowGridLines,
                 Report.xlsTextExportMode
             ];
-            var xlsxExportOptionsSerializationInfo = [Report.xlsxExportMode].concat(xlsxExportOptionsSerializationInfoBase);
+            var xlsxExportOptionsSerializationInfo = [Report.xlsxExportMode].concat(xlsxExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
             var XlsxExportOptions = (function () {
                 function XlsxExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -697,12 +766,59 @@ var DevExpress;
                 return ExportOptions;
             })();
             Report.ExportOptions = ExportOptions;
+            var nativeFormatOptionsSerializationInfo = [
+                { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "showOptionsBeforeSave", modelName: "@ShowOptionsBeforeSave", displayName: "Show Options Before Save", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+            ];
+            var additionalRecipientSerializationsInfo = [
+                { propertyName: "ContactName", modelName: "@ContactName", displayName: "ContactName", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "Address", modelName: "@Address", displayName: "Address", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "Prefix", modelName: "@Prefix", displayName: "Prefix", defaultVal: "SMTP:", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                {
+                    propertyName: "fieldType",
+                    modelName: "@FieldType",
+                    displayName: "Field Type",
+                    defaultVal: "TO",
+                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    from: Designer.fromEnum,
+                    values: {
+                        "TO": "TO",
+                        "CC": "CC",
+                        "BCC": "BCC"
+                    }
+                },
+            ];
+            var AdditionalRecipientModel = (function () {
+                function AdditionalRecipientModel(model, serializer) {
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model);
+                }
+                AdditionalRecipientModel.prototype.getInfo = function () {
+                    return additionalRecipientSerializationsInfo;
+                };
+                AdditionalRecipientModel.createNew = function () {
+                    return new AdditionalRecipientModel({});
+                };
+                return AdditionalRecipientModel;
+            })();
+            Report.AdditionalRecipientModel = AdditionalRecipientModel;
+            Report.additionalRecipients = { propertyName: "additionalRecipients", modelName: "AdditionalRecipients", displayName: "Additional Recipients", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.AdditionalRecipientModel.createNew, template: '#dxrd-commonCollectionItem' };
+            var emailOptionsSerializationInfo = [
+                { propertyName: "recipientName", modelName: "@RecipientName", displayName: "Recipient Name", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "recipientAddress", modelName: "@RecipientAddress", displayName: "Recipient Address", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "recipientAddressPrefix", modelName: "@RecipientAddressPrefix", displayName: "Recipient Address Prefix", defaultVal: "SMTP:", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "subject", modelName: "@Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "body", modelName: "@Body", displayName: "Body", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                Report.additionalRecipients
+            ];
             var exportOptionsSerializationInfo = [
                 { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                { propertyName: "email", modelName: "Email", displayName: "E-mail Options", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: emailOptionsSerializationInfo },
                 { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: HtmlExportOptions.from, toJsonObject: HtmlExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: ImageExportOptions.from, toJsonObject: ImageExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "mailMessage", modelName: "MailMessage", displayName: "Mail Message Export Options", from: MhtExportOptions.from, toJsonObject: MhtExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: MhtExportOptions.from, toJsonObject: MhtExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                { propertyName: "nativeFormat", modelName: "NativeFormat", displayName: "Native Format Options", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: nativeFormatOptionsSerializationInfo },
                 { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: RtfExportOptions.from, toJsonObject: RtfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
@@ -763,6 +879,24 @@ var DevExpress;
                 return MhtExportOptionsPreview;
             })(MhtExportOptions);
             Report.MhtExportOptionsPreview = MhtExportOptionsPreview;
+            var rtfExportOptionsSerializationInfoPreview = [].concat(rtfExportOptionsSerializationInfoBase);
+            var RtfExportOptionsPreview = (function (_super) {
+                __extends(RtfExportOptionsPreview, _super);
+                function RtfExportOptionsPreview() {
+                    _super.apply(this, arguments);
+                }
+                RtfExportOptionsPreview.from = function (model, serializer) {
+                    return new RtfExportOptionsPreview(model || {}, serializer);
+                };
+                RtfExportOptionsPreview.toJson = function (value, serializer, refs) {
+                    return serializer.serialize(value, rtfExportOptionsSerializationInfoPreview, refs);
+                };
+                RtfExportOptionsPreview.prototype.getInfo = function () {
+                    return rtfExportOptionsSerializationInfoPreview;
+                };
+                return RtfExportOptionsPreview;
+            })(RtfExportOptions);
+            Report.RtfExportOptionsPreview = RtfExportOptionsPreview;
             var xlsExportOptionsSerializationInfoPreview = [Report.xlsExportModePreview].concat(xlsExportOptionsSerializationInfoBase);
             var XlsExportOptionsPreview = (function (_super) {
                 __extends(XlsExportOptionsPreview, _super);
@@ -822,7 +956,7 @@ var DevExpress;
                 { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: ImageExportOptionsPreview.from, toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: MhtExportOptionsPreview.from, toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: RtfExportOptions.from, toJsonObject: RtfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: RtfExportOptionsPreview.from, toJsonObject: RtfExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: XlsExportOptionsPreview.from, toJsonObject: XlsExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptionsPreview.from, toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
@@ -1503,7 +1637,7 @@ var DevExpress;
                 };
                 ParameterHelper.prototype.getItemsSource = function (items) {
                     return items ? new DevExpress.data.DataSource({
-                        store: new DevExpress.Designer.SortedArrayStore(items),
+                        store: new DevExpress.Designer.SortedArrayStore(items, "displayValue"),
                         pageSize: 100
                     }) : items;
                 };
@@ -3293,7 +3427,7 @@ var DevExpress;
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'getDocumentData', encodeURIComponent(documentId));
                 };
                 PreviewRequestWrapper.prototype.openReport = function (reportName) {
-                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName));
+                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName), Preview.MessageHandler.processError);
                 };
                 PreviewRequestWrapper.prototype.getStartExportOperation = function (arg) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'startExport', arg);

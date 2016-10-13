@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.6 - 2016-08-26
+/*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -2579,9 +2579,6 @@
 }
 .dxrd-designer-wrapper .dxrd-right-tabs .dxrd-tab-item-active {
   background-color: #ffffff;
-}
-.dxrd-designer-wrapper .dxrd-right-tabs-border {
-  border-top: 1px solid #e5e5e5;
 }
 .dxrd-designer-wrapper .dxrd-transform-origin-left-top {
   -moz-transform-origin: 0% 0%;

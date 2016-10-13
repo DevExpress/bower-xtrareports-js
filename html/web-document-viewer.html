@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.6 - 2016-08-26
+<!-- /*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
  -->
@@ -833,7 +833,7 @@
 </script>
 
 <script type="text/html" id="dxrd-toolbox-template-base">
-    <div class="dxrd-toolbox-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false }">
+    <div class="dxrd-toolbox-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false, bounceEnabled: false, useNative: false, scrollByThumb: true }">
         <!-- ko foreach: toolboxItems -->
         <div class="dxrd-toolbox-item" data-bind="attr: { title: type }">
             <div class="dxrd-image-padding" data-bind="css: imageClassName, draggable: $root.toolboxDragHandler"></div>
@@ -879,7 +879,7 @@
         <!-- /ko -->
     </div>
 
-    <div class="dxrd-right-tabs" data-bind="css: { 'dxrd-right-tabs-border': tabPanel.collapsed() }">
+    <div class="dxrd-right-tabs">
         <!-- ko foreach: tabPanel.tabs -->
         <div class="dxrd-tab-item" data-bind="dxAction: $parent.tabPanel.selectTab, css: { 'dxrd-tab-item-active': active }, attr: { title: text }, visible: visible">
             <div class="dxrd-image-padding" data-bind="css: imageClassName"></div>
@@ -973,7 +973,7 @@
     }">
         </div>
         <!-- /ko -->
-        <div class="dxrd-properties-grid" data-bind="dxScrollView: { showScrollbar: 'onHover' }, styleunit: { top: $root.controlsStore.visible() ? 90 : 40 }">
+        <div class="dxrd-properties-grid" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }, styleunit: { top: $root.controlsStore.visible() ? 90 : 40 }">
             <!-- ko template: { name: 'dxrd-top-grid', data: { contextActions: $root.contextActions, popularProperties: $root.popularProperties, collapsed: ko.observable(false), popularVisible: $root.popularVisible } } -->
             <!-- /ko -->
             <!-- ko foreach: groups -->
@@ -1179,7 +1179,7 @@
     </div>
     <!-- ko if: model -->
     <!-- ko with: model -->
-    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
+    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }">
         <div id="documentMapTree" data-bind="treelist: documentMapOptions" style="width:100%; height: 100%;"></div>
     </div>
     <!-- /ko -->
@@ -1192,7 +1192,7 @@
         <span data-bind="text: DevExpress.Designer.getLocalization('Export Options')"></span>
     </div>
     <!-- ko if: model-->
-    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
+    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }">
         <div class="dx-fieldset">
             <div data-bind="template: { name: 'dx-propertieseditor', data: new DevExpress.JS.Widgets.ObjectProperties(model) }"></div>
         </div>
@@ -1226,7 +1226,7 @@
     <div class="dxrd-group-header-parameters-empty" data-bind="text: DevExpress.Designer.getLocalization('The report does not contain any parameters.')"></div>
     <!-- /ko -->
     <!-- ko if: (model && !model.isEmpty()) -->
-    <div class="dxrd-right-panel-body" id="propertiesPanel" data-bind="dxScrollView: { showScrollbar: 'onHover' }, dxValidationGroup: {}">
+    <div class="dxrd-right-panel-body" id="propertiesPanel" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }, dxValidationGroup: {}">
         <div class="dx-fieldset">
             <div data-bind="template: { name: 'dx-propertieseditor', data: new DevExpress.JS.Widgets.ObjectProperties(ko.observable(model)) }"></div>
         </div>
@@ -1243,7 +1243,7 @@
     <div class="dxrd-preview-search-tab-header">
         <span class="dxrd-preview-search-tab-header-text" data-bind="text: DevExpress.Designer.getLocalization('Search')"></span>
         <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: function() { return $data; } } "></div>
-        <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: DevExpress.Designer.getLocalization('Match Case')}"></div>
+        <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: DevExpress.Designer.getLocalization('Match case')}"></div>
         <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: DevExpress.Designer.getLocalization('Match whole word only')}"></div>
     </div>
     <div class="dxrd-preview-search-result-header">
@@ -1334,7 +1334,7 @@
 </script>
 
 <script type="text/html" id="dxrd-preview-toolbar-scrollable">
-    <div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: 'onHover', direction: 'horizontal'}">
+    <div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: 'onHover', direction: 'horizontal', useNative: false, scrollByThumb: true }">
         <div class="dxrd-toolbar" data-bind="template: {name: 'dxrd-toolbar-tmplt', data: actionLists.toolbarItems }"></div>
     </div>
 </script>
