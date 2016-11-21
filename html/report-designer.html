@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
+<!-- /*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
  -->
@@ -520,7 +520,7 @@
 <script id="dx-filtereditor-common" type="text/html">
     <!-- ko template: contentTemplateName -->
     <!-- /ko -->
-    <!-- ko if: $data.leftPart.condition -->
+    <!-- ko if: $data.leftPart && $data.leftPart.condition -->
     <div class="criteria-operator-content">
         <!-- ko with: leftPart-->
         <!-- ko with: condition-->
@@ -635,6 +635,14 @@
                 <div class="criteria-operator-action-image dx-image-filtereditor-add"></div>
             </div>
         </div>
+    </div>
+</script>
+
+
+<script id="dx-filtereditor-function-lightweight" type="text/html">
+    <div class="criteria-operator-text" data-bind="css: css">
+        <div class="criteria-operator-text" data-bind="text: displayType"></div>
+        <div data-bind="service: { name: 'createChangeValueType' }"></div>
     </div>
 </script>
 
@@ -1150,7 +1158,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { items: displayItems, itemTemplate: 'valueItem', onFocusOut: updateValue, value: selectedValuesString, displayExpr: function() { return selectedValuesString(); } }">
+    <div data-bind="dxSelectBox: { dataSource: displayItems, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: selectedValuesString, displayExpr: function() { return selectedValuesString(); } }">
         <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
             <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
             <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
@@ -2115,7 +2123,7 @@
     <!-- ko if: (model && !model.isEmpty()) -->
     <div class="dxrd-right-panel-body" id="propertiesPanel" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }, dxValidationGroup: {}">
         <div class="dx-fieldset">
-            <div data-bind="template: { name: 'dx-propertieseditor', data: new DevExpress.JS.Widgets.ObjectProperties(ko.observable(model)) }"></div>
+            <div data-bind="template: { name: 'dx-propertieseditor', data: function(){ return new DevExpress.JS.Widgets.ObjectProperties(ko.observable(model)); }}"></div>
         </div>
         <div class="dxrd-preview-parameter-action dxrdp-parameters-submit" data-bind="dxButton: { text: DevExpress.Designer.getLocalization('Submit'), onClick: function(params){ var result = params.validationGroup && params.validationGroup.validate && params.validationGroup.validate(); if(!result || result.isValid) { model.submit(); } } }"></div>
         <div class="dxrd-preview-parameter-action dxrdp-parameters-reset" data-bind="dxButton: { text: DevExpress.Designer.getLocalization('Reset'), onClick: function() { model.restore(); } }"></div>

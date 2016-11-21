@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
+/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -1008,7 +1008,7 @@ var DevExpress;
                     this.isClientVisible = ko.observable(false);
                     this.originalHeight = ko.observable(0);
                     this.originalWidth = ko.observable(0);
-                    this.loadingText = "Loading...";
+                    this.loadingText = DevExpress.Designer.getLocalization("Loading...");
                     this.realZoom = ko.observable(1);
                     this.actualResolution = 0;
                     this.pageLoadFailed = ko.observable(false);
@@ -1162,24 +1162,27 @@ var DevExpress;
                 function SearchViewModel(reportPreview) {
                     var _this = this;
                     _super.call(this);
-                    this._cachedRequests = {};
-                    this._cachedWholeWordRequests = {};
-                    this._cachedCaseSensitiveRequests = {};
-                    this._cachedWholeWordWithCaseRequests = {};
                     this.actions = [];
                     this.focusRequested = ko.observable(true);
                     this.matchWholeWord = ko.observable(false);
                     this.matchCase = ko.observable(false);
                     this.searchUp = ko.observable(false);
-                    this.searchText = ko.observable("");
-                    this.searchResult = ko.observable([]);
+                    this.searchText = ko.observable();
+                    this.searchResult = ko.observable();
                     this.loading = ko.observable(false);
+                    this.resetSearchResult();
                     this._resultNavigator = SearchViewModel.createResultNavigator(this, reportPreview);
                     this.clean = function () {
                         _this.searchText("");
                     };
                     var lastMatchCase = this.matchCase();
                     var lastMatchWholeWord = this.matchWholeWord();
+                    this._disposables.push(reportPreview._currentDocumentId.subscribe(function (newVal) {
+                        _this.resetSearchResult();
+                    }));
+                    this._disposables.push(reportPreview._currentReportId.subscribe(function (newVal) {
+                        _this.resetSearchResult();
+                    }));
                     this.findUp = function () {
                         _this.searchUp(true);
                         _this.findNext();
@@ -1251,6 +1254,14 @@ var DevExpress;
                         newVal && setTimeout(function () { return _this.focusRequested.notifySubscribers(); }, 100);
                     }));
                 }
+                SearchViewModel.prototype.resetSearchResult = function () {
+                    this._cachedRequests = {};
+                    this._cachedWholeWordRequests = {};
+                    this._cachedCaseSensitiveRequests = {};
+                    this._cachedWholeWordWithCaseRequests = {};
+                    this.searchResult([]);
+                    this.searchText("");
+                };
                 SearchViewModel.prototype.findTextRequestDone = function (result, cache) {
                     this.loading(false);
                     if (!result) {
@@ -1364,30 +1375,37 @@ var DevExpress;
                 function dxSearchEditor(element, options) {
                     this._activeStateUnit = EDITOR_BUTTON_SELECTOR;
                     var _self = this;
-                    var searchModel = options && options.searchModel;
+                    var searchModel = null;
                     this._focusRequestRaised = function () {
                         _self.focus();
                     };
-                    searchModel().focusRequested.subscribe(function (val) { return _self._focusRequestRaised(); });
                     options["onEnterKey"] = function (e) {
                         if (DevExpress.browser && DevExpress.browser.msie && e && e.component) {
                             e.component.blur();
                             e.component.focus();
                         }
-                        _self.findNext(searchModel, e && e.jQueryEvent && e.jQueryEvent.shiftKey);
+                        var text = e.component.option("text");
+                        var _searchModel = searchModel && searchModel();
+                        if (_searchModel && (_searchModel.searchText() != text))
+                            _searchModel.searchText(text);
+                        else
+                            _self.findNext(searchModel, e && e.jQueryEvent && e.jQueryEvent.shiftKey);
                     };
                     _super.call(this, element, options);
+                    searchModel = options && options.searchModel;
+                    searchModel().focusRequested.subscribe(function (val) { return _self._focusRequestRaised(); });
                 }
                 dxSearchEditor.prototype.findNext = function (searchModel, searchUp) {
-                    if (!searchModel || !searchModel()) {
+                    var _searchModel = null;
+                    if (!searchModel || !(_searchModel = searchModel())) {
                         return false;
                     }
                     try {
                         if (searchUp) {
-                            (searchModel().loading && !searchModel().loading()) && searchModel().findUp();
+                            (_searchModel.loading && !_searchModel.loading()) && _searchModel.findUp();
                         }
                         else {
-                            (searchModel().loading && !searchModel().loading()) && searchModel().findDown();
+                            (_searchModel.loading && !_searchModel.loading()) && _searchModel.findDown();
                         }
                     }
                     finally {
@@ -1581,23 +1599,29 @@ var DevExpress;
                     }
                     return (value instanceof Date) ? dateConverter(value) : value;
                 };
-                ParameterHelper.prototype.initialize = function (knownEnums, _customizeParameterEditors) {
+                ParameterHelper.prototype.initialize = function (knownEnums, callbacks) {
                     if (arguments.length > 0) {
                         this._knownEnums = knownEnums;
-                        if (arguments.length > 1) {
-                            this._customizeParameterEditors(_customizeParameterEditors);
+                        if (callbacks) {
+                            callbacks.customizeParameterEditors && this._customizeParameterEditors(callbacks.customizeParameterEditors);
+                            callbacks.customizeParameterLookUpSource && (this.customizeParameterLookUpSource = callbacks.customizeParameterLookUpSource);
                         }
                     }
                 };
                 ParameterHelper.prototype.createInfo = function (parameter) {
                     var parameterDescriptor = parameter.getParameterDescriptor();
                     var typeString = this.isEnumType(parameter) ? "Enum" : ko.unwrap(parameterDescriptor.type);
-                    return {
+                    var info = {
                         propertyName: "value",
                         displayName: parameterDescriptor["displayName"],
-                        editor: DevExpress.Designer.getEditorType(typeString),
-                        valueStore: this.getWrappedValueCollection(parameter)
+                        editor: DevExpress.Designer.getEditorType(typeString)
                     };
+                    this.assignValueStore(info, parameter);
+                    return info;
+                };
+                ParameterHelper.prototype.assignValueStore = function (info, parameter) {
+                    var items = this.getEnumCollection(parameter);
+                    info['valueStore'] = this.getItemsSource(parameter.getParameterDescriptor(), items, true);
                 };
                 ParameterHelper.prototype.createMultiValue = function (parameter, value) {
                     var newValue = ko.observable();
@@ -1618,11 +1642,19 @@ var DevExpress;
                 ParameterHelper.prototype.isEnumType = function (parameter) {
                     return this._isKnownEnumType(ko.unwrap(parameter.type));
                 };
-                ParameterHelper.prototype.getWrappedValueCollection = function (parameter) {
-                    var items = this.getValueCollection(parameter);
-                    return this.getItemsSource(items);
+                ParameterHelper.prototype.getItemsSource = function (parameterDescriptor, items, sort) {
+                    if (items) {
+                        var newItems;
+                        if (this.customizeParameterLookUpSource)
+                            newItems = this.customizeParameterLookUpSource(parameterDescriptor, items.slice(0));
+                        return newItems ? newItems : new DevExpress.data.DataSource({
+                            store: sort ? new DevExpress.Designer.SortedArrayStore(items, "displayValue") : new DevExpress.data.ArrayStore(items),
+                            pageSize: 100
+                        });
+                    }
+                    return items;
                 };
-                ParameterHelper.prototype.getValueCollection = function (parameter) {
+                ParameterHelper.prototype.getEnumCollection = function (parameter) {
                     var type = ko.unwrap(parameter.type);
                     if (this._isKnownEnumType(type)) {
                         var currentKnownEnumInfo = this._knownEnums.filter(function (knownEnumType) {
@@ -1634,12 +1666,6 @@ var DevExpress;
                             });
                         }
                     }
-                };
-                ParameterHelper.prototype.getItemsSource = function (items) {
-                    return items ? new DevExpress.data.DataSource({
-                        store: new DevExpress.Designer.SortedArrayStore(items, "displayValue"),
-                        pageSize: 100
-                    }) : items;
                 };
                 ParameterHelper.prototype.getParameterInfo = function (parameter) {
                     var _this = this;
@@ -1666,9 +1692,9 @@ var DevExpress;
             Preview.ParameterHelper = ParameterHelper;
             var PreviewParameterHelper = (function (_super) {
                 __extends(PreviewParameterHelper, _super);
-                function PreviewParameterHelper(knownEnums, customizeParameterEditors) {
+                function PreviewParameterHelper(knownEnums, callbacks) {
                     _super.call(this);
-                    this.initialize(knownEnums, customizeParameterEditors);
+                    this.initialize(knownEnums, callbacks);
                 }
                 PreviewParameterHelper.prototype.mapLookUpValues = function (type, lookUpValues) {
                     var converter = this.getValueConverter(type);
@@ -1680,28 +1706,39 @@ var DevExpress;
                     return propertyName.replace(/\./g, '_');
                 };
                 PreviewParameterHelper.prototype.createInfo = function (parameter) {
-                    var _helper = this;
                     var info = _super.prototype.createInfo.call(this, parameter);
                     info.propertyName = PreviewParameterHelper.fixPropertyName(parameter.path);
                     if (parameter.type === "System.DateTime") {
                         info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty') }];
                     }
-                    Object.defineProperty(info, 'valueStore', {
-                        get: function () {
-                            var items = [];
-                            if (parameter.isFilteredLookUpSettings || parameter.lookUpValues() && parameter.lookUpValues().length !== 0) {
-                                items = parameter.lookUpValues();
-                            }
-                            else {
-                                items = _helper.getValueCollection(parameter);
-                            }
-                            return _helper.getItemsSource(items);
-                        },
-                        set: function (values) {
-                            parameter.lookUpValues(values);
-                        }
-                    });
                     return info;
+                };
+                PreviewParameterHelper.prototype.assignValueStore = function (info, parameter) {
+                    var _helper = this;
+                    if (!parameter.isMultiValueWithLookUp) {
+                        Object.defineProperty(info, 'valueStore', {
+                            get: function () {
+                                var items = [];
+                                var needSorting = false;
+                                if (parameter.isFilteredLookUpSettings || parameter.lookUpValues() && parameter.lookUpValues().length !== 0) {
+                                    items = parameter.lookUpValues();
+                                }
+                                else {
+                                    items = _helper.getEnumCollection(parameter);
+                                    needSorting = true;
+                                }
+                                if (parameter.valueStoreCache)
+                                    return parameter.valueStoreCache;
+                                var itemsSource = _helper.getItemsSource(parameter.getParameterDescriptor(), items, needSorting);
+                                if (itemsSource)
+                                    parameter.valueStoreCache = itemsSource;
+                                return itemsSource;
+                            },
+                            set: function (values) {
+                                parameter.lookUpValues(values);
+                            }
+                        });
+                    }
                 };
                 PreviewParameterHelper.prototype.isEnumType = function (parameter) {
                     return parameter.isFilteredLookUpSettings || !!parameter.lookUpValues() || _super.prototype.isEnumType.call(this, parameter);
@@ -1724,6 +1761,7 @@ var DevExpress;
                     _super.call(this);
                     this.valueInfo = ko.observable();
                     this.lookUpValues = ko.observableArray();
+                    this.valueStoreCache = null;
                     this.multiValueInfo = ko.observable();
                     this.type = parameterInfo.TypeString;
                     this.path = parameterInfo.Path;
@@ -1731,6 +1769,9 @@ var DevExpress;
                     this.isFilteredLookUpSettings = parameterInfo.IsFilteredLookUpSettings;
                     this._originalLookUpValues = parameterInfo.LookUpValues ? parameterHelper.mapLookUpValues(this.type, parameterInfo.LookUpValues || []) : null;
                     this.lookUpValues(this._originalLookUpValues);
+                    this.lookUpValues.subscribe(function () {
+                        _this.valueStoreCache = null;
+                    });
                     this.isMultiValue = parameterInfo.MultiValue;
                     this.isMultiValueWithLookUp = this.isMultiValue && !!this.lookUpValues();
                     this.getParameterDescriptor = function () {
@@ -1766,7 +1807,13 @@ var DevExpress;
                         this.safeAssignObservable("_value", ko.observableArray((value || []).map(function (arrayItem) {
                             return parameterHelper.getValueConverter(_this.type)(arrayItem);
                         })));
-                        this.safeAssignObservable("value", ko.observable(new DevExpress.Designer.Widgets.MultiValuesHelper(this._value, this.lookUpValues())));
+                        var multiValuesHelper = new DevExpress.Designer.Widgets.MultiValuesHelper(this._value, this.lookUpValues());
+                        var newItems;
+                        if (parameterHelper.customizeParameterLookUpSource)
+                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems.slice(0));
+                        if (newItems)
+                            multiValuesHelper.displayItems = newItems;
+                        this.safeAssignObservable("value", ko.observable(multiValuesHelper));
                     }
                     else if (this.isMultiValue) {
                         this.safeAssignObservable("value", parameterHelper.createMultiValueArray(value, this));
@@ -1881,7 +1928,7 @@ var DevExpress;
                         parameter.initialize(_parameterValuesContainedInLookUps.length > 0 ? _parameterValuesContainedInLookUps : [], this.parameterHelper);
                     }
                     else {
-                        parameter.initialize(_parameterValuesContainedInLookUps[0] && _parameterValuesContainedInLookUps[0].Value || assignFirstLookUpValue && lookUpValues.length > 0 ? lookUpValues[0].Value : null, this.parameterHelper);
+                        parameter.initialize(_parameterValuesContainedInLookUps[0] && _parameterValuesContainedInLookUps[0].Value || (assignFirstLookUpValue && lookUpValues.length > 0 ? lookUpValues[0].Value : null), this.parameterHelper);
                     }
                 };
                 PreviewParametersViewModel.prototype._getParameterValuesContainedInLookups = function (parameterLookUpValues, parameter) {
@@ -2594,7 +2641,7 @@ var DevExpress;
                 var reportPreview = new ReportPreview(handlerUri, previewWrapper, undefined, rtl);
                 var searchModel = new Preview.SearchViewModel(reportPreview);
                 var documentMapModel = new Preview.DocumentMapModel(reportPreview);
-                var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks && callbacks.customizeParameterEditors));
+                var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks));
                 var exportModel = new Preview.ExportOptionsModel(reportPreview);
                 reportPreview.canSwitchToDesigner = !previewVisible;
                 reportPreview.allowURLsWithJSContent = !!allowURLsWithJSContent;

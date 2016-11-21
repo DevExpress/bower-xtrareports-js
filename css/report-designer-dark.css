@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
+/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -5279,11 +5279,11 @@
 .dx-treelist-item:hover .dx-image-fieldlist-calcfloat {
   background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6I2ZmZmZmZjt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCAwdjIyaDIyVjBIMHptOCAxNkgydi0yaDJ2LTRIMlY4aDJWNmgydjhoMnYyem00IDBoLTJ2LTJoMnYyem04LTh2MmgtMnYyaC0ydjJoNHYyaC02di00aDJ2LTJoMlY4aC00VjZoNnYyeiIvPjwvc3ZnPg==");
 }
-.dx-image-fieldlist-calcnumber {
+.dx-image-fieldlist-calcinteger {
   background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6I2E4YTlhODt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCAwdjIyaDIyVjBIMHptNiAxNkg0di02SDJWOGgyVjZoMnYxMHptNi05djNoLTJ2NGgydjJIOHYtNmgyVjhIOFY2aDR2MXptOCAwdjloLTZ2LTJoNHYtMmgtMnYtMmgyVjhoLTRWNmg2djF6Ii8+PC9zdmc+");
   background-repeat: no-repeat;
 }
-.dx-treelist-item:hover .dx-image-fieldlist-calcnumber {
+.dx-treelist-item:hover .dx-image-fieldlist-calcinteger {
   background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6I2ZmZmZmZjt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCAwdjIyaDIyVjBIMHptNiAxNkg0di02SDJWOGgyVjZoMnYxMHptNi05djNoLTJ2NGgydjJIOHYtNmgyVjhIOFY2aDR2MXptOCAwdjloLTZ2LTJoNHYtMmgtMnYtMmgyVjhoLTRWNmg2djF6Ii8+PC9zdmc+");
 }
 .dx-image-fieldlist-calcstring {

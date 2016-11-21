@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.7 - 2016-10-10
+/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -280,87 +280,65 @@ var DevExpress;
                 "mm": "Millimetr"
             };
             var FontModel = (function () {
-                function FontModel(object) {
+                function FontModel(value) {
                     var _this = this;
-                    this.modificators = {
-                        bold: null,
-                        italic: null,
-                        underline: null,
-                        strikeout: null
-                    };
                     this.family = ko.observable("Times New Roman");
                     this.unit = ko.observable("pt");
+                    this.isUpdateModel = false;
                     this.size = ko.observable(9);
-                    this.modificators.bold = ko.observable(false);
-                    this.modificators.italic = ko.observable(false);
-                    this.modificators.strikeout = ko.observable(false);
-                    this.modificators.underline = ko.observable(false);
-                    var isUpdated = false;
-                    ko.computed(function () {
-                        if (isUpdated)
-                            return;
-                        isUpdated = true;
-                        try {
-                            if (object.value()) {
-                                var components = object.value().split(',');
-                                var family = components[0];
-                                var size;
-                                var unit;
-                                var bold = false;
-                                var italic = false;
-                                var underline = false;
-                                var strikeout = false;
-                                Object.keys(Widgets.availableUnits).forEach(function (element) {
-                                    if (components[1].indexOf(element) != -1) {
-                                        size = parseFloat(components[1].split(element)[0]);
-                                        unit = element;
-                                    }
-                                });
-                                if (components.length > 2) {
-                                    for (var i = 2; i < components.length; i++) {
-                                        if (components[i].indexOf("Bold") != -1)
-                                            bold = true;
-                                        if (components[i].indexOf("Italic") != -1)
-                                            italic = true;
-                                        if (components[i].indexOf("Underline") != -1)
-                                            underline = true;
-                                        if (components[i].indexOf("Strikeout") != -1)
-                                            strikeout = true;
-                                    }
-                                }
-                                _this.family(family);
-                                _this.unit(unit);
-                                _this.size(size);
-                                _this.modificators.bold(bold);
-                                _this.modificators.italic(italic);
-                                _this.modificators.underline(underline);
-                                _this.modificators.strikeout(strikeout);
-                            }
-                        }
-                        finally {
-                            isUpdated = false;
-                        }
+                    this.modificators = {
+                        bold: ko.observable(false),
+                        italic: ko.observable(false),
+                        strikeout: ko.observable(false),
+                        underline: ko.observable(false)
+                    };
+                    this.updateModel(value());
+                    value.subscribe(function (newVal) {
+                        _this.isUpdateModel = true;
+                        _this.updateModel(newVal);
+                        _this.isUpdateModel = false;
                     });
-                    ko.computed(function () {
-                        var result = _this.family() + ", " + _this.size() + _this.unit();
-                        if (_this.modificators.bold() || _this.modificators.italic() || _this.modificators.strikeout() || _this.modificators.underline()) {
-                            result += ", style=";
-                            var styles = [];
-                            if (_this.modificators.bold())
-                                styles.push("Bold");
-                            if (_this.modificators.italic())
-                                styles.push("Italic");
-                            if (_this.modificators.underline())
-                                styles.push("Underline");
-                            if (_this.modificators.strikeout())
-                                styles.push("Strikeout");
-                            result += styles.join(', ');
-                        }
-                        if (!isUpdated) {
-                            object.value(result);
-                        }
-                    });
+                    this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.family.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.size.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.unit.subscribe(function (newVal) { return _this.updateValue(value); });
                 }
+                FontModel.prototype.updateModel = function (value) {
+                    if (value) {
+                        var components = value.split(',');
+                        this.family(components[0]);
+                        var self = this;
+                        Object.keys(Widgets.availableUnits).forEach(function (element) {
+                            if (components[1].indexOf(element) != -1) {
+                                self.size(parseFloat(components[1].split(element)[0]));
+                                self.unit(element);
+                            }
+                        });
+                        this.modificators.bold(value.indexOf("Bold") !== -1);
+                        this.modificators.italic(value.indexOf("Italic") !== -1);
+                        this.modificators.underline(value.indexOf("Underline") !== -1);
+                        this.modificators.strikeout(value.indexOf("Strikeout") !== -1);
+                    }
+                };
+                FontModel.prototype.updateValue = function (value) {
+                    if (!this.isUpdateModel) {
+                        var leftPart = [this.family(), this.size() + this.unit()].join(", ");
+                        var modificators = [];
+                        if (this.modificators.bold())
+                            modificators.push("Bold");
+                        if (this.modificators.italic())
+                            modificators.push("Italic");
+                        if (this.modificators.underline())
+                            modificators.push("Underline");
+                        if (this.modificators.strikeout())
+                            modificators.push("Strikeout");
+                        var rightPart = modificators.join(', ');
+                        value(!!rightPart ? [leftPart, rightPart].join(", style=") : leftPart);
+                    }
+                };
                 return FontModel;
             })();
             Widgets.FontModel = FontModel;
@@ -684,16 +662,19 @@ var DevExpress;
                         defaultValue = ko.observableArray();
                     }
                     this.values = ko.computed(function () {
-                        if (_this.info().valueStore) {
-                            return _this.info().valueStore;
+                        var _values = _this.info().valueStore;
+                        if (_values) {
+                            return _values;
                         }
-                        if (_this.info().values) {
-                            return $.map(_this.info().values, function (displayValue, value) {
+                        _values = _this.info().values;
+                        if (_values) {
+                            return $.map(_values, function (displayValue, value) {
                                 return { value: value, displayValue: displayValue };
                             });
                         }
-                        if (_this.info().valuesArray) {
-                            return $.map(_this.info().valuesArray, function (value) {
+                        _values = _this.info().valuesArray;
+                        if (_values) {
+                            return $.map(_values, function (value) {
                                 return { value: value.value, displayValue: value.displayValue };
                             });
                         }
@@ -827,7 +808,7 @@ var DevExpress;
                 __extends(FontEditor, _super);
                 function FontEditor(info, level, parentDisabled) {
                     _super.call(this, info, level, parentDisabled);
-                    var model = new Widgets.FontModel({ value: this.value });
+                    var model = new Widgets.FontModel(this.value);
                     var grid = new ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, level + 1, this.disabled);
                     this.viewmodel = grid;
                 }
@@ -1219,41 +1200,6 @@ var DevExpress;
                     console.warn(msg);
                 }
             }
-            function propertiesVisitorInfo(target, info, visitor) {
-                if (target) {
-                    var properties = [];
-                    if (target instanceof Array) {
-                        for (var i = 0; i < target.length; i++) {
-                            properties.push(target[i]);
-                            propertiesVisitorInfo(target[i], target[i].getInfo && target[i].getInfo(), visitor);
-                        }
-                    }
-                    else {
-                        if (info) {
-                            for (var i = 0; i < info.length; i++) {
-                                if (info[i] && (info[i].modelName || info[i].editor || info[i].info)) {
-                                    var propertyName = info[i].propertyName;
-                                    if (propertyName.indexOf("_") !== 0) {
-                                        var realPropertyName = propertyName;
-                                        if (ko.isWriteableObservable(target["_" + propertyName])) {
-                                            realPropertyName = "_" + realPropertyName;
-                                        }
-                                        if (!ko.isComputed(target[realPropertyName])) {
-                                            properties.push(target[realPropertyName]);
-                                            if (!info[i].link) {
-                                                var item = ko.unwrap(target[realPropertyName]);
-                                                propertiesVisitorInfo(item, item && item.getInfo && item.getInfo() || info[i].info, visitor);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    visitor(properties);
-                }
-            }
-            Utils.propertiesVisitorInfo = propertiesVisitorInfo;
             function propertiesVisitor(target, visitor, visited, skip) {
                 if (visited === void 0) { visited = []; }
                 if (skip === void 0) { skip = ["surface"]; }
@@ -1285,6 +1231,7 @@ var DevExpress;
                 function UndoEngine(target, ignoredProperties, getInfoMethodName) {
                     var _this = this;
                     if (ignoredProperties === void 0) { ignoredProperties = ["surface"]; }
+                    this._disposeUndoEngineSubscriptionsName = "___dispose___UndoEngine___Subscriptions___";
                     this._groupObservers = [];
                     this._getInfoMethodName = null;
                     this._groupPosition = -1;
@@ -1300,20 +1247,31 @@ var DevExpress;
                     this._model = ko.unwrap(target);
                     this._getInfoMethodName = getInfoMethodName;
                     this._ignoredProperties = ignoredProperties;
-                    this.subscribe(this._model);
-                    if (ko.isSubscribable(target)) {
-                        var prevVal = target();
-                        this._targetSubscription = target.subscribe(function (newTargetValue) {
-                            _this._removePropertiesSubscriptions();
-                            if (!_this._inUndoRedo) {
-                                _this.properyChanged({
-                                    observable: target, propertyChanged: { oldVal: prevVal, val: newTargetValue }
-                                });
-                                prevVal = newTargetValue;
-                            }
-                            _this._model = newTargetValue;
-                            _this.subscribe(_this._model);
-                        });
+                    if (this._getInfoMethodName) {
+                        if (ko.isSubscribable(target)) {
+                            this._targetSubscription = this.subscribeProperty(target, true);
+                        }
+                        else {
+                            this._createDisposeFunction(target);
+                        }
+                    }
+                    else {
+                        var innerSubscriptions = this.subscribe(this._model);
+                        if (ko.isSubscribable(target)) {
+                            var prevVal = target();
+                            this._targetSubscription = target.subscribe(function (newTargetValue) {
+                                _this._removePropertiesSubscriptions();
+                                if (!_this._inUndoRedo) {
+                                    _this.properyChanged({
+                                        observable: target, propertyChanged: { oldVal: prevVal, val: newTargetValue }
+                                    });
+                                    prevVal = newTargetValue;
+                                }
+                                _this._cleanSubscribtions(innerSubscriptions);
+                                _this._model = newTargetValue;
+                                innerSubscriptions = _this.subscribe(_this._model);
+                            });
+                        }
                     }
                 }
                 Object.defineProperty(UndoEngine.prototype, "_modelReady", {
@@ -1336,6 +1294,31 @@ var DevExpress;
                     this._position = currentPosition;
                     this.undoEnabled(true);
                     this.redoEnabled(false);
+                };
+                UndoEngine.prototype.visitProperties = function (target, info) {
+                    var subscribtions = [];
+                    if (target && info) {
+                        for (var i = 0; i < info.length; i++) {
+                            if (info[i].modelName || info[i].editor || info[i].info) {
+                                var propertyName = info[i].propertyName;
+                                if (propertyName.indexOf("_") !== 0) {
+                                    var realPropertyName = propertyName;
+                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
+                                        realPropertyName = "_" + realPropertyName;
+                                    }
+                                    if (!ko.isComputed(target[realPropertyName])) {
+                                        if (!ko.isObservable(target[realPropertyName])) {
+                                            this._createDisposeFunction(target[realPropertyName], info[i].info);
+                                        }
+                                        else {
+                                            subscribtions.push(this.subscribeProperty(target[realPropertyName], !info[i].link));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return subscribtions;
                 };
                 UndoEngine.prototype.undoChangeSet = function (changeSet) {
                     if (changeSet.propertyChanged) {
@@ -1375,6 +1358,114 @@ var DevExpress;
                         changeSet.observable.valueHasMutated();
                     }
                 };
+                UndoEngine.prototype._disposeChilds = function (target, info) {
+                    if (target && info) {
+                        for (var i = 0; i < info.length; i++) {
+                            if (info[i].modelName || info[i].editor || info[i].info) {
+                                var propertyName = info[i].propertyName;
+                                if (propertyName.indexOf("_") !== 0) {
+                                    var realPropertyName = propertyName;
+                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
+                                        realPropertyName = "_" + realPropertyName;
+                                    }
+                                    if (!ko.isComputed(target[realPropertyName])) {
+                                        var val = ko.unwrap(target[realPropertyName]);
+                                        if (!!val && typeof val === "object") {
+                                            if (!info[i].link) {
+                                                this._callDisposeFunction(val);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                UndoEngine.prototype._createDisposeFunction = function (val, info) {
+                    var _this = this;
+                    var subscriptions = [];
+                    if (val && typeof val === "object") {
+                        var objectInfo = info || (val[this._getInfoMethodName] && val[this._getInfoMethodName]());
+                        if (!!objectInfo) {
+                            if (val[this._disposeUndoEngineSubscriptionsName]) {
+                                val[this._disposeUndoEngineSubscriptionsName].inc++;
+                            }
+                            else {
+                                val[this._disposeUndoEngineSubscriptionsName] = { inc: 1 };
+                                subscriptions = this.subscribe(val, objectInfo);
+                                val[this._disposeUndoEngineSubscriptionsName]["func"] = function () {
+                                    val[_this._disposeUndoEngineSubscriptionsName].inc--;
+                                    _this._disposeChilds(val, objectInfo);
+                                    if (val[_this._disposeUndoEngineSubscriptionsName].inc === 0) {
+                                        _this._cleanSubscribtions(subscriptions);
+                                        delete val[_this._disposeUndoEngineSubscriptionsName];
+                                    }
+                                };
+                            }
+                        }
+                    }
+                    return subscriptions;
+                };
+                UndoEngine.prototype._callDisposeFunction = function (val) {
+                    val && val[this._disposeUndoEngineSubscriptionsName] && val[this._disposeUndoEngineSubscriptionsName].func();
+                };
+                UndoEngine.prototype._cleanSubscribtions = function (subscribtionArray) {
+                    if (subscribtionArray) {
+                        if (subscribtionArray.length) {
+                            for (var i = 0; i < subscribtionArray.length; i++) {
+                                this._cleanSubscribtions(subscribtionArray[i]);
+                            }
+                        }
+                        else {
+                            subscribtionArray.dispose && subscribtionArray.dispose();
+                        }
+                    }
+                };
+                UndoEngine.prototype.subscribeProperty = function (property, subscribeChilds) {
+                    var _this = this;
+                    if (ko.isObservable(property)) {
+                        var prevVal = property();
+                        if (Array.isArray(prevVal)) {
+                            for (var i = 0; i < property().length; i++) {
+                                this._createDisposeFunction(property()[i]);
+                            }
+                            return property.subscribe(function (args) {
+                                if (_this._modelReady) {
+                                    var addedItems = args.filter(function (x) { return x.status === "added"; });
+                                    var removedItems = args.filter(function (x) { return x.status === "deleted"; });
+                                    for (var i = 0; i < removedItems.length; i++) {
+                                        _this._callDisposeFunction(removedItems[i].value);
+                                    }
+                                    for (var i = 0; i < addedItems.length; i++) {
+                                        _this._createDisposeFunction(addedItems[i].value);
+                                    }
+                                    _this.properyChanged({ observable: property, arrayChanges: args });
+                                }
+                            }, null, "arrayChange");
+                        }
+                        else {
+                            if (ko.isWriteableObservable(property)) {
+                                if (subscribeChilds) {
+                                    this._createDisposeFunction(property());
+                                }
+                                return property.subscribe(function (val) {
+                                    if (_this._modelReady) {
+                                        if (subscribeChilds) {
+                                            _this._callDisposeFunction(prevVal);
+                                        }
+                                        _this.properyChanged({
+                                            observable: property, propertyChanged: { oldVal: prevVal, val: val }
+                                        });
+                                        prevVal = val;
+                                        if (subscribeChilds) {
+                                            _this._createDisposeFunction(val);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                };
                 UndoEngine.prototype.subscribeProperties = function (properties) {
                     var _this = this;
                     properties.forEach(function (property) {
@@ -1405,10 +1496,10 @@ var DevExpress;
                         }
                     });
                 };
-                UndoEngine.prototype.subscribe = function (target) {
+                UndoEngine.prototype.subscribe = function (target, info) {
                     var _this = this;
                     if (this._getInfoMethodName) {
-                        propertiesVisitorInfo(target, target[this._getInfoMethodName] && target[this._getInfoMethodName](), function (properties) { _this.subscribeProperties(properties); });
+                        return this.visitProperties(target, info || (target && target[this._getInfoMethodName] && target[this._getInfoMethodName]()));
                     }
                     else {
                         propertiesVisitor(target, function (properties) { _this.subscribeProperties(properties); }, this._visited, this._ignoredProperties);
@@ -1598,7 +1689,7 @@ var DevExpress;
                 };
                 CriteriaOperator.parse = function (stringCriteria) {
                     if (stringCriteria && stringCriteria !== "") {
-                        return window["parser"].parse(stringCriteria);
+                        return window["criteriaparser"].parse(stringCriteria);
                     }
                     return null;
                 };
@@ -2856,7 +2947,7 @@ var DevExpress;
                     };
                     this.serializer = serializer || new FilterEditorSerializer();
                 }
-                FilterEditorHelper.prototype.generateTreelistOptions = function (fieldListProvider, path, popupVisible) {
+                FilterEditorHelper.prototype.generateTreelistOptions = function (fieldListProvider, path) {
                     var _this = this;
                     var treeListOptions = ko.observable(null);
                     var selected = ko.observable(null);
@@ -2866,7 +2957,7 @@ var DevExpress;
                             selectedPath: ko.observable(""),
                             selected: selected,
                             path: ko.unwrap(path),
-                            treeListController: new FilterEditorTreeListController(selected, popupVisible),
+                            treeListController: new FilterEditorTreeListController(selected),
                             rtl: _this.rtl
                         });
                     });
@@ -2902,7 +2993,9 @@ var DevExpress;
                         _this.target.isSelected(true);
                         _this._updateActions(_this.target);
                         _this._popupService.target(args.element);
-                        _this._popupService.visible(true);
+                        setTimeout(function () {
+                            _this._popupService.visible(true);
+                        }, 10);
                     };
                     this.popupContentTemplate = "dx-filtereditor-popup-common";
                     this.target = criteria;
@@ -2960,7 +3053,7 @@ var DevExpress;
                 FilterEditorSerializer.prototype.serializeOperandValue = function (operandValue) {
                     var result = operandValue.value;
                     if (result !== null && result !== undefined && ($.isNumeric(result) || String(result).toLowerCase() === "true" || String(result).toLowerCase() === "false")) {
-                        return result;
+                        return operandValue.specifics === "string" ? "'" + result + "'" : result;
                     }
                     else if (result && operandValue.value instanceof Date) {
                         return "#" + JS.Utils.serializeDate(result) + "#";
@@ -3059,9 +3152,8 @@ var DevExpress;
             Widgets.FilterEditorSerializer = FilterEditorSerializer;
             var FilterEditorTreeListController = (function (_super) {
                 __extends(FilterEditorTreeListController, _super);
-                function FilterEditorTreeListController(selectedItem, popupVisible) {
+                function FilterEditorTreeListController(selectedItem) {
                     _super.call(this);
-                    this.popupVisible = popupVisible;
                     this.selectedItem = selectedItem;
                 }
                 FilterEditorTreeListController.prototype.itemsFilter = function (item) {
@@ -3077,7 +3169,6 @@ var DevExpress;
                     if (this.canSelect(value)) {
                         this.selectedItem(value.data);
                         value.isSelected(true);
-                        this.popupVisible(false);
                     }
                 };
                 return FilterEditorTreeListController;
@@ -3200,7 +3291,7 @@ var DevExpress;
                 }
                 CriteriaOperatorSurface.filterEditorOperators = function (specific) {
                     if (specific === void 0) { specific = "string"; }
-                    var common = [{ name: "Equal", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType },
+                    var common = [{ name: "Equals", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType },
                         { name: "Does not equal", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType },
                         { name: "Is greater than", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType },
                         { name: "Is greater than or equal to", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType },
@@ -3303,7 +3394,7 @@ var DevExpress;
                     get: function () {
                         var _this = this;
                         var item = this.items.filter(function (item) { return _this.operatorType() === item.value && _this.reverse === item.reverse && _this.model.enumType === item.type; })[0];
-                        return item && item.name || "";
+                        return item && item.name || this.operatorType && this.operatorType() || "";
                     },
                     enumerable: true,
                     configurable: true
@@ -3370,98 +3461,6 @@ var DevExpress;
                 return BinaryOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.BinaryOperandSurface = BinaryOperandSurface;
-            var FunctionOperandSurface = (function (_super) {
-                __extends(FunctionOperandSurface, _super);
-                function FunctionOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-function";
-                    this.operands = ko.observableArray([]);
-                    this.operands.push(this._createLeftPartProperty(operator.operands[0]));
-                    for (var i = 1; i < operator.operands.length; i++) {
-                        this.operands.push(this.createChildSurface(operator.operands[i]));
-                    }
-                }
-                Object.defineProperty(FunctionOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.operands && this.operands()[0];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FunctionOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands && this.operands().filter(function (_, index) { return index !== 0; });
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return FunctionOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.FunctionOperandSurface = FunctionOperandSurface;
-            var InOperandSurface = (function (_super) {
-                __extends(InOperandSurface, _super);
-                function InOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-in";
-                    this.operands = ko.observableArray([]);
-                    this.criteriaOperator = ko.observable(null);
-                    this.criteriaOperator(this._createLeftPartProperty(operator.criteriaOperator));
-                    this.operands((operator.operands || []).map(function (operand) {
-                        return _this.createChildSurface(operand);
-                    }));
-                    this.addValue = function () {
-                        var value = new JS.Data.OperandValue(null);
-                        _this.model.operands.push(value);
-                        _this.operands.push(_this.createChildSurface(value));
-                    };
-                }
-                Object.defineProperty(InOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.criteriaOperator();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(InOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return InOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.InOperandSurface = InOperandSurface;
-            var BetweenOperandSurface = (function (_super) {
-                __extends(BetweenOperandSurface, _super);
-                function BetweenOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.property = ko.observable(null);
-                    this.end = ko.observable(null);
-                    this.begin = ko.observable(null);
-                    this.contentTemplateName = "dx-filtereditor-between";
-                    this.property(this._createLeftPartProperty(operator.property));
-                    this.begin(this.createChildSurface(operator.begin));
-                    this.end(this.createChildSurface(operator.end));
-                }
-                Object.defineProperty(BetweenOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.property && this.property();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BetweenOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return [this.begin(), this.end()];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return BetweenOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.BetweenOperandSurface = BetweenOperandSurface;
             var OperandSurfaceBase = (function (_super) {
                 __extends(OperandSurfaceBase, _super);
                 function OperandSurfaceBase(operator, parent, fieldListProvider, path) {
@@ -3535,6 +3534,111 @@ var DevExpress;
                 return OperandSurfaceBase;
             })(CriteriaOperatorSurface);
             Widgets.OperandSurfaceBase = OperandSurfaceBase;
+            var FunctionOperandSurface = (function (_super) {
+                __extends(FunctionOperandSurface, _super);
+                function FunctionOperandSurface(operator, parent, fieldListProvider, path) {
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.canRemove = true;
+                    this.contentTemplateName = "dx-filtereditor-function";
+                    this.operands = ko.observableArray([]);
+                    if (operator.operands.length === 0) {
+                        if (parent instanceof UnaryOperandSurface) {
+                            this.specifics = parent.parent.specifics;
+                        }
+                        else {
+                            this.specifics = parent.specifics;
+                        }
+                        this.canRemove = false;
+                        this.contentTemplateName = "dx-filtereditor-function-lightweight";
+                    }
+                    else {
+                        this.operands.push(this._createLeftPartProperty(operator.operands[0]));
+                        for (var i = 1; i < operator.operands.length; i++) {
+                            this.operands.push(this.createChildSurface(operator.operands[i]));
+                        }
+                    }
+                }
+                Object.defineProperty(FunctionOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.operands && this.operands()[0];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FunctionOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands && this.operands().filter(function (_, index) { return index !== 0; });
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return FunctionOperandSurface;
+            })(OperandSurfaceBase);
+            Widgets.FunctionOperandSurface = FunctionOperandSurface;
+            var InOperandSurface = (function (_super) {
+                __extends(InOperandSurface, _super);
+                function InOperandSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.contentTemplateName = "dx-filtereditor-in";
+                    this.operands = ko.observableArray([]);
+                    this.criteriaOperator = ko.observable(null);
+                    this.criteriaOperator(this._createLeftPartProperty(operator.criteriaOperator));
+                    this.operands((operator.operands || []).map(function (operand) {
+                        return _this.createChildSurface(operand);
+                    }));
+                    this.addValue = function () {
+                        var value = new JS.Data.OperandValue(null);
+                        _this.model.operands.push(value);
+                        _this.operands.push(_this.createChildSurface(value));
+                    };
+                }
+                Object.defineProperty(InOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.criteriaOperator();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(InOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return InOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.InOperandSurface = InOperandSurface;
+            var BetweenOperandSurface = (function (_super) {
+                __extends(BetweenOperandSurface, _super);
+                function BetweenOperandSurface(operator, parent, fieldListProvider, path) {
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.property = ko.observable(null);
+                    this.end = ko.observable(null);
+                    this.begin = ko.observable(null);
+                    this.contentTemplateName = "dx-filtereditor-between";
+                    this.property(this._createLeftPartProperty(operator.property));
+                    this.begin(this.createChildSurface(operator.begin));
+                    this.end(this.createChildSurface(operator.end));
+                }
+                Object.defineProperty(BetweenOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.property && this.property();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BetweenOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return [this.begin(), this.end()];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return BetweenOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.BetweenOperandSurface = BetweenOperandSurface;
             var OperandValueSurface = (function (_super) {
                 __extends(OperandValueSurface, _super);
                 function OperandValueSurface(operator, parent, fieldListProvider, path) {
@@ -3576,6 +3680,7 @@ var DevExpress;
                         this.specifics = parent.specifics;
                     }
                     this.specifics.subscribe(function (newVal) {
+                        operator.specifics = newVal;
                         _this._updateDate(newVal);
                     });
                     this._value(operator.value);
@@ -3623,6 +3728,7 @@ var DevExpress;
                             }
                         }
                     });
+                    operator.specifics = this.specifics();
                 }
                 Object.defineProperty(OperandValueSurface.prototype, "items", {
                     get: function () {
@@ -3861,11 +3967,12 @@ var DevExpress;
                     this.templateName = "dx-filtereditor-property";
                     this.operatorClass = "criteria-operator-item-field";
                     this.propertyName(operator.propertyName);
-                    this.fieldsOptions = this.helper.generateTreelistOptions(fieldListProvider, path, this.popupService.visible);
+                    this.fieldsOptions = this.helper.generateTreelistOptions(fieldListProvider, path);
                     this.fieldsOptions().selectedPath.subscribe(function (newVal) {
                         var realName = _this.fieldsOptions().selectedPath().substr(_this.path && _this.path().length > 0 ? _this.path().length + 1 : 0);
                         _this.propertyName(realName);
                         _this.model.propertyName = realName;
+                        _this.popupService.visible(false);
                     });
                     this.fieldsOptions().selected.subscribe(function (newVal) {
                         _this._updateDisplayName(path, _this.propertyName(), newVal.displayName);
@@ -3910,7 +4017,11 @@ var DevExpress;
                             }
                             var item = result.filter(function (item) { return item.name === realPropertyName; })[0];
                             if (item) {
-                                _this.specifics(item.specifics.toLowerCase());
+                                var specifics = item.specifics.toLowerCase();
+                                if (specifics.indexOf("calc") === 0) {
+                                    specifics = specifics.split("calc")[1];
+                                }
+                                _this.specifics(specifics);
                                 _this._updateDisplayName(_this.path, _this.propertyName(), item.displayName);
                             }
                         });
@@ -4686,7 +4797,7 @@ var DevExpress;
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-ko-widgets.js.map
-/* parser generated by jison 0.4.15 */
+/* parser generated by jison 0.4.17 */
 /*
   Returns a Parser object of the following structure:
 
@@ -4759,13 +4870,13 @@ var DevExpress;
     recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
   }
 */
-var parser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,27],$V4=[1,19],$V5=[1,30],$V6=[1,32],$V7=[1,25],$V8=[1,24],$V9=[1,34],$Va=[1,31],$Vb=[1,33],$Vc=[1,13],$Vd=[1,5],$Ve=[1,21],$Vf=[1,14],$Vg=[1,3],$Vh=[1,4],$Vi=[1,10],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,50],$Vq=[1,52],$Vr=[1,53],$Vs=[1,56],$Vt=[1,55],$Vu=[1,51],$Vv=[1,54],$Vw=[1,36],$Vx=[1,37],$Vy=[1,39],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,22,34,35,36,37,38,39,40,45,51,56,57,58,59,60,61,63,64,65,66],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,34,35,36,37,38,39,40,45,51,56,57,58,59,60,61,63,64,65,66],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,22,34,35,36,37,38,39,40,44,45,51,56,57,58,59,60,61,63,64,65,66],$VN=[1,93],$VO=[1,78],$VP=[1,79],$VQ=[1,80],$VR=[1,81],$VS=[1,82],$VT=[1,83],$VU=[1,84],$VV=[1,85],$VW=[1,86],$VX=[1,87],$VY=[1,88],$VZ=[1,89],$V_=[1,90],$V$=[1,91],$V01=[1,92],$V11=[5,11,16,17,19,20,22,34,35,36,37,38,39,40,45,51,56,57,58,59,60,61,63,64,65,66],$V21=[1,94],$V31=[5,11,19,20,22,34,35,36,37,38,39,40,45,51,60,61,63,64,65,66],$V41=[5,11,35,36,45,51],$V51=[1,141],$V61=[16,45],$V71=[16,17,20],$V81=[5,11,17,19,20,22,34,35,36,37,38,39,40,45,51,58,60,61,63,64,65,66],$V91=[5,11,34,35,36,39,40,45,51,63,64],$Va1=[5,11,19,20,34,35,36,39,40,45,51,63,64,65,66],$Vb1=[11,51],$Vc1=[5,11,16,17,19,20,22,34,35,36,37,38,39,40,44,45,51,56,57,58,59,60,61,63,64,65,66];
+var criteriaparser = (function(){
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,19],$V8=[1,30],$V9=[1,32],$Va=[1,25],$Vb=[1,24],$Vc=[1,34],$Vd=[1,31],$Ve=[1,33],$Vf=[1,13],$Vg=[1,5],$Vh=[1,14],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,39],$Vq=[1,50],$Vr=[1,52],$Vs=[1,53],$Vt=[1,56],$Vu=[1,55],$Vv=[1,51],$Vw=[1,54],$Vx=[1,36],$Vy=[1,37],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$V71=[5,11,41,42,50,56],$V81=[1,145],$V91=[16,50],$Va1=[15,16,17,22,25,26,27,28,50],$Vb1=[16,17,20],$Vc1=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$Vd1=[5,11,40,41,42,45,46,50,56,66,67],$Ve1=[5,11,19,20,40,41,42,45,46,50,56,66,67,68,69],$Vf1=[11,56],$Vg1=[5,11,16,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"^":22,"param":23,"?":24,"property":25,"columnOrAggregate":26,"AGG_COUNT":27,"AGG_AVG":28,"AGG_MAX":29,"AGG_MIN":30,"AGG_SINGLE":31,"AGG_EXISTS":32,"AGG_SUM":33,"OP_LIKE":34,"AND":35,"OR":36,"OP_BETWEEN":37,"OP_IN":38,"NOT":39,"IS":40,"NULL":41,"propertyWithAggregate":42,"compositeProperty":43,"[":44,"]":45,"field":46,"aggregate":47,"aggregateSuffix":48,"topLevelAggregate":49,"(":50,")":51,"MinStart":52,"MaxStart":53,"CONST":54,"NUM":55,"*":56,"/":57,"-":58,"%":59,"|":60,"&":61,"~":62,"OP_EQ":63,"OP_NE":64,"OP_GE":65,"OP_LE":66,"argumentslist":67,"FUNCTION":68,"commadelimitedlist":69,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"^",24:"?",27:"AGG_COUNT",28:"AGG_AVG",29:"AGG_MAX",30:"AGG_MIN",31:"AGG_SINGLE",32:"AGG_EXISTS",33:"AGG_SUM",34:"OP_LIKE",35:"AND",36:"OR",37:"OP_BETWEEN",38:"OP_IN",39:"NOT",40:"IS",41:"NULL",44:"[",45:"]",50:"(",51:")",54:"CONST",55:"NUM",56:"*",57:"/",58:"-",59:"%",60:"|",61:"&",62:"~",63:"OP_EQ",64:"OP_NE",65:"OP_GE",66:"OP_LE",68:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,1],[21,1],[23,2],[23,1],[25,1],[25,3],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[26,1],[42,1],[42,3],[43,3],[43,5],[46,1],[46,2],[47,4],[47,3],[47,6],[47,5],[47,4],[47,3],[47,1],[49,1],[48,1],[48,1],[48,3],[48,3],[48,4],[48,4],[48,3],[48,4],[48,2],[48,2],[52,3],[53,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[67,3],[67,2],[69,1],[69,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"-":26,"[":27,"=":28,"param":29,"?":30,"property":31,"columnOrAggregate":32,"AGG_COUNT":33,"AGG_AVG":34,"AGG_MAX":35,"AGG_MIN":36,"AGG_SINGLE":37,"AGG_EXISTS":38,"AGG_SUM":39,"OP_LIKE":40,"AND":41,"OR":42,"OP_BETWEEN":43,"OP_IN":44,"NOT":45,"IS":46,"NULL":47,"propertyWithAggregate":48,"compositeProperty":49,"]":50,"field":51,"aggregate":52,"aggregateSuffix":53,"topLevelAggregate":54,"(":55,")":56,"MinStart":57,"MaxStart":58,"CONST":59,"*":60,"/":61,"%":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"-",27:"[",28:"=",30:"?",33:"AGG_COUNT",34:"AGG_AVG",35:"AGG_MAX",36:"AGG_MIN",37:"AGG_SINGLE",38:"AGG_EXISTS",39:"AGG_SUM",40:"OP_LIKE",41:"AND",42:"OR",43:"OP_BETWEEN",44:"OP_IN",45:"NOT",46:"IS",47:"NULL",50:"]",55:"(",56:")",59:"CONST",60:"*",61:"/",62:"%",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
+productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[29,2],[29,1],[31,1],[31,3],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[48,1],[48,3],[49,3],[49,5],[51,1],[51,2],[52,4],[52,3],[52,6],[52,5],[52,4],[52,3],[52,1],[54,1],[53,1],[53,1],[53,3],[53,3],[53,4],[53,4],[53,3],[53,4],[53,2],[53,2],[57,3],[58,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -4786,16 +4897,16 @@ break;
 case 5: case 6:
  this.$ = $$[$0-2]; this.$.push($$[$0]); 
 break;
-case 7: case 10: case 16: case 20: case 23: case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31: case 32: case 33: case 34: case 35: case 36: case 37: case 38: case 67: case 68: case 69: case 70:
+case 7: case 10: case 17: case 39: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 86: case 87: case 88: case 89:
  this.$ = $$[$0]; 
 break;
-case 8: case 60: case 61: case 93: case 103:
+case 8: case 79: case 80: case 112: case 122:
  this.$ = $$[$0-1]; 
 break;
 case 9:
  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.OrderDescToken, $$[$0-1]); 
 break;
-case 11: case 21:
+case 11: case 40:
  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '.' + $$[$0].propertyName); 
 break;
 case 12:
@@ -4804,28 +4915,49 @@ break;
 case 13:
  this.$ = new DevExpress.JS.Data.OperandProperty('<' + $$[$0-2].propertyName + '>' + $$[$0].propertyName); 
 break;
-case 14:
+case 14: case 20:
  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0]); 
 break;
-case 15:
+case 15: case 16: case 21:
  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-1].propertyName + ' ' + $$[$0]); 
 break;
-case 17:
+case 18:
  this.$ = new DevExpress.JS.Data.OperandProperty("^"); 
 break;
-case 18:
+case 19:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0]); 
+break;
+case 22: case 23:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-1].propertyName + ' ' + $$[$0]); 
+break;
+case 24:
+  this.$ = new DevExpress.JS.Data.OperandProperty("^"); 
+break;
+case 25: case 26: case 27:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '-' + $$[$0]); 
+break;
+case 28: case 29:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '[' + $$[$0]); 
+break;
+case 30: case 31: case 32: case 33:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '+' + $$[$0]); 
+break;
+case 34: case 35: case 36:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '=' + $$[$0]); 
+break;
+case 37:
  this.$ = new DevExpress.JS.Data.OperandParameter($$[$0]); 
 break;
-case 19:
+case 38:
  this.$ = new DevExpress.JS.Data.OperandValue(undefined); 
 break;
-case 22:
+case 41:
  this.$ = $$[$0].propertyName; 
 break;
-case 39:
+case 58:
  this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
 break;
-case 40:
+case 59:
 
   var lst = [];
   lst.push($$[$0-1]);
@@ -4836,185 +4968,185 @@ case 40:
   };
  
 break;
-case 41:
+case 60:
 
   var propertyNameObject = $$[$0-4];
   propertyNameObject.names.push($$[$0-1]);
   this.$ = propertyNameObject;
  
 break;
-case 42:
+case 61:
  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0].names.join('.'), $$[$0].column, $$[$0].line); 
 break;
-case 43:
+case 62:
  this.$ = new DevExpress.JS.Data.OperandProperty(); 
 break;
-case 44:
+case 63:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty(), null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 45:
+case 64:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty($$[$0-2].names.join('.'), $$[$0-2].column, $$[$0-2].line), null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 46:
+case 65:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 47:
+case 66:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 48:
+case 67:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 49:
+case 68:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 52: case 54:
+case 71: case 73:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Count, null); 
 break;
-case 53: case 55:
+case 72: case 74:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 56:
+case 75:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Avg, null); 
 break;
-case 57:
+case 76:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Sum, null); 
 break;
-case 58:
+case 77:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, new DevExpress.JS.Data.OperandProperty("This"), DevExpress.JS.Data.Aggregate.Single, null); 
 break;
-case 59:
+case 78:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Single, null); 
 break;
-case 62:
+case 81:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Min, null); 
 break;
-case 63:
+case 82:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Max, null); 
 break;
-case 64:
+case 83:
  this.$ = new DevExpress.JS.Data.ConstantValue($$[$0]); 
 break;
-case 65:
+case 84:
  this.$ = new DevExpress.JS.Data.ConstantValue(parseFloat($$[$0])); 
 break;
-case 66:
+case 85:
  this.$ = new DevExpress.JS.Data.ConstantValue(null); 
 break;
-case 71:
+case 90:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Multiply); 
 break;
-case 72:
+case 91:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Divide); 
 break;
-case 73:
+case 92:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Plus); 
 break;
-case 74:
+case 93:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Minus); 
 break;
-case 75:
+case 94:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Modulo); 
 break;
-case 76:
+case 95:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseOr); 
 break;
-case 77:
+case 96:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd); 
 break;
-case 78:
+case 97:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseXor); 
 break;
-case 79:
+case 98:
 
 								this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Minus, $$[$0]);
 							
 break;
-case 80:
+case 99:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Plus, $$[$0]); 
 break;
-case 81:
+case 100:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, $$[$0]); 
 break;
-case 82:
+case 101:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Equal); 
 break;
-case 83:
+case 102:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.NotEqual); 
 break;
-case 84:
+case 103:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Greater); 
 break;
-case 85:
+case 104:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Less); 
 break;
-case 86:
+case 105:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual); 
 break;
-case 87:
+case 106:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.LessOrEqual); 
 break;
-case 88:
+case 107:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like); 
 break;
-case 89:
+case 108:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.BinaryOperator($$[$0-3], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like)); 
 break;
-case 90:
+case 109:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, $$[$0]); 
 break;
-case 91:
+case 110:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 92:
+case 111:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 94:
+case 113:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-2]); 
 break;
-case 95:
+case 114:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-3])); 
 break;
-case 96:
+case 115:
  this.$ = new DevExpress.JS.Data.InOperator($$[$0-2], $$[$0]); 
 break;
-case 97:
+case 116:
  this.$ = new DevExpress.JS.Data.BetweenOperator($$[$0-6], $$[$0-3], $$[$0-1]); 
 break;
-case 98: case 99:
+case 117: case 118:
   this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], $$[$0]); 
 break;
-case 100:
+case 119:
  this.$ = null; 
 break;
-case 101:
+case 120:
  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Min, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
 break;
-case 102:
+case 121:
  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Max, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
 break;
-case 104:
+case 123:
  this.$ = []; 
 break;
-case 105:
+case 124:
 
 							var lst = [];
 							lst.push($$[$0]);
 							this.$ = lst;
 						
 break;
-case 106:
+case 125:
 
 							var lst = $$[$0-2];
 							lst.push($$[$0]);
@@ -5023,13 +5155,19 @@ case 106:
 break;
 }
 },
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,64]),o($VG,[2,65]),o($VG,[2,66]),o($VG,[2,67]),o($VG,[2,68],{44:[1,57]}),o($VG,[2,69],{16:[1,58]}),o($VG,[2,70]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,51:[1,64],52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{50:$VH,67:65},o($VI,$VJ,{67:67,50:$VH}),{11:[1,68],51:$VK},{11:[1,70],51:$VL},o($VG,[2,19],{15:[1,72]}),o($VM,[2,42],{16:[1,73]}),{15:$VN,18:26,19:$V2,21:77,22:$V3,26:76,27:$VO,28:$VP,29:$VQ,30:$VR,31:$VS,32:$VT,33:$VU,34:$VV,35:$VW,36:$VX,37:$VY,38:$VZ,39:$V_,40:$V$,41:$V01,42:75,45:[1,74]},o($V11,[2,20],{15:$V21}),o($VG,[2,50]),{50:[1,95]},{50:[1,96]},o($VI,[2,16]),o($VI,[2,17]),o($VG,[2,51]),{14:97,15:[1,98]},o($VG,[2,52],{50:[1,99]}),o($VG,[2,53],{50:[1,100]}),{50:[1,101]},{50:[1,102]},{50:[1,103]},{1:[2,1]},{4:104,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:105,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:106,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{34:[1,119]},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{39:[1,123],41:[1,122]},{50:$VH,67:124},{50:[1,125]},{4:126,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,45:[1,127],46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{15:$VN,18:26,19:$V2,21:128,22:$V3},o($VG,[2,79]),o($VG,[2,80]),o($V31,[2,81],{17:$Vl,56:$Vw,57:$Vx,58:$Vy,59:$Vz}),o($V41,[2,90],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,129],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,100]),o($VG,[2,98]),{4:132,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,51:[1,131],52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk,69:130},o($VG,[2,99]),{4:133,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},o($VG,[2,60]),{4:134,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},o($VG,[2,61]),o($VG,[2,18]),{27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,44:[1,136],48:135,52:137,53:138},o($VM,[2,43],{16:[1,139]}),{16:$V51,45:[1,140]},o($V61,[2,38]),o($V61,[2,22],{15:$V21}),o($V61,[2,23]),o($V61,[2,24]),o($V61,[2,25]),o($V61,[2,26]),o($V61,[2,27]),o($V61,[2,28]),o($V61,[2,29]),o($V61,[2,30]),o($V61,[2,31]),o($V61,[2,32]),o($V61,[2,33]),o($V61,[2,34]),o($V61,[2,35]),o($V61,[2,36]),o($V61,[2,37]),o($VI,$VJ),o($VI,[2,15]),{4:142,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:143,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{16:[1,145],17:[1,146],20:[1,144]},o($V71,[2,10]),{51:[1,147]},{51:[1,148]},{4:149,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:150,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{4:152,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,51:[1,151],52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},o($VG,[2,71]),o($VG,[2,72]),o($V81,[2,73],{56:$Vw,57:$Vx,59:$Vz}),o($V81,[2,74],{56:$Vw,57:$Vx,59:$Vz}),o($VG,[2,75]),o([5,11,19,20,34,35,36,37,38,39,40,45,51,60,63,64,65,66],[2,76],{17:$Vl,22:$Vo,56:$Vw,57:$Vx,58:$Vy,59:$Vz,61:$VB}),o($V31,[2,77],{17:$Vl,56:$Vw,57:$Vx,58:$Vy,59:$Vz}),o([5,11,19,20,22,34,35,36,37,38,39,40,45,51,60,63,64,65,66],[2,78],{17:$Vl,56:$Vw,57:$Vx,58:$Vy,59:$Vz,61:$VB}),o($V91,[2,82],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,65:$VE,66:$VF}),o($V91,[2,83],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,65:$VE,66:$VF}),o($Va1,[2,84],{17:$Vl,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB}),o($Va1,[2,85],{17:$Vl,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB}),o($Va1,[2,86],{17:$Vl,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB}),o($Va1,[2,87],{17:$Vl,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB}),o($V91,[2,88],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,65:$VE,66:$VF}),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},o($V41,[2,91],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),o([5,11,36,45,51],[2,92],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),o($VG,[2,94]),{41:[1,154]},o($VG,[2,96]),{4:155,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,45:[1,156],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,49],{16:[1,157]}),o($V11,[2,21],{15:$V21}),o($VG,[2,93]),{11:[1,159],51:[1,158]},o($VG,[2,104]),o($Vb1,[2,105],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,160],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,161],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,45]),{15:$VN,18:26,19:$V2,21:77,22:$V3,26:76,27:$VO,28:$VP,29:$VQ,30:$VR,31:$VS,32:$VT,33:$VU,34:$VV,35:$VW,36:$VX,37:$VY,38:$VZ,39:$V_,40:$V$,41:$V01,42:162},{51:$VK},{51:$VL},{27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,48:163,52:137,53:138},o($Vc1,[2,40]),{15:$VN,18:26,19:$V2,21:77,22:$V3,26:164,27:$VO,28:$VP,29:$VQ,30:$VR,31:$VS,32:$VT,33:$VU,34:$VV,35:$VW,36:$VX,37:$VY,38:$VZ,39:$V_,40:$V$,41:$V01},o($Vb1,[2,62],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),o($Vb1,[2,63],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),{15:[1,165]},{15:[1,166]},{15:[1,167]},o($VG,[2,54]),o($VG,[2,55]),{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,168],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,169],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,58]),{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,170],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($V91,[2,89],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,37:$Vs,38:$Vt,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,65:$VE,66:$VF}),o($VG,[2,95]),{11:[1,171],17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,48],{16:[1,172]}),{27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,48:173,52:137,53:138},o($VG,[2,103]),{4:174,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},o($VG,[2,101]),o($VG,[2,102]),{16:$V51,45:[1,175]},o($VG,[2,44]),o($V61,[2,39]),o($VI,[2,13]),o($V71,[2,11]),o($V71,[2,12]),o($VG,[2,56]),o($VG,[2,57]),o($VG,[2,59]),{4:176,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:6,24:$V4,25:8,27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,39:$Vc,41:$Vd,43:20,44:$Ve,46:7,47:9,48:28,49:23,50:$Vf,52:17,53:18,54:$Vg,55:$Vh,58:$Vi,62:$Vj,68:$Vk},{27:$V5,28:$V6,29:$V7,30:$V8,31:$V9,32:$Va,33:$Vb,48:177,52:137,53:138},o($VG,[2,47]),o($Vb1,[2,106],{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF}),o($Vc1,[2,41]),{17:$Vl,19:$Vm,20:$Vn,22:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,51:[1,178],56:$Vw,57:$Vx,58:$Vy,59:$Vz,60:$VA,61:$VB,63:$VC,64:$VD,65:$VE,66:$VF},o($VG,[2,46]),o($VG,[2,97])],
+table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,83]),o($VG,[2,84]),o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87],{27:[1,57]}),o($VG,[2,88],{16:[1,58]}),o($VG,[2,89]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,64],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{55:$VH,70:65},o($VI,$VJ,{70:67,55:$VH}),{11:[1,68],56:$VK},{11:[1,70],56:$VL},o($VG,[2,38],{15:[1,72]}),o($VM,[2,61],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:75,50:[1,74]},o($V31,[2,39],{15:$V41,22:$V51}),o($VG,[2,69]),{55:[1,98]},{55:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,70]),{14:100,15:[1,101]},o($VG,[2,71],{55:[1,102]}),o($VG,[2,72],{55:[1,103]}),{55:[1,104]},{55:[1,105]},{55:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{40:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{45:[1,126],47:[1,125]},{55:$VH,70:127},{55:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,50:[1,130],51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,98]),o($VG,[2,99]),o($V61,[2,100],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o($V71,[2,109],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,133],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,119]),o($VG,[2,117]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,135],57:17,58:18,59:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,118]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,79]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,80]),o($VG,[2,37]),{27:[1,140],33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:139,57:141,58:142},o($VM,[2,62],{16:[1,143]}),{16:$V81,50:[1,144]},o($V91,[2,57]),o($V91,[2,41],{15:[1,146],17:[1,151],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,152]}),o($V91,[2,42]),o($V91,[2,43]),o($V91,[2,44]),o($V91,[2,45]),o($V91,[2,46]),o($V91,[2,47]),o($V91,[2,48]),o($V91,[2,49]),o($V91,[2,50]),o($V91,[2,51]),o($V91,[2,52]),o($V91,[2,53]),o($V91,[2,54]),o($V91,[2,55]),o($V91,[2,56]),o($Va1,[2,19]),o($Va1,[2,20]),o($Va1,[2,24]),o($VI,[2,15]),o($VI,[2,16]),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:154,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{16:[1,156],17:[1,157],20:[1,155]},o($Vb1,[2,10]),{56:[1,158]},{56:[1,159]},{4:160,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:161,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,162],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,90]),o($VG,[2,91]),o($Vc1,[2,92],{60:$Vx,61:$Vy,62:$Vz}),o($Vc1,[2,93],{60:$Vx,61:$Vy,62:$Vz}),o($VG,[2,94]),o([5,11,19,20,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,95],{17:$Vl,23:$Vo,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,96],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o([5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,97],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($Vd1,[2,101],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,102],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Ve1,[2,103],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,104],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,105],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,106],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,107],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($V71,[2,110],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,42,50,56],[2,111],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,113]),{47:[1,165]},o($VG,[2,115]),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,50:[1,167],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,68],{16:[1,168]}),o($V31,[2,40],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,112]),{11:[1,170],56:[1,169]},o($VG,[2,123]),o($Vf1,[2,124],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,171],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,172],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,64]),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:173},{56:$VK},{56:$VL},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:174,57:141,58:142},o($Vg1,[2,59]),{15:$VN,23:$VO,24:77,25:$VP,32:175,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21},o($Va1,[2,21]),o($Va1,[2,22]),o($Va1,[2,23]),{15:[1,176],22:[1,178],25:[1,177]},{15:[1,179],22:[1,181],25:[1,180]},{15:[1,182],22:[1,184],25:[1,183]},{15:[1,185],22:[1,187],25:[1,186]},o($Vf1,[2,81],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,82],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,188]},{15:[1,189]},{15:[1,190]},o($VG,[2,73]),o($VG,[2,74]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,191],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,192],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,77]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,193],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vd1,[2,108],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,114]),{11:[1,194],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,67],{16:[1,195]}),{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:196,57:141,58:142},o($VG,[2,122]),{4:197,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,120]),o($VG,[2,121]),{16:$V81,50:[1,198]},o($VG,[2,63]),o($V91,[2,58]),o($Va1,[2,25]),o($Va1,[2,26]),o($Va1,[2,27]),o($Va1,[2,28]),o($Va1,[2,29]),o($Va1,[2,30]),o($Va1,[2,31]),o($Va1,[2,32]),o($Va1,[2,33]),o($Va1,[2,34]),o($Va1,[2,35]),o($Va1,[2,36]),o($VI,[2,13]),o($Vb1,[2,11]),o($Vb1,[2,12]),o($VG,[2,75]),o($VG,[2,76]),o($VG,[2,78]),{4:199,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:200,57:141,58:142},o($VG,[2,66]),o($Vf1,[2,125],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vg1,[2,60]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,201],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,65]),o($VG,[2,116])],
 defaultActions: {35:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
-        throw new Error(str);
+        function _parseError (msg, hash) {
+            this.message = msg;
+            this.hash = hash;
+        }
+        _parseError.prototype = Error;
+
+        throw new _parseError(str, hash);
     }
 },
 parse: function parse(input) {
@@ -5062,14 +5200,14 @@ parse: function parse(input) {
         lstack.length = lstack.length - n;
     }
     _token_stack:
-        function lex() {
+        var lex = function () {
             var token;
             token = lexer.lex() || EOF;
             if (typeof token !== 'number') {
                 token = self.symbols_[token] || token;
             }
             return token;
-        }
+        };
     var symbol, preErrorSymbol, state, action, a, r, yyval = {}, p, len, newState, expected;
     while (true) {
         state = stack[stack.length - 1];
@@ -5499,100 +5637,106 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:/* skip whitespace */
 break;
-case 1:return 37
+case 1:return 43
 break;
-case 2:return 38
+case 2:return 44
 break;
-case 3:return 39
+case 3:return 45
 break;
-case 4:return 40
+case 4:return 46
 break;
-case 5:return 41
+case 5:return 47
 break;
-case 6:return 56
+case 6:return 60
 break;
-case 7:return 57
+case 7:return 61
 break;
-case 8:return 58
+case 8:return 26
 break;
 case 9:return 17
 break;
-case 10:return 22
+case 10:return 23
 break;
-case 11:return 64
+case 11:return 67
 break;
 case 12:return '!'
 break;
-case 13:return 59
+case 13:return 62
 break;
-case 14:return 50
+case 14:return 55
 break;
-case 15:return 51
+case 15:return 56
 break;
-case 16:return 44
+case 16:return 27
 break;
-case 17:return 45
+case 17:return 50
 break;
-case 18:return 64
+case 18:return 67
 break;
-case 19:return 65
+case 19:return 68
 break;
-case 20:return 66
+case 20:return 69
 break;
 case 21:return 20
 break;
 case 22:return 19
 break;
-case 23:return 28
+case 23:return 42
 break;
-case 24:return 29
+case 24:return 41
 break;
-case 25:return 30
+case 25:return 34
 break;
-case 26:return 31
+case 26:return 35
 break;
-case 27:return 27
+case 27:return 36
 break;
-case 28:return 32
+case 28:return 37
 break;
 case 29:return 33
 break;
-case 30:return 63
+case 30:return 38
 break;
-case 31:return 63
+case 31:return 39
 break;
-case 32:return 34
+case 32:return 66
 break;
-case 33:return 35
+case 33:return 66
 break;
-case 34:return 36
+case 34:return 40
 break;
-case 35:return 5
+case 35:return 41
 break;
-case 36:return 55
+case 36:return 42
 break;
-case 37:return 16
+case 37:return 5
 break;
-case 38:return 11
+case 38:return 22
 break;
-case 39:return 24
+case 39:return 16
 break;
-case 40:return 54
+case 40:return 11
 break;
-case 41:return 54
+case 41:return 30
 break;
-case 42:return 15	
+case 42:return 59
 break;
-case 43:return 54	
+case 43:return 59
 break;
-case 44:return 54
+case 44:return 15	
 break;
-case 45:return 'INVALID'
+case 45:return 59	
+break;
+case 46:return 59
+break;
+case 47:return 25   
+break;
+case 48:return 'INVALID'
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:Between\b)/,/^(?:In\b)/,/^(?:Not\b)/,/^(?:Is\b)/,/^(?:Null\b)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\^)/,/^(?:!=)/,/^(?:!)/,/^(?:%)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:Avg\b)/,/^(?:Max\b)/,/^(?:Min\b)/,/^(?:Single\b)/,/^(?:Count\b)/,/^(?:Exists\b)/,/^(?:Sum\b)/,/^(?:==)/,/^(?:=)/,/^(?:Like\b)/,/^(?:And\b)/,/^(?:Or\b)/,/^(?:$)/,/^(?:(?:\d*\.)?\d+)/,/^(?:\.)/,/^(?:,)/,/^(?:\?)/,/^(?:True\b)/,/^(?:False\b)/,/^(?:^[a-zA-Z_][a-zA-Z0-9_]*)/,/^(?:'[^']*')/,/^(?:#[^#]*#)/,/^(?:.)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45],"inclusive":true}}
+rules: [/^(?:\s+)/,/^(?:Between\b)/,/^(?:In\b)/,/^(?:Not\b)/,/^(?:Is\b)/,/^(?:Null\b)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\^)/,/^(?:!=)/,/^(?:!)/,/^(?:%)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:Avg\b)/,/^(?:Max\b)/,/^(?:Min\b)/,/^(?:Single\b)/,/^(?:Count\b)/,/^(?:Exists\b)/,/^(?:Sum\b)/,/^(?:==)/,/^(?:=)/,/^(?:Like\b)/,/^(?:And\b)/,/^(?:Or\b)/,/^(?:$)/,/^(?:(?:\d*\.)?\d+)/,/^(?:\.)/,/^(?:,)/,/^(?:\?)/,/^(?:True\b)/,/^(?:False\b)/,/^(?:^[a-zA-Z_][a-zA-Z0-9_]*)/,/^(?:'[^']*')/,/^(?:#[^#]*#)/,/^(?:.+(?=\]))/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],"inclusive":true}}
 });
 return lexer;
 })();
@@ -5606,9 +5750,9 @@ return new Parser;
 
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = parser;
-exports.Parser = parser.Parser;
-exports.parse = function () { return parser.parse.apply(parser, arguments); };
+exports.parser = criteriaparser;
+exports.Parser = criteriaparser.Parser;
+exports.parse = function () { return criteriaparser.parse.apply(criteriaparser, arguments); };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
@@ -5764,8 +5908,9 @@ var DevExpress;
                         $selectedNodes
                             .each(function (_, el) {
                             var $el = $(el);
+                            var bounds = el.getBoundingClientRect();
                             $el.data("originalPosition", { top: parseFloat($el.css("top")), left: parseFloat($el.css("left")) });
-                            $el.data("originalSize", { width: $el.width(), height: $el.height() });
+                            $el.data("originalSize", { width: bounds.width, height: bounds.height });
                         });
                     },
                     resize: function (event, ui) {
@@ -9966,6 +10111,7 @@ var DevExpress;
             'Display the previous document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PreviousPage',
             'Add Data Items Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddDataItems',
             'Document is building...': 'ASPxReportsStringId.WebDocumentViewer_DocumentBuilding',
+            'Loading...': 'ASPxReportsStringId.WebDocumentViewer_Loading',
             'Remove parameter': 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveParameter',
             'Navigate through the report\'s hierarchy of bookmarks.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_DocumentMap',
             'Tables': 'ASPxReportsStringId.ReportDesigner_Tables',
@@ -10047,7 +10193,8 @@ var DevExpress;
             else if (curleft < 0) {
                 curleft = 0;
             }
-            return { top: curtop, left: curleft, width: element.width(), height: element.height() };
+            var bounds = element[0].getBoundingClientRect();
+            return { top: curtop, left: curleft, width: bounds.width, height: bounds.height };
         }
         Designer.getControlRect = getControlRect;
         function deserializeChildArray(model, parent, creator) {
@@ -12167,6 +12314,11 @@ var DevExpress;
                     this.updateValue = function () {
                         value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
                     };
+                    this.onOptionChanged = function (e) {
+                        if (e.name !== "opened" || e.value)
+                            return;
+                        _this.updateValue();
+                    };
                 }
                 MultiValuesHelper.prototype._isValueSelected = function (value, array) {
                     if (value instanceof Date) {
@@ -12437,25 +12589,56 @@ var DevExpress;
         var CombinedObject = (function () {
             function CombinedObject() {
             }
+            CombinedObject.combineInfo = function (infos) {
+                var info = [];
+                for (var i = 0; i < infos[0].length; i++) {
+                    if (infos.filter(function (info) { return info.filter(function (x) { return x.propertyName === infos[0][i].propertyName; }).length > 0; }).length === infos.length) {
+                        info.push(infos[0][i]);
+                    }
+                }
+                return info;
+            };
             CombinedObject.collectProperties = function (controls, allProperties) {
-                controls.forEach(function (control) {
-                    for (var propertyName in control) {
-                        if (CombinedObject.skipPropertyNames.indexOf(propertyName) !== -1) {
-                            continue;
-                        }
-                        var property = control[propertyName];
+                for (var propertyName in controls[0]) {
+                    if (CombinedObject.skipPropertyNames.indexOf(propertyName) !== -1) {
+                        continue;
+                    }
+                    if (controls.filter(function (item) { return item[propertyName]; }).length === controls.length) {
+                        var property = controls[0][propertyName];
                         if (ko.isObservable(property) && !property["push"]) {
-                            allProperties[propertyName] = allProperties[propertyName] || { properties: [] };
-                            allProperties[propertyName].properties.push(property);
+                            allProperties[propertyName] = { properties: [].concat(controls.map(function (item) { return item[propertyName]; })) };
                         }
                         else if ($.isPlainObject(property) && !allProperties[propertyName]) {
-                            allProperties[propertyName] = allProperties[propertyName] || { object: {} };
-                            if (controls.filter(function (item) { return item[propertyName]; }).length === controls.length) {
-                                CombinedObject.collectProperties(controls.map(function (item) { return item[propertyName]; }), allProperties[propertyName].object);
-                            }
+                            allProperties[propertyName] = { object: {} };
+                            CombinedObject.collectProperties(controls.map(function (item) { return item[propertyName]; }), allProperties[propertyName].object);
+                        }
+                        else if (propertyName === "getInfo") {
+                            allProperties[propertyName] = function () {
+                                return CombinedObject.combineInfo(controls.map(function (item) { return item["getInfo"](); }));
+                            };
+                        }
+                        else if (propertyName === "isPropertyDisabled") {
+                            allProperties[propertyName] = function (name) {
+                                for (var i = 0; i < controls.length; i++) {
+                                    if (controls[i]["isPropertyDisabled"](name)) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            };
+                        }
+                        else if (propertyName === "isPropertyVisible") {
+                            allProperties[propertyName] = function (name) {
+                                for (var i = 0; i < controls.length; i++) {
+                                    if (!controls[i]["isPropertyVisible"](name)) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            };
                         }
                     }
-                });
+                }
             };
             CombinedObject.createSubscribe = function (object, undoEngine, propertyName, properties) {
                 object[propertyName].subscribe(function (val) {
@@ -12469,7 +12652,10 @@ var DevExpress;
             CombinedObject.generateMergedObject = function (object, allProperties, controlsCount, undoEngine) {
                 var isAdded = false;
                 for (var propertyName in allProperties) {
-                    if (allProperties[propertyName].object) {
+                    if (propertyName === "getInfo" || propertyName === "isPropertyVisible" || propertyName === "isPropertyDisabled") {
+                        object[propertyName] = allProperties[propertyName];
+                    }
+                    else if (allProperties[propertyName].object) {
                         var subObject = {};
                         if (CombinedObject.generateMergedObject(subObject, allProperties[propertyName].object, controlsCount, undoEngine)) {
                             isAdded = true;
@@ -12957,72 +13143,69 @@ var DevExpress;
                     var _this = this;
                     if (disabled === void 0) { disabled = ko.observable(false); }
                     _super.call(this);
-                    var isUpdated = false;
-                    this.disabled = disabled;
                     this.left = ko.observable(false);
                     this.right = ko.observable(false);
                     this.top = ko.observable(false);
-                    this.setAll = function () {
-                        if (_this.disabled())
-                            return;
-                        isUpdated = true;
-                        _this.left(true), _this.bottom(true), _this.right(true);
-                        isUpdated = false;
-                        _this.top(true);
-                    };
-                    this.setValue = function (name) {
-                        if (_this.disabled())
-                            return;
-                        _this[name](!_this[name]());
-                    };
-                    this.setNone = function () {
-                        if (_this.disabled())
-                            return;
-                        isUpdated = true;
-                        _this.left(false), _this.bottom(false), _this.right(false);
-                        isUpdated = false;
-                        _this.top(false);
-                    };
                     this.bottom = ko.observable(false);
-                    this._disposables.push(ko.computed(function () {
-                        if (isUpdated)
-                            return;
-                        isUpdated = true;
-                        var val = object.value() || "None";
-                        var components = val.split(',');
-                        if (val.indexOf("All") !== -1) {
-                            _this.left(true), _this.bottom(true), _this.right(true), _this.top(true);
-                        }
-                        else if (val.indexOf("None") !== -1) {
-                            _this.left(false), _this.bottom(false), _this.right(false), _this.top(false);
-                        }
-                        else {
-                            _this.left(val.indexOf("Left") !== -1);
-                            _this.top(val.indexOf("Top") !== -1);
-                            _this.right(val.indexOf("Right") !== -1);
-                            _this.bottom(val.indexOf("Bottom") !== -1);
-                        }
-                        isUpdated = false;
-                    }));
-                    this._disposables.push(ko.computed(function () {
-                        var result = [];
-                        if (_this.left() && _this.right() && _this.top() && _this.bottom()) {
-                            result.push("All");
-                        }
-                        else if (!_this.left() && !_this.right() && !_this.top() && !_this.bottom()) {
-                            result.push("None");
-                        }
-                        else {
-                            _this.left() ? result.push("Left") : null;
-                            _this.right() ? result.push("Right") : null;
-                            _this.top() ? result.push("Top") : null;
-                            _this.bottom() ? result.push("Bottom") : null;
-                        }
-                        if (!isUpdated) {
-                            object.value(result.join(','));
-                        }
+                    this.disabled = disabled;
+                    this.value = object.value;
+                    this.updateModel(object.value());
+                    this._disposables.push(object.value.subscribe(function (newVal) {
+                        _this.updateModel(newVal);
                     }));
                 }
+                BordersModel.prototype._setAllValues = function (value) {
+                    this.left(value), this.bottom(value), this.right(value), this.top(value);
+                };
+                BordersModel.prototype.setValue = function (name) {
+                    if (this.disabled())
+                        return;
+                    this[name](!this[name]());
+                    this.updateValue();
+                };
+                BordersModel.prototype.setAll = function () {
+                    if (this.disabled())
+                        return;
+                    this._setAllValues(true);
+                    this.updateValue();
+                };
+                BordersModel.prototype.setNone = function () {
+                    if (this.disabled())
+                        return;
+                    this._setAllValues(false);
+                    this.updateValue();
+                };
+                BordersModel.prototype.updateModel = function (value) {
+                    var val = value || "None";
+                    if (val.indexOf("All") !== -1) {
+                        this._setAllValues(true);
+                    }
+                    else if (val.indexOf("None") !== -1) {
+                        this._setAllValues(false);
+                    }
+                    else {
+                        this.left(val.indexOf("Left") !== -1);
+                        this.top(val.indexOf("Top") !== -1);
+                        this.right(val.indexOf("Right") !== -1);
+                        this.bottom(val.indexOf("Bottom") !== -1);
+                    }
+                };
+                BordersModel.prototype.updateValue = function () {
+                    var result = [];
+                    if (this.left() && this.right() && this.top() && this.bottom()) {
+                        result.push("All");
+                    }
+                    else if (!this.left() && !this.right() && !this.top() && !this.bottom()) {
+                        result.push("None");
+                    }
+                    else {
+                        this.left() ? result.push("Left") : null;
+                        this.right() ? result.push("Right") : null;
+                        this.top() ? result.push("Top") : null;
+                        this.bottom() ? result.push("Bottom") : null;
+                    }
+                    this.value(result.join(','));
+                };
                 return BordersModel;
             })(Designer.Disposable);
             Widgets.BordersModel = BordersModel;
@@ -13044,7 +13227,7 @@ var DevExpress;
         var dxFieldListPicker = (function (_super) {
             __extends(dxFieldListPicker, _super);
             function dxFieldListPicker(element, options) {
-                _super.call(this, element, $.extend({ showClearButton: true }, options));
+                _super.call(this, element, $.extend(options, { showClearButton: true }));
                 this._path = ko.observable("");
                 this._value = ko.observable("");
                 this.option("path") && this._path(this.option("path"));
