@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
+/*! DevExpress HTML/JS Designer - v16.2.3 - 2016-12-11
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -199,11 +199,19 @@ var DevExpress;
                             }
                         }
                         var fr = new FileReader();
-                        fr.onload = function (args) {
-                            var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
-                            _this.option("value", encodedContent);
-                        };
-                        fr.readAsDataURL(file);
+                        if (this.option("readMode") !== "text") {
+                            fr.onload = function (args) {
+                                var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
+                                _this.option("value", encodedContent);
+                            };
+                            fr.readAsDataURL(file);
+                        }
+                        else {
+                            fr.onload = function (args) {
+                                _this.option("value", fr.result);
+                            };
+                            fr.readAsText(file);
+                        }
                     }
                 };
                 dxFileImagePicker.prototype._$getInput = function () {
@@ -355,7 +363,7 @@ var DevExpress;
                 $.extend(JS.Localization.messages, json.messages);
             },
             localize: function (val) {
-                return JS.Localization.messages[val];
+                return JS.Localization.messages[val] || val;
             },
             parseDate: function (val) {
                 if (val) {
@@ -379,7 +387,7 @@ var DevExpress;
         var Utils;
         (function (Utils) {
             function getLocalization(value) {
-                return DevExpress.JS.Localization && DevExpress.JS.Localization.localize(value) || value;
+                return DevExpress.JS.Localization && DevExpress.JS.Localization.localize(value);
             }
             Utils.getLocalization = getLocalization;
             var PopupService = (function () {
@@ -1100,6 +1108,9 @@ var DevExpress;
                     }
                     return this._serialize(viewModel, serializationsInfo, refs);
                 };
+                ModelSerializer.prototype._isSerializableValue = function (resultValue) {
+                    return (Utils.isPlainObject(resultValue) && !Utils.isEmptyObject(resultValue)) || (Array.isArray(resultValue) && resultValue["length"] > 0) || (!Array.isArray(resultValue) && !Utils.isPlainObject(resultValue));
+                };
                 ModelSerializer.prototype._serialize = function (viewModel, serializationsInfo, refs) {
                     var _this = this;
                     var result = Utils.extend({}, viewModel._model), isInitial = refs === null;
@@ -1107,7 +1118,7 @@ var DevExpress;
                     serializationsInfo = viewModel.getInfo ? viewModel.getInfo() : serializationsInfo;
                     delete result["@Ref"];
                     if (viewModel["isEmpty"] && viewModel["isEmpty"]())
-                        return;
+                        return {};
                     serializationsInfo.forEach(function (modelPropertyInfo) {
                         var propertyName = modelPropertyInfo.propertyName, value = ko.unwrap(viewModel["_" + propertyName] || viewModel[propertyName]), defaultVal = modelPropertyInfo.defaultVal;
                         var resultValue = {};
@@ -1119,9 +1130,15 @@ var DevExpress;
                                 refs.linkObjTable.push({
                                     obj: value,
                                     setRef: function (index) {
-                                        result[modelPropertyInfo.modelName] = "#Ref-" + index;
+                                        if (index < 0) {
+                                            delete result[modelPropertyInfo.modelName];
+                                        }
+                                        else {
+                                            result[modelPropertyInfo.modelName] = "#Ref-" + index;
+                                        }
                                     }
                                 });
+                                resultValue = undefined;
                             }
                             else if (modelPropertyInfo.array) {
                                 resultValue = {};
@@ -1129,7 +1146,7 @@ var DevExpress;
                                 value.forEach(function (item) {
                                     var info = modelPropertyInfo.info || null;
                                     var item_ = _this._serialize(item, info, refs);
-                                    if (item_) {
+                                    if (_this._isSerializableValue(item_)) {
                                         resultValue["Item" + index] = item_;
                                         if (_this._options.useRefs) {
                                             item_["@Ref"] = (refs.objects.push(item) - 1).toString();
@@ -1160,7 +1177,7 @@ var DevExpress;
                             else {
                                 throw new Error("Invalid info '" + serializationsInfo.stringify() + "'");
                             }
-                            if ((Utils.isPlainObject(resultValue) && !Utils.isEmptyObject(resultValue)) || (Array.isArray(resultValue) && resultValue["length"] > 0) || (!Array.isArray(resultValue) && !Utils.isPlainObject(resultValue))) {
+                            if (_this._isSerializableValue(resultValue)) {
                                 result[modelPropertyInfo.modelName] = resultValue;
                             }
                         }
@@ -1168,9 +1185,7 @@ var DevExpress;
                     if (isInitial) {
                         refs.linkObjTable.forEach(function (item) {
                             var refValue = refs.objects.indexOf(item.obj);
-                            if (refValue !== -1) {
-                                item.setRef(refValue.toString());
-                            }
+                            item.setRef(refValue);
                         });
                     }
                     return result;
@@ -1793,18 +1808,14 @@ var DevExpress;
                         this.assignRightPart(operator);
                     }
                 };
-                Object.defineProperty(CriteriaOperator.prototype, "allOperands", {
-                    get: function () {
-                        var operands = [];
-                        if (this.leftPart)
-                            $.isArray(this.leftPart) ? operands.concat(this.leftPart) : operands.push(this.leftPart);
-                        if (this.rightPart)
-                            $.isArray(this.rightPart) ? operands.concat(this.rightPart) : operands.push(this.rightPart);
-                        return operands;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
+                CriteriaOperator.prototype.children = function () {
+                    var operands = [];
+                    if (this.leftPart)
+                        operands.push.apply(operands, $.isArray(this.leftPart) ? this.leftPart : [this.leftPart]);
+                    if (this.rightPart)
+                        operands.push.apply(operands, $.isArray(this.rightPart) ? this.rightPart : [this.rightPart]);
+                    return operands;
+                };
                 return CriteriaOperator;
             })();
             Data.CriteriaOperator = CriteriaOperator;
@@ -2066,17 +2077,13 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
-                Object.defineProperty(AggregateOperand.prototype, "allOperands", {
-                    get: function () {
-                        var operands = [];
-                        this.property && operands.push(this.property);
-                        this.aggregatedExpression && operands.push(this.aggregatedExpression);
-                        this.condition && operands.push(this.condition);
-                        return operands;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
+                AggregateOperand.prototype.children = function () {
+                    var operands = [];
+                    this.property && operands.push(this.property);
+                    this.aggregatedExpression && operands.push(this.aggregatedExpression);
+                    this.condition && operands.push(this.condition);
+                    return operands;
+                };
                 return AggregateOperand;
             })(CriteriaOperator);
             Data.AggregateOperand = AggregateOperand;
@@ -2551,6 +2558,11 @@ var DevExpress;
                 "LessOrEqual": "<=",
                 "GreaterOrEqual": ">="
             };
+            function criteriaForEach(operator, callback) {
+                callback(operator);
+                operator.children().forEach(function (item) { return criteriaForEach(item, callback); });
+            }
+            Data.criteriaForEach = criteriaForEach;
         })(Data = JS.Data || (JS.Data = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -2561,7 +2573,9 @@ var DevExpress;
         var Widgets;
         (function (Widgets) {
             var PathRequest = (function () {
-                function PathRequest(fullPath) {
+                function PathRequest(fullPath, pathParts) {
+                    if (pathParts === void 0) { pathParts = []; }
+                    this.pathParts = pathParts;
                     this.path = "";
                     this.fullPath = fullPath;
                     if (fullPath) {
@@ -2582,7 +2596,7 @@ var DevExpress;
             var TreeListItemViewModel = (function () {
                 function TreeListItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
                     var _this = this;
-                    if (path === void 0) { path = ""; }
+                    if (path === void 0) { path = []; }
                     if (hasItems === void 0) { hasItems = true; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
@@ -2661,7 +2675,7 @@ var DevExpress;
                             var _data = data;
                             _this.items.peek().forEach(function (item) { return item.dispose(); });
                             _this.items($.map(_data, function (item) {
-                                var newItem = new TreeListItemViewModel(options, _this.path, options.treeListController.hasItems(item), _this._onItemsVisibilityChanged, _this._rtl);
+                                var newItem = new TreeListItemViewModel(options, _this.pathParts, options.treeListController.hasItems(item), _this._onItemsVisibilityChanged, _this._rtl);
                                 newItem.data = item;
                                 newItem.level = _this.level + 1;
                                 newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
@@ -2680,7 +2694,7 @@ var DevExpress;
                         });
                     });
                     this._loader = ko.computed(function () {
-                        promise(options.itemsProvider.getItems(new PathRequest(_this.path)));
+                        promise(options.itemsProvider.getItems(new PathRequest(_this.path, _this.pathParts)));
                     });
                     return deferred.promise();
                 };
@@ -2725,15 +2739,22 @@ var DevExpress;
                 };
                 Object.defineProperty(TreeListItemViewModel.prototype, "name", {
                     get: function () {
-                        return this.data && this.data.name;
+                        return ko.unwrap(this.data && this.data.name);
                     },
                     enumerable: true,
                     configurable: true
                 });
                 Object.defineProperty(TreeListItemViewModel.prototype, "path", {
                     get: function () {
+                        return this.pathParts.join(".");
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "pathParts", {
+                    get: function () {
                         if (this.name) {
-                            return !ko.unwrap(this._path) ? ko.unwrap(this.name) : ko.unwrap(this._path) + "." + ko.unwrap(this.name);
+                            return (ko.unwrap(this._path) || []).concat([this.name]);
                         }
                         else {
                             return ko.unwrap(this._path);
@@ -2803,7 +2824,7 @@ var DevExpress;
                 __extends(TreeListRootItemViewModel, _super);
                 function TreeListRootItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
                     var _this = this;
-                    if (path === void 0) { path = ""; }
+                    if (path === void 0) { path = []; }
                     if (hasItems === void 0) { hasItems = true; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
@@ -2846,7 +2867,7 @@ var DevExpress;
             ko.bindingHandlers['treelist'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var treeListViewModel = null;
-                    var values = valueAccessor(), options = ko.unwrap(values), updateScrollBar = function () {
+                    var values = valueAccessor(), options = ko.unwrap(values), pathArray, updateScrollBar = function () {
                         var $scrollView = $(element).closest(".dx-scrollview");
                         if ($scrollView.data("dxScrollView")) {
                             var scrollView = $scrollView.dxScrollView("instance");
@@ -2864,7 +2885,14 @@ var DevExpress;
                         if (!options.rtl) {
                             options.rtl = $(element).closest('.dx-rtl').length > 0;
                         }
-                        treeListViewModel = new TreeListRootItemViewModel(options, options.path, true, updateScrollBar, options.rtl);
+                        pathArray = ko.computed(function () {
+                            var result = ko.unwrap(options.path);
+                            if (!Array.isArray(result)) {
+                                return !!result ? result.split('.') : [];
+                            }
+                            return result;
+                        });
+                        treeListViewModel = new TreeListRootItemViewModel(options, pathArray, true, updateScrollBar, options.rtl);
                         var templateHtml = $('#dx-treelist').text() || options.templateHtml, $element = $(element).html(templateHtml);
                         var childContext = bindingContext.createChildContext(treeListViewModel.items);
                         ko.applyBindings(childContext, $element.children()[0]);
@@ -2879,6 +2907,7 @@ var DevExpress;
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                         treeListViewModel && treeListViewModel.dispose();
                         subscribtion && subscribtion.dispose();
+                        pathArray && pathArray.dispose();
                     });
                     return { controlsDescendantBindings: true };
                 }
@@ -3548,8 +3577,8 @@ var DevExpress;
                         else {
                             this.specifics = parent.specifics;
                         }
-                        this.canRemove = false;
                         this.contentTemplateName = "dx-filtereditor-function-lightweight";
+                        this.canRemove = false;
                     }
                     else {
                         this.operands.push(this._createLeftPartProperty(operator.operands[0]));
@@ -11173,7 +11202,7 @@ var DevExpress;
                 result.height = controlSurfaceHeight - result.top - result.bottom;
                 return result;
             };
-            CssCalculator.DEFAULT_BORDER = "solid 1px Silver";
+            CssCalculator.DEFAULT_BORDER = "none";
             return CssCalculator;
         })();
         Designer.CssCalculator = CssCalculator;
@@ -11558,6 +11587,7 @@ var DevExpress;
                 this.dataSource = ko.computed(function () {
                     var dataSource = new DevExpress.data.DataSource({
                         store: new ControlsArrayStore(allControls()),
+                        paginate: true,
                         pageSize: 100
                     });
                     return dataSource;
@@ -11807,11 +11837,6 @@ var DevExpress;
                 }
             }
         };
-        function criteriaForEach(operator, callback) {
-            callback(operator);
-            operator.allOperands.forEach(function (item) { return criteriaForEach(item, callback); });
-        }
-        Designer.criteriaForEach = criteriaForEach;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 /// <reference path="utils.ts" />
@@ -12798,7 +12823,7 @@ var DevExpress;
                             return selection.focused().getControlModel().getMetaData().isDeleteDeny || selectionControlsLocked();
                         }
                         else {
-                            return false;
+                            return true;
                         }
                     }),
                     visible: true,
@@ -13245,9 +13270,10 @@ var DevExpress;
             dxFieldListPicker.prototype._closeOutsideDropDownHandler = function (e, ignoreContainerClicks) { _super.prototype._closeOutsideDropDownHandler.call(this, e, true); };
             dxFieldListPicker.prototype._hideOnBlur = function () { return false; };
             dxFieldListPicker.prototype._popupConfig = function () {
+                var dxPolymorphWidget = this._options.integrationOptions.templates["dx-polymorph-widget"];
                 return $.extend(_super.prototype._popupConfig.call(this), {
                     container: '.dx-viewport',
-                    contentTemplate: this._options._templates.template,
+                    contentTemplate: dxPolymorphWidget && dxPolymorphWidget._template,
                     closeOnOutsideClick: true
                 });
             };

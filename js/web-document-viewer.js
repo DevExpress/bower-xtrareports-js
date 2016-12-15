@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
+/*! DevExpress HTML/JS Designer - v16.2.3 - 2016-12-12
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -211,6 +211,28 @@ var DevExpress;
                 from: excludeDifferentFilesMode,
                 values: Report.defaultExportModePreview
             };
+            Report.previewBackColor = { propertyName: "backColor", modelName: "@BackColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
+            Report.previewSides = { propertyName: "borders", modelName: "@Sides" };
+            Report.previewBorderColor = { propertyName: "borderColor", modelName: "@BorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
+            Report.previewBorderStyle = { propertyName: "borderStyle", modelName: "@BorderStyle" };
+            Report.previewBorderDashStyle = { propertyName: "borderDashStyle", modelName: "@BorderDashStyle" };
+            Report.previewBorderWidth = { propertyName: "borderWidth", modelName: "@BorderWidthSerializable", from: Designer.floatFromModel };
+            Report.previewForeColor = { propertyName: "foreColor", modelName: "@ForeColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
+            Report.previewFont = { propertyName: "font", modelName: "@Font" };
+            Report.previewPadding = { propertyName: "padding", modelName: "@Padding" };
+            Report.previewTextAlignment = { propertyName: "textAlignment", modelName: "@TextAlignment" };
+            Report.brickStyleSerializationsInfo = [
+                Report.previewBackColor,
+                Report.previewSides,
+                Report.previewBorderColor,
+                Report.previewBorderStyle,
+                Report.previewBorderDashStyle,
+                Report.previewBorderWidth,
+                Report.previewForeColor,
+                Report.previewFont,
+                Report.previewPadding,
+                Report.previewTextAlignment
+            ];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -229,7 +251,9 @@ var DevExpress;
             Preview.AsyncExportApproach = false;
             var ExportOptionsModel = (function () {
                 function ExportOptionsModel(reportPreview) {
+                    var _this = this;
                     this.actions = [];
+                    this._reportPreview = reportPreview;
                     this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Export Options"), "dxrd-preview-export-options", reportPreview.exportOptionsModel, "properties", ko.pureComputed(function () { return !!reportPreview.exportOptionsModel(); }));
                     this.actions.push({
                         id: Preview.ActionId.ExportTo,
@@ -239,24 +263,10 @@ var DevExpress;
                         clickAction: function (model) {
                             if (reportPreview.exportDisabled())
                                 return;
-                            if (model.itemData.format) {
-                                reportPreview.exportDocumentTo(model.itemData.format);
-                            }
+                            _this._exportDocumentByFormat(model.itemData.format);
                         },
                         items: ko.pureComputed(function () {
-                            var result = [];
-                            if (reportPreview.exportOptionsModel()) {
-                                reportPreview.exportOptionsModel().pdf && result.push({ text: 'PDF', format: 'pdf' });
-                                reportPreview.exportOptionsModel().xls && result.push({ text: 'XLS', format: 'xls' });
-                                reportPreview.exportOptionsModel().xlsx && result.push({ text: 'XLSX', format: 'xlsx' });
-                                reportPreview.exportOptionsModel().rtf && result.push({ text: 'RTF', format: 'rtf' });
-                                reportPreview.exportOptionsModel().mht && result.push({ text: 'MHT', format: 'mht' });
-                                reportPreview.exportOptionsModel().html && result.push({ text: 'HTML', format: 'html' });
-                                reportPreview.exportOptionsModel().textExportOptions && result.push({ text: 'Text', format: 'txt' });
-                                reportPreview.exportOptionsModel().csv && result.push({ text: 'CSV', format: 'csv' });
-                                reportPreview.exportOptionsModel().image && result.push({ text: 'Image', format: 'image' });
-                            }
-                            ;
+                            var result = _this._getExportFormatItems();
                             return [{
                                 text: "Export To",
                                 imageClassName: "dxrd-image-export-to",
@@ -266,6 +276,26 @@ var DevExpress;
                         templateName: "dxrd-preview-export-to"
                     });
                 }
+                ExportOptionsModel.prototype._getExportFormatItems = function () {
+                    var result = [];
+                    var exportOptionsModel = this._reportPreview.exportOptionsModel();
+                    if (exportOptionsModel) {
+                        exportOptionsModel.pdf && result.push({ text: 'PDF', format: 'pdf' });
+                        exportOptionsModel.xls && result.push({ text: 'XLS', format: 'xls' });
+                        exportOptionsModel.xlsx && result.push({ text: 'XLSX', format: 'xlsx' });
+                        exportOptionsModel.rtf && result.push({ text: 'RTF', format: 'rtf' });
+                        exportOptionsModel.mht && result.push({ text: 'MHT', format: 'mht' });
+                        exportOptionsModel.html && result.push({ text: 'HTML', format: 'html' });
+                        exportOptionsModel.textExportOptions && result.push({ text: 'Text', format: 'txt' });
+                        exportOptionsModel.csv && result.push({ text: 'CSV', format: 'csv' });
+                        exportOptionsModel.image && result.push({ text: 'Image', format: 'image' });
+                    }
+                    ;
+                    return result;
+                };
+                ExportOptionsModel.prototype._exportDocumentByFormat = function (format) {
+                    format && this._reportPreview.exportDocumentTo(format);
+                };
                 ExportOptionsModel.prototype.getActions = function (context) {
                     return this.actions;
                 };
@@ -574,7 +604,9 @@ var DevExpress;
                     from: Designer.fromEnum,
                     values: {
                         "Hight": "None",
-                        "PdfA2b": "PdfA2b"
+                        "PdfA1b": "PdfA1b",
+                        "PdfA2b": "PdfA2b",
+                        "PdfA3b": "PdfA3b"
                     }
                 },
                 Report.pageRange,
@@ -970,11 +1002,23 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
-            var previewDefaultResolution = 96;
+            Preview.previewDefaultResolution = 96;
             function convetToPercent(childSize, parentSize) {
                 return childSize * 100 / parentSize + '%';
             }
-            function initializeBrick(brick, processClick, rtl) {
+            Preview.convetToPercent = convetToPercent;
+            function brickText(brick, editingFieldsProvider) {
+                var fields = editingFieldsProvider ? editingFieldsProvider() : [];
+                if (brick.efIndex && brick.efIndex > 0 && brick.efIndex <= fields.length && fields[brick.efIndex - 1].type() === "text") {
+                    return fields[brick.efIndex - 1].editValue();
+                }
+                else {
+                    var brickTextProperty = brick.content && brick.content.filter(function (x) { return x.Key === "text"; })[0];
+                    return brickTextProperty && brickTextProperty.Value;
+                }
+            }
+            Preview.brickText = brickText;
+            function initializeBrick(brick, processClick, zoom, editingFieldsProvider) {
                 if (!brick) {
                     return;
                 }
@@ -983,12 +1027,13 @@ var DevExpress;
                     processClick && processClick(brick);
                 };
                 brick.bricks && brick.bricks.forEach(function (childBrick) {
-                    childBrick[rtl ? 'rightP' : 'leftP'] = convetToPercent(childBrick.left, brick.width);
+                    childBrick[brick.rtl ? 'rightP' : 'leftP'] = convetToPercent(childBrick.left, brick.width);
                     childBrick.widthP = convetToPercent(childBrick.width, brick.width);
                     childBrick.topP = convetToPercent(childBrick.top, brick.height);
                     childBrick.heightP = convetToPercent(childBrick.height, brick.height);
-                    initializeBrick(childBrick, processClick, rtl);
+                    initializeBrick(childBrick, processClick, zoom, editingFieldsProvider);
                 });
+                brick.text = function () { return brickText(brick, editingFieldsProvider); };
             }
             Preview.initializeBrick = initializeBrick;
             var PreviewPageBrickProvider = (function () {
@@ -1000,11 +1045,25 @@ var DevExpress;
                 return PreviewPageBrickProvider;
             })();
             Preview.PreviewPageBrickProvider = PreviewPageBrickProvider;
+            function getCurrentResolution(zoom) {
+                return Math.floor((zoom || 1) * Preview.previewDefaultResolution);
+            }
+            Preview.getCurrentResolution = getCurrentResolution;
             var PreviewPage = (function (_super) {
                 __extends(PreviewPage, _super);
-                function PreviewPage(pageIndex, width, height, zoom, documentId, brickProvider, loading, processClick) {
+                function PreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider) {
                     var _this = this;
                     _super.call(this);
+                    this.editingFields = ko.pureComputed(function () {
+                        var fields = [];
+                        var fieldsModel = _this._editingFieldsProvider();
+                        for (var i = 0, l = fieldsModel.length; i < l; i++) {
+                            if (fieldsModel[i].pageIndex() === _this.pageIndex) {
+                                fields.push(fieldsModel[i].createViewModel(_this.realZoom, _this.originalWidth(), _this.originalHeight(), _this._editingFieldsProvider));
+                            }
+                        }
+                        return fields;
+                    });
                     this.isClientVisible = ko.observable(false);
                     this.originalHeight = ko.observable(0);
                     this.originalWidth = ko.observable(0);
@@ -1017,6 +1076,9 @@ var DevExpress;
                     this.brick = ko.observable(null);
                     this.brickLoading = ko.observable(true);
                     this.active = ko.observable(false);
+                    this.maxZoom = 0;
+                    this.disableResolutionReduction = false;
+                    this._lastZoom = 0;
                     this._selectedBrickPath = null;
                     this.pageIndex = pageIndex;
                     this.documentId = documentId || ko.observable(null);
@@ -1025,16 +1087,18 @@ var DevExpress;
                     this.originalHeight(ko.unwrap(height));
                     this.originalWidth(ko.unwrap(width));
                     this.zoom = zoom;
+                    this._editingFieldsProvider = editingFieldsProvider || (function () { return []; });
                     this.isClientVisible.subscribe(function (newVal) {
                         if (_this.isClientVisible()) {
                             _this._setPageImgSrc(documentId(), _this.zoom());
                         }
                     });
+                    this.color = color;
                     this.width = ko.pureComputed(function () {
-                        return Math.ceil(_this.originalWidth() * _this._getCurrentResolution(_this.zoom()) / previewDefaultResolution);
+                        return Math.ceil(_this.originalWidth() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution);
                     });
                     this.height = ko.pureComputed(function () {
-                        return Math.ceil(_this.originalHeight() * _this._getCurrentResolution(_this.zoom()) / previewDefaultResolution);
+                        return Math.ceil(_this.originalHeight() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution);
                     });
                     var _self = this;
                     this.isEmpty = pageIndex === -1 && !brickProvider && !processClick;
@@ -1053,12 +1117,7 @@ var DevExpress;
                                         _self.brickColumnWidthArray = result.columnWidthArray;
                                         _self.originalWidth(result.brick.width);
                                         _self.originalHeight(result.brick.height);
-                                        initializeBrick(result.brick, processClick, result.rtl);
-                                        result.brick[result.rtl ? 'rightP' : 'leftP'] = convetToPercent(result.brick.left, _this.originalWidth());
-                                        result.brick.topP = convetToPercent(result.brick.top, _this.originalHeight());
-                                        result.brick.widthP = convetToPercent(result.brick.width, _this.originalWidth());
-                                        result.brick.heightP = convetToPercent(result.brick.height, _this.originalHeight());
-                                        _self.brick(result.brick);
+                                        _self.initializeBrick(result.brick, processClick, _self.zoom, editingFieldsProvider);
                                         _self._selectedBrickPath && _self.selectBrick(_self._selectedBrickPath);
                                     }
                                     finally {
@@ -1115,12 +1174,9 @@ var DevExpress;
                         }
                     }));
                 }
-                PreviewPage.prototype._getCurrentResolution = function (zoom) {
-                    return Math.round((zoom ? zoom : 1) * previewDefaultResolution);
-                };
                 PreviewPage.prototype.updateSize = function (zoom) {
-                    var newResolution = this._getCurrentResolution(zoom);
-                    this.realZoom(newResolution / previewDefaultResolution);
+                    var newResolution = getCurrentResolution(zoom);
+                    this.realZoom(newResolution / Preview.previewDefaultResolution);
                     return newResolution;
                 };
                 PreviewPage.prototype.clearBricks = function () {
@@ -1133,13 +1189,31 @@ var DevExpress;
                         this.imageSrc(null);
                         return;
                     }
+                    if (this.maxZoom && this.maxZoom < zoom) {
+                        zoom = this.maxZoom;
+                    }
+                    if (this._lastZoom < zoom) {
+                        this._lastZoom = zoom;
+                    }
+                    else {
+                        if (this.actualResolution && this.disableResolutionReduction && this.imageSrc())
+                            return;
+                    }
                     var newResolution = this.updateSize(zoom);
                     if ((this.actualResolution === newResolution || newResolution < 20) && this.imageSrc()) {
                         return;
                     }
                     this.actualResolution = newResolution;
-                    var imageResolution = Math.round(newResolution * (window["devicePixelRatio"] || 1));
+                    var imageResolution = Math.floor(newResolution * (window["devicePixelRatio"] || 1));
                     this.imageSrc(Preview.HandlerUri + "?actionKey=getPage&unifier=" + Preview.generateGuid() + "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution })));
+                };
+                PreviewPage.prototype.initializeBrick = function (brick, processClick, zoom, editingFieldsProvider) {
+                    initializeBrick(brick, processClick, this.zoom, editingFieldsProvider);
+                    brick['leftP'] = convetToPercent(brick.left, this.originalWidth());
+                    brick.topP = convetToPercent(brick.top, this.originalHeight());
+                    brick.widthP = convetToPercent(brick.width, this.originalWidth());
+                    brick.heightP = convetToPercent(brick.height, this.originalHeight());
+                    this.brick(brick);
                 };
                 return PreviewPage;
             })(DevExpress.Designer.Disposable);
@@ -1289,7 +1363,7 @@ var DevExpress;
             Preview.SearchViewModel = SearchViewModel;
             var SearchResultNavigator = (function (_super) {
                 __extends(SearchResultNavigator, _super);
-                function SearchResultNavigator(seachModel, reportPreview) {
+                function SearchResultNavigator(searchModel, reportPreview) {
                     var _this = this;
                     _super.call(this);
                     this.currentResult = ko.observable(null);
@@ -1302,12 +1376,12 @@ var DevExpress;
                         page && page.selectBrick(foundResult.indexes);
                     };
                     this.getFirstMatchFromPage = function (pageIndex, up, thisPageOnly) {
-                        if (!seachModel.searchResult() || seachModel.searchResult().length === 0) {
+                        if (!searchModel.searchResult() || searchModel.searchResult().length === 0) {
                             return null;
                         }
                         var firstMatch;
                         var sortOutResult = function (index) {
-                            seachModel.searchResult().forEach(function (m) {
+                            searchModel.searchResult().forEach(function (m) {
                                 if (thisPageOnly && m.pageIndex === index) {
                                     if (!firstMatch || (m.id < firstMatch.id && !up || m.id > firstMatch.id && up)) {
                                         firstMatch = m;
@@ -1325,8 +1399,8 @@ var DevExpress;
                         return firstMatch;
                     };
                     var _setCurrentResult = function (highlight, resultId, thisPageOnly) {
-                        if (seachModel.searchResult() && seachModel.searchResult().length !== 0) {
-                            var currentResult = (resultId >= 0 && seachModel.searchResult().length > resultId) ? seachModel.searchResult()[resultId] : _this.getFirstMatchFromPage(reportPreview.pageIndex.peek(), seachModel.searchUp.peek(), thisPageOnly);
+                        if (searchModel.searchResult() && searchModel.searchResult().length !== 0) {
+                            var currentResult = (resultId >= 0 && searchModel.searchResult().length > resultId) ? searchModel.searchResult()[resultId] : _this.getFirstMatchFromPage(reportPreview.pageIndex.peek(), searchModel.searchUp.peek(), thisPageOnly);
                             _this.currentResult(currentResult);
                             highlight && goToMatchedResult(_this.currentResult.peek());
                         }
@@ -1343,11 +1417,11 @@ var DevExpress;
                     this._disposables.push(reportPreview.pageIndex.subscribe(function (newPageIndex) {
                         _this.currentResult(null);
                     }));
-                    this._disposables.push(seachModel.searchResult.subscribe(function () {
+                    this._disposables.push(searchModel.searchResult.subscribe(function () {
                         _setCurrentResult(true);
                     }));
                     this.next = function (up) {
-                        if (!seachModel.searchResult()) {
+                        if (!searchModel.searchResult()) {
                             return false;
                         }
                         !_this.currentResult() && _this.currentResult(_this.getFirstMatchFromPage(reportPreview.pageIndex(), up));
@@ -1356,12 +1430,12 @@ var DevExpress;
                         }
                         var id, currentId = _this.currentResult().id;
                         if (up) {
-                            id = (currentId === 0) ? seachModel.searchResult().length - 1 : (currentId - 1);
+                            id = (currentId === 0) ? searchModel.searchResult().length - 1 : (currentId - 1);
                         }
                         else {
-                            id = (currentId === seachModel.searchResult().length - 1) ? 0 : (currentId + 1);
+                            id = (currentId === searchModel.searchResult().length - 1) ? 0 : (currentId + 1);
                         }
-                        _this.currentResult(seachModel.searchResult()[id]);
+                        _this.currentResult(searchModel.searchResult()[id]);
                         goToMatchedResult(_this.currentResult());
                         return true;
                     };
@@ -1373,12 +1447,8 @@ var DevExpress;
             var dxSearchEditor = (function (_super) {
                 __extends(dxSearchEditor, _super);
                 function dxSearchEditor(element, options) {
-                    this._activeStateUnit = EDITOR_BUTTON_SELECTOR;
-                    var _self = this;
+                    var _this = this;
                     var searchModel = null;
-                    this._focusRequestRaised = function () {
-                        _self.focus();
-                    };
                     options["onEnterKey"] = function (e) {
                         if (DevExpress.browser && DevExpress.browser.msie && e && e.component) {
                             e.component.blur();
@@ -1389,11 +1459,15 @@ var DevExpress;
                         if (_searchModel && (_searchModel.searchText() != text))
                             _searchModel.searchText(text);
                         else
-                            _self.findNext(searchModel, e && e.jQueryEvent && e.jQueryEvent.shiftKey);
+                            _this.findNext(searchModel, e && e.jQueryEvent && e.jQueryEvent.shiftKey);
                     };
                     _super.call(this, element, options);
+                    this._activeStateUnit = EDITOR_BUTTON_SELECTOR;
+                    this._focusRequestRaised = function () {
+                        _this.focus();
+                    };
                     searchModel = options && options.searchModel;
-                    searchModel().focusRequested.subscribe(function (val) { return _self._focusRequestRaised(); });
+                    searchModel().focusRequested.subscribe(function (val) { return _this._focusRequestRaised(); });
                 }
                 dxSearchEditor.prototype.findNext = function (searchModel, searchUp) {
                     var _searchModel = null;
@@ -1649,6 +1723,7 @@ var DevExpress;
                             newItems = this.customizeParameterLookUpSource(parameterDescriptor, items.slice(0));
                         return newItems ? newItems : new DevExpress.data.DataSource({
                             store: sort ? new DevExpress.Designer.SortedArrayStore(items, "displayValue") : new DevExpress.data.ArrayStore(items),
+                            paginate: true,
                             pageSize: 100
                         });
                     }
@@ -1884,7 +1959,18 @@ var DevExpress;
                         _this.initialize(originalParametersInfo);
                     }));
                     this.initialize(reportPreview.originalParametersInfo());
-                    this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Parameters"), "dxrd-preview-parameters", this, "parameters", ko.pureComputed(function () { return !_this.isEmpty(); }));
+                    var notEmpty = ko.pureComputed(function () { return !_this.isEmpty(); });
+                    this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Parameters"), "dxrd-preview-parameters", this, "parameters", notEmpty);
+                    var popupVisibleSwitch = ko.observable(false);
+                    var popupVisible = ko.pureComputed({
+                        read: function () {
+                            return notEmpty() && popupVisibleSwitch();
+                        },
+                        write: function (newVal) {
+                            return popupVisibleSwitch(newVal);
+                        }
+                    });
+                    this.popupInfo = { visible: popupVisible, notEmpty: notEmpty };
                 }
                 Object.defineProperty(PreviewParametersViewModel.prototype, "_visibleParameters", {
                     get: function () {
@@ -1986,6 +2072,7 @@ var DevExpress;
                     else {
                         this._reportPreview.removeEmptyPages();
                         this.tabInfo.active(true);
+                        this.popupInfo.visible(true);
                         this._reportPreview.pageLoading(false);
                     }
                 };
@@ -2093,12 +2180,15 @@ var DevExpress;
                     this.predefinedZoomLevels = ko.observableArray([5, 2, 1.5, 1, 0.75, 0.5, 0.25]);
                     this._pageWidth = ko.observable(818);
                     this._pageHeight = ko.observable(1058);
+                    this._pageBackColor = ko.observable('');
                     this._currentReportId = ko.observable(null);
                     this._currentDocumentId = ko.observable(null);
                     this._currentOperationId = ko.observable(null);
                     this._stopBuildRequests = {};
                     this._closeDocumentRequests = {};
                     this._startBuildOperationId = "";
+                    this._editingFields = ko.observable([]);
+                    this._editingValuesSubscriptions = [];
                     this._drillDownState = [];
                     this.rtlReport = ko.observable(false);
                     this.currentPage = ko.observable(null);
@@ -2136,6 +2226,7 @@ var DevExpress;
                             }
                         }
                     });
+                    this.editingFieldsProvider = function () { return _this._editingFields(); };
                     this._currentPageText = ko.pureComputed(function () {
                         if (_this.pageIndex() === -1) {
                             return DevExpress.Designer.getLocalization('0 pages');
@@ -2151,6 +2242,7 @@ var DevExpress;
                     this.previewSize = ko.observable(0);
                     this.onSizeChanged = ko.observable();
                     this.previewVisible = ko.observable(false);
+                    this.editingFieldsHighlighted = ko.observable(false);
                     this.canSwitchToDesigner = true;
                     this.allowURLsWithJSContent = false;
                     Preview.HandlerUri = handlerUri || Preview.HandlerUri;
@@ -2225,16 +2317,24 @@ var DevExpress;
                     this.pageIndex(-1);
                     this.pageLoading(true);
                     this.progressBar.complete();
-                    this.pages([new Preview.PreviewPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, null, this.pageLoading)]);
+                    this.pages([this.createPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, this._pageBackColor.peek(), null, this.pageLoading)]);
+                };
+                ReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider) {
+                    return new Preview.PreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider);
                 };
                 ReportPreview.prototype._cleanTabInfo = function () {
                     this.exportOptionsModel(null);
                     this.documentMap(null);
                 };
+                ReportPreview.prototype._clearReportInfo = function () {
+                    this._cleanTabInfo();
+                    this.closeReport();
+                    this.originalParametersInfo(null);
+                };
                 ReportPreview.prototype._export = function (args, actionUri, printable) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    if (Preview.AsyncExportApproach) {
+                    if (this._editingFields().length > 0 || Preview.AsyncExportApproach) {
                         var self = this;
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
@@ -2278,7 +2378,14 @@ var DevExpress;
                             }
                             else {
                                 var validateUrl = function (url) {
-                                    return _self.allowURLsWithJSContent || (typeof url === "string" && (url.toLocaleLowerCase().indexOf("javascript:") === -1));
+                                    var isUrlString = typeof url === "string";
+                                    if (isUrlString) {
+                                        url = url.toLocaleLowerCase();
+                                    }
+                                    if (url === "empty") {
+                                        return false;
+                                    }
+                                    return _self.allowURLsWithJSContent || (isUrlString && (url.indexOf("javascript:") === -1));
                                 };
                                 if (brick.navigation.url && validateUrl(brick.navigation.url)) {
                                     _self._safelyRunWindowOpen(brick.navigation.url, brick.navigation.target || "_blank");
@@ -2289,9 +2396,7 @@ var DevExpress;
                 };
                 ReportPreview.prototype.openReport = function (reportName) {
                     var _this = this;
-                    this._cleanTabInfo();
-                    this.closeReport();
-                    this.originalParametersInfo(null);
+                    this._clearReportInfo();
                     var deferred = $.Deferred();
                     this._openReportOperationDeferred = deferred;
                     this.requestWrapper.openReport(reportName).done(function (response) {
@@ -2302,36 +2407,54 @@ var DevExpress;
                     });
                     return this.initialize(deferred.promise());
                 };
+                ReportPreview.prototype.drillThrough = function (customData, closeCurrentReport) {
+                    var _this = this;
+                    if (closeCurrentReport === void 0) { closeCurrentReport = true; }
+                    var deferred = $.Deferred();
+                    this.requestWrapper.drillThrough(customData).done(function (response) {
+                        if (closeCurrentReport) {
+                            _this._clearReportInfo();
+                            _this.initialize(deferred.promise());
+                        }
+                        deferred.resolve(response);
+                    }).fail(function (error) {
+                        deferred.reject(error);
+                        _this._processError(DevExpress.Designer.getLocalization("Drill through operation failed"), error);
+                    });
+                    return deferred.promise();
+                };
                 ReportPreview.prototype.initialize = function (initializeDataPromise) {
+                    var _this = this;
                     this._currentReportId(null);
                     this._currentDocumentId(null);
-                    var _self = this;
                     this._initialize();
                     initializeDataPromise.done(function (previewInitialize) {
                         if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
-                            _self._currentReportId(previewInitialize.reportId);
-                            _self._currentDocumentId(previewInitialize.documentId);
-                            _self.rtlReport(previewInitialize.rtlReport);
-                            if (previewInitialize.pageHeight) {
-                                _self._pageHeight(previewInitialize.pageHeight);
-                            }
-                            if (previewInitialize.pageWidth) {
-                                _self._pageWidth(previewInitialize.pageWidth);
+                            _this._currentReportId(previewInitialize.reportId);
+                            _this._currentDocumentId(previewInitialize.documentId);
+                            _this.rtlReport(previewInitialize.rtlReport);
+                            var pageSettings = previewInitialize.pageSettings;
+                            if (pageSettings) {
+                                if (pageSettings.height)
+                                    _this._pageHeight(pageSettings.height);
+                                if (pageSettings.width)
+                                    _this._pageWidth(pageSettings.width);
+                                _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
                             }
                             var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(previewInitialize.exportOptions && JSON.parse(previewInitialize.exportOptions));
-                            _self.exportOptionsModel(deserializedExportOptions);
-                            _self.originalParametersInfo(previewInitialize.parametersInfo);
+                            _this.exportOptionsModel(deserializedExportOptions);
+                            _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
-                                var doGetBuildStatusFunc = _self.getDoGetBuildStatusFunc();
+                                var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
                         }
                         else {
-                            _self.pageLoading(false);
-                            _self._processError(DevExpress.Designer.getLocalization("The report preview initialization has failed"), previewInitialize && previewInitialize.error);
+                            _this.pageLoading(false);
+                            _this._processError(DevExpress.Designer.getLocalization("The report preview initialization has failed"), previewInitialize && previewInitialize.error);
                         }
                     }).fail(function (error) {
-                        _self.removeEmptyPages();
+                        _this.removeEmptyPages();
                     });
                     return initializeDataPromise;
                 };
@@ -2449,6 +2572,18 @@ var DevExpress;
                         }
                         _self._drillDownState = response.drillDownKeys || [];
                         _self.documentMap(response.documentMap);
+                        _self._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
+                        _self._editingValuesSubscriptions = [];
+                        _self._editingFields((response.editingFields || []).map(function (item) {
+                            var field = new Preview.EditingField(item);
+                            if (_self.editingFieldChanged) {
+                                var subscription = field.editValue.subscribe(function () {
+                                    _self.editingFieldChanged(field);
+                                });
+                                _self._editingValuesSubscriptions.push(subscription);
+                            }
+                            return field;
+                        }));
                     }).fail(function (error) {
                         _self._processError(DevExpress.Designer.getLocalization("Cannot obtain additional document data for the current document"), error, _self._closeDocumentRequests[documentId]);
                     });
@@ -2460,7 +2595,8 @@ var DevExpress;
                     var args = encodeURIComponent(JSON.stringify({
                         documentId: this._currentDocumentId(),
                         exportOptions: serializedExportOptions,
-                        format: format
+                        format: format,
+                        editingFieldValues: this._editingFields && this._editingFields().map(function (item) { return item.editValue(); })
                     }));
                     this._export(args, Preview.HandlerUri);
                 };
@@ -2477,7 +2613,8 @@ var DevExpress;
                     var args = encodeURIComponent(JSON.stringify({
                         documentId: this._currentDocumentId(),
                         exportOptions: serializedExportOptions,
-                        format: "printpdf"
+                        format: "printpdf",
+                        editingFieldValues: this._editingFields && this._editingFields().map(function (item) { return item.editValue(); })
                     }));
                     this._export(args, Preview.HandlerUri, true);
                 };
@@ -2512,12 +2649,12 @@ var DevExpress;
                     if (!forcePageChanging && this.pageIndex.peek() === pageIndex || this.pages.peek().length === 0 || pageIndex < 0 || pageIndex >= this.pages.peek().length) {
                         return;
                     }
-                    this.pageIndex(pageIndex);
                     this.pages.peek().forEach(function (page) {
                         var visible = page.pageIndex === pageIndex;
                         page.active(visible);
                         page.isClientVisible(visible);
                     });
+                    this.pageIndex(pageIndex);
                 };
                 ReportPreview.prototype.getSelectedContent = function () {
                     var currentPage = this.pages()[this.pageIndex()];
@@ -2554,8 +2691,7 @@ var DevExpress;
                             row = [];
                             sortedActiveBricks[activeBrick.row] = row;
                         }
-                        var brickText = activeBrick.content && activeBrick.content.filter(function (x) { return x.Key === "text"; })[0];
-                        row[activeBrick.col] = brickText && brickText.Value;
+                        row[activeBrick.col] = activeBrick.text();
                         if (firstUsedColumn > activeBrick.col) {
                             firstUsedColumn = activeBrick.col;
                         }
@@ -2610,7 +2746,8 @@ var DevExpress;
                 };
             }
             Preview.updatePreviewContentSize = updatePreviewContentSize;
-            function updatePreviewZoomWithAutoFit(width, height, element) {
+            function updatePreviewZoomWithAutoFit(width, height, element, direction) {
+                if (direction === void 0) { direction = "both"; }
                 var $element = $(element);
                 var $previewWrapper = $element.closest(".dxrd-preview-wrapper");
                 var $preview = $element.closest(".dxrd-preview");
@@ -2618,33 +2755,28 @@ var DevExpress;
                     return 1;
                 }
                 var rightAreaWidth = $preview.find(".dxrd-right-panel").outerWidth() + $preview.find(".dxrd-right-tabs").outerWidth();
-                var surfaceWidth = $preview.width() - (rightAreaWidth + 10);
+                var surfaceWidth = $preview.width() - (rightAreaWidth > 0 ? (rightAreaWidth + 10) : 0);
                 var topAreaHeight = parseFloat($previewWrapper.css("top").split("px")[0]);
                 var designerHeight = $preview.outerHeight();
                 var needHeight = designerHeight - topAreaHeight;
                 var zoomHeight = needHeight / (height + 6);
                 var zoomWidth = surfaceWidth / width;
+                if (direction === 'horizontal') {
+                    return zoomWidth;
+                }
                 return Math.min(zoomHeight, zoomWidth);
             }
             Preview.updatePreviewZoomWithAutoFit = updatePreviewZoomWithAutoFit;
-            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, applyBindings, allowURLsWithJSContent) {
+            function createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl) {
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                if (localization) {
-                    DevExpress.JS.Localization.addCultureInfo({
-                        messages: localization
-                    });
-                }
-                DevExpress["config"]({ rtlEnabled: !!rtl });
-                var previewWrapper = new Preview.PreviewRequestWrapper();
-                var reportPreview = new ReportPreview(handlerUri, previewWrapper, undefined, rtl);
-                var searchModel = new Preview.SearchViewModel(reportPreview);
+                var previewWrapper = new Preview.PreviewRequestWrapper(), reportPreview = new ReportPreview(handlerUri, previewWrapper, undefined, rtl), searchModel = new Preview.SearchViewModel(reportPreview);
                 var documentMapModel = new Preview.DocumentMapModel(reportPreview);
                 var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks));
                 var exportModel = new Preview.ExportOptionsModel(reportPreview);
                 reportPreview.canSwitchToDesigner = !previewVisible;
-                reportPreview.allowURLsWithJSContent = !!allowURLsWithJSContent;
+                reportPreview.allowURLsWithJSContent = allowURLsWithJSContent;
                 previewWrapper.initialize(reportPreview, parametersModel, searchModel);
                 var tabPanel = new DevExpress.Designer.TabPanel([
                     parametersModel.tabInfo,
@@ -2656,7 +2788,7 @@ var DevExpress;
                 var globalActionProviders = ko.observableArray([new Preview.PreviewActions(reportPreview), exportModel, searchModel, new Preview.PreviewDesignerActions(reportPreview)]);
                 reportPreview.previewVisible(previewVisible);
                 var designerModel = {
-                    rootStyle: "dxrd-preview",
+                    rootStyle: { 'dxrd-preview': true },
                     reportPreview: reportPreview,
                     parametersModel: parametersModel,
                     exportModel: exportModel,
@@ -2681,10 +2813,6 @@ var DevExpress;
                     { templateName: 'dxrdp-surface', model: designerModel.reportPreview },
                     { templateName: 'dxrd-right-panel-template-base', model: designerModel }
                 ];
-                if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
-                    $(element).children().remove();
-                    ko.applyBindings(designerModel, element);
-                }
                 var updatePreviewContentSize_ = updatePreviewContentSize(reportPreview.previewSize, element, rtl);
                 $(window).bind("resize", function () {
                     updatePreviewContentSize_();
@@ -2696,11 +2824,37 @@ var DevExpress;
                     updatePreviewContentSize_();
                 };
                 updatePreviewContentSize_();
+                if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
+                    $(element).children().remove();
+                    ko.applyBindings(designerModel, element);
+                }
                 return designerModel;
             }
+            Preview.createDesktopPreview = createDesktopPreview;
+            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent) {
+                if (previewVisible === void 0) { previewVisible = true; }
+                if (applyBindings === void 0) { applyBindings = true; }
+                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
+                if (!localization) {
+                    localization = {};
+                    Object.keys(DevExpress.Designer.localization_values).forEach(function (value) {
+                        localization[DevExpress.Designer.localization_values[value]] = value;
+                    });
+                }
+                DevExpress.JS.Localization.addCultureInfo({
+                    messages: localization
+                });
+                DevExpress["config"]({ rtlEnabled: !!rtl });
+                if (isMobile) {
+                    return Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
+                }
+                else {
+                    return createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
+                }
+            }
             Preview.createPreview = createPreview;
-            function createAndInitPreviewModel(viewerModel, element, callbacks, rtl, applyBindings) {
-                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, rtl, applyBindings, viewerModel.allowURLsWithJSContent);
+            function createAndInitPreviewModel(viewerModel, element, callbacks, applyBindings) {
+                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent);
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
                 }
@@ -2724,6 +2878,7 @@ var DevExpress;
                 NextPage: "dxxrp-next-page",
                 LastPage: "dxxrp-last-page",
                 MultipageToggle: "dxxrp-multipage-toggle",
+                HightlightEditingFields: "dxxrp-highlight-editing-fields",
                 ZoomOut: "dxxrp-zoom-out",
                 ZoomSelector: "dxxrp-zoom-selector",
                 ZoomIn: "dxxrp-zoom-in",
@@ -2974,6 +3129,19 @@ var DevExpress;
                         }
                     });
                     this.actions.push({
+                        id: Preview.ActionId.HightlightEditingFields,
+                        text: DevExpress.Designer.getLocalization("Highlight Editing Fields"),
+                        imageClassName: "dxrp-image-hightlight-editing-fields",
+                        disabled: ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                        selected: ko.pureComputed(function () { return reportPreview.editingFieldsHighlighted(); }),
+                        hotKey: { ctrlKey: true, keyCode: "H".charCodeAt(0) },
+                        clickAction: function () {
+                            reportPreview.editingFieldsHighlighted(!reportPreview.editingFieldsHighlighted());
+                        },
+                        hasSeparator: true
+                    });
+                    this.actions.push({
                         id: Preview.ActionId.Print,
                         text: DevExpress.Designer.getLocalization("Print"),
                         imageClassName: "dxrd-image-print",
@@ -3007,6 +3175,1759 @@ var DevExpress;
                 return PreviewActions;
             })();
             Preview.PreviewActions = PreviewActions;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var EditingField = (function () {
+                function EditingField(model) {
+                    this._model = model;
+                    this.readOnly = ko.observable(model.readOnly);
+                    this.editValue = ko.observable(model.editValue);
+                }
+                EditingField.prototype.editorName = function () {
+                    return this._model.editorName;
+                };
+                EditingField.prototype.id = function () {
+                    return this._model.id;
+                };
+                EditingField.prototype.groupID = function () {
+                    return this._model.groupID;
+                };
+                EditingField.prototype.pageIndex = function () {
+                    return this._model.pageIndex;
+                };
+                EditingField.prototype.type = function () {
+                    return this._model.type;
+                };
+                EditingField.prototype.model = function () {
+                    return $.extend({}, this._model, {
+                        readOnly: this.readOnly.peek(),
+                        editValue: this.editValue.peek(),
+                    });
+                };
+                EditingField.prototype.createViewModel = function (zoom, pageWidth, pageHeight, editingFieldsProvider) {
+                    if (this._model.type === "check") {
+                        return new Preview.CheckEditingFieldViewModel(this, pageWidth, pageHeight, zoom, editingFieldsProvider);
+                    }
+                    else if (this._model.type === "text") {
+                        return new Preview.TextEditFieldViewModel(this, pageWidth, pageHeight, zoom);
+                    }
+                    else if (this._model.type === "charactercomb") {
+                        return new Preview.CharacterCombEditingFieldViewModel(this, pageWidth, pageHeight, zoom);
+                    }
+                };
+                return EditingField;
+            })();
+            Preview.EditingField = EditingField;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        Report.Categories = {
+            Numeric: function () { return "Numeric"; },
+            DateTime: function () { return "Date-Time"; },
+            Letters: function () { return "Letters"; }
+        };
+        function getCharFromKeyCode(e) {
+            var code = 0;
+            if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
+                code = e.keyCode;
+            }
+            else if (e.ctrlKey === false) {
+                code = e.charCode;
+            }
+            if (code) {
+                return String.fromCharCode(code);
+            }
+        }
+        var EditingFieldExtensions = (function () {
+            function EditingFieldExtensions() {
+                this._editors = {};
+            }
+            EditingFieldExtensions.instance = function () {
+                if (!EditingFieldExtensions._instance) {
+                    EditingFieldExtensions._instance = new EditingFieldExtensions();
+                    EditingFieldExtensions._instance._registerStandartEditors();
+                }
+                return EditingFieldExtensions._instance;
+            };
+            EditingFieldExtensions.prototype._registerStandartEditors = function () {
+                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d+$/);
+                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/);
+                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?\d+([\.,]?\d*)?$/);
+                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/);
+                EditingFieldExtensions.registerEditor("Date", "Date", Report.Categories.DateTime(), {
+                    onValueChanged: function (e) {
+                        e.model.value(e.component.option("text"));
+                    }
+                }, "dxrp-editing-field-datetime");
+                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/);
+            };
+            EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template) {
+                EditingFieldExtensions.instance()._editors[name] = {
+                    name: name,
+                    displayName: displayName,
+                    category: category,
+                    options: options,
+                    template: template
+                };
+            };
+            EditingFieldExtensions.registerMaskEditor = function (editorID, displayName, category, mask) {
+                EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
+            };
+            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExp) {
+                var options = {
+                    onKeyPress: function (e) {
+                        var char = getCharFromKeyCode(e.jQueryEvent);
+                        if (!char)
+                            return;
+                        var $input = $(e.element).find("input").eq(0);
+                        var caretPosition = getCaretPosition($input.get(0)).start;
+                        var currentValue = $input.val();
+                        if (caretPosition < 0) {
+                            caretPosition = currentValue ? currentValue.length : 0;
+                        }
+                        var result = [currentValue.slice(0, caretPosition), char, currentValue.slice(caretPosition)].join('');
+                        if (!regExp.test(result))
+                            e.jQueryEvent.preventDefault();
+                    },
+                    onPaste: function (e) {
+                        var clipboardData = e.jQueryEvent.originalEvent.clipboardData || window["clipboardData"] || {};
+                        var pastedData = clipboardData && clipboardData.getData && clipboardData.getData('Text');
+                        if (typeof pastedData !== "string")
+                            return;
+                        var $input = $(e.element).find("input").eq(0);
+                        var caretPosition = getCaretPosition($input.get(0));
+                        var currentValue = $input.val();
+                        if (caretPosition.start < 0) {
+                            caretPosition.end = caretPosition.start = currentValue ? currentValue.length : 0;
+                        }
+                        var result = [currentValue.slice(0, caretPosition.start), pastedData, currentValue.slice(caretPosition.end)].join('');
+                        if (!regExp.test(result))
+                            e.jQueryEvent.preventDefault();
+                    }
+                };
+                EditingFieldExtensions.registerEditor(editorID, displayName, category, options);
+            };
+            EditingFieldExtensions.unregisterEditor = function (editorID) {
+                delete EditingFieldExtensions.instance()._editors[editorID];
+            };
+            EditingFieldExtensions.prototype.categories = function () {
+                var categories = [];
+                for (var p in this._editors) {
+                    var category = this._editors[p].category;
+                    if (categories.indexOf(category) === -1) {
+                        categories.push(category);
+                    }
+                }
+                return categories;
+            };
+            EditingFieldExtensions.prototype.editors = function () {
+                var _this = this;
+                return Object.keys(this._editors).map(function (key) { return _this._editors[key]; });
+            };
+            EditingFieldExtensions.prototype.editorsByCategory = function (category) {
+                var editors = [];
+                for (var p in this._editors) {
+                    if (this._editors[p].category === category) {
+                        editors.push(this._editors[p]);
+                    }
+                }
+                return editors;
+            };
+            EditingFieldExtensions.prototype.editor = function (editorID) {
+                return this._editors[editorID];
+            };
+            return EditingFieldExtensions;
+        })();
+        Report.EditingFieldExtensions = EditingFieldExtensions;
+        function getCaretPosition(el) {
+            var start = -1, end = -1, normalizedValue, range, textInputRange, len, endRange;
+            try {
+                if (typeof el.selectionStart == "number" && typeof el.selectionEnd == "number") {
+                    start = el.selectionStart;
+                    end = el.selectionEnd;
+                }
+                else if (document["selection"]) {
+                    range = document["selection"].createRange();
+                    if (range && range.parentElement() == el) {
+                        len = el.value.length;
+                        normalizedValue = el.value.replace(/\r\n/g, "\n");
+                        textInputRange = el.createTextRange();
+                        textInputRange.moveToBookmark(range.getBookmark());
+                        endRange = el.createTextRange();
+                        endRange.collapse(false);
+                        if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
+                            start = end = len;
+                        }
+                        else {
+                            start = -textInputRange.moveStart("character", -len);
+                            start += normalizedValue.slice(0, start).split("\n").length - 1;
+                            if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
+                                end = len;
+                            }
+                            else {
+                                end = -textInputRange.moveEnd("character", -len);
+                                end += normalizedValue.slice(0, end).split("\n").length - 1;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (e) {
+            }
+            return {
+                start: start,
+                end: end
+            };
+        }
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            (function (CheckState) {
+                CheckState[CheckState["Unchecked"] = 0] = "Unchecked";
+                CheckState[CheckState["Checked"] = 1] = "Checked";
+                CheckState[CheckState["Indeterminate"] = 2] = "Indeterminate";
+            })(Preview.CheckState || (Preview.CheckState = {}));
+            var CheckState = Preview.CheckState;
+            ;
+            var TextEditFieldViewModel = (function () {
+                function TextEditFieldViewModel(field, pageWidth, pageHeight, zoom) {
+                    var _this = this;
+                    this.template = "dxrp-editing-field-container";
+                    this.active = ko.observable(false);
+                    var brickStyle = field.model().brickOptions;
+                    var style = { rtl: function () { return brickStyle.rtl; } };
+                    new DevExpress.JS.Utils.ModelSerializer().deserialize(style, JSON.parse(brickStyle.style), DevExpress.Designer.Report.brickStyleSerializationsInfo);
+                    var cssCalculator = new DevExpress.Designer.CssCalculator(style, ko.observable(!!brickStyle.rtlLayout));
+                    var verticalPadding = parseInt(cssCalculator.paddingsCss()["paddingTop"]) + parseInt(cssCalculator.paddingsCss()["paddingBottom"]);
+                    if (cssCalculator.borderCss()["borderTop"] !== "none") {
+                        verticalPadding += style["borderWidth"]();
+                    }
+                    if (cssCalculator.borderCss()["borderBottom"] !== "none") {
+                        verticalPadding += style["borderWidth"]();
+                    }
+                    var bounds = field.model().bounds;
+                    this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
+                    this.zoom = zoom;
+                    this.field = field;
+                    this.hideEditor = function () {
+                        setTimeout(function () {
+                            _this.active(false);
+                        });
+                    };
+                    var editor = DevExpress.Report.EditingFieldExtensions.instance().editor(field.editorName());
+                    var editorOptions = $.extend(true, {}, editor && editor.options || {});
+                    this.data = {
+                        value: field.editValue,
+                        hideEditor: this.hideEditor,
+                        textStyle: this.textStyle,
+                        options: editorOptions
+                    };
+                    var isCustomEditor = !!(editor && editor.template && editor.template !== "dxrp-editing-field-datetime");
+                    if (!isCustomEditor) {
+                        this.data.options = $.extend(editorOptions, {
+                            value: field.editValue,
+                            onFocusOut: this.hideEditor,
+                            valueChangeEvent: "blur"
+                        });
+                    }
+                    if (editor) {
+                        this.editorTemplate = editor.template || "dxrp-editing-field-mask";
+                    }
+                    else {
+                        this.editorTemplate = "dxrp-editing-field-text";
+                    }
+                    this.containerStyle = ko.pureComputed(function () {
+                        return $.extend({
+                            width: bounds.width + "px",
+                            height: bounds.height + "px",
+                            "line-height": (bounds.height - verticalPadding) + "px",
+                            top: bounds.top * 100 / pageHeight + "%",
+                            left: bounds.left * 100 / pageWidth + "%"
+                        }, cssCalculator.borderCss(), isCustomEditor && _this.active() ? { padding: 0 } : cssCalculator.paddingsCss(), { "border-color": "transparent" });
+                    });
+                }
+                TextEditFieldViewModel.prototype.activateEditor = function (viewModel, e) {
+                    if (this.field.readOnly()) {
+                        return;
+                    }
+                    this.active(true);
+                    var elementFocused = false;
+                    if (viewModel.options && viewModel.options.onEditorShown) {
+                        elementFocused = viewModel.options.onEditorShown(this.data, $(e && e.currentTarget).first().get(0));
+                    }
+                    if (!elementFocused) {
+                        $(e && e.currentTarget).find(":focusable").eq(0).focus();
+                    }
+                };
+                return TextEditFieldViewModel;
+            })();
+            Preview.TextEditFieldViewModel = TextEditFieldViewModel;
+            ko.bindingHandlers["childStyle"] = {
+                init: function (element, valueAccessor) {
+                    var values = valueAccessor();
+                    $(element).find(values.selector).css(values.style);
+                }
+            };
+            var CheckEditingFieldViewModel = (function () {
+                function CheckEditingFieldViewModel(field, pageWidth, pageHeight, zoom, editingFieldsProvider) {
+                    this.focused = ko.observable(false);
+                    this._editingFieldsProvider = editingFieldsProvider;
+                    this.template = "dxrp-editing-field-checkbox";
+                    this.field = field;
+                    this.zoom = zoom;
+                    var bounds = this.field.model().bounds;
+                    var checkBounds = this.field.model().brickOptions.checkBoxBounds;
+                    var rtl = this.field.model().brickOptions.rtlLayout;
+                    this.containerStyle = function () {
+                        return {
+                            height: bounds.height + "px",
+                            width: bounds.width + "px",
+                            top: bounds.top * 100 / pageHeight + "%",
+                            left: bounds.left * 100 / pageWidth + "%"
+                        };
+                    };
+                    this.checkStyle = function () {
+                        var result = {
+                            height: checkBounds.height + "px",
+                            width: checkBounds.width + "px",
+                            top: checkBounds.top + "px",
+                            left: (rtl ? (bounds.width - checkBounds.left - checkBounds.width) : checkBounds.left) + "px"
+                        };
+                        return result;
+                    };
+                }
+                CheckEditingFieldViewModel.prototype._toggleCheckState = function () {
+                    if (this.field.editValue() === 1 /* Checked */) {
+                        this.field.editValue(0 /* Unchecked */);
+                    }
+                    else {
+                        this.field.editValue(1 /* Checked */);
+                    }
+                };
+                CheckEditingFieldViewModel.prototype.onKeyDown = function (_, e) {
+                    if (e.keyCode == 32) {
+                        this.toggleCheckState();
+                    }
+                    else {
+                    }
+                };
+                CheckEditingFieldViewModel.prototype.onBlur = function () {
+                    this.focused(false);
+                };
+                CheckEditingFieldViewModel.prototype.onFocus = function () {
+                    this.focused(true);
+                };
+                CheckEditingFieldViewModel.prototype.onClick = function (_, e) {
+                    this.toggleCheckState();
+                };
+                CheckEditingFieldViewModel.prototype.checked = function () {
+                    if (this.field.editValue() === 1 /* Checked */) {
+                        return true;
+                    }
+                    if (this.field.editValue() === 0 /* Unchecked */) {
+                        return false;
+                    }
+                };
+                CheckEditingFieldViewModel.prototype.toggleCheckState = function () {
+                    var _this = this;
+                    if (this.field.readOnly())
+                        return;
+                    if (!this.field.groupID()) {
+                        this._toggleCheckState();
+                    }
+                    else if (this.checked() === false) {
+                        this._editingFieldsProvider().forEach(function (value) {
+                            if (value.groupID() === _this.field.groupID()) {
+                                value.editValue(0 /* Unchecked */);
+                            }
+                        });
+                        this._toggleCheckState();
+                    }
+                };
+                return CheckEditingFieldViewModel;
+            })();
+            Preview.CheckEditingFieldViewModel = CheckEditingFieldViewModel;
+            var CharacterCombEditingFieldViewModel = (function () {
+                function CharacterCombEditingFieldViewModel(field, pageWidth, pageHeight, zoom) {
+                    var _this = this;
+                    this.field = field;
+                    this.template = "dxrp-character-comb-editing-field";
+                    this.active = ko.observable(false);
+                    var brickStyle = field.model().brickOptions;
+                    var style = { rtl: function () { return brickStyle.rtl; } };
+                    new DevExpress.JS.Utils.ModelSerializer().deserialize(style, JSON.parse(brickStyle.style), DevExpress.Designer.Report.brickStyleSerializationsInfo);
+                    var cssCalculator = new DevExpress.Designer.CssCalculator(style, ko.observable(!!brickStyle.rtlLayout));
+                    var verticalPadding = parseInt(cssCalculator.paddingsCss()["paddingTop"]) + parseInt(cssCalculator.paddingsCss()["paddingBottom"]);
+                    var borderCss = cssCalculator.borderCss();
+                    if (borderCss["borderTop"] !== "none") {
+                        verticalPadding += style["borderWidth"]();
+                    }
+                    if (borderCss["borderBottom"] !== "none") {
+                        verticalPadding += style["borderWidth"]();
+                    }
+                    var bounds = field.model().bounds;
+                    this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
+                    this.containerStyle = ko.pureComputed(function () {
+                        return $.extend({
+                            width: bounds.width + "px",
+                            height: bounds.height + "px",
+                            "line-height": (bounds.height - verticalPadding) + "px",
+                            top: bounds.top * 100 / pageHeight + "%",
+                            left: bounds.left * 100 / pageWidth + "%"
+                        }, cssCalculator.fontCss(), cssCalculator.foreColorCss());
+                    });
+                    var cellVerticalPadding = 0;
+                    var borderCellStyle = "none";
+                    ["Left", "Top", "Right", "Bottom"].forEach(function (item) {
+                        if (borderCss["border" + item] !== "none") {
+                            borderCellStyle = borderCss["border" + item];
+                            cellVerticalPadding = style["borderWidth"]() * 2;
+                        }
+                    });
+                    var cellStyle = {
+                        "border": borderCellStyle,
+                        "text-align": "center",
+                        "position": "absolute",
+                        "box-sizing": "border-box",
+                        "border-color": "transparent"
+                    };
+                    var characterCombBounds = field.model().brickOptions.characterCombBounds;
+                    this.cells = [];
+                    var rowTops = {};
+                    for (var i = 0; i < characterCombBounds.length; i++) {
+                        this.cells.push({
+                            style: $.extend({
+                                width: characterCombBounds[i].width + "px",
+                                height: characterCombBounds[i].height + "px",
+                                "line-height": (characterCombBounds[i].height - cellVerticalPadding) + "px",
+                                top: characterCombBounds[i].top + "px",
+                                left: characterCombBounds[i].left + "px"
+                            }, cellStyle),
+                            text: ""
+                        });
+                        rowTops[characterCombBounds[i].top] = i;
+                    }
+                    var rowsCount = Object.keys(rowTops).length;
+                    var colsCount = this.cells.length / rowsCount;
+                    CharacterCombEditingFieldViewModel.setText(this.cells, style["textAlignment"](), style.rtl(), field.editValue.peek(), rowsCount, colsCount);
+                    field.editValue.subscribe(function (newValue) {
+                        CharacterCombEditingFieldViewModel.setText(_this.cells, style["textAlignment"](), style.rtl(), newValue, rowsCount, colsCount);
+                    });
+                    this.zoom = zoom;
+                }
+                CharacterCombEditingFieldViewModel.prototype.activateEditor = function (viewModel, e) {
+                    if (!this.field.readOnly()) {
+                        this.active(true);
+                        $(e && e.currentTarget).find(":focusable").eq(0).focus();
+                    }
+                };
+                CharacterCombEditingFieldViewModel.prototype.hideEditor = function () {
+                    var _this = this;
+                    setTimeout(function () {
+                        _this.active(false);
+                    });
+                };
+                CharacterCombEditingFieldViewModel.setText = function (cells, textAlignment, rtl, text, rowsCount, colsCount) {
+                    for (var j = 0; j < cells.length; j++) {
+                        cells[j].text = "";
+                    }
+                    var textRowsCount = Math.ceil(text.length / colsCount);
+                    var textLastRowColCount = text.length % colsCount;
+                    var startRow = -1;
+                    if (textAlignment.indexOf("Bottom") === 0) {
+                        startRow = rowsCount - textRowsCount;
+                    }
+                    else if (textAlignment.indexOf("Middle") === 0) {
+                        startRow = Math.floor((rowsCount - textRowsCount) / 2);
+                    }
+                    else {
+                        startRow = 0;
+                    }
+                    var lastRowStartCol = -1;
+                    if (textAlignment.indexOf("Right") > 0) {
+                        lastRowStartCol = rtl ? 0 : (colsCount - textLastRowColCount);
+                    }
+                    else if (textAlignment.indexOf("Center") > 0) {
+                        lastRowStartCol = Math.floor((colsCount - textLastRowColCount) / 2);
+                    }
+                    else {
+                        lastRowStartCol = rtl ? (colsCount - textLastRowColCount) : 0;
+                    }
+                    var j = startRow * colsCount;
+                    var i = 0;
+                    for (; i < text.length - textLastRowColCount; i++, j++) {
+                        if (j >= 0 && j < cells.length) {
+                            cells[j].text = text[i];
+                        }
+                    }
+                    for (; i < text.length; i++, j++) {
+                        if (j >= 0 && j < cells.length) {
+                            cells[j + lastRowStartCol].text = text[i];
+                        }
+                    }
+                };
+                return CharacterCombEditingFieldViewModel;
+            })();
+            Preview.CharacterCombEditingFieldViewModel = CharacterCombEditingFieldViewModel;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var slowdownDisctanceFactor = 2.5;
+            var minScale = 0.92;
+            var EventProcessor = (function () {
+                function EventProcessor(element, slideOptions) {
+                    var _this = this;
+                    this.element = element;
+                    this.slideOptions = slideOptions;
+                    this._direction = {
+                        vertical: false,
+                        horizontal: false,
+                    };
+                    this.isLeftMove = false;
+                    this.isRightMove = false;
+                    this.$element = $(element), this.$gallery = this.$element.find(".dxrd-mobile-gallery");
+                    this.$galleryblocks = this.$gallery.find(".dxrd-gallery-blocks");
+                    this.firstMobilePageOffset = $(this.$galleryblocks.find(".dxrd-mobile-page")[0]).offset();
+                    this.slideOptions.searchPanel.height.subscribe(function (newVal) {
+                        if (_this.slideOptions.readerMode) {
+                            _this.slideOptions.topOffset(newVal);
+                        }
+                        else {
+                            _this.slideOptions.topOffset(Math.min(newVal, Math.max(0, Preview.MobileSearchViewModel.maxHeight - _this.firstMobilePageOffset.top)));
+                        }
+                        if (!newVal) {
+                            _this.applySearchAnimation(newVal);
+                        }
+                        else if (newVal === Preview.MobileSearchViewModel.maxHeight) {
+                            _this.slideOptions.searchPanel.searchPanelVisible(true);
+                            _this.applySearchAnimation(newVal);
+                        }
+                        else {
+                            var dif = 1 - minScale;
+                            var perc = newVal / Preview.MobileSearchViewModel.maxHeight;
+                            var scale = 1 - dif * perc;
+                            setTransform(_this.$galleryblocks, 'scale(' + Math.max(minScale, scale) + ')');
+                        }
+                    });
+                }
+                EventProcessor.prototype.getDirection = function (x, y) {
+                    var distanceY = Math.abs(y - this._startingPositionY);
+                    var distanceX = Math.abs(x - this._startingPositionX);
+                    if (distanceY === 0 && distanceX === 0) {
+                        this._direction.horizontal = false;
+                        this._direction.vertical = false;
+                        return this._direction;
+                    }
+                    var tg = !distanceX ? 10 : distanceY / distanceX;
+                    if (tg < 2) {
+                        this._direction.horizontal = true;
+                        this._direction.vertical = false;
+                    }
+                    else {
+                        this._direction.horizontal = false;
+                        this._direction.vertical = true;
+                    }
+                    return this._direction;
+                };
+                EventProcessor.prototype.setPosition = function (x, y) {
+                    this.isLeftMove = this.latestX > x;
+                    this.isRightMove = this.latestX < x;
+                    this.latestY = y;
+                    this.latestX = x;
+                };
+                EventProcessor.prototype.initialize = function (x, y) {
+                    this._startingPositionX = x;
+                    this._startingPositionY = y;
+                    this.latestX = x;
+                    this.latestY = y;
+                    this._direction = { horizontal: false, vertical: false };
+                };
+                EventProcessor.prototype.start = function (e) {
+                    this.$galleryblocks = this.$gallery.find(".dxrd-gallery-blocks");
+                    if (!this.slideOptions.topOffset()) {
+                        this.firstMobilePageOffset = $(this.$galleryblocks.find(".dxrd-mobile-page")[0]).offset();
+                        this.firstMobilePageOffset.top = this.firstMobilePageOffset.top * minScale;
+                    }
+                    this.initialize(e.pageX, e.pageY);
+                };
+                EventProcessor.prototype.move = function (e) {
+                    e.preventDefault();
+                    if (this.slideOptions.zoomUpdating() || this.slideOptions.galleryIsAnimated()) {
+                        return;
+                    }
+                    if (!this.slideOptions.searchPanel.editorVisible()) {
+                        var direction = this.getDirection(e.pageX, e.pageY);
+                        if (!direction.vertical && !direction.horizontal)
+                            return;
+                        if (direction.vertical || this.slideOptions.searchPanel.height() !== 0) {
+                            if (this.slideOptions.reachedTop()) {
+                                this.slideOptions.brickEventsDisabled(true);
+                                e.stopPropagation();
+                                var currentHeight = this.slideOptions.searchPanel.height();
+                                var difference = currentHeight + (e.clientY - this.latestY) / slowdownDisctanceFactor;
+                                var distance = difference > 0 ? Math.min(difference, Preview.MobileSearchViewModel.maxHeight) : 0;
+                                this.slideOptions.searchPanel.height(distance);
+                            }
+                        }
+                    }
+                    this.setPosition(e.clientX, e.clientY);
+                };
+                EventProcessor.prototype.end = function (e) {
+                    var _this = this;
+                    if (this.slideOptions.zoomUpdating() || this.slideOptions.galleryIsAnimated()) {
+                        var touches = e["touches"];
+                        if (!touches || touches.length === 0) {
+                            if (this.slideOptions.zoomUpdating()) {
+                                e.stopPropagation();
+                            }
+                            this.slideOptions.zoomUpdating(false);
+                        }
+                        return;
+                    }
+                    var direction = this.getDirection(e.pageX, e.pageY);
+                    if (this.slideOptions.scrollAvailable()) {
+                        if (direction.horizontal && this.slideOptions.swipeEnabled()) {
+                            var galleryInstance = this.$gallery["dxGalleryReportPreview"]("instance");
+                            if (this.slideOptions.reachedLeft() && this.isRightMove) {
+                                galleryInstance.prevItem();
+                            }
+                            else if (this.slideOptions.reachedRight() && this.isLeftMove) {
+                                galleryInstance.nextItem();
+                            }
+                        }
+                    }
+                    if (this.slideOptions.searchPanel.height() >= Preview.MobileSearchViewModel.maxHeight / 2) {
+                        this.slideOptions.searchPanel.height(Preview.MobileSearchViewModel.maxHeight);
+                    }
+                    else {
+                        this.slideOptions.searchPanel.height(0);
+                    }
+                    if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
+                        this.slideOptions.isAutoFit(true);
+                    }
+                    setTimeout(function () {
+                        _this.slideOptions.brickEventsDisabled(false);
+                    }, 10);
+                };
+                EventProcessor.prototype.applySearchAnimation = function (value) {
+                    var _this = this;
+                    if (this.slideOptions.animationSettings.zoomEnabled()) {
+                        this.$galleryblocks.addClass("dxrdp-animation");
+                        this.$element.addClass("dxrdp-animation");
+                        setTimeout(function () {
+                            _this.$galleryblocks.removeClass("dxrdp-animation");
+                            _this.$element.removeClass("dxrdp-animation");
+                        }, 410);
+                    }
+                    setTransform(this.$galleryblocks, !value ? '' : 'scale(0.92)');
+                };
+                return EventProcessor;
+            })();
+            Preview.EventProcessor = EventProcessor;
+            ko.bindingHandlers["mobileZoom"] = {
+                init: function (element, valueAccessor) {
+                    var $element = $(element);
+                    var options = valueAccessor();
+                    var zoom = options.zoom();
+                    $element.on('dxpinch', function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        var scale = e['scale'];
+                        var newZoom = zoom;
+                        if (scale > 1) {
+                            newZoom += ((scale - 1) / slowdownDisctanceFactor);
+                        }
+                        else {
+                            newZoom -= ((1 - scale) / slowdownDisctanceFactor);
+                        }
+                        newZoom = Math.max(0.15, Math.min(2, newZoom));
+                        options.zoom(newZoom);
+                    });
+                    $element.on("dxpinchstart", function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        options.zoomUpdating(true);
+                        zoom = options.zoom.peek();
+                    });
+                    $element.on("dxpinchend", function (e) {
+                        e.stopPropagation();
+                    });
+                }
+            };
+            function setTransform($element, transform) {
+                $element.css({
+                    '-webkit-transform': transform,
+                    'transform': transform
+                });
+            }
+            ko.bindingHandlers["slide"] = {
+                init: function (element, valueAccessor) {
+                    var slideOptionsValue = valueAccessor();
+                    var isStarted = false;
+                    var processor = new EventProcessor(element, slideOptionsValue);
+                    processor.$element.on('dxpointerdown', function (e) {
+                        processor.start(e);
+                        isStarted = true;
+                    });
+                    processor.$element.on('dxpointermove', function (e) {
+                        isStarted && processor.move(e);
+                    });
+                    ["dxpointercancel", "dxpointerleave", "dxpointerup"].forEach(function (value) {
+                        processor.$element.on(value, function (e) {
+                            if (isStarted) {
+                                processor.end(e);
+                                isStarted = false;
+                            }
+                        });
+                    });
+                }
+            };
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            function getPreviewActionsMobile(preview, exportModel, parametersModel, searchModel) {
+                var exportToModel = {
+                    visible: ko.observable(false),
+                    items: ko.pureComputed(function () {
+                        return exportModel._getExportFormatItems().map(function (item) {
+                            item.action = function (e) {
+                                exportModel._exportDocumentByFormat(e.model && e.model.format);
+                            };
+                            return item;
+                        });
+                    })
+                };
+                return new Preview.MobileActionList([
+                    {
+                        action: function () {
+                            searchModel.searchPanelVisible(true);
+                            searchModel.editorVisible(true);
+                            searchModel.focusEditor({ element: $('.dxrdp-taptosearch') });
+                            preview.actionsVisible(false);
+                        },
+                        image: "dxrd-image-search-inactive",
+                        visible: true
+                    },
+                    {
+                        action: function () {
+                            exportToModel.visible(!exportToModel.visible());
+                        },
+                        image: "dxrd-image-export-to",
+                        visible: true,
+                        content: {
+                            name: "dxrd-menu-export-content",
+                            data: exportToModel
+                        }
+                    },
+                    {
+                        action: function () {
+                            parametersModel.popupInfo.visible(!parametersModel.popupInfo.visible());
+                            preview.actionsVisible(false);
+                        },
+                        image: "dxrd-image-parameters-inactive",
+                        visible: parametersModel.popupInfo.notEmpty
+                    }
+                ]);
+            }
+            function updatePreviewContentSizeMobile(previewSize, root, rtl) {
+                return function () {
+                    var $root = $(root);
+                    var $surface = $root.find(".dxrd-preview-wrapper");
+                    $surface.css("width", $root.outerWidth());
+                    $surface.css("height", $root.outerHeight());
+                    previewSize({ height: $root.outerHeight(), width: $root.outerWidth() });
+                };
+            }
+            Preview.updatePreviewContentSizeMobile = updatePreviewContentSizeMobile;
+            function createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings) {
+                if (previewVisible === void 0) { previewVisible = true; }
+                if (applyBindings === void 0) { applyBindings = true; }
+                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
+                var previewWrapper = new Preview.PreviewRequestWrapper(), reportPreview = new Preview.MobileReportPreview(handlerUri, previewWrapper, undefined, undefined, mobileModeSettings), searchModel = new Preview.MobileSearchViewModel(reportPreview);
+                var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks));
+                var exportModel = new Preview.ExportOptionsModel(reportPreview);
+                reportPreview.allowURLsWithJSContent = allowURLsWithJSContent;
+                previewWrapper.initialize(reportPreview, parametersModel, searchModel);
+                var mobileActions = getPreviewActionsMobile(reportPreview, exportModel, parametersModel, searchModel);
+                reportPreview.pageIndex.subscribe(function (newVal) {
+                    mobileActions.visible(false);
+                });
+                reportPreview.actionsVisible = mobileActions.visible;
+                var contentSize = ko.observable({ width: 0, height: 0 });
+                var updatePreviewContentSize_ = updatePreviewContentSizeMobile(contentSize, element);
+                updatePreviewContentSize_();
+                var gallery = new Preview.GalleryModel(reportPreview, contentSize);
+                var designerModel = {
+                    rootStyle: { 'dxrd-preview': true, 'dxrdp-mobile': true },
+                    reportPreview: reportPreview,
+                    parametersModel: parametersModel,
+                    exportModel: exportModel,
+                    searchModel: searchModel,
+                    rtl: reportPreview.rtlViewer,
+                    brickEventsDisabled: ko.observable(false),
+                    gallery: gallery,
+                    paginator: new Preview.MobilePaginator(reportPreview, gallery),
+                    updateSurfaceSize: function () {
+                        updatePreviewContentSize_();
+                    }
+                };
+                designerModel.slideOptions = {
+                    readerMode: reportPreview.readerMode,
+                    animationSettings: reportPreview.animationSettings,
+                    searchPanel: searchModel,
+                    topOffset: reportPreview.topOffset,
+                    reachedTop: reportPreview.scrollReachedTop,
+                    reachedLeft: reportPreview.scrollReachedLeft,
+                    reachedRight: reportPreview.scrollReachedRight,
+                    scrollAvailable: ko.computed(function () {
+                        return !(reportPreview.scrollReachedTop() && reportPreview.scrollReachedLeft() && reportPreview.scrollReachedRight() && reportPreview.scrollReachedBottom());
+                    }),
+                    swipeEnabled: ko.computed(function () {
+                        if (reportPreview.zoomUpdating()) {
+                            return false;
+                        }
+                        if (searchModel.height() > 0 && !searchModel.editorVisible()) {
+                            return false;
+                        }
+                        if (!(reportPreview.scrollReachedLeft() || reportPreview.scrollReachedRight())) {
+                            return false;
+                        }
+                        return true;
+                    }),
+                    isAutoFit: reportPreview.isAutoFit,
+                    galleryIsAnimated: gallery.isAnimated,
+                    zoomUpdating: reportPreview.zoomUpdating,
+                    brickEventsDisabled: designerModel.brickEventsDisabled
+                };
+                var parametersPopup = {
+                    visible: parametersModel.popupInfo.visible,
+                    model: parametersModel,
+                    submit: function (params) {
+                        var result = params.validationGroup && params.validationGroup.validate && params.validationGroup.validate();
+                        if (!result || result.isValid) {
+                            parametersModel.submit();
+                            parametersModel.popupInfo.visible(false);
+                        }
+                    },
+                    cancelDisabled: ko.computed(function () {
+                        return reportPreview._currentDocumentId() === null;
+                    }),
+                    reset: function () {
+                        parametersModel.restore();
+                    },
+                    cancel: function () {
+                        parametersModel.popupInfo.visible(false);
+                    }
+                };
+                designerModel.parts = [
+                    { templateName: 'dxrdp-surface-mobile', model: designerModel.reportPreview },
+                    { templateName: 'dxrdp-search-mobile', model: designerModel.searchModel },
+                    { templateName: 'dxrdp-pages-mobile', model: designerModel.paginator },
+                    { templateName: 'dxrdp-surface-mobile-bottom', model: mobileActions },
+                    { templateName: 'dxrd-menu-parameters-content', model: parametersPopup }
+                ];
+                $(window).bind("resize", function () {
+                    updatePreviewContentSize_();
+                });
+                if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
+                    $(element).children().remove();
+                    ko.applyBindings(designerModel, element);
+                }
+                return designerModel;
+            }
+            Preview.createMobilePreview = createMobilePreview;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var MobilePaginator = (function () {
+                function MobilePaginator(reportPreview, gallery) {
+                    var _this = this;
+                    this.visible = ko.observable(false).extend({ notify: 'always' });
+                    this.text = ko.computed(function () {
+                        setTimeout(function () {
+                            _this.visible(true);
+                        }, 1);
+                        if (reportPreview.pageIndex() === -1) {
+                            return DevExpress.Designer.getLocalization('0 pages');
+                        }
+                        else {
+                            var ofText = DevExpress.Designer.getLocalization('of');
+                            var pageText = DevExpress.Designer.getLocalization('Page');
+                            return pageText + " " + gallery.currentBlockText() + " " + ofText + " " + reportPreview.pages().length;
+                        }
+                    });
+                }
+                return MobilePaginator;
+            })();
+            Preview.MobilePaginator = MobilePaginator;
+            ko.bindingHandlers["dxrdMobilePaginator"] = {
+                init: function (element, valueAccessor) {
+                    var values = valueAccessor();
+                    var $element = $(element);
+                    var timeoutId = null;
+                    var hideAnimationTimeoutId = null;
+                    values.visible.subscribe(function (newVal) {
+                        if (newVal) {
+                            $element.removeClass("dxrdp-hide").addClass("dxrdp-show");
+                            timeoutId && clearTimeout(timeoutId);
+                            timeoutId = setTimeout(function () {
+                                values.visible(false);
+                            }, 2000);
+                        }
+                        else {
+                            $element.removeClass("dxrdp-show").addClass("dxrdp-hide");
+                            hideAnimationTimeoutId && clearTimeout(hideAnimationTimeoutId);
+                            hideAnimationTimeoutId = setTimeout(function () {
+                                $element.removeClass("dxrdp-hide");
+                            }, 500);
+                        }
+                    });
+                }
+            };
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            function updateBricksPosition(brick, height, width) {
+                if (!brick) {
+                    return;
+                }
+                brick[brick.rtl ? 'rightP' : 'leftP'] = Preview.convetToPercent(brick.left, width);
+                brick.widthP = Preview.convetToPercent(brick.width, width);
+                brick.topP = Preview.convetToPercent(brick.top, height);
+                brick.heightP = Preview.convetToPercent(brick.height, height);
+                brick.bricks && brick.bricks.forEach(function (childBrick) {
+                    updateBricksPosition(childBrick, height, width);
+                });
+            }
+            Preview.updateBricksPosition = updateBricksPosition;
+            function initializeBrickMobile(brick, processClick, zoom, editingFieldsProvider) {
+                if (!brick) {
+                    return;
+                }
+                !!brick.active && !!brick.active(false) || (brick.active = ko.observable(false));
+                brick["onClick"] = function () {
+                    processClick && processClick(brick);
+                };
+                brick.bricks && brick.bricks.forEach(function (childBrick) {
+                    childBrick.top += brick.top;
+                    childBrick.left += brick.left;
+                    initializeBrickMobile(childBrick, processClick, zoom, editingFieldsProvider);
+                });
+                brick.text = function () { return Preview.brickText(brick, editingFieldsProvider); };
+            }
+            Preview.initializeBrickMobile = initializeBrickMobile;
+            var MobilePreviewPage = (function (_super) {
+                __extends(MobilePreviewPage, _super);
+                function MobilePreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider) {
+                    var _this = this;
+                    _super.call(this, pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider);
+                    this.bricks = ko.computed(function () {
+                        return _this.getBricksFlatList(_this.brick());
+                    });
+                    this.activeBricks = ko.computed(function () {
+                        return _this.bricks().filter(function (x) {
+                            return x.active();
+                        });
+                    });
+                    this.selectBrick = function (path, ctrlKey) {
+                        var currentBrick = _this.brick();
+                        !ctrlKey && _this.resetBrickRecusive(currentBrick);
+                        if (!path) {
+                            return;
+                        }
+                        if (!currentBrick) {
+                            _this["_selectedBrickPath"] = path;
+                            return;
+                        }
+                        _this.bricks().forEach(function (brick) {
+                            brick.indexes === path && brick.active(true);
+                        });
+                    };
+                }
+                MobilePreviewPage.prototype.clickToBrick = function (s, e) {
+                    var target = $(e.currentTarget);
+                    var offset = target.offset();
+                    var xPerc = (e.clientX - offset.left) / target.width() * 100;
+                    var yPerc = (e.clientY - offset.top) / target.height() * 100;
+                    var bricks = s.bricks();
+                    for (var i = 0; i < bricks.length; i++) {
+                        if (parseFloat(bricks[i].topP) < yPerc && parseFloat(bricks[i].topP) + parseFloat(bricks[i].heightP) > yPerc && parseFloat(bricks[i].leftP) < xPerc && parseFloat(bricks[i].leftP) + parseFloat(bricks[i].widthP) > xPerc) {
+                            bricks[i]["onClick"] && bricks[i]["onClick"]();
+                            break;
+                        }
+                    }
+                };
+                MobilePreviewPage.prototype.initializeBrick = function (brick, processClick, zoom, editingFieldsProvider) {
+                    initializeBrickMobile(brick, processClick, this.zoom, editingFieldsProvider);
+                    updateBricksPosition(brick, brick.height, brick.width);
+                    this.brick(brick);
+                };
+                MobilePreviewPage.prototype.getBricksFlatList = function (brick) {
+                    if (brick) {
+                        var bricks = [];
+                        var innerBricksLength = brick.bricks && brick.bricks.length || 0;
+                        for (var i = 0; i < innerBricksLength; i++) {
+                            bricks = bricks.concat(this.getBricksFlatList(brick.bricks[i]));
+                        }
+                        bricks.push(brick);
+                        return bricks;
+                    }
+                    return [];
+                };
+                return MobilePreviewPage;
+            })(Preview.PreviewPage);
+            Preview.MobilePreviewPage = MobilePreviewPage;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var MobileReportPreview = (function (_super) {
+                __extends(MobileReportPreview, _super);
+                function MobileReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, rtl, mobileSettings) {
+                    var _this = this;
+                    if (rtl === void 0) { rtl = false; }
+                    if (mobileSettings === void 0) { mobileSettings = { readerMode: true, animationEnabled: true }; }
+                    _super.call(this, handlerUri, previewRequestWrapper, previewHandlersHelper, rtl);
+                    this.availablePages = ko.observable(null);
+                    this.visiblePages = ko.computed(function () {
+                        if (!_this.availablePages()) {
+                            return _this.pages();
+                        }
+                        else {
+                            return _this.pages().filter(function (x) {
+                                return _this.availablePages().indexOf(x.pageIndex) !== -1;
+                            });
+                        }
+                    });
+                    this.topOffset = ko.observable(0);
+                    this.searchPanelVisible = ko.observable(false);
+                    this.actionsVisible = ko.observable(false);
+                    this.scrollReachedLeft = ko.observable(false);
+                    this.scrollReachedRight = ko.observable(false);
+                    this.scrollReachedTop = ko.observable(true);
+                    this.scrollReachedBottom = ko.observable(true);
+                    this.zoomUpdating = ko.observable(false);
+                    this.mobileZoom = ko.computed({
+                        read: function () {
+                            return _this.zoom() || _this._zoom();
+                        },
+                        write: function (newVal) {
+                            _this.zoom(newVal);
+                        }
+                    });
+                    this.readerMode = mobileSettings.readerMode;
+                    var globalAnimationEnabled = mobileSettings.animationEnabled;
+                    this.animationSettings = { zoomEnabled: ko.observable(globalAnimationEnabled), swipeEnabled: ko.observable(globalAnimationEnabled) };
+                    this.canSwitchToDesigner = false;
+                    this.isAutoFit(true);
+                    this.showMultipagePreview(true);
+                    this.searchPanelVisible.subscribe(function (newVal) {
+                        if (newVal) {
+                            _this.actionsVisible(false);
+                        }
+                    });
+                }
+                MobileReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider) {
+                    return new Preview.MobilePreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFieldsProvider);
+                };
+                MobileReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
+                    var _this = this;
+                    var _clickHandler = _super.prototype.createBrickClickProcessor.call(this, cyclePageIndex);
+                    var func = function (brick) {
+                        if (_this.zoomUpdating())
+                            return;
+                        if (cyclePageIndex !== _this.pageIndex()) {
+                            _this.actionsVisible(false);
+                            var supscription = _this.actionsVisible.subscribe(function (newVal) {
+                                supscription.dispose();
+                                _this.actionsVisible(false);
+                            });
+                        }
+                        _clickHandler(brick);
+                    };
+                    return func;
+                };
+                MobileReportPreview.prototype.showActions = function (s) {
+                    if (s.zoomUpdating())
+                        return;
+                    var searchVisible = s.searchPanelVisible();
+                    if (!searchVisible) {
+                        s.actionsVisible(!s.actionsVisible());
+                    }
+                    else {
+                        s.searchPanelVisible(!searchVisible);
+                    }
+                };
+                MobileReportPreview.prototype.onSlide = function (e) {
+                    this.scrollReachedLeft(true);
+                    this.scrollReachedRight(true);
+                    if (!this.isAutoFit() && e.removedItems && e.removedItems[0].blocks().length === 1 && e.addedItems && e.addedItems[0].blocks().length === 1)
+                        this.isAutoFit(true);
+                };
+                MobileReportPreview.prototype.setScrollReached = function (e) {
+                    this.scrollReachedLeft(e.reachedLeft);
+                    this.scrollReachedRight(e.reachedRight);
+                    this.scrollReachedTop(e.reachedTop);
+                    this.scrollReachedBottom(e.reachedBottom);
+                };
+                return MobileReportPreview;
+            })(Preview.ReportPreview);
+            Preview.MobileReportPreview = MobileReportPreview;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var MobileSearchViewModel = (function (_super) {
+                __extends(MobileSearchViewModel, _super);
+                function MobileSearchViewModel(reportPreview) {
+                    var _this = this;
+                    _super.call(this, reportPreview);
+                    this.height = ko.observable(0);
+                    this["_resultNavigator"]["_disposables"].forEach(function (x) {
+                        x.dispose();
+                    });
+                    reportPreview.currentPage.subscribe(function (page) {
+                        if (page && _this.searchResult() && _this.searchResult().length > 0) {
+                            _this._updateBricks(page, _this.searchResult());
+                        }
+                    });
+                    this._disposables.push(this.searchResult.subscribe(function (newResult) {
+                        var currentPage = reportPreview.currentPage();
+                        currentPage && currentPage.resetBrickRecusive(currentPage.brick());
+                        if (!newResult || newResult.length === 0) {
+                            reportPreview.availablePages(null);
+                        }
+                        else {
+                            reportPreview.availablePages(newResult.map(function (x) { return x.pageIndex; }));
+                            if (currentPage) {
+                                _this._updateBricks(currentPage, _this.searchResult());
+                            }
+                        }
+                    }));
+                    this.searchPanelVisible = reportPreview.searchPanelVisible;
+                    this.editorVisible = ko.observable(false);
+                    this.searchPanelVisible.subscribe(function (newVal) {
+                        if (!newVal) {
+                            _this.height(0);
+                            _this.editorVisible(false);
+                            _this.searchResult(null);
+                        }
+                        else {
+                            _this.height(MobileSearchViewModel.maxHeight);
+                        }
+                    });
+                }
+                MobileSearchViewModel.prototype.focusEditor = function (s) {
+                    if (this.searchPanelVisible()) {
+                        this.editorVisible(true);
+                        var previewSearch = $(".dxrdp-search-editor");
+                        var searchEditor = previewSearch.data("dxTextBox") && previewSearch["dxTextBox"]("instance");
+                        setTimeout(function () {
+                            s.element.blur();
+                            searchEditor.focus();
+                        }, 1);
+                    }
+                };
+                MobileSearchViewModel.prototype._createPageSubscription = function (page) {
+                    var _this = this;
+                    return page.brick.subscribe(function (newVal) {
+                        _this._updateBricks(page, _this.searchResult());
+                    });
+                };
+                MobileSearchViewModel.prototype._updateBricks = function (page, searchResult) {
+                    if (page.brick() && searchResult && searchResult.length > 0) {
+                        var results = searchResult.filter(function (x) {
+                            return x.pageIndex === page.pageIndex;
+                        });
+                        for (var i = 0; i < results.length; i++) {
+                            page.selectBrick(results[i].indexes, true);
+                        }
+                    }
+                };
+                MobileSearchViewModel.maxHeight = 80;
+                return MobileSearchViewModel;
+            })(Preview.SearchViewModel);
+            Preview.MobileSearchViewModel = MobileSearchViewModel;
+            ko.bindingHandlers["dxrdSearchBar"] = {
+                init: function (element, valueAccessor) {
+                    var viewModel = ko.unwrap(valueAccessor());
+                    var $element = $(element);
+                    var $searchText = $element.find('.dxrdp-taptosearch-text');
+                    viewModel.height.subscribe(function (newValue) {
+                        $searchText.css({
+                            'opacity': Math.min((newValue / MobileSearchViewModel.maxHeight), 1)
+                        });
+                    });
+                }
+            };
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var MobileActionList = (function () {
+                function MobileActionList(actions) {
+                    this.actions = actions;
+                    this.visible = ko.observable(false);
+                }
+                return MobileActionList;
+            })();
+            Preview.MobileActionList = MobileActionList;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var InteractiveMenu = (function () {
+                function InteractiveMenu(items, $_element) {
+                    this.items = items;
+                    this.$_element = $_element;
+                    this.collectionVisible = ko.observable(false);
+                    this.$_itemsContainer = this.$_element.find(".dx-circle-menu-container");
+                }
+                InteractiveMenu.prototype.hideContent = function () {
+                    if (!!this.$_hideDiv) {
+                        this.$_hideDiv.remove();
+                        this.$_hideDiv = null;
+                    }
+                    else {
+                        this.$_hideDiv = $("<div>").css({
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            "z-index": 100,
+                            "background": "black",
+                            "opacity": "0.3",
+                            "position": "absolute"
+                        }).appendTo($("body"));
+                        this.$_element.zIndex(101);
+                        this.$_hideDiv.focus(function () {
+                            this.$_hideDiv.remove();
+                            this.$_hideDiv = null;
+                        });
+                    }
+                };
+                InteractiveMenu.prototype.fade = function (delay, item, opacity) {
+                    setTimeout(function () {
+                        item.css("opacity", opacity);
+                    }, delay);
+                };
+                InteractiveMenu.prototype.changeMenuItemVisible = function () {
+                    var _this = this;
+                    this.hideContent();
+                    if (!this.collectionVisible()) {
+                        this.collectionVisible(true);
+                        setTimeout(function () {
+                            var $items = _this.$_itemsContainer.find(".dx-circle-menu-item");
+                            for (var i = $items.length - 1; i >= 0; i--) {
+                                _this.fade(($items.length - i - 1) * 30, $items.eq(i), 1);
+                            }
+                        }, 10);
+                    }
+                    else {
+                        var $items = this.$_itemsContainer.find(".dx-circle-menu-item");
+                        for (var i = 0; i < $items.length; i++) {
+                            this.fade(i * 15, $items.eq(i), 0);
+                        }
+                        setTimeout(function () {
+                            _this.collectionVisible(false);
+                        }, 250 + $items.length * 30);
+                    }
+                };
+                return InteractiveMenu;
+            })();
+            Preview.InteractiveMenu = InteractiveMenu;
+            ko.bindingHandlers['dxCircleMenu'] = {
+                init: function (element, valueAccessor) {
+                    $(element).children().remove();
+                    var templateHtml = $('#dx-circle-menu').text(), $element = $(element).append(templateHtml), values = valueAccessor();
+                    ko.applyBindings(new InteractiveMenu(values.options, $element), $element.children()[0]);
+                    return { controlsDescendantBindings: true };
+                }
+            };
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var GalleryModel = (function () {
+                function GalleryModel(preview, containerSize) {
+                    var _this = this;
+                    this.preview = preview;
+                    this.containerSize = containerSize;
+                    this._spacing = 1;
+                    this._animationTimeout = null;
+                    this.horizontal = ko.observable(1);
+                    this.vertical = ko.observable(1);
+                    this.pageCount = 0;
+                    this.isAnimated = ko.observable(false);
+                    this.items = ko.observableArray([{ blocks: ko.observableArray([]) }, { blocks: ko.observableArray([]) }, { blocks: ko.observableArray([]) }]);
+                    this.currentBlockText = ko.observable("");
+                    this.selectedIndexReal = ko.observable(0);
+                    this.selectedIndex = ko.observable(0);
+                    var oldIndex = this.selectedIndex();
+                    this.animationEnabled = preview.animationSettings.swipeEnabled;
+                    var _calcHorizontalVertical = function () {
+                        var pageHeight = Math.ceil(preview._pageHeight() * Preview.getCurrentResolution(preview._zoom()) / Preview.previewDefaultResolution);
+                        var pageWidth = Math.ceil(preview._pageWidth() * Preview.getCurrentResolution(preview._zoom()) / Preview.previewDefaultResolution);
+                        _this.horizontal(Math.floor(containerSize().width / (pageWidth + 2 * _this._spacing)) || 1);
+                        _this.vertical(Math.floor(containerSize().height / (pageHeight + 2 * _this._spacing)) || 1);
+                    };
+                    var updateGalleryContent = function () {
+                        _calcHorizontalVertical();
+                        _this.updateContent(preview, _this.horizontal() * _this.vertical());
+                    };
+                    containerSize.subscribe(updateGalleryContent);
+                    preview.visiblePages.subscribe(function () {
+                        for (var i = 0; i < _this.items().length; i++) {
+                            _this.items()[i].blocks([]);
+                            _this.items()[i].realIndex = -1;
+                        }
+                        updateGalleryContent();
+                    });
+                    preview.pageIndex.subscribe(updateGalleryContent);
+                    preview._zoom.subscribe(function () {
+                        _calcHorizontalVertical();
+                        if (_this.pageCount !== _this.horizontal() * _this.vertical()) {
+                            _this.pageCount = _this.horizontal() * _this.vertical();
+                            _this.updateContent(preview, _this.horizontal() * _this.vertical());
+                        }
+                    });
+                    this.selectedIndexReal.subscribe(function (newVal) {
+                        if (newVal >= 0) {
+                            _this.changePage(preview);
+                        }
+                        else if (newVal < 0) {
+                            _this.selectedIndexReal(0);
+                        }
+                    });
+                    this.selectedIndex.subscribe(function (newVal) {
+                        var result = newVal - oldIndex;
+                        if (result === -2 || result === 1) {
+                            _this.selectedIndexReal(_this.selectedIndexReal() + 1);
+                        }
+                        else if (result === 2 || result === -1) {
+                            _this.selectedIndexReal(_this.selectedIndexReal() - 1);
+                        }
+                        oldIndex = newVal;
+                    });
+                    this.swipeLeftEnable = ko.computed(function () {
+                        return _this.selectedIndexReal() !== 0;
+                    });
+                    this.swipeRightEnable = ko.computed(function () {
+                        return _this.selectedIndexReal() != (Math.ceil(preview.visiblePages().length / (_this.horizontal() * _this.vertical())) - 1);
+                    });
+                }
+                GalleryModel.prototype._createBlock = function (previewPage, className, visible) {
+                    previewPage.disableResolutionReduction = true;
+                    previewPage.maxZoom = 1;
+                    var classSet = {};
+                    if (this.animationEnabled()) {
+                        classSet[className] = true;
+                        classSet["dxrdp-animation"] = true;
+                    }
+                    return {
+                        page: previewPage,
+                        visible: visible,
+                        classSet: classSet,
+                        position: ko.observable({ top: 0, left: 0, width: 0, height: 0 })
+                    };
+                };
+                GalleryModel.prototype.updatePagesVisible = function (preview) {
+                    if (this.items()[this.selectedIndex()]) {
+                        var someActive = false;
+                        var pages = this.items()[this.selectedIndex()].blocks();
+                        if (pages.length > 0) {
+                            for (var i = 0; i < pages.length; i++) {
+                                if (pages[i].page) {
+                                    pages[i].page.isClientVisible(true);
+                                    if (pages[i].page.active()) {
+                                        someActive = true;
+                                    }
+                                }
+                                ;
+                            }
+                            if (!someActive) {
+                                pages[0].page && preview.goToPage(pages[0].page.pageIndex);
+                            }
+                        }
+                    }
+                };
+                GalleryModel.prototype.updateCurrentBlock = function () {
+                    if (this.items()[this.selectedIndex()]) {
+                        var blocks = this.items()[this.selectedIndex()].blocks();
+                        if (blocks.length > 0) {
+                            if (blocks.length > 1) {
+                                this.currentBlockText([blocks[0].page.pageIndex + 1, blocks[blocks.length - 1].page.pageIndex + 1].join(" - "));
+                            }
+                            else {
+                                if (blocks[0].page) {
+                                    this.currentBlockText((blocks[0].page.pageIndex + 1).toString());
+                                }
+                            }
+                        }
+                    }
+                };
+                GalleryModel.prototype.updateContent = function (preview, pagesCount) {
+                    var itemsCount = Math.ceil(preview.visiblePages().length / pagesCount);
+                    var pageIndex = 0;
+                    var isCurrentBlock = false;
+                    var realIndex = 0;
+                    for (var i = 0; i < itemsCount; i++) {
+                        for (var j = 0; j < pagesCount; j++) {
+                            if (preview.visiblePages()[pageIndex].active()) {
+                                isCurrentBlock = true;
+                                realIndex = i;
+                                break;
+                            }
+                            pageIndex++;
+                            if (preview.visiblePages().length === pageIndex) {
+                                break;
+                            }
+                        }
+                        if (isCurrentBlock)
+                            break;
+                    }
+                    if (this.selectedIndexReal() !== realIndex) {
+                        this.selectedIndexReal(realIndex);
+                    }
+                    else {
+                        this.changePage(preview);
+                    }
+                };
+                GalleryModel.prototype.updateBlockPositions = function (blocks, visible) {
+                    var height = this.containerSize().height / this.vertical();
+                    var width = this.containerSize().width / this.horizontal();
+                    for (var i = 0; i < blocks.length; i++) {
+                        var vertical = Math.floor((i) / this.horizontal());
+                        var horizontal = i - (this.horizontal() * vertical);
+                        var left = horizontal * width;
+                        if (blocks[i].visible === visible || blocks[i].visible === true) {
+                            blocks[i].position({
+                                top: vertical * height,
+                                left: left,
+                                width: width,
+                                height: height
+                            });
+                            blocks[i].visible = true;
+                        }
+                        else {
+                            blocks[i].position({
+                                top: vertical * height,
+                                left: blocks[i].classSet["left"] ? ((this.containerSize().width + left) * -1) : this.containerSize().width + left,
+                                width: width,
+                                height: height
+                            });
+                        }
+                    }
+                };
+                GalleryModel.prototype.updateStartBlocks = function (galleryItem, pages) {
+                    var currentBlockPages = galleryItem.blocks().map(function (x) { return x.page; });
+                    var firstPage = pages.indexOf(currentBlockPages[0]);
+                    if (firstPage !== -1) {
+                        for (var i = 0; i < firstPage; i++) {
+                            galleryItem.blocks.splice(i, 0, this._createBlock(pages[i], "left", false));
+                        }
+                    }
+                    else {
+                        firstPage = currentBlockPages.indexOf(pages[0]);
+                        if (firstPage !== -1) {
+                            galleryItem.blocks.splice(0, firstPage);
+                        }
+                    }
+                    return firstPage;
+                };
+                GalleryModel.prototype.updateLastBlocks = function (galleryItem, pages) {
+                    var currentBlockPages = galleryItem.blocks().map(function (x) { return x.page; });
+                    var lastPage = pages.indexOf(currentBlockPages[currentBlockPages.length - 1]);
+                    if (lastPage === pages.length - 1) {
+                        return 0;
+                    }
+                    if (lastPage !== -1) {
+                        for (var i = lastPage + 1; i < pages.length; i++) {
+                            galleryItem.blocks.splice(i, 0, this._createBlock(pages[i], "right", false));
+                        }
+                    }
+                    else {
+                        lastPage = currentBlockPages.indexOf(pages[pages.length - 1]);
+                        galleryItem.blocks.splice(lastPage + 1, currentBlockPages.length - lastPage);
+                    }
+                    return lastPage;
+                };
+                GalleryModel.prototype.updateBlocks = function (galleryItem, pagesCount, preview, index, useAnimation) {
+                    if (useAnimation === void 0) { useAnimation = false; }
+                    if (galleryItem.realIndex !== index || (galleryItem.blocks().length !== pagesCount || galleryItem.blocks()[0].page.pageIndex === -1)) {
+                        galleryItem.realIndex = index;
+                        clearTimeout(this._animationTimeout);
+                        var startIndex = pagesCount * index;
+                        if (startIndex < 0 || startIndex >= preview.visiblePages().length) {
+                            galleryItem.blocks([]);
+                            return;
+                        }
+                        var pages = [];
+                        for (var i = startIndex; i < startIndex + pagesCount; i++) {
+                            if (i >= preview.visiblePages().length) {
+                                break;
+                            }
+                            pages.push(preview.visiblePages()[i]);
+                        }
+                        var first = this.updateStartBlocks(galleryItem, pages);
+                        var last = this.updateLastBlocks(galleryItem, pages);
+                        if (first === -1 && last === -1) {
+                            galleryItem.blocks([]);
+                            for (var i = 0; i < pages.length; i++) {
+                                galleryItem.blocks.splice(i, 0, this._createBlock(pages[i], null, true));
+                            }
+                        }
+                        this.updateBlockPositions(galleryItem.blocks(), true);
+                        var self = this;
+                        if (useAnimation) {
+                            this._animationTimeout = setTimeout(function () {
+                                self.updateBlockPositions(galleryItem.blocks(), false);
+                            }, 400);
+                        }
+                        else {
+                            self.updateBlockPositions(galleryItem.blocks(), false);
+                        }
+                    }
+                };
+                GalleryModel.prototype.changePage = function (preview) {
+                    var pagesCount = this.horizontal() * this.vertical();
+                    var itemsCount = Math.ceil(preview.visiblePages().length / pagesCount);
+                    if (this.selectedIndex() === this.items().length - 1) {
+                        this.updateBlocks(this.items()[0], pagesCount, preview, this.selectedIndexReal() + 1);
+                        this.updateBlocks(this.items()[1], pagesCount, preview, this.selectedIndexReal() - 1);
+                    }
+                    else if (this.selectedIndex() === 0) {
+                        this.updateBlocks(this.items()[2], pagesCount, preview, this.selectedIndexReal() - 1);
+                        this.updateBlocks(this.items()[1], pagesCount, preview, this.selectedIndexReal() + 1);
+                    }
+                    else {
+                        this.updateBlocks(this.items()[0], pagesCount, preview, this.selectedIndexReal() - 1);
+                        this.updateBlocks(this.items()[2], pagesCount, preview, this.selectedIndexReal() + 1);
+                    }
+                    var currentGalleryItem = this.items()[this.selectedIndex()];
+                    this.updateBlocks(currentGalleryItem, pagesCount, preview, this.selectedIndexReal(), preview.animationSettings.zoomEnabled());
+                    if (!this.isAnimated()) {
+                        this.updatePagesVisible(preview);
+                    }
+                    this.updateCurrentBlock();
+                };
+                return GalleryModel;
+            })();
+            Preview.GalleryModel = GalleryModel;
+            var dxGalleryReportPreview = (function (_super) {
+                __extends(dxGalleryReportPreview, _super);
+                function dxGalleryReportPreview(element, options) {
+                    _super.call(this, element, options);
+                    this._animationClassName = "dxrdp-gallery-item-animation";
+                    this.blockItems = [];
+                    this.currentBlockItem = null;
+                    this.nextBlockItem = null;
+                    var $items = this["_getAvailableItems"]();
+                    for (var i = 0; i < $items.length; i++) {
+                        this.blockItems.push({
+                            element: $($items[i]),
+                            left: parseFloat($items[i]["style"].left)
+                        });
+                    }
+                    this.gallery = this["option"]("gallery");
+                }
+                dxGalleryReportPreview.prototype._swipeStartHandler = function (e) {
+                    _super.prototype._swipeStartHandler.call(this, e);
+                    var swipeRightEnable = this.gallery.swipeRightEnable();
+                    var swipeLeftEnable = this.gallery.swipeLeftEnable();
+                    if (!swipeRightEnable || !swipeLeftEnable) {
+                        var selectedIndex = swipeRightEnable ? 0 : 2;
+                        var startOffset = 3 - selectedIndex - 1, endOffset = selectedIndex;
+                        if (!swipeRightEnable && !swipeLeftEnable) {
+                            startOffset = 0;
+                            endOffset = 0;
+                        }
+                        e.jQueryEvent.maxLeftOffset = startOffset;
+                        e.jQueryEvent.maxRightOffset = endOffset;
+                    }
+                    this.gallery.isAnimated(true);
+                    if (this.gallery.animationEnabled()) {
+                        this.currentBlockItem && this.currentBlockItem.element.removeClass(this._animationClassName);
+                        this.nextBlockItem && this.nextBlockItem.element.removeClass(this._animationClassName);
+                    }
+                };
+                dxGalleryReportPreview.prototype._getNextIndex = function (offset) {
+                    var index = this.gallery.selectedIndex();
+                    if (offset < 0) {
+                        if (index === 2) {
+                            index = 0;
+                        }
+                        else {
+                            index++;
+                        }
+                    }
+                    else {
+                        if (index === 0) {
+                            index = 2;
+                        }
+                        else {
+                            index--;
+                        }
+                    }
+                    return index;
+                };
+                dxGalleryReportPreview.prototype._setSwipeAnimation = function (element, difference, offset, right) {
+                    var diffperc = 100 * offset / 4;
+                    var newLeft = "0%";
+                    if (right) {
+                        newLeft = (element.left + diffperc) + "%";
+                    }
+                    else {
+                        newLeft = (element.left - diffperc) + "%";
+                    }
+                    element.element.css({
+                        "opacity": difference,
+                        "transform": "scale(" + difference + ")",
+                        "left": newLeft
+                    });
+                };
+                dxGalleryReportPreview.prototype._addAnimation = function (item) {
+                    if (item) {
+                        if (this.gallery.animationEnabled()) {
+                            item.element.addClass(this._animationClassName);
+                        }
+                    }
+                };
+                dxGalleryReportPreview.prototype._restoreDefault = function (item) {
+                    if (item) {
+                        item.element.css({
+                            "opacity": 1,
+                            "transform": "scale(" + 1 + ")",
+                            "left": item.left + "%"
+                        });
+                    }
+                };
+                dxGalleryReportPreview.prototype._getItem = function (index, loopTest) {
+                    var realIndex = index;
+                    var currentBlockIndex = this.blockItems.indexOf(this.currentBlockItem);
+                    if (loopTest) {
+                        if (currentBlockIndex === 2 && index === 0) {
+                            realIndex = 3;
+                        }
+                        else if (currentBlockIndex === 0 && index === 2) {
+                            realIndex = 4;
+                        }
+                    }
+                    var item = this.blockItems[realIndex];
+                    if (this.gallery.animationEnabled()) {
+                        item.element.removeClass(this._animationClassName);
+                    }
+                    return item;
+                };
+                dxGalleryReportPreview.prototype._swipeUpdateHandler = function (e) {
+                    _super.prototype._swipeUpdateHandler.call(this, e);
+                    var offset = e.jQueryEvent.offset;
+                    var nextIndex = this._getNextIndex(offset);
+                    var currentIndex = this.gallery.selectedIndex();
+                    var currentBlockIndex = this.blockItems.indexOf(this.currentBlockItem);
+                    var nextBlockIndex = this.blockItems.indexOf(this.nextBlockItem);
+                    if (!this.currentBlockItem || currentBlockIndex !== currentIndex) {
+                        this.currentBlockItem = this._getItem(currentIndex, false);
+                    }
+                    if (!this.nextBlockItem || nextBlockIndex !== nextIndex) {
+                        this.nextBlockItem = this._getItem(nextIndex, true);
+                    }
+                    if (this.gallery.animationEnabled()) {
+                        offset = Math.abs(offset);
+                        var right = (nextIndex - currentIndex === 1) || (currentIndex === 2 && nextIndex === 0);
+                        this._setSwipeAnimation(this.currentBlockItem, Math.min(1, (1 - offset)), offset, right);
+                        this._setSwipeAnimation(this.nextBlockItem, Math.min(1, offset * 1.5), offset, !right);
+                    }
+                };
+                dxGalleryReportPreview.prototype._swipeEndHandler = function (e) {
+                    _super.prototype._swipeEndHandler.call(this, e);
+                    if (this.gallery.animationEnabled()) {
+                        for (var i = 0; i < this.blockItems.length; i++) {
+                            if (this.blockItems[i] === this.currentBlockItem || this.blockItems[i] === this.nextBlockItem) {
+                                this._addAnimation(this.blockItems[i]);
+                            }
+                            this._restoreDefault(this.blockItems[i]);
+                        }
+                    }
+                    else {
+                        this.gallery.isAnimated(false);
+                        this.gallery.updatePagesVisible(this.gallery.preview);
+                    }
+                };
+                dxGalleryReportPreview.prototype._endSwipe = function () {
+                    _super.prototype._endSwipe.apply(this, arguments);
+                    this.gallery.isAnimated(false);
+                    this.gallery.updatePagesVisible(this.gallery.preview);
+                };
+                return dxGalleryReportPreview;
+            })(DevExpress.ui.dxGallery);
+            Preview.dxGalleryReportPreview = dxGalleryReportPreview;
+            DevExpress.registerComponent("dxGalleryReportPreview", dxGalleryReportPreview);
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
 })(DevExpress || (DevExpress = {}));
@@ -3112,6 +5033,19 @@ var DevExpress;
                     });
                     $element.selectable(options);
                     element.addEventListener(touchEventName, touchStartHandler, false);
+                    element.addEventListener("mouseup", function (e) {
+                        var $target = $(e.target);
+                        var isTargetElementFocusable = $target.is(":focusable") || $target.closest(".dxrp-editing-field-container").length > 0;
+                        if (!isTargetElementFocusable) {
+                            var ieVersion = getInternetExplorerVersion();
+                            if (ieVersion > -1 && ieVersion <= 10) {
+                                $("body").focus();
+                            }
+                            else {
+                                $(":focus").blur();
+                            }
+                        }
+                    }, false);
                 }
             };
             ko.bindingHandlers["textCopier"] = {
@@ -3143,8 +5077,8 @@ var DevExpress;
                     var options = valueAccessor();
                     var subscriptions = [];
                     var updateZoom = function (newOptions) {
-                        if (newOptions.isAutoFit() === true && !newOptions.brickLoading()) {
-                            var newZoom = Math.round(Preview.updatePreviewZoomWithAutoFit(newOptions.width(), newOptions.height(), element) * 100 - 1) / 100;
+                        if (newOptions.isAutoFit() && ((!newOptions.brickLoading || (newOptions.brickLoading && !newOptions.brickLoading())) || options.alwaysRecalculate)) {
+                            var newZoom = Math.floor(Preview.updatePreviewZoomWithAutoFit(newOptions.width(), newOptions.height(), element, newOptions.resolution) * 100) / 100;
                             newOptions.zoom(Math.max(newZoom, 0.02));
                         }
                     };
@@ -3153,24 +5087,19 @@ var DevExpress;
                         updateZoom(options);
                     };
                     $(window).bind("resize", onResize);
-                    subscriptions.push(options.rightPanelWidth.subscribe(function (newVal) {
-                        updateZoom(options);
-                    }));
-                    subscriptions.push(options.width.subscribe(function (newVal) {
-                        updateZoom(options);
-                    }));
-                    subscriptions.push(options.height.subscribe(function (newVal) {
-                        updateZoom(options);
-                    }));
-                    subscriptions.push(options.isAutoFit.subscribe(function (newVal) {
-                        updateZoom(options);
-                    }));
-                    subscriptions.push(options.brickLoading.subscribe(function (newVal) {
-                        updateZoom(options);
-                    }));
-                    subscriptions.push(options.previewSize.subscribe(function (newVal) {
-                        updateZoom(options);
-                    }));
+                    var subscribe = function (value) {
+                        if (value) {
+                            subscriptions.push(value.subscribe(function (newVal) {
+                                updateZoom(options);
+                            }));
+                        }
+                    };
+                    subscribe(options.rightPanelWidth);
+                    subscribe(options.width);
+                    subscribe(options.height);
+                    subscribe(options.isAutoFit);
+                    subscribe(options.brickLoading);
+                    subscribe(options.previewSize);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                         $(window).unbind("resize", onResize);
                         subscriptions.forEach(function (subscription) {
@@ -3187,6 +5116,20 @@ var DevExpress;
                     return { controlsDescendantBindings: true };
                 }
             };
+            function getInternetExplorerVersion() {
+                var rv = -1;
+                if (navigator.appName == 'Microsoft Internet Explorer') {
+                    var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+                    if (re.exec(navigator.userAgent) != null)
+                        rv = parseFloat(RegExp.$1);
+                }
+                else if (navigator.appName == 'Netscape') {
+                    var re = new RegExp("Trident/.*rv:([0-9]{1,}[\.0-9]{0,})");
+                    if (re.exec(navigator.userAgent) != null)
+                        rv = parseFloat(RegExp.$1);
+                }
+                return rv;
+            }
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
 })(DevExpress || (DevExpress = {}));
@@ -3333,7 +5276,7 @@ var DevExpress;
                         var brickProvider = this._preview.getPreviewPageBrickProvider(Preview.HandlerUri, documentId);
                         for (var i = 0; i < response.pageCount && !this._preview._stopBuildRequests[documentId] && !this._preview._closeDocumentRequests[documentId]; i++) {
                             var createNewPage = function (index) {
-                                return new Preview.PreviewPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, brickProvider, null, _this._preview.createBrickClickProcessor(index));
+                                return _this._preview.createPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, _this._preview._pageBackColor.peek(), brickProvider, null, _this._preview.createBrickClickProcessor(index), _this._preview.editingFieldsProvider);
                             };
                             if (i < this._preview.pages().length) {
                                 var page = this._preview.pages()[i];
@@ -3475,6 +5418,15 @@ var DevExpress;
                 };
                 PreviewRequestWrapper.prototype.openReport = function (reportName) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName), Preview.MessageHandler.processError);
+                };
+                PreviewRequestWrapper.prototype.drillThrough = function (customData) {
+                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'drillThrough', encodeURIComponent(JSON.stringify({
+                        reportId: this._reportPreview.reportId,
+                        documentId: this._reportPreview.documentId,
+                        parameters: this._parametersModel.serializeParameters(),
+                        editingFields: this._reportPreview.editingFieldsProvider().map(function (field) { return field.model(); }),
+                        customData: customData
+                    })));
                 };
                 PreviewRequestWrapper.prototype.getStartExportOperation = function (arg) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'startExport', arg);
