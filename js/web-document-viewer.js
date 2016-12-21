@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
+/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -3181,9 +3181,32 @@ var DevExpress;
             };
             ko.bindingHandlers['dxReportViewer'] = {
                 init: function (element, valueAccessor) {
-                    $(element).children().remove();
-                    var templateHtml = $('#dxrd-designer').text(), $element = $(element).append(templateHtml), values = ko.unwrap(valueAccessor());
-                    ko.applyBindings(values, $element.children()[0]);
+                    var $element = $(element), values = ko.unwrap(valueAccessor()) || {}, getDesignerTemplate = function () {
+                        return $('#dxrd-designer').text();
+                    }, templateHtml = getDesignerTemplate(), processBinding = function () {
+                        if (!templateHtml)
+                            templateHtml = getDesignerTemplate();
+                        $element.children().remove();
+                        var child = $element.append(templateHtml).children()[0];
+                        if (!child)
+                            return;
+                        ko.cleanNode(child);
+                        var viewerModel = ko.isWriteableObservable(values.viewerModel) ? values.viewerModel : ko.observable(null);
+                        if (!values.reportPreview || !values.parts) {
+                            var model = DevExpress.Report.Preview.createAndInitPreviewModel(values, element, values.callbacks, values.rtl, false);
+                            viewerModel(model);
+                        }
+                        else {
+                            viewerModel(values);
+                        }
+                        ko.applyBindings(viewerModel, child);
+                    };
+                    if (!templateHtml) {
+                        DevExpress.Designer.loadTemplates().done(processBinding);
+                    }
+                    else {
+                        processBinding();
+                    }
                     return { controlsDescendantBindings: true };
                 }
             };

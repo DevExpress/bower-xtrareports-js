@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
+/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -6242,36 +6242,36 @@
   font-size: 10pt;
   color: black;
 }
-.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.corporate .title {
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.compact .title {
   font-family: 'Times New Roman';
   font-size: 21pt;
   color: black;
 }
-.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.corporate .caption {
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.compact .caption {
   font-family: 'Times New Roman';
   font-size: 10pt;
   color: black;
 }
-.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.corporate .data {
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.compact .data {
   font-family: Arial;
   font-size: 9pt;
   color: black;
 }
-.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.compact .title {
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.corporate .title {
   font-family: 'Times New Roman';
   font-size: 20pt;
   font-weight: bold;
   font-style: italic;
   color: navy;
 }
-.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.compact .caption {
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.corporate .caption {
   font-family: 'Times New Roman';
   font-size: 11pt;
   font-weight: bold;
   font-style: italic;
   color: navy;
 }
-.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.compact .data {
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-report-style-page .dxrd-wizard-report-style-image-container .dxrd-wizard-report-style-image.corporate .data {
   font-family: Arial;
   font-size: 8pt;
   color: black;

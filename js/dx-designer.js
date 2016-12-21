@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
+/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -1793,18 +1793,14 @@ var DevExpress;
                         this.assignRightPart(operator);
                     }
                 };
-                Object.defineProperty(CriteriaOperator.prototype, "allOperands", {
-                    get: function () {
-                        var operands = [];
-                        if (this.leftPart)
-                            $.isArray(this.leftPart) ? operands.concat(this.leftPart) : operands.push(this.leftPart);
-                        if (this.rightPart)
-                            $.isArray(this.rightPart) ? operands.concat(this.rightPart) : operands.push(this.rightPart);
-                        return operands;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
+                CriteriaOperator.prototype.children = function () {
+                    var operands = [];
+                    if (this.leftPart)
+                        operands.push.apply(operands, $.isArray(this.leftPart) ? this.leftPart : [this.leftPart]);
+                    if (this.rightPart)
+                        operands.push.apply(operands, $.isArray(this.rightPart) ? this.rightPart : [this.rightPart]);
+                    return operands;
+                };
                 return CriteriaOperator;
             })();
             Data.CriteriaOperator = CriteriaOperator;
@@ -2066,17 +2062,13 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
-                Object.defineProperty(AggregateOperand.prototype, "allOperands", {
-                    get: function () {
-                        var operands = [];
-                        this.property && operands.push(this.property);
-                        this.aggregatedExpression && operands.push(this.aggregatedExpression);
-                        this.condition && operands.push(this.condition);
-                        return operands;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
+                AggregateOperand.prototype.children = function () {
+                    var operands = [];
+                    this.property && operands.push(this.property);
+                    this.aggregatedExpression && operands.push(this.aggregatedExpression);
+                    this.condition && operands.push(this.condition);
+                    return operands;
+                };
                 return AggregateOperand;
             })(CriteriaOperator);
             Data.AggregateOperand = AggregateOperand;
@@ -2551,6 +2543,11 @@ var DevExpress;
                 "LessOrEqual": "<=",
                 "GreaterOrEqual": ">="
             };
+            function criteriaForEach(operator, callback) {
+                callback(operator);
+                operator.children().forEach(function (item) { return criteriaForEach(item, callback); });
+            }
+            Data.criteriaForEach = criteriaForEach;
         })(Data = JS.Data || (JS.Data = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -10179,6 +10176,27 @@ var DevExpress;
         function num(v) {
             return parseInt(v, 10) || 0;
         }
+        function loadTemplates() {
+            var promises = $("script[type='text/html']").map(function (_, script) {
+                if (script.src) {
+                    var deffered = $.Deferred();
+                    $.get(script.src)
+                        .done(function (tmpl) {
+                        script.text = tmpl;
+                        if (tmpl.indexOf('type="text/html"') !== -1 || tmpl.indexOf("type='text/html'") !== -1) {
+                            $(document.body).append(tmpl);
+                        }
+                        deffered.resolve();
+                    })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                        deffered.reject();
+                    });
+                    return deffered.promise();
+                }
+            });
+            return $.when.apply($.when, promises);
+        }
+        Designer.loadTemplates = loadTemplates;
         function getControlRect(element, control, surface) {
             var curleft = num(element.css("left")), curtop = num(element.css("top"));
             if (curtop < 0) {
@@ -10714,7 +10732,7 @@ var DevExpress;
         Designer.collectionsVisitor = collectionsVisitor;
         function getImageClassName(controlType) {
             var controlType = getTypeNameFromFullName(controlType || "").split(".").join("_"), name;
-            if (controlType.indexOf("XR") !== -1) {
+            if (controlType.indexOf("XR") === 0) {
                 name = controlType.slice(2).toLowerCase();
             }
             else if (controlType === "DevExpress_XtraReports_UI_XtraReport") {
@@ -11807,11 +11825,6 @@ var DevExpress;
                 }
             }
         };
-        function criteriaForEach(operator, callback) {
-            callback(operator);
-            operator.allOperands.forEach(function (item) { return criteriaForEach(item, callback); });
-        }
-        Designer.criteriaForEach = criteriaForEach;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 /// <reference path="utils.ts" />
@@ -12099,21 +12112,22 @@ var DevExpress;
                         return item.getMetaData().canDrop(adjustedTarget, item);
                     });
                     if (changeParent) {
+                        for (var i = 0; i < itemsToDrop.length; i++) {
+                            itemsToDrop[i].surface.rect({ top: 0, left: 0 });
+                        }
                         focusedModel.parentModel().removeChilds(itemsToDrop);
-                    }
-                    for (var i = 0; i < itemsToDrop.length; i++) {
-                        if (changeParent) {
-                            this.ajustLocation(adjustedTarget, itemsToDrop[i].surface);
-                        }
-                        else {
-                            this.ajustLocation(adjustedTarget, itemsToDrop[i].surface);
-                            this.selection.expectClick = true;
-                        }
-                    }
-                    if (changeParent) {
                         parent["addChilds"](itemsToDrop);
+                        for (var i = 0; i < itemsToDrop.length; i++) {
+                            this.ajustLocation(adjustedTarget, itemsToDrop[i].surface);
+                        }
                         this.selection.focused(focusedSurface);
                         this.selection.selectItems(itemsToDrop.map(function (item) { return item.surface; }));
+                    }
+                    else {
+                        for (var i = 0; i < itemsToDrop.length; i++) {
+                            this.ajustLocation(adjustedTarget, itemsToDrop[i].surface);
+                        }
+                        this.selection.expectClick = true;
                     }
                 }
             };
@@ -12490,8 +12504,8 @@ var DevExpress;
                     selectedControl.selected(false);
                 });
                 this._selectedControlsInner = [];
-                this.applySelection();
                 this._setFocused(control);
+                this.applySelection();
             };
             SurfaceSelection.prototype.swapFocusedItem = function (control) {
                 if (this._focused() !== control) {
@@ -12503,12 +12517,7 @@ var DevExpress;
             SurfaceSelection.prototype.initialize = function (control) {
                 control = control || this.dropTarget;
                 this._firstSelected = !!(control && control["focused"]) ? control : null;
-                if (this._firstSelected) {
-                    this.updateSelection(this._firstSelected);
-                }
-                else {
-                    this.updateSelection(null);
-                }
+                this.updateSelection(this._firstSelected);
             };
             SurfaceSelection.prototype.clickHandler = function (control, event) {
                 if (event === void 0) { event = { ctrlKey: false }; }

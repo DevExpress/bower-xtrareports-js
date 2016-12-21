@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.8 - 2016-11-14
+/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
 * http://www.devexpress.com
 * Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
 
@@ -4261,7 +4261,7 @@ var DevExpress;
                     else if (this.expression()) {
                         try {
                             this._criteria = DevExpress.JS.Data.CriteriaOperator.parse(this.expression());
-                            Designer.criteriaForEach(this._criteria, function (operand) {
+                            DevExpress.JS.Data.criteriaForEach(this._criteria, function (operand) {
                                 if (operand instanceof DevExpress.JS.Data.OperandProperty) {
                                     var dependedTable = Designer.findFirstItemMatchesCondition(query.tables(), function (table) { return operand.propertyName.indexOf(table.actualName() + ".") === 0; });
                                     dependedTable && _this._dependedTables.push(dependedTable);
@@ -9592,9 +9592,32 @@ var DevExpress;
             };
             ko.bindingHandlers['dxReportViewer'] = {
                 init: function (element, valueAccessor) {
-                    $(element).children().remove();
-                    var templateHtml = $('#dxrd-designer').text(), $element = $(element).append(templateHtml), values = ko.unwrap(valueAccessor());
-                    ko.applyBindings(values, $element.children()[0]);
+                    var $element = $(element), values = ko.unwrap(valueAccessor()) || {}, getDesignerTemplate = function () {
+                        return $('#dxrd-designer').text();
+                    }, templateHtml = getDesignerTemplate(), processBinding = function () {
+                        if (!templateHtml)
+                            templateHtml = getDesignerTemplate();
+                        $element.children().remove();
+                        var child = $element.append(templateHtml).children()[0];
+                        if (!child)
+                            return;
+                        ko.cleanNode(child);
+                        var viewerModel = ko.isWriteableObservable(values.viewerModel) ? values.viewerModel : ko.observable(null);
+                        if (!values.reportPreview || !values.parts) {
+                            var model = DevExpress.Report.Preview.createAndInitPreviewModel(values, element, values.callbacks, values.rtl, false);
+                            viewerModel(model);
+                        }
+                        else {
+                            viewerModel(values);
+                        }
+                        ko.applyBindings(viewerModel, child);
+                    };
+                    if (!templateHtml) {
+                        DevExpress.Designer.loadTemplates().done(processBinding);
+                    }
+                    else {
+                        processBinding();
+                    }
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -12891,7 +12914,8 @@ var DevExpress;
                     return _super.prototype.getInfo.call(this).concat([
                         { propertyName: "parameters", modelName: "Parameters", array: true },
                         { propertyName: "tableInfoCollection", modelName: "TableInfoCollection", array: true },
-                        { propertyName: "spParameterInfoCollection", modelName: "StoredProcedureParameterInfoCollection", array: true }
+                        { propertyName: "spParameterInfoCollection", modelName: "StoredProcedureParameterInfoCollection", array: true },
+                        { propertyName: "name", modelName: "@Name" }
                     ]);
                 };
                 return UniversalDataSource;
@@ -21834,8 +21858,8 @@ var DevExpress;
                 (function (ReportStyle) {
                     ReportStyle[ReportStyle["Bold"] = 0] = "Bold";
                     ReportStyle[ReportStyle["Casual"] = 1] = "Casual";
-                    ReportStyle[ReportStyle["Corporate"] = 2] = "Corporate";
-                    ReportStyle[ReportStyle["Compact"] = 3] = "Compact";
+                    ReportStyle[ReportStyle["Compact"] = 2] = "Compact";
+                    ReportStyle[ReportStyle["Corporate"] = 3] = "Corporate";
                     ReportStyle[ReportStyle["Formal"] = 4] = "Formal";
                 })(Wizard.ReportStyle || (Wizard.ReportStyle = {}));
                 var ReportStyle = Wizard.ReportStyle;
@@ -21865,8 +21889,8 @@ var DevExpress;
                         this.reportStyleItems = [
                             new ReportStyleItem("Bold", 0 /* Bold */),
                             new ReportStyleItem("Casual", 1 /* Casual */),
-                            new ReportStyleItem("Corporate", 2 /* Corporate */),
-                            new ReportStyleItem("Compact", 3 /* Compact */),
+                            new ReportStyleItem("Corporate", 3 /* Corporate */),
+                            new ReportStyleItem("Compact", 2 /* Compact */),
                             new ReportStyleItem("Formal", 4 /* Formal */)
                         ];
                         this.selectedReportStyle = ko.observable(this.reportStyleItems[0]);
@@ -22213,10 +22237,15 @@ var DevExpress;
                     }
                     var requests = [];
                     var result = [];
-                    Designer.criteriaForEach(expressionCriteria, function (operator) {
+                    DevExpress.JS.Data.criteriaForEach(expressionCriteria, function (operator) {
                         if (operator instanceof DevExpress.JS.Data.OperandProperty) {
-                            var request = getDisplayExpression ? _this.displayNameProvider.getDisplayNameByPath(path, operator.propertyName) : _this.displayNameProvider.getRealName(path, operator.propertyName);
-                            requests.push(request.done(function (data) { return result.push({ operand: operator, convertedName: data }); }));
+                            var isContainsParentRelationshipTraversalOperator = operator.propertyName.indexOf("^.") === 0;
+                            var propertyName = isContainsParentRelationshipTraversalOperator ? operator.propertyName.substring(2) : operator.propertyName;
+                            var request = getDisplayExpression ? _this.displayNameProvider.getDisplayNameByPath(path, propertyName) : _this.displayNameProvider.getRealName(path, propertyName);
+                            requests.push(request.done(function (data) { return result.push({
+                                operand: operator,
+                                convertedName: isContainsParentRelationshipTraversalOperator ? "^." + data : data
+                            }); }));
                         }
                     });
                     if (requests.length === 0) {
@@ -23075,7 +23104,10 @@ var DevExpress;
                             clickHandler();
                         }
                     }];
-                    if (item.data && item.data.data && ((item.data.data.getMetaData && !item.data.data.getMetaData().isDeleteDeny) || !item.data.data.getMetaData)) {
+                    var element = item.data && item.data.data;
+                    var isDeleteDeny = element && ((element.getMetaData && element.getMetaData().isDeleteDeny) || false);
+                    var isLocked = element && ((element.lockedInUserDesigner && element.lockedInUserDesigner()) || false);
+                    if (!isDeleteDeny && !isLocked) {
                         actions.push({
                             text: "Delete",
                             imageClassName: "dxrd-image-recycle-bin",
