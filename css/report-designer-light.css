@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.2.3 - 2016-12-11
+/*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 .dx-collapsing-image {
   padding: 4.5px;
@@ -1636,6 +1636,14 @@
   height: 100%;
   overflow: hidden;
 }
+.dx-ltr.dx-editors .dxrd-properties-wrapper .dxrd-editor-header .dx-field-label {
+  padding-left: 0px;
+  padding-right: 13px;
+}
+.dx-rtl.dx-editors .dxrd-properties-wrapper .dxrd-editor-header .dx-field-label {
+  padding-left: 13px;
+  padding-right: 0px;
+}
 .dx-ltr.dx-editors .dxrd-properties-wrapper .dx-widget:not(.dx-scrollable-scrollbar):not(.dx-dropdowneditor-button):not(.dx-button-has-icon):not(.no-margin-right) {
   margin-right: 16px;
 }
@@ -1843,6 +1851,9 @@
 .dx-designer .dx-ltr .dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 24px;
 }
+.dx-designer .dx-ltr .dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 54px;
+}
 .dx-designer .dx-ltr .dx-fieldset .dx-field-value > .dx-checkbox {
   float: left;
 }
@@ -1854,6 +1865,9 @@
 }
 .dx-designer .dx-rtl .dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-left: 24px;
+}
+.dx-designer .dx-rtl .dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-left: 54px;
 }
 .dx-designer .dx-rtl .dx-fieldset .dx-field-value > .dx-checkbox {
   float: right;
@@ -1971,6 +1985,9 @@
 }
 .dx-designer .dx-viewport .dxrd-action-items-container {
   border-radius: 0;
+}
+.dx-designer .dx-viewport .dxrd-action-items-container .dx-popup-content {
+  font-size: 12px;
 }
 .dx-designer .dx-viewport .dxrd-action-items-container .dxrd-action-item {
   display: inline-block;
@@ -4598,8 +4615,12 @@
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text {
   width: 100%;
   word-wrap: break-word;
+  white-space: pre-wrap;
   line-height: normal;
   display: inline-block;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text.dxrp-editing-field-text-wordwrap {
+  white-space: pre;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-mask {
   border: none;
@@ -4686,8 +4707,12 @@
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text {
   width: 100%;
   word-wrap: break-word;
+  white-space: pre-wrap;
   line-height: normal;
   display: inline-block;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text.dxrp-editing-field-text-wordwrap {
+  white-space: pre;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-mask {
   border: none;
@@ -4739,22 +4764,22 @@
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-focused {
   background-color: rgba(241, 244, 255, 0.7);
 }
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-container,
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-charactercomb-cell {
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-container,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-charactercomb-cell {
   background-color: #cadeff;
   background-clip: padding-box;
 }
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-container.active,
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-container.readonly,
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-charactercomb.active .dxrp-editing-field-charactercomb-cell,
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-charactercomb.readonly .dxrp-editing-field-charactercomb-cell {
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-container.active,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-container.readonly,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-charactercomb.active .dxrp-editing-field-charactercomb-cell,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-charactercomb.readonly .dxrp-editing-field-charactercomb-cell {
   background: transparent;
 }
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-check .highlight {
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-check .highlight {
   fill: #cadeff;
 }
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-check .highlight.active,
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-fields-hightlighted .dxrp-editing-field-check .highlight.readonly {
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-check .highlight.active,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper.dxrp-editing-fields-hightlighted .dxrp-editing-field-check .highlight.readonly {
   fill: transparent;
 }
 .dxrd-preview-export-toolbar-item {
@@ -7738,6 +7763,9 @@
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-control-rtl.dxrd-image-surface-picturebox_placeholder {
   background-position: right top;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface:not(.dxrd-surface-rtl) .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-control.dxrd-control-rtl .dxrd-pivot-content {
+  direction: ltr;
 }
 .dxrd-designer-wrapper.dx-rtl .dxrd-surface-wrapper .dxrd-surface .dxrd-bands-panel-wrapper {
   margin-right: -100%;

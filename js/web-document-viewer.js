@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.2.3 - 2016-12-12
+/*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 var DevExpress;
 (function (DevExpress) {
@@ -1885,9 +1885,13 @@ var DevExpress;
                         var multiValuesHelper = new DevExpress.Designer.Widgets.MultiValuesHelper(this._value, this.lookUpValues());
                         var newItems;
                         if (parameterHelper.customizeParameterLookUpSource)
-                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems.slice(0));
-                        if (newItems)
-                            multiValuesHelper.displayItems = newItems;
+                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems);
+                        if (newItems) {
+                            multiValuesHelper.dataSource = newItems;
+                        }
+                        else {
+                            multiValuesHelper.dataSource = new DevExpress.data.DataSource({ store: multiValuesHelper.displayItems, pageSize: 100, paginate: true });
+                        }
                         this.safeAssignObservable("value", ko.observable(multiValuesHelper));
                     }
                     else if (this.isMultiValue) {
@@ -3261,16 +3265,16 @@ var DevExpress;
                 return EditingFieldExtensions._instance;
             };
             EditingFieldExtensions.prototype._registerStandartEditors = function () {
-                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d+$/);
-                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/);
-                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?\d+([\.,]?\d*)?$/);
-                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/);
+                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?\d+([\.,]?\d*)?$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/, "0");
                 EditingFieldExtensions.registerEditor("Date", "Date", Report.Categories.DateTime(), {
                     onValueChanged: function (e) {
                         e.model.value(e.component.option("text"));
                     }
                 }, "dxrp-editing-field-datetime");
-                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/);
+                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, "");
             };
             EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template) {
                 EditingFieldExtensions.instance()._editors[name] = {
@@ -3284,8 +3288,15 @@ var DevExpress;
             EditingFieldExtensions.registerMaskEditor = function (editorID, displayName, category, mask) {
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
             };
-            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExp) {
+            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExp, defaultVal) {
                 var options = {
+                    onFocusIn: function (e) {
+                        var $input = $(e.element).find("input").eq(0);
+                        var currentValue = $input.val();
+                        if (!regExp.test(currentValue))
+                            $input.val(defaultVal);
+                        $input = null;
+                    },
                     onKeyPress: function (e) {
                         var char = getCharFromKeyCode(e.jQueryEvent);
                         if (!char)
@@ -3299,6 +3310,7 @@ var DevExpress;
                         var result = [currentValue.slice(0, caretPosition), char, currentValue.slice(caretPosition)].join('');
                         if (!regExp.test(result))
                             e.jQueryEvent.preventDefault();
+                        $input = null;
                     },
                     onPaste: function (e) {
                         var clipboardData = e.jQueryEvent.originalEvent.clipboardData || window["clipboardData"] || {};
@@ -3314,6 +3326,7 @@ var DevExpress;
                         var result = [currentValue.slice(0, caretPosition.start), pastedData, currentValue.slice(caretPosition.end)].join('');
                         if (!regExp.test(result))
                             e.jQueryEvent.preventDefault();
+                        $input = null;
                     }
                 };
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, options);
@@ -3409,6 +3422,7 @@ var DevExpress;
                 function TextEditFieldViewModel(field, pageWidth, pageHeight, zoom) {
                     var _this = this;
                     this.template = "dxrp-editing-field-container";
+                    this.wordWrap = true;
                     this.active = ko.observable(false);
                     var brickStyle = field.model().brickOptions;
                     var style = { rtl: function () { return brickStyle.rtl; } };
@@ -3425,6 +3439,9 @@ var DevExpress;
                     this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
                     this.zoom = zoom;
                     this.field = field;
+                    if (brickStyle.wordWrap != undefined) {
+                        this.wordWrap = brickStyle.wordWrap;
+                    }
                     this.hideEditor = function () {
                         setTimeout(function () {
                             _this.active(false);
@@ -3687,6 +3704,23 @@ var DevExpress;
             Preview.CharacterCombEditingFieldViewModel = CharacterCombEditingFieldViewModel;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Report;
+        (function (Report) {
+            Report.StringId = {
+                Copy: "ReportStringId.RibbonXRDesign_Copy_STipTitle",
+                NewViaWizard: "ReportStringId.UD_Capt_NewWizardReport",
+                Open: "ReportStringId.UD_Capt_OpenFile",
+                Save: "ReportStringId.Verb_Save",
+                SaveAs: "ReportStringId.UD_Capt_SaveFileAs",
+                MdiReportChanged: "ReportStringId.UD_Msg_MdiReportChanged"
+            };
+        })(Report = Designer.Report || (Designer.Report = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
@@ -4378,13 +4412,8 @@ var DevExpress;
                         }, 1);
                     }
                 };
-                MobileSearchViewModel.prototype._createPageSubscription = function (page) {
-                    var _this = this;
-                    return page.brick.subscribe(function (newVal) {
-                        _this._updateBricks(page, _this.searchResult());
-                    });
-                };
                 MobileSearchViewModel.prototype._updateBricks = function (page, searchResult) {
+                    var _this = this;
                     if (page.brick() && searchResult && searchResult.length > 0) {
                         var results = searchResult.filter(function (x) {
                             return x.pageIndex === page.pageIndex;
@@ -4392,6 +4421,12 @@ var DevExpress;
                         for (var i = 0; i < results.length; i++) {
                             page.selectBrick(results[i].indexes, true);
                         }
+                    }
+                    else {
+                        var subscription = page.brick.subscribe(function (newVal) {
+                            subscription.dispose();
+                            _this._updateBricks(page, _this.searchResult());
+                        });
                     }
                 };
                 MobileSearchViewModel.maxHeight = 80;
@@ -4402,8 +4437,15 @@ var DevExpress;
                 init: function (element, valueAccessor) {
                     var viewModel = ko.unwrap(valueAccessor());
                     var $element = $(element);
+                    element.style.display = "none";
                     var $searchText = $element.find('.dxrdp-taptosearch-text');
                     viewModel.height.subscribe(function (newValue) {
+                        if (!newValue) {
+                            element.style.display = "none";
+                        }
+                        else {
+                            element.style.display = "block";
+                        }
                         $searchText.css({
                             'opacity': Math.min((newValue / MobileSearchViewModel.maxHeight), 1)
                         });
@@ -5110,9 +5152,32 @@ var DevExpress;
             };
             ko.bindingHandlers['dxReportViewer'] = {
                 init: function (element, valueAccessor) {
-                    $(element).children().remove();
-                    var templateHtml = $('#dxrd-designer').text(), $element = $(element).append(templateHtml), values = ko.unwrap(valueAccessor());
-                    ko.applyBindings(values, $element.children()[0]);
+                    var $element = $(element), values = ko.unwrap(valueAccessor()) || {}, getDesignerTemplate = function () {
+                        return $('#dxrd-designer').text();
+                    }, templateHtml = getDesignerTemplate(), processBinding = function () {
+                        if (!templateHtml)
+                            templateHtml = getDesignerTemplate();
+                        $element.children().remove();
+                        var child = $element.append(templateHtml).children()[0];
+                        if (!child)
+                            return;
+                        ko.cleanNode(child);
+                        var viewerModel = ko.isWriteableObservable(values.viewerModel) ? values.viewerModel : ko.observable(null);
+                        if (!values.reportPreview || !values.parts) {
+                            var model = DevExpress.Report.Preview.createAndInitPreviewModel(values, element, values.callbacks, false);
+                            viewerModel(model);
+                        }
+                        else {
+                            viewerModel(values);
+                        }
+                        ko.applyBindings(viewerModel, child);
+                    };
+                    if (!templateHtml) {
+                        DevExpress.Designer.loadTemplates().done(processBinding);
+                    }
+                    else {
+                        processBinding();
+                    }
                     return { controlsDescendantBindings: true };
                 }
             };

@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.2.3 - 2016-12-11
+/*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 var DevExpress;
 (function (DevExpress) {
@@ -2801,7 +2801,7 @@ var DevExpress;
                     function SqlDataSourceWizard(connectionStrings, callbacks, disableCustomSql, rtl) {
                         if (rtl === void 0) { rtl = false; }
                         _super.call(this);
-                        this.title = "Sql Data Source Wizard";
+                        this.title = DevExpress.Designer.getLocalization("Sql Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
                         this.extendCssClass = "dxrd-sqldatasource-wizard";
                         this.container = function (element) { return $(element).closest('.dx-viewport'); };
                         this.steps = [
@@ -2879,7 +2879,7 @@ var DevExpress;
                         _super.call(this, wizard);
                         this._showPageForSingleConnectionString = _showPageForSingleConnectionString;
                         this.template = "dxrd-page-connectionstring";
-                        this.title = "SQL Data Source Wizard";
+                        this.title = DevExpress.Designer.getLocalization("SQL Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
                         this.description = "Choose a data connection";
                         this.selectedConnectionString = ko.observableArray([]);
                         this._begin = function (data) {
@@ -2932,8 +2932,8 @@ var DevExpress;
                         if (rtl === void 0) { rtl = false; }
                         _super.call(this, wizard);
                         this.template = "dxrd-wizard-create-query-page";
-                        this.title = "SQL Data Source Wizard";
-                        this.description = "Create a query or select a stored procedure";
+                        this.title = DevExpress.Designer.getLocalization("SQL Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
+                        this.description = DevExpress.Designer.getLocalization("Create a query or select a stored procedure", DevExpress.Designer.StringId.WizardPageConfigureQuery);
                         this.queryTypeItems = [CreateQueryPage.QUERY_TEXT, CreateQueryPage.SP_TEXT];
                         this.selectedQueryType = ko.observable();
                         this.isDataLoadingInProcess = ko.observable(false);
@@ -3150,7 +3150,7 @@ var DevExpress;
                         var newQuery = new DevExpress.Data.StoredProcQuery({ "@Name": this._query.name() || this._selectedProcedure.name, "ProcName": this._selectedProcedure.name }, this._query.parent);
                         this._selectedProcedure.arguments.forEach(function (arg) {
                             if (StoredProceduresQueryControl._availableConvertToParameter(arg)) {
-                                newQuery.parameters.push(Designer.getFirstItemByPropertyValue(_this._query.parameters(), "name", arg.name) || new DevExpress.Data.DataSourceParameter({ "@Name": arg.name, "@Type": DevExpress.Data.DBColumn.GetType(arg.type) }));
+                                newQuery.parameters.push(Designer.getFirstItemByPropertyValue(_this._query.parameters(), "name", arg.name) || new DevExpress.Data.DataSourceParameter({ "@Name": arg.name, "@Type": DevExpress.Data.DBColumn.GetType(arg.type) }, null, DevExpress.Data.storedProcParameterSerializationsInfo(DevExpress.Data.DBColumn.GetType(arg.type))));
                             }
                         });
                         return newQuery;
@@ -3188,7 +3188,7 @@ var DevExpress;
                         _super.call(this, wizard);
                         this.parametersConverter = parametersConverter;
                         this.template = "dxrd-page-configure-parameters";
-                        this.title = "SQL Data Source Wizard";
+                        this.title = DevExpress.Designer.getLocalization("SQL Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
                         this.description = "Configure query parameters";
                         this._begin = function (data) {
                             _this.parametersEditorOptions.hideButtons(data.sqlQuery.type() === DevExpress.Data.SqlQueryType.storedProcQuery);
@@ -3223,6 +3223,7 @@ var DevExpress;
                             collapsed: false
                         };
                     }
+                    ;
                     return ConfigureParametersPage;
                 })(Wizard.WizardPage);
                 Wizard.ConfigureParametersPage = ConfigureParametersPage;
@@ -3316,28 +3317,41 @@ var DevExpress;
                 message: DevExpress.Designer.getLocalization('Name is required and should be a valid identifier.')
             }];
         Data.parameterValueSerializationsInfo = { propertyName: "value", displayName: "Value", editor: DevExpress.JS.Widgets.editorTemplates.text };
-        Data.dsParameterSerializationInfo = [
+        var dsParameterName = { propertyName: "name", displayName: "Name", validationRules: Data.dsParameterNameValidationRules, editor: DevExpress.JS.Widgets.editorTemplates.text };
+        var dsParameterType = {
+            propertyName: "type", displayName: "Type", modelName: "@Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                "System.String": "String",
+                "System.DateTime": "Date",
+                "System.Int16": "Number (16 bit integer)",
+                "System.Int32": "Number (32 bit integer)",
+                "System.Int64": "Number (64 bit integer)",
+                "System.Single": "Number (floating-point)",
+                "System.Double": "Number (double-precision floating-point)",
+                "System.Decimal": "Number (decimal)",
+                "System.Boolean": "Boolean",
+                "System.Guid": "Guid",
+                "DevExpress.DataAccess.Expression": "Expression"
+            }
+        };
+        var baseDSParamterSerializationsInfo = [
             { propertyName: "_name", modelName: "@Name" },
-            { propertyName: "name", displayName: "Name", validationRules: Data.dsParameterNameValidationRules, editor: DevExpress.JS.Widgets.editorTemplates.text },
-            {
-                propertyName: "type", displayName: "Type", modelName: "@Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "System.String": "String",
-                    "System.DateTime": "Date",
-                    "System.Int16": "Number (16 bit integer)",
-                    "System.Int32": "Number (32 bit integer)",
-                    "System.Int64": "Number (64 bit integer)",
-                    "System.Single": "Number (floating-point)",
-                    "System.Double": "Number (double-precision floating-point)",
-                    "System.Decimal": "Number (decimal)",
-                    "System.Boolean": "Boolean",
-                    "System.Guid": "Guid",
-                    "DevExpress.DataAccess.Expression": "Expression"
-                }
-            },
             { propertyName: "_value", modelName: "#text" },
             Data.parameterValueSerializationsInfo,
             { propertyName: "itemType", modelName: "@ItemType" }
         ];
+        Data.dsParameterSerializationInfo = [dsParameterName, dsParameterType].concat(baseDSParamterSerializationsInfo);
+        function storedProcParameterSerializationsInfo(type) {
+            var copyParamType = $.extend(true, [], dsParameterType);
+            var newValues = {};
+            newValues[type] = dsParameterType.values[type];
+            newValues["DevExpress.DataAccess.Expression"] = dsParameterType.values["DevExpress.DataAccess.Expression"];
+            copyParamType.values = newValues;
+            return [
+                $.extend({ disabled: true }, dsParameterName),
+                copyParamType
+            ].concat(baseDSParamterSerializationsInfo);
+        }
+        Data.storedProcParameterSerializationsInfo = storedProcParameterSerializationsInfo;
         var DataSourceParameterTypeValue = (function () {
             function DataSourceParameterTypeValue(name, defaultValue, valueConverter) {
                 this.name = name;
@@ -3370,9 +3384,11 @@ var DevExpress;
         };
         var DataSourceParameter = (function (_super) {
             __extends(DataSourceParameter, _super);
-            function DataSourceParameter(model, serializer) {
+            function DataSourceParameter(model, serializer, _serializationsInfo) {
                 var _this = this;
+                if (_serializationsInfo === void 0) { _serializationsInfo = Data.dsParameterSerializationInfo; }
                 _super.call(this);
+                this._serializationsInfo = _serializationsInfo;
                 this._valueInfo = ko.observable(Data.parameterValueSerializationsInfo);
                 serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
                 serializer.deserialize(this, $.extend(model, { "@ItemType": "Parameter" }));
@@ -3434,11 +3450,11 @@ var DevExpress;
             };
             DataSourceParameter.prototype.getInfo = function () {
                 if (this.type) {
-                    var info = $.extend(true, [], Data.dsParameterSerializationInfo);
+                    var info = $.extend(true, [], this._serializationsInfo);
                     info.splice(info.indexOf(info.filter(function (prop) { return prop.propertyName === "value"; })[0]), 1, this._valueInfo());
                     return info;
                 }
-                return Data.dsParameterSerializationInfo;
+                return this._serializationsInfo;
             };
             DataSourceParameter.typeValues = [
                 new DataSourceParameterTypeValue("System.DateTime", dateDefaultValue(), tryParseDate),
@@ -3504,6 +3520,7 @@ var DevExpress;
                 this.loadPanelVisible = ko.observable(false);
                 this.buttonItems = [];
                 this.masterQueries = ko.observableArray();
+                this.title = DevExpress.Designer.getLocalization('Master-Detail Relation Editor', DevExpress.Designer.StringId.MasterDetailRelationsEditor);
                 this.popupService = new DevExpress.JS.Utils.PopupService();
                 this.save = function () {
                     var emptyFieldsExist = dataSource.relations().some(function (relation) {
@@ -3547,8 +3564,8 @@ var DevExpress;
             MasterDetailEditor.prototype._createMainPopupButtons = function () {
                 var self = this;
                 this.buttonItems = [
-                    { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Save'), onClick: function () { self.save(); } } },
-                    { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Cancel'), onClick: function () { self.popupVisible(false); } } }
+                    { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Save', DevExpress.Designer.StringId.DataAccessBtnOK), onClick: function () { self.save(); } } },
+                    { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Cancel', DevExpress.Designer.StringId.DataAccessBtnCancel), onClick: function () { self.popupVisible(false); } } }
                 ];
             };
             return MasterDetailEditor;
@@ -3832,7 +3849,7 @@ var DevExpress;
                 this.parent = parent;
                 (serializer || new DevExpress.JS.Utils.ModelSerializer()).deserialize(this, $.extend(model, { "@ItemType": "Query" }));
                 this.type = ko.pureComputed(function () { return Data.SqlQueryType.storedProcQuery; });
-                this.parameters = DevExpress.JS.Utils.deserializeArray(model["Parameters"], function (item) { return new Data.DataSourceParameter(item, serializer); });
+                this.parameters = DevExpress.JS.Utils.deserializeArray(model["Parameters"], function (item) { return new Data.DataSourceParameter(item, serializer, Data.storedProcParameterSerializationsInfo(Data.DBColumn.GetType(item.type))); });
             }
             StoredProcQuery.prototype.getInfo = function () {
                 return Data.storedProcQuerySerializationsInfo;
@@ -4487,7 +4504,7 @@ var DevExpress;
     (function (Designer) {
         var Chart;
         (function (Chart) {
-            var minValue = { propertyName: "minValue", modelName: "@MinValue", displayName: "Min Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, maxValue = { propertyName: "maxValue", modelName: "@MaxValue", displayName: "Max Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, auto = { propertyName: "auto", modelName: "@Auto", displayName: "Auto", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, autoSideMargins = { propertyName: "autoSideMargins", modelName: "@AutoSideMargins", displayName: "Auto Side Margins", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, sideMarginsValue = { propertyName: "sideMarginsValue", modelName: "@SideMarginsValue", displayName: "Side Margins Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            var minValue = { propertyName: "minValue", modelName: "@MinValueSerializable", displayName: "Min Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, maxValue = { propertyName: "maxValue", modelName: "@MaxValueSerializable", displayName: "Max Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, auto = { propertyName: "auto", modelName: "@Auto", displayName: "Auto", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, autoSideMargins = { propertyName: "autoSideMargins", modelName: "@AutoSideMargins", displayName: "Auto Side Margins", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, sideMarginsValue = { propertyName: "sideMarginsValue", modelName: "@SideMarginsValue", displayName: "Side Margins Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Chart.visualRangeSerializationsInfo = [auto, autoSideMargins, minValue, maxValue, sideMarginsValue], Chart.visualRange = { propertyName: "visualRange", modelName: "VisualRange", displayName: "Visual Range", info: Chart.visualRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var alwaysShowZeroLevel = { propertyName: "alwaysShowZeroLevel", modelName: "@AlwaysShowZeroLevel", displayName: "Always Show Zero Level", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool };
             Chart.wholeRangeSerializationsInfo = Chart.visualRangeSerializationsInfo.concat(alwaysShowZeroLevel), Chart.wholeRange = { propertyName: "wholeRange", modelName: "WholeRange", displayName: "Whole Range", info: Chart.wholeRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
@@ -5295,7 +5312,7 @@ var DevExpress;
                     this.titles()["innerActions"] = createInnerActionsWithPopover("Add Title", "addtitles-action", actions);
                 }
                 ChartViewModel.from = function (model, serializer) {
-                    return new ChartViewModel(model, serializer);
+                    return new ChartViewModel(model || {}, serializer);
                 };
                 ChartViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, Chart.chartSerializationsInfo, refs);
@@ -5338,7 +5355,7 @@ var DevExpress;
                     ];
                 }
                 TitleViewModel.from = function (model, serializer) {
-                    return new TitleViewModel(model, null, serializer);
+                    return new TitleViewModel(model || {}, null, serializer);
                 };
                 TitleViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, Chart.titleSerializationsInfo, refs);
@@ -5377,7 +5394,7 @@ var DevExpress;
                     this.series()["innerActions"] = createInnerActionsWithPopover("Add Series", "addseries-action", actions);
                 }
                 DataContainerViewModel.from = function (model, serializer) {
-                    return new DataContainerViewModel(model, serializer);
+                    return new DataContainerViewModel(model || {}, serializer);
                 };
                 DataContainerViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, Chart.dataContainerSerializationsInfo, refs);
@@ -5518,7 +5535,7 @@ var DevExpress;
                     ];
                 }
                 SeriesViewModel.from = function (model, serializer) {
-                    return new SeriesViewModel(model, null, serializer);
+                    return new SeriesViewModel(model || {}, null, serializer);
                 };
                 SeriesViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, Chart.seriesSerializationsInfo, refs);
@@ -5544,7 +5561,7 @@ var DevExpress;
                     });
                 }
                 SeriesViewViewModel.from = function (model, serializer) {
-                    return new SeriesViewViewModel(model, serializer);
+                    return new SeriesViewViewModel(model || {}, serializer);
                 };
                 SeriesViewViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
@@ -5576,7 +5593,7 @@ var DevExpress;
                     _super.call(this, model, serializer, seriesLabelSerializationsInfo);
                 }
                 SeriesLabelViewModel.from = function (model, serializer) {
-                    return new SeriesLabelViewModel(model, serializer);
+                    return new SeriesLabelViewModel(model || {}, serializer);
                 };
                 SeriesLabelViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, seriesLabelSerializationsInfo, refs);
@@ -5601,7 +5618,7 @@ var DevExpress;
                     return newDiagram;
                 };
                 DiagramViewModel.from = function (model, serializer) {
-                    return new DiagramViewModel(model, serializer);
+                    return new DiagramViewModel(model || {}, serializer);
                 };
                 DiagramViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, refs);
@@ -5625,7 +5642,7 @@ var DevExpress;
                     this.displayName = ko.observable(Designer.getLocalization("Legend"));
                 }
                 LegendViewModel.from = function (model, serializer) {
-                    return new LegendViewModel(model, serializer);
+                    return new LegendViewModel(model || {}, serializer);
                 };
                 LegendViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, Chart.legendSerializationsInfo, refs);
@@ -6128,8 +6145,8 @@ var DevExpress;
                                     return _this.getPath("seriesDataMember");
                                 }
                             };
-                            args["isPropertyDisabled"] = function (propertyName) {
-                                return _this.dataSource() === null && (propertyName === "argumentDataMember" || propertyName === "valueDataMembers" || propertyName === "dataFilters");
+                            args[0].value["isPropertyDisabled"] = function (propertyName) {
+                                return _this.dataSource() === null && (propertyName === "argumentDataMember" || propertyName === "valueDataMembers" || propertyName === "dataFilters" || propertyName === "colorDataMember");
                             };
                             args[0].value.valueDataMembers()["getPath"] = function (propertyName) {
                                 return _this.getPath("seriesDataMember");
@@ -8348,9 +8365,13 @@ var DevExpress;
                         var multiValuesHelper = new DevExpress.Designer.Widgets.MultiValuesHelper(this._value, this.lookUpValues());
                         var newItems;
                         if (parameterHelper.customizeParameterLookUpSource)
-                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems.slice(0));
-                        if (newItems)
-                            multiValuesHelper.displayItems = newItems;
+                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems);
+                        if (newItems) {
+                            multiValuesHelper.dataSource = newItems;
+                        }
+                        else {
+                            multiValuesHelper.dataSource = new DevExpress.data.DataSource({ store: multiValuesHelper.displayItems, pageSize: 100, paginate: true });
+                        }
                         this.safeAssignObservable("value", ko.observable(multiValuesHelper));
                     }
                     else if (this.isMultiValue) {
@@ -9724,16 +9745,16 @@ var DevExpress;
                 return EditingFieldExtensions._instance;
             };
             EditingFieldExtensions.prototype._registerStandartEditors = function () {
-                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d+$/);
-                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/);
-                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?\d+([\.,]?\d*)?$/);
-                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/);
+                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?\d+([\.,]?\d*)?$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/, "0");
                 EditingFieldExtensions.registerEditor("Date", "Date", Report.Categories.DateTime(), {
                     onValueChanged: function (e) {
                         e.model.value(e.component.option("text"));
                     }
                 }, "dxrp-editing-field-datetime");
-                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/);
+                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, "");
             };
             EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template) {
                 EditingFieldExtensions.instance()._editors[name] = {
@@ -9747,8 +9768,15 @@ var DevExpress;
             EditingFieldExtensions.registerMaskEditor = function (editorID, displayName, category, mask) {
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
             };
-            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExp) {
+            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExp, defaultVal) {
                 var options = {
+                    onFocusIn: function (e) {
+                        var $input = $(e.element).find("input").eq(0);
+                        var currentValue = $input.val();
+                        if (!regExp.test(currentValue))
+                            $input.val(defaultVal);
+                        $input = null;
+                    },
                     onKeyPress: function (e) {
                         var char = getCharFromKeyCode(e.jQueryEvent);
                         if (!char)
@@ -9762,6 +9790,7 @@ var DevExpress;
                         var result = [currentValue.slice(0, caretPosition), char, currentValue.slice(caretPosition)].join('');
                         if (!regExp.test(result))
                             e.jQueryEvent.preventDefault();
+                        $input = null;
                     },
                     onPaste: function (e) {
                         var clipboardData = e.jQueryEvent.originalEvent.clipboardData || window["clipboardData"] || {};
@@ -9777,6 +9806,7 @@ var DevExpress;
                         var result = [currentValue.slice(0, caretPosition.start), pastedData, currentValue.slice(caretPosition.end)].join('');
                         if (!regExp.test(result))
                             e.jQueryEvent.preventDefault();
+                        $input = null;
                     }
                 };
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, options);
@@ -9872,6 +9902,7 @@ var DevExpress;
                 function TextEditFieldViewModel(field, pageWidth, pageHeight, zoom) {
                     var _this = this;
                     this.template = "dxrp-editing-field-container";
+                    this.wordWrap = true;
                     this.active = ko.observable(false);
                     var brickStyle = field.model().brickOptions;
                     var style = { rtl: function () { return brickStyle.rtl; } };
@@ -9888,6 +9919,9 @@ var DevExpress;
                     this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
                     this.zoom = zoom;
                     this.field = field;
+                    if (brickStyle.wordWrap != undefined) {
+                        this.wordWrap = brickStyle.wordWrap;
+                    }
                     this.hideEditor = function () {
                         setTimeout(function () {
                             _this.active(false);
@@ -10150,6 +10184,23 @@ var DevExpress;
             Preview.CharacterCombEditingFieldViewModel = CharacterCombEditingFieldViewModel;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Report;
+        (function (Report) {
+            Report.StringId = {
+                Copy: "ReportStringId.RibbonXRDesign_Copy_STipTitle",
+                NewViaWizard: "ReportStringId.UD_Capt_NewWizardReport",
+                Open: "ReportStringId.UD_Capt_OpenFile",
+                Save: "ReportStringId.Verb_Save",
+                SaveAs: "ReportStringId.UD_Capt_SaveFileAs",
+                MdiReportChanged: "ReportStringId.UD_Msg_MdiReportChanged"
+            };
+        })(Report = Designer.Report || (Designer.Report = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
@@ -10841,13 +10892,8 @@ var DevExpress;
                         }, 1);
                     }
                 };
-                MobileSearchViewModel.prototype._createPageSubscription = function (page) {
-                    var _this = this;
-                    return page.brick.subscribe(function (newVal) {
-                        _this._updateBricks(page, _this.searchResult());
-                    });
-                };
                 MobileSearchViewModel.prototype._updateBricks = function (page, searchResult) {
+                    var _this = this;
                     if (page.brick() && searchResult && searchResult.length > 0) {
                         var results = searchResult.filter(function (x) {
                             return x.pageIndex === page.pageIndex;
@@ -10855,6 +10901,12 @@ var DevExpress;
                         for (var i = 0; i < results.length; i++) {
                             page.selectBrick(results[i].indexes, true);
                         }
+                    }
+                    else {
+                        var subscription = page.brick.subscribe(function (newVal) {
+                            subscription.dispose();
+                            _this._updateBricks(page, _this.searchResult());
+                        });
                     }
                 };
                 MobileSearchViewModel.maxHeight = 80;
@@ -10865,8 +10917,15 @@ var DevExpress;
                 init: function (element, valueAccessor) {
                     var viewModel = ko.unwrap(valueAccessor());
                     var $element = $(element);
+                    element.style.display = "none";
                     var $searchText = $element.find('.dxrdp-taptosearch-text');
                     viewModel.height.subscribe(function (newValue) {
+                        if (!newValue) {
+                            element.style.display = "none";
+                        }
+                        else {
+                            element.style.display = "block";
+                        }
                         $searchText.css({
                             'opacity': Math.min((newValue / MobileSearchViewModel.maxHeight), 1)
                         });
@@ -11573,9 +11632,32 @@ var DevExpress;
             };
             ko.bindingHandlers['dxReportViewer'] = {
                 init: function (element, valueAccessor) {
-                    $(element).children().remove();
-                    var templateHtml = $('#dxrd-designer').text(), $element = $(element).append(templateHtml), values = ko.unwrap(valueAccessor());
-                    ko.applyBindings(values, $element.children()[0]);
+                    var $element = $(element), values = ko.unwrap(valueAccessor()) || {}, getDesignerTemplate = function () {
+                        return $('#dxrd-designer').text();
+                    }, templateHtml = getDesignerTemplate(), processBinding = function () {
+                        if (!templateHtml)
+                            templateHtml = getDesignerTemplate();
+                        $element.children().remove();
+                        var child = $element.append(templateHtml).children()[0];
+                        if (!child)
+                            return;
+                        ko.cleanNode(child);
+                        var viewerModel = ko.isWriteableObservable(values.viewerModel) ? values.viewerModel : ko.observable(null);
+                        if (!values.reportPreview || !values.parts) {
+                            var model = DevExpress.Report.Preview.createAndInitPreviewModel(values, element, values.callbacks, false);
+                            viewerModel(model);
+                        }
+                        else {
+                            viewerModel(values);
+                        }
+                        ko.applyBindings(viewerModel, child);
+                    };
+                    if (!templateHtml) {
+                        DevExpress.Designer.loadTemplates().done(processBinding);
+                    }
+                    else {
+                        processBinding();
+                    }
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -12057,40 +12139,6 @@ var DevExpress;
     (function (Designer) {
         var Report;
         (function (Report) {
-            var EditOptionsEditorHeaderModel = (function () {
-                function EditOptionsEditorHeaderModel(type, editOptions, objectStorage, disabled) {
-                    this.disabled = disabled;
-                    this.displayCustomValue = true;
-                    this.value = ko.pureComputed({
-                        read: function () {
-                            return editOptions() ? type : null;
-                        },
-                        write: function (newVal) {
-                            if (newVal === type) {
-                                if (editOptions()) {
-                                    objectStorage.remove(editOptions());
-                                }
-                                editOptions(new DevExpress.Designer.Report[type]({}));
-                                objectStorage.push(editOptions());
-                            }
-                            else if (editOptions()) {
-                                objectStorage.remove(editOptions());
-                                editOptions(null);
-                            }
-                        }
-                    });
-                    this.items = [type];
-                }
-                EditOptionsEditorHeaderModel.createPropertiesModel = function (data) {
-                    return new DevExpress.JS.Widgets.ObjectProperties(data.value, null, data.level + 1, data.disabled);
-                };
-                EditOptionsEditorHeaderModel.create = function (data, editOptions, objectStorage, disabled) {
-                    var editOptionsType = data.info() && data.info()["editOptionsType"];
-                    return new EditOptionsEditorHeaderModel(editOptionsType, editOptions, objectStorage, disabled);
-                };
-                return EditOptionsEditorHeaderModel;
-            })();
-            Report.EditOptionsEditorHeaderModel = EditOptionsEditorHeaderModel;
             var EditOptionsEditorNameEditorModel = (function () {
                 function EditOptionsEditorNameEditorModel(editorName, disabled) {
                     var _this = this;
@@ -12913,12 +12961,7 @@ var DevExpress;
                 calculatedFields: { custom: "dxrd-calculatedFields" },
                 reportRtlProperty: { header: "dxrd-reportRtlProperty" },
                 comboboxUndo: { header: "dx-combobox-undo", editorType: Report.ComboboxUndoEditor },
-                fontUndo: { header: "dx-emptyHeader", content: "dx-objectEditorContentUndo", editorType: Report.FontEditorUndo },
-                editOptions: { header: "dxrd-editOptions", content: "dxrd-editOptionsContent" }
-            };
-            Report.EditOptionsTypes = {
-                text: "TextEditOptions",
-                check: "CheckEditOptions"
+                fontUndo: { header: "dx-emptyHeader", content: "dx-objectEditorContentUndo", editorType: Report.FontEditorUndo }
             };
             Report.textAlignmentValues = {
                 "TopLeft": "Top Left",
@@ -13212,7 +13255,8 @@ var DevExpress;
                 { propertyName: "onPieSeriesPointExploded", modelName: "@OnPieSeriesPointExploded", displayName: "Pie Series Point Exploded", editor: Report.editorTemplates.scriptsBox },
                 { propertyName: "onAxisScaleChanged", modelName: "@OnAxisScaleChanged", displayName: "Axis Scale Changed", editor: Report.editorTemplates.scriptsBox },
                 { propertyName: "onAxisWholeRangeChanged", modelName: "@OnAxisWholeRangeChanged", displayName: "Axis Whole Range Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onAxisVisualRangeChanged", modelName: "@OnAxisVisualRangeChanged", displayName: "Axis Visual Range Changed", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onAxisVisualRangeChanged", modelName: "@OnAxisVisualRangeChanged", displayName: "Axis Visual Range Changed", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onSmallChartTextShowing", modelName: "@OnSmallChartTextShowing", displayName: "Small Chart Text Showing", editor: Report.editorTemplates.scriptsBox }
             ], chartEventsSerializationInfo = controlEventsSerializationInfo.concat(specificChartEventsSerializationInfo);
             Report.chartScripts = { propertyName: "scripts", modelName: "Scripts", info: chartEventsSerializationInfo, displayName: "Scripts", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var specificPivotEventsSerializationInfo = [
@@ -13323,16 +13367,18 @@ var DevExpress;
             Report.processGroup = [Report.processDuplicatesMode, Report.processDuplicatesTarget, Report.processNullValues];
             Report.canGrowShrinkGroup = [Report.canGrow, Report.canShrink];
             Report.labelGroup = [Report.textAlignment, Report.text, Report.textArea, Report.nullValueText, Report.keepTogetherDefaultValueFalse, Report.summary, Report.multiline, Report.angle, Report.wordWrap, Report.xlsxFormatString, Report.rtl].concat(Report.commonControlProperties, Report.fontGroup, Report.navigationGroup, Report.canGrowShrinkGroup, Report.processGroup);
-            Report.editOptionsSerializationInfo = [
-                { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect },
-                { propertyName: "id", modelName: "@ID", displayName: "ID", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "readOnly", modelName: "@ReadOnly", displayName: "Read Only", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect }
-            ];
-            Report.editOptions = { propertyName: "editOptions", modelName: "EditOptions", displayName: "Edit Options", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: Report.editOptionsSerializationInfo };
-            Report.textEditOptionsSerializationInfo = Report.editOptionsSerializationInfo.concat([
-                { propertyName: "editorName", modelName: "@EditorName", displayName: "Editor Name", defaultVal: "", editor: { header: "dxrd-editOptionsEditorName" } }
-            ]);
-            Report.textEditOptions = $.extend({}, Report.editOptions, { propertyName: "textEditOptions", info: Report.textEditOptionsSerializationInfo });
+            Report.editOptions = {
+                propertyName: "editOptions",
+                modelName: "EditOptions",
+                displayName: "Edit Options",
+                editor: DevExpress.JS.Widgets.editorTemplates.objecteditor,
+                from: function (model, serializer) { return new Report.EditOptions(model, serializer); },
+                toJsonObject: function (value, serializer) { return serializer.serialize(value); }
+            };
+            Report.textEditOptions = $.extend({}, Report.editOptions, {
+                propertyName: "textEditOptions",
+                from: function (model, serializer) { return new Report.TextEditOptions(model, serializer); }
+            });
             Report.labelSerializationsInfo = [
                 Report.textEditOptions,
                 Report.autoWidth,
@@ -14878,14 +14924,18 @@ var DevExpress;
                     { value: "System.Int32", displayValue: "Number (32 bit integer)", defaultValue: 0, specifics: "Integer", valueConverter: function (val) {
                         return parseInt(val);
                     } },
-                    { value: "System.Int64", displayValue: "Number (64 bit integer)", defaultValue: "0", specifics: "String" },
+                    { value: "System.Int64", displayValue: "Number (64 bit integer)", defaultValue: 0, specifics: "Integer", valueConverter: function (val) {
+                        return parseInt(val);
+                    } },
                     { value: "System.Single", displayValue: "Number (floating-point)", defaultValue: 0, specifics: "Float", valueConverter: function (val) {
                         return parseFloat(val);
                     } },
                     { value: "System.Double", displayValue: "Number (double-precision floating-point)", defaultValue: 0, specifics: "Float", valueConverter: function (val) {
                         return parseFloat(val);
                     } },
-                    { value: "System.Decimal", displayValue: "Number (decimal)", defaultValue: "0", specifics: "String" },
+                    { value: "System.Decimal", displayValue: "Number (decimal)", defaultValue: 0, specifics: "Float", valueConverter: function (val) {
+                        return parseFloat(val);
+                    } },
                     { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) {
                         return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null);
                     } },
@@ -15000,9 +15050,6 @@ var DevExpress;
                     }
                     else if (objectType.indexOf("DynamicListLookUpSettings") !== -1) {
                         return new DynamicListLookUpSettings(model, dsHelperProvider, serializer);
-                    }
-                    else if (objectType.indexOf(Report.EditOptionsTypes.check) !== -1) {
-                        return new Report.CheckEditOptions(model, serializer);
                     }
                     else if (objectType.indexOf("ReportServer") !== -1 && model["@ObjectType"].indexOf("DataSource") !== -1) {
                         return new UniversalDataSource(model, dsHelperProvider, serializer);
@@ -16309,6 +16356,13 @@ var DevExpress;
                             subBands.push(new BandViewModel(band.SubBands[key], this, serializer));
                         }
                     }
+                    if (this.sortingSummary) {
+                        this.sortingSummary.getPath = function (propertyName) {
+                            if (propertyName === "fieldName") {
+                                return _this.getPath("groupFields");
+                            }
+                        };
+                    }
                     this.subBands = ko.observableArray(subBands);
                     var self = this;
                     if (this.bands().length > 0) {
@@ -16836,7 +16890,7 @@ var DevExpress;
                         "RecordNumber": "Record Number"
                     })
                 },
-                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: "", editor: Designer.Widgets.editorTemplates.field },
                 { propertyName: "ignoreNullValues", modelName: "@IgnoreNullValues", displayName: "Ignore Null Values", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
                 {
                     propertyName: "sortOrder",
@@ -16948,10 +17002,10 @@ var DevExpress;
                     "Far": "Far"
                 }
             };
-            Report.checkEditOptionsSerializationInfo = Report.editOptionsSerializationInfo.concat([
-                { propertyName: "groupId", modelName: "@GroupID", displayName: "Group ID", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
-            ]);
-            Report.chekEditOptions = $.extend({}, Report.editOptions, { propertyName: "checkEditOptions", info: Report.checkEditOptionsSerializationInfo });
+            Report.chekEditOptions = $.extend({}, Report.editOptions, {
+                propertyName: "checkEditOptions",
+                from: function (model, serializer) { return new Report.CheckEditOptions(model, serializer); }
+            });
             Report.checkboxSerializationsInfo = [
                 Report.checkState,
                 Report.checked,
@@ -17270,7 +17324,7 @@ var DevExpress;
             Report.chartStructure = { propertyName: "_chartStructure", displayName: "Chart Structure", editor: Designer.Widgets.editorTemplates.treelist };
             Report.chartElement = { propertyName: "_chartElement", displayName: "Selected Element", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.chartDataSource = { propertyName: "dataSource", modelName: "@DataSource", displayName: "Data Source", link: true, editor: Report.editorTemplates.chartDataSource };
-            Report.xrChartSerializationInfo = [Designer.Chart.chart, Report.stylePriority, Report.chartDataSource, Report.imageType, { propertyName: "dataMember", displayName: "Data Member", defaultVal: "", editor: Designer.Widgets.editorTemplates.dataMember }, Report.chartStructure, Report.chartElement].concat(Report.baseControlProperties, Report.sizeLocation, Report.bordersProperties);
+            Report.xrChartSerializationInfo = [Designer.Chart.chart, Report.stylePriority, Report.chartDataSource, Report.imageType, Report.chartScripts, { propertyName: "dataMember", displayName: "Data Member", defaultVal: "", editor: Designer.Widgets.editorTemplates.dataMember }, Report.chartStructure, Report.chartElement].concat(Report.baseControlProperties, Report.sizeLocation, Report.bordersProperties);
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -21058,6 +21112,7 @@ var DevExpress;
                 Report.stylePriority,
                 Report.canPublish,
                 Report.backColor,
+                Report.autoWidth,
                 Report.formattingRuleLinks,
                 Report.cellSizeMode,
                 wordWrap,
@@ -21731,9 +21786,28 @@ var DevExpress;
                     return result;
                 }
             };
+            function correctModel(model) {
+                if (Array.isArray(model)) {
+                    for (var i = 0; i < model.length; i++) {
+                        if (model[i]["@Ref"] !== undefined) {
+                            model = model[i];
+                            break;
+                        }
+                    }
+                }
+                else {
+                    Object.keys(model).forEach(function (name) {
+                        if (model[name] instanceof Object)
+                            model[name] = correctModel(model[name]);
+                    });
+                }
+                return model;
+            }
+            Report.correctModel = correctModel;
             function customizeDesignerActions(designerModel, nextCustomizer, exitDesigner, state) {
                 var report = designerModel.model, reportPreview = designerModel.reportPreviewModel.reportPreview, reportWizard = designerModel.wizard, dataSourceWizard = designerModel.dataSourceWizard, sqlDataSourceWizard = designerModel.sqlDataSourceWizard, completeSqlDataSourceWizard = designerModel.completeSqlDataSourceWizard, scriptsEditor = designerModel.scriptsEditor;
                 return (function (actions) {
+                    $.extend(Designer.findFirstItemMatchesCondition(actions, function (item) { return item.id === Designer.ActionId.Copy; }), { textId: Report.StringId.Copy });
                     if (Report.reportStorageWebIsRegister) {
                         actions.push({
                             id: Report.ActionId.NewReport,
@@ -21752,6 +21826,7 @@ var DevExpress;
                             id: Report.ActionId.NewReportViaWizard,
                             container: "menu",
                             text: "New via Wizard",
+                            textId: Report.StringId.NewViaWizard,
                             imageClassName: "dxrd-image-new-via-wizard",
                             disabled: ko.observable(false),
                             visible: true,
@@ -21775,6 +21850,7 @@ var DevExpress;
                             id: Report.ActionId.OpenReport,
                             container: "menu",
                             text: "Open",
+                            textId: Report.StringId.Open,
                             imageClassName: "dxrd-image-open",
                             disabled: ko.observable(false),
                             visible: true,
@@ -21888,6 +21964,7 @@ var DevExpress;
                         id: Report.ActionId.Save,
                         container: "menu",
                         text: "Save",
+                        textId: Report.StringId.Save,
                         imageClassName: "dxrd-image-save",
                         disabled: ko.observable(false),
                         visible: true,
@@ -21918,6 +21995,7 @@ var DevExpress;
                             id: Report.ActionId.SaveAs,
                             container: "menu",
                             text: "Save As",
+                            textId: Report.StringId.SaveAs,
                             imageClassName: "dxrd-image-save",
                             disabled: ko.observable(false),
                             visible: true,
@@ -22087,8 +22165,10 @@ var DevExpress;
                             Height: reportWizardModel.labelDetails.height,
                             HorizontalPitch: reportWizardModel.labelDetails.hPitch,
                             LeftMargin: reportWizardModel.labelDetails.leftMargin,
+                            RightMargin: reportWizardModel.labelDetails.rightMargin,
                             PaperKindDataId: reportWizardModel.labelDetails.paperKindId,
                             TopMargin: reportWizardModel.labelDetails.topMargin,
+                            BottomMargin: reportWizardModel.labelDetails.bottomMargin,
                             Unit: reportWizardModel.labelDetails.unit === 4 /* Inch */ ? 4 /* Inch */ : 6 /* Millimeter */,
                             VerticalPitch: reportWizardModel.labelDetails.vPitch,
                             Width: reportWizardModel.labelDetails.width
@@ -24840,7 +24920,7 @@ var DevExpress;
                         this._customQueries = ko.observableArray([]);
                         this._chechedQueries = ko.observableArray([]);
                         this.template = "dxrd-wizard-add-queries-page";
-                        this.title = "SQL Data Source Wizard";
+                        this.title = DevExpress.Designer.getLocalization("SQL Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
                         this.description = "Columns selected from specific tables and/or views will be automatically included into a separate query.";
                         this.isTablesGenerateColumnsCallBack = ko.observableArray([]);
                         this.popupSelectStatment = ({
@@ -24873,17 +24953,17 @@ var DevExpress;
                                 }
                                 else {
                                     _this.queryEditIndex(_this._customQueries().indexOf(query));
-                                    _this.popupQueryBuilder.show(query, _this._dataSourceClone);
+                                    _this.popupQueryBuilder.show(query, _this.dataSourceClone());
                                 }
                             }
                             else {
                                 _this.queryEditIndex(-1);
                                 if (isCustomQuery) {
-                                    _this.showStatementPopup(new DevExpress.Data.CustomSqlQuery({ "@Name": null }, _this._dataSourceClone));
+                                    _this.showStatementPopup(new DevExpress.Data.CustomSqlQuery({ "@Name": null }, _this.dataSourceClone()));
                                 }
                                 else {
-                                    var queryNew = new DevExpress.Data.TableQuery({ "@Name": null }, _this._dataSourceClone);
-                                    _this.popupQueryBuilder.show(queryNew, _this._dataSourceClone);
+                                    var queryNew = new DevExpress.Data.TableQuery({ "@Name": null }, _this.dataSourceClone());
+                                    _this.popupQueryBuilder.show(queryNew, _this.dataSourceClone());
                                 }
                             }
                         };
@@ -24893,7 +24973,7 @@ var DevExpress;
                                 _this._selectedPath("");
                                 _this._dataSourceClone = new DevExpress.Data.SqlDataSource({});
                                 _this._dataSourceClone.connection.name(data.connectionString());
-                                _this._itemsProvider(new Wizard.DBSchemaItemsProvider(_this.dataSourceCloneProvider(), _this._customQueries, _this.showQbCallBack, _this.disableCustomSql));
+                                _this._itemsProvider(new Wizard.DBSchemaItemsProvider(_this.dataSourceClone().dbSchemaProvider, _this._customQueries, _this.showQbCallBack, _this.disableCustomSql));
                                 _this.fieldListModel({
                                     itemsProvider: _this._itemsProvider(),
                                     selectedPath: _this._selectedPath,
@@ -24903,7 +24983,7 @@ var DevExpress;
                                 _this._connection = data.connectionString();
                                 _this._data = data;
                                 _this.popupQueryBuilder.isVisible(false);
-                                return _this._dataSourceClone.dbSchemaProvider.getDbSchema();
+                                return _this.dataSourceClone().dbSchemaProvider.getDbSchema();
                             }
                             return $.Deferred().resolve({}).promise();
                         };
@@ -24930,8 +25010,7 @@ var DevExpress;
                             wizard.cancel();
                         };
                         this.getItemsAfterCheck = function (node) {
-                            _this._dataSource.relations([]);
-                            _this._dataSource.resultSet = null;
+                            _this._resetDataSourceResult();
                             if (node.checked.peek() && node.isList) {
                                 if (node.name === "tables" || node.name === "views") {
                                     _this._itemsProvider().getItems(new DevExpress.JS.Widgets.PathRequest(node.name)).done(function () {
@@ -25025,7 +25104,7 @@ var DevExpress;
                             if (procedure.checked()) {
                                 var newQuery = new DevExpress.Data.StoredProcQuery({ "@Name": procedure.name, "ProcName": procedure.name }, dataSource);
                                 procedure.arguments.forEach(function (arg) {
-                                    newQuery.parameters.push(new DevExpress.Data.DataSourceParameter({ "@Name": arg.name, "@Type": DevExpress.Data.DBColumn.GetType(arg.type) }));
+                                    newQuery.parameters.push(new DevExpress.Data.DataSourceParameter({ "@Name": arg.name, "@Type": DevExpress.Data.DBColumn.GetType(arg.type) }, null, DevExpress.Data.storedProcParameterSerializationsInfo(DevExpress.Data.DBColumn.GetType(arg.type))));
                                 });
                                 AddQueriesPage.pushQuery(newQuery, procedure, dataSource.queries);
                             }
@@ -25055,6 +25134,10 @@ var DevExpress;
                             this.isTablesGenerateColumnsCallBack.push(request);
                         }
                     };
+                    AddQueriesPage.prototype._resetDataSourceResult = function () {
+                        this._dataSource.relations([]);
+                        this._dataSource.resultSet = null;
+                    };
                     AddQueriesPage.pushQuery = function (newQuery, node, queries) {
                         if (!Designer.findFirstItemMatchesCondition(queries.peek(), function (item) { return item.name() === (newQuery.name() || newQuery.generateName()); })) {
                             newQuery.name(DevExpress.Data.generateQueryUniqueName(queries.peek(), newQuery));
@@ -25078,8 +25161,8 @@ var DevExpress;
                             node.hasQuery = false;
                         }
                     };
-                    AddQueriesPage.prototype.dataSourceCloneProvider = function () {
-                        return this._dataSourceClone.dbSchemaProvider;
+                    AddQueriesPage.prototype.dataSourceClone = function () {
+                        return this._dataSourceClone;
                     };
                     AddQueriesPage.prototype.AddQueryWithBuilder = function () {
                     };
@@ -25095,6 +25178,7 @@ var DevExpress;
                             provider.customQueries().push(query);
                         }
                         this._selectedPath("queries." + query.name());
+                        this._resetDataSourceResult();
                     };
                     return AddQueriesPage;
                 })(Wizard.WizardPage);
@@ -25133,7 +25217,7 @@ var DevExpress;
                         var _this = this;
                         _super.call(this, wizard);
                         this.template = "dxrd-wizard-configure-relations-page";
-                        this.title = "SQL Data Source Wizard";
+                        this.title = DevExpress.Designer.getLocalization("SQL Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
                         this.description = "Configure master-detail relationships.";
                         this.relationsEditor = ko.observable(null);
                         this.beginAsync = function (data) {
@@ -25188,7 +25272,7 @@ var DevExpress;
                         this._selectedPath = ko.observable(null);
                         this._itemsProvider = ko.observable();
                         this.template = "dxrd-configure-query-parameters-page";
-                        this.title = "SQL Data Source Wizard";
+                        this.title = DevExpress.Designer.getLocalization("SQL Data Source Wizard", DevExpress.Designer.StringId.DataSourceWizardTitle);
                         this.description = "Configure query parameters.";
                         this.addParameterCallBack = function (query) {
                             var newParameter = _this.parametersConverter.createParameterViewModel(new DevExpress.Data.DataSourceParameter({
@@ -25739,8 +25823,13 @@ var DevExpress;
                     var result = [];
                     DevExpress.JS.Data.criteriaForEach(expressionCriteria, function (operator) {
                         if (operator instanceof DevExpress.JS.Data.OperandProperty) {
-                            var request = getDisplayExpression ? _this.displayNameProvider.getDisplayNameByPath(path, operator.propertyName) : _this.displayNameProvider.getRealName(path, operator.propertyName);
-                            requests.push(request.done(function (data) { return result.push({ operand: operator, convertedName: data }); }));
+                            var isContainsParentRelationshipTraversalOperator = operator.propertyName.indexOf("^.") === 0;
+                            var propertyName = isContainsParentRelationshipTraversalOperator ? operator.propertyName.substring(2) : operator.propertyName;
+                            var request = getDisplayExpression ? _this.displayNameProvider.getDisplayNameByPath(path, propertyName) : _this.displayNameProvider.getRealName(path, propertyName);
+                            requests.push(request.done(function (data) { return result.push({
+                                operand: operator,
+                                convertedName: isContainsParentRelationshipTraversalOperator ? "^." + data : data
+                            }); }));
                         }
                     });
                     if (requests.length === 0) {
@@ -25788,31 +25877,36 @@ var DevExpress;
     (function (Designer) {
         var Report;
         (function (Report) {
-            var EditOptions = (function (_super) {
-                __extends(EditOptions, _super);
+            Report.editOptionsSerializationInfo = [
+                { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect },
+                { propertyName: "id", modelName: "@ID", displayName: "ID", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "readOnly", modelName: "@ReadOnly", displayName: "Read Only", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect }
+            ];
+            var EditOptions = (function () {
                 function EditOptions(model, serializer) {
-                    _super.call(this, model, null, serializer);
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model || {});
                 }
                 EditOptions.prototype.getInfo = function () {
-                    return [
-                        { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect },
-                        { propertyName: "id", modelName: "@ID", displayName: "ID", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
-                    ];
+                    return Report.editOptionsSerializationInfo;
                 };
-                EditOptions.fullType = function (type) {
-                    return "DevExpress.XtraReports.UI." + type;
+                EditOptions.prototype.isEmpty = function () {
+                    return !this.enabled();
+                };
+                EditOptions.prototype.isPropertyDisabled = function (name) {
+                    return name !== "enabled" && !this.enabled();
                 };
                 return EditOptions;
-            })(Report.ObjectItem);
+            })();
             Report.EditOptions = EditOptions;
             var CheckEditOptions = (function (_super) {
                 __extends(CheckEditOptions, _super);
                 function CheckEditOptions(model, serializer) {
-                    _super.call(this, $.extend({ "@ObjectType": EditOptions.fullType(Report.EditOptionsTypes.check) }, model), serializer);
+                    _super.call(this, model || {}, serializer);
                 }
                 CheckEditOptions.prototype.getInfo = function () {
                     return _super.prototype.getInfo.call(this).concat([
-                        { propertyName: "groupID", modelName: "@GroupID", displayName: "Group ID", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+                        { propertyName: "groupId", modelName: "@GroupID", displayName: "Group ID", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
                     ]);
                 };
                 return CheckEditOptions;
@@ -25821,7 +25915,7 @@ var DevExpress;
             var TextEditOptions = (function (_super) {
                 __extends(TextEditOptions, _super);
                 function TextEditOptions(model, serializer) {
-                    _super.call(this, $.extend({ "@ObjectType": EditOptions.fullType(Report.EditOptionsTypes.text) }, model), serializer);
+                    _super.call(this, model || {}, serializer);
                 }
                 TextEditOptions.prototype.getInfo = function () {
                     return _super.prototype.getInfo.call(this).concat([
@@ -26262,9 +26356,10 @@ var DevExpress;
                         var self = this;
                         Report.ReportRenderingService.getRichImage(this, propertyName).done(function (result) {
                             if (propertyName === self._lastRequest()) {
+                                self.root && self.root["_update"] && self.root["_update"](true);
                                 if (propertyName !== "height" && propertyName !== "width") {
                                     self._innerUpdate(true);
-                                    if (propertyName !== null && propertyName !== "textRtf") {
+                                    if (propertyName !== "textRtf") {
                                         self.textRtf(result.Text);
                                     }
                                     self._rtf(result.Rtf);
@@ -26272,6 +26367,7 @@ var DevExpress;
                                     self._innerUpdate(false);
                                 }
                                 self._imageSrc("data:image/x;base64," + result.Img);
+                                self.root && self.root["_update"] && self.root["_update"](false);
                             }
                         }).fail(function (jqXHR) {
                             Designer.NotifyAboutWarning("It is impossible to get richText");
@@ -26665,7 +26761,10 @@ var DevExpress;
                             clickHandler();
                         }
                     }];
-                    if (item.data && item.data.data && ((item.data.data.getMetaData && !item.data.data.getMetaData().isDeleteDeny) || !item.data.data.getMetaData)) {
+                    var element = item.data && item.data.data;
+                    var isDeleteDeny = element && ((element.getMetaData && element.getMetaData().isDeleteDeny) || false);
+                    var isLocked = element && ((element.lockedInUserDesigner && element.lockedInUserDesigner()) || false);
+                    if (!isDeleteDeny && !isLocked) {
                         actions.push({
                             text: "Delete",
                             imageClassName: "dxrd-image-recycle-bin",
@@ -26730,11 +26829,13 @@ var DevExpress;
                         this._verticalPitch = ko.observable(0);
                         this._topMargin = ko.observable(0);
                         this._leftMargin = ko.observable(0);
+                        this._rightMargin = ko.observable(0);
+                        this._bottomMargin = ko.observable(0);
                         this._rowsCount = ko.pureComputed(function () {
-                            return _this._getLabelsCount(_this._pageHeight(), _this._verticalPitch(), _this._labelHeight(), _this._topMargin());
+                            return _this._getLabelsCount(_this._pageHeight(), _this._verticalPitch(), _this._labelHeight(), _this._topMargin() + _this._bottomMargin());
                         });
                         this._columnsCount = ko.pureComputed(function () {
-                            return _this._getLabelsCount(_this._pageWidth(), _this._horizontalPitch(), _this._labelWidth(), _this._leftMargin());
+                            return _this._getLabelsCount(_this._pageWidth(), _this._horizontalPitch(), _this._labelWidth(), _this._leftMargin() + _this._rightMargin());
                         });
                         this._pageHeight = ko.pureComputed(function () {
                             if (_this.selectedPaperSize().unit === _this.unit())
@@ -26783,11 +26884,13 @@ var DevExpress;
                             read: function () { return parseFloat(_this._getFormattedValueInUnits(_this._leftMargin())); },
                             write: function (value) { return _this._leftMargin(value); }
                         });
-                        this.rightMargin = ko.computed(function () {
-                            return _this._getOtherMarginValue(_this._pageWidth(), _this._horizontalPitch(), _this._labelWidth(), _this._leftMargin(), _this._columnsCount());
+                        this.rightMargin = ko.computed({
+                            read: function () { return parseFloat(_this._getFormattedValueInUnits(_this._rightMargin())); },
+                            write: function (value) { return _this._rightMargin(value); }
                         });
-                        this.bottomMargin = ko.computed(function () {
-                            return _this._getOtherMarginValue(_this._pageHeight(), _this._verticalPitch(), _this._labelHeight(), _this._topMargin(), _this._rowsCount());
+                        this.bottomMargin = ko.computed({
+                            read: function () { return parseFloat(_this._getFormattedValueInUnits(_this._bottomMargin())); },
+                            write: function (value) { return _this._bottomMargin(value); }
                         });
                         this.labelsCountText = ko.pureComputed(function () {
                             return _this._rowsCount() * _this._columnsCount() + " " + DevExpress.Designer.getLocalization("labels on the page") + ", " + _this._columnsCount() + " x " + _this._rowsCount();
@@ -26814,6 +26917,8 @@ var DevExpress;
                                 _this._verticalPitch(data.labelDetails.vPitch);
                                 _this._topMargin(data.labelDetails.topMargin);
                                 _this._leftMargin(data.labelDetails.leftMargin);
+                                _this._rightMargin(data.labelDetails.rightMargin);
+                                _this._bottomMargin(data.labelDetails.bottomMargin);
                             });
                         };
                         this.commit = function (data) {
@@ -26825,6 +26930,8 @@ var DevExpress;
                             data.labelDetails.vPitch = _this._verticalPitch();
                             data.labelDetails.topMargin = _this._topMargin();
                             data.labelDetails.leftMargin = _this._leftMargin();
+                            data.labelDetails.rightMargin = _this._rightMargin();
+                            data.labelDetails.bottomMargin = _this._bottomMargin();
                             data.labelDetails.unit = _this.unit();
                             data.labelDetails.paperKindId = _this.selectedPaperSize().id;
                         };
@@ -26837,6 +26944,8 @@ var DevExpress;
                                 _this._verticalPitch(_this._verticalPitch() * CustomizeLabelPage.CONVERSION_COEEFICIENT);
                                 _this._topMargin(_this._topMargin() * CustomizeLabelPage.CONVERSION_COEEFICIENT);
                                 _this._leftMargin(_this._leftMargin() * CustomizeLabelPage.CONVERSION_COEEFICIENT);
+                                _this._rightMargin(_this._rightMargin() * CustomizeLabelPage.CONVERSION_COEEFICIENT);
+                                _this._bottomMargin(_this._bottomMargin() * CustomizeLabelPage.CONVERSION_COEEFICIENT);
                             }
                             else if (newUnit === 6 /* Millimeter */) {
                                 _this._labelWidth(_this._labelWidth() / CustomizeLabelPage.CONVERSION_COEEFICIENT);
@@ -26845,6 +26954,8 @@ var DevExpress;
                                 _this._verticalPitch(_this._verticalPitch() / CustomizeLabelPage.CONVERSION_COEEFICIENT);
                                 _this._topMargin(_this._topMargin() / CustomizeLabelPage.CONVERSION_COEEFICIENT);
                                 _this._leftMargin(_this._leftMargin() / CustomizeLabelPage.CONVERSION_COEEFICIENT);
+                                _this._rightMargin(_this._rightMargin() / CustomizeLabelPage.CONVERSION_COEEFICIENT);
+                                _this._bottomMargin(_this._bottomMargin() / CustomizeLabelPage.CONVERSION_COEEFICIENT);
                             }
                         });
                     }

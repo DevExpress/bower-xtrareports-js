@@ -1,6 +1,6 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.2.3 - 2016-12-11
+<!-- /*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
 <script type="text/html" id="dx-collectioneditor">
     <div class="dx-collectioneditor">
@@ -125,7 +125,7 @@
 </script>
 
 <script type="text/html" id="dx-boolean-select">
-    <div data-bind="dxLocalizedSelectBox: { dataSource: [ { val: true, text: 'Yes' }, { val: false, text: 'No' }], valueExpr: 'val', displayExpr: 'text', value: value }, dxValidator: { validationRules: validationRules || [] }"></div>
+    <div data-bind="dxLocalizedSelectBox: { dataSource: [ { val: true, text: 'Yes' }, { val: false, text: 'No' }], valueExpr: 'val', displayExpr: 'text', value: value, disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-text">
@@ -825,8 +825,8 @@
             <div class="dxrd-menu-break"></div>
             <!-- ko foreach: actionLists.menuItems -->
             <div class="dxrd-menu-item" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled }, visible: visible">
-                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap(imageClassName), attr: { title: DevExpress.Designer.getLocalization(text) }"></div>
-                <div class="dxrd-menu-item-text" data-bind="text: DevExpress.Designer.getLocalization(text)"></div>
+                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap(imageClassName), attr: { title: DevExpress.Designer.getLocalization(text, $data.textId) }"></div>
+                <div class="dxrd-menu-item-text" data-bind="text: DevExpress.Designer.getLocalization(text, $data.textId)"></div>
                 <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
             </div>
             <!-- /ko -->
@@ -921,7 +921,7 @@
     <!-- /ko -->
     <!-- ko if: !$data.templateName -->
     <div class="dxrd-toolbar-item" data-bind="visible: visible">
-        <div data-bind="attr: { class: 'dxrd-toolbar-item-image ' + ko.unwrap(imageClassName), title: DevExpress.Designer.getLocalization(text) }, dxAction: function() { if($.isFunction(disabled) && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxrd-toolbar-item-image-selected': $data.selected }"></div>
+        <div data-bind="attr: { class: 'dxrd-toolbar-item-image ' + ko.unwrap(imageClassName), title: DevExpress.Designer.getLocalization(text, $data.textId) }, dxAction: function() { if($.isFunction(disabled) && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxrd-toolbar-item-image-selected': $data.selected }"></div>
         <div class="dxrd-toolbar-item-separator" data-bind="visible: $data.hasSeparator"></div>
     </div>
     <!-- /ko -->
@@ -1158,7 +1158,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { dataSource: displayItems, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: selectedValuesString, displayExpr: function() { return selectedValuesString(); } }">
+    <div data-bind="dxSelectBox: { dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } }">
         <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
             <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
             <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
@@ -2071,7 +2071,7 @@
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
         <div class="dxrp-editing-field-content" data-bind="click: activateEditor">
             <!-- ko if: !active() || field.readOnly()  -->
-            <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), text: field.editValue"></div>
+            <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap},  text: field.editValue"></div>
             <!--/ko-->
             <!-- ko if: active() && !field.readOnly() -->
             <!-- ko template: { name: editorTemplate, data: data } -->
@@ -2467,12 +2467,12 @@
 </script>
 
 <script type="text/html" id="dxrdp-surface">
-    <div class="dxrd-preview-wrapper" data-bind="textCopier, css: { 'dx-rtl': $data.rtlReport } ">
+    <div class="dxrd-preview-wrapper" data-bind="textCopier, css: { 'dx-rtl': $data.rtlReport, 'dxrp-editing-fields-hightlighted': editingFieldsHighlighted } ">
         <!-- ko with: progressBar-->
         <!-- ko template: 'dxrd-preview-progress-bar'-->
         <!-- /ko -->
         <!-- /ko -->
-        <div class="dxrd-preview-surface" data-bind="styleunit: { width: previewSize() }, visible: !showMultipagePreview(), css: { 'dxrp-editing-fields-hightlighted': editingFieldsHighlighted }">
+        <div class="dxrd-preview-surface" data-bind="styleunit: { width: previewSize() }, visible: !showMultipagePreview()">
             <div class="dxrd-report-preview-holder">
                 <!-- ko with: currentPage-->
                 <!-- ko if: !pageLoadFailed() -->
@@ -2767,7 +2767,7 @@
 <script type="text/html" id="dx-treelist-action-with-popover">
     <div class="dx-treelist-action-with-popover" style="display: inline-block">
         <div class="dx-treelist-action" data-bind="dxButton: { onClick: function() { clickAction($parent); }, icon: imageClassName, disabled: $data.disabled && $data.disabled() }, attr: { title: DevExpress.JS.Utils.getLocalization(text) }"></div>
-        <div data-bind="dxPopover:{ width: 200, position:'left', visible: $parent.data.popoverVisible, target: '.dx-treelist-action-with-popover', title: 'Add Data Source:' }">
+        <div data-bind="dxPopover:{ width: 200, position: !$root.rtl ? 'left' : 'right', visible: $parent.data.popoverVisible, target: '.dx-treelist-action-with-popover', title: 'Add Data Source:' }">
             <div data-bind="dxList: { dataSource: $parent.data.popoverListItems(), onItemClick: $parent.data.itemClickAction }">
                 <div data-options="dxTemplate : { name: 'item' }">
                     <div data-bind="text: name"></div>
@@ -3339,7 +3339,7 @@
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- ko foreach: crossBandControls -->
-                                <div class="dxrd-cross-band" data-bind="visible: isSelected(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+                                <div class="dxrd-cross-band" data-bind="visible: isSelected() && !DevExpress.Designer.DragDropHandler.started(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
                                 </div>
                                 <!-- /ko -->
                             </div>
@@ -3750,7 +3750,7 @@
 <script type="text/html" id="dxrd-shapeHeader">
     <!-- ko if: value -->
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { items: DevExpress.Designer.Report.shapes, value: shapeName, displayCustomValue: true, disabled: $parent.disabled }"></div>
+    <div data-bind="dxLocalizedSelectBox: { items: DevExpress.Designer.Report.shapes, value: shapeName, displayCustomValue: true, disabled: $parent.disabled }"></div>
     <!-- /ko -->
     <!-- /ko -->
 </script>
@@ -3782,7 +3782,7 @@
 <script type="text/html" id="dxrd-sparklineHeader">
     <!-- ko if: value -->
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { items: DevExpress.Designer.Report.XRSparklineViewModel.spartlineTypes, value: sparklineType, displayCustomValue: true, disabled: $parent.disabled }"></div>
+    <div data-bind="dxLocalizedSelectBox: { items: DevExpress.Designer.Report.XRSparklineViewModel.spartlineTypes, value: sparklineType, displayCustomValue: true, disabled: $parent.disabled }"></div>
     <!-- /ko -->
     <!-- /ko -->
 </script>
@@ -3950,16 +3950,6 @@
     <!-- /ko -->
 </script>
 
-<script type="text/html" id="dxrd-editOptions">
-    <div data-bind="dxSelectBox: DevExpress.Designer.Report.EditOptionsEditorHeaderModel.create($data, value, $root.model().objectStorage, disabled)"></div>
-</script>
-
-<script type="text/html" id="dxrd-editOptionsContent">
-    <!-- ko if: value -->
-    <div data-bind="template: { name: 'dx-propertieseditor', data: DevExpress.Designer.Report.EditOptionsEditorHeaderModel.createPropertiesModel($data) }"></div>
-    <!-- /ko -->
-</script>
-
 <script type="text/html" id="dxrd-editOptionsEditorName">
     <div data-bind="dxFieldListPicker: new DevExpress.Designer.Report.EditOptionsEditorNameEditorModel(value, disabled)"></div>
 </script>
@@ -4056,11 +4046,11 @@
                     </div>
                     <div>
                         <span data-bind="text: DevExpress.Designer.getLocalization('Right Margin:')"></span>
-                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: rightMargin, disabled:true  }"></div>
+                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: rightMargin }"></div>
                     </div>
                     <div>
                         <span data-bind="text: DevExpress.Designer.getLocalization('Bottom Margin:')"></span>
-                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: bottomMargin, disabled:true }"></div>
+                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: bottomMargin }"></div>
                     </div>
 
                 </div>
