@@ -1,6 +1,6 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
+<!-- /*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
 <script type="text/html" id="dx-collectioneditor">
     <div class="dx-collectioneditor">
@@ -1148,7 +1148,7 @@
 
 <script type="text/html" id="dxrd-field">
     <!-- ko displayNameExtender: { path: path, dataMember: value } -->
-    <div data-bind="dxFieldListPicker: { path: path, value: value, displayExpr: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
+    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
     <!-- /ko -->
 </script>
 
@@ -1158,7 +1158,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { dataSource: displayItems, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: selectedValuesString, displayExpr: function() { return selectedValuesString(); } }">
+    <div data-bind="dxSelectBox: { dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } }">
         <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
             <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
             <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>

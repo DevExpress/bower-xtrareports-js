@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
+/*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 var DevExpress;
 (function (DevExpress) {
@@ -1810,9 +1810,13 @@ var DevExpress;
                         var multiValuesHelper = new DevExpress.Designer.Widgets.MultiValuesHelper(this._value, this.lookUpValues());
                         var newItems;
                         if (parameterHelper.customizeParameterLookUpSource)
-                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems.slice(0));
-                        if (newItems)
-                            multiValuesHelper.displayItems = newItems;
+                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems);
+                        if (newItems) {
+                            multiValuesHelper.dataSource = newItems;
+                        }
+                        else {
+                            multiValuesHelper.dataSource = new DevExpress.data.DataSource({ store: multiValuesHelper.displayItems, pageSize: 100, paginate: true });
+                        }
                         this.safeAssignObservable("value", ko.observable(multiValuesHelper));
                     }
                     else if (this.isMultiValue) {

@@ -1,6 +1,6 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
+<!-- /*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
 <script type="text/html" id="dx-collectioneditor">
     <div class="dx-collectioneditor">
@@ -1148,7 +1148,7 @@
 
 <script type="text/html" id="dxrd-field">
     <!-- ko displayNameExtender: { path: path, dataMember: value } -->
-    <div data-bind="dxFieldListPicker: { path: path, value: value, displayExpr: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
+    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
     <!-- /ko -->
 </script>
 
@@ -1158,7 +1158,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { dataSource: displayItems, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: selectedValuesString, displayExpr: function() { return selectedValuesString(); } }">
+    <div data-bind="dxSelectBox: { dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } }">
         <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
             <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
             <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
@@ -2900,8 +2900,10 @@
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- ko foreach: crossBandControls -->
-                                <div class="dxrd-cross-band" data-bind="visible: isSelected(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+                                <!-- ko if: visible -->
+                                <div class="dxrd-cross-band" data-bind="visible: isSelected() && !DevExpress.Designer.DragDropHandler.started(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
                                 </div>
+                                <!-- /ko -->
                                 <!-- /ko -->
                             </div>
 
@@ -2916,7 +2918,9 @@
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- ko foreach: crossBandControls -->
+                                <!-- ko if: visible -->
                                 <!-- ko template: { name: template } -->
+                                <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <svg style="height: 100%; position: absolute; top: 0; width: 1px; z-index:-1" data-bind="styleunit: { left: leftMarginOffset() }">
@@ -3311,7 +3315,7 @@
 <script type="text/html" id="dxrd-shapeHeader">
     <!-- ko if: value -->
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { items: DevExpress.Designer.Report.shapes, value: shapeName, displayCustomValue: true, disabled: $parent.disabled }"></div>
+    <div data-bind="dxLocalizedSelectBox: { items: DevExpress.Designer.Report.shapes, value: shapeName, displayCustomValue: true, disabled: $parent.disabled }"></div>
     <!-- /ko -->
     <!-- /ko -->
 </script>
@@ -3343,7 +3347,7 @@
 <script type="text/html" id="dxrd-sparklineHeader">
     <!-- ko if: value -->
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { items: DevExpress.Designer.Report.XRSparklineViewModel.spartlineTypes, value: sparklineType, displayCustomValue: true, disabled: $parent.disabled }"></div>
+    <div data-bind="dxLocalizedSelectBox: { items: DevExpress.Designer.Report.XRSparklineViewModel.spartlineTypes, value: sparklineType, displayCustomValue: true, disabled: $parent.disabled }"></div>
     <!-- /ko -->
     <!-- /ko -->
 </script>
@@ -3365,7 +3369,7 @@
 </script>
 
 <script type="text/html" id="dxrd-bands">
-    <div data-bind="dxSelectBox: { items: $root.bands, value: value, displayExpr: 'displayName', valueExpr: 'value', displayCustomValue: true, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { items: $root.bands, value: value, displayExpr: 'displayName', valueExpr: 'value', displayCustomValue: true, disabled: disabled, placeholder: DevExpress.Designer.getLocalization('(none)') }"></div>
 </script>
 
 <script type="text/html" id="dxrd-formattingRuleCollection">

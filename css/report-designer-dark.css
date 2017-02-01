@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
+/*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 .dx-collapsing-image {
   padding: 4.5px;
@@ -1840,6 +1840,9 @@
 .dx-designer .dx-ltr .dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 24px;
 }
+.dx-designer .dx-ltr .dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 54px;
+}
 .dx-designer .dx-ltr .dx-fieldset .dx-field-value > .dx-checkbox {
   float: left;
 }
@@ -1851,6 +1854,9 @@
 }
 .dx-designer .dx-rtl .dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-left: 24px;
+}
+.dx-designer .dx-rtl .dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-left: 54px;
 }
 .dx-designer .dx-rtl .dx-fieldset .dx-field-value > .dx-checkbox {
   float: right;
@@ -1967,6 +1973,9 @@
 }
 .dx-designer .dx-viewport .dxrd-action-items-container {
   border-radius: 0;
+}
+.dx-designer .dx-viewport .dxrd-action-items-container .dx-popup-content {
+  font-size: 12px;
 }
 .dx-designer .dx-viewport .dxrd-action-items-container .dxrd-action-item {
   display: inline-block;

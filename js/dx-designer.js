@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
+/*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 var DevExpress;
 (function (DevExpress) {
@@ -487,12 +487,11 @@ var DevExpress;
                 var options = valueAccessor();
                 var prevDisplayExpr = options.displayExpr;
                 options.displayExpr = function (value) {
-                    if ($.isFunction(prevDisplayExpr)) {
-                        return JS.Utils.getLocalization(prevDisplayExpr(value));
-                    }
-                    else {
-                        return value ? JS.Utils.getLocalization(value[prevDisplayExpr]) : value;
-                    }
+                    if (!value)
+                        return value;
+                    if (!prevDisplayExpr)
+                        return JS.Utils.getLocalization(value);
+                    return JS.Utils.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr]);
                 };
                 ko.bindingHandlers["dxSelectBox"].init(element, function () { return options; }, allBindings, viewModel, bindingContext);
                 return { controlsDescendantBindings: true };
@@ -1192,14 +1191,31 @@ var DevExpress;
                 return model.isModelReady ? model.isModelReady() : true;
             }
             Utils.DEBUG = true;
+            var wrappedConsole = (function (console) {
+                var getWrappedMethod = function (methodName) { return (function () {
+                    var args = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        args[_i - 0] = arguments[_i];
+                    }
+                    if (console && $.isFunction(console[methodName])) {
+                        console[methodName].apply(console, arguments);
+                    }
+                }); };
+                return {
+                    info: getWrappedMethod("info"),
+                    warn: getWrappedMethod("warn"),
+                    error: getWrappedMethod("error")
+                };
+            })(window.console);
             function NotifyAboutWarning(msg) {
                 if (Utils.DEBUG) {
                     throw new Error(msg);
                 }
                 else {
-                    console.warn(msg);
+                    wrappedConsole.warn(msg);
                 }
             }
+            Utils.NotifyAboutWarning = NotifyAboutWarning;
             function propertiesVisitor(target, visitor, visited, skip) {
                 if (visited === void 0) { visited = []; }
                 if (skip === void 0) { skip = ["surface"]; }
@@ -1880,6 +1896,9 @@ var DevExpress;
                     }
                     return new GroupOperator(operation, combinedOperands);
                 };
+                GroupOperator.prototype.children = function () {
+                    return this.operands;
+                };
                 Object.defineProperty(GroupOperator.prototype, "displayType", {
                     get: function () {
                         return GroupOperatorType[this.operatorType];
@@ -2065,8 +2084,8 @@ var DevExpress;
                 AggregateOperand.prototype.children = function () {
                     var operands = [];
                     this.property && operands.push(this.property);
-                    this.aggregatedExpression && operands.push(this.aggregatedExpression);
                     this.condition && operands.push(this.condition);
+                    this.aggregatedExpression && operands.push(this.aggregatedExpression);
                     return operands;
                 };
                 return AggregateOperand;
@@ -6296,7 +6315,7 @@ var DevExpress;
                 result = val * 96 / 100;
             }
             result = result * (zoom);
-            return (Math.round(result * 100) / 100);
+            return Math.floor(result * 100) / 100;
         }
         Designer.unitsToPixel = unitsToPixel;
         function pixelToUnits(val, measureUnit, zoom) {
@@ -6311,7 +6330,7 @@ var DevExpress;
                 result = val / 96 * 100;
             }
             result = result / (zoom);
-            return Math.round(result * 100) / 100;
+            return Math.floor(result * 100) / 100;
         }
         Designer.pixelToUnits = pixelToUnits;
         var HoverInfo = (function () {
@@ -10276,12 +10295,7 @@ var DevExpress;
             if (showForUser) {
                 ShowMessage(msg);
             }
-            if (Designer.DEBUG) {
-                throw new Error(msg);
-            }
-            else {
-                console.warn(msg);
-            }
+            DevExpress.JS.Utils.NotifyAboutWarning(msg);
         }
         Designer.NotifyAboutWarning = NotifyAboutWarning;
         function getErrorMessage(jqXHR) {
@@ -11399,7 +11413,7 @@ var DevExpress;
                 return item.specifics !== "none";
             };
             DataMemberTreeListController.prototype.canSelect = function (value) {
-                return (value.hasItems && !!value.path) || value.data.specifics === "none";
+                return (value.hasItems && !!value.path && (value.data.specifics === "List" || value.data.specifics === "ListSource")) || value.data.specifics === "none";
             };
             DataMemberTreeListController.prototype.select = function (value) {
                 if (this.canSelect(value)) {
@@ -11677,6 +11691,8 @@ var DevExpress;
                 return DevExpress.Designer.Widgets.editorTemplates.guid;
             }
             if (typeString === "System.SByte"
+                || typeString === "System.Decimal"
+                || typeString === "System.Int64"
                 || typeString === "System.Int32"
                 || typeString === "System.Int16"
                 || typeString === "System.Single"
@@ -12279,9 +12295,13 @@ var DevExpress;
                     var _this = this;
                     this.selectedItems = ko.observable([]);
                     var values = value();
+                    this.value = value;
+                    var valueHasMutated = function () {
+                        _this.editorValue.notifySubscribers(_this.displayItems[0]);
+                    };
                     this._items = items.map(function (item) {
                         var selected = ko.observable(_this._isValueSelected(item.value, values));
-                        return { selected: selected, value: item.value, displayValue: item.displayValue || item.value, toggleSelected: function () { selected(!selected()); } };
+                        return { selected: selected, value: item.value, displayValue: item.displayValue || item.value, toggleSelected: function () { selected(!selected()); valueHasMutated(); } };
                     });
                     this.selectedItems = ko.pureComputed(function () {
                         return _this._items.filter(function (item) { return item.selected(); });
@@ -12324,7 +12344,10 @@ var DevExpress;
                             }
                         }
                     });
-                    this.displayItems = [{ selected: this.isSelectedAll, value: null, displayValue: Designer.getLocalization('(Select All)'), toggleSelected: function () { _this.isSelectedAll(!_this.isSelectedAll()); } }].concat(this._items);
+                    var selectAllItem = { selected: this.isSelectedAll, value: null, displayValue: Designer.getLocalization('(Select All)'), toggleSelected: function () { _this.isSelectedAll(!_this.isSelectedAll()); valueHasMutated(); } };
+                    this.displayItems = [selectAllItem].concat(this._items);
+                    this.dataSource = this.displayItems;
+                    this.editorValue = ko.observable(selectAllItem);
                     this.updateValue = function () {
                         value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
                     };
@@ -12959,6 +12982,17 @@ var DevExpress;
                 };
                 this._copyInfo(cutInfo);
             };
+            CopyPasteHandler.prototype._removeNames = function (object) {
+                var keys = Object.keys(object);
+                for (var i = keys.length - 1; i >= 0; i--) {
+                    if (keys[i] === "@Name") {
+                        object[keys[i]] = undefined;
+                    }
+                    else if (object[keys[i]] instanceof Object) {
+                        this._removeNames(object[keys[i]]);
+                    }
+                }
+            };
             CopyPasteHandler.prototype.paste = function () {
                 var _this = this;
                 if (this.canPaste()) {
@@ -12973,7 +13007,7 @@ var DevExpress;
                     }
                     var minPoint = new Designer.Point(Number.MAX_VALUE, Number.MAX_VALUE), maxPoint = new Designer.Point(-1, -1);
                     for (var i = 0; i < this._copyInfo().objects.length; i++) {
-                        this._copyInfo().objects[i]["@Name"] = undefined;
+                        this._removeNames(this._copyInfo().objects[i]);
                         var newControl = this._copyPasteStrategy.createChild(pasteTarget, this._copyInfo().objects[i]);
                         var newControlSurface = Designer.findSurface(newControl);
                         if (!newControlSurface)

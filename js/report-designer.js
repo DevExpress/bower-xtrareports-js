@@ -1,6 +1,6 @@
-/*! DevExpress HTML/JS Designer - v16.1.9 - 2016-12-20
+/*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
 * http://www.devexpress.com
-* Copyright (c) 2016 Developer Express Inc; Licensed Commercial */
+* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
 var DevExpress;
 (function (DevExpress) {
@@ -4435,7 +4435,7 @@ var DevExpress;
     (function (Designer) {
         var Chart;
         (function (Chart) {
-            var minValue = { propertyName: "minValue", modelName: "@MinValue", displayName: "Min Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, maxValue = { propertyName: "maxValue", modelName: "@MaxValue", displayName: "Max Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, auto = { propertyName: "auto", modelName: "@Auto", displayName: "Auto", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, autoSideMargins = { propertyName: "autoSideMargins", modelName: "@AutoSideMargins", displayName: "Auto Side Margins", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, sideMarginsValue = { propertyName: "sideMarginsValue", modelName: "@SideMarginsValue", displayName: "Side Margins Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            var minValue = { propertyName: "minValue", modelName: "@MinValueSerializable", displayName: "Min Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, maxValue = { propertyName: "maxValue", modelName: "@MaxValueSerializable", displayName: "Max Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, auto = { propertyName: "auto", modelName: "@Auto", displayName: "Auto", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, autoSideMargins = { propertyName: "autoSideMargins", modelName: "@AutoSideMargins", displayName: "Auto Side Margins", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, sideMarginsValue = { propertyName: "sideMarginsValue", modelName: "@SideMarginsValue", displayName: "Side Margins Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Chart.visualRangeSerializationsInfo = [auto, autoSideMargins, minValue, maxValue, sideMarginsValue], Chart.visualRange = { propertyName: "visualRange", modelName: "VisualRange", displayName: "Visual Range", info: Chart.visualRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var alwaysShowZeroLevel = { propertyName: "alwaysShowZeroLevel", modelName: "@AlwaysShowZeroLevel", displayName: "Always Show Zero Level", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool };
             Chart.wholeRangeSerializationsInfo = Chart.visualRangeSerializationsInfo.concat(alwaysShowZeroLevel), Chart.wholeRange = { propertyName: "wholeRange", modelName: "WholeRange", displayName: "Whole Range", info: Chart.wholeRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
@@ -8221,9 +8221,13 @@ var DevExpress;
                         var multiValuesHelper = new DevExpress.Designer.Widgets.MultiValuesHelper(this._value, this.lookUpValues());
                         var newItems;
                         if (parameterHelper.customizeParameterLookUpSource)
-                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems.slice(0));
-                        if (newItems)
-                            multiValuesHelper.displayItems = newItems;
+                            newItems = parameterHelper.customizeParameterLookUpSource(this.getParameterDescriptor(), multiValuesHelper.displayItems);
+                        if (newItems) {
+                            multiValuesHelper.dataSource = newItems;
+                        }
+                        else {
+                            multiValuesHelper.dataSource = new DevExpress.data.DataSource({ store: multiValuesHelper.displayItems, pageSize: 100, paginate: true });
+                        }
                         this.safeAssignObservable("value", ko.observable(multiValuesHelper));
                     }
                     else if (this.isMultiValue) {
@@ -11733,7 +11737,7 @@ var DevExpress;
                     return rectWidhtElement > parentRect.width && Math.abs(rectWidhtElement - parentRect.width) > this.delta || rectHeightElement > parentRect.height && Math.abs(rectHeightElement - parentRect.height) > this.delta;
                 };
                 ControlSurfaceBase.prototype.isThereIntersectionWithMargin = function () {
-                    var root = this.getRoot(), usefulPageWidth = root.pageWidth() - root.margins.left() - root.margins.right(), right = ko.unwrap(this.getRoot().rtl) ? (this.container().rect().width - this.rect().left) : this.rect().right;
+                    var root = this.getRoot(), usefulPageWidth = root.pageWidth() - root.margins.left() - root.margins.right(), right = ko.unwrap(this.getRoot().rtl) && this.container() ? (this.container().rect().width - this.rect().left) : this.rect().right;
                     return right > usefulPageWidth && Math.abs(right - usefulPageWidth) > this.delta;
                 };
                 ControlSurfaceBase.prototype.isThereIntersectionWithCollectionControl = function (currentRect, collectionControls, controlRectProperty) {
@@ -11778,12 +11782,12 @@ var DevExpress;
                     if (currentRect === void 0) { currentRect = this.absoluteRect(); }
                     var isThereIntersection = false, crossBandControls = this.getRoot()["crossBandControls"]();
                     if (this.isThereIntersectionWithNeighborsCollection(currentRect, crossBandControls.filter(function (control) {
-                        return control.getControlModel().controlType === "XRCrossBandLine";
+                        return control.visible() && control.getControlModel().controlType === "XRCrossBandLine";
                     }), "rect")) {
                         return true;
                     }
                     var crossBandBoxControls = crossBandControls.filter(function (control) {
-                        return control.getControlModel().controlType === "XRCrossBandBox";
+                        return control.visible() && control.getControlModel().controlType === "XRCrossBandBox";
                     });
                     for (var crossbandIndex = 0; crossbandIndex < crossBandBoxControls.length; crossbandIndex++) {
                         var rects = crossBandBoxControls[crossbandIndex]._getCrossBandBoxSides();
@@ -11886,7 +11890,7 @@ var DevExpress;
                         else {
                             displayName("");
                         }
-                    });
+                    }).extend({ rateLimit: 0 });
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                         displayNameLoader.dispose();
                     });
@@ -12716,14 +12720,18 @@ var DevExpress;
                     { value: "System.Int32", displayValue: "Number (32 bit integer)", defaultValue: 0, specifics: "Integer", valueConverter: function (val) {
                         return parseInt(val);
                     } },
-                    { value: "System.Int64", displayValue: "Number (64 bit integer)", defaultValue: "0", specifics: "String" },
+                    { value: "System.Int64", displayValue: "Number (64 bit integer)", defaultValue: 0, specifics: "Integer", valueConverter: function (val) {
+                        return parseInt(val);
+                    } },
                     { value: "System.Single", displayValue: "Number (floating-point)", defaultValue: 0, specifics: "Float", valueConverter: function (val) {
                         return parseFloat(val);
                     } },
                     { value: "System.Double", displayValue: "Number (double-precision floating-point)", defaultValue: 0, specifics: "Float", valueConverter: function (val) {
                         return parseFloat(val);
                     } },
-                    { value: "System.Decimal", displayValue: "Number (decimal)", defaultValue: "0", specifics: "String" },
+                    { value: "System.Decimal", displayValue: "Number (decimal)", defaultValue: 0, specifics: "Float", valueConverter: function (val) {
+                        return parseFloat(val);
+                    } },
                     { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) {
                         return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null);
                     } },
@@ -14144,6 +14152,13 @@ var DevExpress;
                             subBands.push(new BandViewModel(band.SubBands[key], this, serializer));
                         }
                     }
+                    if (this.sortingSummary) {
+                        this.sortingSummary.getPath = function (propertyName) {
+                            if (propertyName === "fieldName") {
+                                return _this.getPath("groupFields");
+                            }
+                        };
+                    }
                     this.subBands = ko.observableArray(subBands);
                     var self = this;
                     if (this.bands().length > 0) {
@@ -14671,7 +14686,7 @@ var DevExpress;
                         "RecordNumber": "Record Number"
                     })
                 },
-                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: "", editor: Designer.Widgets.editorTemplates.field },
                 { propertyName: "ignoreNullValues", modelName: "@IgnoreNullValues", displayName: "Ignore Null Values", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
                 {
                     propertyName: "sortOrder",
@@ -17657,6 +17672,9 @@ var DevExpress;
                 function CrossBandControlViewModel(control, parent, serializer) {
                     var _this = this;
                     _super.call(this, control, parent, serializer);
+                    this.isCrossbandShow = ko.computed(function () {
+                        return !!(_this.startBand() && _this.endBand());
+                    });
                     var originalEndBand = this.endBand;
                     this.endPoint.x = ko.pureComputed({
                         read: function () {
@@ -17749,17 +17767,18 @@ var DevExpress;
                     this._disposables.push(this["_x"].subscribe(function (newVal) {
                         _this["_endX"](newVal);
                     }));
+                    this.visible = control.isCrossbandShow;
                     var currentAbsoluteStartY = this["_startY"]();
                     var currentAbsoluteEndY = this["_endY"]();
                     this._disposables.push(ko.computed(function () {
-                        if (control.startBand.peek()) {
+                        if (control.startBand()) {
                             var startBandSurface = Designer.findSurface(control.startBand.peek());
                             currentAbsoluteStartY = _this._isBandCollapsed(startBandSurface) ? startBandSurface.absolutePosition.y() : _this["_startY"]() + startBandSurface.absolutePosition.y();
                         }
                         _this["_y"](currentAbsoluteStartY);
                     }));
                     this._disposables.push(ko.computed(function () {
-                        if (control.endBand.peek()) {
+                        if (control.endBand()) {
                             var endBandSurface = Designer.findSurface(control.endBand.peek());
                             currentAbsoluteEndY = _this._isBandCollapsed(endBandSurface) ? endBandSurface.absolutePosition.y() : _this["_endY"]() + endBandSurface.absolutePosition.y();
                         }
@@ -17809,12 +17828,16 @@ var DevExpress;
                         });
                     }
                     this._disposables.push(control.startBand.subscribe(function (newBand) {
-                        var bandSurface = Designer.findSurface(newBand);
-                        _this["_y"](bandSurface.absolutePosition.y());
+                        if (newBand) {
+                            var bandSurface = Designer.findSurface(newBand);
+                            _this["_y"](bandSurface.absolutePosition.y());
+                        }
                     }));
                     this._disposables.push(control.endBand.subscribe(function (newBand) {
-                        var bandSurface = Designer.findSurface(newBand);
-                        _this["_height"](bandSurface.absolutePosition.y() - _this["_y"]());
+                        if (newBand) {
+                            var bandSurface = Designer.findSurface(newBand);
+                            _this["_height"](bandSurface.absolutePosition.y() - _this["_y"]());
+                        }
                     }));
                     this.borderWidth = ko.pureComputed(function () {
                         return control["borderWidth"] && Math.floor(control["borderWidth"]());
@@ -17894,7 +17917,12 @@ var DevExpress;
                     }
                 };
                 CrossBandSurface.prototype.container = function () {
-                    return Designer.findSurface(this.getControlModel().startBand());
+                    if (this._control.isCrossbandShow()) {
+                        return Designer.findSurface(this.getControlModel().startBand());
+                    }
+                    else {
+                        return null;
+                    }
                 };
                 CrossBandSurface.prototype._getChildrenHolderName = function () {
                     return null;
@@ -18022,16 +18050,17 @@ var DevExpress;
             })(Report.TodoControlSurface);
             Report.SparkLineSurface = SparkLineSurface;
             Report.valueMember = { propertyName: "valueMember", modelName: "@ValueMember", displayName: "Value Member", editor: Designer.Widgets.editorTemplates.field };
-            var highlightMinPoint = { modelName: "@HighlightMinPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMinPoint", displayName: "Highlight Min Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightMaxPoint = { modelName: "@HighlightMaxPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMaxPoint", displayName: "Highlight Max Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightStartPoint = { modelName: "@HighlightStartPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightStartPoint", displayName: "Highlight Max Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightEndPoint = { modelName: "@HighlightEndPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightEndPoint", displayName: "Highlight End Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightNegativePoints = { modelName: "@HighlightNegativePoints", defaultVal: false, from: Designer.parseBool, propertyName: "highlightNegativePoints", displayName: "Highlight Negative Points", editor: DevExpress.JS.Widgets.editorTemplates.bool }, color = { modelName: "@Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "color", displayName: "Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, maxPointColor = { modelName: "@MaxPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "maxPointColor", displayName: "Max Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, minPointColor = { modelName: "@MinPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "minPointColor", displayName: "Min Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, startPointColor = { modelName: "@StartPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "startPointColor", displayName: "Start Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, negativePointColor = { modelName: "@NegativePointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "negativePointColor", displayName: "Negative Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, endPointColor = { modelName: "@EndPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "endPointColor", displayName: "End Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, type = {
+            var highlightMinPoint = { modelName: "@HighlightMinPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMinPoint", displayName: "Highlight Min Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightMaxPoint = { modelName: "@HighlightMaxPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMaxPoint", displayName: "Highlight Max Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightStartPoint = { modelName: "@HighlightStartPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightStartPoint", displayName: "Highlight Start Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightEndPoint = { modelName: "@HighlightEndPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightEndPoint", displayName: "Highlight End Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightNegativePoints = { modelName: "@HighlightNegativePoints", defaultVal: false, from: Designer.parseBool, propertyName: "highlightNegativePoints", displayName: "Highlight Negative Points", editor: DevExpress.JS.Widgets.editorTemplates.bool }, color = { modelName: "@Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "color", displayName: "Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, maxPointColor = { modelName: "@MaxPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "maxPointColor", displayName: "Max Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, minPointColor = { modelName: "@MinPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "minPointColor", displayName: "Min Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, startPointColor = { modelName: "@StartPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "startPointColor", displayName: "Start Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, negativePointColor = { modelName: "@NegativePointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "negativePointColor", displayName: "Negative Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, endPointColor = { modelName: "@EndPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "endPointColor", displayName: "End Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, sparklineViewType = {
                 modelName: "@Type",
                 propertyName: "type"
             }, enableAntialiasing = { modelName: "@EnableAntialiasing", propertyName: "enableAntialiasing", displayName: "Enable Antialiasing", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true }, maxPointMarkerSize = { modelName: "@MaxPointMarkerSize", defaultVal: 5, propertyName: "maxPointMarkerSize", displayName: "Max Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, minPointMarkerSize = { modelName: "@MinPointMarkerSize", defaultVal: 5, propertyName: "minPointMarkerSize", displayName: "Min Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, startPointMarkerSize = { modelName: "@StartPointMarkerSize", defaultVal: 5, propertyName: "startPointMarkerSize", displayName: "Start Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, negativePointMarkerSize = { modelName: "@NegativePointMarkerSize", defaultVal: 5, propertyName: "negativePointMarkerSize", displayName: "Negative Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, endPointMarkerSize = { modelName: "@EndPointMarkerSize", defaultVal: 5, propertyName: "endPointMarkerSize", displayName: "End Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, markerSize = { modelName: "@MarkerSize", propertyName: "markerSize", defaultVal: 5, displayName: "Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, showMarkers = { modelName: "@ShowMarkers", propertyName: "showMarkers", displayName: "Show Markers", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false }, markerColor = { modelName: "@MarkerColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "markerColor", displayName: "Marker Color", editor: Designer.Widgets.editorTemplates.customColorEditor };
             var barDistance = { modelName: "@BarDistance", propertyName: "barDistance", defaultVal: 2, displayName: "Bar Distance", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             var areaOpacity = { modelName: "@AreaOpacity", propertyName: "areaOpacity", defaultVal: 135, displayName: "Area Opacity", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            var viewLineSerializationsInfo = [highlightEndPoint, highlightMaxPoint, highlightMinPoint, highlightNegativePoints, highlightStartPoint, color, maxPointColor, minPointColor, startPointColor, negativePointColor, endPointColor, type, enableAntialiasing, negativePointMarkerSize, endPointMarkerSize, startPointMarkerSize, minPointMarkerSize, maxPointMarkerSize, markerSize, showMarkers, Report.lineWidth, markerColor];
-            var viewWinLoseSerializationsInfo = [endPointColor, startPointColor, minPointColor, maxPointColor, color, highlightEndPoint, highlightStartPoint, negativePointColor, highlightMinPoint, highlightMaxPoint, type, barDistance];
-            var viewBarSerializationsInfo = [endPointColor, startPointColor, minPointColor, maxPointColor, color, highlightEndPoint, highlightStartPoint, highlightMinPoint, highlightMaxPoint, barDistance, type, negativePointColor, highlightNegativePoints];
-            var viewAreaSerializationsInfo = [endPointColor, startPointColor, minPointColor, maxPointColor, color, highlightEndPoint, highlightStartPoint, highlightMinPoint, highlightMaxPoint, negativePointColor, enableAntialiasing, areaOpacity, negativePointMarkerSize, type, Report.lineWidth, highlightNegativePoints, showMarkers, markerSize, maxPointMarkerSize, markerColor, minPointMarkerSize, endPointMarkerSize, startPointMarkerSize];
+            var commonSparklineViewProperties = [highlightStartPoint, highlightEndPoint, highlightMaxPoint, highlightMinPoint, color, maxPointColor, minPointColor, startPointColor, endPointColor, negativePointColor, sparklineViewType];
+            var viewLineSerializationsInfo = [].concat(commonSparklineViewProperties, [highlightNegativePoints, enableAntialiasing, negativePointMarkerSize, endPointMarkerSize, startPointMarkerSize, minPointMarkerSize, maxPointMarkerSize, markerSize, showMarkers, Report.lineWidth, markerColor]);
+            var viewWinLoseSerializationsInfo = [].concat(commonSparklineViewProperties, [barDistance]);
+            var viewBarSerializationsInfo = [].concat(commonSparklineViewProperties, [barDistance, highlightNegativePoints]);
+            var viewAreaSerializationsInfo = [].concat(commonSparklineViewProperties, [enableAntialiasing, areaOpacity, negativePointMarkerSize, Report.lineWidth, highlightNegativePoints, showMarkers, markerSize, maxPointMarkerSize, markerColor, minPointMarkerSize, endPointMarkerSize, startPointMarkerSize]);
             var sparklineViewMap = {
                 "Line": viewLineSerializationsInfo,
                 "Bar": viewBarSerializationsInfo,
@@ -18203,7 +18232,7 @@ var DevExpress;
                 __extends(XRSubreportViewModel, _super);
                 function XRSubreportViewModel(model, parent, serializer) {
                     var _this = this;
-                    _super.call(this, model, parent, serializer);
+                    _super.call(this, this._patchModel(model), parent, serializer);
                     var _self = this;
                     this.key = ko.pureComputed(function () {
                         var key = _this.parentModel() && _this.parentModel().root && _this.parentModel().root["key"];
@@ -18274,6 +18303,12 @@ var DevExpress;
                         serializationInfo.splice(serializationInfo.indexOf(property), 1);
                     }
                     return serializationInfo;
+                };
+                XRSubreportViewModel.prototype._patchModel = function (model) {
+                    if (!!model["@ReportSourceUrl"]) {
+                        delete model["ReportSource"];
+                    }
+                    return model;
                 };
                 return XRSubreportViewModel;
             })(Report.ControlViewModel);
@@ -19156,14 +19191,15 @@ var DevExpress;
                 ],
                 "Data": [Report.actualValue, Designer.Chart.seriesDataMember, Report.checkState, Report.checked, Report.chartDataSource, Report.dataSource, Report.dataMember, Report.dataAdapter, Designer.Pivot.expandedInFieldsGroup, Designer.Chart.pivotGridDataSourceOptions, Designer.Pivot.fieldName, Report.filterStringEditable, Report.image, Report.imageUrl, Report.maximum, Report.minimum, Report.nullValueText, Report.prefilter, Designer.Pivot.runningTotal, Report.sortFields, Report.summary, Designer.Pivot.showNewValues, Designer.Pivot.sortMode, Designer.Pivot.sortOrder, Designer.Pivot.summaryDisplayType, Designer.Pivot.summaryType, Report.targetValue, Report.tag, Report.text, Report.rtf, Report.textRtf, Report.serializableRtfString, Designer.Pivot.topValueCount, Designer.Pivot.topValueShowOthers, Designer.Pivot.topValueType, Designer.Pivot.unboundExpression, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat, Report.xlsxFormatString, Designer.Pivot.pivotGridFieldsSerializable, Report.valueMember, Report.reportSourceUrl, Report.calculatedFields, Report.parameterBindings, Report.dataBindings([])],
                 "Design": [Report.name, Report.snapGridSize],
-                "Layout": [Report.endBand, Report.endPoint, Report.height, Report.location, Report.size, Report.startBand, Report.startPoint, Designer.Pivot.minWidth, Report.width],
+                "Layout": [Report.startBand, Report.startPoint, Report.endBand, Report.endPoint, Report.height, Report.location, Report.size, Designer.Pivot.minWidth, Report.width],
                 "Navigation": [Report.bookmark, Report.bookmarkParent, Report.bookmarkDuplicateSuppress, Report.target, Report.navigateUrl],
                 "Page Settings": [Report.landscape, Report.rollPaper, Report.pageWidth, Report.pageHeight, Report.paperKind, Report.margins],
                 "Options": Report.pivotGridOptions.concat(Designer.Pivot.options),
                 "KPI": [Designer.Pivot.KPIGraphic],
             };
             Report.formatStringEditorCustomSet = {};
-            function getControls(controls, filter) {
+            function getControls(controls, filter, isNoneItemAdded) {
+                if (isNoneItemAdded === void 0) { isNoneItemAdded = true; }
                 return ko.pureComputed(function () {
                     var result = controls();
                     if (filter) {
@@ -19171,8 +19207,9 @@ var DevExpress;
                     }
                     var allControls = result.map(function (item) {
                         return { displayName: item.name(), value: item };
-                    }), none = { displayName: Designer.localizeNoneString("(none)"), value: null };
-                    allControls.splice(0, 0, none);
+                    });
+                    if (isNoneItemAdded)
+                        allControls.splice(0, 0, { displayName: Designer.localizeNoneString("(none)"), value: null });
                     return allControls;
                 }).extend({ throttle: 1 });
             }
@@ -19191,6 +19228,24 @@ var DevExpress;
                     return result;
                 }
             };
+            function correctModel(model) {
+                if (Array.isArray(model)) {
+                    for (var i = 0; i < model.length; i++) {
+                        if (model[i]["@Ref"] !== undefined) {
+                            model = model[i];
+                            break;
+                        }
+                    }
+                }
+                else {
+                    Object.keys(model).forEach(function (name) {
+                        if (model[name] instanceof Object)
+                            model[name] = correctModel(model[name]);
+                    });
+                }
+                return model;
+            }
+            Report.correctModel = correctModel;
             function customizeDesignerActions(designerModel, nextCustomizer, exitDesigner, state) {
                 var report = designerModel.model, reportPreview = designerModel.reportPreviewModel.reportPreview, reportWizard = designerModel.wizard, dataSourceWizard = designerModel.dataSourceWizard, sqlDataSourceWizard = designerModel.sqlDataSourceWizard, scriptsEditor = designerModel.scriptsEditor;
                 return (function (actions) {
@@ -19941,7 +19996,7 @@ var DevExpress;
                 designerModel.bands = ko.pureComputed(function () {
                     return getControls(designerModel.controlsHelper.allControls, function (item) {
                         return item instanceof Report.BandViewModel && item.bands().length === 0;
-                    });
+                    }, false);
                 });
                 designerModel.chartDataSources = ko.computed(function () {
                     var pivotGrids = designerModel.controlsHelper.allControls().filter(function (item) {
@@ -22701,9 +22756,10 @@ var DevExpress;
                         var self = this;
                         Report.ReportRenderingService.getRichImage(this, propertyName).done(function (result) {
                             if (propertyName === self._lastRequest()) {
+                                self.root && self.root["_update"] && self.root["_update"](true);
                                 if (propertyName !== "height" && propertyName !== "width") {
                                     self._innerUpdate(true);
-                                    if (propertyName !== null && propertyName !== "textRtf") {
+                                    if (propertyName !== "textRtf") {
                                         self.textRtf(result.Text);
                                     }
                                     self._rtf(result.Rtf);
@@ -22711,6 +22767,7 @@ var DevExpress;
                                     self._innerUpdate(false);
                                 }
                                 self._imageSrc("data:image/x;base64," + result.Img);
+                                self.root && self.root["_update"] && self.root["_update"](false);
                             }
                         }).fail(function (jqXHR) {
                             Designer.NotifyAboutWarning("It is impossible to get richText");
