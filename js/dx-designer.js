@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
+/*! DevExpress HTML/JS Designer - v16.1.11 - 2017-02-20
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -2645,7 +2645,7 @@ var DevExpress;
                 }
                 TreeListItemViewModel.prototype._getImageClassName = function (field) {
                     return ko.computed(function () {
-                        return "dx-image-fieldlist-" + (ko.unwrap(field.specifics) || "default").toLowerCase();
+                        return "dx-image-fieldlist-" + (ko.unwrap(field.icon || field.specifics) || "default").toLowerCase();
                     });
                 };
                 TreeListItemViewModel.prototype._getNodeImageClassName = function () {
@@ -11125,7 +11125,7 @@ var DevExpress;
                 return fontStyles;
             };
             CssCalculator.prototype.createPadding = function (paddings) {
-                var padding = {}, paddingModel = new Designer.Widgets.PaddingModel({ value: ko.observable(paddings) });
+                var padding = {}, paddingModel = new Designer.Widgets.PaddingModel(ko.observable(paddings));
                 padding["paddingLeft"] = paddingModel.left() + "px";
                 padding["paddingTop"] = paddingModel.top() + "px";
                 padding["paddingRight"] = paddingModel.right() + "px";
@@ -13361,39 +13361,43 @@ var DevExpress;
         (function (Widgets) {
             var PaddingModel = (function (_super) {
                 __extends(PaddingModel, _super);
-                function PaddingModel(object) {
+                function PaddingModel(value) {
                     var _this = this;
                     _super.call(this);
-                    var isUpdated = false;
                     this.left = ko.observable(0);
                     this.right = ko.observable(0);
                     this.top = ko.observable(0);
                     this.bottom = ko.observable(0);
                     this.dpi = 100;
-                    this._disposables.push(ko.computed(function () {
-                        if (isUpdated)
-                            return;
-                        isUpdated = true;
-                        if (object.value()) {
-                            var val = object.value();
-                            var components = val.split(',');
-                            _this.left(parseFloat(components[0]) || 0);
-                            _this.right(parseFloat(components[1]) || 0);
-                            _this.top(parseFloat(components[2]) || 0);
-                            _this.bottom(parseFloat(components[3]) || 0);
-                            _this.dpi = parseFloat(components[4]) || 100;
-                        }
-                        isUpdated = false;
+                    this.isUpdate = false;
+                    var isUpdate = false;
+                    this._updateModel(value());
+                    this._disposables.push(value.subscribe(function (newVal) {
+                        isUpdate = true;
+                        _this._updateModel(newVal);
+                        isUpdate = false;
                     }));
-                    this._disposables.push(ko.computed(function () {
-                        if (_this.left() || _this.right() || _this.top() || _this.bottom()) {
-                            var result = _this.left() + "," + _this.right() + "," + _this.top() + "," + _this.bottom() + "," + 100;
-                            if (!isUpdated) {
-                                object.value(result);
+                    ["left", "right", "bottom", "top"].forEach(function (val) {
+                        _this._disposables.push(_this[val].subscribe(function (newVal) {
+                            if (!isUpdate) {
+                                value(_this._updateValue(newVal));
                             }
-                        }
-                    }));
+                        }));
+                    });
                 }
+                PaddingModel.prototype._updateModel = function (newVal) {
+                    var components = (newVal || "").split(',');
+                    this.left(parseFloat(components[0]) || 0);
+                    this.right(parseFloat(components[1]) || 0);
+                    this.top(parseFloat(components[2]) || 0);
+                    this.bottom(parseFloat(components[3]) || 0);
+                    this.dpi = parseFloat(components[4]) || 100;
+                };
+                PaddingModel.prototype._updateValue = function (value) {
+                    if (value !== null && value !== undefined) {
+                        return this.left() + "," + this.right() + "," + this.top() + "," + this.bottom() + "," + this.dpi;
+                    }
+                };
                 return PaddingModel;
             })(Designer.Disposable);
             Widgets.PaddingModel = PaddingModel;

@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.10 - 2017-01-30
+/*! DevExpress HTML/JS Designer - v16.1.11 - 2017-02-20
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -6472,10 +6472,7 @@ var DevExpress;
                 defaultVal: "SingleFilePageByPage",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 displayName: "Export Mode",
-                values: {
-                    "SingleFile": "Single File",
-                    "SingleFilePageByPage": "Single File PageByPage",
-                }
+                values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.htmlExportMode = {
                 propertyName: "htmlExportMode",
@@ -6483,7 +6480,7 @@ var DevExpress;
                 defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 displayName: "Export Mode",
-                values: Report.defaultExportMode
+                values: $.extend({}, Report.defaultExportMode)
             };
             Report.embedImagesInHTML = {
                 propertyName: "embedImagesInHTML",
@@ -6499,7 +6496,7 @@ var DevExpress;
                 defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 displayName: "Export Mode",
-                values: Report.defaultExportMode
+                values: $.extend({}, Report.defaultExportMode)
             };
             Report.xlsExportMode = {
                 propertyName: "xlsExportMode",
@@ -6507,7 +6504,7 @@ var DevExpress;
                 defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 displayName: "Export Mode",
-                values: Report.defaultExportMode
+                values: $.extend({}, Report.defaultExportMode)
             };
             Report.xlsxExportMode = {
                 propertyName: "xlsxExportMode",
@@ -6515,7 +6512,7 @@ var DevExpress;
                 defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 displayName: "Export Mode",
-                values: Report.defaultExportMode
+                values: $.extend({}, Report.defaultExportMode)
             };
             Report.textExportMode = {
                 propertyName: "textExportMode",
@@ -6599,7 +6596,7 @@ var DevExpress;
                 editor: Report.htmlExportMode.editor,
                 displayName: Report.htmlExportMode.displayName,
                 from: excludeDifferentFilesMode,
-                values: Report.defaultExportModePreview
+                values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.xlsExportModePreview = {
                 propertyName: Report.xlsExportMode.propertyName,
@@ -6608,7 +6605,7 @@ var DevExpress;
                 editor: Report.xlsExportMode.editor,
                 displayName: Report.xlsExportMode.displayName,
                 from: excludeDifferentFilesMode,
-                values: Report.defaultExportModePreview
+                values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.imageExportModePreview = {
                 propertyName: Report.imageExportMode.propertyName,
@@ -6617,7 +6614,7 @@ var DevExpress;
                 editor: Report.imageExportMode.editor,
                 displayName: Report.imageExportMode.displayName,
                 from: excludeDifferentFilesMode,
-                values: Report.defaultExportModePreview
+                values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.xlsxExportModePreview = {
                 propertyName: Report.xlsxExportMode.propertyName,
@@ -6626,7 +6623,7 @@ var DevExpress;
                 editor: Report.xlsxExportMode.editor,
                 displayName: Report.xlsxExportMode.displayName,
                 from: excludeDifferentFilesMode,
-                values: Report.defaultExportModePreview
+                values: $.extend({}, Report.defaultExportModePreview)
             };
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -7239,17 +7236,27 @@ var DevExpress;
             var htmlExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(htmlExportOptionsSerializationInfoBase);
             var HtmlExportOptionsPreview = (function (_super) {
                 __extends(HtmlExportOptionsPreview, _super);
-                function HtmlExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function HtmlExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
                 }
-                HtmlExportOptionsPreview.from = function (model, serializer) {
-                    return new HtmlExportOptionsPreview(model || {}, serializer);
-                };
                 HtmlExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, htmlExportOptionsSerializationInfoPreview, refs);
+                    return serializer.serialize(value, value.getInfo(), refs);
                 };
                 HtmlExportOptionsPreview.prototype.getInfo = function () {
-                    return htmlExportOptionsSerializationInfoPreview;
+                    var info = [].concat(htmlExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) {
+                            return item.modelName === "@ExportMode";
+                        })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
+                            defaultVal: "SingleFilePageByPage",
+                            values: {
+                                "SingleFilePageByPage": "Single File PageByPage"
+                            }
+                        }));
+                    }
+                    return info;
                 };
                 return HtmlExportOptionsPreview;
             })(HtmlExportOptions);
@@ -7257,17 +7264,27 @@ var DevExpress;
             var imageExportOptionsSerializationInfoPreview = [Report.imageExportModePreview].concat(imageExportOptionsSerializationInfoBase);
             var ImageExportOptionsPreview = (function (_super) {
                 __extends(ImageExportOptionsPreview, _super);
-                function ImageExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function ImageExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
                 }
-                ImageExportOptionsPreview.from = function (model, serializer) {
-                    return new ImageExportOptionsPreview(model || {}, serializer);
-                };
                 ImageExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, imageExportOptionsSerializationInfoPreview, refs);
+                    return serializer.serialize(value, value.getInfo(), refs);
                 };
                 ImageExportOptionsPreview.prototype.getInfo = function () {
-                    return imageExportOptionsSerializationInfoPreview;
+                    var info = [].concat(imageExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) {
+                            return item.modelName === "@ExportMode";
+                        })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.imageExportModePreview, {
+                            defaultVal: "SingleFilePageByPage",
+                            values: {
+                                "SingleFilePageByPage": "Single File PageByPage"
+                            }
+                        }));
+                    }
+                    return info;
                 };
                 return ImageExportOptionsPreview;
             })(ImageExportOptions);
@@ -7275,17 +7292,27 @@ var DevExpress;
             var mhtExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(mhtExportOptionsSerializationInfoBase);
             var MhtExportOptionsPreview = (function (_super) {
                 __extends(MhtExportOptionsPreview, _super);
-                function MhtExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function MhtExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
                 }
-                MhtExportOptionsPreview.from = function (model, serializer) {
-                    return new MhtExportOptionsPreview(model || {}, serializer);
-                };
                 MhtExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, mhtExportOptionsSerializationInfoPreview, refs);
+                    return serializer.serialize(value, value.getInfo(), refs);
                 };
                 MhtExportOptionsPreview.prototype.getInfo = function () {
-                    return mhtExportOptionsSerializationInfoPreview;
+                    var info = [].concat(mhtExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) {
+                            return item.modelName === "@ExportMode";
+                        })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
+                            defaultVal: "SingleFilePageByPage",
+                            values: {
+                                "SingleFilePageByPage": "Single File PageByPage"
+                            }
+                        }));
+                    }
+                    return info;
                 };
                 return MhtExportOptionsPreview;
             })(MhtExportOptions);
@@ -7293,17 +7320,22 @@ var DevExpress;
             var rtfExportOptionsSerializationInfoPreview = [].concat(rtfExportOptionsSerializationInfoBase);
             var RtfExportOptionsPreview = (function (_super) {
                 __extends(RtfExportOptionsPreview, _super);
-                function RtfExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function RtfExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
                 }
-                RtfExportOptionsPreview.from = function (model, serializer) {
-                    return new RtfExportOptionsPreview(model || {}, serializer);
-                };
                 RtfExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, rtfExportOptionsSerializationInfoPreview, refs);
+                    return serializer.serialize(value, value.getInfo(), refs);
                 };
                 RtfExportOptionsPreview.prototype.getInfo = function () {
-                    return rtfExportOptionsSerializationInfoPreview;
+                    var info = [].concat(rtfExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) {
+                            return item.modelName === "@ExportMode";
+                        })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.rtfExportMode, { values: { "SingleFilePageByPage": "Single File PageByPage" } }));
+                    }
+                    return info;
                 };
                 return RtfExportOptionsPreview;
             })(RtfExportOptions);
@@ -7311,17 +7343,27 @@ var DevExpress;
             var xlsExportOptionsSerializationInfoPreview = [Report.xlsExportModePreview].concat(xlsExportOptionsSerializationInfoBase);
             var XlsExportOptionsPreview = (function (_super) {
                 __extends(XlsExportOptionsPreview, _super);
-                function XlsExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function XlsExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
                 }
-                XlsExportOptionsPreview.from = function (model, serializer) {
-                    return new XlsExportOptionsPreview(model || {}, serializer);
-                };
                 XlsExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, xlsExportOptionsSerializationInfoPreview, refs);
+                    return serializer.serialize(value, value.getInfo(), refs);
                 };
                 XlsExportOptionsPreview.prototype.getInfo = function () {
-                    return xlsExportOptionsSerializationInfoPreview;
+                    var info = [].concat(xlsExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) {
+                            return item.modelName === "@ExportMode";
+                        })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsExportModePreview, {
+                            defaultVal: "SingleFilePageByPage",
+                            values: {
+                                "SingleFilePageByPage": "Single File PageByPage"
+                            }
+                        }));
+                    }
+                    return info;
                 };
                 return XlsExportOptionsPreview;
             })(XlsExportOptions);
@@ -7329,49 +7371,62 @@ var DevExpress;
             var xlsxExportOptionsSerializationInfoPreview = [Report.xlsxExportModePreview].concat(xlsxExportOptionsSerializationInfoBase);
             var XlsxExportOptionsPreview = (function (_super) {
                 __extends(XlsxExportOptionsPreview, _super);
-                function XlsxExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function XlsxExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
                 }
-                XlsxExportOptionsPreview.from = function (model, serializer) {
-                    return new XlsxExportOptionsPreview(model || {}, serializer);
-                };
                 XlsxExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, xlsxExportOptionsSerializationInfoPreview, refs);
+                    return serializer.serialize(value, value.getInfo(), refs);
                 };
                 XlsxExportOptionsPreview.prototype.getInfo = function () {
-                    return xlsxExportOptionsSerializationInfoPreview;
+                    var info = [].concat(xlsxExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) {
+                            return item.modelName === "@ExportMode";
+                        })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsxExportModePreview, {
+                            defaultVal: "SingleFilePageByPage",
+                            values: {
+                                "SingleFilePageByPage": "Single File PageByPage"
+                            }
+                        }));
+                    }
+                    return info;
                 };
                 return XlsxExportOptionsPreview;
             })(XlsxExportOptions);
             Report.XlsxExportOptionsPreview = XlsxExportOptionsPreview;
             var ExportOptionsPreview = (function (_super) {
                 __extends(ExportOptionsPreview, _super);
-                function ExportOptionsPreview() {
-                    _super.apply(this, arguments);
+                function ExportOptionsPreview(model, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, model, serializer);
                 }
-                ExportOptionsPreview.from = function (model, serializer) {
-                    return new ExportOptionsPreview(model || {}, serializer);
+                ExportOptionsPreview.prototype._generateFromFunction = function (exportType) {
+                    var isMerged = this._isMerged;
+                    return function (model, serializer) {
+                        return new exportType(model || {}, isMerged, serializer);
+                    };
                 };
-                ExportOptionsPreview.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, exportOptionsSerializationInfoPreview, refs);
+                ExportOptionsPreview.prototype._generateInfo = function () {
+                    return [
+                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: this._generateFromFunction(HtmlExportOptionsPreview), toJsonObject: HtmlExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: this._generateFromFunction(ImageExportOptionsPreview), toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: this._generateFromFunction(MhtExportOptionsPreview), toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: this._generateFromFunction(RtfExportOptionsPreview), toJsonObject: RtfExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: this._generateFromFunction(XlsExportOptionsPreview), toJsonObject: XlsExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: this._generateFromFunction(XlsxExportOptionsPreview), toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                    ];
                 };
                 ExportOptionsPreview.prototype.getInfo = function () {
-                    return exportOptionsSerializationInfoPreview;
+                    return this._generateInfo();
                 };
                 return ExportOptionsPreview;
             })(ExportOptions);
             Report.ExportOptionsPreview = ExportOptionsPreview;
-            var exportOptionsSerializationInfoPreview = [
-                { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: HtmlExportOptionsPreview.from, toJsonObject: HtmlExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: ImageExportOptionsPreview.from, toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: MhtExportOptionsPreview.from, toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: RtfExportOptionsPreview.from, toJsonObject: RtfExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: XlsExportOptionsPreview.from, toJsonObject: XlsExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptionsPreview.from, toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
-            ];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -8718,6 +8773,7 @@ var DevExpress;
                     return this.initialize(deferred.promise());
                 };
                 ReportPreview.prototype.initialize = function (initializeDataPromise) {
+                    var _this = this;
                     this._currentReportId(null);
                     this._currentDocumentId(null);
                     var _self = this;
@@ -8733,7 +8789,7 @@ var DevExpress;
                             if (previewInitialize.pageWidth) {
                                 _self._pageWidth(previewInitialize.pageWidth);
                             }
-                            var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(previewInitialize.exportOptions && JSON.parse(previewInitialize.exportOptions));
+                            var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(previewInitialize.exportOptions && JSON.parse(previewInitialize.exportOptions), !_this.reportId);
                             _self.exportOptionsModel(deserializedExportOptions);
                             _self.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
@@ -8882,7 +8938,7 @@ var DevExpress;
                 ReportPreview.prototype.printDocument = function (pageIndex) {
                     if (!this._currentDocumentId())
                         return;
-                    var exportOptions = new DevExpress.Designer.Report.ExportOptionsPreview({});
+                    var exportOptions = new DevExpress.Designer.Report.ExportOptionsPreview({}, !this.reportId);
                     exportOptions.pdf["showPrintDialogOnOpen"] = true;
                     pageIndex = parseInt(pageIndex);
                     if ((!!pageIndex && pageIndex > 0 || pageIndex === 0) && (this.pages().length > pageIndex)) {
@@ -10542,6 +10598,7 @@ var DevExpress;
                 function ExplorerEditor(modelPropertyInfo, level, parentDisabled) {
                     var _this = this;
                     _super.call(this, modelPropertyInfo, level, parentDisabled);
+                    this._collectionNames = ["controls", "bands", "subbands"];
                     this.displayExpr = ko.computed(function () {
                         var value = ko.unwrap(_this.value);
                         return value && ko.unwrap(value.displayName || value.name) || "";
@@ -10549,14 +10606,32 @@ var DevExpress;
                     this.itemsProvider = new Designer.ObjectExplorerProvider([{ model: ko.computed(function () {
                         return _this._model() && _this._model()["root"];
                     }), displayName: "Report", className: "master_report" }], ["bands", "controls", "rows", "cells", "subBands"], this.value, Report.ReportExplorerModel.getPathByMember);
+                    this.itemsProvider.path("Report");
                     this.treeListController = new Designer.ObjectStructureTreeListController(["bands", "controls", "rows", "cells", "Report"]);
                     this.treeListController.canSelect = function (item) {
                         return !item.hasItems && !(item.data && (item.data["data"] instanceof Report.BandViewModel));
                     };
                     this.treeListController.itemsFilter = function (item) {
-                        return !(item["data"] instanceof Report.TableOfContentsViewModel);
+                        return item && item["data"] && _this._isVisible(item["data"]);
                     };
                 }
+                ExplorerEditor.prototype._isVisible = function (item) {
+                    if (item instanceof Report.BandViewModel) {
+                        for (var i = 0; i < this._collectionNames.length; i++) {
+                            var collection = item[this._collectionNames[i]] && item[this._collectionNames[i]]();
+                            if (collection) {
+                                for (var j = 0; j < collection.length; j++) {
+                                    if (this._isVisible(collection[j]))
+                                        return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                    else {
+                        return item !== this._model() && item.controlType !== "XRTableOfContents" && item.controlType !== "XRPivotGrid" && item.controlType !== "XRPageBreak" && item.controlType !== "XRSubreport" && item.controlType !== "PivotGridField";
+                    }
+                };
                 return ExplorerEditor;
             })(DevExpress.JS.Widgets.Editor);
             Report.ExplorerEditor = ExplorerEditor;
@@ -10569,8 +10644,9 @@ var DevExpress;
                     ko.computed(function () {
                         if (_this._model() && _this._model() instanceof Report.BandViewModel) {
                             var bands = _this._model().parentModel()["bands"]();
-                            var target = bands[bands.indexOf(_this._model()) - 1];
-                            if (target && (target.controlType === "GroupHeaderBand" || target.controlType === "DetailBand")) {
+                            var position = bands.indexOf(_this._model());
+                            var target = _this._findFistAvailableBand(bands, bands.indexOf(_this._model()) - 1);
+                            if (target) {
                                 _this._setDisabled(false);
                                 _this.itemsProvider.path(Report.ReportExplorerModel.getPathByMember(target));
                             }
@@ -10595,6 +10671,21 @@ var DevExpress;
                         info.disabled = ko.observable(value);
                     }
                 };
+                DrillDownEditor.prototype._findFistAvailableBand = function (bands, position) {
+                    if (position === -1) {
+                        return null;
+                    }
+                    var target = bands[position];
+                    if (target && (target.controlType === "GroupHeaderBand" || target.controlType === "DetailBand")) {
+                        return target;
+                    }
+                    else if (target) {
+                        return this._findFistAvailableBand(bands, position - 1);
+                    }
+                    else {
+                        return null;
+                    }
+                };
                 return DrillDownEditor;
             })(ExplorerEditor);
             Report.DrillDownEditor = DrillDownEditor;
@@ -10602,7 +10693,7 @@ var DevExpress;
                 __extends(PaddingEditor, _super);
                 function PaddingEditor(info, level, parentDisabled) {
                     _super.call(this, info, level, parentDisabled);
-                    var model = ko.observable(new Designer.Widgets.PaddingModel({ value: this.value }));
+                    var model = ko.observable(new Designer.Widgets.PaddingModel(this.value));
                     var grid = new DevExpress.JS.Widgets.ObjectProperties(model, { editors: Report.paddingSerializationsInfo }, level + 1, this.disabled);
                     this.viewmodel = grid;
                 }
@@ -10692,6 +10783,46 @@ var DevExpress;
                 return FormattingRuleEditor;
             })(DevExpress.JS.Widgets.Editor);
             Report.FormattingRuleEditor = FormattingRuleEditor;
+            var BandEditorBase = (function (_super) {
+                __extends(BandEditorBase, _super);
+                function BandEditorBase() {
+                    var _this = this;
+                    _super.apply(this, arguments);
+                    this.generateValue = function (bands) {
+                        if (!_this.bands) {
+                            _this.bands = bands(_this.filter, _this.noneNeaded);
+                        }
+                        return _this.bands;
+                    };
+                    this.bands = null;
+                }
+                return BandEditorBase;
+            })(DevExpress.JS.Widgets.Editor);
+            Report.BandEditorBase = BandEditorBase;
+            var RunningBandEditor = (function (_super) {
+                __extends(RunningBandEditor, _super);
+                function RunningBandEditor() {
+                    _super.apply(this, arguments);
+                    this.filter = function (item) {
+                        return item.controlType === "GroupHeaderBand" || item.controlType === "DetailReportBand";
+                    };
+                    this.noneNeaded = true;
+                }
+                return RunningBandEditor;
+            })(BandEditorBase);
+            Report.RunningBandEditor = RunningBandEditor;
+            var BandsEditor = (function (_super) {
+                __extends(BandsEditor, _super);
+                function BandsEditor() {
+                    _super.apply(this, arguments);
+                    this.filter = function (item) {
+                        return item.bands().length === 0;
+                    };
+                    this.noneNeaded = false;
+                }
+                return BandsEditor;
+            })(BandEditorBase);
+            Report.BandsEditor = BandsEditor;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -10715,10 +10846,14 @@ var DevExpress;
                     this["conditionObj"] = {
                         value: this["condition"],
                         path: ko.pureComputed(function () {
-                            if (_this["dataSource"]() && _this["dataMember"]()) {
-                                return _this.getPath("") + (_this["dataMember"]() ? "." + _this["dataMember"]() : "");
+                            var dsPath = _this.getPath("");
+                            if (!!dsPath) {
+                                var dataMember = _this["dataMember"]() || parent.dataMember();
+                                return dsPath + (dataMember ? "." + dataMember : "");
                             }
-                            return parent.getPath("dataMember") + (parent["dataMember"]() ? "." + parent["dataMember"]() : "");
+                            else {
+                                return dsPath;
+                            }
                         })
                     };
                 }
@@ -10729,7 +10864,7 @@ var DevExpress;
                     return Report.formattingRuleSerializationsInfo;
                 };
                 FormattingRule.prototype.getPath = function (propertyName) {
-                    return this.parent && this.parent.dsHelperProvider() && this.parent.dsHelperProvider().getDataSourcePath(this["dataSource"]());
+                    return this.parent && this.parent.dsHelperProvider() && this.parent.dsHelperProvider().getDataSourcePath(this["dataSource"]() || this.parent.dataSource());
                 };
                 return FormattingRule;
             })();
@@ -10771,7 +10906,8 @@ var DevExpress;
                 dataBinding: { header: "dxrd-dataBinding", content: "dxrd-dataBindingContent", editorType: Designer.Widgets.FieldListEditor },
                 reportExplorer: { header: "dxrd-reportexplorer-editor", editorType: Report.ExplorerEditor },
                 reportSourceUrl: { header: "dxrd-reportSourceUrl" },
-                bands: { header: "dxrd-bands" },
+                bands: { header: "dxrd-bands", editorType: Report.BandsEditor },
+                runningBand: { header: "dxrd-bands", editorType: Report.RunningBandEditor },
                 style: { header: "dxrd-style", content: "dxrd-styleContent" },
                 stylePriority: { header: "dxrd-stylePriority" },
                 shape: { header: "dxrd-shapeHeader", content: "dxrd-shapeContent" },
@@ -11004,6 +11140,8 @@ var DevExpress;
                 "Avg": "Average",
                 "Count": "Count",
                 "Sum": "Sum",
+                "RunningSum": "Running Summary",
+                "Percentage": "Percentage",
                 "Max": "Max",
                 "Min": "Min",
                 "Median": "Median",
@@ -11018,6 +11156,7 @@ var DevExpress;
                 "DVarP": "Population Variance (Distinct)",
                 "DStdDev": "Standard Deviation (Distinct)",
                 "DStdDevP": "Standard Population Deviation (Distinct)",
+                "RecordNumber": "Record Number",
                 "Custom": "Custom"
             };
             Report.summarySerializationInfo = [
@@ -12686,6 +12825,14 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                Object.defineProperty(Parameter.prototype, "icon", {
+                    get: function () {
+                        var typeValue = this._getTypeValue(this.type());
+                        return typeValue && typeValue.icon;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 Object.defineProperty(Parameter.prototype, "defaultValue", {
                     get: function () {
                         var typeValue = this._getTypeValue(this.type());
@@ -12735,7 +12882,7 @@ var DevExpress;
                     { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) {
                         return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null);
                     } },
-                    { value: "System.Guid", displayValue: "Guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) {
+                    { value: "System.Guid", displayValue: "Guid", icon: "guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) {
                         return DevExpress.Designer.validateGuid(val) ? val : Parameter.defaultGuidValue;
                     }, specifics: "String" }
                 ];
@@ -14832,8 +14979,12 @@ var DevExpress;
                     _super.call(this, model, parent, serializer);
                     this._chartStructure = ko.observable();
                     this._chartElement = ko.observable({});
-                    this._disposables.push(ko.computed(function () {
-                        _this._setDataMembers(_this.isPivotGridDataSource);
+                    var isPivotGridDataSource = ko.observable(this.dataSource() instanceof Report.XRPivotGridViewModel);
+                    this._disposables.push(this.dataSource.subscribe(function (newDataSource) {
+                        isPivotGridDataSource(newDataSource instanceof Report.XRPivotGridViewModel);
+                    }));
+                    this._disposables.push(isPivotGridDataSource.subscribe(function (val) {
+                        _this._setDataMembers(val);
                     }));
                     this._initChartElementFunctions();
                     this._assignChartPropertiesFromNestedObjects();
@@ -15850,7 +16001,7 @@ var DevExpress;
                     }));
                     this._disposables.push(ko.computed(function () {
                         if (_this.isAutoSize && _this.image.peek()) {
-                            var borders = new Designer.Widgets.BordersModel({ value: _this["borders"] }), borderWidth = _this["borderWidth"]() || 0, top, bottom, left, right, paddings = new Designer.Widgets.PaddingModel({ value: _this["padding"] });
+                            var borders = new Designer.Widgets.BordersModel({ value: _this["borders"] }), borderWidth = _this["borderWidth"]() || 0, top, bottom, left, right, paddings = new Designer.Widgets.PaddingModel(_this["padding"]);
                             top = borders.top() ? borderWidth : 0;
                             bottom = borders.bottom() ? borderWidth : 0;
                             left = borders.left() ? borderWidth : 0;
@@ -17562,7 +17713,7 @@ var DevExpress;
                 modelName: "@RunningBand",
                 link: true,
                 displayName: "Running Band",
-                editor: Report.editorTemplates.bands
+                editor: Report.editorTemplates.runningBand
             };
             Report.pageInfoSerializationsInfo = [
                 Report.anchorVertical,
@@ -19988,16 +20139,17 @@ var DevExpress;
                 designerModel.fieldListDataSources = fieldListDataSources;
                 designerModel.dataSourceHelper = dataSourceHelper;
                 designerModel.selectedPath = selectedPath;
-                designerModel.controls = ko.pureComputed(function () {
-                    return getControls(designerModel.controlsHelper.allControls, function (item) {
-                        return !(item instanceof Report.BandViewModel || item instanceof Report.ReportViewModel);
-                    });
+                designerModel.controls = getControls(designerModel.controlsHelper.allControls, function (item) {
+                    return !(item instanceof Report.BandViewModel || item instanceof Report.ReportViewModel);
                 });
-                designerModel.bands = ko.pureComputed(function () {
-                    return getControls(designerModel.controlsHelper.allControls, function (item) {
-                        return item instanceof Report.BandViewModel && item.bands().length === 0;
-                    }, false);
+                var bands = getControls(designerModel.controlsHelper.allControls, function (item) {
+                    return item instanceof Report.BandViewModel;
                 });
+                designerModel.bands = function (filter, IsNoneNeaded) {
+                    return getControls(designerModel.controlsHelper.allControls, function (item) {
+                        return item instanceof Report.BandViewModel && (filter ? filter(item) : true);
+                    }, IsNoneNeaded);
+                };
                 designerModel.chartDataSources = ko.computed(function () {
                     var pivotGrids = designerModel.controlsHelper.allControls().filter(function (item) {
                         return item instanceof Report.XRPivotGridViewModel;
