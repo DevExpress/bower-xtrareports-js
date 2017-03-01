@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
+/*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -521,6 +521,13 @@
 .dx-treelist-item:hover .dx-image-fieldlist-view {
   background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCA2aDR2NEgwek02IDZoNHY0SDZ6TTEyIDZoNHY0aC00ek0xOCA2aDR2NGgtNHpNMCAxMmg0djRIMHpNNiAxMmg0djRINnpNMCAxOGg0djRIMHpNNiAxOGg0djRINnpNMCAwaDIydjRIMHpNMjMuNyAyMi4zbC0yLjUtMi41Yy41LS44LjgtMS44LjgtMi44IDAtMi44LTIuMi01LTUtNXMtNSAyLjItNSA1IDIuMiA1IDUgNWMxIDAgMi0uMyAyLjgtLjhsMi41IDIuNWMuNC40IDEgLjQgMS40IDAgLjQtLjQuNC0xIDAtMS40ek0xNyAyMGMtMS43IDAtMy0xLjMtMy0zczEuMy0zIDMtMyAzIDEuMyAzIDMtMS4zIDMtMyAzeiIvPjwvc3ZnPg==");
 }
+.dx-image-fieldlist-guid {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzZENkQ2RDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTAgMTB2MTBoOFYyaC0ydjhoLTZ6bTIgMmg0djZoLTR2LTZ6TTYgMTBoMnYxMEg2ek02IDZoMnYySDZ6Ii8+PC9zdmc+");
+  background-repeat: no-repeat;
+}
+.dx-treelist-item:hover .dx-image-fieldlist-guid {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTAgMTB2MTBoOFYyaC0ydjhoLTZ6bTIgMmg0djZoLTR2LTZ6TTYgMTBoMnYxMEg2ek02IDZoMnYySDZ6Ii8+PC9zdmc+");
+}
 .dx-popup-general .dx-texteditor:not(.dxrd-multiline) {
   height: 26px;
   /*.dx-numberbox-spin-container {
@@ -1009,8 +1016,8 @@
   right: 20px;
   overflow: hidden;
   max-height: 30px;
-  -ms-word-break: break-all;
-  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
   color: #2b2b2b;
   font-size: 11px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
@@ -4605,12 +4612,31 @@
   position: absolute;
   box-sizing: border-box;
 }
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-borders {
+  display: none;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container:not(.readonly):hover .dxrp-editing-field-borders,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container.active .dxrp-editing-field-borders {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid gray;
+  -webkit-box-shadow: inset 0px 0px 0px 1px gray;
+  -moz-box-shadow: inset 0px 0px 0px 1px gray;
+  box-shadow: inset 0px 0px 0px 1px gray;
+}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-content {
   width: 100%;
   height: 100%;
   overflow: hidden;
   cursor: text;
   background-color: rgba(255, 255, 255, 0.01);
+  position: relative;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text {
   width: 100%;
@@ -4697,12 +4723,31 @@
   position: absolute;
   box-sizing: border-box;
 }
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-borders {
+  display: none;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb:not(.readonly):hover .dxrp-editing-field-borders,
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb.active .dxrp-editing-field-borders {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid gray;
+  -webkit-box-shadow: inset 0px 0px 0px 1px gray;
+  -moz-box-shadow: inset 0px 0px 0px 1px gray;
+  box-shadow: inset 0px 0px 0px 1px gray;
+}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-content {
   width: 100%;
   height: 100%;
   overflow: hidden;
   cursor: text;
   background-color: rgba(255, 255, 255, 0.01);
+  position: relative;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text {
   width: 100%;

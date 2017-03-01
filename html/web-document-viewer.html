@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
+<!-- /*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -242,7 +242,7 @@
                 </div>
                 <!-- /ko-->
             </div>
-            <div class="dx-expressioneditor-description" data-bind="text: description"></div>
+            <div class="dx-expressioneditor-description" data-bind="text: description, attr: { title: description }"></div>
             <!-- /ko -->
         </div>
     </div>
@@ -253,7 +253,7 @@
         <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: value, buttonAction: function() { popupVisible(true); }, disabled: disabled }"></div>
         <div class="dx-expressioneditor dx-popup-general" data-bind="dxPopup: {
             showTitle: true,
-            title: DevExpress.JS.Utils.getLocalization('Expression Editor'),
+            title: DevExpress.Designer.getLocalization('Expression Editor', 'XtraEditorsExpressionEditor.Expression.Text'),
             visible: popupVisible,
             toolbarItems: buttonItems,
             showCloseButton: true,
@@ -287,7 +287,7 @@
         <div data-bind="dxdAccordion: { collapsed: collapsed }">
             <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header">
                 <div class="dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
-                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: DevExpress.JS.Utils.getLocalization(display)"></span>
+                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: display"></span>
             </div>
             <div class="dx-accordion-content">
                 <!-- ko foreach: items-->
@@ -1148,7 +1148,7 @@
 
 <script type="text/html" id="dxrd-field">
     <!-- ko displayNameExtender: { path: path, dataMember: value } -->
-    <div data-bind="dxFieldListPicker: { path: path, value: value, displayExpr: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
+    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
     <!-- /ko -->
 </script>
 
@@ -1182,6 +1182,7 @@
 </script>
 <script type="text/html" id="dxrp-editing-field-container">
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
+        <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>
         <div class="dxrp-editing-field-content" data-bind="click: activateEditor">
             <!-- ko if: !active() || field.readOnly()  -->
             <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap},  text: field.editValue"></div>
@@ -1306,8 +1307,10 @@
         <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
         <!--/ko-->
         <!--/ko-->
+        <!-- ko ifnot: pageLoading -->
         <!-- ko foreach: editingFields() -->
         <!-- ko template: template -->
+        <!--/ko-->
         <!--/ko-->
         <!--/ko-->
     </div>
@@ -1449,8 +1452,10 @@
         <!-- ko template: { name: "dxrd-page-brick", data: brick } -->
         <!--/ko-->
         <!--/ko-->
+        <!-- ko ifnot: pageLoading -->
         <!-- ko foreach: editingFields() -->
         <!-- ko template: template -->
+        <!--/ko-->
         <!--/ko-->
         <!--/ko-->
     </div>
@@ -1482,7 +1487,7 @@
     <!-- ko with: model -->
     <div class="dxrd-preview-search-tab-header">
         <span class="dxrd-preview-search-tab-header-text" data-bind="text: DevExpress.Designer.getLocalization('Search')"></span>
-        <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: function() { return $data; } } "></div>
+        <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: $data } "></div>
         <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: DevExpress.Designer.getLocalization('Match case')}"></div>
         <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: DevExpress.Designer.getLocalization('Match whole word only')}"></div>
     </div>
@@ -1535,7 +1540,7 @@
 
 <script type="text/html" id="dxrd-preview-pager">
     <div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">
-        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout }"></div>
+        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled }"></div>
         <div class="dxrd-toolbar-item-separator" data-bind="visible: $data.hasSeparator"></div>
     </div>
 </script>

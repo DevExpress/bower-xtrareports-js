@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
+<!-- /*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -242,7 +242,7 @@
                 </div>
                 <!-- /ko-->
             </div>
-            <div class="dx-expressioneditor-description" data-bind="text: description"></div>
+            <div class="dx-expressioneditor-description" data-bind="text: description, attr: { title: description }"></div>
             <!-- /ko -->
         </div>
     </div>
@@ -253,7 +253,7 @@
         <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: value, buttonAction: function() { popupVisible(true); }, disabled: disabled }"></div>
         <div class="dx-expressioneditor dx-popup-general" data-bind="dxPopup: {
             showTitle: true,
-            title: DevExpress.JS.Utils.getLocalization('Expression Editor'),
+            title: DevExpress.Designer.getLocalization('Expression Editor', 'XtraEditorsExpressionEditor.Expression.Text'),
             visible: popupVisible,
             toolbarItems: buttonItems,
             showCloseButton: true,
@@ -287,7 +287,7 @@
         <div data-bind="dxdAccordion: { collapsed: collapsed }">
             <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header">
                 <div class="dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
-                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: DevExpress.JS.Utils.getLocalization(display)"></span>
+                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: display"></span>
             </div>
             <div class="dx-accordion-content">
                 <!-- ko foreach: items-->
@@ -1148,7 +1148,7 @@
 
 <script type="text/html" id="dxrd-field">
     <!-- ko displayNameExtender: { path: path, dataMember: value } -->
-    <div data-bind="dxFieldListPicker: { path: path, value: value, displayExpr: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
+    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>
     <!-- /ko -->
 </script>
 
@@ -1833,7 +1833,7 @@
 
 <script type="text/html" id="dxrd-select-control">
     <div data-bind="text: DevExpress.Designer.getLocalization('SQL string:')"></div>
-    <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: 'keyup', disabled: disableCustomSql() }"></div>
+    <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: 'keyup input blur', disabled: disableCustomSql() }"></div>
 </script>
 
 <script type="text/html" id="dxrd-procedures-control">
@@ -1958,16 +1958,16 @@
         </div>
         <div class="dxrd-wizard-navigation">
             <!-- ko with: currentStep.actionCancel  -->
-            <div data-bind="dxButton: { text: DevExpress.Designer.getLocalization(text), onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn left"></div>
+            <div data-bind="dxButton: { text: text, onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn left"></div>
             <!-- /ko -->
             <!-- ko with: currentStep.actionFinish  -->
-            <div data-bind="dxButton: { text: DevExpress.Designer.getLocalization(text), onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>
+            <div data-bind="dxButton: { text: text, onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>
             <!-- /ko -->
             <!-- ko with: currentStep.actionNext  -->
-            <div data-bind="dxButton: { text: DevExpress.Designer.getLocalization(text), onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>
+            <div data-bind="dxButton: { text: text, onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>
             <!-- /ko -->
             <!-- ko with: currentStep.actionPrevious  -->
-            <div data-bind="dxButton: { text: DevExpress.Designer.getLocalization(text), onClick: handler, disabled: $parent.isPreviousButtonDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>
+            <div data-bind="dxButton: { text: text, onClick: handler, disabled: $parent.isPreviousButtonDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>
             <!-- /ko -->
         </div>
     </div>
@@ -1976,8 +1976,8 @@
 
 <script type="text/html" id="dxrd-wizard-header-custom">
     <div class="dxrd-wizard-header-custom">
-        <div class="dxrd-span-title" data-bind="text: DevExpress.Designer.getLocalization(currentStep.title)"></div>
-        <div class="dxrd-span-description" data-bind="text: DevExpress.Designer.getLocalization(currentStep.description), attr: { title: DevExpress.Designer.getLocalization(currentStep.description) }"></div>
+        <div class="dxrd-span-title" data-bind="text: currentStep.title"></div>
+        <div class="dxrd-span-description" data-bind="text: currentStep.description, attr: { title: currentStep.description }"></div>
     </div>
 </script>
 <script type="text/html" id="dx-chart-leftPanel">
@@ -2069,6 +2069,7 @@
 </script>
 <script type="text/html" id="dxrp-editing-field-container">
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
+        <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>
         <div class="dxrp-editing-field-content" data-bind="click: activateEditor">
             <!-- ko if: !active() || field.readOnly()  -->
             <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap},  text: field.editValue"></div>
@@ -2193,8 +2194,10 @@
         <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
         <!--/ko-->
         <!--/ko-->
+        <!-- ko ifnot: pageLoading -->
         <!-- ko foreach: editingFields() -->
         <!-- ko template: template -->
+        <!--/ko-->
         <!--/ko-->
         <!--/ko-->
     </div>
@@ -2336,8 +2339,10 @@
         <!-- ko template: { name: "dxrd-page-brick", data: brick } -->
         <!--/ko-->
         <!--/ko-->
+        <!-- ko ifnot: pageLoading -->
         <!-- ko foreach: editingFields() -->
         <!-- ko template: template -->
+        <!--/ko-->
         <!--/ko-->
         <!--/ko-->
     </div>
@@ -2369,7 +2374,7 @@
     <!-- ko with: model -->
     <div class="dxrd-preview-search-tab-header">
         <span class="dxrd-preview-search-tab-header-text" data-bind="text: DevExpress.Designer.getLocalization('Search')"></span>
-        <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: function() { return $data; } } "></div>
+        <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: $data } "></div>
         <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: DevExpress.Designer.getLocalization('Match case')}"></div>
         <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: DevExpress.Designer.getLocalization('Match whole word only')}"></div>
     </div>
@@ -2422,7 +2427,7 @@
 
 <script type="text/html" id="dxrd-preview-pager">
     <div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">
-        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout }"></div>
+        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled }"></div>
         <div class="dxrd-toolbar-item-separator" data-bind="visible: $data.hasSeparator"></div>
     </div>
 </script>
@@ -3339,8 +3344,10 @@
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- ko foreach: crossBandControls -->
+                                <!-- ko if: visible -->
                                 <div class="dxrd-cross-band" data-bind="visible: isSelected() && !DevExpress.Designer.DragDropHandler.started(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
                                 </div>
+                                <!-- /ko -->
                                 <!-- /ko -->
                             </div>
 
@@ -3355,7 +3362,9 @@
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- ko foreach: crossBandControls -->
+                                <!-- ko if: visible -->
                                 <!-- ko template: { name: template } -->
+                                <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <svg style="height: 100%; position: absolute; top: 0; width: 1px; z-index:-1" data-bind="styleunit: { left: leftMarginOffset() }">
@@ -3804,7 +3813,7 @@
 </script>
 
 <script type="text/html" id="dxrd-bands">
-    <div data-bind="dxSelectBox: { items: $root.bands, value: value, displayExpr: 'displayName', valueExpr: 'value', displayCustomValue: true, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { items: generateValue($root.bands), value: value, displayExpr: 'displayName', valueExpr: 'value', displayCustomValue: true, disabled: disabled, placeholder: DevExpress.Designer.getLocalization('(none)') }"></div>
 </script>
 
 <script type="text/html" id="dxrd-formattingRuleCollection">
@@ -3969,7 +3978,7 @@
 <script type='text/html' id='dxrd-page-columns'>
 <div class="dxrd-wizard-page dxrd-wizard-columns-page">
     <div class="dxrd-wizard-left-panel">
-        <div class="dxrd-wizard-list-title" data-bind="text: DevExpress.Designer.getLocalization('Available fields')"></div>
+        <div class="dxrd-wizard-list-title" data-bind="text: availableFields.caption"></div>
         <div class="dxrd-wizard-list" data-bind="dxList: { items: availableFields.items, selectedItems: availableFields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: availableFieldClick }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.availableFieldDblClick }">
                 <div data-bind="text: displayName"></div>
@@ -3983,7 +3992,7 @@
         <div class="dxrd-wizard-splitter-action" data-bind="dxButton: { onClick: unselectAll, disabled: !isUnselectEnable(), icon: 'dxrd-image-moveleft-all' }"></div>
     </div>
     <div class="dxrd-wizard-right-panel">
-        <div class="dxrd-wizard-list-title" data-bind="text: DevExpress.Designer.getLocalization('Selected fields')"></div>
+        <div class="dxrd-wizard-list-title" data-bind="text: selectedFields.caption"></div>
         <div class="dxrd-wizard-list" data-bind="dxList: { items: selectedFields.items, selectedItems: selectedFields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: selectedFieldClick }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.selectedFieldDblClick }">
                 <div data-bind="text: displayName"></div>
@@ -3999,7 +4008,7 @@
         <div class="dxrd-wizard-customizelabel-list">
             <div class="dxrd-wizard-customizelabel-head-props">
                 <div class="dxrd-wizard-customizelabel-select-papersize">
-                    <span data-bind="text: DevExpress.Designer.getLocalization('Page Size:')"></span>
+                    <span data-bind="text: DevExpress.Designer.getLocalization('Page Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSize')"></span>
                     <div data-bind="dxSelectBox: { items: labelData.paperKinds, displayExpr: 'name', value: selectedPaperSize, itemTemplate: 'PaperSizeText',
                             onOpened: function (e) {
                                 e.component._popup.option('width', 300);
@@ -4021,35 +4030,35 @@
             <div class="dxrd-wizard-customizelabel-props-container">
                 <div class="dxrd-wizard-customizelabel-props">
                     <div>
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Label Width:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Label Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: labelWidth }"></div>
                     </div>
                     <div>
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Label Height:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Label Height:', 'ASPxReportsStringId.ReportDesigner_Wizard_LabelHeight')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: labelHeight }"></div>
                     </div>
                     <div class="dxrd-wizard-customizelabel-prop-whis-top-margin">
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Horizontal Pitch:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Horizontal Pitch:', 'ASPxReportsStringId.ReportDesigner_Wizard_HorizontalPitch')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: horizontalPitch }"></div>
                     </div>
                     <div>
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Vertical Pitch:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Vertical Pitch:', 'ASPxReportsStringId.ReportDesigner_Wizard_VerticalPitch')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: verticalPitch }"></div>
                     </div>
                     <div class="dxrd-wizard-customizelabel-prop-whis-top-margin">
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Top Margin:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Top Margin:', 'ASPxReportsStringId.ReportDesigner_Wizard_TopMargin')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: topMargin }"></div>
                     </div>
                     <div>
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Left Margin:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Left Margin:', 'ASPxReportsStringId.ReportDesigner_Wizard_LeftMargin')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: leftMargin }"></div>
                     </div>
                     <div>
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Right Margin:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Right Margin:', 'ASPxReportsStringId.ReportDesigner_Wizard_')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: rightMargin }"></div>
                     </div>
                     <div>
-                        <span data-bind="text: DevExpress.Designer.getLocalization('Bottom Margin:')"></span>
+                        <span data-bind="text: DevExpress.Designer.getLocalization('Bottom Margin:', 'ASPxReportsStringId.ReportDesigner_Wizard_BottomMargin')"></span>
                         <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: stepUnit, value: bottomMargin }"></div>
                     </div>
 
@@ -4082,7 +4091,7 @@
 <script type='text/html' id='dxrd-page-groups'>
 <div class="dxrd-wizard-page dxrd-wizard-groups-page">
     <div class="dxrd-wizard-left-panel">
-        <div class="dxrd-wizard-list-title" data-bind="text: DevExpress.Designer.getLocalization('Available fields')"></div>
+        <div class="dxrd-wizard-list-title" data-bind="text: fields.caption"></div>
         <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: fields.items, selectedItems: fields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
                 <div data-bind="text: $data"></div>
@@ -4097,7 +4106,7 @@
         <div class="dxrd-wizard-splitter-action" data-bind="dxButton: { onClick: moveDown, disabled: !isMoveDownEnabled(), icon: 'dxrd-image-movedown' }"></div>
     </div>
     <div class="dxrd-wizard-right-panel">
-        <div class="dxrd-wizard-list-title" data-bind="text: DevExpress.Designer.getLocalization('Groups')"></div>
+        <div class="dxrd-wizard-list-title" data-bind="text: groups.caption"></div>
         <div class="dxrd-wizard-list" data-bind="dxList: { items: groups.items, height: 257, selectionMode: 'single', selectedItems: groups.activeItemArray, activeStateEnabled: false, onItemClick: groupClick }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
                 <div data-bind="text: fields().join(', ')"></div>
@@ -4112,19 +4121,19 @@
         <div class="dxrd-report-layout-type-items" data-bind="css: { 'dxrd-report-layout-type-five-items': layoutTypeItems()[0].margin == 1 }">
             <div>
                 <div data-bind="dxRadioGroup: { value: selectedPageOrientation, items: pageOrientationItems, layout: 'horizontal' }">
-                    <div data-options="dxTemplate : { name: 'item' }">
-                        <div data-bind="text: DevExpress.Designer.getLocalization($data)"></div>
+                    <div data-options="dxTemplate : { name: 'text' }">
+                        <div data-bind="text: $data"></div>
                     </div>
                 </div>
             </div>
             <!-- ko foreach: layoutTypeItems -->
             <div class="dxrd-report-layout-type-item" data-bind="event: { click: $parent.layoutTypeItemClick }, css: { selected: $parent.isSelected($data) }, style: { margin: '0 ' + margin + 'px' }">
                 <div data-bind="attr: { class: imageClassName }"></div>
-                <div data-bind="text: DevExpress.Designer.getLocalization(text)" class="dxrd-report-layout-type-text"></div>
+                <div data-bind="text: text" class="dxrd-report-layout-type-text"></div>
             </div>
             <!-- /ko -->
             <div style="clear:both"></div>
-            <div data-bind="dxCheckBox: { value: fitFieldsToPage, text: DevExpress.Designer.getLocalization('Adjust the field width so all fields fit onto a page') }"></div>
+            <div data-bind="dxCheckBox: { value: fitFieldsToPage, text: DevExpress.Designer.getLocalization('Adjust the field width so all fields fit onto a page', 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AdjustFieldWidth') }"></div>
         </div>
     </div>
 </div></script>
@@ -4133,21 +4142,21 @@
 <div class="dxrd-wizard-page dxrd-wizard-report-style-page">
     <div class="dxrd-wizard-report-style-image-container">
         <div data-bind="attr: { class: selectedReportStyle().className }">
-            <div class="title" style="margin-bottom: 18px;" data-bind="text: DevExpress.Designer.getLocalization('Title')"></div>
-            <div class="caption" style="margin-bottom: 4px;" data-bind="text: DevExpress.Designer.getLocalization('Caption')"></div>
-            <div class="data" data-bind="text: DevExpress.Designer.getLocalization('Data')"></div>
+            <div class="title" style="margin-bottom: 18px;" data-bind="text: DevExpress.Designer.getLocalization('Title', 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Title')"></div>
+            <div class="caption" style="margin-bottom: 4px;" data-bind="text: DevExpress.Designer.getLocalization('Caption', 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Caption')"></div>
+            <div class="data" data-bind="text: DevExpress.Designer.getLocalization('Data', 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Data')"></div>
         </div>
     </div>
     <div class="dxrd-wizard-report-style-items" data-bind="dxRadioGroup: { value: selectedReportStyle, items: reportStyleItems }">
         <div data-options="dxTemplate : { name: 'item' }">
-            <div data-bind="text: DevExpress.Designer.getLocalization(text)"></div>
+            <div data-bind="text: text"></div>
         </div>
     </div>
 </div></script>
 
 <script type='text/html' id='dxrd-page-reportTitle'>
 <div style="width: 272px; position: relative; top: 38%; margin: 0 auto;">
-    <div style="margin-bottom: 5px;" data-bind="text: DevExpress.Designer.getLocalization('Specify the report\'s title')"></div>
+    <div style="margin-bottom: 5px;" data-bind="text: DevExpress.Designer.getLocalization('Specify the report\'s title', 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_SpecifyTitle')"></div>
     <div data-bind="dxTextBox: { value: reportTitle, width: 270 }"></div>
 </div></script>
 
@@ -4165,28 +4174,28 @@
 <div class="dxrd-wizard-page">
     <div class="dxrd-wizard-selectlabelproduct-page">
         <div class="dxrd-wizard-selectlabelproduct-list">
-            <div class="dxrd-wizard-selectlabelproduct-list-label" data-bind="text: DevExpress.Designer.getLocalization('Label Product:')"></div>
+            <div class="dxrd-wizard-selectlabelproduct-list-label" data-bind="text: DevExpress.Designer.getLocalization('Label Product:', 'ASPxReportsStringId.ReportDesigner_Wizard_LabelProduct')"></div>
             <div data-bind="dxSelectBox: { items: labelData.labelProducts, displayExpr: 'name', value: selectedLabelProduct }"></div>
 
-            <div class="dxrd-wizard-selectlabelproduct-list-label" data-bind="text: DevExpress.Designer.getLocalization('Product Number:')"></div>
+            <div class="dxrd-wizard-selectlabelproduct-list-label" data-bind="text: DevExpress.Designer.getLocalization('Product Number:', 'ASPxReportsStringId.ReportDesigner_Wizard_ProductNumber')"></div>
             <div data-bind="dxSelectBox: { dataSource: labelDetails, displayExpr: 'name', value: selectedLabelDetails }"></div>
         </div>
 
         <div class="dxrd-wizard-selectproduct-props">
             <div>
-                <span data-bind="text: DevExpress.Designer.getLocalization('Width:')"></span>
+                <span data-bind="text: DevExpress.Designer.getLocalization('Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_Width')"></span>
                 <span data-bind="text: width"></span>
             </div>
             <div>
-                <span data-bind="text: DevExpress.Designer.getLocalization('Height:')"></span>
+                <span data-bind="text: DevExpress.Designer.getLocalization('Height:', 'ASPxReportsStringId.ReportDesigner_Wizard_Height')"></span>
                 <span data-bind="text: height"></span>
             </div>
             <div>
-                <span data-bind="text: DevExpress.Designer.getLocalization('Paper Type:')"></span>
+                <span data-bind="text: DevExpress.Designer.getLocalization('Paper Type:', 'ASPxReportsStringId.ReportDesigner_Wizard_PaperType')"></span>
                 <span data-bind="text: paperType"></span>
             </div>
             <div>
-                <span data-bind="text: DevExpress.Designer.getLocalization('Paper Size:')"></span>
+                <span data-bind="text: DevExpress.Designer.getLocalization('Paper Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PaperSize')"></span>
                 <span data-bind="text: pageSizeText"></span>
             </div>
         </div>
@@ -4197,11 +4206,11 @@
 <script type='text/html' id='dxrd-page-summaryOptions'>
 <div class="dxrd-wizard-summary-options-page">
     <div class="dxrd-wizard-summary-options-titles">
-        <div data-bind="text: DevExpress.Designer.getLocalization('Average')"></div>
-        <div data-bind="text: DevExpress.Designer.getLocalization('Count')"></div>
-        <div data-bind="text: DevExpress.Designer.getLocalization('Max')"></div>
-        <div data-bind="text: DevExpress.Designer.getLocalization('Min')"></div>
-        <div data-bind="text: DevExpress.Designer.getLocalization('Sum')"></div>
+        <div data-bind="text: DevExpress.Designer.getLocalization('Average', 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Average')"></div>
+        <div data-bind="text: DevExpress.Designer.getLocalization('Count', 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Count')"></div>
+        <div data-bind="text: DevExpress.Designer.getLocalization('Max', 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Max')"></div>
+        <div data-bind="text: DevExpress.Designer.getLocalization('Min', 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Min')"></div>
+        <div data-bind="text: DevExpress.Designer.getLocalization('Sum', 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Sum')"></div>
     </div>
     <div class="dxrd-wizard-summary-content" data-bind="dxScrollView: { }">
         <div class="dxrd-wizard-summary-columns">
@@ -4221,7 +4230,7 @@
             <!-- /ko -->
         </div>
     </div>
-    <div class="dxrd-wizard-ignore-null-values" data-bind="dxCheckBox: { value: ignoreNullValues, text: DevExpress.Designer.getLocalization('Ignore null values') }"></div>
+    <div class="dxrd-wizard-ignore-null-values" data-bind="dxCheckBox: { value: ignoreNullValues, text: DevExpress.Designer.getLocalization('Ignore null values', 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_IgnoreNullValues') }"></div>
 </div>
 </script>
 

@@ -1,358 +1,7 @@
-/*! DevExpress HTML/JS Designer - v16.2.4 - 2017-01-16
+/*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var CollectionItemWrapper = (function () {
-                function CollectionItemWrapper(editor, array, index, displayNameField) {
-                    var _this = this;
-                    if (displayNameField === void 0) { displayNameField = ""; }
-                    this.collapsed = ko.observable(true);
-                    this.selected = ko.observable(false);
-                    this.value = ko.computed({
-                        read: function () {
-                            return array.peek()[index()];
-                        },
-                        write: function (val) {
-                            array.peek()[index()] = val;
-                        }
-                    });
-                    this.editor = editor;
-                    this.index = index;
-                    this.name = ko.computed(function () {
-                        return displayNameField && _this.value() && _this.value()[displayNameField] ? ko.unwrap(_this.value()[displayNameField]) : index();
-                    });
-                }
-                return CollectionItemWrapper;
-            })();
-            Widgets.CollectionItemWrapper = CollectionItemWrapper;
-            var CollectionEditorViewModel = (function () {
-                function CollectionEditorViewModel(options, disabled) {
-                    var _this = this;
-                    if (disabled === void 0) { disabled = ko.observable(false); }
-                    this.selectedIndex = ko.observable(null);
-                    this.alwaysShow = ko.observable(false);
-                    this.collapsed = ko.observable(options.collapsed !== false);
-                    var addHandler = options.addHandler || options.info && options.info() && options.info()["addHandler"];
-                    var hideButtons = options.hideButtons || options.info && options.info() && options.info()["hideButtons"];
-                    this.displayPropertyName = options.info && options.info() && options.info()["displayPropertyName"] || options.displayName;
-                    this.showButtons = ko.computed(function () {
-                        return !ko.unwrap(hideButtons) && !_this.collapsed();
-                    });
-                    this.padding = options.level !== void 0 ? options.level * Widgets.propertiesGridEditorsPaddingLeft : 0;
-                    this.displayName = options.displayName;
-                    this.options = options;
-                    if (!options.displayName) {
-                        this.collapsed(false);
-                        this.alwaysShow(true);
-                    }
-                    this.values = ko.computed(function () {
-                        return ko.unwrap(options.values());
-                    });
-                    this.add = function (model) {
-                        options.undoEngine && options.undoEngine().start();
-                        options.values().push(addHandler());
-                        options.undoEngine && options.undoEngine().end();
-                        model.jQueryEvent.stopPropagation();
-                    };
-                    this.up = function (model) {
-                        _this._move(options.values(), -1);
-                        model.jQueryEvent.stopPropagation();
-                    };
-                    this.down = function (model) {
-                        _this._move(options.values(), 1);
-                        model.jQueryEvent.stopPropagation();
-                    };
-                    this.remove = function (model) {
-                        if (_this.selectedIndex() >= 0) {
-                            options.values().splice(_this.selectedIndex(), 1);
-                            _this.selectedIndex(null);
-                        }
-                        model.jQueryEvent.stopPropagation();
-                    };
-                    this.select = function (event) {
-                        _this.selectedIndex(event.model.index());
-                    };
-                    this.disabled = disabled;
-                }
-                CollectionEditorViewModel.prototype._move = function (array, offset) {
-                    if (this.selectedIndex() >= 0) {
-                        var old_index = this.selectedIndex(), new_index = old_index + offset;
-                        if ((new_index >= array().length) || (new_index < 0)) {
-                            return;
-                        }
-                        array.splice(new_index, 0, array.splice(old_index, 1)[0]);
-                        this.selectedIndex(new_index);
-                    }
-                };
-                return CollectionEditorViewModel;
-            })();
-            Widgets.CollectionEditorViewModel = CollectionEditorViewModel;
-            ko.bindingHandlers['dxCollectionEditor'] = {
-                init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                    var values = valueAccessor(), gridViewModel = new CollectionEditorViewModel(values, viewModel.disabled), templateHtml = $(values.editorTemplate || '#dx-collectioneditor').text(), $templateHtml = $(templateHtml), itemTemplateName = values.info && values.info() && values.info()["template"] || values.template;
-                    if (itemTemplateName) {
-                        var itemTemplateHtml = $(itemTemplateName).text();
-                        $templateHtml.find(".dx-collection-item").append($(itemTemplateHtml));
-                    }
-                    else {
-                        $templateHtml.find(".dx-collection-item").append($(element).children());
-                    }
-                    var $element = $(element).append($templateHtml);
-                    var childContext = bindingContext.createChildContext(gridViewModel);
-                    ko.applyBindings(childContext, $element.children()[0]);
-                    return { controlsDescendantBindings: true };
-                }
-            };
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var editor_prefix = "dx-ellipsiseditor", EDITOR_CLASS = editor_prefix + " dx-dropdowneditor", EDITOR_BUTTON_CLASS = editor_prefix + "-button dx-widget dx-button-normal dx-dropdowneditor-button dx-ellipsis-button", EDITOR_BUTTON_ICON = editor_prefix + "-icon dx-ellipsis-image dx-dropdowneditor-icon";
-            var dxEllipsisEditor = (function (_super) {
-                __extends(dxEllipsisEditor, _super);
-                function dxEllipsisEditor(element, options) {
-                    _super.call(this, element, options);
-                }
-                dxEllipsisEditor.prototype._init = function () {
-                    _super.prototype._init.call(this);
-                    this.element().addClass(EDITOR_CLASS);
-                };
-                dxEllipsisEditor.prototype._render = function () {
-                    _super.prototype._render.call(this);
-                    this._renderButton();
-                };
-                dxEllipsisEditor.prototype._renderButton = function () {
-                    this._button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
-                    this._attachButtonEvents();
-                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON).height("100%").appendTo(this._button);
-                    var buttonsContainer = _super.prototype._buttonsContainer.call(this);
-                    this._button.prependTo(buttonsContainer);
-                };
-                dxEllipsisEditor.prototype._updateButtonSize = function () {
-                    this._buttonIcon.height(this.element().height());
-                };
-                dxEllipsisEditor.prototype._attachButtonEvents = function () {
-                    var _this = this;
-                    this._button.off("click");
-                    if (!this.option("disabled")) {
-                        this._button.on("click", function (e) {
-                            if (_this.option("buttonAction")) {
-                                _this.option("buttonAction")();
-                                e.stopPropagation();
-                            }
-                        });
-                    }
-                };
-                dxEllipsisEditor.prototype._optionChanged = function (obj, value) {
-                    var name = obj.name || obj;
-                    switch (name) {
-                        case "disabled":
-                            this._attachButtonEvents();
-                            break;
-                    }
-                    _super.prototype._optionChanged.apply(this, arguments);
-                };
-                return dxEllipsisEditor;
-            })(DevExpress.ui.dxTextBox);
-            Widgets.dxEllipsisEditor = dxEllipsisEditor;
-            DevExpress.registerComponent("dxEllipsisEditor", dxEllipsisEditor);
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var editor_prefix = "dx-fileimage", EDITOR_INPUT_WRAPPER_CLASS = editor_prefix + "-input-wrapper";
-            var dxFileImagePicker = (function (_super) {
-                __extends(dxFileImagePicker, _super);
-                function dxFileImagePicker(element, options) {
-                    _super.call(this, element, options);
-                }
-                dxFileImagePicker.prototype._handleFiles = function (filesHolder) {
-                    var _this = this;
-                    var files = filesHolder.files;
-                    for (var i = 0; i < files.length; i++) {
-                        var file = files[i];
-                        if (this.option("type") === "img") {
-                            var imageType = /image.*/;
-                            if (!file.type.match(imageType)) {
-                                continue;
-                            }
-                        }
-                        var fr = new FileReader();
-                        if (this.option("readMode") !== "text") {
-                            fr.onload = function (args) {
-                                var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
-                                _this.option("value", encodedContent);
-                            };
-                            fr.readAsDataURL(file);
-                        }
-                        else {
-                            fr.onload = function (args) {
-                                _this.option("value", fr.result);
-                            };
-                            fr.readAsText(file);
-                        }
-                    }
-                };
-                dxFileImagePicker.prototype._$getInput = function () {
-                    var accept = this.option('accept') ? "accept = '" + this.option('accept') + "'" : "";
-                    return $("<input type='file' " + accept + " style='display:none' />");
-                };
-                dxFileImagePicker.prototype._render = function () {
-                    _super.prototype._render.call(this);
-                    var _this = this;
-                    this._filesinput = this._$getInput().on("change", function (e) {
-                        _this._handleFiles(_this._filesinput.get(0));
-                    }).appendTo(this.element());
-                };
-                dxFileImagePicker.prototype._renderInput = function (inputContainer) {
-                    this._inputContainer = inputContainer || $("<div />");
-                    this._inputContainer.addClass(EDITOR_INPUT_WRAPPER_CLASS);
-                    this.element().append(this["_inputContainer"]);
-                    _super.prototype._renderInput.call(this, inputContainer);
-                };
-                dxFileImagePicker.prototype._attachButtonEvents = function () {
-                    var _this = this;
-                    this._button.off("click");
-                    if (!this.option("disabled")) {
-                        this._button.on("click", function (e) {
-                            if (!_this.option("value")) {
-                                _this._filesinput.val("");
-                            }
-                            _this._filesinput.click();
-                        });
-                    }
-                };
-                dxFileImagePicker.prototype._renderValue = function () {
-                    this.option("text", this.option("value") ? this.option("placeHolder") : DevExpress.JS.Utils.getLocalization("(none)"));
-                    _super.prototype._renderValue.call(this);
-                };
-                return dxFileImagePicker;
-            })(Widgets.dxEllipsisEditor);
-            Widgets.dxFileImagePicker = dxFileImagePicker;
-            DevExpress.registerComponent("dxFileImagePicker", dxFileImagePicker);
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            Widgets.availableFonts = {
-                "Times New Roman": "Times New Roman",
-                "Arial": "Arial",
-                "Arial Black": "Arial Black",
-                "Comic Sans MS": "Comic Sans MS",
-                "Courier New": "Courier New",
-                "Georgia": "Georgia",
-                "Impact": "Impact",
-                "Lucida Console": "Lucida Console",
-                "Lucida Sans Unicode": "Lucida Sans Unicode",
-                "Tahoma": "Tahoma",
-                "Trebuchet MS": "Trebuchet MS",
-                "Verdana": "Verdana",
-                "MS Sans Serif": "MS Sans Serif",
-                "MS Serif": "MS Serif",
-                "Symbol": "Symbol",
-                "Webdings": "Webdings",
-                "Wingdings": "Wingdings"
-            };
-            Widgets.availableUnits = {
-                "pt": "Point",
-                "world": "World",
-                "px": "Pixel",
-                "in": "Inch",
-                "doc": "Document",
-                "mm": "Millimetr"
-            };
-            var FontModel = (function () {
-                function FontModel(value) {
-                    var _this = this;
-                    this.family = ko.observable("Times New Roman");
-                    this.unit = ko.observable("pt");
-                    this.isUpdateModel = false;
-                    this.size = ko.observable(9);
-                    this.modificators = {
-                        bold: ko.observable(false),
-                        italic: ko.observable(false),
-                        strikeout: ko.observable(false),
-                        underline: ko.observable(false)
-                    };
-                    this.updateModel(value());
-                    value.subscribe(function (newVal) {
-                        _this.isUpdateModel = true;
-                        _this.updateModel(newVal);
-                        _this.isUpdateModel = false;
-                    });
-                    this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.family.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.size.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.unit.subscribe(function (newVal) { return _this.updateValue(value); });
-                }
-                FontModel.prototype.updateModel = function (value) {
-                    if (value) {
-                        var components = value.split(',');
-                        this.family(components[0]);
-                        var self = this;
-                        Object.keys(Widgets.availableUnits).forEach(function (element) {
-                            if (components[1].indexOf(element) != -1) {
-                                self.size(parseFloat(components[1].split(element)[0]));
-                                self.unit(element);
-                            }
-                        });
-                        this.modificators.bold(value.indexOf("Bold") !== -1);
-                        this.modificators.italic(value.indexOf("Italic") !== -1);
-                        this.modificators.underline(value.indexOf("Underline") !== -1);
-                        this.modificators.strikeout(value.indexOf("Strikeout") !== -1);
-                    }
-                };
-                FontModel.prototype.updateValue = function (value) {
-                    if (!this.isUpdateModel) {
-                        var leftPart = [this.family(), this.size() + this.unit()].join(", ");
-                        var modificators = [];
-                        if (this.modificators.bold())
-                            modificators.push("Bold");
-                        if (this.modificators.italic())
-                            modificators.push("Italic");
-                        if (this.modificators.underline())
-                            modificators.push("Underline");
-                        if (this.modificators.strikeout())
-                            modificators.push("Strikeout");
-                        var rightPart = modificators.join(', ');
-                        value(!!rightPart ? [leftPart, rightPart].join(", style=") : leftPart);
-                    }
-                };
-                return FontModel;
-            })();
-            Widgets.FontModel = FontModel;
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -382,6259 +31,56 @@ var DevExpress;
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Utils;
-        (function (Utils) {
-            function getLocalization(value) {
-                return DevExpress.JS.Localization && DevExpress.JS.Localization.localize(value) || value;
-            }
-            Utils.getLocalization = getLocalization;
-            var PopupService = (function () {
-                function PopupService() {
-                    this.data = ko.observable();
-                    this.title = ko.observable();
-                    this.visible = ko.observable(false);
-                    this.actions = ko.observableArray([]);
-                    this.target = ko.observable();
-                }
-                return PopupService;
-            })();
-            Utils.PopupService = PopupService;
-        })(Utils = JS.Utils || (JS.Utils = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        ko.virtualElements.allowedBindings["lazy"] = true;
-        ko.bindingHandlers['lazy'] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var parsedBindings = valueAccessor();
-                $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
-                    var innerBinding = ko.bindingHandlers[innerBindingKey];
-                    setTimeout(function () {
-                        var isInitialized = false;
-                        ko.computed({
-                            read: function () {
-                                if (!isInitialized && innerBinding.init) {
-                                    innerBinding.init(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
-                                    isInitialized = true;
-                                }
-                                if (innerBinding.update) {
-                                    innerBinding.update(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
-                                }
-                            },
-                            disposeWhenNodeIsRemoved: element
-                        });
-                    }, 1);
-                });
-                return { controlsDescendantBindings: true };
-            }
-        };
-        ko.bindingHandlers["dxdAccordion"] = {
-            init: function (element, valueAccessor) {
-                var options = valueAccessor(), $element = $(element), $accordionContent = $element.find(".dx-accordion-content").first(), scrollUpdateCallback = function () {
-                    var scrollView = $element.parents(".dx-scrollview").dxScrollView("instance");
-                    scrollView && scrollView["update"]();
-                };
-                $element
-                    .find(".dx-accordion-header,.dx-accordion-button").first()
-                    .off("dxclick")
-                    .on("dxclick", function () {
-                    var newCollapsed = options.alwaysShow && options.alwaysShow() ? false : !options.collapsed();
-                    if (newCollapsed) {
-                        options.collapsed(true);
-                        $accordionContent.slideUp(options.timeout, function () {
-                            scrollUpdateCallback();
-                        });
-                    }
-                    else {
-                        options.collapsed(false);
-                        $accordionContent.slideDown(options.timeout, function () {
-                            scrollUpdateCallback();
-                        });
-                    }
-                });
-                options.collapsed() ? $accordionContent.hide() : $accordionContent.show();
-            }
-        };
-        ko.bindingHandlers["dxdAccordionExt"] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var options = valueAccessor(), $element = $(element), scrollUpdateCallback = function () {
-                    var scrollView = $element.parents(".dx-scrollview").dxScrollView("instance");
-                    scrollView && scrollView["update"]();
-                }, $accordionContent = $element.find(".dx-accordion-content").first(), accordionContentHTML = null;
-                if (options.collapsed() && options.lazyContentRendering === true) {
-                    accordionContentHTML = $accordionContent.html();
-                    $accordionContent.empty();
-                }
-                options.collapsed.subscribe(function (newVal) {
-                    if (newVal) {
-                        $accordionContent.slideUp(options.timeout, function () {
-                            scrollUpdateCallback();
-                        });
-                    }
-                    else {
-                        if (accordionContentHTML) {
-                            $accordionContent.html(accordionContentHTML);
-                            ko.applyBindingsToDescendants(bindingContext, $accordionContent.get(0));
-                            accordionContentHTML = null;
-                        }
-                        $accordionContent.slideDown(options.timeout, function () {
-                            scrollUpdateCallback();
-                        });
-                    }
-                });
-                options.collapsed() ? $accordionContent.hide() : $accordionContent.show();
-            }
-        };
-        ko.bindingHandlers["dxLocalizedSelectBox"] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var options = valueAccessor();
-                var prevDisplayExpr = options.displayExpr;
-                options.displayExpr = function (value) {
-                    if (!value)
-                        return value;
-                    if (!prevDisplayExpr)
-                        return JS.Utils.getLocalization(value);
-                    return JS.Utils.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr]);
-                };
-                ko.bindingHandlers["dxSelectBox"].init(element, function () { return options; }, allBindings, viewModel, bindingContext);
-                return { controlsDescendantBindings: true };
-            }
-        };
-        ko.bindingHandlers["styleunit"] = {
-            'update': function (element, valueAccessor) {
-                var value = ko.utils.unwrapObservable(valueAccessor() || {});
-                $.each(value, function (styleName, styleValue) {
-                    styleValue = ko.utils.unwrapObservable(styleValue) || 0;
-                    element.style[styleName] = styleValue + "px";
-                });
-            }
-        };
-        ko.bindingHandlers["service"] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var value = ko.unwrap(valueAccessor() || {}), findService = function (serviceName) {
-                    var context = bindingContext.$parents.filter(function (item) { return item[serviceName] !== undefined; })[0];
-                    if (context) {
-                        return context[serviceName];
-                    }
-                    return null;
-                }, service = findService(value.name);
-                if (service) {
-                    var entity = service(viewModel);
-                    var childContext = bindingContext.createChildContext(entity.data);
-                    ko.renderTemplate(entity.templateName, childContext, {}, element, 'replaceNode');
-                }
-            }
-        };
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var EditorAddOn = (function () {
-                function EditorAddOn(editor, popupService) {
-                    var _this = this;
-                    this.showPopup = function (args) {
-                        _this._popupService.title(_this._editor.displayName());
-                        _this._updateActions(_this._editor._model());
-                        _this._popupService.target(args.element);
-                        _this._popupService.visible(true);
-                    };
-                    this.templateName = "dx-editor-addons";
-                    this._editor = editor;
-                    this._popupService = popupService;
-                    this.visible = ko["pureComputed"](function () {
-                        if (editor.disabled()) {
-                            return false;
-                        }
-                        var actions = editor._model() && editor._model().actions;
-                        return actions && actions.length > 0 && actions.some(function (x) { return x.visible(editor.name); });
-                    });
-                    this.editorMenuButtonCss = ko["pureComputed"](function () {
-                        return editor._model() && editor._model()["getActionClassName"] && editor._model()["getActionClassName"](editor.name) || "";
-                    });
-                }
-                EditorAddOn.prototype._updateActions = function (viewModel) {
-                    var _this = this;
-                    this._popupService.actions([]);
-                    if (viewModel.actions) {
-                        viewModel.actions.forEach(function (modelAction) {
-                            if (modelAction.visible(_this._editor.name)) {
-                                _this._popupService.actions.push({
-                                    action: function () {
-                                        modelAction.action(_this._editor.name);
-                                        _this._popupService.visible(false);
-                                    },
-                                    title: modelAction.title,
-                                    visible: function () { return true; }
-                                });
-                            }
-                        });
-                    }
-                };
-                return EditorAddOn;
-            })();
-            Widgets.EditorAddOn = EditorAddOn;
-            Widgets.propertiesGridEditorsPaddingLeft = 19;
-            function compareEditorInfo(editor1, editor2) {
-                return !!editor1 && !!editor2 &&
-                    editor1.header === editor2.header
-                    && editor1.content === editor2.content
-                    && editor1.editorType === editor2.editorType;
-            }
-            var ObjectProperties = (function () {
-                function ObjectProperties(target, editorsInfo, level, parentDisabled) {
-                    var _this = this;
-                    if (level === void 0) { level = 0; }
-                    if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
-                    this.level = 0;
-                    this.rtl = DevExpress['config']()['rtlEnabled'];
-                    this._editors = ko.observableArray([]);
-                    this.level = level;
-                    this._parentDisabled = parentDisabled;
-                    ko.computed(function () {
-                        var viewModel = target();
-                        var serializationInfo = editorsInfo && editorsInfo.editors || viewModel && viewModel["getInfo"] && viewModel["getInfo"]();
-                        _this._createEditors(viewModel, serializationInfo);
-                        _this.update(viewModel);
-                    });
-                }
-                ObjectProperties.prototype.update = function (viewModel) {
-                    if (viewModel) {
-                        this._editors().forEach(function (editor) {
-                            editor.update(viewModel);
-                        });
-                    }
-                };
-                ObjectProperties.prototype.createEditor = function (modelPropertyInfo) {
-                    var editorType = modelPropertyInfo.editor && modelPropertyInfo.editor.editorType || Editor;
-                    return new editorType(modelPropertyInfo, this.level, this._parentDisabled);
-                };
-                ObjectProperties.prototype.createEditors = function (serializationInfo) {
-                    var _this = this;
-                    var self = this;
-                    return (serializationInfo || [])
-                        .filter(function (info) { return !!info.editor && self._editors().filter(function (editor) { return editor.name === info.propertyName && compareEditorInfo(editor.info().editor, info.editor); }).length === 0; })
-                        .map(function (info) { return _this.createEditor(info); });
-                };
-                ObjectProperties.prototype._createEditors = function (target, serializationInfo) {
-                    var _this = this;
-                    if (!serializationInfo)
-                        return false;
-                    this.createEditors(serializationInfo).forEach(function (editor) { return _this._editors.push(editor); });
-                    var propertyNames = serializationInfo.map(function (info) { return info.propertyName; });
-                    this._editors.sort(function (a, b) {
-                        return propertyNames.indexOf(a.name) - propertyNames.indexOf(b.name);
-                    });
-                };
-                ObjectProperties.prototype.getEditors = function () {
-                    return this._editors();
-                };
-                return ObjectProperties;
-            })();
-            Widgets.ObjectProperties = ObjectProperties;
-            var Editor = (function () {
-                function Editor(modelPropertyInfo, level, parentDisabled) {
-                    var _this = this;
-                    if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
-                    this._model = ko.observable();
-                    this.isVisibleByContent = ko.observable(true);
-                    this.rtl = DevExpress["config"]()["rtlEnabled"];
-                    this.isEditorSelected = ko.observable(false);
-                    this.isPropertyModified = ko.computed(function () {
-                        return _this._model() && _this._model().isPropertyModified && _this._model().isPropertyModified(_this.name);
-                    });
-                    this.collapsed = ko.observable(true);
-                    this.info = ko.observable(modelPropertyInfo);
-                    this.displayName = ko.computed(function () { return _this.info() && _this.info().displayName; });
-                    this.padding = this._setPadding(this.rtl ? "right" : "left", level * Widgets.propertiesGridEditorsPaddingLeft);
-                    var defaultValue = ko.observable(null), propertyName = modelPropertyInfo.propertyName;
-                    this["localizationId"] = modelPropertyInfo.localizationId;
-                    this.editorOptions = modelPropertyInfo.editorOptions;
-                    if (modelPropertyInfo.defaultVal !== undefined) {
-                        defaultValue = ko.observable(modelPropertyInfo.defaultVal);
-                    }
-                    if (modelPropertyInfo.from) {
-                        defaultValue = modelPropertyInfo.from(modelPropertyInfo.defaultVal);
-                    }
-                    if (modelPropertyInfo.array) {
-                        defaultValue = ko.observableArray();
-                    }
-                    this.values = ko.computed(function () {
-                        var _values = _this.info().valueStore;
-                        if (_values) {
-                            return _values;
-                        }
-                        _values = _this.info().values;
-                        if (_values) {
-                            return $.map(_values, function (displayValue, value) {
-                                return { value: value, displayValue: displayValue };
-                            });
-                        }
-                        _values = _this.info().valuesArray;
-                        if (_values) {
-                            return $.map(_values, function (value) {
-                                return { value: value.value, displayValue: value.displayValue };
-                            });
-                        }
-                    });
-                    this.level = level;
-                    this._init(modelPropertyInfo.editor, defaultValue, propertyName);
-                    var calculateAccessibleByPropertyInfo = function (model, propertyInfo, defaultValue) {
-                        var result;
-                        if (ko.isObservable(propertyInfo)) {
-                            result = propertyInfo();
-                        }
-                        else if (typeof propertyInfo === 'function') {
-                            result = propertyInfo(model);
-                        }
-                        else {
-                            result = propertyInfo !== undefined ? propertyInfo : defaultValue;
-                        }
-                        return result;
-                    };
-                    this.disabled = ko.computed(function () {
-                        var model = _this._model(), result = parentDisabled() || model && (model.isPropertyDisabled && model.isPropertyDisabled(_this.name));
-                        if (!result) {
-                            result = calculateAccessibleByPropertyInfo(model, _this.info().disabled, false);
-                        }
-                        return result;
-                    });
-                    this.visible = ko.computed(function () {
-                        var model = _this._model(), result = (model && model.isPropertyVisible) ? model.isPropertyVisible(_this.name) : _this.isVisibleByContent();
-                        if (result) {
-                            result = calculateAccessibleByPropertyInfo(model, _this.info().visible, true);
-                        }
-                        return result;
-                    });
-                }
-                Editor.prototype._setPadding = function (position, value) {
-                    var obj = {};
-                    obj["padding-" + position] = value;
-                    return obj;
-                };
-                Editor.prototype._init = function (editorTemplate, value, name) {
-                    var _this = this;
-                    editorTemplate = editorTemplate || Widgets.editorTemplates.text;
-                    this.templateName = editorTemplate.header;
-                    this.contentTemplateName = editorTemplate.content;
-                    this.defaultValue = editorTemplate === Widgets.editorTemplates.color ? "transparent" : null;
-                    this.value = ko.computed({
-                        read: function () {
-                            var model = _this._model();
-                            var modelValue = model && model[name] !== undefined ? model[name] : value;
-                            if (ko.isObservable(modelValue) && !modelValue["push"]) {
-                                var hasValueInModel = modelValue() !== undefined && modelValue() !== null;
-                                return hasValueInModel ? modelValue() : _this.defaultValue;
-                            }
-                            else {
-                                return modelValue;
-                            }
-                        },
-                        write: function (val) {
-                            var model = _this._model();
-                            if (!model) {
-                                return;
-                            }
-                            var modelValue = model[name];
-                            if (ko.isObservable(modelValue)) {
-                                modelValue(val);
-                            }
-                            else {
-                                model[name] = val;
-                            }
-                        }
-                    });
-                    this.name = name;
-                    this.editorTemplate = editorTemplate && editorTemplate.custom || 'dx-property-editor';
-                };
-                Editor.prototype.findInfo = function (viewModel) {
-                    var _this = this;
-                    var modelInfo = viewModel["getInfo"] && viewModel["getInfo"]();
-                    if (modelInfo) {
-                        return modelInfo.filter(function (property) { return property.propertyName === _this.name; })[0];
-                    }
-                    return null;
-                };
-                Editor.prototype.updateInfo = function (propertyInfo) {
-                    if (propertyInfo && compareEditorInfo(propertyInfo.editor, this.info().editor)) {
-                        this.info(propertyInfo);
-                        return true;
-                    }
-                    return !propertyInfo;
-                };
-                Editor.prototype.update = function (viewModel) {
-                    var propertyInfo = this.findInfo(viewModel);
-                    this.isVisibleByContent(viewModel[this.name] !== undefined && this.updateInfo(propertyInfo));
-                    this._model(this.isVisibleByContent() ? viewModel : null);
-                };
-                Editor.prototype.localizingDisplayName = function () {
-                    return this["localizationId"] ? (DevExpress.JS.Localization.localize(this["localizationId"]) || this.displayName()) : DevExpress.JS.Utils.getLocalization(this.displayName());
-                };
-                Object.defineProperty(Editor.prototype, "validationRules", {
-                    get: function () {
-                        return !!this.info && !!this.info() && this.info().validationRules || [];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(Editor.prototype, "isComplexEditor", {
-                    get: function () { return !!this.contentTemplateName; },
-                    enumerable: true,
-                    configurable: true
-                });
-                return Editor;
-            })();
-            Widgets.Editor = Editor;
-            var PropertyGridEditor = (function (_super) {
-                __extends(PropertyGridEditor, _super);
-                function PropertyGridEditor(info, level, parentDisabled) {
-                    var _this = this;
-                    _super.call(this, info, level, parentDisabled);
-                    this.editorCreated = ko.observable(false);
-                    this.collapsed.subscribe(function () {
-                        if (!_this.editorCreated()) {
-                            _this.viewmodel = new ObjectProperties(_this.value, { editors: info.info }, level + 1, _this.disabled);
-                            _this.editorCreated(true);
-                        }
-                    });
-                    this.viewmodel = {};
-                }
-                return PropertyGridEditor;
-            })(Editor);
-            Widgets.PropertyGridEditor = PropertyGridEditor;
-            var FontEditor = (function (_super) {
-                __extends(FontEditor, _super);
-                function FontEditor(info, level, parentDisabled) {
-                    _super.call(this, info, level, parentDisabled);
-                    var model = new Widgets.FontModel(this.value);
-                    var grid = new ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, level + 1, this.disabled);
-                    this.viewmodel = grid;
-                }
-                return FontEditor;
-            })(Editor);
-            Widgets.FontEditor = FontEditor;
-            Widgets.editorTemplates = {
-                color: { header: "dx-color" },
-                bool: { header: "dx-boolean" },
-                boolSelect: { header: "dx-boolean-select" },
-                numeric: { header: "dx-numeric" },
-                date: { header: "dx-date" },
-                modificators: { custom: "dx-modificators" },
-                font: { header: "dx-emptyHeader", content: "dx-objectEditorContent", editorType: FontEditor },
-                combobox: { header: "dx-combobox" },
-                comboboxEditable: { header: "dx-combobox-editable" },
-                text: { header: "dx-text" },
-                image: { header: "dx-image" },
-                file: { header: "dx-file" },
-                objecteditor: { header: "dx-emptyHeader", content: "dx-objectEditorContent", editorType: PropertyGridEditor },
-                commonCollection: { custom: "dx-commonCollection" },
-                stringArray: { header: "dx-emptyHeader", content: "dx-string-array" }
-            };
-            Widgets.fontInfo = [
-                {
-                    propertyName: "family", displayName: "Font Name",
-                    editor: Widgets.editorTemplates.combobox, values: Widgets.availableFonts
-                },
-                { propertyName: "size", displayName: "Size", editor: Widgets.editorTemplates.numeric },
-                {
-                    propertyName: "unit", displayName: "Unit", editor: Widgets.editorTemplates.combobox,
-                    values: Widgets.availableUnits
-                },
-                { propertyName: "modificators", editor: Widgets.editorTemplates.modificators },
-            ];
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-ko-propertygrid.js.map
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Utils;
-        (function (Utils) {
-            function knockoutArrayWrapper(items) {
-                var onChange = [];
-                for (var _i = 1; _i < arguments.length; _i++) {
-                    onChange[_i - 1] = arguments[_i];
-                }
-                var array = ko.observableArray(items);
-                var notifySubscribers = array.notifySubscribers;
-                array.notifySubscribers = function (valueToNotify, event) {
-                    if (onChange) {
-                        for (var i = 0, len = onChange.length; i < len; i++) {
-                            onChange[i](valueToNotify, event);
-                        }
-                    }
-                    return notifySubscribers.call(array, valueToNotify, event);
-                };
-                return array;
-            }
-            Utils.knockoutArrayWrapper = knockoutArrayWrapper;
-            function isWindow(obj) {
-                return obj != null && obj === obj.window;
-            }
-            var class2type = {};
-            var hasOwn = class2type.hasOwnProperty;
-            ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object", "Error"].forEach(function (name) { return class2type["[object " + name + "]"] = name.toLowerCase(); });
-            function type(obj) {
-                if (obj == null) {
-                    return obj + "";
-                }
-                return typeof obj === "object" || typeof obj === "function" ?
-                    class2type[class2type.toString.call(obj)] || "object" :
-                    typeof obj;
-            }
-            function isNumeric(obj) {
-                return !Array.isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-            }
-            function isPlainObject(obj) {
-                if (type(obj) !== "object" || obj.nodeType || isWindow(obj)) {
-                    return false;
-                }
-                return !(obj.constructor && !hasOwn.call(obj.constructor.prototype, "isPrototypeOf"));
-            }
-            Utils.isPlainObject = isPlainObject;
-            function isEmptyObject(obj) {
-                for (var name in obj) {
-                    return false;
-                }
-                return true;
-            }
-            Utils.isEmptyObject = isEmptyObject;
-            function isFunction(obj) {
-                return type(obj) === "function";
-            }
-            function extend(target, object1) {
-                var objectN = [];
-                for (var _i = 2; _i < arguments.length; _i++) {
-                    objectN[_i - 2] = arguments[_i];
-                }
-                var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length, deep = false;
-                if (typeof target === "boolean") {
-                    deep = target;
-                    target = arguments[i] || {};
-                    i++;
-                }
-                if (typeof target !== "object" && !isFunction(target)) {
-                    target = {};
-                }
-                if (i === length) {
-                    target = this;
-                    i--;
-                }
-                for (; i < length; i++) {
-                    if ((options = arguments[i]) != null) {
-                        for (name in options) {
-                            src = target[name];
-                            copy = options[name];
-                            if (target === copy) {
-                                continue;
-                            }
-                            if (deep && copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
-                                if (copyIsArray) {
-                                    copyIsArray = false;
-                                    clone = src && Array.isArray(src) ? src : [];
-                                }
-                                else {
-                                    clone = src && isPlainObject(src) ? src : {};
-                                }
-                                target[name] = extend(deep, clone, copy);
-                            }
-                            else if (copy !== undefined) {
-                                target[name] = copy;
-                            }
-                        }
-                    }
-                }
-                return target;
-            }
-            Utils.extend = extend;
-            ;
-            function getPropertyValues(target) {
-                if (target === void 0) { target = {}; }
-                var result = [];
-                for (var propertyName in target) {
-                    result.push(target[propertyName]);
-                }
-                return result;
-            }
-            Utils.getPropertyValues = getPropertyValues;
-        })(Utils = JS.Utils || (JS.Utils = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Utils;
-        (function (Utils) {
-            function deserializeArray(model, creator) {
-                var result = [];
-                Utils.getPropertyValues(model).forEach(function (item) {
-                    var createdItem = creator(item);
-                    result.push(createdItem);
-                });
-                return ko.observableArray(result);
-            }
-            Utils.deserializeArray = deserializeArray;
-            function toStringWithDelimiter(values, delimiter) {
-                return (values || []).map(function (value) {
-                    var str = value !== undefined && value !== null ? value.toString() : "00";
-                    if (str.length === 1) {
-                        str = "0" + str;
-                    }
-                    return str;
-                }).join(delimiter);
-            }
-            function serializeDate(date) {
-                var datePart = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
-                var timePart = toStringWithDelimiter([date.getHours(), date.getMinutes(), date.getSeconds()], ":");
-                return timePart === "00:00:00" ? toStringWithDelimiter([datePart[2], datePart[0], datePart[1]], "-")
-                    : toStringWithDelimiter(datePart, "/") + " " + timePart;
-            }
-            Utils.serializeDate = serializeDate;
-            var ModelSerializer = (function () {
-                function ModelSerializer(options) {
-                    this._refTable = {};
-                    this._linkTable = {};
-                    this._options = Utils.extend({
-                        useRefs: true,
-                        serializeDate: serializeDate
-                    }, options);
-                }
-                ModelSerializer.prototype.linkObjects = function () {
-                    for (var index in this._linkTable) {
-                        var val = this._refTable[index];
-                        if (val) {
-                            var properties = this._linkTable[index];
-                            properties.forEach(function (property) { return property(val); });
-                        }
-                    }
-                    ;
-                };
-                ModelSerializer.prototype.deserializeProperty = function (modelPropertyInfo, model) {
-                    var _this = this;
-                    var modelValue = modelPropertyInfo.defaultVal, propertyName = modelPropertyInfo.propertyName, propName = modelPropertyInfo.modelName;
-                    if (!propName) {
-                        return;
-                    }
-                    if (model[propName] !== undefined) {
-                        modelValue = model[propName];
-                    }
-                    if (typeof modelPropertyInfo === "string") {
-                        return ko.observable(modelValue);
-                    }
-                    else if (modelPropertyInfo.link) {
-                        var value = ko.observable(null);
-                        if (modelValue) {
-                            var refVal = modelValue && modelValue.slice("#Ref-".length);
-                            this._linkTable[refVal] = this._linkTable[refVal] || [];
-                            this._linkTable[refVal].push(value);
-                        }
-                        return value;
-                    }
-                    else if (modelPropertyInfo.array) {
-                        if (modelPropertyInfo.from) {
-                            return modelPropertyInfo.from(modelValue, this);
-                        }
-                        else if (modelPropertyInfo.info) {
-                            var result = [];
-                            Utils.getPropertyValues(modelValue).forEach(function (item) {
-                                var object = {};
-                                _this.deserialize(object, item || {}, modelPropertyInfo.info);
-                                result.push(object);
-                            });
-                            return ko.observableArray(result);
-                        }
-                    }
-                    else if (modelPropertyInfo.from) {
-                        return modelPropertyInfo.from(modelValue, this);
-                    }
-                    else if (modelPropertyInfo.type) {
-                        var ctorResult = new modelPropertyInfo.type(modelValue, this, modelPropertyInfo.info);
-                        if (!ctorResult._model) {
-                            this.deserialize(ctorResult, modelValue || {}, modelPropertyInfo.info);
-                        }
-                        return ctorResult;
-                    }
-                    else if (modelPropertyInfo.info) {
-                        var object = {};
-                        this.deserialize(object, modelValue || {}, modelPropertyInfo.info);
-                        return object;
-                    }
-                    else if (modelPropertyInfo.modelName) {
-                        return ko.observable(modelValue);
-                    }
-                    else {
-                        throw new Error("Invalid info '" + JSON.stringify(modelPropertyInfo) + "'");
-                    }
-                };
-                ModelSerializer.prototype.deserialize = function (viewModel, model, serializationsInfo) {
-                    var _this = this;
-                    if (serializationsInfo === void 0) { serializationsInfo = null; }
-                    if (!model) {
-                        return;
-                    }
-                    viewModel._model = Utils.extend({}, model);
-                    var serializationsInfo = viewModel.getInfo ? viewModel.getInfo() : serializationsInfo;
-                    var refValue = model["@Ref"];
-                    if (refValue) {
-                        this._refTable[refValue] = viewModel;
-                    }
-                    serializationsInfo.forEach(function (modelPropertyInfo) {
-                        var propertyName = modelPropertyInfo.propertyName, propName = modelPropertyInfo.modelName;
-                        if (model[propName] !== undefined) {
-                            delete viewModel._model[propName];
-                        }
-                        viewModel[propertyName] = _this.deserializeProperty(modelPropertyInfo, model);
-                    });
-                    this.linkObjects();
-                };
-                ModelSerializer.prototype.serialize = function (viewModel, serializationsInfo, refs) {
-                    if (refs === void 0) { refs = null; }
-                    if (!serializationsInfo && !refs) {
-                        return this._serialize(viewModel, null, null);
-                    }
-                    return this._serialize(viewModel, serializationsInfo, refs);
-                };
-                ModelSerializer.prototype._isSerializableValue = function (resultValue) {
-                    return (Utils.isPlainObject(resultValue) && !Utils.isEmptyObject(resultValue)) || (Array.isArray(resultValue) && resultValue["length"] > 0) || (!Array.isArray(resultValue) && !Utils.isPlainObject(resultValue));
-                };
-                ModelSerializer.prototype._serialize = function (viewModel, serializationsInfo, refs) {
-                    var _this = this;
-                    var result = Utils.extend({}, viewModel._model), isInitial = refs === null;
-                    refs = refs || { linkObjTable: [], objects: [] };
-                    serializationsInfo = viewModel.getInfo ? viewModel.getInfo() : serializationsInfo;
-                    delete result["@Ref"];
-                    if (viewModel["isEmpty"] && viewModel["isEmpty"]())
-                        return {};
-                    serializationsInfo.forEach(function (modelPropertyInfo) {
-                        var propertyName = modelPropertyInfo.propertyName, value = ko.unwrap(viewModel["_" + propertyName] || viewModel[propertyName]), defaultVal = modelPropertyInfo.defaultVal;
-                        var resultValue = {};
-                        if (!modelPropertyInfo.modelName) {
-                            return;
-                        }
-                        if ((value !== undefined && value !== null) && ((Utils.isPlainObject(value) || !Utils.isEmptyObject(value)) || (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && !Utils.isPlainObject(value))) && (value !== defaultVal)) {
-                            if (modelPropertyInfo.link) {
-                                refs.linkObjTable.push({
-                                    obj: value,
-                                    setRef: function (index) {
-                                        if (index < 0) {
-                                            delete result[modelPropertyInfo.modelName];
-                                        }
-                                        else {
-                                            result[modelPropertyInfo.modelName] = "#Ref-" + index;
-                                        }
-                                    }
-                                });
-                                resultValue = undefined;
-                            }
-                            else if (modelPropertyInfo.array) {
-                                resultValue = {};
-                                var index = 1;
-                                value.forEach(function (item) {
-                                    var info = modelPropertyInfo.info || null;
-                                    var item_ = _this._serialize(item, info, refs);
-                                    if (_this._isSerializableValue(item_)) {
-                                        resultValue["Item" + index] = item_;
-                                        if (_this._options.useRefs) {
-                                            item_["@Ref"] = (refs.objects.push(item) - 1).toString();
-                                        }
-                                        index++;
-                                    }
-                                });
-                            }
-                            else if (modelPropertyInfo.from) {
-                                if (value["isEmpty"] && value["isEmpty"]()) {
-                                    resultValue = {};
-                                }
-                                else {
-                                    resultValue = modelPropertyInfo.toJsonObject ? modelPropertyInfo.toJsonObject(value, _this, refs) : value.toString();
-                                }
-                            }
-                            else if (modelPropertyInfo.info || value["getInfo"]) {
-                                resultValue = _this._serialize(value, modelPropertyInfo.info, refs);
-                            }
-                            else if (modelPropertyInfo.modelName) {
-                                if (value instanceof Date) {
-                                    resultValue = _this._options.serializeDate(value);
-                                }
-                                else {
-                                    resultValue = value;
-                                }
-                            }
-                            else {
-                                throw new Error("Invalid info '" + serializationsInfo.stringify() + "'");
-                            }
-                            if (_this._isSerializableValue(resultValue)) {
-                                result[modelPropertyInfo.modelName] = resultValue;
-                            }
-                        }
-                    });
-                    if (isInitial) {
-                        refs.linkObjTable.forEach(function (item) {
-                            var refValue = refs.objects.indexOf(item.obj);
-                            item.setRef(refValue);
-                        });
-                    }
-                    return result;
-                };
-                return ModelSerializer;
-            })();
-            Utils.ModelSerializer = ModelSerializer;
-        })(Utils = JS.Utils || (JS.Utils = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-ko-serializer.js.map
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Utils;
-        (function (Utils) {
-            function checkModelReady(model) {
-                return model.isModelReady ? model.isModelReady() : true;
-            }
-            Utils.DEBUG = true;
-            function NotifyAboutWarning(msg) {
-                if (Utils.DEBUG) {
-                    throw new Error(msg);
-                }
-                else {
-                    console.warn(msg);
-                }
-            }
-            function propertiesVisitor(target, visitor, visited, skip) {
-                if (visited === void 0) { visited = []; }
-                if (skip === void 0) { skip = ["surface"]; }
-                if (target && target !== undefined) {
-                    var properties = [];
-                    for (var propertyName in target) {
-                        if (propertyName.indexOf("_") !== 0 && skip.indexOf(propertyName) === -1) {
-                            var realPropertyName = propertyName;
-                            if (ko.isComputed(target[propertyName]) && ko.isWriteableObservable(target["_" + propertyName])) {
-                                realPropertyName = "_" + realPropertyName;
-                            }
-                            if (visited.indexOf(target[realPropertyName]) === -1 && !ko.isComputed(target[realPropertyName])) {
-                                properties.push(target[realPropertyName]);
-                            }
-                        }
-                    }
-                    visitor(properties);
-                    visited.push.apply(visited, properties);
-                    properties.forEach(function (property) {
-                        property = ko.unwrap(property);
-                        if (typeof property === 'object') {
-                            propertiesVisitor(property, visitor, visited, skip);
-                        }
-                    });
-                }
-            }
-            Utils.propertiesVisitor = propertiesVisitor;
-            var UndoEngine = (function () {
-                function UndoEngine(target, ignoredProperties, getInfoMethodName) {
-                    var _this = this;
-                    if (ignoredProperties === void 0) { ignoredProperties = ["surface"]; }
-                    this._disposeUndoEngineSubscriptionsName = "___dispose___UndoEngine___Subscriptions___";
-                    this._groupObservers = [];
-                    this._getInfoMethodName = null;
-                    this._groupPosition = -1;
-                    this._observers = [];
-                    this._subscriptions = [];
-                    this._visited = [];
-                    this._position = -1;
-                    this._inUndoRedo = false;
-                    this.redoEnabled = ko.observable(false);
-                    this.undoEnabled = ko.observable(false);
-                    this.isIngroup = -1;
-                    this.isDirty = ko.observable(false);
-                    this._model = ko.unwrap(target);
-                    this._getInfoMethodName = getInfoMethodName;
-                    this._ignoredProperties = ignoredProperties;
-                    if (this._getInfoMethodName) {
-                        if (ko.isSubscribable(target)) {
-                            this._targetSubscription = this.subscribeProperty(target, true);
-                        }
-                        else {
-                            this._createDisposeFunction(target);
-                        }
-                    }
-                    else {
-                        var innerSubscriptions = this.subscribe(this._model);
-                        if (ko.isSubscribable(target)) {
-                            var prevVal = target();
-                            this._targetSubscription = target.subscribe(function (newTargetValue) {
-                                _this._removePropertiesSubscriptions();
-                                if (!_this._inUndoRedo) {
-                                    _this.properyChanged({
-                                        observable: target, propertyChanged: { oldVal: prevVal, val: newTargetValue }
-                                    });
-                                    prevVal = newTargetValue;
-                                }
-                                _this._cleanSubscribtions(innerSubscriptions);
-                                _this._model = newTargetValue;
-                                innerSubscriptions = _this.subscribe(_this._model);
-                            });
-                        }
-                    }
-                }
-                Object.defineProperty(UndoEngine.prototype, "_modelReady", {
-                    get: function () {
-                        return checkModelReady(this._model);
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                UndoEngine.prototype.properyChanged = function (undoRecord) {
-                    if (this._inUndoRedo) {
-                        return;
-                    }
-                    var currentPosition = this._position + 1;
-                    if (currentPosition < this._observers.length) {
-                        this._observers = this._observers.splice(0, currentPosition);
-                    }
-                    this._observers.push(undoRecord);
-                    this.isDirty(true);
-                    this._position = currentPosition;
-                    this.undoEnabled(true);
-                    this.redoEnabled(false);
-                };
-                UndoEngine.prototype.visitProperties = function (target, info) {
-                    var subscribtions = [];
-                    if (target && info) {
-                        for (var i = 0; i < info.length; i++) {
-                            if (info[i].modelName || info[i].editor || info[i].info) {
-                                var propertyName = info[i].propertyName;
-                                if (propertyName.indexOf("_") !== 0) {
-                                    var realPropertyName = propertyName;
-                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
-                                        realPropertyName = "_" + realPropertyName;
-                                    }
-                                    if (!ko.isComputed(target[realPropertyName])) {
-                                        if (!ko.isObservable(target[realPropertyName])) {
-                                            this._createDisposeFunction(target[realPropertyName], info[i].info);
-                                        }
-                                        else {
-                                            subscribtions.push(this.subscribeProperty(target[realPropertyName], !info[i].link));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return subscribtions;
-                };
-                UndoEngine.prototype.undoChangeSet = function (changeSet) {
-                    if (changeSet.propertyChanged) {
-                        changeSet.observable(changeSet.propertyChanged.oldVal);
-                    }
-                    else {
-                        var array = changeSet.observable();
-                        for (var i = 0; i < changeSet.arrayChanges.length; i++) {
-                            if (changeSet.arrayChanges[i].status === "added") {
-                                array.splice(array.indexOf(changeSet.arrayChanges[i].value), 1);
-                            }
-                            else if (changeSet.arrayChanges[i].status === "deleted") {
-                                array.splice(changeSet.arrayChanges[i].index, 0, changeSet.arrayChanges[i].value);
-                            }
-                            else
-                                NotifyAboutWarning("Unsupported array modification status: " + changeSet.arrayChanges[i].status);
-                        }
-                        changeSet.observable.valueHasMutated();
-                    }
-                };
-                UndoEngine.prototype.redoChangeSet = function (changeSet) {
-                    if (changeSet.propertyChanged) {
-                        changeSet.observable(changeSet.propertyChanged.val);
-                    }
-                    else {
-                        var array = changeSet.observable();
-                        for (var i = 0; i < changeSet.arrayChanges.length; i++) {
-                            if (changeSet.arrayChanges[i].status === "added") {
-                                array.splice(changeSet.arrayChanges[i].index, 0, changeSet.arrayChanges[i].value);
-                            }
-                            else if (changeSet.arrayChanges[i].status === "deleted") {
-                                array.splice(array.indexOf(changeSet.arrayChanges[i].value), 1);
-                            }
-                            else
-                                NotifyAboutWarning("Unsupported array modification status: " + changeSet.arrayChanges[i].status);
-                        }
-                        changeSet.observable.valueHasMutated();
-                    }
-                };
-                UndoEngine.prototype._disposeChilds = function (target, info) {
-                    if (target && info) {
-                        for (var i = 0; i < info.length; i++) {
-                            if (info[i].modelName || info[i].editor || info[i].info) {
-                                var propertyName = info[i].propertyName;
-                                if (propertyName.indexOf("_") !== 0) {
-                                    var realPropertyName = propertyName;
-                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
-                                        realPropertyName = "_" + realPropertyName;
-                                    }
-                                    if (!ko.isComputed(target[realPropertyName])) {
-                                        var val = ko.unwrap(target[realPropertyName]);
-                                        if (!!val && typeof val === "object") {
-                                            if (!info[i].link) {
-                                                this._callDisposeFunction(val);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-                UndoEngine.prototype._createDisposeFunction = function (val, info) {
-                    var _this = this;
-                    var subscriptions = [];
-                    if (val && typeof val === "object") {
-                        var objectInfo = info || (val[this._getInfoMethodName] && val[this._getInfoMethodName]());
-                        if (!!objectInfo) {
-                            if (val[this._disposeUndoEngineSubscriptionsName]) {
-                                val[this._disposeUndoEngineSubscriptionsName].inc++;
-                            }
-                            else {
-                                val[this._disposeUndoEngineSubscriptionsName] = { inc: 1 };
-                                subscriptions = this.subscribe(val, objectInfo);
-                                val[this._disposeUndoEngineSubscriptionsName]["func"] = function () {
-                                    val[_this._disposeUndoEngineSubscriptionsName].inc--;
-                                    _this._disposeChilds(val, objectInfo);
-                                    if (val[_this._disposeUndoEngineSubscriptionsName].inc === 0) {
-                                        _this._cleanSubscribtions(subscriptions);
-                                        delete val[_this._disposeUndoEngineSubscriptionsName];
-                                    }
-                                };
-                            }
-                        }
-                    }
-                    return subscriptions;
-                };
-                UndoEngine.prototype._callDisposeFunction = function (val) {
-                    val && val[this._disposeUndoEngineSubscriptionsName] && val[this._disposeUndoEngineSubscriptionsName].func();
-                };
-                UndoEngine.prototype._cleanSubscribtions = function (subscribtionArray) {
-                    if (subscribtionArray) {
-                        if (subscribtionArray.length) {
-                            for (var i = 0; i < subscribtionArray.length; i++) {
-                                this._cleanSubscribtions(subscribtionArray[i]);
-                            }
-                        }
-                        else {
-                            subscribtionArray.dispose && subscribtionArray.dispose();
-                        }
-                    }
-                };
-                UndoEngine.prototype.subscribeProperty = function (property, subscribeChilds) {
-                    var _this = this;
-                    if (ko.isObservable(property)) {
-                        var prevVal = property();
-                        if (Array.isArray(prevVal)) {
-                            for (var i = 0; i < property().length; i++) {
-                                this._createDisposeFunction(property()[i]);
-                            }
-                            return property.subscribe(function (args) {
-                                if (_this._modelReady) {
-                                    var addedItems = args.filter(function (x) { return x.status === "added"; });
-                                    var removedItems = args.filter(function (x) { return x.status === "deleted"; });
-                                    for (var i = 0; i < removedItems.length; i++) {
-                                        _this._callDisposeFunction(removedItems[i].value);
-                                    }
-                                    for (var i = 0; i < addedItems.length; i++) {
-                                        _this._createDisposeFunction(addedItems[i].value);
-                                    }
-                                    _this.properyChanged({ observable: property, arrayChanges: args });
-                                }
-                            }, null, "arrayChange");
-                        }
-                        else {
-                            if (ko.isWriteableObservable(property)) {
-                                if (subscribeChilds) {
-                                    this._createDisposeFunction(property());
-                                }
-                                return property.subscribe(function (val) {
-                                    if (_this._modelReady) {
-                                        if (subscribeChilds) {
-                                            _this._callDisposeFunction(prevVal);
-                                        }
-                                        _this.properyChanged({
-                                            observable: property, propertyChanged: { oldVal: prevVal, val: val }
-                                        });
-                                        prevVal = val;
-                                        if (subscribeChilds) {
-                                            _this._createDisposeFunction(val);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                };
-                UndoEngine.prototype.subscribeProperties = function (properties) {
-                    var _this = this;
-                    properties.forEach(function (property) {
-                        if (ko.isObservable(property)) {
-                            var prevVal = property();
-                            if (property["push"]) {
-                                _this._subscriptions.push(property.subscribe(function (args) {
-                                    if (_this._modelReady) {
-                                        if (!_this._inUndoRedo) {
-                                            _this.properyChanged({ observable: property, arrayChanges: args });
-                                            _this.subscribe(args.map(function (item) { return item.value; }));
-                                        }
-                                    }
-                                }, null, "arrayChange"));
-                            }
-                            else {
-                                if (ko.isWriteableObservable(property)) {
-                                    _this._subscriptions.push(property.subscribe(function (val) {
-                                        if (_this._modelReady) {
-                                            _this.properyChanged({
-                                                observable: property, propertyChanged: { oldVal: prevVal, val: val }
-                                            });
-                                            prevVal = property();
-                                        }
-                                    }));
-                                }
-                            }
-                        }
-                    });
-                };
-                UndoEngine.prototype.subscribe = function (target, info) {
-                    var _this = this;
-                    if (this._getInfoMethodName) {
-                        return this.visitProperties(target, info || (target && target[this._getInfoMethodName] && target[this._getInfoMethodName]()));
-                    }
-                    else {
-                        propertiesVisitor(target, function (properties) { _this.subscribeProperties(properties); }, this._visited, this._ignoredProperties);
-                    }
-                };
-                UndoEngine.prototype._removePropertiesSubscriptions = function () {
-                    this._subscriptions.forEach(function (subscription) { return subscription.dispose(); });
-                    this._subscriptions = [];
-                    this._visited = [];
-                };
-                UndoEngine.prototype.removeTargetSubscription = function () {
-                    this._targetSubscription.dispose();
-                    this.reset();
-                };
-                UndoEngine.prototype.undoAll = function () {
-                    if (this.undoEnabled()) {
-                        this.undo();
-                        this.undoAll();
-                    }
-                };
-                UndoEngine.prototype.reset = function () {
-                    this._removePropertiesSubscriptions();
-                    this.clearHistory();
-                };
-                UndoEngine.prototype.clearHistory = function () {
-                    this._groupObservers = [];
-                    this._observers = [];
-                    this.redoEnabled(false);
-                    this.undoEnabled(false);
-                    this._inUndoRedo = false;
-                    this._groupPosition = -1;
-                    this._position = -1;
-                    this.isDirty(false);
-                };
-                UndoEngine.prototype.undo = function () {
-                    var _this = this;
-                    try {
-                        this._inUndoRedo = true;
-                        if (this.undoEnabled()) {
-                            var changeSet = this._observers[this._position];
-                            if (Array.isArray(changeSet)) {
-                                changeSet.reverse().forEach(function (item) { return _this.undoChangeSet(item); });
-                            }
-                            else {
-                                this.undoChangeSet(changeSet);
-                            }
-                            this._position = this._position - 1;
-                            this.isDirty(true);
-                            this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
-                            this.redoEnabled(true);
-                        }
-                    }
-                    finally {
-                        this._inUndoRedo = false;
-                    }
-                };
-                UndoEngine.prototype.redo = function () {
-                    var _this = this;
-                    try {
-                        this._inUndoRedo = true;
-                        if (this.redoEnabled()) {
-                            var changeSet = this._observers[this._position + 1];
-                            if (Array.isArray(changeSet)) {
-                                changeSet.reverse().forEach(function (item) { return _this.redoChangeSet(item); });
-                            }
-                            else {
-                                this.redoChangeSet(changeSet);
-                            }
-                            this._position = this._position + 1;
-                            this.isDirty(true);
-                            this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
-                            this.redoEnabled(this._position + 1 < this._observers.length);
-                        }
-                    }
-                    finally {
-                        this._inUndoRedo = false;
-                    }
-                };
-                UndoEngine.prototype.start = function () {
-                    this.isIngroup++;
-                    if (this.isIngroup !== 0)
-                        return;
-                    this._groupObservers = this._observers;
-                    this._observers = [];
-                    this._groupPosition = this._position;
-                    this._position = -1;
-                };
-                UndoEngine.prototype.end = function () {
-                    this.isIngroup--;
-                    if (this.isIngroup !== -1) {
-                        return;
-                    }
-                    if (this._observers.length > 0) {
-                        this._position = this._groupPosition + 1;
-                        this._groupObservers.splice(this._position, this._groupObservers.length - this._position, this._observers);
-                    }
-                    else {
-                        this._position = this._groupPosition;
-                    }
-                    this._observers = this._groupObservers;
-                };
-                return UndoEngine;
-            })();
-            Utils.UndoEngine = UndoEngine;
-        })(Utils = JS.Utils || (JS.Utils = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-ko-undoengine.js.map
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Utils;
-        (function (Utils) {
-            var Disposable = (function () {
-                function Disposable() {
-                    this._disposables = [];
-                    this.isDisposing = false;
-                }
-                Disposable.prototype.dispose = function () {
-                    this.isDisposing = true;
-                    ko.utils.arrayForEach(this._disposables, this.disposeOne);
-                    this._disposables = [];
-                };
-                Disposable.prototype.disposeOne = function (propOrValue, value) {
-                    var disposable = value || propOrValue;
-                    if (disposable && !disposable.isDisposing && typeof disposable.dispose === "function") {
-                        disposable.dispose();
-                    }
-                };
-                return Disposable;
-            })();
-            Utils.Disposable = Disposable;
-        })(Utils = JS.Utils || (JS.Utils = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Data;
-        (function (Data) {
-            var CriteriaOperator = (function () {
-                function CriteriaOperator() {
-                    var _this = this;
-                    this.type = "Default";
-                    this.operands = null;
-                    this.changeValueType = function (type, location) {
-                        var result = new type();
-                        if (location.index !== null) {
-                            _this[location.name][location.index] = result;
-                        }
-                        else {
-                            _this[location.name] = result;
-                        }
-                        return result;
-                    };
-                    this.changeValue = function (operand, reverse, location) {
-                        var result = reverse ? new UnaryOperator(UnaryOperatorType.Minus, operand) : operand;
-                        if (location.index !== null) {
-                            _this[location.name][location.index] = result;
-                        }
-                        else {
-                            _this[location.name] = result;
-                        }
-                        return result;
-                    };
-                    this.assignLeftPart = function (criteriaOperator) { return void 0; };
-                    this.assignRightPart = function (criteriaOperator) { return void 0; };
-                    this.assignType = function (type) {
-                        _this.operatorType = type;
-                    };
-                    this.resetrightPart = function (value) { return void 0; };
-                }
-                CriteriaOperator.operators = function (enums) {
-                    var result = [].concat.apply([], enums.map(function (enumType) {
-                        return getEnumNames(enumType).map(function (enumName) {
-                            return { name: enumName, value: enumType[enumName], type: enumType };
-                        });
-                    }));
-                    return result;
-                };
-                CriteriaOperator.parse = function (stringCriteria) {
-                    if (stringCriteria && stringCriteria !== "") {
-                        return window["criteriaparser"].parse(stringCriteria);
-                    }
-                    return null;
-                };
-                CriteriaOperator.create = function (operatorType) {
-                    var operator = null;
-                    switch (operatorType.type) {
-                        case BinaryOperatorType:
-                            operator = new BinaryOperator(new OperandProperty(), new OperandValue(), operatorType.value);
-                            break;
-                        case GroupOperatorType:
-                            operator = new GroupOperator(operatorType.value, []);
-                            break;
-                        case FunctionOperatorType:
-                            operator = new FunctionOperator(operatorType.value, [new OperandProperty()]);
-                            break;
-                        case BetweenOperator:
-                            operator = new BetweenOperator(new OperandProperty(), new OperandValue(), new OperandValue());
-                            break;
-                        case InOperator:
-                            operator = new InOperator(new OperandProperty(), [new OperandValue()]);
-                            break;
-                        case UnaryOperatorType:
-                            operator = new UnaryOperator(operatorType.value, new OperandProperty());
-                            break;
-                        case Aggregate:
-                            var result = new AggregateOperand(new OperandProperty(), null, operatorType.value, new GroupOperator(GroupOperatorType.And, []));
-                            if (operatorType.value === Aggregate.Exists) {
-                                operator = result;
-                            }
-                            else {
-                                if (operatorType.value !== Aggregate.Count) {
-                                    result.aggregatedExpression = new OperandProperty();
-                                }
-                                operator = new BinaryOperator(result, new OperandValue(), BinaryOperatorType.Equal);
-                            }
-                            break;
-                        default:
-                            throw Error("Unsupported operator type");
-                    }
-                    if (operatorType.reverse) {
-                        return new UnaryOperator(UnaryOperatorType.Not, operator);
-                    }
-                    return operator;
-                };
-                CriteriaOperator.and = function (left, right) {
-                    return GroupOperator.combine(GroupOperatorType.Or, [left, right]);
-                };
-                CriteriaOperator.or = function (left, right) {
-                    return GroupOperator.combine(GroupOperatorType.Or, [left, right]);
-                };
-                CriteriaOperator.getNotValidRange = function (value, errorMessage) {
-                    var start = 0;
-                    var end = 0;
-                    var parts = errorMessage.split('\n');
-                    var errorText = parts[1];
-                    var errorLength = parts[2].length;
-                    if (errorText.indexOf('...') === 0) {
-                        errorText = errorText.split("...")[1];
-                    }
-                    var start = value.indexOf(errorText);
-                    var end = start + errorLength;
-                    return { start: start, end: end };
-                };
-                Object.defineProperty(CriteriaOperator.prototype, "displayType", {
-                    get: function () {
-                        return this.operatorType;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperator.prototype, "enumType", {
-                    get: function () {
-                        return null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperator.prototype, "leftPart", {
-                    get: function () { return null; },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperator.prototype, "rightPart", {
-                    get: function () { return null; },
-                    enumerable: true,
-                    configurable: true
-                });
-                CriteriaOperator.prototype.assignFrom = function (criteriaOperator, incorrectSpecificsForAggregate) {
-                    if (incorrectSpecificsForAggregate === void 0) { incorrectSpecificsForAggregate = false; }
-                    var operator = criteriaOperator;
-                    if (criteriaOperator instanceof UnaryOperator && !(criteriaOperator.leftPart instanceof OperandProperty)) {
-                        operator = criteriaOperator.leftPart;
-                    }
-                    if (incorrectSpecificsForAggregate) {
-                        this.assignLeftPart(operator.leftPart);
-                    }
-                    else {
-                        this.assignLeftPart(operator);
-                    }
-                    if (operator.rightPart) {
-                        this.assignRightPart(operator);
-                    }
-                };
-                CriteriaOperator.prototype.children = function () {
-                    var operands = [];
-                    if (this.leftPart)
-                        operands.push.apply(operands, $.isArray(this.leftPart) ? this.leftPart : [this.leftPart]);
-                    if (this.rightPart)
-                        operands.push.apply(operands, $.isArray(this.rightPart) ? this.rightPart : [this.rightPart]);
-                    return operands;
-                };
-                return CriteriaOperator;
-            })();
-            Data.CriteriaOperator = CriteriaOperator;
-            function getEnumNames(enumType) {
-                var result = [];
-                for (var enumValue in enumType) {
-                    if (isNaN(enumValue)) {
-                        result.push(enumValue);
-                    }
-                }
-                return result;
-            }
-            (function (GroupOperatorType) {
-                GroupOperatorType[GroupOperatorType["And"] = 0] = "And";
-                GroupOperatorType[GroupOperatorType["Or"] = 1] = "Or";
-            })(Data.GroupOperatorType || (Data.GroupOperatorType = {}));
-            var GroupOperatorType = Data.GroupOperatorType;
-            var GroupOperator = (function (_super) {
-                __extends(GroupOperator, _super);
-                function GroupOperator(operation, operands) {
-                    var _this = this;
-                    _super.call(this);
-                    this.create = function (isGroup, property, specifics) {
-                        var operator = new BinaryOperator(property, new OperandValue(""), BinaryOperatorType.Equal);
-                        if (isGroup) {
-                            operator = new GroupOperator(GroupOperatorType.And, []);
-                        }
-                        else if (specifics && specifics === "list") {
-                            operator = new AggregateOperand(property, null, Aggregate.Exists, new GroupOperator(GroupOperatorType.And, []));
-                        }
-                        _this.operands.push(operator);
-                        return _this.operands[_this.operands.indexOf(operator)];
-                    };
-                    this.change = function (operationType, item, incorrectSpecificsForAggregate) {
-                        if (incorrectSpecificsForAggregate === void 0) { incorrectSpecificsForAggregate = false; }
-                        var position = _this.operands.indexOf(item);
-                        if (position !== -1) {
-                            var operator = CriteriaOperator.create(operationType);
-                            if (operationType.type !== operator.enumType) {
-                                operator.leftPart.assignFrom(item);
-                            }
-                            else {
-                                operator.assignFrom(item, incorrectSpecificsForAggregate);
-                            }
-                            _this.operands[position] = operator;
-                        }
-                        else {
-                            throw Error("dont have this element in operands collection");
-                        }
-                        item = null;
-                        return _this.operands[position];
-                    };
-                    this.remove = function (operator) {
-                        _this.operands.splice(_this.operands.indexOf(operator), 1);
-                    };
-                    this.assignLeftPart = function (operator) {
-                        _this.operands = operator.operands;
-                    };
-                    this.operands = [];
-                    this.type = "Group";
-                    this.operatorType = operation;
-                    operands = operands || [new CriteriaOperator(), new CriteriaOperator()];
-                    operands.forEach(function (operand) { return _this.operands.push(operand); });
-                }
-                GroupOperator.combine = function (operation, operands) {
-                    var combinedOperands = [];
-                    (operands || []).forEach(function (operand) {
-                        if (operand instanceof GroupOperator && operand.operatorType === operation) {
-                            combinedOperands.push.apply(combinedOperands, operand.operands);
-                        }
-                        else {
-                            combinedOperands.push(operand);
-                        }
-                    });
-                    if (combinedOperands.length === 1) {
-                        return combinedOperands[0];
-                    }
-                    return new GroupOperator(operation, combinedOperands);
-                };
-                GroupOperator.prototype.children = function () {
-                    return this.operands;
-                };
-                Object.defineProperty(GroupOperator.prototype, "displayType", {
-                    get: function () {
-                        return GroupOperatorType[this.operatorType];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(GroupOperator.prototype, "enumType", {
-                    get: function () {
-                        return GroupOperatorType;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return GroupOperator;
-            })(CriteriaOperator);
-            Data.GroupOperator = GroupOperator;
-            var OperandProperty = (function (_super) {
-                __extends(OperandProperty, _super);
-                function OperandProperty(propertyName, startColumn, startLine) {
-                    if (propertyName === void 0) { propertyName = ""; }
-                    if (startColumn === void 0) { startColumn = -1; }
-                    if (startLine === void 0) { startLine = -1; }
-                    _super.call(this);
-                    this.type = "Property";
-                    this.propertyName = propertyName;
-                    this.startPosition = { column: startColumn, line: startLine };
-                }
-                Object.defineProperty(OperandProperty.prototype, "displayType", {
-                    get: function () {
-                        return '[' + this.propertyName + ']';
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return OperandProperty;
-            })(CriteriaOperator);
-            Data.OperandProperty = OperandProperty;
-            var OperandValue = (function (_super) {
-                __extends(OperandValue, _super);
-                function OperandValue(value) {
-                    _super.call(this);
-                    this.type = "Value";
-                    var result = value !== null && value !== undefined ? value : "";
-                    if (value && value["length"] && value[0] === "'" && value[value.length - 1] === "'") {
-                        result = value.slice(1, value.length - 1);
-                    }
-                    else if (value && value["length"] && value[0] === "#" && value[value.length - 1] === "#") {
-                        result = value.slice(1, value.length - 1);
-                        result = JS.Localization.parseDate(result);
-                        if (!result) {
-                            result = JS.Localization.parseDate(value.slice(1, value.length - 1));
-                        }
-                    }
-                    else if (String(value).toLowerCase() === "true" || String(value).toLowerCase() === "false") {
-                        result = String(value).toLowerCase() === "true" ? "True" : "False";
-                    }
-                    this.value = result;
-                }
-                Object.defineProperty(OperandValue.prototype, "displayType", {
-                    get: function () {
-                        return this.value || "?";
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return OperandValue;
-            })(CriteriaOperator);
-            Data.OperandValue = OperandValue;
-            var ConstantValue = (function (_super) {
-                __extends(ConstantValue, _super);
-                function ConstantValue(value) {
-                    _super.call(this, value);
-                }
-                return ConstantValue;
-            })(OperandValue);
-            Data.ConstantValue = ConstantValue;
-            var OperandParameter = (function (_super) {
-                __extends(OperandParameter, _super);
-                function OperandParameter(parameterName, value) {
-                    _super.call(this, value);
-                    this.type = "Parameter";
-                    this.parameterName = parameterName || "";
-                }
-                Object.defineProperty(OperandParameter.prototype, "displayType", {
-                    get: function () {
-                        return '?' + this.parameterName;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return OperandParameter;
-            })(OperandValue);
-            Data.OperandParameter = OperandParameter;
-            (function (Aggregate) {
-                Aggregate[Aggregate["Count"] = 0] = "Count";
-                Aggregate[Aggregate["Exists"] = 1] = "Exists";
-                Aggregate[Aggregate["Min"] = 2] = "Min";
-                Aggregate[Aggregate["Max"] = 3] = "Max";
-                Aggregate[Aggregate["Avg"] = 4] = "Avg";
-                Aggregate[Aggregate["Sum"] = 5] = "Sum";
-                Aggregate[Aggregate["Single"] = 6] = "Single";
-            })(Data.Aggregate || (Data.Aggregate = {}));
-            var Aggregate = Data.Aggregate;
-            var AggregateOperand = (function (_super) {
-                __extends(AggregateOperand, _super);
-                function AggregateOperand(property, aggregatedExpression, aggregateType, condition) {
-                    var _this = this;
-                    _super.call(this);
-                    this.change = function (operationType, item) {
-                        var operator = null;
-                        if (operationType.type === GroupOperatorType) {
-                            operator = CriteriaOperator.create(operationType);
-                            if (operationType.type !== operator.enumType) {
-                                operator.leftPart.assignFrom(item);
-                            }
-                            else {
-                                operator.assignFrom(item);
-                            }
-                            _this.condition = operator;
-                        }
-                        return operator;
-                    };
-                    this.assignLeftPart = function (criteriaOperator) {
-                        if (criteriaOperator.leftPart instanceof AggregateOperand) {
-                            _this.assignFrom(criteriaOperator.leftPart);
-                        }
-                        else {
-                            if (CriteriaOperator instanceof AggregateOperand) {
-                                _this.property = criteriaOperator.property;
-                                if (_this.aggregatedExpression && criteriaOperator.aggregatedExpression) {
-                                    _this.aggregatedExpression = criteriaOperator.aggregatedExpression;
-                                }
-                                _this.condition = criteriaOperator.property;
-                            }
-                            else {
-                                _this.property = criteriaOperator.leftPart;
-                            }
-                        }
-                    };
-                    this.type = "Aggregate";
-                    this.property = property;
-                    if (condition instanceof GroupOperator) {
-                        this.condition = condition;
-                    }
-                    else {
-                        if (condition instanceof UnaryOperator && condition.operatorType === UnaryOperatorType.Not) {
-                            if (condition.operand instanceof GroupOperator) {
-                                this.condition = new UnaryOperator(UnaryOperatorType.Not, condition.operand);
-                            }
-                            else {
-                                this.condition = new UnaryOperator(UnaryOperatorType.Not, new GroupOperator(GroupOperatorType.And, condition.operand ? [condition.operand] : []));
-                            }
-                        }
-                        else {
-                            this.condition = new GroupOperator(GroupOperatorType.And, condition ? [condition] : []);
-                        }
-                    }
-                    this.operatorType = aggregateType;
-                    this.aggregatedExpression = aggregatedExpression;
-                }
-                Object.defineProperty(AggregateOperand.prototype, "displayType", {
-                    get: function () {
-                        return Aggregate[this.operatorType];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(AggregateOperand.prototype, "enumType", {
-                    get: function () {
-                        return Aggregate;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(AggregateOperand.prototype, "leftPart", {
-                    get: function () {
-                        return this.property;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                AggregateOperand.prototype.children = function () {
-                    var operands = [];
-                    this.property && operands.push(this.property);
-                    this.condition && operands.push(this.condition);
-                    this.aggregatedExpression && operands.push(this.aggregatedExpression);
-                    return operands;
-                };
-                return AggregateOperand;
-            })(CriteriaOperator);
-            Data.AggregateOperand = AggregateOperand;
-            var JoinOperand = (function (_super) {
-                __extends(JoinOperand, _super);
-                function JoinOperand(joinTypeName, condition, type, aggregated) {
-                    _super.call(this);
-                    this.type = "Join";
-                    this.joinTypeName = joinTypeName;
-                    this.condition = condition;
-                    this.operatorType = type;
-                    this.aggregatedExpression = aggregated;
-                }
-                JoinOperand.joinOrAggregate = function (collectionProperty, condition, type, aggregated) {
-                    if (collectionProperty === null || collectionProperty.propertyName.length < 2 || collectionProperty.propertyName[0] != '<' || collectionProperty.propertyName[collectionProperty.propertyName.length - 1] != '>') {
-                        return new AggregateOperand(collectionProperty, aggregated, type, condition);
-                    }
-                    else {
-                        return new JoinOperand(collectionProperty.propertyName.substring(1, collectionProperty.propertyName.length - 2), condition, type, aggregated);
-                    }
-                };
-                return JoinOperand;
-            })(CriteriaOperator);
-            Data.JoinOperand = JoinOperand;
-            var BetweenOperator = (function (_super) {
-                __extends(BetweenOperator, _super);
-                function BetweenOperator(property, begin, end) {
-                    var _this = this;
-                    _super.call(this);
-                    this.resetRightPart = function (newVal) {
-                        _this.begin = new OperandValue(newVal);
-                        _this.end = new OperandValue(newVal);
-                    };
-                    this.assignLeftPart = function (criteriaOperator) {
-                        _this.property = criteriaOperator.leftPart;
-                    };
-                    this.assignRightPart = function (criteriaOperator) {
-                        if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
-                            if (criteriaOperator.rightPart.length) {
-                                _this.begin = criteriaOperator.rightPart[0];
-                                _this.end = criteriaOperator.rightPart.length > 1 ? criteriaOperator.rightPart[1] : new OperandValue();
-                            }
-                            else {
-                                _this.begin = new OperandValue();
-                                _this.end = new OperandValue();
-                            }
-                        }
-                        else {
-                            _this.begin = criteriaOperator.rightPart;
-                            _this.end = new OperandValue();
-                        }
-                    };
-                    this.operatorType = "Between";
-                    this.type = "Between";
-                    this.property = property;
-                    this.begin = begin || new OperandValue();
-                    this.end = end || new OperandValue();
-                }
-                Object.defineProperty(BetweenOperator.prototype, "leftPart", {
-                    get: function () {
-                        return this.property;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BetweenOperator.prototype, "rightPart", {
-                    get: function () {
-                        return [this.begin, this.end];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BetweenOperator.prototype, "displayType", {
-                    get: function () {
-                        return "Between";
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BetweenOperator.prototype, "enumType", {
-                    get: function () {
-                        return BetweenOperator;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return BetweenOperator;
-            })(CriteriaOperator);
-            Data.BetweenOperator = BetweenOperator;
-            var InOperator = (function (_super) {
-                __extends(InOperator, _super);
-                function InOperator(criteriaOperator, operands) {
-                    var _this = this;
-                    _super.call(this);
-                    this.assignLeftPart = function (criteriaOperator) {
-                        _this.criteriaOperator = criteriaOperator.leftPart;
-                    };
-                    this.assignRightPart = function (criteriaOperator) {
-                        _this.operands = [].concat(criteriaOperator.rightPart);
-                    };
-                    this.operatorType = "In";
-                    this.type = "In";
-                    this.operands = [];
-                    this.criteriaOperator = criteriaOperator || new CriteriaOperator();
-                    (operands || []).forEach(function (operand) { return _this.operands.push(operand); });
-                }
-                Object.defineProperty(InOperator.prototype, "leftPart", {
-                    get: function () {
-                        return this.criteriaOperator;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(InOperator.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(InOperator.prototype, "displayType", {
-                    get: function () {
-                        return "In";
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(InOperator.prototype, "enumType", {
-                    get: function () {
-                        return InOperator;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return InOperator;
-            })(CriteriaOperator);
-            Data.InOperator = InOperator;
-            (function (BinaryOperatorType) {
-                BinaryOperatorType[BinaryOperatorType["Equal"] = 0] = "Equal";
-                BinaryOperatorType[BinaryOperatorType["NotEqual"] = 1] = "NotEqual";
-                BinaryOperatorType[BinaryOperatorType["Greater"] = 2] = "Greater";
-                BinaryOperatorType[BinaryOperatorType["Less"] = 3] = "Less";
-                BinaryOperatorType[BinaryOperatorType["LessOrEqual"] = 4] = "LessOrEqual";
-                BinaryOperatorType[BinaryOperatorType["GreaterOrEqual"] = 5] = "GreaterOrEqual";
-                BinaryOperatorType[BinaryOperatorType["Like"] = 6] = "Like";
-                BinaryOperatorType[BinaryOperatorType["BitwiseAnd"] = 7] = "BitwiseAnd";
-                BinaryOperatorType[BinaryOperatorType["BitwiseOr"] = 8] = "BitwiseOr";
-                BinaryOperatorType[BinaryOperatorType["BitwiseXor"] = 9] = "BitwiseXor";
-                BinaryOperatorType[BinaryOperatorType["Divide"] = 10] = "Divide";
-                BinaryOperatorType[BinaryOperatorType["Modulo"] = 11] = "Modulo";
-                BinaryOperatorType[BinaryOperatorType["Multiply"] = 12] = "Multiply";
-                BinaryOperatorType[BinaryOperatorType["Plus"] = 13] = "Plus";
-                BinaryOperatorType[BinaryOperatorType["Minus"] = 14] = "Minus";
-            })(Data.BinaryOperatorType || (Data.BinaryOperatorType = {}));
-            var BinaryOperatorType = Data.BinaryOperatorType;
-            var BinaryOperator = (function (_super) {
-                __extends(BinaryOperator, _super);
-                function BinaryOperator(left, right, operatorType) {
-                    var _this = this;
-                    _super.call(this);
-                    this.assignLeftPart = function (criteriaOperator) {
-                        _this.leftOperand = criteriaOperator.leftPart;
-                    };
-                    this.assignRightPart = function (criteriaOperator) {
-                        if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
-                            if (criteriaOperator.rightPart.length) {
-                                _this.rightOperand = criteriaOperator.rightPart[0];
-                            }
-                        }
-                        else {
-                            _this.rightOperand = criteriaOperator.rightPart;
-                        }
-                    };
-                    this.type = "Binary";
-                    this.leftOperand = left || new CriteriaOperator();
-                    this.rightOperand = right || new CriteriaOperator();
-                    this.operatorType = operatorType;
-                }
-                Object.defineProperty(BinaryOperator.prototype, "leftPart", {
-                    get: function () {
-                        return this.leftOperand;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BinaryOperator.prototype, "rightPart", {
-                    get: function () {
-                        return this.rightOperand;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BinaryOperator.prototype, "displayType", {
-                    get: function () {
-                        return Data.operatorTokens[BinaryOperatorType[this.operatorType]] || BinaryOperatorType[this.operatorType];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BinaryOperator.prototype, "enumType", {
-                    get: function () {
-                        return BinaryOperatorType;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return BinaryOperator;
-            })(CriteriaOperator);
-            Data.BinaryOperator = BinaryOperator;
-            (function (UnaryOperatorType) {
-                UnaryOperatorType[UnaryOperatorType["Minus"] = 0] = "Minus";
-                UnaryOperatorType[UnaryOperatorType["Plus"] = 1] = "Plus";
-                UnaryOperatorType[UnaryOperatorType["BitwiseNot"] = 2] = "BitwiseNot";
-                UnaryOperatorType[UnaryOperatorType["Not"] = 3] = "Not";
-                UnaryOperatorType[UnaryOperatorType["IsNull"] = 4] = "IsNull";
-            })(Data.UnaryOperatorType || (Data.UnaryOperatorType = {}));
-            var UnaryOperatorType = Data.UnaryOperatorType;
-            var UnaryOperator = (function (_super) {
-                __extends(UnaryOperator, _super);
-                function UnaryOperator(operatorType, operand) {
-                    _super.call(this);
-                    this.type = "Unary";
-                    this.operand = operand || new CriteriaOperator();
-                    this.operatorType = operatorType;
-                }
-                Object.defineProperty(UnaryOperator.prototype, "leftPart", {
-                    get: function () {
-                        return this.operand;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                UnaryOperator.prototype.assignFrom = function (criteriaOperator) {
-                    if (this.operatorType === UnaryOperatorType.Not) {
-                        if (criteriaOperator instanceof UnaryOperator) {
-                            this.operand.assignFrom(criteriaOperator.operand);
-                        }
-                        else {
-                            this.operand.assignFrom(criteriaOperator);
-                        }
-                    }
-                    else {
-                        if (criteriaOperator instanceof UnaryOperator) {
-                            this.operand = criteriaOperator.operand.leftPart;
-                        }
-                        else {
-                            this.operand = criteriaOperator.leftPart || criteriaOperator;
-                        }
-                    }
-                };
-                Object.defineProperty(UnaryOperator.prototype, "displayType", {
-                    get: function () {
-                        return UnaryOperatorType[this.operatorType];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(UnaryOperator.prototype, "enumType", {
-                    get: function () {
-                        return UnaryOperatorType;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return UnaryOperator;
-            })(CriteriaOperator);
-            Data.UnaryOperator = UnaryOperator;
-            (function (FunctionOperatorType) {
-                FunctionOperatorType[FunctionOperatorType["None"] = 0] = "None";
-                FunctionOperatorType[FunctionOperatorType["Custom"] = 1] = "Custom";
-                FunctionOperatorType[FunctionOperatorType["CustomNonDeterministic"] = 2] = "CustomNonDeterministic";
-                FunctionOperatorType[FunctionOperatorType["Iif"] = 3] = "Iif";
-                FunctionOperatorType[FunctionOperatorType["IsNull"] = 4] = "IsNull";
-                FunctionOperatorType[FunctionOperatorType["IsNullOrEmpty"] = 5] = "IsNullOrEmpty";
-                FunctionOperatorType[FunctionOperatorType["Trim"] = 6] = "Trim";
-                FunctionOperatorType[FunctionOperatorType["Len"] = 7] = "Len";
-                FunctionOperatorType[FunctionOperatorType["Substring"] = 8] = "Substring";
-                FunctionOperatorType[FunctionOperatorType["Upper"] = 9] = "Upper";
-                FunctionOperatorType[FunctionOperatorType["Lower"] = 10] = "Lower";
-                FunctionOperatorType[FunctionOperatorType["Concat"] = 11] = "Concat";
-                FunctionOperatorType[FunctionOperatorType["Ascii"] = 12] = "Ascii";
-                FunctionOperatorType[FunctionOperatorType["Char"] = 13] = "Char";
-                FunctionOperatorType[FunctionOperatorType["ToStr"] = 14] = "ToStr";
-                FunctionOperatorType[FunctionOperatorType["Replace"] = 15] = "Replace";
-                FunctionOperatorType[FunctionOperatorType["Reverse"] = 16] = "Reverse";
-                FunctionOperatorType[FunctionOperatorType["Insert"] = 17] = "Insert";
-                FunctionOperatorType[FunctionOperatorType["CharIndex"] = 18] = "CharIndex";
-                FunctionOperatorType[FunctionOperatorType["Remove"] = 19] = "Remove";
-                FunctionOperatorType[FunctionOperatorType["Abs"] = 20] = "Abs";
-                FunctionOperatorType[FunctionOperatorType["Sqr"] = 21] = "Sqr";
-                FunctionOperatorType[FunctionOperatorType["Cos"] = 22] = "Cos";
-                FunctionOperatorType[FunctionOperatorType["Sin"] = 23] = "Sin";
-                FunctionOperatorType[FunctionOperatorType["Atn"] = 24] = "Atn";
-                FunctionOperatorType[FunctionOperatorType["Exp"] = 25] = "Exp";
-                FunctionOperatorType[FunctionOperatorType["Log"] = 26] = "Log";
-                FunctionOperatorType[FunctionOperatorType["Rnd"] = 27] = "Rnd";
-                FunctionOperatorType[FunctionOperatorType["Tan"] = 28] = "Tan";
-                FunctionOperatorType[FunctionOperatorType["Power"] = 29] = "Power";
-                FunctionOperatorType[FunctionOperatorType["Sign"] = 30] = "Sign";
-                FunctionOperatorType[FunctionOperatorType["Round"] = 31] = "Round";
-                FunctionOperatorType[FunctionOperatorType["Ceiling"] = 32] = "Ceiling";
-                FunctionOperatorType[FunctionOperatorType["Floor"] = 33] = "Floor";
-                FunctionOperatorType[FunctionOperatorType["Max"] = 34] = "Max";
-                FunctionOperatorType[FunctionOperatorType["Min"] = 35] = "Min";
-                FunctionOperatorType[FunctionOperatorType["Acos"] = 36] = "Acos";
-                FunctionOperatorType[FunctionOperatorType["Asin"] = 37] = "Asin";
-                FunctionOperatorType[FunctionOperatorType["Atn2"] = 38] = "Atn2";
-                FunctionOperatorType[FunctionOperatorType["BigMul"] = 39] = "BigMul";
-                FunctionOperatorType[FunctionOperatorType["Cosh"] = 40] = "Cosh";
-                FunctionOperatorType[FunctionOperatorType["Log10"] = 41] = "Log10";
-                FunctionOperatorType[FunctionOperatorType["Sinh"] = 42] = "Sinh";
-                FunctionOperatorType[FunctionOperatorType["Tanh"] = 43] = "Tanh";
-                FunctionOperatorType[FunctionOperatorType["PadLeft"] = 44] = "PadLeft";
-                FunctionOperatorType[FunctionOperatorType["PadRight"] = 45] = "PadRight";
-                FunctionOperatorType[FunctionOperatorType["StartsWith"] = 46] = "StartsWith";
-                FunctionOperatorType[FunctionOperatorType["EndsWith"] = 47] = "EndsWith";
-                FunctionOperatorType[FunctionOperatorType["Contains"] = 48] = "Contains";
-                FunctionOperatorType[FunctionOperatorType["ToInt"] = 49] = "ToInt";
-                FunctionOperatorType[FunctionOperatorType["ToLong"] = 50] = "ToLong";
-                FunctionOperatorType[FunctionOperatorType["ToFloat"] = 51] = "ToFloat";
-                FunctionOperatorType[FunctionOperatorType["ToDouble"] = 52] = "ToDouble";
-                FunctionOperatorType[FunctionOperatorType["ToDecimal"] = 53] = "ToDecimal";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeThisYear"] = 54] = "LocalDateTimeThisYear";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeThisMonth"] = 55] = "LocalDateTimeThisMonth";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeLastWeek"] = 56] = "LocalDateTimeLastWeek";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeThisWeek"] = 57] = "LocalDateTimeThisWeek";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeYesterday"] = 58] = "LocalDateTimeYesterday";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeToday"] = 59] = "LocalDateTimeToday";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNow"] = 60] = "LocalDateTimeNow";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeTomorrow"] = 61] = "LocalDateTimeTomorrow";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeDayAfterTomorrow"] = 62] = "LocalDateTimeDayAfterTomorrow";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNextWeek"] = 63] = "LocalDateTimeNextWeek";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeTwoWeeksAway"] = 64] = "LocalDateTimeTwoWeeksAway";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNextMonth"] = 65] = "LocalDateTimeNextMonth";
-                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNextYear"] = 66] = "LocalDateTimeNextYear";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalBeyondThisYear"] = 67] = "IsOutlookIntervalBeyondThisYear";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLaterThisYear"] = 68] = "IsOutlookIntervalLaterThisYear";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLaterThisMonth"] = 69] = "IsOutlookIntervalLaterThisMonth";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalNextWeek"] = 70] = "IsOutlookIntervalNextWeek";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLaterThisWeek"] = 71] = "IsOutlookIntervalLaterThisWeek";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalTomorrow"] = 72] = "IsOutlookIntervalTomorrow";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalToday"] = 73] = "IsOutlookIntervalToday";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalYesterday"] = 74] = "IsOutlookIntervalYesterday";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalEarlierThisWeek"] = 75] = "IsOutlookIntervalEarlierThisWeek";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLastWeek"] = 76] = "IsOutlookIntervalLastWeek";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalEarlierThisMonth"] = 77] = "IsOutlookIntervalEarlierThisMonth";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalEarlierThisYear"] = 78] = "IsOutlookIntervalEarlierThisYear";
-                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalPriorThisYear"] = 79] = "IsOutlookIntervalPriorThisYear";
-                FunctionOperatorType[FunctionOperatorType["IsThisWeek"] = 80] = "IsThisWeek";
-                FunctionOperatorType[FunctionOperatorType["IsThisMonth"] = 81] = "IsThisMonth";
-                FunctionOperatorType[FunctionOperatorType["IsThisYear"] = 82] = "IsThisYear";
-                FunctionOperatorType[FunctionOperatorType["DateDiffTick"] = 83] = "DateDiffTick";
-                FunctionOperatorType[FunctionOperatorType["DateDiffSecond"] = 84] = "DateDiffSecond";
-                FunctionOperatorType[FunctionOperatorType["DateDiffMilliSecond"] = 85] = "DateDiffMilliSecond";
-                FunctionOperatorType[FunctionOperatorType["DateDiffMinute"] = 86] = "DateDiffMinute";
-                FunctionOperatorType[FunctionOperatorType["DateDiffHour"] = 87] = "DateDiffHour";
-                FunctionOperatorType[FunctionOperatorType["DateDiffDay"] = 88] = "DateDiffDay";
-                FunctionOperatorType[FunctionOperatorType["DateDiffMonth"] = 89] = "DateDiffMonth";
-                FunctionOperatorType[FunctionOperatorType["DateDiffYear"] = 90] = "DateDiffYear";
-                FunctionOperatorType[FunctionOperatorType["GetDate"] = 91] = "GetDate";
-                FunctionOperatorType[FunctionOperatorType["GetMilliSecond"] = 92] = "GetMilliSecond";
-                FunctionOperatorType[FunctionOperatorType["GetSecond"] = 93] = "GetSecond";
-                FunctionOperatorType[FunctionOperatorType["GetMinute"] = 94] = "GetMinute";
-                FunctionOperatorType[FunctionOperatorType["GetHour"] = 95] = "GetHour";
-                FunctionOperatorType[FunctionOperatorType["GetDay"] = 96] = "GetDay";
-                FunctionOperatorType[FunctionOperatorType["GetMonth"] = 97] = "GetMonth";
-                FunctionOperatorType[FunctionOperatorType["GetYear"] = 98] = "GetYear";
-                FunctionOperatorType[FunctionOperatorType["GetDayOfWeek"] = 99] = "GetDayOfWeek";
-                FunctionOperatorType[FunctionOperatorType["GetDayOfYear"] = 100] = "GetDayOfYear";
-                FunctionOperatorType[FunctionOperatorType["GetTimeOfDay"] = 101] = "GetTimeOfDay";
-                FunctionOperatorType[FunctionOperatorType["Now"] = 102] = "Now";
-                FunctionOperatorType[FunctionOperatorType["UtcNow"] = 103] = "UtcNow";
-                FunctionOperatorType[FunctionOperatorType["Today"] = 104] = "Today";
-                FunctionOperatorType[FunctionOperatorType["AddTimeSpan"] = 105] = "AddTimeSpan";
-                FunctionOperatorType[FunctionOperatorType["AddTicks"] = 106] = "AddTicks";
-                FunctionOperatorType[FunctionOperatorType["AddMilliSeconds"] = 107] = "AddMilliSeconds";
-                FunctionOperatorType[FunctionOperatorType["AddSeconds"] = 108] = "AddSeconds";
-                FunctionOperatorType[FunctionOperatorType["AddMinutes"] = 109] = "AddMinutes";
-                FunctionOperatorType[FunctionOperatorType["AddHours"] = 110] = "AddHours";
-                FunctionOperatorType[FunctionOperatorType["AddDays"] = 111] = "AddDays";
-                FunctionOperatorType[FunctionOperatorType["AddMonths"] = 112] = "AddMonths";
-                FunctionOperatorType[FunctionOperatorType["AddYears"] = 113] = "AddYears";
-                FunctionOperatorType[FunctionOperatorType["OrderDescToken"] = 114] = "OrderDescToken";
-            })(Data.FunctionOperatorType || (Data.FunctionOperatorType = {}));
-            var FunctionOperatorType = Data.FunctionOperatorType;
-            var FunctionOperator = (function (_super) {
-                __extends(FunctionOperator, _super);
-                function FunctionOperator(operatorType, operands) {
-                    var _this = this;
-                    _super.call(this);
-                    this.toString = function (reverse) {
-                        var result = (Data.operatorTokens[_this.displayType] || _this.displayType) + '(' + _this.operands.map(function (operand) {
-                            return operand.toString();
-                        }).join(", ") + ')';
-                        return reverse ? "Not " + result : result;
-                    };
-                    this.assignLeftPart = function (criteriaOperator) {
-                        _this.operands = [criteriaOperator.leftPart];
-                    };
-                    this.assignRightPart = function (criteriaOperator) {
-                        if (_this.operatorType !== FunctionOperatorType.IsNullOrEmpty &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalBeyondThisYear &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisYear &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisMonth &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalNextWeek &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisWeek &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalTomorrow &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalToday &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalYesterday &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalEarlierThisWeek &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLastWeek &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalEarlierThisMonth &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalEarlierThisYear &&
-                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalPriorThisYear) {
-                            if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
-                                if (criteriaOperator.rightPart.length) {
-                                    _this.operands.push(criteriaOperator.rightPart[0]);
-                                }
-                                else {
-                                    _this.operands.push(new OperandValue());
-                                }
-                            }
-                            else {
-                                _this.operands.push(criteriaOperator.rightPart);
-                            }
-                        }
-                    };
-                    this.operands = [];
-                    this.type = "Function";
-                    this.operatorType = operatorType;
-                    operands = operands || [new CriteriaOperator()];
-                    operands.forEach(function (operand) { return _this.operands.push(operand); });
-                }
-                Object.defineProperty(FunctionOperator.prototype, "leftPart", {
-                    get: function () {
-                        return this.operands[0];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FunctionOperator.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands.filter(function (_, index) { return index !== 0; });
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FunctionOperator.prototype, "displayType", {
-                    get: function () {
-                        return FunctionOperatorType[this.operatorType] || this.operatorType.toString();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FunctionOperator.prototype, "enumType", {
-                    get: function () {
-                        return FunctionOperatorType;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return FunctionOperator;
-            })(CriteriaOperator);
-            Data.FunctionOperator = FunctionOperator;
-            Data.operatorTokens = {
-                "Plus": "+",
-                "Minus": "-",
-                "Equal": "=",
-                "NotEqual": "<>",
-                "Greater": ">",
-                "Less": "<",
-                "LessOrEqual": "<=",
-                "GreaterOrEqual": ">="
-            };
-            function criteriaForEach(operator, callback) {
-                callback(operator);
-                operator.children().forEach(function (item) { return criteriaForEach(item, callback); });
-            }
-            Data.criteriaForEach = criteriaForEach;
-        })(Data = JS.Data || (JS.Data = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var PathRequest = (function () {
-                function PathRequest(fullPath, pathParts) {
-                    if (pathParts === void 0) { pathParts = []; }
-                    this.pathParts = pathParts;
-                    this.path = "";
-                    this.fullPath = fullPath;
-                    if (fullPath) {
-                        if (fullPath.indexOf('.') !== -1) {
-                            var pathComponents = fullPath.split('.');
-                            this.id = this.ref = pathComponents[0];
-                            pathComponents.splice(0, 1);
-                            this.path = pathComponents.join('.');
-                        }
-                        else {
-                            this.id = this.ref = fullPath;
-                        }
-                    }
-                }
-                return PathRequest;
-            })();
-            Widgets.PathRequest = PathRequest;
-            var TreeListItemViewModel = (function () {
-                function TreeListItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
-                    var _this = this;
-                    if (path === void 0) { path = []; }
-                    if (hasItems === void 0) { hasItems = true; }
-                    if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
-                    if (rtl === void 0) { rtl = false; }
-                    this._rtl = false;
-                    this.level = -1;
-                    this.hasItems = true;
-                    this.items = ko.observableArray();
-                    this.collapsed = ko.observable(true);
-                    this.data = null;
-                    this.isSelected = ko.observable(false);
-                    this._path = path;
-                    this._rtl = rtl;
-                    this.hasItems = hasItems;
-                    this._treeListController = options.treeListController;
-                    this._templateName = options.templateName;
-                    this._onItemsVisibilityChanged = onItemsVisibilityChanged;
-                    this.dragDropHandler = options.treeListController.dragDropHandler;
-                    this.getItems = function () {
-                        return _this._loadItems(options);
-                    };
-                    this.toggleSelected = function () {
-                        if (_this._treeListController.canSelect(_this)) {
-                            options.treeListController["clickHandler"] && options.treeListController["clickHandler"](_this);
-                            options.selectedPath(_this.path);
-                        }
-                    };
-                    if (options.treeListController.dblClickHandler) {
-                        this.dblClickHandler = function (item) {
-                            options.treeListController.dblClickHandler && options.treeListController.dblClickHandler(item);
-                        };
-                    }
-                    this.toggleCollapsed = function () {
-                        if (_this.hasItems) {
-                            _this.collapsed(!_this.collapsed.peek());
-                            if (!_this.collapsed.peek() && _this.items().length === 0) {
-                                _this._loadItems(options).always(function () { onItemsVisibilityChanged(); });
-                            }
-                            else {
-                                onItemsVisibilityChanged();
-                            }
-                        }
-                    };
-                    this.nodeImageClass = this._getNodeImageClassName();
-                }
-                TreeListItemViewModel.prototype._getImageClassName = function (field) {
-                    return ko.computed(function () {
-                        return "dx-image-fieldlist-" + (ko.unwrap(field.specifics) || "default").toLowerCase();
-                    });
-                };
-                TreeListItemViewModel.prototype._getNodeImageClassName = function () {
-                    var _this = this;
-                    var imageClassName = ko.observable("dx-collapsing-image");
-                    return ko.computed({
-                        read: function () {
-                            if (!_this.hasItems) {
-                                return 'dx-image-leaf-node';
-                            }
-                            return _this.collapsed() ? 'dx-collapsing-image' : imageClassName();
-                        },
-                        write: function (newValue) {
-                            imageClassName(newValue);
-                        }
-                    });
-                };
-                TreeListItemViewModel.prototype._loadItems = function (options) {
-                    var _this = this;
-                    var deferred = $.Deferred();
-                    if (this._loader) {
-                        this._loader.dispose();
-                    }
-                    var promise = ko.observable();
-                    promise.subscribe(function (value) {
-                        if (!value)
-                            return;
-                        value.done(function (data) {
-                            var _data = data;
-                            _this.items.peek().forEach(function (item) { return item.dispose(); });
-                            _this.items($.map(_data, function (item) {
-                                var newItem = new TreeListItemViewModel(options, _this.pathParts, options.treeListController.hasItems(item), _this._onItemsVisibilityChanged, _this._rtl);
-                                newItem.data = item;
-                                newItem.level = _this.level + 1;
-                                newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
-                                newItem.imageClassName = _this._getImageClassName(item);
-                                return newItem;
-                            }));
-                            _this.nodeImageClass(_this.items.peek().filter(function (x) { return x.visible; }).length > 0 ? "dx-collapsing-image dx-image-expanded" : "dx-image-leaf-node");
-                            deferred.resolve(_this.items.peek());
-                            var selectedPath = options.selectedPath.peek();
-                            if (selectedPath) {
-                                var item2Select = _this.items.peek().filter(function (item) { return selectedPath.indexOf(item.path) === 0; })[0];
-                                if (item2Select) {
-                                    _this._selectItem(item2Select.name + selectedPath.substring(item2Select.path.length));
-                                }
-                            }
-                        });
-                    });
-                    this._loader = ko.computed(function () {
-                        promise(options.itemsProvider.getItems(new PathRequest(_this.path, _this.pathParts)));
-                    });
-                    return deferred.promise();
-                };
-                TreeListItemViewModel.prototype._selectItem = function (itemPath) {
-                    var _this = this;
-                    if (!this.hasItems) {
-                        return;
-                    }
-                    var selectItemDelegate = function () {
-                        _this._find(itemPath);
-                        if (_this.collapsed.peek()) {
-                            _this.toggleCollapsed();
-                        }
-                    };
-                    if (this.items.peek().length === 0) {
-                        this.getItems().done(function (items) {
-                            selectItemDelegate();
-                        });
-                    }
-                    else {
-                        selectItemDelegate();
-                    }
-                };
-                TreeListItemViewModel.prototype._find = function (itemPath) {
-                    var item = itemPath && this.items.peek().filter(function (childItem) {
-                        return itemPath === childItem.name
-                            || itemPath.indexOf(childItem.name) === 0 && itemPath[childItem.name.length] === '.';
-                    })[0];
-                    if (item) {
-                        if (itemPath.length > item.name.length) {
-                            item._selectItem(itemPath.substr(item.name.length + 1));
-                        }
-                        else {
-                            this._treeListController.select(item);
-                        }
-                    }
-                };
-                TreeListItemViewModel.prototype._applyPadding = function (position, value) {
-                    var padding = {};
-                    padding["padding-" + position] = value;
-                    return padding;
-                };
-                Object.defineProperty(TreeListItemViewModel.prototype, "name", {
-                    get: function () {
-                        return ko.unwrap(this.data && this.data.name);
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "path", {
-                    get: function () {
-                        return this.pathParts.join(".");
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "pathParts", {
-                    get: function () {
-                        if (this.name) {
-                            return (ko.unwrap(this._path) || []).concat([this.name]);
-                        }
-                        else {
-                            return ko.unwrap(this._path);
-                        }
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "text", {
-                    get: function () {
-                        return this.data && this.data.displayName;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "templateName", {
-                    get: function () {
-                        return this._templateName || this.data && this.data.templateName || "dx-treelist-item";
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "hasContent", {
-                    get: function () {
-                        return this.data && this.data["contenttemplate"];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "actions", {
-                    get: function () {
-                        return this._treeListController.getActions ? this._treeListController.getActions(this) : [];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TreeListItemViewModel.prototype, "isDraggable", {
-                    get: function () {
-                        if (this.data && this.data["dragData"]) {
-                            return !this.data["dragData"].noDragable;
-                        }
-                        if (this._treeListController.isDraggable) {
-                            return this._treeListController.isDraggable(this);
-                        }
-                        return false;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                TreeListItemViewModel.prototype.dispose = function () {
-                    if (this._loader) {
-                        this._loader.dispose();
-                    }
-                    this.items().forEach(function (item) { return item.dispose(); });
-                };
-                Object.defineProperty(TreeListItemViewModel.prototype, "visible", {
-                    get: function () {
-                        return !this._treeListController.itemsFilter || this._treeListController.itemsFilter(this.data, this.path);
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return TreeListItemViewModel;
-            })();
-            Widgets.TreeListItemViewModel = TreeListItemViewModel;
-            var TreeListRootItemViewModel = (function (_super) {
-                __extends(TreeListRootItemViewModel, _super);
-                function TreeListRootItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
-                    var _this = this;
-                    if (path === void 0) { path = []; }
-                    if (hasItems === void 0) { hasItems = true; }
-                    if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
-                    if (rtl === void 0) { rtl = false; }
-                    _super.call(this, options, path, hasItems, onItemsVisibilityChanged, rtl);
-                    var selectedPathSubscriptions = options.selectedPath.subscribe(function (newPath) {
-                        _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
-                    });
-                    this._selectItem(!!this.path ? this.path + "." + options.selectedPath() : options.selectedPath());
-                    this.dispose = function () {
-                        selectedPathSubscriptions.dispose();
-                        _super.prototype.dispose.call(_this);
-                    };
-                }
-                return TreeListRootItemViewModel;
-            })(TreeListItemViewModel);
-            Widgets.TreeListRootItemViewModel = TreeListRootItemViewModel;
-            var TreeListController = (function () {
-                function TreeListController() {
-                    this.selectedItem = null;
-                }
-                TreeListController.prototype.itemsFilter = function (item) {
-                    return true;
-                };
-                TreeListController.prototype.hasItems = function (item) {
-                    return item.specifics !== "none" && (item.specifics === "List" || item.specifics === "ListSource" || item.isList === true);
-                };
-                TreeListController.prototype.canSelect = function (value) {
-                    return !value.hasItems;
-                };
-                TreeListController.prototype.select = function (value) {
-                    if (this.canSelect(value)) {
-                        this.selectedItem && this.selectedItem.isSelected(false);
-                        this.selectedItem = value;
-                        value.isSelected(true);
-                    }
-                };
-                return TreeListController;
-            })();
-            Widgets.TreeListController = TreeListController;
-            ko.bindingHandlers['treelist'] = {
-                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var treeListViewModel = null;
-                    var values = valueAccessor(), options = ko.unwrap(values), pathArray, updateScrollBar = function () {
-                        var $scrollView = $(element).closest(".dx-scrollview");
-                        if ($scrollView.data("dxScrollView")) {
-                            var scrollView = $scrollView.dxScrollView("instance");
-                            scrollView && scrollView["update"]();
-                        }
-                        if (options.onItemsVisibilityChanged) {
-                            options.onItemsVisibilityChanged();
-                        }
-                    }, updateTreeList = function (options) {
-                        options.treeListController = options.treeListController ? options.treeListController : new TreeListController();
-                        if (!options.treeListController.dragDropHandler) {
-                            options.treeListController.dragDropHandler = bindingContext.$root.fieldDragHandler;
-                        }
-                        treeListViewModel && treeListViewModel.dispose();
-                        if (!options.rtl) {
-                            options.rtl = $(element).closest('.dx-rtl').length > 0;
-                        }
-                        pathArray = ko.computed(function () {
-                            var result = ko.unwrap(options.path);
-                            if (!Array.isArray(result)) {
-                                return !!result ? result.split('.') : [];
-                            }
-                            return result;
-                        });
-                        treeListViewModel = new TreeListRootItemViewModel(options, pathArray, true, updateScrollBar, options.rtl);
-                        var templateHtml = $('#dx-treelist').text() || options.templateHtml, $element = $(element).html(templateHtml);
-                        var childContext = bindingContext.createChildContext(treeListViewModel.items);
-                        ko.applyBindings(childContext, $element.children()[0]);
-                    };
-                    updateTreeList($.extend({}, options));
-                    var subscribtion = null;
-                    if (ko.isSubscribable(values)) {
-                        subscribtion = values.subscribe(function (newValue) {
-                            updateTreeList(newValue);
-                        });
-                    }
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        treeListViewModel && treeListViewModel.dispose();
-                        subscribtion && subscribtion.dispose();
-                        pathArray && pathArray.dispose();
-                    });
-                    return { controlsDescendantBindings: true };
-                }
-            };
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var FilterEditorHelper = (function () {
-                function FilterEditorHelper(serializer) {
-                    this.rtl = false;
-                    this.parameters = ko.observable(null);
-                    this.canSelectLists = true;
-                    this.canCreateParameters = false;
-                    this.canChoiceParameters = true;
-                    this.canChoiceProperty = true;
-                    this.handlers = {
-                        create: function (criteria, popupService) {
-                            return {
-                                data: new FilterEditorAddOn(criteria, popupService, "create", "createItems"),
-                                templateName: "dx-filtereditor-create"
-                            };
-                        },
-                        change: function (criteria, popupService) {
-                            return {
-                                data: new FilterEditorAddOn(criteria, popupService, "change", "items"),
-                                templateName: "dx-filtereditor-change"
-                            };
-                        },
-                        changeProperty: function (criteria, popupService) {
-                            return {
-                                data: new FilterEditorAddOn(criteria, popupService, "changeProperty", "items", "dx-filtereditor-popup-treelist"),
-                                templateName: "dx-filtereditor-changeProperty"
-                            };
-                        },
-                        changeValueType: function (criteria, popupService) {
-                            return {
-                                data: new FilterEditorAddOn(criteria, popupService, "changeValueType", "changeTypeItems"),
-                                templateName: "dx-filtereditor-changeValueType"
-                            };
-                        },
-                        changeParameter: function (criteria, popupService) {
-                            return {
-                                data: new FilterEditorAddOn(criteria, popupService, "changeParameter", "items"),
-                                templateName: "dx-filtereditor-changeParameter"
-                            };
-                        }
-                    };
-                    this.mapper = {
-                        Aggregate: AggregateOperandSurface,
-                        Property: OperandPropertySurface,
-                        Parameter: OperandParameterSurface,
-                        Value: OperandValueSurface,
-                        Group: GroupOperandSurface,
-                        Between: BetweenOperandSurface,
-                        Binary: BinaryOperandSurface,
-                        Function: FunctionOperandSurface,
-                        In: InOperandSurface,
-                        Unary: UnaryOperandSurface,
-                        Default: CriteriaOperatorSurface
-                    };
-                    this.serializer = serializer || new FilterEditorSerializer();
-                }
-                FilterEditorHelper.prototype.generateTreelistOptions = function (fieldListProvider, path) {
-                    var _this = this;
-                    var treeListOptions = ko.observable(null);
-                    var selected = ko.observable(null);
-                    ko.computed(function () {
-                        treeListOptions({
-                            itemsProvider: ko.unwrap(fieldListProvider),
-                            selectedPath: ko.observable(""),
-                            selected: selected,
-                            path: ko.unwrap(path),
-                            treeListController: new FilterEditorTreeListController(selected),
-                            rtl: _this.rtl
-                        });
-                    });
-                    return treeListOptions;
-                };
-                return FilterEditorHelper;
-            })();
-            Widgets.FilterEditorHelper = FilterEditorHelper;
-            var FilterStringOptions = (function () {
-                function FilterStringOptions(filterString, dataMember, disabled) {
-                    var _this = this;
-                    this.popupContainer = ".dx-viewport";
-                    this.itemsProvider = null;
-                    this.resetValue = function () {
-                        _this.value("");
-                    };
-                    this.value = filterString;
-                    this.path = dataMember || ko.observable("");
-                    this.disabled = disabled || ko.observable(false);
-                    this.helper = new FilterEditorHelper();
-                }
-                return FilterStringOptions;
-            })();
-            Widgets.FilterStringOptions = FilterStringOptions;
-            var FilterEditorAddOn = (function () {
-                function FilterEditorAddOn(criteria, popupService, action, propertyName, templateName) {
-                    var _this = this;
-                    this.showPopup = function (args) {
-                        if (_this._popupService["subscription"]) {
-                            _this._popupService["subscription"].dispose();
-                        }
-                        _this._popupService.title("");
-                        _this.target.isSelected(true);
-                        _this._updateActions(_this.target);
-                        _this._popupService.target(args.element);
-                        setTimeout(function () {
-                            _this._popupService.visible(true);
-                        }, 10);
-                    };
-                    this.popupContentTemplate = "dx-filtereditor-popup-common";
-                    this.target = criteria;
-                    this._action = action;
-                    this.propertyName = propertyName;
-                    this._popupService = popupService;
-                    this.popupContentTemplate = templateName || this.popupContentTemplate;
-                }
-                FilterEditorAddOn.prototype._updateActions = function (viewModel) {
-                    var _this = this;
-                    this._popupService.data(null);
-                    if (viewModel) {
-                        this._popupService["subscription"] = this._popupService.visible.subscribe(function (newVal) {
-                            _this.target.isSelected(newVal);
-                        });
-                        this._popupService["viewModel"] = viewModel;
-                        this._popupService.data({
-                            data: ko.unwrap(viewModel[this.propertyName]),
-                            template: this.popupContentTemplate,
-                            click: function (data) { viewModel[_this._action](data); _this._popupService.visible(false); },
-                        });
-                    }
-                };
-                return FilterEditorAddOn;
-            })();
-            Widgets.FilterEditorAddOn = FilterEditorAddOn;
-            var FilterEditorSerializer = (function () {
-                function FilterEditorSerializer(operatorTokens) {
-                    if (operatorTokens === void 0) { operatorTokens = JS.Data.operatorTokens; }
-                    this.operatorTokens = operatorTokens;
-                }
-                FilterEditorSerializer.prototype.serializeGroupOperand = function (groupOperator, reverse) {
-                    var _this = this;
-                    var result = groupOperator.operands.map(function (operand) {
-                        if (operand instanceof JS.Data.GroupOperator) {
-                            return "(" + _this.serialize(operand) + ")";
-                        }
-                        else {
-                            return _this.serialize(operand);
-                        }
-                    }).filter(function (serialize) { return serialize !== "" && serialize !== "()"; }).join(' ' + (this.operatorTokens[groupOperator.displayType] || groupOperator.displayType) + ' ');
-                    return reverse && result ? "Not(" + result + ")" : result;
-                };
-                FilterEditorSerializer.prototype.serializeAggregateOperand = function (aggregateOperand, reverse) {
-                    var operatorTypeSuffix = aggregateOperand.operatorType === JS.Data.Aggregate.Exists ? "" : "." + JS.Data.Aggregate[aggregateOperand.operatorType];
-                    var condition = aggregateOperand.condition ? this.serialize(aggregateOperand.condition) : "";
-                    var result = this.serialize(aggregateOperand.property) + '[' + condition + ']';
-                    var aggregateSuffix = aggregateOperand.operatorType !== JS.Data.Aggregate.Exists ?
-                        '(' + (aggregateOperand.aggregatedExpression && this.serialize(aggregateOperand.aggregatedExpression) || "") + ')' : '';
-                    return result + operatorTypeSuffix + aggregateSuffix;
-                };
-                FilterEditorSerializer.prototype.serializeOperandProperty = function (operandProperty) {
-                    return operandProperty.displayType;
-                };
-                FilterEditorSerializer.prototype.serializeOperandValue = function (operandValue) {
-                    var result = operandValue.value;
-                    if (result !== null && result !== undefined && ($.isNumeric(result) || String(result).toLowerCase() === "true" || String(result).toLowerCase() === "false")) {
-                        return operandValue.specifics === "string" ? "'" + result + "'" : result;
-                    }
-                    else if (result && operandValue.value instanceof Date) {
-                        return "#" + JS.Utils.serializeDate(result) + "#";
-                    }
-                    return result ? "'" + result + "'" : "?";
-                };
-                FilterEditorSerializer.prototype.serializeOperandParameter = function (operandParameter) {
-                    return operandParameter.displayType;
-                };
-                FilterEditorSerializer.prototype.serializeBetweenOperator = function (betweenOperator, reverse) {
-                    var result = this.serialize(betweenOperator.property) + " " + betweenOperator.displayType +
-                        "(" + this.serialize(betweenOperator.begin) + ", " + this.serialize(betweenOperator.end) + ")";
-                    return reverse ? "Not " + result : result;
-                };
-                FilterEditorSerializer.prototype.serializeInOperator = function (inOperator, reverse) {
-                    var _this = this;
-                    var result = this.serialize(inOperator.criteriaOperator) + " " + inOperator.displayType + "(" +
-                        inOperator.operands.map(function (operand) { return _this.serialize(operand); }).join(', ') + ")";
-                    return reverse ? "Not " + result : result;
-                };
-                FilterEditorSerializer.prototype.serializeBinaryOperator = function (binaryOperator, reverse) {
-                    var separator = reverse ? " Not " : " ";
-                    return this.serialize(binaryOperator.leftOperand) + separator + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
-                };
-                FilterEditorSerializer.prototype.serializeUnaryOperator = function (unaryOperator, reverse) {
-                    if (unaryOperator.operatorType === JS.Data.UnaryOperatorType.IsNull) {
-                        var separator = reverse ? " Not " : " ";
-                        return this.serialize(unaryOperator.operand) + " Is" + separator + "Null";
-                    }
-                    else if (unaryOperator.operatorType === JS.Data.UnaryOperatorType.Not) {
-                        return this.serialize(unaryOperator.operand, true);
-                    }
-                    var result = (this.operatorTokens[unaryOperator.displayType] || unaryOperator.displayType) + this.serialize(unaryOperator.operand);
-                    return reverse ? "Not " + result : result;
-                };
-                FilterEditorSerializer.prototype.serializeFunctionOperator = function (functionOperator, reverse) {
-                    var _this = this;
-                    var result = (this.operatorTokens[functionOperator.displayType] || functionOperator.displayType) + '(' + functionOperator.operands.map(function (operand) {
-                        return _this.serialize(operand);
-                    }).join(", ") + ')';
-                    return reverse ? "Not " + result : result;
-                };
-                FilterEditorSerializer.prototype.serialize = function (criteriaOperator, reverse) {
-                    if (reverse === void 0) { reverse = false; }
-                    if (criteriaOperator instanceof JS.Data.AggregateOperand) {
-                        return this.serializeAggregateOperand(criteriaOperator, reverse);
-                    }
-                    if (criteriaOperator instanceof JS.Data.BetweenOperator) {
-                        return this.serializeBetweenOperator(criteriaOperator, reverse);
-                    }
-                    if (criteriaOperator instanceof JS.Data.BinaryOperator) {
-                        return this.serializeBinaryOperator(criteriaOperator, reverse);
-                    }
-                    if (criteriaOperator instanceof JS.Data.ConstantValue) {
-                        return this.serializeOperandValue(criteriaOperator);
-                    }
-                    if (criteriaOperator instanceof JS.Data.FunctionOperator) {
-                        return this.serializeFunctionOperator(criteriaOperator, reverse);
-                    }
-                    if (criteriaOperator instanceof JS.Data.GroupOperator) {
-                        return this.serializeGroupOperand(criteriaOperator, reverse);
-                    }
-                    if (criteriaOperator instanceof JS.Data.InOperator) {
-                        return this.serializeInOperator(criteriaOperator, reverse);
-                    }
-                    if (criteriaOperator instanceof JS.Data.OperandParameter) {
-                        return this.serializeOperandParameter(criteriaOperator);
-                    }
-                    if (criteriaOperator instanceof JS.Data.OperandProperty) {
-                        return this.serializeOperandProperty(criteriaOperator);
-                    }
-                    if (criteriaOperator instanceof JS.Data.OperandValue) {
-                        return this.serializeOperandValue(criteriaOperator);
-                    }
-                    if (criteriaOperator instanceof JS.Data.UnaryOperator) {
-                        return this.serializeUnaryOperator(criteriaOperator, reverse);
-                    }
-                    throw Error("Undefined type criteria operator");
-                };
-                FilterEditorSerializer.prototype.deserialize = function (stringCriteria) {
-                    var operand = JS.Data.CriteriaOperator.parse(stringCriteria);
-                    if (operand instanceof JS.Data.GroupOperator) {
-                        return operand;
-                    }
-                    else if (operand instanceof JS.Data.UnaryOperator && operand.operatorType === JS.Data.UnaryOperatorType.Not) {
-                        var child = operand["operand"];
-                        if (child instanceof JS.Data.GroupOperator) {
-                            return operand;
-                        }
-                        return new JS.Data.UnaryOperator(JS.Data.UnaryOperatorType.Not, new JS.Data.GroupOperator(JS.Data.GroupOperatorType.And, child ? [child] : []));
-                    }
-                    return new JS.Data.GroupOperator(JS.Data.GroupOperatorType.And, operand ? [operand] : []);
-                };
-                return FilterEditorSerializer;
-            })();
-            Widgets.FilterEditorSerializer = FilterEditorSerializer;
-            var FilterEditorTreeListController = (function (_super) {
-                __extends(FilterEditorTreeListController, _super);
-                function FilterEditorTreeListController(selectedItem) {
-                    _super.call(this);
-                    this.selectedItem = selectedItem;
-                }
-                FilterEditorTreeListController.prototype.itemsFilter = function (item) {
-                    return true;
-                };
-                FilterEditorTreeListController.prototype.hasItems = function (item) {
-                    return item.specifics !== "none" && (item.specifics !== "List" && item.isList === true);
-                };
-                FilterEditorTreeListController.prototype.canSelect = function (value) {
-                    return !value.data.isList || (value.data.isList === true && value.data.specifics === "List");
-                };
-                FilterEditorTreeListController.prototype.select = function (value) {
-                    if (this.canSelect(value)) {
-                        this.selectedItem(value.data);
-                        value.isSelected(true);
-                    }
-                };
-                return FilterEditorTreeListController;
-            })(Widgets.TreeListController);
-            Widgets.FilterEditorTreeListController = FilterEditorTreeListController;
-            var FilterEditor = (function () {
-                function FilterEditor(options, fieldListProvider, rtl) {
-                    var _this = this;
-                    if (rtl === void 0) { rtl = false; }
-                    this.isValid = ko.observable(true);
-                    this.operandSurface = ko.observable(null);
-                    this.operand = null;
-                    this.popupVisible = ko.observable(false);
-                    this.buttonItems = [];
-                    this.popupService = new JS.Utils.PopupService();
-                    this.rtl = rtl;
-                    options() && options().helper && (options().helper.rtl = rtl);
-                    this.options = options;
-                    this.save = function () {
-                        _this.options().value(options().helper.serializer.serialize(_this.operandSurface().model, false));
-                        _this.popupVisible(false);
-                    };
-                    this.fieldListProvider = fieldListProvider;
-                    this.isValid = ko.computed(function () {
-                        try {
-                            _this.operand = _this.options().helper.serializer.deserialize(_this.options().value());
-                            return true;
-                        }
-                        catch (e) {
-                            return false;
-                        }
-                    });
-                    this.popupVisible.subscribe(function (newVal) {
-                        _this.operand = _this.options().helper.serializer.deserialize(_this.options().value());
-                        if (newVal) {
-                            var type = null;
-                            if (_this.operand instanceof JS.Data.UnaryOperator) {
-                                type = _this.options().helper.mapper.Unary;
-                            }
-                            else {
-                                type = _this.options().helper.mapper.Group;
-                            }
-                            var surface = new type(_this.operand, _this, _this.fieldListProvider, _this.path);
-                            surface.canRemove = false;
-                            if (surface instanceof UnaryOperandSurface) {
-                                surface.operand().canRemove = false;
-                            }
-                            _this.operandSurface(surface);
-                        }
-                        else {
-                            _this.operandSurface(null);
-                        }
-                    });
-                    this.createAddButton = function (criteria) { return options().helper.handlers.create(criteria, _this.popupService); };
-                    this.createChangeType = function (criteria) { return options().helper.handlers.change(criteria, _this.popupService); };
-                    this.createChangeProperty = function (criteria) { return options().helper.handlers.changeProperty(criteria, _this.popupService); };
-                    this.createChangeParameter = function (criteria) { return options().helper.handlers.changeParameter(criteria, _this.popupService); };
-                    this.createChangeValueType = function (criteria) { return options().helper.handlers.changeValueType(criteria, _this.popupService); };
-                    this._createMainPopupButtons();
-                }
-                FilterEditor.prototype._createMainPopupButtons = function () {
-                    var self = this;
-                    this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: JS.Utils.getLocalization('Save'), onClick: function () { self.save(); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: JS.Utils.getLocalization('Cancel'), onClick: function () { self.popupVisible(false); } } }
-                    ];
-                };
-                FilterEditor.prototype.change = function (type, surface) {
-                    this.operand = JS.Data.CriteriaOperator.create(type);
-                    this.operand.assignFrom(surface.model);
-                    var type = null;
-                    if (this.operand instanceof JS.Data.UnaryOperator) {
-                        type = this.options().helper.mapper.Unary;
-                    }
-                    else {
-                        type = this.options().helper.mapper.Group;
-                    }
-                    var surface = new type(this.operand, this, this.fieldListProvider, this.path);
-                    surface.canRemove = false;
-                    if (surface instanceof UnaryOperandSurface) {
-                        surface.operand().canRemove = false;
-                    }
-                    this.operandSurface(surface);
-                };
-                Object.defineProperty(FilterEditor.prototype, "helper", {
-                    get: function () {
-                        return this.options().helper;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FilterEditor.prototype, "path", {
-                    get: function () {
-                        return this.options().path;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return FilterEditor;
-            })();
-            Widgets.FilterEditor = FilterEditor;
-            var CriteriaOperatorSurface = (function () {
-                function CriteriaOperatorSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    this.canRemove = true;
-                    this.operatorType = ko.observable(null);
-                    this.templateName = "dx-filtereditor-common";
-                    this.isSelected = ko.observable(false);
-                    this.operatorClass = "criteria-operator-item-operator";
-                    this.popupService = parent.popupService || { visible: ko.observable(false) };
-                    this.model = operator;
-                    this.helper = parent.helper;
-                    this.fieldListProvider = fieldListProvider;
-                    this.path = path;
-                    this.parent = parent;
-                    this.operatorType(operator.operatorType);
-                    this.operatorType.subscribe(function (newVal) {
-                        _this.model.assignType(newVal);
-                    });
-                }
-                CriteriaOperatorSurface.filterEditorOperators = function (specific) {
-                    if (specific === void 0) { specific = "string"; }
-                    var common = [{ name: "Equals", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType },
-                        { name: "Does not equal", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType },
-                        { name: "Is greater than", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType },
-                        { name: "Is greater than or equal to", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType },
-                        { name: "Is less than", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType },
-                        { name: "Is less than or equal to", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType },
-                        { name: "Is between", value: "Between", type: JS.Data.BetweenOperator },
-                        { name: "Is not between", value: "Between", type: JS.Data.BetweenOperator, reverse: true }];
-                    switch (specific) {
-                        case "guid":
-                        case "string":
-                            return [].concat(common, [
-                                { name: "Contains", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType },
-                                { name: "Does not contain", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, reverse: true },
-                                { name: "Begins with", value: JS.Data.FunctionOperatorType.StartsWith, type: JS.Data.FunctionOperatorType },
-                                { name: "Ends with", value: JS.Data.FunctionOperatorType.EndsWith, type: JS.Data.FunctionOperatorType },
-                                { name: "Is like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType },
-                                { name: "Is not like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, reverse: true },
-                                { name: "Is any of", value: "In", type: JS.Data.InOperator },
-                                { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
-                                { name: "Is blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType },
-                                { name: "Is not blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, reverse: true }
-                            ]);
-                        case "integer":
-                        case "float":
-                            return [].concat(common, [
-                                { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType },
-                                { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true },
-                                { name: "Is any of", value: "In", type: JS.Data.InOperator },
-                                { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
-                            ]);
-                        case "date":
-                            return [].concat(common, [
-                                { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType },
-                                { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true },
-                                { name: "Is any of", value: "In", type: JS.Data.InOperator },
-                                { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
-                                { name: "Is beyond this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalBeyondThisYear, type: JS.Data.FunctionOperatorType },
-                                { name: "Is later this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisYear, type: JS.Data.FunctionOperatorType },
-                                { name: "Is later this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisMonth, type: JS.Data.FunctionOperatorType },
-                                { name: "Is next week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalNextWeek, type: JS.Data.FunctionOperatorType },
-                                { name: "Is later this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisWeek, type: JS.Data.FunctionOperatorType },
-                                { name: "Is tomorrow", value: JS.Data.FunctionOperatorType.IsOutlookIntervalTomorrow, type: JS.Data.FunctionOperatorType },
-                                { name: "Is today", value: JS.Data.FunctionOperatorType.IsOutlookIntervalToday, type: JS.Data.FunctionOperatorType },
-                                { name: "Is yesterday", value: JS.Data.FunctionOperatorType.IsOutlookIntervalYesterday, type: JS.Data.FunctionOperatorType },
-                                { name: "Is earlier this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisWeek, type: JS.Data.FunctionOperatorType },
-                                { name: "Is last week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLastWeek, type: JS.Data.FunctionOperatorType },
-                                { name: "Is earlier this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisMonth, type: JS.Data.FunctionOperatorType },
-                                { name: "Is earlier this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisYear, type: JS.Data.FunctionOperatorType },
-                                { name: "Is prior this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalPriorThisYear, type: JS.Data.FunctionOperatorType },
-                            ]);
-                        case "list":
-                            return [
-                                { name: "Exists", value: JS.Data.Aggregate.Exists, type: JS.Data.Aggregate },
-                                { name: "Count", value: JS.Data.Aggregate.Count, type: JS.Data.Aggregate },
-                                { name: "Max", value: JS.Data.Aggregate.Max, type: JS.Data.Aggregate },
-                                { name: "Min", value: JS.Data.Aggregate.Min, type: JS.Data.Aggregate },
-                                { name: "Sum", value: JS.Data.Aggregate.Sum, type: JS.Data.Aggregate },
-                                { name: "Avg", value: JS.Data.Aggregate.Avg, type: JS.Data.Aggregate }
-                            ];
-                        case "group":
-                            return [
-                                { name: "And", value: JS.Data.GroupOperatorType.And, type: JS.Data.GroupOperatorType },
-                                { name: "Or", value: JS.Data.GroupOperatorType.Or, type: JS.Data.GroupOperatorType },
-                                { name: "Not And", value: JS.Data.GroupOperatorType.And, reverse: true, type: JS.Data.GroupOperatorType },
-                                { name: "Not Or", value: JS.Data.GroupOperatorType.Or, reverse: true, type: JS.Data.GroupOperatorType },
-                            ];
-                    }
-                    return [].concat(common);
-                };
-                CriteriaOperatorSurface.prototype._createLeftPartProperty = function (value) {
-                    if (value instanceof JS.Data.OperandProperty) {
-                        var surface = this.createChildSurface(value);
-                    }
-                    else {
-                        var surface = this.createChildSurface(value);
-                    }
-                    surface["canChange"] = false;
-                    surface.canRemove = false;
-                    if (surface instanceof AggregateOperandSurface) {
-                        this.specifics = ko.computed(function () {
-                            return surface["aggregatedExpression"]() && surface["aggregatedExpression"]().specifics() || "integer";
-                        });
-                    }
-                    else {
-                        this.specifics = surface.specifics;
-                    }
-                    return surface;
-                };
-                CriteriaOperatorSurface.prototype.createChildSurface = function (item, path, actions) {
-                    return new this.helper.mapper[item.type](item, this, this.fieldListProvider, path || this.path);
-                };
-                Object.defineProperty(CriteriaOperatorSurface.prototype, "items", {
-                    get: function () {
-                        return CriteriaOperatorSurface.filterEditorOperators(this.specifics());
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperatorSurface.prototype, "displayType", {
-                    get: function () {
-                        var _this = this;
-                        var item = this.items.filter(function (item) { return _this.operatorType() === item.value && _this.reverse === item.reverse && _this.model.enumType === item.type; })[0];
-                        return item && item.name || this.operatorType && this.operatorType() || "";
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperatorSurface.prototype, "leftPart", {
-                    get: function () {
-                        return null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperatorSurface.prototype, "rightPart", {
-                    get: function () {
-                        return null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(CriteriaOperatorSurface.prototype, "css", {
-                    get: function () {
-                        return this.operatorClass + (this.isSelected() ? " selected" : "");
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                CriteriaOperatorSurface.prototype.change = function (type, surface) {
-                    if (!surface && type && this.model.enumType === type.type && this.reverse === type.reverse && type.type !== JS.Data.FunctionOperatorType) {
-                        this.operatorType(type.value);
-                    }
-                    else {
-                        this.parent.change(type, this);
-                    }
-                };
-                CriteriaOperatorSurface.prototype.remove = function (surface) {
-                    this.parent.remove(this);
-                };
-                return CriteriaOperatorSurface;
-            })();
-            Widgets.CriteriaOperatorSurface = CriteriaOperatorSurface;
-            var BinaryOperandSurface = (function (_super) {
-                __extends(BinaryOperandSurface, _super);
-                function BinaryOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-binary";
-                    this.leftOperand = ko.observable(null);
-                    this.rightOperand = ko.observable(null);
-                    this.leftOperand(this._createLeftPartProperty(operator.leftOperand));
-                    this.rightOperand(this.createChildSurface(operator.rightOperand));
-                }
-                Object.defineProperty(BinaryOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.leftOperand();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BinaryOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.rightOperand();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return BinaryOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.BinaryOperandSurface = BinaryOperandSurface;
-            var OperandSurfaceBase = (function (_super) {
-                __extends(OperandSurfaceBase, _super);
-                function OperandSurfaceBase(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.canChange = true;
-                    this.canRemove = false;
-                    this.changeValueType = function (type) {
-                        var parent = _this.getRealParent(_this.parent);
-                        var property = _this.getRealProperty(_this);
-                        var propertyLocation = _this.getPropertyName(parent, property);
-                        var model = parent.model.changeValueType(type.instance, propertyLocation);
-                        if (propertyLocation.index !== null) {
-                            parent[propertyLocation.name].splice(propertyLocation.index, 1, parent.createChildSurface(model));
-                        }
-                        else {
-                            parent[propertyLocation.name](parent.createChildSurface(model));
-                        }
-                    };
-                }
-                OperandSurfaceBase.prototype.getRealParent = function (parent) {
-                    if (parent instanceof UnaryOperandSurface) {
-                        return this.getRealParent(parent.parent);
-                    }
-                    else {
-                        return parent;
-                    }
-                };
-                OperandSurfaceBase.prototype.getRealProperty = function (property) {
-                    if (property.parent instanceof UnaryOperandSurface) {
-                        return this.getRealProperty(property.parent);
-                    }
-                    else {
-                        return property;
-                    }
-                };
-                OperandSurfaceBase.prototype.getPropertyName = function (parent, searchProperty) {
-                    var position = null;
-                    var name = null;
-                    $.each(parent, function (propertyName, property) {
-                        if (Array.isArray(ko.unwrap(property)) && ko.isObservable(property)) {
-                            var index = ko.unwrap(property).indexOf(searchProperty);
-                            if (index > -1) {
-                                position = index;
-                                name = propertyName;
-                                return;
-                            }
-                        }
-                        else if (searchProperty === ko.unwrap(property) && ko.isObservable(property)) {
-                            name = propertyName;
-                            return;
-                        }
-                    });
-                    return { index: position, name: name };
-                };
-                Object.defineProperty(OperandSurfaceBase.prototype, "changeTypeItems", {
-                    get: function () {
-                        var _this = this;
-                        var items = [{ name: "Value", instance: JS.Data.OperandValue }];
-                        if (this.helper.canChoiceProperty) {
-                            items.push({ name: "Property", instance: JS.Data.OperandProperty });
-                        }
-                        if (this.helper.canChoiceParameters && (this.helper.parameters() && this.helper.parameters().filter(function (item) { return item.specifics && item.specifics.toLowerCase() === _this.parent.specifics(); }).length > 0 || this.helper.canCreateParameters)) {
-                            items.push({ name: "Parameter", instance: JS.Data.OperandParameter });
-                        }
-                        return items;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return OperandSurfaceBase;
-            })(CriteriaOperatorSurface);
-            Widgets.OperandSurfaceBase = OperandSurfaceBase;
-            var FunctionOperandSurface = (function (_super) {
-                __extends(FunctionOperandSurface, _super);
-                function FunctionOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.canRemove = true;
-                    this.contentTemplateName = "dx-filtereditor-function";
-                    this.operands = ko.observableArray([]);
-                    if (operator.operands.length === 0) {
-                        if (parent instanceof UnaryOperandSurface) {
-                            this.specifics = parent.parent.specifics;
-                        }
-                        else {
-                            this.specifics = parent.specifics;
-                        }
-                        this.contentTemplateName = "dx-filtereditor-function-lightweight";
-                        this.canRemove = false;
-                    }
-                    else {
-                        this.operands.push(this._createLeftPartProperty(operator.operands[0]));
-                        for (var i = 1; i < operator.operands.length; i++) {
-                            this.operands.push(this.createChildSurface(operator.operands[i]));
-                        }
-                    }
-                }
-                Object.defineProperty(FunctionOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.operands && this.operands()[0];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FunctionOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands && this.operands().filter(function (_, index) { return index !== 0; });
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return FunctionOperandSurface;
-            })(OperandSurfaceBase);
-            Widgets.FunctionOperandSurface = FunctionOperandSurface;
-            var InOperandSurface = (function (_super) {
-                __extends(InOperandSurface, _super);
-                function InOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-in";
-                    this.operands = ko.observableArray([]);
-                    this.criteriaOperator = ko.observable(null);
-                    this.criteriaOperator(this._createLeftPartProperty(operator.criteriaOperator));
-                    this.operands((operator.operands || []).map(function (operand) {
-                        return _this.createChildSurface(operand);
-                    }));
-                    this.addValue = function () {
-                        var value = new JS.Data.OperandValue(null);
-                        _this.model.operands.push(value);
-                        _this.operands.push(_this.createChildSurface(value));
-                    };
-                }
-                Object.defineProperty(InOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.criteriaOperator();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(InOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return InOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.InOperandSurface = InOperandSurface;
-            var BetweenOperandSurface = (function (_super) {
-                __extends(BetweenOperandSurface, _super);
-                function BetweenOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.property = ko.observable(null);
-                    this.end = ko.observable(null);
-                    this.begin = ko.observable(null);
-                    this.contentTemplateName = "dx-filtereditor-between";
-                    this.property(this._createLeftPartProperty(operator.property));
-                    this.begin(this.createChildSurface(operator.begin));
-                    this.end(this.createChildSurface(operator.end));
-                }
-                Object.defineProperty(BetweenOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.property && this.property();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BetweenOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return [this.begin(), this.end()];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return BetweenOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.BetweenOperandSurface = BetweenOperandSurface;
-            var OperandValueSurface = (function (_super) {
-                __extends(OperandValueSurface, _super);
-                function OperandValueSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this._value = ko.observable(null);
-                    this._updateDate = function (specifics) {
-                        if (specifics === "date") {
-                            if (!(this._value() instanceof Date)) {
-                                this._value(new Date(new Date().setHours(0, 0, 0, 0)));
-                            }
-                        }
-                        else {
-                            this._value("");
-                        }
-                    };
-                    this.changeValue = function () {
-                        var parent = _this.getRealParent(_this.parent);
-                        var property = _this.getRealProperty(_this);
-                        var propertyLocation = _this.getPropertyName(parent, property);
-                        var model = parent.model.changeValue(_this.model, _this.reverse, propertyLocation);
-                        if (propertyLocation.index !== null) {
-                            parent[propertyLocation.name].splice(propertyLocation.index, 1, parent.createChildSurface(model));
-                        }
-                        else {
-                            parent[propertyLocation.name](parent.createChildSurface(model));
-                        }
-                    };
-                    this.values = ko.observable([]);
-                    this.isEditable = ko.observable(false);
-                    this.templateName = "dx-filtereditor-value";
-                    if (parent instanceof UnaryOperandSurface) {
-                        this.specifics = parent.parent.specifics;
-                        if (parent.model.operatorType === JS.Data.UnaryOperatorType.Minus) {
-                            this.reverse = true;
-                        }
-                    }
-                    else {
-                        this.specifics = parent.specifics;
-                    }
-                    this.specifics.subscribe(function (newVal) {
-                        operator.specifics = newVal;
-                        _this._updateDate(newVal);
-                    });
-                    this._value(operator.value);
-                    this._value.subscribe(function (newVal) {
-                        _this.model.value = newVal;
-                    });
-                    if (this._value() === null || this._value() === undefined || this._value() === "") {
-                        this._updateDate(this.specifics());
-                    }
-                    this.value = ko.computed({
-                        read: function () {
-                            var value = _this._value();
-                            if (value instanceof Date) {
-                                value = Globalize["formatDate"](value);
-                            }
-                            if (_this.items.length > 0) {
-                                var result = _this.items.filter(function (item) { return item.value === value; })[0];
-                                if (result) {
-                                    return result.display;
-                                }
-                            }
-                            if (_this.reverse) {
-                                value = "-" + value;
-                            }
-                            return value !== null && value !== undefined && value !== "" ? value : OperandValueSurface.defaultDisplay;
-                        },
-                        write: function (newVal) {
-                            if (newVal > 0 && !_this.reverse || newVal < 0 && _this.reverse) {
-                                _this._value(newVal);
-                            }
-                            else if (newVal > 0 && _this.reverse || newVal < 0 && !_this.reverse) {
-                                _this.reverse = !_this.reverse;
-                                _this._value(newVal < 0 ? 0 - newVal : newVal);
-                                _this.changeValue();
-                            }
-                        }
-                    });
-                    ko.computed(function () {
-                        var itemsProvider = ko.unwrap(fieldListProvider);
-                        if (itemsProvider && itemsProvider.getValues && _this.parent.leftPart instanceof OperandPropertySurface) {
-                            if (_this.parent.leftPart.propertyName()) {
-                                itemsProvider.getValues(new Widgets.PathRequest(ko.unwrap(_this.path) + "." + _this.parent.leftPart.propertyName())).done(function (result) {
-                                    _this.values(result);
-                                });
-                            }
-                        }
-                    });
-                    operator.specifics = this.specifics();
-                }
-                Object.defineProperty(OperandValueSurface.prototype, "items", {
-                    get: function () {
-                        return this.values();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(OperandValueSurface.prototype, "displayType", {
-                    get: function () {
-                        return null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                OperandValueSurface.defaultDisplay = "Enter a value";
-                return OperandValueSurface;
-            })(OperandSurfaceBase);
-            Widgets.OperandValueSurface = OperandValueSurface;
-            var GroupOperandSurface = (function (_super) {
-                __extends(GroupOperandSurface, _super);
-                function GroupOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.templateName = "dx-filtereditor-group";
-                    this.operatorClass = "criteria-operator-item-group";
-                    this.operands = ko.observableArray([]);
-                    this.createItems = null;
-                    this.createItems = [
-                        { name: JS.Utils.getLocalization("Add group"), value: true },
-                        { name: JS.Utils.getLocalization("Add condition"), value: false }
-                    ];
-                    this.operands((operator.operands || []).map(function (operand) {
-                        return _this.createChildSurface(operand);
-                    }));
-                    this.specifics = ko.observable("group");
-                }
-                GroupOperandSurface.prototype.change = function (type, surface) {
-                    if (surface) {
-                        var specifics = surface.specifics() || "integer";
-                        var operators = CriteriaOperatorSurface.filterEditorOperators(specifics);
-                        if (!type) {
-                            var item = operators.filter(function (item) {
-                                return surface.operatorType() === item.value && surface.reverse === item.reverse && surface.model.enumType === item.type;
-                            })[0];
-                            if (item) {
-                                type = item;
-                            }
-                            else {
-                                type = operators[0];
-                            }
-                        }
-                        var newModel = this.model.change(type, surface.model, surface.leftPart instanceof AggregateOperandSurface && surface.leftPart.leftPart.specifics() !== "list");
-                        var position = this.operands().indexOf(surface);
-                        var operand = this.createChildSurface(newModel);
-                        this.operands.splice(position, 1, operand);
-                    }
-                    else {
-                        _super.prototype.change.call(this, type, surface);
-                    }
-                };
-                GroupOperandSurface.prototype.remove = function (surface) {
-                    if (surface) {
-                        this.model.remove(surface.model);
-                        this.operands.remove(surface);
-                    }
-                    else {
-                        this.parent.remove(this);
-                    }
-                };
-                GroupOperandSurface.prototype.create = function (type) {
-                    var newModel = this.model.create(type.value, new JS.Data.OperandProperty());
-                    this.operands.push(this.createChildSurface(newModel));
-                };
-                Object.defineProperty(GroupOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.operands();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return GroupOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.GroupOperandSurface = GroupOperandSurface;
-            var AggregateOperandSurface = (function (_super) {
-                __extends(AggregateOperandSurface, _super);
-                function AggregateOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-aggregate";
-                    this.property = ko.observable(null);
-                    this.aggregatedExpression = ko.observable(null);
-                    this.condition = ko.observable(null);
-                    this.property(this._createLeftPartProperty(operator.property));
-                    var childPath = ko.computed(function () {
-                        return _this.path() + "." + _this.property().propertyName();
-                    });
-                    if (operator.aggregatedExpression) {
-                        this.aggregatedExpression(this.createChildSurface(operator.aggregatedExpression, childPath));
-                        this.templateName = "dx-filtereditor-aggregate-common";
-                    }
-                    if (operator.operatorType === JS.Data.Aggregate.Count) {
-                        this.templateName = "dx-filtereditor-aggregate-common";
-                    }
-                    var surface = this.createChildSurface(operator.condition, childPath);
-                    surface.canRemove = false;
-                    if (surface instanceof UnaryOperandSurface) {
-                        surface.operand().canRemove = false;
-                    }
-                    this.condition(surface);
-                    this.change = function (type, surface) {
-                        if (surface) {
-                            var newModel = _this.model.change(type, surface.model);
-                            var condition = _this.createChildSurface(newModel, childPath);
-                            condition.canRemove = false;
-                            if (condition instanceof UnaryOperandSurface) {
-                                condition.operand().canRemove = false;
-                            }
-                            _this.condition(condition);
-                        }
-                        else {
-                            if (_this.operatorType() === JS.Data.Aggregate.Exists || _this.operatorType() === JS.Data.Aggregate.Count) {
-                                _this.parent.change(type, _this);
-                            }
-                            else {
-                                if (type && (type.value === JS.Data.Aggregate.Exists || type.value === JS.Data.Aggregate.Count)) {
-                                    _this.parent.change(type, _this);
-                                }
-                                else {
-                                    _super.prototype.change.call(_this, type, surface);
-                                }
-                            }
-                        }
-                    };
-                }
-                Object.defineProperty(AggregateOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        return this.property && this.property();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(AggregateOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.aggregatedExpression();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return AggregateOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.AggregateOperandSurface = AggregateOperandSurface;
-            var OperandParameterSurface = (function (_super) {
-                __extends(OperandParameterSurface, _super);
-                function OperandParameterSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.changeParameter = function (item) {
-                        _this.model.parameterName = item.name;
-                        _this.parameterName(item.name);
-                    };
-                    this.operatorClass = "criteria-operator-item-parameter";
-                    this.parameterName = ko.observable("");
-                    this.templateName = "dx-filtereditor-parameter";
-                    this.specifics = parent.specifics;
-                    this.parameterName(operator.parameterName);
-                }
-                Object.defineProperty(OperandParameterSurface.prototype, "items", {
-                    get: function () {
-                        var _this = this;
-                        return this.helper.parameters().filter(function (item) { return item.specifics.toLocaleLowerCase() === _this.specifics(); });
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(OperandParameterSurface.prototype, "displayType", {
-                    get: function () {
-                        return null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return OperandParameterSurface;
-            })(OperandSurfaceBase);
-            Widgets.OperandParameterSurface = OperandParameterSurface;
-            var UnaryOperandSurface = (function (_super) {
-                __extends(UnaryOperandSurface, _super);
-                function UnaryOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-unary";
-                    this.operand = ko.observable(null);
-                    var operand = this.createChildSurface(operator.operand);
-                    if (operator.operatorType === JS.Data.UnaryOperatorType.Not) {
-                        this.templateName = "dx-filtereditor-not";
-                        operand.reverse = true;
-                        this.specifics = operand.specifics;
-                    }
-                    else {
-                        operand = this._createLeftPartProperty(operator.operand);
-                    }
-                    this.operand(operand);
-                }
-                Object.defineProperty(UnaryOperandSurface.prototype, "leftPart", {
-                    get: function () {
-                        var leftPart = this.operand();
-                        if (this.operand() && this.operand().reverse && this.operand().leftPart) {
-                            leftPart = this.operand().leftPart;
-                        }
-                        return leftPart;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(UnaryOperandSurface.prototype, "rightPart", {
-                    get: function () {
-                        return this.operand() && this.operand().reverse ? this.operand().rightPart : null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return UnaryOperandSurface;
-            })(CriteriaOperatorSurface);
-            Widgets.UnaryOperandSurface = UnaryOperandSurface;
-            var OperandPropertySurface = (function (_super) {
-                __extends(OperandPropertySurface, _super);
-                function OperandPropertySurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this._displayName = ko.observable("");
-                    this.propertyName = ko.observable("");
-                    this.specifics = ko.observable("integer");
-                    this.valueType = ko.observable("");
-                    this.changeProperty = function (item) {
-                        _this.fieldsOptions().selected(item);
-                    };
-                    this.templateName = "dx-filtereditor-property";
-                    this.operatorClass = "criteria-operator-item-field";
-                    this.propertyName(operator.propertyName);
-                    this.fieldsOptions = this.helper.generateTreelistOptions(fieldListProvider, path);
-                    this.fieldsOptions().selectedPath.subscribe(function (newVal) {
-                        var realName = _this.fieldsOptions().selectedPath().substr(_this.path && _this.path().length > 0 ? _this.path().length + 1 : 0);
-                        _this.propertyName(realName);
-                        _this.model.propertyName = realName;
-                        _this.popupService.visible(false);
-                    });
-                    this.fieldsOptions().selected.subscribe(function (newVal) {
-                        _this._updateDisplayName(path, _this.propertyName(), newVal.displayName);
-                        var specifics = newVal.specifics.toLowerCase();
-                        if (specifics.indexOf("calc") === 0) {
-                            specifics = specifics.split("calc")[1];
-                        }
-                        if (_this.specifics() !== specifics) {
-                            _this.specifics(specifics);
-                            _this.parent.change();
-                        }
-                    });
-                    this.fieldsOptions().selectedPath(this.path && !!ko.unwrap(this.path) ? [ko.unwrap(this.path), this.propertyName()].join('.') : this.propertyName());
-                    this._updateSpecifics();
-                    this.displayName = ko.computed(function () {
-                        return _this._displayName() || _this.propertyName();
-                    });
-                }
-                OperandPropertySurface.prototype._updateDisplayName = function (path, propertyName, displayName) {
-                    var _this = this;
-                    if (!!this.helper.getDisplayPropertyName) {
-                        this.helper.getDisplayPropertyName(ko.unwrap(path), propertyName).done(function (newVal) {
-                            _this._displayName(newVal);
-                        });
-                    }
-                    else {
-                        this._displayName(displayName);
-                    }
-                };
-                OperandPropertySurface.prototype._updateSpecifics = function () {
-                    var _this = this;
-                    var self = this;
-                    var propertyPath = this.propertyName().split('.');
-                    var realPropertyName = propertyPath.pop();
-                    if (ko.unwrap(this.fieldsOptions).itemsProvider) {
-                        ko.unwrap(this.fieldsOptions).itemsProvider.getItems(new Widgets.PathRequest([this.path()].concat(propertyPath).join('.'))).done(function (result) {
-                            var notListProperties = result.filter(function (item) { return item.specifics !== "List" && !item.isList; });
-                            if (!_this.propertyName() && notListProperties.length > 0) {
-                                _this.model.propertyName = notListProperties[0].name;
-                                _this.propertyName(notListProperties[0].name);
-                                realPropertyName = notListProperties[0].name;
-                            }
-                            var item = result.filter(function (item) { return item.name === realPropertyName; })[0];
-                            if (item) {
-                                var specifics = item.specifics.toLowerCase();
-                                if (specifics.indexOf("calc") === 0) {
-                                    specifics = specifics.split("calc")[1];
-                                }
-                                _this.specifics(specifics);
-                                _this._updateDisplayName(_this.path, _this.propertyName(), item.displayName);
-                            }
-                        });
-                    }
-                };
-                Object.defineProperty(OperandPropertySurface.prototype, "items", {
-                    get: function () {
-                        return this.fieldsOptions;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(OperandPropertySurface.prototype, "displayType", {
-                    get: function () {
-                        return null;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return OperandPropertySurface;
-            })(OperandSurfaceBase);
-            Widgets.OperandPropertySurface = OperandPropertySurface;
-            ko.bindingHandlers['dxFilterEditor'] = {
-                init: function (element, valueAccessor) {
-                    $(element).children().remove();
-                    $(element).addClass("dx-popup-general");
-                    var templateHtml = $('#dx-filtereditor').text(), $element = $(element).append(templateHtml), values = valueAccessor();
-                    var itemsProvider = ko.observable(ko.unwrap(values.fieldListProvider));
-                    ko.computed(function () {
-                        if (values.options().itemsProvider) {
-                            itemsProvider(ko.unwrap(values.options().itemsProvider));
-                        }
-                        else {
-                            itemsProvider(ko.unwrap(values.fieldListProvider));
-                        }
-                    });
-                    ko.computed(function () {
-                        if (values.getDisplayNameByPath && values.options() && values.options().helper && !values.options().helper.getDisplayPropertyName) {
-                            values.options().helper.getDisplayPropertyName = values.getDisplayNameByPath;
-                        }
-                    });
-                    ko.applyBindings(new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0), $element.children()[0]);
-                    return { controlsDescendantBindings: true };
-                }
-            };
-            ko.components.register("dx-filtereditor-plain", {
-                viewModel: {
-                    createViewModel: function (params, componentInfo) {
-                        var viewModel = new FilterEditor(params.options, ko.observable(params.fieldListProvider));
-                        viewModel.popupVisible(true);
-                        params.options().value.subscribe(function () {
-                            viewModel.popupVisible(false);
-                            viewModel.popupVisible(true);
-                        });
-                        return viewModel;
-                    }
-                },
-                template: { element: 'dx-filtereditor-plain' }
-            });
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-/// <reference path="treelist.ts" />
-/// <reference path="filtereditor.ts" />
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var operatorNames = [
-                { text: "+", image: "addition", description: "Adds the value of one numeric expression to another or concatenates two strings." },
-                { text: "-", image: "subtraction", description: "Finds the difference between two numbers." },
-                { text: "*", image: "multiplication", description: "Multiplies the value of two expressions." },
-                { text: "/", image: "division", description: "Divides the first operand by the second." },
-                { text: "%", image: "modulus", hasSeparator: true, description: "Returns the remainder (modulus) obtained by dividing one numeric expression into another." },
-                { text: "()", image: "parenthesis", hasSeparator: true },
-                { text: "|", description: "Compares each bit of its first operand to the corresponding bit of its second operand. If either bit is 1, the corresponding result bit is set to 1. Otherwise, the corresponding result bit is set to 0." },
-                { text: "&", description: "Performs a bitwise logical AND operation between two integer values." },
-                { text: "^", description: "Performs a logical exclusion on two Boolean expressions, or a bitwise exclusion on two numeric expressions." },
-                { text: "==", image: "equal", description: "Returns true if both operands have the same value; otherwise, it returns false." },
-                { text: "!=", image: "not_equal", description: "Returns true if the operands do not have the same value; otherwise, it returns false." },
-                { text: "<", image: "less", description: "Less than operator. Used to compare expressions." },
-                { text: "<=", image: "less_or_equal", description: "Less than or equal to operator. Used to compare expressions." },
-                { text: ">=", image: "greater_or_equal", description: "Greater than or equal to operator. Used to compare expressions." },
-                { text: ">", hasSeparator: true, image: "greater", description: "Greater than operator. Used to compare expressions." },
-                { text: "In", description: "In (,,,)    Tests for the existence of a property in an object." },
-                { text: "Like", description: "Compares a string against a pattern. If the value of the string matches the pattern, then the result is true. If the string does not match the pattern, the result is false. If both string and pattern are empty strings, the result is true." },
-                { text: "Between", description: "Between (,)    Specifies a range to test. Returns true if a value is greater than or equal to the first operand and less than or equal to the second operand." },
-                { text: "And", image: "and", description: "Performs a logical conjunction on two expressions." },
-                { text: "Or", image: "or", description: "Performs a logical disjunction on two Boolean expressions." },
-                { text: "Not", image: "not", description: "Performs logical negation on an expression." }
-            ];
-            Widgets.functionDisplay = [
-                {
-                    display: "Aggregate",
-                    items: {
-                        Avg: [{ paramCount: 0, text: "[].Avg()", displayName: "Avg()" }],
-                        Count: [{ paramCount: 0, text: "[].Count()", displayName: "Count()" }],
-                        Exists: [{ paramCount: 0, text: "[].Exists()", displayName: "Exists()" }],
-                        Max: [{ paramCount: 0, text: "[].Max()", displayName: "Max()" }],
-                        Min: [{ paramCount: 0, text: "[].Min()", displayName: "Min()" }],
-                        Single: [{ paramCount: 0, text: "[].Single()", displayName: "Single()" }],
-                        Sum: [{ paramCount: 0, text: "[].Sum()", displayName: "Sum()" }],
-                    }
-                },
-                {
-                    display: "Date-Time",
-                    items: {
-                        LocalDateTimeThisYear: [{ paramCount: 0, text: "LocalDateTimeThisYear()" }],
-                        LocalDateTimeThisMonth: [{ paramCount: 0, text: "LocalDateTimeThisMonth()" }],
-                        LocalDateTimeLastWeek: [{ paramCount: 0, text: "LocalDateTimeLastWeek()" }],
-                        LocalDateTimeThisWeek: [{ paramCount: 0, text: "LocalDateTimeThisWeek()" }],
-                        LocalDateTimeYesterday: [{ paramCount: 0, text: "LocalDateTimeYesterday()" }],
-                        LocalDateTimeToday: [{ paramCount: 0, text: "LocalDateTimeToday()" }],
-                        LocalDateTimeNow: [{ paramCount: 0, text: "LocalDateTimeNow()" }],
-                        LocalDateTimeTomorrow: [{ paramCount: 0, text: "LocalDateTimeTomorrow()" }],
-                        LocalDateTimeDayAfterTomorrow: [{ paramCount: 0, text: "LocalDateTimeDayAfterTomorrow()" }],
-                        LocalDateTimeNextWeek: [{ paramCount: 0, text: "LocalDateTimeNextWeek()" }],
-                        LocalDateTimeTwoWeeksAway: [{ paramCount: 0, text: "LocalDateTimeTwoWeeksAway()" }],
-                        LocalDateTimeNextMonth: [{ paramCount: 0, text: "LocalDateTimeNextMonth()" }],
-                        LocalDateTimeNextYear: [{ paramCount: 0, text: "LocalDateTimeNextYear()" }],
-                        IsOutlookIntervalBeyondThisYear: null,
-                        IsOutlookIntervalLaterThisYear: null,
-                        IsOutlookIntervalLaterThisMonth: null,
-                        IsOutlookIntervalNextWeek: null,
-                        IsOutlookIntervalLaterThisWeek: null,
-                        IsOutlookIntervalTomorrow: null,
-                        IsOutlookIntervalToday: null,
-                        IsOutlookIntervalYesterday: null,
-                        IsOutlookIntervalEarlierThisWeek: null,
-                        IsOutlookIntervalLastWeek: null,
-                        IsOutlookIntervalEarlierThisMonth: null,
-                        IsOutlookIntervalEarlierThisYear: null,
-                        IsOutlookIntervalPriorThisYear: null,
-                        IsThisWeek: [{ paramCount: 1, text: "IsThisWeek()" }],
-                        IsThisMonth: [{ paramCount: 1, text: "IsThisMonth()" }],
-                        IsThisYear: [{ paramCount: 1, text: "IsThisYear()" }],
-                        DateDiffTick: [{ paramCount: 2, text: "DateDiffTick(, )" }],
-                        DateDiffSecond: [{ paramCount: 2, text: "DateDiffSecond(, )" }],
-                        DateDiffMilliSecond: [{ paramCount: 2, text: "DateDiffMilliSecond(, )" }],
-                        DateDiffMinute: [{ paramCount: 2, text: "DateDiffMinute(, )" }],
-                        DateDiffHour: [{ paramCount: 2, text: "DateDiffHour(, )" }],
-                        DateDiffDay: [{ paramCount: 2, text: "DateDiffDay(, )" }],
-                        DateDiffMonth: [{ paramCount: 2, text: "DateDiffMonth(, )" }],
-                        DateDiffYear: [{ paramCount: 2, text: "DateDiffYear(, )" }],
-                        GetDate: [{ paramCount: 1, text: "GetDate()" }],
-                        GetMilliSecond: [{ paramCount: 1, text: "GetMilliSecond()" }],
-                        GetSecond: [{ paramCount: 1, text: "GetSecond()" }],
-                        GetMinute: [{ paramCount: 1, text: "GetMinute()" }],
-                        GetHour: [{ paramCount: 1, text: "GetHour()" }],
-                        GetDay: [{ paramCount: 1, text: "GetDay()" }],
-                        GetMonth: [{ paramCount: 1, text: "GetMonth()" }],
-                        GetYear: [{ paramCount: 1, text: "GetYear()" }],
-                        GetDayOfWeek: [{ paramCount: 1, text: "GetDayOfWeek()" }],
-                        GetDayOfYear: [{ paramCount: 1, text: "GetDayOfYear()" }],
-                        GetTimeOfDay: [{ paramCount: 1, text: "GetTimeOfDay()" }],
-                        Now: [{ paramCount: 0, text: "Now()" }],
-                        UtcNow: [{ paramCount: 0, text: "UtcNow()" }],
-                        Today: [{ paramCount: 0, text: "Today()" }],
-                        AddTimeSpan: [{ paramCount: 2, text: "AddTimeSpan(, )" }],
-                        AddTicks: [{ paramCount: 2, text: "AddTicks(, )" }],
-                        AddMilliSeconds: [{ paramCount: 2, text: "AddMilliSeconds(, )" }],
-                        AddSeconds: [{ paramCount: 2, text: "AddSeconds(, )" }],
-                        AddMinutes: [{ paramCount: 2, text: "AddMinutes(, )" }],
-                        AddHours: [{ paramCount: 2, text: "AddHours(, )" }],
-                        AddDays: [{ paramCount: 2, text: "AddDays(, )" }],
-                        AddMonths: [{ paramCount: 2, text: "AddMonths(, )" }],
-                        AddYears: [{ paramCount: 2, text: "AddYears(, )" }],
-                    },
-                }, {
-                    display: "Logical",
-                    items: {
-                        Iif: [{ paramCount: 3, text: "Iif(, , )" }],
-                        IsNull: [{ paramCount: 1, text: "IsNull()" }],
-                        IsNullOrEmpty: [{ paramCount: 1, text: "IsNullOrEmpty()" }],
-                    }
-                }, {
-                    display: "Math",
-                    items: {
-                        Abs: [{ paramCount: 1, text: "Abs()" }],
-                        Sqr: [{ paramCount: 1, text: "Sqr()" }],
-                        Cos: [{ paramCount: 1, text: "Cos()" }],
-                        Sin: [{ paramCount: 1, text: "Sin()" }],
-                        Atn: [{ paramCount: 1, text: "Atn()" }],
-                        Exp: [{ paramCount: 1, text: "Exp()" }],
-                        Log: [
-                            { paramCount: 1, text: "Log()" },
-                            { paramCount: 2, text: "Log(, )" },
-                        ],
-                        Rnd: [{ paramCount: 0, text: "Rnd()" }],
-                        Tan: [{ paramCount: 1, text: "Tan()" }],
-                        Power: [{ paramCount: 2, text: "Power(, )" }],
-                        Sign: [{ paramCount: 1, text: "Sign()" }],
-                        Round: [
-                            { paramCount: 1, text: "Round()" },
-                            { paramCount: 2, text: "Round(, )" },
-                        ],
-                        Ceiling: [{ paramCount: 1, text: "Ceiling()" }],
-                        Floor: [{ paramCount: 1, text: "Floor()" }],
-                        Max: [{ paramCount: 2, text: "Max(, )" }],
-                        Min: [{ paramCount: 2, text: "Min(, )" }],
-                        Acos: [{ paramCount: 1, text: "Acos()" }],
-                        Asin: [{ paramCount: 1, text: "Asin()" }],
-                        Atn2: [{ paramCount: 2, text: "Atn2(, )" }],
-                        BigMul: [{ paramCount: 2, text: "BigMul(, )" }],
-                        Cosh: [{ paramCount: 1, text: "Cosh()" }],
-                        Log10: [{ paramCount: 1, text: "Log10()" }],
-                        Sinh: [{ paramCount: 1, text: "Sinh()" }],
-                        Tanh: [{ paramCount: 1, text: "Tanh()" }],
-                        ToInt: [{ paramCount: 1, text: "ToInt()" }],
-                        ToLong: [{ paramCount: 1, text: "ToLong()" }],
-                        ToFloat: [{ paramCount: 1, text: "ToFloat()" }],
-                        ToDouble: [{ paramCount: 1, text: "ToDouble()" }],
-                        ToDecimal: [{ paramCount: 1, text: "ToDecimal()" }],
-                    }
-                }, {
-                    display: "String",
-                    items: {
-                        Trim: [{ paramCount: 1, text: "Trim()" }],
-                        Len: [{ paramCount: 1, text: "Len()" }],
-                        Substring: [
-                            { paramCount: 3, text: "Substring('', , )" },
-                            { paramCount: 2, text: "Substring('', )" }
-                        ],
-                        Upper: [{ paramCount: 1, text: "Upper()" }],
-                        Lower: [{ paramCount: 1, text: "Lower()" }],
-                        Concat: [{ paramCount: Infinity, text: "Concat(, )" }],
-                        Ascii: [{ paramCount: 1, text: "Ascii('')" }],
-                        Char: [{ paramCount: 1, text: "Char()" }],
-                        ToStr: [{ paramCount: 1, text: "ToStr()" }],
-                        Replace: [{ paramCount: 3, text: "Replace('','', '')" }],
-                        Reverse: [{ paramCount: 1, text: "Reverse('')" }],
-                        Insert: [{ paramCount: 3, text: "Insert('', , '')" }],
-                        CharIndex: [
-                            { paramCount: 2, text: "CharIndex('','')" },
-                            { paramCount: 3, text: "CharIndex('','', )" }],
-                        Remove: [{ paramCount: 3, text: "Remove('', , )" }],
-                        PadLeft: [
-                            { paramCount: 2, text: "PadLeft(, )" },
-                            { paramCount: 3, text: "PadLeft(, , '')" }
-                        ],
-                        PadRight: [
-                            { paramCount: 2, text: "PadRight(, )" },
-                            { paramCount: 3, text: "PadRight(, , '')" }
-                        ],
-                        StartsWith: [{ paramCount: 2, text: "StartsWith('', '')" }],
-                        EndsWith: [{ paramCount: 2, text: "EndsWith('', '')" }],
-                        Contains: [{ paramCount: 0, text: "Contains('', '')" }],
-                    }
-                }
-            ];
-            var Tools = (function () {
-                function Tools(onClick, parametersOptions, fieldListOptions, functions) {
-                    if (functions === void 0) { functions = Widgets.functionDisplay; }
-                    this.popularItems = [];
-                    this.toolBox = [];
-                    this.description = ko.observable();
-                    this._defaultClick = onClick;
-                    this.popularItems = this._generatePopularItems(operatorNames.filter(function (item) { return !!item.image; }));
-                    this.toolBox = [
-                        this._generateList("FUNCTIONS", functions.map(function (item) {
-                            return {
-                                display: item.display,
-                                collapsed: ko.observable(true),
-                                items: $.map(item.items, function (value) {
-                                    if (value) {
-                                        var result = [];
-                                        value.forEach(function (item) {
-                                            result.push(item);
-                                        });
-                                        return result;
-                                    }
-                                })
-                            };
-                        }), "dx-expressioneditor-functions"),
-                        this._generateList("OPERATORS", operatorNames.filter(function (item) { return !!item.description; }))
-                    ];
-                    this.toolBox.push(this._generateList("FIELDS", { fields: fieldListOptions, parameters: parametersOptions }, "dx-expressioneditor-fields", "37%"));
-                }
-                Tools.prototype._generateList = function (title, content, templateName, width, click) {
-                    var _this = this;
-                    if (templateName === void 0) { templateName = null; }
-                    return {
-                        templateName: templateName,
-                        width: width || "30%",
-                        title: JS.Utils.getLocalization(title),
-                        content: content,
-                        click: click || this._defaultClick,
-                        selection: function (item) { _this.description(item.description || item.text); }
-                    };
-                };
-                Tools.prototype._generatePopularItems = function (values, click) {
-                    var _this = this;
-                    return values.map(function (item) {
-                        return {
-                            templateName: item.templateName || null,
-                            text: item.text || item,
-                            imgClassName: "dx-image-expressioneditor-" + item.image,
-                            hasSeparator: item.hasSeparator,
-                            description: item.description,
-                            click: click || _this._defaultClick
-                        };
-                    });
-                };
-                return Tools;
-            })();
-            Widgets.Tools = Tools;
-            var ExpressionEditorTreeListController = (function (_super) {
-                __extends(ExpressionEditorTreeListController, _super);
-                function ExpressionEditorTreeListController(fieldName, putSelectionHandler, selectionHandler) {
-                    _super.call(this);
-                    this.fieldName = fieldName;
-                    this.putSelectionHandler = putSelectionHandler;
-                    this.selectionHandler = selectionHandler;
-                }
-                ExpressionEditorTreeListController.prototype.itemsFilter = function (item) {
-                    return item.specifics !== "none" && item.name !== ko.unwrap(this.fieldName);
-                };
-                ExpressionEditorTreeListController.prototype.select = function (value) {
-                    this.selectionHandler(ko.unwrap(value.data["type"]));
-                };
-                ExpressionEditorTreeListController.prototype.getActions = function (item) {
-                    var _this = this;
-                    return [{ clickAction: function (element) { _this.putSelectionHandler(item.path, element); } }];
-                };
-                ExpressionEditorTreeListController.prototype.canSelect = function (value) {
-                    return true;
-                };
-                return ExpressionEditorTreeListController;
-            })(Widgets.TreeListController);
-            Widgets.ExpressionEditorTreeListController = ExpressionEditorTreeListController;
-            var ExpressionEditor = (function () {
-                function ExpressionEditor(options, fieldListProvider, disabled, rtl, _displayConverter) {
-                    var _this = this;
-                    if (disabled === void 0) { disabled = ko.observable(false); }
-                    if (rtl === void 0) { rtl = false; }
-                    this._displayConverter = _displayConverter;
-                    this._updateTextAreaValue = function (item, element) {
-                        var textArea = _this._getTextArea(element), textAreaValue = _this.textAreaValue().toString(), cursorPosition = textArea && textArea.selectionStart || textAreaValue.length, newAddedText = textAreaValue[cursorPosition - 1] == " " ? (item.text || item) + " " : " " + (item.text || item) + " ";
-                        _this.textAreaValue([textAreaValue.slice(0, cursorPosition), newAddedText, textAreaValue.slice(cursorPosition)].join(''));
-                        if (textArea && textArea.setSelectionRange) {
-                            textArea.focus();
-                            var posisition = cursorPosition + (newAddedText.indexOf("(") !== -1 ? newAddedText.indexOf("(") + 1 : newAddedText.length);
-                            textArea.setSelectionRange(posisition, posisition);
-                        }
-                    };
-                    this.patchFieldName = function (fieldName) { return fieldName; };
-                    this.popupVisible = ko.observable(false);
-                    this.value = ko.observable("");
-                    this.textAreaValue = ko.observable("");
-                    this.isValid = ko.observable(true);
-                    this.buttonItems = [];
-                    this.rtl = false;
-                    if (options.patchFieldName) {
-                        this.patchFieldName = options.patchFieldName;
-                    }
-                    this.value = options.value;
-                    this.rtl = rtl;
-                    this.textAreaValue(this.value());
-                    this.popupVisible.subscribe(function (newVal) {
-                        _this.textAreaValue(_this.value());
-                    });
-                    this.fieldListProvider = ko.unwrap(fieldListProvider);
-                    this.disabled = disabled;
-                    var self = this;
-                    this.save = function (sender) {
-                        try {
-                            JS.Data.CriteriaOperator.parse(_this.textAreaValue());
-                            options.value(_this.textAreaValue());
-                            _this.popupVisible(false);
-                        }
-                        catch (exception) {
-                            var result = JS.Data.CriteriaOperator.getNotValidRange(_this.textAreaValue(), exception.message);
-                            var textArea = _this._getTextArea(sender.element);
-                            textArea && textArea.setSelectionRange(result.start, result.end);
-                            _this.isValid(false);
-                        }
-                    };
-                    var treeListOptions = options.path && ko.pureComputed(function () { return _this._createToolsOptions("field", options.path(), options.fieldName); });
-                    this.tools = new Tools(this._updateTextAreaValue, this._createToolsOptions("parameter"), treeListOptions, options.functions);
-                    this._createMainPopupButtons();
-                }
-                ExpressionEditor.prototype._createMainPopupButtons = function () {
-                    var self = this;
-                    this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: JS.Utils.getLocalization('Save'), onClick: function (sender) { self.save(sender); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: JS.Utils.getLocalization('Cancel'), onClick: function () { self.popupVisible(false); } } },
-                        { toolbar: 'bottom', location: 'before', template: function () { return $('#dx-expressioneditor-description'); }, text: self.tools.description }
-                    ];
-                };
-                ExpressionEditor.prototype._getTextArea = function (element) {
-                    return element && element.parents(".dx-expressioneditor").find(":input")[0];
-                };
-                ExpressionEditor.prototype._createToolsOptions = function (objectName, path, fieldName) {
-                    var _this = this;
-                    if (path === void 0) { path = null; }
-                    var putSelectionHandler = function (selectedItemPath, element) {
-                        var proposedFieldName = !!path ? selectedItemPath.substring(path.length + 1) : selectedItemPath;
-                        var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
-                        if (_this._displayConverter && path !== null) {
-                            _this._displayConverter.toDisplayExpression(path, newAddedString)
-                                .done(function (result) { _this._updateTextAreaValue(result, element); })
-                                .fail(function () { _this._updateTextAreaValue(newAddedString, element); });
-                        }
-                        else {
-                            _this._updateTextAreaValue(newAddedString, element);
-                        }
-                    };
-                    var selectionHandler = function (selectedItemType) {
-                        _this.tools.description(selectedItemType && selectedItemType !== "None" ? ("The type of this " + objectName + " is: " + selectedItemType) : "");
-                    };
-                    return {
-                        itemsProvider: this.fieldListProvider,
-                        selectedPath: ko.observable(""),
-                        path: path || "parameters",
-                        templateName: "dx-ee-treelist-item",
-                        treeListController: new ExpressionEditorTreeListController(fieldName || "", putSelectionHandler, selectionHandler),
-                        rtl: this.rtl
-                    };
-                };
-                return ExpressionEditor;
-            })();
-            Widgets.ExpressionEditor = ExpressionEditor;
-            function wrapExpressionOptionsValue(options, converter, element) {
-                if (!(converter && options.path))
-                    return options;
-                var _displayValue = ko.observable(options.value());
-                converter.toDisplayExpression(options.path(), options.value()).done(function (result) {
-                    _displayValue(result);
-                });
-                var subscription = options.value.subscribe(function (newValue) {
-                    converter.toDisplayExpression(options.path(), newValue).done(function (result) {
-                        _displayValue(result);
-                    });
-                });
-                var displayValue = ko.pureComputed({
-                    read: function () { return _displayValue(); },
-                    write: function (newValue) {
-                        converter.toRealExpression(options.path(), newValue).done(function (result) {
-                            options.value(result);
-                        }).fail(function () {
-                            options.value(newValue);
-                        });
-                    }
-                });
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    subscription.dispose();
-                    displayValue.dispose();
-                });
-                return $.extend({}, options, { value: displayValue });
-            }
-            Widgets.wrapExpressionOptionsValue = wrapExpressionOptionsValue;
-            ko.bindingHandlers['dxExpressionEditor'] = {
-                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var $element = $(element);
-                    $element.children().remove();
-                    $(element).addClass("dx-popup-general");
-                    var templateHtml = $('#dx-expressioneditor').text(), $element = $element.append(templateHtml), values = valueAccessor();
-                    var editorOptions = wrapExpressionOptionsValue(ko.unwrap(values.options), values.displayExpressionConverter, element);
-                    ko.applyBindings(new ExpressionEditor(editorOptions, values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayExpressionConverter), $element.children()[0]);
-                    return { controlsDescendantBindings: true };
-                }
-            };
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            Widgets.formatStringStandardPatterns = {
-                'DateTime': { type: 'System.DateTime', value: new Date(Date.now()), patterns: [] },
-                'Number': { type: 'System.Int32', value: '123456789', patterns: ['#.00', '#, #', '0.E+0.0', '0.e+0.0', 'n', 'n1', 'n2', 'e', 'e1', 'f', 'f1'] },
-                'Percent': { type: 'System.Int32', value: '100', patterns: ['0.00%', '0%'] },
-                'Currency': { type: 'System.Int32', value: '100', patterns: ['$0.00', '$0', 'c', 'c1', 'c2'] },
-                'Special': { type: 'System.Int32', value: '123456789', patterns: ['(###) ### - ####', '### - ## - ####'] },
-                'General': { type: 'System.String', value: '', patterns: ['General format have no specific number format'] }
-            };
-            var FormatStringEditor = (function (_super) {
-                __extends(FormatStringEditor, _super);
-                function FormatStringEditor(value, disabled, defaultPatterns, customPatterns, actions, rtl, popupContainer) {
-                    _super.call(this);
-                    this.currentType = ko.observable();
-                    this.patternList = ko.observableArray([]);
-                    this.canAddCustomFormat = ko.observable(false);
-                    this.formatPrefix = ko.observable("");
-                    this.formatSuffix = ko.observable("");
-                    this.previewString = ko.observable("Preview string");
-                    this.formatResult = ko.observable("");
-                    this.selectedFormats = ko.observable([]);
-                    this.selectedTypes = ko.observable([]);
-                    this.popupVisible = ko.observable(false);
-                    this.option("value", value);
-                    this.option("disabled", disabled || false);
-                    this.option("rtl", rtl || false);
-                    this.option("popupContainer", popupContainer || ".dx-viewport");
-                    var self = this;
-                    this.popupService = new JS.Utils.PopupService();
-                    this._standardPatternSource = defaultPatterns || Widgets.formatStringStandardPatterns;
-                    this._customPatternSource = customPatterns || {};
-                    this.types = this._convertArray(Object.keys(this._standardPatternSource));
-                    this._disposables.push(this.currentType.subscribe(function (newVal) {
-                        if (self.isGeneralType) {
-                            self.formatResult("");
-                            self.selectedFormats([]);
-                        }
-                        else {
-                            self._updateFormatList();
-                        }
-                    }));
-                    this.currentType(this.types[0].name);
-                    this._disposables.push(this.formatResult.subscribe(function (newVal) {
-                        self._updateCanAddCustomFormat(newVal);
-                        self._updatePreview();
-                    }));
-                    this._disposables.push(this.formatPrefix.subscribe(function (newVal) {
-                        self._updatePreview();
-                    }));
-                    this._disposables.push(this.formatSuffix.subscribe(function (newVal) {
-                        self._updatePreview();
-                    }));
-                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
-                        if (!newVal)
-                            return;
-                        self._initEditor(value());
-                        self.selectedTypes(self.types.filter(function (item) { return item.name === self.currentType(); }));
-                    }));
-                    this._createMainPopupButtons();
-                    actions && actions.updatePreview && (this.updatePreview = actions.updatePreview);
-                    this.setType = function (e) {
-                        self.currentType(e.itemData.name);
-                        self._updateSelection();
-                    };
-                    this.setFormat = function (e) {
-                        self.formatResult(e.itemData.name);
-                    };
-                    this.addCustomFormat = function () {
-                        if (self.formatResult() && self.canAddCustomFormat()) {
-                            self.customPatterns.push(self.formatResult());
-                            self._updateFormatList();
-                            self._scrollToBottom();
-                            actions && actions.saveCustomPattern(self.currentType(), self.formatResult());
-                            self._updateSelection(self.patternList().length - 1);
-                            self.canAddCustomFormat(false);
-                        }
-                    };
-                    this.removeCustomFormat = function (data) {
-                        var currentSelection = self.selectedFormats()[0];
-                        var patternList = self.patternList();
-                        var removedItemIndex = patternList.map(function (item) { return item.name; }).indexOf(data.name);
-                        self.customPatterns.splice(self.customPatterns.indexOf(data.name), 1);
-                        self._updateFormatList();
-                        actions && actions.removeCustomPattern(self.currentType(), data.name);
-                        if (currentSelection.name === data.name) {
-                            self._updateSelection(removedItemIndex === (patternList.length - 1) ? (self.patternList().length - 1) : removedItemIndex);
-                        }
-                        else {
-                            self.selectedFormats(self.patternList().filter(function (item) { return item.name === currentSelection.name; }));
-                        }
-                    };
-                }
-                FormatStringEditor.prototype.okAction = function () {
-                    var result = this.isGeneralType ? this._getGeneralPreview('{0}') : this._wrapFormat();
-                    this.option("value", result);
-                    this.popupVisible(false);
-                };
-                FormatStringEditor.prototype._createMainPopupButtons = function () {
-                    var self = this;
-                    this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: 'OK', onClick: function () { self.okAction(); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: 'Cancel', onClick: function () { self.popupVisible(false); } } }
-                    ];
-                };
-                FormatStringEditor.prototype._convertArray = function (array, canRemove) {
-                    return array.map(function (item) { return { name: item, canRemove: !!canRemove }; });
-                };
-                FormatStringEditor.prototype._scrollToBottom = function () {
-                    var $scrollView = $(".dx-format-string .dx-format-string-formats").find(".dx-scrollview").filter(":visible");
-                    var scrollViewInstance = $scrollView.data("dxScrollView") && $scrollView.dxScrollView("instance");
-                    scrollViewInstance && scrollViewInstance["scrollTo"] && scrollViewInstance["scrollTo"](scrollViewInstance["scrollHeight"]());
-                };
-                FormatStringEditor.prototype._updateFormatList = function () {
-                    this.selectedFormats([]);
-                    var currentTypeInfo = this._standardPatternSource[this.currentType()];
-                    this.patternList(this._convertArray(currentTypeInfo.patterns).concat(this._convertArray(this.customPatterns, true)));
-                };
-                FormatStringEditor.prototype._updateSelection = function (selectedItemIndex) {
-                    var currectFormat = this.patternList()[selectedItemIndex || 0];
-                    if (currectFormat) {
-                        this.selectedFormats([currectFormat]);
-                        this.formatResult(currectFormat.name);
-                    }
-                };
-                FormatStringEditor.prototype._updatePreview = function () {
-                    var _this = this;
-                    if (this.isGeneralType) {
-                        this.previewString(this._getGeneralPreview(undefined));
-                        return;
-                    }
-                    var category = this._standardPatternSource[this.currentType()];
-                    var updatedPreviewPromise = this.updatePreview(category.value, category.type, this._wrapFormat());
-                    this._lastUpdatePreviewPromise = updatedPreviewPromise;
-                    updatedPreviewPromise
-                        .done(function (previewString) {
-                        if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
-                            _this.previewString(previewString);
-                    }).fail(function (error) {
-                        if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
-                            _this.previewString('Preview string is not available');
-                    });
-                };
-                FormatStringEditor.prototype._getGeneralPreview = function (value) {
-                    if (value === void 0) { value = '###'; }
-                    return this.formatPrefix() + value + this.formatSuffix();
-                };
-                FormatStringEditor.prototype._wrapFormat = function (format) {
-                    var pattern = format || this.formatResult();
-                    if (pattern && pattern.indexOf("{0:") !== -1) {
-                        return pattern;
-                    }
-                    return pattern ? "{0:" + pattern + "}" : "";
-                };
-                FormatStringEditor.prototype._updateCanAddCustomFormat = function (newFormat) {
-                    if (!newFormat) {
-                        this.canAddCustomFormat(false);
-                        return;
-                    }
-                    var canAddCustomFormat = true;
-                    for (var name in this._standardPatternSource) {
-                        canAddCustomFormat = this._standardPatternSource[name].patterns.indexOf(newFormat) === -1;
-                        if (!canAddCustomFormat) {
-                            break;
-                        }
-                    }
-                    this.canAddCustomFormat(canAddCustomFormat ? this.customPatterns.indexOf(newFormat) === -1 : canAddCustomFormat);
-                };
-                FormatStringEditor.prototype._initEditor = function (formatStringValue) {
-                    var _this = this;
-                    if (!formatStringValue) {
-                        this.setType({ itemData: this.types[0] });
-                        return;
-                    }
-                    if (formatStringValue.indexOf("{0}") !== -1) {
-                        this.currentType("General");
-                        this.formatPrefix(formatStringValue.substring(0, formatStringValue.indexOf("{0}")));
-                        this.formatSuffix(formatStringValue.substring(formatStringValue.indexOf("{0}") + 3));
-                        return;
-                    }
-                    var startIndex = formatStringValue.indexOf("{0:"), closingBracketIndex = formatStringValue.indexOf("}", startIndex), formatPattern = formatStringValue.substring(startIndex + 3, closingBracketIndex), isFormatPatternFind;
-                    var selectTypePatternPair = function () {
-                        _this.currentType(name);
-                        if (startIndex === 0 && closingBracketIndex === (formatStringValue.length - 1)) {
-                            _this.selectedFormats(_this.patternList().filter(function (item) { return item.name === formatPattern; }));
-                            _this.formatResult(formatPattern);
-                            isFormatPatternFind = true;
-                        }
-                    };
-                    for (var name in this._standardPatternSource) {
-                        if (this._standardPatternSource[name].patterns.indexOf(formatPattern) !== -1) {
-                            selectTypePatternPair();
-                            break;
-                        }
-                        var customPatterns = this._customPatternSource[this._standardPatternSource[name].type];
-                        if (customPatterns && customPatterns.indexOf(formatPattern) !== -1) {
-                            selectTypePatternPair();
-                            break;
-                        }
-                    }
-                    if (!isFormatPatternFind) {
-                        this.currentType(this.types[0].name);
-                        this.selectedFormats([]);
-                        this.formatResult(formatStringValue);
-                    }
-                };
-                FormatStringEditor.prototype.updateInputText = function (propertyName, componentInstance) {
-                    this[propertyName](componentInstance.option("text"));
-                };
-                FormatStringEditor.prototype.option = function (name, value) {
-                    if (value !== void 0) {
-                        if (ko.isObservable(this[name])) {
-                            this[name](value);
-                        }
-                        else {
-                            this[name] = value;
-                        }
-                    }
-                    return ko.unwrap(this[name]);
-                };
-                FormatStringEditor.prototype.updatePreview = function (value, category, pattern) {
-                    return $.Deferred().resolve(value || "preview string").promise();
-                };
-                Object.defineProperty(FormatStringEditor.prototype, "customPatterns", {
-                    get: function () {
-                        var currentTypeInfo = this._standardPatternSource[this.currentType()];
-                        return this._customPatternSource[currentTypeInfo.type] = this._customPatternSource[currentTypeInfo.type] || [];
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(FormatStringEditor.prototype, "isGeneralType", {
-                    get: function () {
-                        return this.currentType() === "General";
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return FormatStringEditor;
-            })(DevExpress.JS.Utils.Disposable);
-            Widgets.FormatStringEditor = FormatStringEditor;
-            ko.bindingHandlers['dxFormatEditor'] = {
-                init: function (element, valueAccessor) {
-                    $(element).children().remove();
-                    $(element).addClass("dx-popup-general");
-                    var templateHtml = $('#dx-format-string').text(), $element = $(element).append(templateHtml), values = valueAccessor();
-                    var formatEditor = new FormatStringEditor(values.value, values['disabled'], values['standardPatterns'], values['customPatterns'], values['actions'], values['rtl'], values['popupContainer']);
-                    ko.applyBindings(formatEditor, $element.children()[0]);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        formatEditor.dispose();
-                    });
-                    return { controlsDescendantBindings: true };
-                }
-            };
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Widgets;
-        (function (Widgets) {
-            var dxPopupWithAutoHeight = (function (_super) {
-                __extends(dxPopupWithAutoHeight, _super);
-                function dxPopupWithAutoHeight(element, options) {
-                    _super.call(this, element, options);
-                }
-                dxPopupWithAutoHeight.prototype._setContentHeight = function () {
-                    this["_$popupContent"].css({
-                        height: "100%"
-                    });
-                };
-                return dxPopupWithAutoHeight;
-            })(DevExpress.ui.dxPopup);
-            Widgets.dxPopupWithAutoHeight = dxPopupWithAutoHeight;
-            DevExpress.registerComponent("dxPopupWithAutoHeight", dxPopupWithAutoHeight);
-        })(Widgets = JS.Widgets || (JS.Widgets = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var JS;
-    (function (JS) {
-        var Utils;
-        (function (Utils) {
-            ko.bindingHandlers["focus"] = {
-                init: function (element, valueAccessor) {
-                    var visible = valueAccessor().on || valueAccessor();
-                    var subscription = visible.subscribe(function (newVal) {
-                        if (newVal) {
-                            if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
-                                $(element).find(":input").focus();
-                            }
-                        }
-                    });
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        subscription.dispose();
-                    });
-                }
-            };
-        })(Utils = JS.Utils || (JS.Utils = {}));
-    })(JS = DevExpress.JS || (DevExpress.JS = {}));
-})(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-ko-widgets.js.map
-/* parser generated by jison 0.4.17 */
-/*
-  Returns a Parser object of the following structure:
-
-  Parser: {
-    yy: {}
-  }
-
-  Parser.prototype: {
-    yy: {},
-    trace: function(),
-    symbols_: {associative list: name ==> number},
-    terminals_: {associative list: number ==> name},
-    productions_: [...],
-    performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate, $$, _$),
-    table: [...],
-    defaultActions: {...},
-    parseError: function(str, hash),
-    parse: function(input),
-
-    lexer: {
-        EOF: 1,
-        parseError: function(str, hash),
-        setInput: function(input),
-        input: function(),
-        unput: function(str),
-        more: function(),
-        less: function(n),
-        pastInput: function(),
-        upcomingInput: function(),
-        showPosition: function(),
-        test_match: function(regex_match_array, rule_index),
-        next: function(),
-        lex: function(),
-        begin: function(condition),
-        popState: function(),
-        _currentRules: function(),
-        topState: function(),
-        pushState: function(condition),
-
-        options: {
-            ranges: boolean           (optional: true ==> token location info will include a .range[] member)
-            flex: boolean             (optional: true ==> flex-like lexing behaviour where the rules are tested exhaustively to find the longest match)
-            backtrack_lexer: boolean  (optional: true ==> lexer regexes are tested in order and for each matching regex the action code is invoked; the lexer terminates the scan when a token is returned by the action code)
-        },
-
-        performAction: function(yy, yy_, $avoiding_name_collisions, YY_START),
-        rules: [...],
-        conditions: {associative list: name ==> set},
-    }
-  }
-
-
-  token location info (@$, _$, etc.): {
-    first_line: n,
-    last_line: n,
-    first_column: n,
-    last_column: n,
-    range: [start_number, end_number]       (where the numbers are indexes into the input string, regular zero-based)
-  }
-
-
-  the parseError function receives a 'hash' object with these members for lexer and parser errors: {
-    text:        (matched text)
-    token:       (the produced terminal token, if any)
-    line:        (yylineno)
-  }
-  while parser (grammar) errors will also provide these members, i.e. parser errors deliver a superset of attributes: {
-    loc:         (yylloc)
-    expected:    (string describing the set of expected tokens)
-    recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
-  }
-*/
-var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,19],$V8=[1,30],$V9=[1,32],$Va=[1,25],$Vb=[1,24],$Vc=[1,34],$Vd=[1,31],$Ve=[1,33],$Vf=[1,13],$Vg=[1,5],$Vh=[1,14],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,39],$Vq=[1,50],$Vr=[1,52],$Vs=[1,53],$Vt=[1,56],$Vu=[1,55],$Vv=[1,51],$Vw=[1,54],$Vx=[1,36],$Vy=[1,37],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$V71=[5,11,41,42,50,56],$V81=[1,145],$V91=[16,50],$Va1=[15,16,17,22,25,26,27,28,50],$Vb1=[16,17,20],$Vc1=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$Vd1=[5,11,40,41,42,45,46,50,56,66,67],$Ve1=[5,11,19,20,40,41,42,45,46,50,56,66,67,68,69],$Vf1=[11,56],$Vg1=[5,11,16,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69];
-var parser = {trace: function trace() { },
-yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"-":26,"[":27,"=":28,"param":29,"?":30,"property":31,"columnOrAggregate":32,"AGG_COUNT":33,"AGG_AVG":34,"AGG_MAX":35,"AGG_MIN":36,"AGG_SINGLE":37,"AGG_EXISTS":38,"AGG_SUM":39,"OP_LIKE":40,"AND":41,"OR":42,"OP_BETWEEN":43,"OP_IN":44,"NOT":45,"IS":46,"NULL":47,"propertyWithAggregate":48,"compositeProperty":49,"]":50,"field":51,"aggregate":52,"aggregateSuffix":53,"topLevelAggregate":54,"(":55,")":56,"MinStart":57,"MaxStart":58,"CONST":59,"*":60,"/":61,"%":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"-",27:"[",28:"=",30:"?",33:"AGG_COUNT",34:"AGG_AVG",35:"AGG_MAX",36:"AGG_MIN",37:"AGG_SINGLE",38:"AGG_EXISTS",39:"AGG_SUM",40:"OP_LIKE",41:"AND",42:"OR",43:"OP_BETWEEN",44:"OP_IN",45:"NOT",46:"IS",47:"NULL",50:"]",55:"(",56:")",59:"CONST",60:"*",61:"/",62:"%",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[29,2],[29,1],[31,1],[31,3],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[48,1],[48,3],[49,3],[49,5],[51,1],[51,2],[52,4],[52,3],[52,6],[52,5],[52,4],[52,3],[52,1],[54,1],[53,1],[53,1],[53,3],[53,3],[53,4],[53,4],[53,3],[53,4],[53,2],[53,2],[57,3],[58,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
-performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
-/* this == yyval */
-
-var $0 = $$.length - 1;
-switch (yystate) {
-case 1:
- return $$[$0-1]; 
-break;
-case 2:
- result = new DevExpress.JS.Data.CriteriaOperator(); 
-break;
-case 3:
- result = $$[$0-1]; 
-break;
-case 4:
- this.$ = [ $$[$0] ]; 
-break;
-case 5: case 6:
- this.$ = $$[$0-2]; this.$.push($$[$0]); 
-break;
-case 7: case 10: case 17: case 39: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 86: case 87: case 88: case 89:
- this.$ = $$[$0]; 
-break;
-case 8: case 79: case 80: case 112: case 122:
- this.$ = $$[$0-1]; 
-break;
-case 9:
- this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.OrderDescToken, $$[$0-1]); 
-break;
-case 11: case 40:
- this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '.' + $$[$0].propertyName); 
-break;
-case 12:
- this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '+' + $$[$0].propertyName); 
-break;
-case 13:
- this.$ = new DevExpress.JS.Data.OperandProperty('<' + $$[$0-2].propertyName + '>' + $$[$0].propertyName); 
-break;
-case 14: case 20:
- this.$ = new DevExpress.JS.Data.OperandProperty($$[$0]); 
-break;
-case 15: case 16: case 21:
- this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-1].propertyName + ' ' + $$[$0]); 
-break;
-case 18:
- this.$ = new DevExpress.JS.Data.OperandProperty("^"); 
-break;
-case 19:
-  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0]); 
-break;
-case 22: case 23:
-  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-1].propertyName + ' ' + $$[$0]); 
-break;
-case 24:
-  this.$ = new DevExpress.JS.Data.OperandProperty("^"); 
-break;
-case 25: case 26: case 27:
-  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '-' + $$[$0]); 
-break;
-case 28: case 29:
-  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '[' + $$[$0]); 
-break;
-case 30: case 31: case 32: case 33:
-  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '+' + $$[$0]); 
-break;
-case 34: case 35: case 36:
-  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '=' + $$[$0]); 
-break;
-case 37:
- this.$ = new DevExpress.JS.Data.OperandParameter($$[$0]); 
-break;
-case 38:
- this.$ = new DevExpress.JS.Data.OperandValue(undefined); 
-break;
-case 41:
- this.$ = $$[$0].propertyName; 
-break;
-case 58:
- this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
-break;
-case 59:
-
-  var lst = [];
-  lst.push($$[$0-1]);
-  this.$ = {
-   column: _$[$0-1].first_column,
-   line: _$[$0-1].first_line - 1,
-   names: lst
-  };
- 
-break;
-case 60:
-
-  var propertyNameObject = $$[$0-4];
-  propertyNameObject.names.push($$[$0-1]);
-  this.$ = propertyNameObject;
- 
-break;
-case 61:
- this.$ = new DevExpress.JS.Data.OperandProperty($$[$0].names.join('.'), $$[$0].column, $$[$0].line); 
-break;
-case 62:
- this.$ = new DevExpress.JS.Data.OperandProperty(); 
-break;
-case 63:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty(), null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 64:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty($$[$0-2].names.join('.'), $$[$0-2].column, $$[$0-2].line), null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 65:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 66:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 67:
- this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 68:
- this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 71: case 73:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Count, null); 
-break;
-case 72: case 74:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 75:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Avg, null); 
-break;
-case 76:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Sum, null); 
-break;
-case 77:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, new DevExpress.JS.Data.OperandProperty("This"), DevExpress.JS.Data.Aggregate.Single, null); 
-break;
-case 78:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Single, null); 
-break;
-case 81:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Min, null); 
-break;
-case 82:
- this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Max, null); 
-break;
-case 83:
- this.$ = new DevExpress.JS.Data.ConstantValue($$[$0]); 
-break;
-case 84:
- this.$ = new DevExpress.JS.Data.ConstantValue(parseFloat($$[$0])); 
-break;
-case 85:
- this.$ = new DevExpress.JS.Data.ConstantValue(null); 
-break;
-case 90:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Multiply); 
-break;
-case 91:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Divide); 
-break;
-case 92:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Plus); 
-break;
-case 93:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Minus); 
-break;
-case 94:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Modulo); 
-break;
-case 95:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseOr); 
-break;
-case 96:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd); 
-break;
-case 97:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseXor); 
-break;
-case 98:
-
-								this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Minus, $$[$0]);
-							
-break;
-case 99:
- this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Plus, $$[$0]); 
-break;
-case 100:
- this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, $$[$0]); 
-break;
-case 101:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Equal); 
-break;
-case 102:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.NotEqual); 
-break;
-case 103:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Greater); 
-break;
-case 104:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Less); 
-break;
-case 105:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual); 
-break;
-case 106:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.LessOrEqual); 
-break;
-case 107:
- this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like); 
-break;
-case 108:
- this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.BinaryOperator($$[$0-3], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like)); 
-break;
-case 109:
- this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, $$[$0]); 
-break;
-case 110:
- this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
-break;
-case 111:
- this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
-break;
-case 113:
- this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-2]); 
-break;
-case 114:
- this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-3])); 
-break;
-case 115:
- this.$ = new DevExpress.JS.Data.InOperator($$[$0-2], $$[$0]); 
-break;
-case 116:
- this.$ = new DevExpress.JS.Data.BetweenOperator($$[$0-6], $$[$0-3], $$[$0-1]); 
-break;
-case 117: case 118:
-  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], $$[$0]); 
-break;
-case 119:
- this.$ = null; 
-break;
-case 120:
- this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Min, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
-break;
-case 121:
- this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Max, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
-break;
-case 123:
- this.$ = []; 
-break;
-case 124:
-
-							var lst = [];
-							lst.push($$[$0]);
-							this.$ = lst;
-						
-break;
-case 125:
-
-							var lst = $$[$0-2];
-							lst.push($$[$0]);
-							this.$ = lst;
-						
-break;
-}
-},
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,83]),o($VG,[2,84]),o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87],{27:[1,57]}),o($VG,[2,88],{16:[1,58]}),o($VG,[2,89]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,64],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{55:$VH,70:65},o($VI,$VJ,{70:67,55:$VH}),{11:[1,68],56:$VK},{11:[1,70],56:$VL},o($VG,[2,38],{15:[1,72]}),o($VM,[2,61],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:75,50:[1,74]},o($V31,[2,39],{15:$V41,22:$V51}),o($VG,[2,69]),{55:[1,98]},{55:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,70]),{14:100,15:[1,101]},o($VG,[2,71],{55:[1,102]}),o($VG,[2,72],{55:[1,103]}),{55:[1,104]},{55:[1,105]},{55:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{40:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{45:[1,126],47:[1,125]},{55:$VH,70:127},{55:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,50:[1,130],51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,98]),o($VG,[2,99]),o($V61,[2,100],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o($V71,[2,109],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,133],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,119]),o($VG,[2,117]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,135],57:17,58:18,59:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,118]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,79]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,80]),o($VG,[2,37]),{27:[1,140],33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:139,57:141,58:142},o($VM,[2,62],{16:[1,143]}),{16:$V81,50:[1,144]},o($V91,[2,57]),o($V91,[2,41],{15:[1,146],17:[1,151],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,152]}),o($V91,[2,42]),o($V91,[2,43]),o($V91,[2,44]),o($V91,[2,45]),o($V91,[2,46]),o($V91,[2,47]),o($V91,[2,48]),o($V91,[2,49]),o($V91,[2,50]),o($V91,[2,51]),o($V91,[2,52]),o($V91,[2,53]),o($V91,[2,54]),o($V91,[2,55]),o($V91,[2,56]),o($Va1,[2,19]),o($Va1,[2,20]),o($Va1,[2,24]),o($VI,[2,15]),o($VI,[2,16]),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:154,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{16:[1,156],17:[1,157],20:[1,155]},o($Vb1,[2,10]),{56:[1,158]},{56:[1,159]},{4:160,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:161,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,162],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,90]),o($VG,[2,91]),o($Vc1,[2,92],{60:$Vx,61:$Vy,62:$Vz}),o($Vc1,[2,93],{60:$Vx,61:$Vy,62:$Vz}),o($VG,[2,94]),o([5,11,19,20,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,95],{17:$Vl,23:$Vo,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,96],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o([5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,97],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($Vd1,[2,101],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,102],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Ve1,[2,103],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,104],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,105],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,106],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,107],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($V71,[2,110],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,42,50,56],[2,111],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,113]),{47:[1,165]},o($VG,[2,115]),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,50:[1,167],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,68],{16:[1,168]}),o($V31,[2,40],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,112]),{11:[1,170],56:[1,169]},o($VG,[2,123]),o($Vf1,[2,124],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,171],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,172],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,64]),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:173},{56:$VK},{56:$VL},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:174,57:141,58:142},o($Vg1,[2,59]),{15:$VN,23:$VO,24:77,25:$VP,32:175,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21},o($Va1,[2,21]),o($Va1,[2,22]),o($Va1,[2,23]),{15:[1,176],22:[1,178],25:[1,177]},{15:[1,179],22:[1,181],25:[1,180]},{15:[1,182],22:[1,184],25:[1,183]},{15:[1,185],22:[1,187],25:[1,186]},o($Vf1,[2,81],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,82],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,188]},{15:[1,189]},{15:[1,190]},o($VG,[2,73]),o($VG,[2,74]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,191],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,192],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,77]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,193],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vd1,[2,108],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,114]),{11:[1,194],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,67],{16:[1,195]}),{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:196,57:141,58:142},o($VG,[2,122]),{4:197,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,120]),o($VG,[2,121]),{16:$V81,50:[1,198]},o($VG,[2,63]),o($V91,[2,58]),o($Va1,[2,25]),o($Va1,[2,26]),o($Va1,[2,27]),o($Va1,[2,28]),o($Va1,[2,29]),o($Va1,[2,30]),o($Va1,[2,31]),o($Va1,[2,32]),o($Va1,[2,33]),o($Va1,[2,34]),o($Va1,[2,35]),o($Va1,[2,36]),o($VI,[2,13]),o($Vb1,[2,11]),o($Vb1,[2,12]),o($VG,[2,75]),o($VG,[2,76]),o($VG,[2,78]),{4:199,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:200,57:141,58:142},o($VG,[2,66]),o($Vf1,[2,125],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vg1,[2,60]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,201],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,65]),o($VG,[2,116])],
-defaultActions: {35:[2,1]},
-parseError: function parseError(str, hash) {
-    if (hash.recoverable) {
-        this.trace(str);
-    } else {
-        function _parseError (msg, hash) {
-            this.message = msg;
-            this.hash = hash;
-        }
-        _parseError.prototype = Error;
-
-        throw new _parseError(str, hash);
-    }
-},
-parse: function parse(input) {
-    var self = this, stack = [0], tstack = [], vstack = [null], lstack = [], table = this.table, yytext = '', yylineno = 0, yyleng = 0, recovering = 0, TERROR = 2, EOF = 1;
-    var args = lstack.slice.call(arguments, 1);
-    var lexer = Object.create(this.lexer);
-    var sharedState = { yy: {} };
-    for (var k in this.yy) {
-        if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
-            sharedState.yy[k] = this.yy[k];
-        }
-    }
-    lexer.setInput(input, sharedState.yy);
-    sharedState.yy.lexer = lexer;
-    sharedState.yy.parser = this;
-    if (typeof lexer.yylloc == 'undefined') {
-        lexer.yylloc = {};
-    }
-    var yyloc = lexer.yylloc;
-    lstack.push(yyloc);
-    var ranges = lexer.options && lexer.options.ranges;
-    if (typeof sharedState.yy.parseError === 'function') {
-        this.parseError = sharedState.yy.parseError;
-    } else {
-        this.parseError = Object.getPrototypeOf(this).parseError;
-    }
-    function popStack(n) {
-        stack.length = stack.length - 2 * n;
-        vstack.length = vstack.length - n;
-        lstack.length = lstack.length - n;
-    }
-    _token_stack:
-        var lex = function () {
-            var token;
-            token = lexer.lex() || EOF;
-            if (typeof token !== 'number') {
-                token = self.symbols_[token] || token;
-            }
-            return token;
-        };
-    var symbol, preErrorSymbol, state, action, a, r, yyval = {}, p, len, newState, expected;
-    while (true) {
-        state = stack[stack.length - 1];
-        if (this.defaultActions[state]) {
-            action = this.defaultActions[state];
-        } else {
-            if (symbol === null || typeof symbol == 'undefined') {
-                symbol = lex();
-            }
-            action = table[state] && table[state][symbol];
-        }
-                    if (typeof action === 'undefined' || !action.length || !action[0]) {
-                var errStr = '';
-                expected = [];
-                for (p in table[state]) {
-                    if (this.terminals_[p] && p > TERROR) {
-                        expected.push('\'' + this.terminals_[p] + '\'');
-                    }
-                }
-                if (lexer.showPosition) {
-                    errStr = 'Parse error on line ' + (yylineno + 1) + ':\n' + lexer.showPosition() + '\nExpecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
-                } else {
-                    errStr = 'Parse error on line ' + (yylineno + 1) + ': Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
-                }
-                this.parseError(errStr, {
-                    text: lexer.match,
-                    token: this.terminals_[symbol] || symbol,
-                    line: lexer.yylineno,
-                    loc: yyloc,
-                    expected: expected
-                });
-            }
-        if (action[0] instanceof Array && action.length > 1) {
-            throw new Error('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol);
-        }
-        switch (action[0]) {
-        case 1:
-            stack.push(symbol);
-            vstack.push(lexer.yytext);
-            lstack.push(lexer.yylloc);
-            stack.push(action[1]);
-            symbol = null;
-            if (!preErrorSymbol) {
-                yyleng = lexer.yyleng;
-                yytext = lexer.yytext;
-                yylineno = lexer.yylineno;
-                yyloc = lexer.yylloc;
-                if (recovering > 0) {
-                    recovering--;
-                }
-            } else {
-                symbol = preErrorSymbol;
-                preErrorSymbol = null;
-            }
-            break;
-        case 2:
-            len = this.productions_[action[1]][1];
-            yyval.$ = vstack[vstack.length - len];
-            yyval._$ = {
-                first_line: lstack[lstack.length - (len || 1)].first_line,
-                last_line: lstack[lstack.length - 1].last_line,
-                first_column: lstack[lstack.length - (len || 1)].first_column,
-                last_column: lstack[lstack.length - 1].last_column
-            };
-            if (ranges) {
-                yyval._$.range = [
-                    lstack[lstack.length - (len || 1)].range[0],
-                    lstack[lstack.length - 1].range[1]
-                ];
-            }
-            r = this.performAction.apply(yyval, [
-                yytext,
-                yyleng,
-                yylineno,
-                sharedState.yy,
-                action[1],
-                vstack,
-                lstack
-            ].concat(args));
-            if (typeof r !== 'undefined') {
-                return r;
-            }
-            if (len) {
-                stack = stack.slice(0, -1 * len * 2);
-                vstack = vstack.slice(0, -1 * len);
-                lstack = lstack.slice(0, -1 * len);
-            }
-            stack.push(this.productions_[action[1]][0]);
-            vstack.push(yyval.$);
-            lstack.push(yyval._$);
-            newState = table[stack[stack.length - 2]][stack[stack.length - 1]];
-            stack.push(newState);
-            break;
-        case 3:
-            return true;
-        }
-    }
-    return true;
-}};
-/* generated by jison-lex 0.3.4 */
-var lexer = (function(){
-var lexer = ({
-
-EOF:1,
-
-parseError:function parseError(str, hash) {
-        if (this.yy.parser) {
-            this.yy.parser.parseError(str, hash);
-        } else {
-            throw new Error(str);
-        }
-    },
-
-// resets the lexer, sets new input
-setInput:function (input, yy) {
-        this.yy = yy || this.yy || {};
-        this._input = input;
-        this._more = this._backtrack = this.done = false;
-        this.yylineno = this.yyleng = 0;
-        this.yytext = this.matched = this.match = '';
-        this.conditionStack = ['INITIAL'];
-        this.yylloc = {
-            first_line: 1,
-            first_column: 0,
-            last_line: 1,
-            last_column: 0
-        };
-        if (this.options.ranges) {
-            this.yylloc.range = [0,0];
-        }
-        this.offset = 0;
-        return this;
-    },
-
-// consumes and returns one char from the input
-input:function () {
-        var ch = this._input[0];
-        this.yytext += ch;
-        this.yyleng++;
-        this.offset++;
-        this.match += ch;
-        this.matched += ch;
-        var lines = ch.match(/(?:\r\n?|\n).*/g);
-        if (lines) {
-            this.yylineno++;
-            this.yylloc.last_line++;
-        } else {
-            this.yylloc.last_column++;
-        }
-        if (this.options.ranges) {
-            this.yylloc.range[1]++;
-        }
-
-        this._input = this._input.slice(1);
-        return ch;
-    },
-
-// unshifts one char (or a string) into the input
-unput:function (ch) {
-        var len = ch.length;
-        var lines = ch.split(/(?:\r\n?|\n)/g);
-
-        this._input = ch + this._input;
-        this.yytext = this.yytext.substr(0, this.yytext.length - len);
-        //this.yyleng -= len;
-        this.offset -= len;
-        var oldLines = this.match.split(/(?:\r\n?|\n)/g);
-        this.match = this.match.substr(0, this.match.length - 1);
-        this.matched = this.matched.substr(0, this.matched.length - 1);
-
-        if (lines.length - 1) {
-            this.yylineno -= lines.length - 1;
-        }
-        var r = this.yylloc.range;
-
-        this.yylloc = {
-            first_line: this.yylloc.first_line,
-            last_line: this.yylineno + 1,
-            first_column: this.yylloc.first_column,
-            last_column: lines ?
-                (lines.length === oldLines.length ? this.yylloc.first_column : 0)
-                 + oldLines[oldLines.length - lines.length].length - lines[0].length :
-              this.yylloc.first_column - len
-        };
-
-        if (this.options.ranges) {
-            this.yylloc.range = [r[0], r[0] + this.yyleng - len];
-        }
-        this.yyleng = this.yytext.length;
-        return this;
-    },
-
-// When called from action, caches matched text and appends it on next action
-more:function () {
-        this._more = true;
-        return this;
-    },
-
-// When called from action, signals the lexer that this rule fails to match the input, so the next matching rule (regex) should be tested instead.
-reject:function () {
-        if (this.options.backtrack_lexer) {
-            this._backtrack = true;
-        } else {
-            return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. You can only invoke reject() in the lexer when the lexer is of the backtracking persuasion (options.backtrack_lexer = true).\n' + this.showPosition(), {
-                text: "",
-                token: null,
-                line: this.yylineno
-            });
-
-        }
-        return this;
-    },
-
-// retain first n characters of the match
-less:function (n) {
-        this.unput(this.match.slice(n));
-    },
-
-// displays already matched input, i.e. for error messages
-pastInput:function () {
-        var past = this.matched.substr(0, this.matched.length - this.match.length);
-        return (past.length > 20 ? '...':'') + past.substr(-20).replace(/\n/g, "");
-    },
-
-// displays upcoming input, i.e. for error messages
-upcomingInput:function () {
-        var next = this.match;
-        if (next.length < 20) {
-            next += this._input.substr(0, 20-next.length);
-        }
-        return (next.substr(0,20) + (next.length > 20 ? '...' : '')).replace(/\n/g, "");
-    },
-
-// displays the character position where the lexing error occurred, i.e. for error messages
-showPosition:function () {
-        var pre = this.pastInput();
-        var c = new Array(pre.length + 1).join("-");
-        return pre + this.upcomingInput() + "\n" + c + "^";
-    },
-
-// test the lexed token: return FALSE when not a match, otherwise return token
-test_match:function (match, indexed_rule) {
-        var token,
-            lines,
-            backup;
-
-        if (this.options.backtrack_lexer) {
-            // save context
-            backup = {
-                yylineno: this.yylineno,
-                yylloc: {
-                    first_line: this.yylloc.first_line,
-                    last_line: this.last_line,
-                    first_column: this.yylloc.first_column,
-                    last_column: this.yylloc.last_column
-                },
-                yytext: this.yytext,
-                match: this.match,
-                matches: this.matches,
-                matched: this.matched,
-                yyleng: this.yyleng,
-                offset: this.offset,
-                _more: this._more,
-                _input: this._input,
-                yy: this.yy,
-                conditionStack: this.conditionStack.slice(0),
-                done: this.done
-            };
-            if (this.options.ranges) {
-                backup.yylloc.range = this.yylloc.range.slice(0);
-            }
-        }
-
-        lines = match[0].match(/(?:\r\n?|\n).*/g);
-        if (lines) {
-            this.yylineno += lines.length;
-        }
-        this.yylloc = {
-            first_line: this.yylloc.last_line,
-            last_line: this.yylineno + 1,
-            first_column: this.yylloc.last_column,
-            last_column: lines ?
-                         lines[lines.length - 1].length - lines[lines.length - 1].match(/\r?\n?/)[0].length :
-                         this.yylloc.last_column + match[0].length
-        };
-        this.yytext += match[0];
-        this.match += match[0];
-        this.matches = match;
-        this.yyleng = this.yytext.length;
-        if (this.options.ranges) {
-            this.yylloc.range = [this.offset, this.offset += this.yyleng];
-        }
-        this._more = false;
-        this._backtrack = false;
-        this._input = this._input.slice(match[0].length);
-        this.matched += match[0];
-        token = this.performAction.call(this, this.yy, this, indexed_rule, this.conditionStack[this.conditionStack.length - 1]);
-        if (this.done && this._input) {
-            this.done = false;
-        }
-        if (token) {
-            return token;
-        } else if (this._backtrack) {
-            // recover context
-            for (var k in backup) {
-                this[k] = backup[k];
-            }
-            return false; // rule action called reject() implying the next rule should be tested instead.
-        }
-        return false;
-    },
-
-// return next match in input
-next:function () {
-        if (this.done) {
-            return this.EOF;
-        }
-        if (!this._input) {
-            this.done = true;
-        }
-
-        var token,
-            match,
-            tempMatch,
-            index;
-        if (!this._more) {
-            this.yytext = '';
-            this.match = '';
-        }
-        var rules = this._currentRules();
-        for (var i = 0; i < rules.length; i++) {
-            tempMatch = this._input.match(this.rules[rules[i]]);
-            if (tempMatch && (!match || tempMatch[0].length > match[0].length)) {
-                match = tempMatch;
-                index = i;
-                if (this.options.backtrack_lexer) {
-                    token = this.test_match(tempMatch, rules[i]);
-                    if (token !== false) {
-                        return token;
-                    } else if (this._backtrack) {
-                        match = false;
-                        continue; // rule action called reject() implying a rule MISmatch.
-                    } else {
-                        // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
-                        return false;
-                    }
-                } else if (!this.options.flex) {
-                    break;
-                }
-            }
-        }
-        if (match) {
-            token = this.test_match(match, rules[index]);
-            if (token !== false) {
-                return token;
-            }
-            // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
-            return false;
-        }
-        if (this._input === "") {
-            return this.EOF;
-        } else {
-            return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. Unrecognized text.\n' + this.showPosition(), {
-                text: "",
-                token: null,
-                line: this.yylineno
-            });
-        }
-    },
-
-// return next match that has a token
-lex:function lex() {
-        var r = this.next();
-        if (r) {
-            return r;
-        } else {
-            return this.lex();
-        }
-    },
-
-// activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
-begin:function begin(condition) {
-        this.conditionStack.push(condition);
-    },
-
-// pop the previously active lexer condition state off the condition stack
-popState:function popState() {
-        var n = this.conditionStack.length - 1;
-        if (n > 0) {
-            return this.conditionStack.pop();
-        } else {
-            return this.conditionStack[0];
-        }
-    },
-
-// produce the lexer rule set which is active for the currently active lexer condition state
-_currentRules:function _currentRules() {
-        if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
-            return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
-        } else {
-            return this.conditions["INITIAL"].rules;
-        }
-    },
-
-// return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
-topState:function topState(n) {
-        n = this.conditionStack.length - 1 - Math.abs(n || 0);
-        if (n >= 0) {
-            return this.conditionStack[n];
-        } else {
-            return "INITIAL";
-        }
-    },
-
-// alias for begin(condition)
-pushState:function pushState(condition) {
-        this.begin(condition);
-    },
-
-// return the number of states currently on the stack
-stateStackSize:function stateStackSize() {
-        return this.conditionStack.length;
-    },
-options: {},
-performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
-var YYSTATE=YY_START;
-switch($avoiding_name_collisions) {
-case 0:/* skip whitespace */
-break;
-case 1:return 43
-break;
-case 2:return 44
-break;
-case 3:return 45
-break;
-case 4:return 46
-break;
-case 5:return 47
-break;
-case 6:return 60
-break;
-case 7:return 61
-break;
-case 8:return 26
-break;
-case 9:return 17
-break;
-case 10:return 23
-break;
-case 11:return 67
-break;
-case 12:return '!'
-break;
-case 13:return 62
-break;
-case 14:return 55
-break;
-case 15:return 56
-break;
-case 16:return 27
-break;
-case 17:return 50
-break;
-case 18:return 67
-break;
-case 19:return 68
-break;
-case 20:return 69
-break;
-case 21:return 20
-break;
-case 22:return 19
-break;
-case 23:return 42
-break;
-case 24:return 41
-break;
-case 25:return 34
-break;
-case 26:return 35
-break;
-case 27:return 36
-break;
-case 28:return 37
-break;
-case 29:return 33
-break;
-case 30:return 38
-break;
-case 31:return 39
-break;
-case 32:return 66
-break;
-case 33:return 66
-break;
-case 34:return 40
-break;
-case 35:return 41
-break;
-case 36:return 42
-break;
-case 37:return 5
-break;
-case 38:return 22
-break;
-case 39:return 16
-break;
-case 40:return 11
-break;
-case 41:return 30
-break;
-case 42:return 59
-break;
-case 43:return 59
-break;
-case 44:return 15	
-break;
-case 45:return 59	
-break;
-case 46:return 59
-break;
-case 47:return 25   
-break;
-case 48:return 'INVALID'
-break;
-}
-},
-rules: [/^(?:\s+)/,/^(?:Between\b)/,/^(?:In\b)/,/^(?:Not\b)/,/^(?:Is\b)/,/^(?:Null\b)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\^)/,/^(?:!=)/,/^(?:!)/,/^(?:%)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:Avg\b)/,/^(?:Max\b)/,/^(?:Min\b)/,/^(?:Single\b)/,/^(?:Count\b)/,/^(?:Exists\b)/,/^(?:Sum\b)/,/^(?:==)/,/^(?:=)/,/^(?:Like\b)/,/^(?:And\b)/,/^(?:Or\b)/,/^(?:$)/,/^(?:(?:\d*\.)?\d+)/,/^(?:\.)/,/^(?:,)/,/^(?:\?)/,/^(?:True\b)/,/^(?:False\b)/,/^(?:^[a-zA-Z_][a-zA-Z0-9_]*)/,/^(?:'[^']*')/,/^(?:#[^#]*#)/,/^(?:.+(?=\]))/,/^(?:.)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],"inclusive":true}}
-});
-return lexer;
-})();
-parser.lexer = lexer;
-function Parser () {
-  this.yy = {};
-}
-Parser.prototype = parser;parser.Parser = Parser;
-return new Parser;
-})();
-
-
-if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = criteriaparser;
-exports.Parser = criteriaparser.Parser;
-exports.parse = function () { return criteriaparser.parse.apply(criteriaparser, arguments); };
-exports.main = function commonjsMain(args) {
-    if (!args[1]) {
-        console.log('Usage: '+args[0]+' FILE');
-        process.exit(1);
-    }
-    var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
-    return exports.parser.parse(source);
-};
-if (typeof module !== 'undefined' && require.main === module) {
-  exports.main(process.argv.slice(1));
-}
-}
-var DevExpress;
-(function (DevExpress) {
     var Designer;
     (function (Designer) {
-        var BaseActionsProvider = (function () {
-            function BaseActionsProvider() {
-            }
-            BaseActionsProvider.prototype.initActions = function (actions) {
-                this.actions = actions;
-                this.actions.forEach(function (action) {
-                    if (!action.disabled)
-                        action.disabled = ko.observable(false);
-                });
-            };
-            BaseActionsProvider.prototype.getActions = function (context) {
-                if (this.condition(context)) {
-                    this.setDisabled && this.setDisabled(context);
-                    return this.actions;
-                }
-                return [];
-            };
-            BaseActionsProvider.prototype.condition = function (context) {
-                return true;
-            };
-            return BaseActionsProvider;
-        })();
-        Designer.BaseActionsProvider = BaseActionsProvider;
-    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var Designer;
-    (function (Designer) {
-        ko.bindingHandlers["selectable"] = {
-            update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var values = valueAccessor(), isUpdate = false, selection = ko.unwrap(values.selection), options = $.extend({ filter: '.dxd-selectable', distance: 1 }, ko.unwrap(values), {
-                    selecting: function (event, ui) {
-                        var _event = { control: ko.dataFor(ui.selecting), cancel: false, ctrlKey: event.ctrlKey };
-                        selection.selecting(_event);
-                        if (_event.cancel) {
-                            $(ui.selecting).removeClass('ui-selecting');
-                        }
-                    },
-                    start: function (event, ui) {
-                        selection.clickHandler(null, event);
-                        selection.started = true;
-                        event.stopPropagation();
-                    },
-                    stop: function () {
-                        selection.started = false;
-                        selection.applySelection();
-                    },
-                    unselecting: function (event, ui) {
-                        selection.unselecting(ko.dataFor(ui.unselecting));
-                    }
-                });
-                $(element).selectable(options);
-            }
-        };
-        ko.bindingHandlers["updateTop"] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var value = valueAccessor();
-                var updateTop = function (value) {
-                    var top = (value === 0 || !!value) ? value : $(element).prev().position().top + $(element).prev().height();
-                    $(element).css('top', top + "px");
-                };
-                var subscription = value.subscribe(function (newVal) {
-                    updateTop(newVal);
-                });
-                updateTop(value());
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    subscription.dispose();
-                });
-            }
-        };
-        ko.bindingHandlers["draggable"] = {
-            init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                var values = valueAccessor();
-                if (!values)
-                    return;
-                var $element = $(element), parent = $($(element).parents(".dx-designer")[0]), containment = values.containment || ".dxrd-ghost-container", initialScroll = { left: 0, top: 0 }, attachDelta = function (ui) {
-                    var $containment = parent.find(containment), $ghost_container = parent.find(".dxrd-ghost-container");
-                    ui["delta"] = { left: $ghost_container.offset().left - $containment.offset().left, top: $ghost_container.offset().top - $containment.offset().top };
-                    var $viewport = parent.find(".dxrd-viewport");
-                    ui["scroll"] = { left: $viewport.scrollLeft() - initialScroll.left, top: $viewport.scrollTop() - initialScroll.top };
-                }, options = $.extend({ snap: '.dxrd-drag-snap-line', snapTolerance: Designer.SnapLinesHelper.snapTolerance }, ko.unwrap(values), {
-                    start: function (event, ui) {
-                        Designer.DragDropHandler.started(true);
-                        var draggable = $element.data("ui-draggable");
-                        var $viewport = parent.find(".dxrd-viewport");
-                        initialScroll.left = $viewport.scrollLeft();
-                        initialScroll.top = $viewport.scrollTop();
-                        values.startDrag && values.startDrag(ko.dataFor(event.currentTarget || event.toElement));
-                    },
-                    stop: function (event, ui) {
-                        attachDelta(ui);
-                        values.stopDrag(ui, ko.dataFor(event.target));
-                        Designer.DragDropHandler.started(false);
-                    },
-                    drag: function (event, ui) {
-                        if (event.altKey === true || values.alwaysAlt) {
-                            $element.draggable("option", "snap", false);
-                        }
-                        else {
-                            $element.draggable("option", "snap", ".dxrd-drag-snap-line");
-                        }
-                        attachDelta(ui);
-                        values.drag && values.drag(event, ui);
-                    },
-                    helper: function (event) {
-                        $element.draggable("option", "snap", ".dxrd-drag-snap-line");
-                        values.helper && values.helper(ko.dataFor(event.currentTarget || event["toElement"]));
-                        var $container = parent.find('.dxrd-drag-helper-source').clone().css({ 'display': 'block' });
-                        $container.prependTo(parent.find(options.containment));
-                        ko.applyBindings(bindingContext.$root, $container[0]);
-                        return $container;
-                    }
-                });
-                options.containment = parent.find(options.containment);
-                $element.draggable(options);
-            }
-        };
-        ko.bindingHandlers["resizable"] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var values = valueAccessor(), $element = $(element), $selectedNodes = null, options = $.extend({
-                    handles: values.handles || "all", ghost: false,
-                    stop: function (event, ui) {
-                        $selectedNodes.each(function (_, el) {
-                            var control = ko.dataFor(el), surface = ko.contextFor(el).$root.surface(), $el = $(el);
-                            control.rect(Designer.getControlRect($el, control, surface));
-                            $el.removeData("originalPosition");
-                            $el.removeData("originalSize");
-                        });
-                        values.stopped();
-                        values.started = false;
-                    },
-                    start: function () {
-                        values.started = true;
-                        values.starting();
-                        $selectedNodes = values.$selectedNodes || $(".dxrd-viewport > .dxrd-focused, .dxrd-selected").filter(":visible");
-                        $selectedNodes
-                            .each(function (_, el) {
-                            var $el = $(el);
-                            var bounds = el.getBoundingClientRect();
-                            $el.data("originalPosition", { top: parseFloat($el.css("top")), left: parseFloat($el.css("left")) });
-                            $el.data("originalSize", { width: bounds.width, height: bounds.height });
-                        });
-                    },
-                    resize: function (event, ui) {
-                        var dw = ui.size.width - ui.originalSize.width, dh = ui.size.height - ui.originalSize.height, dx = ui.position.left - ui.originalPosition.left, dy = ui.position.top - ui.originalPosition.top;
-                        if (values.forceResize) {
-                            values.forceResize({ size: new Designer.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
-                        }
-                        $selectedNodes
-                            .each(function (key, el) {
-                            if (el === event.target)
-                                return;
-                            var $el = $(el);
-                            var originalPosition = $el.data("originalPosition"), originalSize = $el.data("originalSize");
-                            $el.css({
-                                left: originalPosition.left + dx,
-                                top: originalPosition.top + dy,
-                                width: originalSize.width + dw,
-                                height: originalSize.height + dh
-                            });
-                        });
-                    }
-                }, ko.unwrap(values));
-                var subscription = null;
-                if (!values.disabled) {
-                    subscription = Designer.DragDropHandler.started.subscribe(function (newVal) {
-                        $element.resizable("option", "disabled", newVal);
-                        newVal ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
-                    });
-                }
-                $element.resizable(options);
-                $element.resizable().on("resize", function (event) {
-                    event.stopPropagation();
-                });
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    subscription && subscription.dispose();
-                });
-            },
-            update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                var $element = $(element);
-                var disabled = !!(ko.unwrap(valueAccessor().disabled) || false || viewModel.locked);
-                $element.resizable("option", "disabled", disabled);
-                $element.resizable("option", "minHeight", ko.unwrap(valueAccessor()).minimumHeight) || 1;
-                disabled ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
-            }
-        };
-        var trackCursorData = "dxd-track-cursor-data";
-        var trackCursorClass = "dxd-track-cursor";
-        var trackCursorSelector = "." + trackCursorClass;
-        var dragHelperLineClass = "dxrd-drag-helper-item";
-        ko.bindingHandlers["trackCursor"] = {
-            init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                var $element = $(element);
-                $element.addClass(trackCursorClass);
-                var value = valueAccessor();
-                var bounds = null;
-                var selection = valueAccessor().dropTarget, subscriptionTarget = valueAccessor().subscriptionTarget || '.dx-designer', body = document.body, docElem = document.documentElement, overHandler = function (event) {
-                    if (!(bindingContext.$root.selection.started && bindingContext.$root.resizeHandler.started)) {
-                        bounds = element.getBoundingClientRect();
-                        if (!value().isNotDropTarget) {
-                            bindingContext.$root.selection.dropTarget = ko.dataFor(element);
-                            event.stopPropagation();
-                        }
-                    }
-                }, enterHandler = function (event) {
-                    value($.extend(value(), { isOver: true }));
-                }, leaveHandler = function (event) {
-                    bindingContext.$root.selection.dropTarget = null;
-                    value($.extend(value(), { isOver: false }));
-                }, handler = function (event) {
-                    if (!(bindingContext.$root.selection.started && bindingContext.$root.resizeHandler.started)) {
-                        bounds = element.getBoundingClientRect();
-                        var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop, scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft, clientTop = docElem.clientTop || body.clientTop || 0, clientLeft = docElem.clientLeft || body.clientLeft || 0, y = event.pageY - (bounds.top + scrollTop - clientTop), x = event.pageX - (bounds.left + scrollLeft - clientLeft);
-                        value($.extend(value(), { x: x, y: y }));
-                    }
-                };
-                $element.bind("mousemove", handler);
-                $element.bind("mouseenter", enterHandler);
-                $element.bind("mouseover", overHandler);
-                $element.bind("mouseleave", leaveHandler);
-                $element.bind("dragover", function (event) { handler(event.originalEvent); });
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    $element.unbind("dragover", function (event) { handler(event.originalEvent); });
-                    $element.unbind("mousemove", handler);
-                    $element.unbind("mouseover", overHandler);
-                    $element.unbind("mouseleave", leaveHandler);
-                    $element.unbind("mouseenter", enterHandler);
-                    $element.removeClass(trackCursorClass);
-                });
-            }
-        };
-        ko.bindingHandlers["templates"] = {
-            init: function (element, valueAccessor) {
-                var templateHtml = $(valueAccessor()).text(), $templateHtml = $(templateHtml);
-                $(element).append($templateHtml);
-                return { controlsDescendantBindings: true };
-            }
-        };
-        Designer.cssTransform = ["-webkit-transform", "-moz-transform", "-ms-transform", "-o-transform", "transform"];
-        ko.bindingHandlers["zoom"] = {
-            update: function (element, valueAccessor) {
-                var value = ko.unwrap(valueAccessor() || {});
-                for (var i = 0; i < Designer.cssTransform.length; i++) {
-                    element.style[Designer.cssTransform[i]] = "scale(" + (value) + ")";
-                }
-                $(element).addClass("dxrd-transform-origin-left-top");
-            }
-        };
-        var KeyDownHandlersManager = (function () {
-            function KeyDownHandlersManager(targetElement) {
-                this._handlers = [];
-                this._targetElement = targetElement;
-            }
-            Object.defineProperty(KeyDownHandlersManager.prototype, "_activeHandler", {
-                get: function () {
-                    return this._handlers.length > 0 ? this._handlers[this._handlers.length - 1] : null;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            KeyDownHandlersManager.prototype._removeHandler = function (handler) {
-                var index = this._handlers.indexOf(handler);
-                if (index < 0)
-                    return;
-                this._handlers.splice(index, 1);
-                if (index === this._handlers.length) {
-                    this._targetElement.off("keydown", handler);
-                    if (this._activeHandler)
-                        this._targetElement.on("keydown", this._activeHandler);
-                }
-            };
-            KeyDownHandlersManager.prototype.bindHandler = function (element, handler) {
-                var _this = this;
-                if (this._activeHandler)
-                    this._targetElement.off("keydown", this._activeHandler);
-                this._handlers.push(handler);
-                this._targetElement.on("keydown", handler);
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () { _this._removeHandler(handler); });
-            };
-            return KeyDownHandlersManager;
-        })();
-        ko.bindingHandlers["keyDownActions"] = (function () {
-            var handlersManager = new KeyDownHandlersManager($(window));
-            return {
-                init: function (element, valueAccessor) {
-                    var actionLists = valueAccessor(), handler = function (e) { actionLists.processShortcut(actionLists.toolbarItems, e); };
-                    handlersManager.bindHandler(element, handler);
-                }
-            };
-        })();
-    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
-})(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var DevExpress;
-(function (DevExpress) {
-    var Designer;
-    (function (Designer) {
-        var Disposable = (function () {
-            function Disposable() {
-                this._disposables = [];
-                this.isDisposing = false;
-            }
-            Disposable.prototype.dispose = function () {
-                this.isDisposing = true;
-                ko.utils.arrayForEach(this._disposables, this.disposeOne);
-                ko.utils["objectForEach"](this, this.disposeOne);
-                this._disposables = [];
-            };
-            Disposable.prototype.disposeOne = function (propOrValue, value) {
-                var disposable = value || propOrValue;
-                if (disposable && !disposable.isDisposing && typeof disposable.dispose === "function") {
-                    disposable.dispose();
-                }
-            };
-            return Disposable;
-        })();
-        Designer.Disposable = Disposable;
-        function copyObservables(from, to) {
-            for (var name in (from || {})) {
-                if (ko.isObservable(from[name])) {
-                    to[name](from[name]());
-                }
-                else {
-                    copyObservables(from[name], to[name]);
-                }
-            }
-            ;
+        function _getLocalization(text) {
+            return (DevExpress.JS.Localization.localize(Designer.localization_values[text]) || DevExpress.JS.Localization.localize(text)) || text;
         }
-        Designer.copyObservables = copyObservables;
-        function compareObjects(a, b) {
-            var result = a && b && !(a instanceof Array) && !(b instanceof Array);
-            result = result && (Object.getOwnPropertyNames(a).length === Object.getOwnPropertyNames(b).length);
-            if (result) {
-                for (var name in (a || {})) {
-                    if (name.indexOf("_") !== 0 && (typeof a[name] !== "function" || ko.isObservable(a[name]))) {
-                        if (ko.isObservable(a[name])) {
-                            result = ko.unwrap(a[name]) === ko.unwrap(b[name]);
-                        }
-                        else if (a[name] instanceof Array) {
-                            if ((b[name] instanceof Array) && a[name].length === b[name].length) {
-                                for (var i = 0; i < a[name].length; i++) {
-                                    result = compareObjects(a[name][i], b[name][i]);
-                                    if (result === false)
-                                        break;
-                                }
-                            }
-                            else {
-                                result = false;
-                            }
-                        }
-                        else if (a[name] instanceof Object) {
-                            result = compareObjects(a[name], b[name]);
-                        }
-                        else {
-                            result = a[name] === b[name];
-                        }
-                        if (result === false)
-                            break;
-                    }
-                }
+        var custom_localization_values = {};
+        function getLocalization(text, id) {
+            if (id === void 0) { id = null; }
+            var result;
+            if (id && !custom_localization_values[text]) {
+                result = DevExpress.JS.Localization.localize(id);
             }
-            return result;
+            return result || _getLocalization(text);
         }
-        Designer.compareObjects = compareObjects;
-        var ElementViewModel = (function (_super) {
-            __extends(ElementViewModel, _super);
-            function ElementViewModel(model, parent, serializer) {
-                var _this = this;
-                _super.call(this);
-                this.actions = [];
-                this.update = ko.observable(false);
-                this.parentModel = ko.observable(parent);
-                this.controlType = this.controlType || this.getControlFactory().getControlType(model);
-                serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
-                serializer.deserialize(this, model);
-                this["displayName"] = ko.pureComputed(function () {
-                    var result = _this.name && _this.name();
-                    if (!result) {
-                        result = "unnamed " + _this.controlType;
-                    }
-                    return result;
-                });
-                this.resetValue = function (propertyName) {
-                    if (_this[propertyName].resetValue) {
-                        _this[propertyName].resetValue();
-                    }
-                    else {
-                        var defaultValue = _this.getPropertyDefaultValue(propertyName);
-                        if (ko.isObservable(_this[propertyName])) {
-                            _this[propertyName](defaultValue);
-                        }
-                        else {
-                            copyObservables(defaultValue, _this[propertyName]);
-                        }
-                    }
-                };
-                this.actions.push({ action: this.resetValue, title: "Reset", visible: this.isResettableProperty });
+        Designer.getLocalization = getLocalization;
+        function updateLocalization(object) {
+            $.extend(custom_localization_values, object);
+            var messages = {};
+            for (var name in object) {
+                messages[Designer.localization_values[name] ? Designer.localization_values[name] : name] = object[name];
             }
-            ElementViewModel.prototype.getPropertyDefaultValue = function (propertyName) {
-                var info = this.getPropertyInfo(propertyName);
-                return ko.unwrap(info && new DevExpress.JS.Utils.ModelSerializer().deserializeProperty(info, {}));
-            };
-            ElementViewModel.prototype.getPropertyInfo = function (propertyName) {
-                return this.getInfo().filter(function (info) { return info.propertyName === propertyName; })[0];
-            };
-            ElementViewModel.prototype.getInfo = function () {
-                return this.getControlFactory().controlsMap[this.controlType].info;
-            };
-            ElementViewModel.prototype.createControl = function (model, serializer) {
-                return this.getControlFactory().createControl(model, this, serializer);
-            };
-            ElementViewModel.prototype.getNearestParent = function (target) {
-                return target.getMetaData().isContainer ? target : target.getNearestParent(target.parentModel());
-            };
-            ElementViewModel.prototype.getControlInfo = function () {
-                return this.getControlFactory().controlsMap[this.controlType || "Unknown"];
-            };
-            ElementViewModel.prototype.getMetaData = function () {
-                var controlType = this.controlType ? this.controlType : "Unknown", data = this.getControlFactory().controlsMap[controlType];
-                return {
-                    isContainer: data.isContainer || false,
-                    isCopyDeny: data.isCopyDeny || false,
-                    isDeleteDeny: data.isDeleteDeny || false,
-                    canDrop: data.canDrop || (function () { return true; })
-                };
-            };
-            ElementViewModel.prototype._hasModifiedValue = function (name) {
-                return this["_" + name] && this["_" + name]() && this.isPropertyModified(name);
-            };
-            ElementViewModel.prototype.createChild = function (info) {
-                var newControl = this.getControlFactory().createControl(info, this);
-                this.addChild(newControl);
-                return newControl;
-            };
-            ElementViewModel.prototype.removeChilds = function (controls) {
-                if (this["controls"]) {
-                    var childs = this["controls"]();
-                    for (var i = 0; i < controls.length; i++) {
-                        childs.splice(childs.indexOf(controls[i]), 1);
-                    }
-                    this["controls"].valueHasMutated();
-                }
-            };
-            ElementViewModel.prototype.addChilds = function (controls) {
-                if (this["controls"]) {
-                    var childs = this["controls"]();
-                    for (var i = 0; i < controls.length; i++) {
-                        childs.splice(0, 0, controls[i]);
-                    }
-                    this["controls"].valueHasMutated();
-                }
-            };
-            ElementViewModel.prototype.removeChild = function (control) {
-                if (this["controls"]) {
-                    this["controls"].splice(this["controls"]().indexOf(control), 1);
-                }
-            };
-            ElementViewModel.prototype.addChild = function (control) {
-                if (this["controls"] && this["controls"]().indexOf(control) === -1) {
-                    control.parentModel(this);
-                    this["controls"].splice(0, 0, control);
-                }
-            };
-            ElementViewModel.prototype.isPropertyDisabled = function (name) {
-                return false;
-            };
-            ElementViewModel.prototype.isPropertyModified = function (name) {
-                var needName = this["_" + name] ? "_" + name : name;
-                if (this[needName].isPropertyModified) {
-                    return this[needName].isPropertyModified();
-                }
-                else if (this[needName].isEmpty) {
-                    return !this[needName].isEmpty();
-                }
-                else {
-                    var defaultValue = this.getPropertyDefaultValue(name), propertyValue = ko.unwrap(this[needName]);
-                    if (defaultValue instanceof Object) {
-                        return !compareObjects(defaultValue, propertyValue);
-                    }
-                    else {
-                        return defaultValue !== propertyValue;
-                    }
-                }
-            };
-            ElementViewModel.prototype.getControlFactory = function () {
-                throw Error("Virtual method getControlFactory");
-            };
-            ElementViewModel.prototype.isResettableProperty = function (propertyName) {
-                return ["name", "size", "location"].indexOf(propertyName) === -1;
-            };
-            Object.defineProperty(ElementViewModel.prototype, "root", {
-                get: function () {
-                    var root = this;
-                    while (root && root.parentModel()) {
-                        root = root.parentModel();
-                    }
-                    return root;
-                },
-                enumerable: true,
-                configurable: true
+            DevExpress.JS.Localization.addCultureInfo({
+                messages: messages
             });
-            ElementViewModel.prototype.rtl = function () {
-                return false;
-            };
-            return ElementViewModel;
-        })(Disposable);
-        Designer.ElementViewModel = ElementViewModel;
+        }
+        Designer.updateLocalization = updateLocalization;
         ;
-        function findSurface(viewModel) {
-            return viewModel["surface"];
-        }
-        Designer.findSurface = findSurface;
-        function unitsToPixel(val, measureUnit, zoom) {
-            if (zoom === void 0) { zoom = 1; }
-            var result;
-            if (measureUnit === "Test" || measureUnit === "Pixels") {
-                result = 1 * val;
-            }
-            else if (measureUnit === "TenthsOfAMillimeter") {
-                result = val * 3.78 / 10;
-            }
-            else {
-                result = val * 96 / 100;
-            }
-            result = result * (zoom);
-            return Math.floor(result * 100) / 100;
-        }
-        Designer.unitsToPixel = unitsToPixel;
-        function pixelToUnits(val, measureUnit, zoom) {
-            var result;
-            if (measureUnit === "Test" || measureUnit === "Pixels") {
-                result = 1 * val;
-            }
-            else if (measureUnit === "TenthsOfAMillimeter") {
-                result = val / 3.78 * 10;
-            }
-            else {
-                result = val / 96 * 100;
-            }
-            result = result / (zoom);
-            return Math.floor(result * 100) / 100;
-        }
-        Designer.pixelToUnits = pixelToUnits;
-        var HoverInfo = (function () {
-            function HoverInfo() {
-                this._x = 0;
-                this._y = 0;
-                this.isOver = false;
-            }
-            Object.defineProperty(HoverInfo.prototype, "x", {
-                get: function () {
-                    return this._x;
-                },
-                set: function (newX) {
-                    this._x = newX;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(HoverInfo.prototype, "y", {
-                get: function () {
-                    return this._y;
-                },
-                set: function (newY) {
-                    this._y = newY;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return HoverInfo;
-        })();
-        Designer.HoverInfo = HoverInfo;
-        function createObservableReverseArrayMapCollection(elementModels, target, createItem) {
-            elementModels.peek().forEach(function (item) {
-                var surface = createItem(item);
-                target.splice(0, 0, surface);
-            });
-            elementModels.subscribe(function (args) {
-                var unwrapedTarget = target();
-                var targetLength = unwrapedTarget.length;
-                args.forEach(function (changeSet) {
-                    if (changeSet.status === "deleted") {
-                        unwrapedTarget.splice(unwrapedTarget.indexOf(changeSet.value.surface), 1);
-                    }
-                });
-                args.forEach(function (changeSet) {
-                    if (changeSet.status === "added") {
-                        unwrapedTarget.splice(targetLength - changeSet.index, 0, createItem(changeSet.value));
-                    }
-                });
-                target.valueHasMutated();
-            }, null, "arrayChange");
-        }
-        Designer.createObservableReverseArrayMapCollection = createObservableReverseArrayMapCollection;
-        function createObservableArrayMapCollection(elementModels, target, createItem) {
-            elementModels.peek().forEach(function (item) {
-                var surface = createItem(item);
-                target.push(surface);
-            });
-            elementModels.subscribe(function (args) {
-                var startIndex = target().length, deleteCount = 0, valuesToAdd = [];
-                args.forEach(function (changeSet) {
-                    if (changeSet.status === "deleted") {
-                        deleteCount++;
-                        if (changeSet.index < startIndex) {
-                            startIndex = changeSet.index;
-                        }
-                    }
-                });
-                args.forEach(function (changeSet) {
-                    if (changeSet.status === "added") {
-                        if (changeSet.index < startIndex) {
-                            startIndex = changeSet.index;
-                        }
-                        valuesToAdd.push(createItem(changeSet.value));
-                    }
-                });
-                target.splice.apply(target, [startIndex, deleteCount].concat(valuesToAdd));
-            }, null, "arrayChange");
-        }
-        Designer.createObservableArrayMapCollection = createObservableArrayMapCollection;
-        var SurfaceElementArea = (function (_super) {
-            __extends(SurfaceElementArea, _super);
-            function SurfaceElementArea(control, context, unitProperties) {
-                var _this = this;
-                _super.call(this);
-                this._createSurface = function (item) {
-                    return item["surface"] || new (item.getControlFactory()).controlsMap[item.controlType].surfaceType(item, _this._context);
-                };
-                this._control = control;
-                this._context = context;
-                control["surface"] = this;
-                if (this._context) {
-                    Designer.createUnitProperties(control, this, unitProperties, this._context.measureUnit, this._context.zoom);
-                }
-                this["_x"] = this["_x"] || ko.observable(0);
-                this["_y"] = this["_y"] || ko.observable(0);
-                this["_width"] = this["_width"] || ko.observable(0);
-                this["_height"] = this["_height"] || ko.observable(0);
-                var container = ko.pureComputed(function () { return _this.container(); });
-                this._container = container();
-                container.subscribe(function (value) {
-                    if (_this._container !== value && _this.rtlLayout()) {
-                        var x = _this._getX();
-                        _this._container = value;
-                        _this._setX(x);
-                    }
-                    else {
-                        _this._container = value;
-                    }
-                });
-                var x = ko.computed({
-                    read: function () { return _this._getX(); },
-                    write: function (value) {
-                        _this._setX(value);
-                    }
-                }), y = this["_y"], width = this["_width"], height = this["_height"];
-                this["position"] = {
-                    top: y,
-                    left: x,
-                    width: width,
-                    height: height,
-                    lineHeight: height
-                };
-                var _rect = ko.observable();
-                this._disposables.push(ko.computed(function () {
-                    if (!_this._control.update()) {
-                        _rect({ top: y(), left: x(), right: x() + width(), bottom: y() + height(), width: width(), height: height() });
-                    }
-                }));
-                this.rect = ko.pureComputed({
-                    read: function () {
-                        return _rect();
-                    },
-                    write: function (newRect) {
-                        _this._control.update(true);
-                        try {
-                            if (newRect.left !== undefined) {
-                                _this._setX(newRect.left, newRect.width);
-                            }
-                            else if (newRect.width !== undefined) {
-                                _this._setX(x(), newRect.width);
-                            }
-                            if (newRect.top !== undefined) {
-                                y(newRect.top);
-                            }
-                            if (newRect.right !== undefined && newRect.left === undefined && newRect.width === undefined) {
-                                width(newRect.right - x());
-                            }
-                            if (newRect.bottom !== undefined && newRect.top === undefined) {
-                                height(newRect.bottom - y());
-                            }
-                            if (newRect.right !== undefined && newRect.left !== undefined && newRect.width === undefined) {
-                                width(newRect.right - newRect.left);
-                            }
-                            if (newRect.bottom !== undefined && newRect.top !== undefined) {
-                                height(newRect.bottom - newRect.top);
-                            }
-                            if (newRect.width !== undefined) {
-                                width(newRect.width);
-                            }
-                            if (newRect.height !== undefined) {
-                                height(newRect.height);
-                            }
-                        }
-                        finally {
-                            _this._control.update(false);
-                        }
-                    }
-                });
-            }
-            SurfaceElementArea.prototype._getX = function () {
-                if (this.rtlLayout() && this._container) {
-                    return this._container.rect().width - this["_x"]() - this["_width"]();
-                }
-                else {
-                    return this["_x"]();
-                }
-            };
-            SurfaceElementArea.prototype._setX = function (value, width) {
-                width = width || this["_width"]();
-                if (this.rtlLayout() && this._container) {
-                    this["_x"](this._container.rect().width - value - width);
-                }
-                else {
-                    this["_x"](value);
-                }
-            };
-            SurfaceElementArea.prototype.getRoot = function () {
-                return this._context;
-            };
-            SurfaceElementArea.prototype.container = function () {
-                return this["parent"];
-            };
-            SurfaceElementArea.prototype.rtlLayout = function () {
-                return !!ko.unwrap(this._context.rtl);
-            };
-            SurfaceElementArea.prototype.getControlModel = function () {
-                return this._control;
-            };
-            return SurfaceElementArea;
-        })(Disposable);
-        Designer.SurfaceElementArea = SurfaceElementArea;
-        var SurfaceElementBase = (function (_super) {
-            __extends(SurfaceElementBase, _super);
-            function SurfaceElementBase(control, context, unitProperties) {
-                var _this = this;
-                _super.call(this, control, context, unitProperties);
-                this._countSelectedChildren = ko.observable(0);
-                this.focused = ko.observable(false);
-                this.selected = ko.observable(false);
-                this.underCursor = ko.observable(new HoverInfo());
-                this.allowMultiselect = true;
-                this.absolutePosition = new Designer.Point(0, 0);
-                this.snapLines = ko.observableArray([]);
-                this.getControlModel = function () {
-                    return control;
-                };
-                this.cssCalculator = new Designer.CssCalculator(control, context.rtl);
-                if (this._getChildrenHolderName() && control[this._getChildrenHolderName()]) {
-                    var collection = ko.observableArray();
-                    if (this._getChildrenHolderName() === "controls") {
-                        createObservableReverseArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface);
-                    }
-                    else {
-                        createObservableArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface);
-                    }
-                    this[this._getChildrenHolderName()] = collection;
-                    this.isSelected = ko.pureComputed(function () {
-                        if (!(_this.focused() || _this.selected())) {
-                            return collection().some(function (item) {
-                                return item.isSelected();
-                            });
-                        }
-                        return true;
-                    });
-                }
-                else {
-                    this.isSelected = ko.pureComputed(function () {
-                        return _this.focused() || _this.selected();
-                    });
-                }
-                this.css = ko.pureComputed(function () {
-                    return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.backGroundCss(), _this.cssCalculator.textAlignmentCss());
-                });
-                this.contentCss = ko.pureComputed(function () {
-                    return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.textAlignmentCss(), _this.cssCalculator.angle(), _this.cssCalculator.paddingsCss());
-                });
-                this._disposables.push(ko.computed(function () {
-                    _this.updateAbsolutePosition();
-                }));
-                this.absoluteRect = ko.pureComputed(function () {
-                    var controlRect = _this.rect(), absolutePositionY = _this.absolutePosition.y();
-                    return { top: absolutePositionY, left: controlRect.left, right: controlRect.right, bottom: absolutePositionY + controlRect.height, width: controlRect.width, height: controlRect.height };
-                });
-                this.locked = control["lockedInUserDesigner"] ? control["lockedInUserDesigner"]() : false;
-            }
-            Object.defineProperty(SurfaceElementBase.prototype, "parent", {
-                get: function () {
-                    return this.getControlModel().parentModel() && this.getControlModel().parentModel().surface;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            SurfaceElementBase.prototype.checkParent = function (surfaceParent) {
-                return this.parent === surfaceParent;
-            };
-            SurfaceElementBase.prototype._getChildrenHolderName = function () { return "controls"; };
-            SurfaceElementBase.prototype.getChildrenCollection = function () {
-                return this._getChildrenHolderName() && this[this._getChildrenHolderName()] || ko.observableArray([]);
-            };
-            SurfaceElementBase.prototype.updateAbsolutePosition = function () {
-                if (this.parent && this.parent.absolutePosition) {
-                    var parentX = this.parent.absolutePosition.x(), parentY = this.parent.absolutePosition.y(), newX = parentX + this.rect().left, newY = parentY + this.rect().top;
-                    this.absolutePosition.x(newX);
-                    this.absolutePosition.y(newY);
-                }
-                else {
-                    this.absolutePosition.x(0);
-                    this.absolutePosition.y(0);
-                }
-                this.afterUpdateAbsolutePosition();
-            };
-            SurfaceElementBase.prototype.canDrop = function () { return !this.locked && this._control.getMetaData().isContainer; };
-            SurfaceElementBase.prototype.afterUpdateAbsolutePosition = function () {
-            };
-            return SurfaceElementBase;
-        })(SurfaceElementArea);
-        Designer.SurfaceElementBase = SurfaceElementBase;
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            DevExpress.JS.Utils.getLocalization = DevExpress.Designer.getLocalization;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        Designer.StringId = {
+            MasterDetailRelationsEditor: "DataAccessUIStringId.MasterDetailEditorForm_Title",
+            DataAccessBtnOK: "DataAccessUIStringId.Button_OK",
+            DataAccessBtnCancel: "DataAccessUIStringId.Button_Cancel",
+            DataSourceWizardTitle: "DataAccessUIStringId.WizardTitleDatasource",
+            WizardPageConfigureQuery: 'DataAccessUIStringId.WizardPageConfigureQuery'
+        };
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
@@ -8590,6 +2036,7 @@ var DevExpress;
             'Rasterize Images': 'DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizeImages',
             'Export Mode': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.ExportMode',
             'Human-Readable Text': 'DevExpress.XtraPrinting.BarCode.EAN128Generator.HumanReadableText',
+            'Compatible': 'DevExpress.XtraPrinting.XlEncryptionType.Compatible',
             'Category': 'DevExpress.XtraPrinting.XlDocumentOptions.Category',
             'Different Files': 'DevExpress.XtraPrinting.XlsxExportMode.DifferentFiles',
             'Attachments': 'DevExpress.XtraPrinting.PdfExportOptions.Attachments',
@@ -8660,6 +2107,7 @@ var DevExpress;
             'Version 39 (173x173)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version39',
             'Version 38 (169x169)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version38',
             'Tail\'s Length': 'DevExpress.XtraPrinting.Shape.ShapeBrace.TailLength',
+            'Type': 'DevExpress.XtraPrinting.XlEncryptionOptions.Type',
             'Subject': 'DevExpress.XtraPrinting.XlDocumentOptions.Subject',
             'Using Printer Settings': 'DevExpress.XtraPrinting.PrinterSettingsUsing',
             'Matrix Size': 'DevExpress.XtraPrinting.BarCode.DataMatrixGenerator.MatrixSize',
@@ -8678,6 +2126,7 @@ var DevExpress;
             'High Resolution': 'DevExpress.XtraPrinting.PrintingPermissions.HighResolution',
             'Retain Background Transparency': 'DevExpress.XtraPrinting.ImageExportOptions.RetainBackgroundTransparency',
             'OpenPassword': 'DevExpress.XtraPrinting.PdfPasswordSecurityOptions.OpenPassword',
+            'Excel Encryption Options': 'DevExpress.XtraPrinting.XlEncryptionOptions',
             'Suppress 65536 Rows Warning': 'DevExpress.XtraPrinting.XlsExportOptions.Suppress65536RowsWarning',
             'Description': 'DevExpress.XtraReports.Parameters.Parameter.Description',
             'Omnidirectional': 'DevExpress.XtraPrinting.BarCode.DataBarType.Omnidirectional',
@@ -8710,6 +2159,7 @@ var DevExpress;
             'Version 3 (29x29)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version3',
             'Version 8 (49x49)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version8',
             'Version 9 (53x53)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version9',
+            'Strong': 'DevExpress.XtraPrinting.XlEncryptionType.Strong',
             'Using a Default Path': 'DevExpress.XtraPrinting.SaveMode.UsingDefaultPath',
             'Wide Narrow Ratio': 'DevExpress.XtraPrinting.BarCode.Interleaved2of5Generator.WideNarrowRatio',
             'CSV Export Options': 'DevExpress.XtraPrinting.CsvExportOptions',
@@ -8734,6 +2184,8 @@ var DevExpress;
             'Text Rendering Mode': 'DevExpress.XtraPrinting.ImageExportOptions.TextRenderingMode',
             'XLSx Export Options': 'DevExpress.XtraPrinting.XlsxExportOptions',
             'Quote Strings with Separators': 'DevExpress.XtraPrinting.TextExportOptionsBase.QuoteStringsWithSeparators',
+            'Encryption Options': 'DevExpress.XtraPrinting.XlExportOptionsBase.EncryptionOptions',
+            'Password': 'DevExpress.XtraPrinting.XlEncryptionOptions.Password',
             'Rotate to the Right': 'DevExpress.XtraPrinting.BarCode.BarCodeOrientation.RotateRight',
             'Brace': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.Brace',
             'Octagon': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.Octagon',
@@ -8742,7 +2194,6 @@ var DevExpress;
             'Upside Down': 'DevExpress.XtraPrinting.BarCode.BarCodeOrientation.UpsideDown',
             'Encoding': 'DevExpress.XtraPrinting.TextExportOptionsBase.Encoding',
             'ASCII': 'DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.ASCII',
-            'Type': 'DevExpress.XtraPrinting.BarCode.DataBarGenerator.Type',
             'Company': 'DevExpress.XtraPrinting.XlDocumentOptions.Company',
             'Reduce Palette For Exact Colors': 'DevExpress.XtraPrinting.WorkbookColorPaletteCompliance.ReducePaletteForExactColors',
             'Suppress 256 Columns Warning': 'DevExpress.XtraPrinting.XlsExportOptions.Suppress256ColumnsWarning',
@@ -9249,6 +2700,7 @@ var DevExpress;
             'Load Report Template...': 'ReportStringId.Verb_LoadReportTemplate',
             'Delete Unused Styles': 'ReportStringId.Cmd_PurgeStyles',
             'Save \'{0}\'': 'ReportStringId.Dlg_SaveFile_Title',
+            'Cannot obtain data columns. Make sure that the report data source and data member are valid.': 'ReportStringId.Msg_CannotObtainDataColumns',
             'Layout Toolbar': 'ReportStringId.UD_Capt_LayoutToolbarName',
             'Move forward to the next page.': 'ReportStringId.RibbonXRDesign_HtmlForward_STipContent',
             'XRPivotGrid Fields': 'ReportStringId.PivotGridFrame_Fields_ColumnsText',
@@ -9384,6 +2836,7 @@ var DevExpress;
             'Show values from': 'PivotGridStringId.SummaryFilterRangeFrom',
             '(Any)': 'PivotGridStringId.PopupMenuFormatRulesAnyField',
             '(Blank)': 'PivotGridStringId.FilterBlank',
+            'The following fields have circular dependency: {0}': 'PivotGridStringId.ExpressionValidationCircularDependency',
             '[Data Area Headers]': 'PivotGridStringId.Alt_DataAreaHeaders',
             '[Resize]': 'PivotGridStringId.Alt_FilterWindowSizeGrip',
             'KPIs': 'PivotGridStringId.OLAPKPIsCaption',
@@ -9395,6 +2848,7 @@ var DevExpress;
             'Clear Sorting': 'PivotGridStringId.PopupMenuClearSorting',
             'Show Field List': 'PivotGridStringId.PopupMenuShowFieldList',
             'OK': 'PivotGridStringId.FilterOk',
+            'A summary expression is expected.': 'PivotGridStringId.ExpressionValidationSummaryExpressionExpected',
             '[Layout Button]': 'PivotGridStringId.Alt_LayoutButton',
             '[Row Area Headers]': 'PivotGridStringId.Alt_RowAreaHeaders',
             '[Stacked Default Layout]': 'PivotGridStringId.Alt_StackedDefaultLayout',
@@ -9412,6 +2866,7 @@ var DevExpress;
             'This command cannot be used on multiple selections.': 'PivotGridStringId.CannotCopyMultipleSelections',
             'Clear Rules from This Intersection': 'PivotGridStringId.PopupMenuFormatRulesClearIntersectionRules',
             'Sort "{0}" by This Row': 'PivotGridStringId.PopupMenuSortFieldByRow',
+            'Criteria cannot contain aggregates.': 'PivotGridStringId.ExpressionValidationNotSummaryExpressionExpected',
             'Going Up': 'PivotGridStringId.TrendGoingUp',
             'Defer Layout Update': 'PivotGridStringId.CustomizationFormDeferLayoutUpdate',
             'Choose fields to add to report:': 'PivotGridStringId.CustomizationFormAvailableFields',
@@ -9450,6 +2905,7 @@ var DevExpress;
             '{0} Sum': 'PivotGridStringId.TotalFormatSum',
             '{0} Max': 'PivotGridStringId.TotalFormatMax',
             '{0} Min': 'PivotGridStringId.TotalFormatMin',
+            'The {0} not found.': 'PivotGridStringId.ExpressionValidationInvalidProperty',
             'The palette is default and then can\'t be modified.': 'ChartStringId.MsgModifyDefaultPaletteError',
             'Export the current document in one of the available formats, and save it to the file on a disk.': 'ChartStringId.CmdExportPlaceHolderDescription',
             'Spline': 'ChartStringId.SvnSpline',
@@ -10343,7 +3799,6 @@ var DevExpress;
             'Create Groups': 'ASPxReportsStringId.ReportDesigner_Wizard_CreateGroups_Title',
             'Cannot create a document for the current report': 'ASPxReportsStringId.WebDocumentViewer_DocumentCreationError',
             'Casual': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Casual',
-            'The report does not contain any parameters.': 'ASPxReportsStringId.WebDocumentViewer_NoParameters',
             'CSV': 'ASPxReportsStringId.ExportName_csv',
             'XLS': 'ASPxReportsStringId.ExportName_xls',
             'PDF': 'ASPxReportsStringId.ExportName_pdf',
@@ -10554,7 +4009,7 @@ var DevExpress;
             'Error has occurred during loading databases list.': 'DataAccessUIStringId.MessageCannotLoadDatabasesList',
             'Query Builder': 'DataAccessUIStringId.QueryBuilder',
             'Add stored procedures to the data source, configure their parameters and preview the result.': 'DataAccessUIStringId.WizardPageConfigureStoredProcedures',
-            'Unable to connect to the database. See details below.': 'DataAccessUIStringId.DataConnectionParametersDialog_Header_UnableConnect',
+            'Cannot connect to the database using the specified connection parameters.\r\nSpecify the correct connection parameters and click OK.\r\nThese parameters will not be saved after closing this dialog window.': 'DataAccessUIStringId.DataConnectionParametersDialog_Header_UnableConnect',
             'Alias': 'DataAccessUIStringId.QueryBuilderColumns_Alias',
             'Join Editor': 'DataAccessUIStringId.JoinEditor',
             'SQL execution error:\r\n{0}\r\n': 'DataAccessUIStringId.LoadingDataSqlError',
@@ -10710,278 +4165,6901 @@ var DevExpress;
             'Does not equal to': 'DataAccessUIStringId.JoinEditorNotEqualOperator',
             'The data source has been successfully created': 'DataAccessUIStringId.WizardDataSourceCreatedMessage',
             'Select stored procedures to add': 'DataAccessUIStringId.ChooseEFStoredProceduresDialog',
-            'Returns the index of the current data row in a datasource. Note that this index is zero-based.': 'CurrentRowIndex.Description',
-            'Log10(Value)\r\nReturns the base 10 logarithm of a specified number.': 'Log10.Description',
-            'AddMinutes(DateTime, MinutesCount)\r\nReturns a date-time value that is the specified number of minutes away from the specified DateTime.': 'AddMinutes.Description',
-            'Sqr(Value)\r\nReturns the square root of a given number.': 'Sqr.Description',
-            'IsNovember(DateTime)\r\nReturns True if the specified date falls within November.': 'IsNovember.Description',
-            'Greater than or equal to operator. Used to compare expressions.': 'GreaterOrEqual.Description',
-            'LocalDateTimeNextYear()\r\nReturns a date-time value corresponding to the first day of the following year.': 'LocalDateTimeNextYear.Description',
-            'Returns the remainder (modulus) obtained by dividing one numeric expression into another.': 'Modulo.Description',
-            'IsApril(DateTime)\r\nReturns True if the specified date falls within April.': 'IsApril.Description',
-            'ToFloat(Value)\r\nConverts Value to an equivalent 32-bit single-precision floating-point number.': 'ToFloat.Description',
-            'IsLastYear(DateTime)\r\nReturns True if the specified date falls within the previous year.': 'IsLastYear.Description',
-            'Sign(Value)\r\nReturns the positive (+1), zero (0), or negative (-1) sign of the given expression.': 'Sign.Description',
-            'GetHour(DateTime)\r\nExtracts an hour from the defined DateTime.': 'GetHour.Description',
-            'Compares each bit of its first operand to the corresponding bit of its second operand. If either bit is 1, the corresponding result bit is set to 1. Otherwise, the corresponding result bit is set to 0.': 'BitwiseOr.Description',
-            'IsJune(DateTime)\r\nReturns True if the specified date falls within June.': 'IsJune.Description',
-            'DateDiffMilliSecond(startDate, endDate)\r\nReturns the number of millisecond boundaries between two non-nullable dates.': 'DateDiffMilliSecond.Description',
-            'Math': 'functionsTypes.Properties.MathItems',
-            'expressionEdit': '>>expressionEdit.Name',
-            'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': '>>expressionEdit.Type',
-            'Date-time': 'functionsTypes.Properties.DateTimeItems',
-            'Concat(String1, ... , StringN)\r\nReturns a string value containing the concatenation of the current string with any additional strings.': 'Concat.Description',
-            'Cos(Value)\r\nReturns the cosine of the angle defined in radians.': 'Cos.Description',
-            '$this': '>>layoutItemButton12.Parent',
-            'PadLeft(String, Length, Char)\r\nLeft-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'PadLeft3Param.Description',
-            'IsFebruary(DateTime)\r\nReturns True if the specified date falls within February.': 'IsFebruary.Description',
-            'Exists()\r\nDetermines whether the object exists in the collection.': 'ExistsAggregate.Description',
-            'LocalDateTimeThisYear()\r\nReturns a date-time value corresponding to the first day of the current year.': 'LocalDateTimeThisYear.Description',
-            'listOfInputParameters': '>>listOfInputParameters.Name',
-            'DevExpress.XtraEditors.ListBoxControl, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': '>>listOfInputParameters.Type',
-            '0': '>>functionsTypes.ZOrder',
-            'LocalDateTimeToday()\r\nReturns a date-time value corresponding to Today.': 'LocalDateTimeToday.Description',
-            '6': '>>layoutItemButton12.ZOrder',
-            'IsSeptember(DateTime)\r\nReturns True if the specified date falls within September.': 'IsSeptember.Description',
-            'IsNextYear(DateTime)\r\nReturns True if the specified date falls within the next year.': 'IsNextYear.Description',
-            'IsJuly(DateTime)\r\nReturns True if the specified date falls within July.': 'IsJuly.Description',
-            '3': '>>listOfInputTypes.ZOrder',
-            'Divides the first operand by the second.': 'Divide.Description',
-            'Lower(String)\r\nReturns the String in lowercase.': 'Lower.Description',
-            '13': '>>layoutItemButton8.ZOrder',
-            '8': '>>layoutItemButton14.ZOrder',
-            'Operators': 'Operators.Text',
-            'Format rule expression editor': 'FormatRule.Caption',
-            'LocalDateTimeTwoWeeksAway()\r\nReturns a date-time value corresponding to the first day of the week that is after next week.': 'LocalDateTimeTwoWeeksAway.Description',
-            'IsMay(DateTime)\r\nReturns True if the specified date falls within May.': 'IsMay.Description',
-            'Upper(String)\r\nReturns String in uppercase.': 'Upper.Description',
-            'LocalDateTimeYesterday()\r\nReturns a date-time value corresponding to Yesterday.': 'LocalDateTimeYesterday.Description',
-            'Between (,)\r\nSpecifies a range to test. Returns true if a value is greater than or equal to the first operand and less than or equal to the second operand.': 'Between.Description',
-            '16': '>>labelControl1.ZOrder',
-            '9': '>>labelControl2.ZOrder',
-            'layoutItemButton9': '>>layoutItemButton9.Name',
-            'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v16.2, Version=16.2.0.0, Culture=neutral': '>>layoutItemButton9.Type',
-            'Constants': 'Constants.Text',
-            'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'ToInt.Description',
-            '19': '>>layoutItemButton3.ZOrder',
-            'layoutItemButton8': '>>layoutItemButton8.Name',
-            'Variables': 'Variables.Text',
-            'UtcNow()\r\nReturns the current system date and time, expressed as Coordinated Universal Time (UTC).': 'UtcNow.Description',
-            'plusItemButton': '>>plusItemButton.Name',
-            'IsYearToDate(DateTime)\r\nReturns True if the specified date falls within the year-to-date period (starting from the first day of the current year and continuing up to the current date).': 'IsYearToDate.Description',
-            'Count()\r\nReturns the number of objects in a collection.': 'CountAggregate.Description',
-            'layoutItemButton5': '>>layoutItemButton5.Name',
-            'Len(Value)\r\nReturns an integer containing either the number of characters in a string or the nominal number of bytes required to store a variable.': 'Len.Description',
-            'Trim(String)\r\nRemoves all leading and trailing SPACE characters from String.': 'Trim.Description',
-            'layoutItemButton4': '>>layoutItemButton4.Name',
-            'BigMul(Value1, Value2)\r\nReturns an Int64 containing the full product of two specified 32-bit numbers.': 'BigMul.Description',
-            'GetMinute(DateTime)\r\nExtracts minutes from the defined DateTime.': 'GetMinute.Description',
-            'layoutItemButton7': '>>layoutItemButton7.Name',
-            'PadRight(String, Length)\r\nRight-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'PadRight.Description',
-            'Floor(Value)\r\nReturns the largest integer less than or equal to the given numeric expression.': 'Floor.Description',
-            'Exp(Value)\r\nReturns the exponential value of the given float expression.': 'Exp.Description',
-            'AddYears(DateTime, YearsCount)\r\nReturns a date-time value that is the specified number of years away from the specieid DateTime.': 'AddYears.Description',
-            'IsNextMonth(DateTime)\r\nReturns True if the specified date falls within the next month.': 'IsNextMonth.Description',
-            'layoutItemButton6': '>>layoutItemButton6.Name',
-            'ToStr(Value)\r\nReturns a string representation of an object.': 'ToStr.Description',
-            'LocalDateTimeThisMonth()\r\nReturns a date-time value corresponding to the first day of the current month.': 'LocalDateTimeThisMonth.Description',
-            '1': '>>labelControl4.ZOrder',
-            'Performs a logical conjunction on two expressions.': 'And.Description',
-            '17': '>>layoutItemButton5.ZOrder',
-            '15': '>>layoutItemButton6.ZOrder',
-            'Field Information\r\nCaption: {1}\r\nThe type of this field is: {2}': 'GridFields Description Prefix',
-            'DateDiffMinute(startDate, endDate)\r\nReturns the number of minute boundaries between two non-nullable dates.': 'DateDiffMinute.Description',
-            'layoutItemButton3': '>>layoutItemButton3.Name',
-            'Logical': 'functionsTypes.Properties.LogicalItems',
-            'DateDiffMonth(startDate, endDate)\r\nReturns the number of month boundaries between two non-nullable dates.': 'DateDiffMonth.Description',
-            'layoutItemButton2': '>>layoutItemButton2.Name',
-            '2': '>>listOfInputParameters.ZOrder',
-            'Today()\r\nReturns the current date. Regardless of the actual time, this function returns midnight of the current date.': 'Today.Description',
-            'Atn2(Value1, Value2)\r\nReturns the angle whose tangent is the quotient of two specified numbers, in radians.': 'Atn2.Description',
-            'Sin(Value)\r\nReturns the sine of the angle, defined in radians.': 'Sin.Description',
-            'AddDays(DateTime, DaysCount)\r\nReturns a date-time value that is the specified number of days away from the specified DateTime.': 'AddDays.Description',
-            'LocalDateTimeLastWeek()\r\nReturns a date-time value corresponding to the first day of the previous week.': 'LocalDateTimeLastWeek.Description',
-            'LocalDateTimeTomorrow()\r\nReturns a date-time value corresponding to Tomorrow.': 'LocalDateTimeTomorrow.Description',
-            'IsNull(Value)\r\nReturns True if the specified Value is NULL.': 'IsNull.Description',
-            'CharIndex(String1, String2)\r\nReturns the starting position of String1 within String2, beginning from the zero character position to the end of a string.': 'CharIndex.Description',
-            'GetDay(DateTime)\r\nExtracts a day from the defined DateTime.': 'GetDay.Description',
-            'IsThisMonth(DateTime)\r\nReturns True if the specified date falls within the current month.': 'IsThisMonth.Description',
-            'IsThisWeek(DateTime)\r\nReturns True if the specified date falls within the current week.': 'IsThisWeek.Description',
-            'Insert(String1, StartPosition, String2)\r\nInserts String2 into String1 at the position specified by StartPositon': 'Insert.Description',
-            'LocalDateTimeThisWeek()\r\nReturns a date-time value corresponding to the first day of the current week.': 'LocalDateTimeThisWeek.Description',
-            'IsLastMonth(DateTime)\r\nReturns True if the specified date falls within the previous month.': 'IsLastMonth.Description',
-            'ToDouble(Value)\r\nConverts Value to an equivalent 64-bit double-precision floating-point number.': 'ToDouble.Description',
-            'Functions': 'Functions.Text',
-            'Now()\r\nReturns the current system date and time.': 'Now.Description',
-            'IsNullOrEmpty(String)\r\nReturns True if the specified String object is NULL or an empty string; otherwise, False is returned.': 'IsNullOrEmpty.Description',
-            'IsDecember(DateTime)\r\nReturns True if the specified date falls within December.': 'IsDecember.Description',
-            'Round(Value)\r\nRounds the given value to the nearest integer.': 'Round.Description',
-            'DateDiffDay(startDate, endDate)\r\nReturns the number of day boundaries between two non-nullable dates.': 'DateDiffDay.Description',
-            '11': '>>layoutItemButton10.ZOrder',
-            '7': '>>layoutItemButton13.ZOrder',
-            '24': '>>buttonOK.ZOrder',
-            'Ascii(String)\r\nReturns the ASCII code value of the leftmost character in a character expression.': 'Ascii.Description',
-            'Log(Value, Base)\r\nReturns the logarithm of a specified number in a specified Base.': 'Log2Param.Description',
-            'Performs a logical disjunction on two Boolean expressions.': 'Or.Description',
-            'IsThisYear(DateTime)\r\nReturns True if the specified date falls within the current year.': 'IsThisYear.Description',
-            'Char(Number)\r\nConverts an integerASCIICode to a character.': 'Char.Description',
-            'DateDiffSecond(startDate, endDate)\r\nReturns the number of second boundaries between two non-nullable dates.': 'DateDiffSecond.Description',
-            'Returns true if both operands have the same value; otherwise, it returns false.': 'Equal.Description',
-            'Represents the Boolean False value.': 'False.Description',
-            'Atn(Value)\r\nReturns the arctangent of a number (the angle, in radians, whose tangent is the given float expression).': 'Atn.Description',
-            'AddMilliSeconds(DateTime, MilliSecondsCount)\r\nReturns a date-time value that is the specified number of milliseconds away from the specified DateTime.': 'AddMilliSeconds.Description',
-            'GetTimeOfDay(DateTime)\r\nExtracts the time of the day from the defined DateTime, in ticks.': 'GetTimeOfDay.Description',
-            'IsSameDay(DateTime, DateTime)\r\nReturns True if the specified date-time values fall within the same day.': 'IsSameDay.Description',
-            'Rnd()\r\nReturns a random number that is less than 1, but greater than or equal to zero.': 'Rnd.Description',
-            'layoutItemButton14': '>>layoutItemButton14.Name',
-            'Performs a logical exclusion on two Boolean expressions, or a bitwise exclusion on two numeric expressions.': 'BitwiseXor.Description',
-            'Tan(Value)\r\nReturns the tangent of the angle defined in radians.': 'Tan.Description',
-            'layoutItemButton15': '>>layoutItemButton15.Name',
-            '4': '>>descriptionControl.ZOrder',
-            'DevExpress.XtraEditors.SimpleButton, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': '>>buttonOK.Type',
-            'buttonOK': '>>buttonOK.Name',
-            'IsOctober(DateTime)\r\nReturns True if the specified date falls within October.': 'IsOctober.Description',
-            'Less than or equal to operator. Used to compare expressions.': 'LessOrEqual.Description',
-            'layoutItemButton10': '>>layoutItemButton10.Name',
-            'The type of this field is: ': 'Fields Description Prefix',
-            'IsJanuary(DateTime)\r\nReturns True if the specified date falls within January.': 'IsJanuary.Description',
-            'DateDiffTick(startDate, endDate)\r\nReturns the number of tick boundaries between two non-nullable dates.': 'DateDiffTick.Description',
-            'layoutItemButton11': '>>layoutItemButton11.Name',
-            'Tanh(Value)\r\nReturns the hyperbolic tangent of the angle defined in radians.': 'Tanh.Description',
-            'listOfInputTypes': '>>listOfInputTypes.Name',
-            'GetDayOfWeek(DateTime)\r\nExtracts a day of the week from the defined DateTime.': 'GetDayOfWeek.Description',
-            'layoutItemButton12': '>>layoutItemButton12.Name',
-            'Represents the Boolean True value.': 'True.Description',
-            '18': '>>layoutItemButton4.ZOrder',
-            'Min(Value)\r\nReturns the minimum expression value in a collection.': 'MinAggregate.Description',
-            '20': '>>layoutItemButton2.ZOrder',
-            'layoutItemButton13': '>>layoutItemButton13.Name',
-            'PadRight(String, Length, Char)\r\nRight-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'PadRight3Param.Description',
-            'Expression editor': 'UnboundColumn.Caption',
-            'Avg(Value)\r\nEvaluates the average of the values in the collection.': 'AvgAggregate.Description',
-            'IsMarch(DateTime)\r\nReturns True if the specified date falls within March.': 'IsMarch.Description',
-            'LocalDateTimeYearBeforeToday()\r\nReturns a date-time value corresponding to the day one year ago.': 'LocalDateTimeYearBeforeToday.Description',
-            'Replace(String, SubString2, String3)\r\nReturns a copy of String1, in which SubString2 has been replaced with String3.': 'Replace.Description',
-            'AddHours(DateTime, HoursCount)\r\nReturns a date-time value that is the specified number of hours away from the specified DateTime.': 'AddHours.Description',
-            'Reverse(String)\r\nReverses the order of elements within a string.': 'Reverse.Description',
-            'Remove(String, StartPosition, Length)\r\nDeletes a specified number of characters from this instance, beginning at a specified position.': 'Remove3Param.Description',
-            'Remove(String, StartPosition)\r\nDeletes all characters from this instance, beginning at a specified position.': 'Remove2Param.Description',
-            'GetDate(DateTime)\r\nExtracts a date from the defined DateTime.': 'GetDate.Description',
-            '22': '>>plusItemButton.ZOrder',
-            'DevExpress.XtraEditors.LabelControl, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': '>>labelControl4.Type',
-            'labelControl4': '>>labelControl4.Name',
-            'AddTimeSpan(DateTime, TimeSpan)\r\nReturns a date-time value that is away from the specified DateTime for the given TimeSpan.': 'AddTimeSpan.Description',
-            'labelControl1': '>>labelControl1.Name',
-            'Performs a bitwise logical AND operation between two integer values.': 'BitwiseAnd.Description',
-            'Represents a null reference, one that does not refer to any object.': 'Null.Description',
-            'LocalDateTimeNextWeek()\r\nReturns a date-time value corresponding to the first day of the following week.': 'LocalDateTimeNextWeek.Description',
-            'ToLong(Value)\r\nConverts Value to an equivalent 64-bit signed integer.': 'ToLong.Description',
-            'labelControl3': '>>labelControl3.Name',
-            'AddSeconds(DateTime, SecondsCount)\r\nReturns a date-time value that is the specified number of seconds away from the specified DateTime.': 'AddSeconds.Description',
-            'The type of this parameter is: ': 'Parameters Description Prefix',
-            '23': '>>buttonCancel.ZOrder',
-            'Ceiling(Value)\r\nReturns the smallest integer that is greater than or equal to the given numeric expression.': 'Ceiling.Description',
-            'labelControl2': '>>labelControl2.Name',
-            'GetSecond(DateTime)\r\nExtracts seconds from the defined DateTime.': 'GetSecond.Description',
-            'CharIndex(String1, String2, StartLocation)\r\nReturns the starting position of String1 within String2, beginning from the StartLocation character position to the end of a string.': 'CharIndex3Param.Description',
-            'Asin(Value)\r\nReturns the arcsine of a number (the angle, in radians, whose sine is the given float expression).': 'Asin.Description',
-            'Round(Value, Precision)\r\nRounds the given value to the nearest integer, or to a specified number of decimal places.': 'Round2Param.Description',
-            'AddTicks(DateTime, TicksCount)\r\nReturns a date-time value that is the specified number of ticks away from the specified DateTime.': 'AddTicks.Description',
-            'IsAugust(DateTime)\r\nReturns True if the specified date falls within August.': 'IsAugust.Description',
-            'Substring(String, StartPosition, Length)\r\nRetrieves a substring from String. The substring starts at StartPosition and has the specified Length.': 'Substring3param.Description',
-            '10': '>>layoutItemButton11.ZOrder',
-            'CalculatedFieldExpressionEditorForm': '>>$this.Name',
-            'DevExpress.XtraEditors.XtraForm, DevExpress.Utils.v16.2, Version=16.2.0.0, Culture=neutral': '>>$this.Type',
-            'Condition expression editor': 'Condition.Caption',
-            'ToDecimal(Value)\r\nConverts Value to an equivalent decimal number.': 'ToDecimal.Description',
-            '21': '>>expressionEdit.ZOrder',
-            'Max(Value1, Value2)\r\nReturns the maximum value from the specified values.': 'Max.Description',
-            'LocalDateTimeTwoMonthsAway()\r\nReturns a date-time value corresponding to the first day of the month after next.': 'LocalDateTimeTwoMonthsAway.Description',
-            'Substring(String, StartPosition)\r\nRetrieves a substring from String. The substring starts at StartPosition.': 'Substring2param.Description',
-            'Acos(Value)\r\nReturns the arccosine of a number (the angle, in radians, whose cosine is the given float expression).': 'Acos.Description',
-            'GetDayOfYear(DateTime)\r\nExtracts a day of the year from the defined DateTime.': 'GetDayOfYear.Description',
-            'Multiplies the value of two expressions.': 'Multiply.Description',
-            'Returns the total amount of data rows in a datasource.': 'RowCount.Description',
-            'LocalDateTimeNow()\r\nReturns a date-time value corresponding to the current moment in time.': 'LocalDateTimeNow.Description',
-            'LocalDateTimeLastYear()\r\nReturns a date-time value corresponding to the first day of the previous year.': 'LocalDateTimeLastYear.Description',
-            'LocalDateTimeDayAfterTomorrow()\r\nReturns a date-time value corresponding to the day after Tomorrow.': 'LocalDateTimeDayAfterTomorrow.Description',
-            'Sum(Value)\r\nReturns the sum of all the expression values in the collection.': 'SumAggregate.Description',
-            'Compares a string against a pattern. If the value of the string matches the pattern, result is true. If the string does not match the pattern, result is false. If both string and pattern are empty strings, the result is true.': 'Like.Description',
-            'Power(Value, Power)\r\nReturns a specified number raised to a specified power.': 'Power.Description',
-            'Finds the difference between two numbers.': 'Minus.Description',
-            'Log(Value)\r\nReturns the natural logarithm of a specified number.': 'Log.Description',
-            'LocalDateTimeTwoYearsAway()\r\nReturns a date-time value corresponding to the first day of the year after next.': 'LocalDateTimeTwoYearsAway.Description',
-            'Sinh(Value)\r\nReturns the hyperbolic sine of the angle defined in radians.': 'Sinh.Description',
-            'Max(Value)\r\nReturns the maximum expression value in a collection.': 'MaxAggregate.Description',
-            'Greater than operator. Used to compare expressions.': 'Greater.Description',
-            '(All)': 'functionsTypes.Properties.AllItems',
-            'In (,,,)\r\nTests for the existence of a property in an object.': 'In.Description',
-            'DevExpress.XtraEditors.ComboBoxEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': '>>functionsTypes.Type',
-            'functionsTypes': '>>functionsTypes.Name',
-            'Less than operator. Used to compare expressions.': 'Less.Description',
-            'StartsWith(String, StartString)\r\nReturns True if the beginning of String matches StartString; otherwise, False is returned.': 'StartsWith.Description',
-            '12': '>>layoutItemButton9.ZOrder',
-            'GetMonth(DateTime)\r\nExtracts a month from the defined DateTime.': 'GetMonth.Description',
-            'EndsWith(String, EndString)\r\nReturns True if the end of String matches EndString; otherwise, False is returned.': 'EndsWith.Description',
-            'Adds the value of one numeric expression to another, or concatenates two strings.': 'Plus.Description',
-            'Single()\r\nReturns a single object from the collection.': 'SingleAggregate.Description',
-            'Contains(String, SubString)\r\nReturns True if SubString occurs within String; otherwise, False is returned.': 'Contains.Description',
-            'DateDiffHour(startDate, endDate)\r\nReturns the number of hour boundaries between two non-nullable dates.': 'DateDiffHour.Description',
-            'Returns true if the operands do not have the same value; otherwise, it returns false.': 'NotEqual.Description',
-            'Abs(Value)\r\nReturns the absolute, positive value of the given numeric expression.': 'Abs.Description',
-            'LocalDateTimeNextMonth()\r\nReturns a date-time value corresponding to the first day of next month.': 'LocalDateTimeNextMonth.Description',
-            'AddMonths(DateTime, MonthsCount)\r\nReturns a date-time value that is the specified number of months away from the specified DateTime.': 'AddMonths.Description',
-            'Iif(Expression, TruePart, FalsePart)\r\nReturns either TruePart or FalsePart, depending on the evaluation of the Boolean Expression.': 'Iif.Description',
-            'GetMilliSecond(DateTime)\r\nExtracts milliseconds from the defined DateTime.': 'GetMilliSecond.Description',
-            'LocalDateTimeLastMonth()\r\nReturns a date-time value corresponding to the first day of the previous month.': 'LocalDateTimeLastMonth.Description',
-            'buttonCancel': '>>buttonCancel.Name',
-            'PadLeft(String, Length)\r\nLeft-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'PadLeft.Description',
-            'descriptionControl': '>>descriptionControl.Name',
-            'DevExpress.XtraEditors.LabelControl, DevExpress.Utils.v16.2, Version=16.2.0.0, Culture=neutral': '>>descriptionControl.Type',
-            '5': '>>labelControl3.ZOrder',
-            'Min(Value1, Value2)\r\nReturns the minimum value from the specified values.': 'Min.Description',
-            '14': '>>layoutItemButton7.ZOrder',
-            'Condition Editor': 'Condition.Text',
-            'Cosh(Value)\r\nReturns the hyperbolic cosine of the angle defined in radians.': 'Cosh.Description',
-            'Performs logical negation on an expression.': 'Not.Description',
-            'GetYear(DateTime)\r\nExtracts a year from the defined DateTime.': 'GetYear.Description',
-            'DateDiffYear(startDate, endDate)\r\nReturns the number of year boundaries between two non-nullable dates.': 'DateDiffYear.Description'
+            'Returns the index of the current data row in a datasource. Note that this index is zero-based.': 'XtraEditorsExpressionEditor.CurrentRowIndex.Description',
+            'Log10(Value)\r\nReturns the base 10 logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log10.Description',
+            'AddMinutes(DateTime, MinutesCount)\r\nReturns a date-time value that is the specified number of minutes away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMinutes.Description',
+            'Sqr(Value)\r\nReturns the square root of a given number.': 'XtraEditorsExpressionEditor.Sqr.Description',
+            'IsNovember(DateTime)\r\nReturns True if the specified date falls within November.': 'XtraEditorsExpressionEditor.IsNovember.Description',
+            'Greater than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.GreaterOrEqual.Description',
+            'LocalDateTimeNextYear()\r\nReturns a date-time value corresponding to the first day of the following year.': 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description',
+            'Returns the remainder (modulus) obtained by dividing one numeric expression into another.': 'XtraEditorsExpressionEditor.Modulo.Description',
+            'IsApril(DateTime)\r\nReturns True if the specified date falls within April.': 'XtraEditorsExpressionEditor.IsApril.Description',
+            'ToFloat(Value)\r\nConverts Value to an equivalent 32-bit single-precision floating-point number.': 'XtraEditorsExpressionEditor.ToFloat.Description',
+            'IsLastYear(DateTime)\r\nReturns True if the specified date falls within the previous year.': 'XtraEditorsExpressionEditor.IsLastYear.Description',
+            'Sign(Value)\r\nReturns the positive (+1), zero (0), or negative (-1) sign of the given expression.': 'XtraEditorsExpressionEditor.Sign.Description',
+            'GetHour(DateTime)\r\nExtracts an hour from the defined DateTime.': 'XtraEditorsExpressionEditor.GetHour.Description',
+            'Compares each bit of its first operand to the corresponding bit of its second operand. If either bit is 1, the corresponding result bit is set to 1. Otherwise, the corresponding result bit is set to 0.': 'XtraEditorsExpressionEditor.BitwiseOr.Description',
+            'IsJune(DateTime)\r\nReturns True if the specified date falls within June.': 'XtraEditorsExpressionEditor.IsJune.Description',
+            'DateDiffMilliSecond(startDate, endDate)\r\nReturns the number of millisecond boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description',
+            'Math': 'XtraEditorsExpressionEditor.functionsTypes.Properties.MathItems',
+            'expressionEdit': 'XtraEditorsExpressionEditor.>>expressionEdit.Name',
+            'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>expressionEdit.Type',
+            'Date-time': 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems',
+            'Concat(String1, ... , StringN)\r\nReturns a string value containing the concatenation of the current string with any additional strings.': 'XtraEditorsExpressionEditor.Concat.Description',
+            'Cos(Value)\r\nReturns the cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cos.Description',
+            '$this': 'XtraEditorsExpressionEditor.>>layoutItemButton12.Parent',
+            'PadLeft(String, Length, Char)\r\nLeft-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft3Param.Description',
+            'IsFebruary(DateTime)\r\nReturns True if the specified date falls within February.': 'XtraEditorsExpressionEditor.IsFebruary.Description',
+            'Exists()\r\nDetermines whether the object exists in the collection.': 'XtraEditorsExpressionEditor.ExistsAggregate.Description',
+            'LocalDateTimeThisYear()\r\nReturns a date-time value corresponding to the first day of the current year.': 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description',
+            'listOfInputParameters': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Name',
+            'DevExpress.XtraEditors.ListBoxControl, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Type',
+            '0': 'XtraEditorsExpressionEditor.>>functionsTypes.ZOrder',
+            'LocalDateTimeToday()\r\nReturns a date-time value corresponding to Today.': 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description',
+            '6': 'XtraEditorsExpressionEditor.>>layoutItemButton12.ZOrder',
+            'IsSeptember(DateTime)\r\nReturns True if the specified date falls within September.': 'XtraEditorsExpressionEditor.IsSeptember.Description',
+            'IsNextYear(DateTime)\r\nReturns True if the specified date falls within the next year.': 'XtraEditorsExpressionEditor.IsNextYear.Description',
+            'IsJuly(DateTime)\r\nReturns True if the specified date falls within July.': 'XtraEditorsExpressionEditor.IsJuly.Description',
+            '3': 'XtraEditorsExpressionEditor.>>listOfInputTypes.ZOrder',
+            'Divides the first operand by the second.': 'XtraEditorsExpressionEditor.Divide.Description',
+            'Lower(String)\r\nReturns the String in lowercase.': 'XtraEditorsExpressionEditor.Lower.Description',
+            '13': 'XtraEditorsExpressionEditor.>>layoutItemButton8.ZOrder',
+            '8': 'XtraEditorsExpressionEditor.>>layoutItemButton14.ZOrder',
+            'Operators': 'XtraEditorsExpressionEditor.Operators.Text',
+            'Format rule expression editor': 'XtraEditorsExpressionEditor.FormatRule.Caption',
+            'LocalDateTimeTwoWeeksAway()\r\nReturns a date-time value corresponding to the first day of the week that is after next week.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description',
+            'IsMay(DateTime)\r\nReturns True if the specified date falls within May.': 'XtraEditorsExpressionEditor.IsMay.Description',
+            'Upper(String)\r\nReturns String in uppercase.': 'XtraEditorsExpressionEditor.Upper.Description',
+            'LocalDateTimeYesterday()\r\nReturns a date-time value corresponding to Yesterday.': 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description',
+            'Between (,)\r\nSpecifies a range to test. Returns true if a value is greater than or equal to the first operand and less than or equal to the second operand.': 'XtraEditorsExpressionEditor.Between.Description',
+            '16': 'XtraEditorsExpressionEditor.>>labelControl1.ZOrder',
+            '9': 'XtraEditorsExpressionEditor.>>labelControl2.ZOrder',
+            'layoutItemButton9': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Name',
+            'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Type',
+            'Constants': 'XtraEditorsExpressionEditor.Constants.Text',
+            'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'XtraEditorsExpressionEditor.ToInt.Description',
+            '19': 'XtraEditorsExpressionEditor.>>layoutItemButton3.ZOrder',
+            'layoutItemButton8': 'XtraEditorsExpressionEditor.>>layoutItemButton8.Name',
+            'Variables': 'XtraEditorsExpressionEditor.Variables.Text',
+            'UtcNow()\r\nReturns the current system date and time, expressed as Coordinated Universal Time (UTC).': 'XtraEditorsExpressionEditor.UtcNow.Description',
+            'plusItemButton': 'XtraEditorsExpressionEditor.>>plusItemButton.Name',
+            'IsYearToDate(DateTime)\r\nReturns True if the specified date falls within the year-to-date period (starting from the first day of the current year and continuing up to the current date).': 'XtraEditorsExpressionEditor.IsYearToDate.Description',
+            'Count()\r\nReturns the number of objects in a collection.': 'XtraEditorsExpressionEditor.CountAggregate.Description',
+            'layoutItemButton5': 'XtraEditorsExpressionEditor.>>layoutItemButton5.Name',
+            'Len(Value)\r\nReturns an integer containing either the number of characters in a string or the nominal number of bytes required to store a variable.': 'XtraEditorsExpressionEditor.Len.Description',
+            'Trim(String)\r\nRemoves all leading and trailing SPACE characters from String.': 'XtraEditorsExpressionEditor.Trim.Description',
+            'layoutItemButton4': 'XtraEditorsExpressionEditor.>>layoutItemButton4.Name',
+            'BigMul(Value1, Value2)\r\nReturns an Int64 containing the full product of two specified 32-bit numbers.': 'XtraEditorsExpressionEditor.BigMul.Description',
+            'GetMinute(DateTime)\r\nExtracts minutes from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMinute.Description',
+            'layoutItemButton7': 'XtraEditorsExpressionEditor.>>layoutItemButton7.Name',
+            'PadRight(String, Length)\r\nRight-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadRight.Description',
+            'Floor(Value)\r\nReturns the largest integer less than or equal to the given numeric expression.': 'XtraEditorsExpressionEditor.Floor.Description',
+            'Exp(Value)\r\nReturns the exponential value of the given float expression.': 'XtraEditorsExpressionEditor.Exp.Description',
+            'AddYears(DateTime, YearsCount)\r\nReturns a date-time value that is the specified number of years away from the specieid DateTime.': 'XtraEditorsExpressionEditor.AddYears.Description',
+            'IsNextMonth(DateTime)\r\nReturns True if the specified date falls within the next month.': 'XtraEditorsExpressionEditor.IsNextMonth.Description',
+            'layoutItemButton6': 'XtraEditorsExpressionEditor.>>layoutItemButton6.Name',
+            'ToStr(Value)\r\nReturns a string representation of an object.': 'XtraEditorsExpressionEditor.ToStr.Description',
+            'LocalDateTimeThisMonth()\r\nReturns a date-time value corresponding to the first day of the current month.': 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description',
+            '1': 'XtraEditorsExpressionEditor.>>labelControl4.ZOrder',
+            'Performs a logical conjunction on two expressions.': 'XtraEditorsExpressionEditor.And.Description',
+            '17': 'XtraEditorsExpressionEditor.>>layoutItemButton5.ZOrder',
+            '15': 'XtraEditorsExpressionEditor.>>layoutItemButton6.ZOrder',
+            'Field Information\r\nCaption: {1}\r\nThe type of this field is: {2}': 'XtraEditorsExpressionEditor.GridFields Description Prefix',
+            'DateDiffMinute(startDate, endDate)\r\nReturns the number of minute boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMinute.Description',
+            'layoutItemButton3': 'XtraEditorsExpressionEditor.>>layoutItemButton3.Name',
+            'Logical': 'XtraEditorsExpressionEditor.functionsTypes.Properties.LogicalItems',
+            'DateDiffMonth(startDate, endDate)\r\nReturns the number of month boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMonth.Description',
+            'layoutItemButton2': 'XtraEditorsExpressionEditor.>>layoutItemButton2.Name',
+            '2': 'XtraEditorsExpressionEditor.>>listOfInputParameters.ZOrder',
+            'Today()\r\nReturns the current date. Regardless of the actual time, this function returns midnight of the current date.': 'XtraEditorsExpressionEditor.Today.Description',
+            'Atn2(Value1, Value2)\r\nReturns the angle whose tangent is the quotient of two specified numbers, in radians.': 'XtraEditorsExpressionEditor.Atn2.Description',
+            'Sin(Value)\r\nReturns the sine of the angle, defined in radians.': 'XtraEditorsExpressionEditor.Sin.Description',
+            'AddDays(DateTime, DaysCount)\r\nReturns a date-time value that is the specified number of days away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddDays.Description',
+            'LocalDateTimeLastWeek()\r\nReturns a date-time value corresponding to the first day of the previous week.': 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description',
+            'LocalDateTimeTomorrow()\r\nReturns a date-time value corresponding to Tomorrow.': 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description',
+            'IsNull(Value)\r\nReturns True if the specified Value is NULL.': 'XtraEditorsExpressionEditor.IsNull.Description',
+            'CharIndex(String1, String2)\r\nReturns the starting position of String1 within String2, beginning from the zero character position to the end of a string.': 'XtraEditorsExpressionEditor.CharIndex.Description',
+            'GetDay(DateTime)\r\nExtracts a day from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDay.Description',
+            'IsThisMonth(DateTime)\r\nReturns True if the specified date falls within the current month.': 'XtraEditorsExpressionEditor.IsThisMonth.Description',
+            'IsThisWeek(DateTime)\r\nReturns True if the specified date falls within the current week.': 'XtraEditorsExpressionEditor.IsThisWeek.Description',
+            'Insert(String1, StartPosition, String2)\r\nInserts String2 into String1 at the position specified by StartPositon': 'XtraEditorsExpressionEditor.Insert.Description',
+            'LocalDateTimeThisWeek()\r\nReturns a date-time value corresponding to the first day of the current week.': 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description',
+            'IsLastMonth(DateTime)\r\nReturns True if the specified date falls within the previous month.': 'XtraEditorsExpressionEditor.IsLastMonth.Description',
+            'ToDouble(Value)\r\nConverts Value to an equivalent 64-bit double-precision floating-point number.': 'XtraEditorsExpressionEditor.ToDouble.Description',
+            'Functions': 'XtraEditorsExpressionEditor.Functions.Text',
+            'Now()\r\nReturns the current system date and time.': 'XtraEditorsExpressionEditor.Now.Description',
+            'IsNullOrEmpty(String)\r\nReturns True if the specified String object is NULL or an empty string; otherwise, False is returned.': 'XtraEditorsExpressionEditor.IsNullOrEmpty.Description',
+            'IsDecember(DateTime)\r\nReturns True if the specified date falls within December.': 'XtraEditorsExpressionEditor.IsDecember.Description',
+            'Round(Value)\r\nRounds the given value to the nearest integer.': 'XtraEditorsExpressionEditor.Round.Description',
+            'DateDiffDay(startDate, endDate)\r\nReturns the number of day boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffDay.Description',
+            '11': 'XtraEditorsExpressionEditor.>>layoutItemButton10.ZOrder',
+            '7': 'XtraEditorsExpressionEditor.>>layoutItemButton13.ZOrder',
+            '24': 'XtraEditorsExpressionEditor.>>buttonOK.ZOrder',
+            'Ascii(String)\r\nReturns the ASCII code value of the leftmost character in a character expression.': 'XtraEditorsExpressionEditor.Ascii.Description',
+            'Log(Value, Base)\r\nReturns the logarithm of a specified number in a specified Base.': 'XtraEditorsExpressionEditor.Log2Param.Description',
+            'Performs a logical disjunction on two Boolean expressions.': 'XtraEditorsExpressionEditor.Or.Description',
+            'IsThisYear(DateTime)\r\nReturns True if the specified date falls within the current year.': 'XtraEditorsExpressionEditor.IsThisYear.Description',
+            'Char(Number)\r\nConverts an integerASCIICode to a character.': 'XtraEditorsExpressionEditor.Char.Description',
+            'DateDiffSecond(startDate, endDate)\r\nReturns the number of second boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffSecond.Description',
+            'Returns true if both operands have the same value; otherwise, it returns false.': 'XtraEditorsExpressionEditor.Equal.Description',
+            'Represents the Boolean False value.': 'XtraEditorsExpressionEditor.False.Description',
+            'Atn(Value)\r\nReturns the arctangent of a number (the angle, in radians, whose tangent is the given float expression).': 'XtraEditorsExpressionEditor.Atn.Description',
+            'AddMilliSeconds(DateTime, MilliSecondsCount)\r\nReturns a date-time value that is the specified number of milliseconds away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMilliSeconds.Description',
+            'GetTimeOfDay(DateTime)\r\nExtracts the time of the day from the defined DateTime, in ticks.': 'XtraEditorsExpressionEditor.GetTimeOfDay.Description',
+            'IsSameDay(DateTime, DateTime)\r\nReturns True if the specified date-time values fall within the same day.': 'XtraEditorsExpressionEditor.IsSameDay.Description',
+            'Rnd()\r\nReturns a random number that is less than 1, but greater than or equal to zero.': 'XtraEditorsExpressionEditor.Rnd.Description',
+            'layoutItemButton14': 'XtraEditorsExpressionEditor.>>layoutItemButton14.Name',
+            'Performs a logical exclusion on two Boolean expressions, or a bitwise exclusion on two numeric expressions.': 'XtraEditorsExpressionEditor.BitwiseXor.Description',
+            'Tan(Value)\r\nReturns the tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tan.Description',
+            'layoutItemButton15': 'XtraEditorsExpressionEditor.>>layoutItemButton15.Name',
+            '4': 'XtraEditorsExpressionEditor.>>descriptionControl.ZOrder',
+            'DevExpress.XtraEditors.SimpleButton, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>buttonOK.Type',
+            'buttonOK': 'XtraEditorsExpressionEditor.>>buttonOK.Name',
+            'IsOctober(DateTime)\r\nReturns True if the specified date falls within October.': 'XtraEditorsExpressionEditor.IsOctober.Description',
+            'Less than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.LessOrEqual.Description',
+            'layoutItemButton10': 'XtraEditorsExpressionEditor.>>layoutItemButton10.Name',
+            'The type of this field is: ': 'XtraEditorsExpressionEditor.Fields Description Prefix',
+            'IsJanuary(DateTime)\r\nReturns True if the specified date falls within January.': 'XtraEditorsExpressionEditor.IsJanuary.Description',
+            'DateDiffTick(startDate, endDate)\r\nReturns the number of tick boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffTick.Description',
+            'layoutItemButton11': 'XtraEditorsExpressionEditor.>>layoutItemButton11.Name',
+            'Tanh(Value)\r\nReturns the hyperbolic tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tanh.Description',
+            'listOfInputTypes': 'XtraEditorsExpressionEditor.>>listOfInputTypes.Name',
+            'GetDayOfWeek(DateTime)\r\nExtracts a day of the week from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDayOfWeek.Description',
+            'layoutItemButton12': 'XtraEditorsExpressionEditor.>>layoutItemButton12.Name',
+            'Represents the Boolean True value.': 'XtraEditorsExpressionEditor.True.Description',
+            '18': 'XtraEditorsExpressionEditor.>>layoutItemButton4.ZOrder',
+            'Min(Value)\r\nReturns the minimum expression value in a collection.': 'XtraEditorsExpressionEditor.MinAggregate.Description',
+            '20': 'XtraEditorsExpressionEditor.>>layoutItemButton2.ZOrder',
+            'layoutItemButton13': 'XtraEditorsExpressionEditor.>>layoutItemButton13.Name',
+            'PadRight(String, Length, Char)\r\nRight-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'XtraEditorsExpressionEditor.PadRight3Param.Description',
+            'Expression editor': 'XtraEditorsExpressionEditor.UnboundColumn.Caption',
+            'Avg(Value)\r\nEvaluates the average of the values in the collection.': 'XtraEditorsExpressionEditor.AvgAggregate.Description',
+            'IsMarch(DateTime)\r\nReturns True if the specified date falls within March.': 'XtraEditorsExpressionEditor.IsMarch.Description',
+            'LocalDateTimeYearBeforeToday()\r\nReturns a date-time value corresponding to the day one year ago.': 'XtraEditorsExpressionEditor.LocalDateTimeYearBeforeToday.Description',
+            'Replace(String, SubString2, String3)\r\nReturns a copy of String1, in which SubString2 has been replaced with String3.': 'XtraEditorsExpressionEditor.Replace.Description',
+            'AddHours(DateTime, HoursCount)\r\nReturns a date-time value that is the specified number of hours away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddHours.Description',
+            'Reverse(String)\r\nReverses the order of elements within a string.': 'XtraEditorsExpressionEditor.Reverse.Description',
+            'Remove(String, StartPosition, Length)\r\nDeletes a specified number of characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove3Param.Description',
+            'Remove(String, StartPosition)\r\nDeletes all characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove2Param.Description',
+            'GetDate(DateTime)\r\nExtracts a date from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDate.Description',
+            '22': 'XtraEditorsExpressionEditor.>>plusItemButton.ZOrder',
+            'DevExpress.XtraEditors.LabelControl, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>labelControl4.Type',
+            'labelControl4': 'XtraEditorsExpressionEditor.>>labelControl4.Name',
+            'AddTimeSpan(DateTime, TimeSpan)\r\nReturns a date-time value that is away from the specified DateTime for the given TimeSpan.': 'XtraEditorsExpressionEditor.AddTimeSpan.Description',
+            'labelControl1': 'XtraEditorsExpressionEditor.>>labelControl1.Name',
+            'Performs a bitwise logical AND operation between two integer values.': 'XtraEditorsExpressionEditor.BitwiseAnd.Description',
+            'Represents a null reference, one that does not refer to any object.': 'XtraEditorsExpressionEditor.Null.Description',
+            'LocalDateTimeNextWeek()\r\nReturns a date-time value corresponding to the first day of the following week.': 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description',
+            'ToLong(Value)\r\nConverts Value to an equivalent 64-bit signed integer.': 'XtraEditorsExpressionEditor.ToLong.Description',
+            'labelControl3': 'XtraEditorsExpressionEditor.>>labelControl3.Name',
+            'AddSeconds(DateTime, SecondsCount)\r\nReturns a date-time value that is the specified number of seconds away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddSeconds.Description',
+            'The type of this parameter is: ': 'XtraEditorsExpressionEditor.Parameters Description Prefix',
+            '23': 'XtraEditorsExpressionEditor.>>buttonCancel.ZOrder',
+            'Ceiling(Value)\r\nReturns the smallest integer that is greater than or equal to the given numeric expression.': 'XtraEditorsExpressionEditor.Ceiling.Description',
+            'labelControl2': 'XtraEditorsExpressionEditor.>>labelControl2.Name',
+            'GetSecond(DateTime)\r\nExtracts seconds from the defined DateTime.': 'XtraEditorsExpressionEditor.GetSecond.Description',
+            'CharIndex(String1, String2, StartLocation)\r\nReturns the starting position of String1 within String2, beginning from the StartLocation character position to the end of a string.': 'XtraEditorsExpressionEditor.CharIndex3Param.Description',
+            'Asin(Value)\r\nReturns the arcsine of a number (the angle, in radians, whose sine is the given float expression).': 'XtraEditorsExpressionEditor.Asin.Description',
+            'Round(Value, Precision)\r\nRounds the given value to the nearest integer, or to a specified number of decimal places.': 'XtraEditorsExpressionEditor.Round2Param.Description',
+            'AddTicks(DateTime, TicksCount)\r\nReturns a date-time value that is the specified number of ticks away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddTicks.Description',
+            'IsAugust(DateTime)\r\nReturns True if the specified date falls within August.': 'XtraEditorsExpressionEditor.IsAugust.Description',
+            'Substring(String, StartPosition, Length)\r\nRetrieves a substring from String. The substring starts at StartPosition and has the specified Length.': 'XtraEditorsExpressionEditor.Substring3param.Description',
+            '10': 'XtraEditorsExpressionEditor.>>layoutItemButton11.ZOrder',
+            'CalculatedFieldExpressionEditorForm': 'XtraEditorsExpressionEditor.>>$this.Name',
+            'DevExpress.XtraEditors.XtraForm, DevExpress.Utils.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>$this.Type',
+            'Condition expression editor': 'XtraEditorsExpressionEditor.Condition.Caption',
+            'ToDecimal(Value)\r\nConverts Value to an equivalent decimal number.': 'XtraEditorsExpressionEditor.ToDecimal.Description',
+            '21': 'XtraEditorsExpressionEditor.>>expressionEdit.ZOrder',
+            'Max(Value1, Value2)\r\nReturns the maximum value from the specified values.': 'XtraEditorsExpressionEditor.Max.Description',
+            'LocalDateTimeTwoMonthsAway()\r\nReturns a date-time value corresponding to the first day of the month after next.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoMonthsAway.Description',
+            'Substring(String, StartPosition)\r\nRetrieves a substring from String. The substring starts at StartPosition.': 'XtraEditorsExpressionEditor.Substring2param.Description',
+            'Acos(Value)\r\nReturns the arccosine of a number (the angle, in radians, whose cosine is the given float expression).': 'XtraEditorsExpressionEditor.Acos.Description',
+            'GetDayOfYear(DateTime)\r\nExtracts a day of the year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDayOfYear.Description',
+            'Multiplies the value of two expressions.': 'XtraEditorsExpressionEditor.Multiply.Description',
+            'Returns the total amount of data rows in a datasource.': 'XtraEditorsExpressionEditor.RowCount.Description',
+            'LocalDateTimeNow()\r\nReturns a date-time value corresponding to the current moment in time.': 'XtraEditorsExpressionEditor.LocalDateTimeNow.Description',
+            'LocalDateTimeLastYear()\r\nReturns a date-time value corresponding to the first day of the previous year.': 'XtraEditorsExpressionEditor.LocalDateTimeLastYear.Description',
+            'LocalDateTimeDayAfterTomorrow()\r\nReturns a date-time value corresponding to the day after Tomorrow.': 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description',
+            'Sum(Value)\r\nReturns the sum of all the expression values in the collection.': 'XtraEditorsExpressionEditor.SumAggregate.Description',
+            'Compares a string against a pattern. If the value of the string matches the pattern, result is true. If the string does not match the pattern, result is false. If both string and pattern are empty strings, the result is true.': 'XtraEditorsExpressionEditor.Like.Description',
+            'Power(Value, Power)\r\nReturns a specified number raised to a specified power.': 'XtraEditorsExpressionEditor.Power.Description',
+            'Finds the difference between two numbers.': 'XtraEditorsExpressionEditor.Minus.Description',
+            'Log(Value)\r\nReturns the natural logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log.Description',
+            'LocalDateTimeTwoYearsAway()\r\nReturns a date-time value corresponding to the first day of the year after next.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoYearsAway.Description',
+            'Sinh(Value)\r\nReturns the hyperbolic sine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Sinh.Description',
+            'Max(Value)\r\nReturns the maximum expression value in a collection.': 'XtraEditorsExpressionEditor.MaxAggregate.Description',
+            'Greater than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Greater.Description',
+            '(All)': 'XtraEditorsExpressionEditor.functionsTypes.Properties.AllItems',
+            'In (,,,)\r\nTests for the existence of a property in an object.': 'XtraEditorsExpressionEditor.In.Description',
+            'DevExpress.XtraEditors.ComboBoxEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>functionsTypes.Type',
+            'functionsTypes': 'XtraEditorsExpressionEditor.>>functionsTypes.Name',
+            'Less than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Less.Description',
+            'StartsWith(String, StartString)\r\nReturns True if the beginning of String matches StartString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.StartsWith.Description',
+            '12': 'XtraEditorsExpressionEditor.>>layoutItemButton9.ZOrder',
+            'GetMonth(DateTime)\r\nExtracts a month from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMonth.Description',
+            'EndsWith(String, EndString)\r\nReturns True if the end of String matches EndString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.EndsWith.Description',
+            'Adds the value of one numeric expression to another, or concatenates two strings.': 'XtraEditorsExpressionEditor.Plus.Description',
+            'Single()\r\nReturns a single object from the collection.': 'XtraEditorsExpressionEditor.SingleAggregate.Description',
+            'Contains(String, SubString)\r\nReturns True if SubString occurs within String; otherwise, False is returned.': 'XtraEditorsExpressionEditor.Contains.Description',
+            'DateDiffHour(startDate, endDate)\r\nReturns the number of hour boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffHour.Description',
+            'Returns true if the operands do not have the same value; otherwise, it returns false.': 'XtraEditorsExpressionEditor.NotEqual.Description',
+            'Abs(Value)\r\nReturns the absolute, positive value of the given numeric expression.': 'XtraEditorsExpressionEditor.Abs.Description',
+            'LocalDateTimeNextMonth()\r\nReturns a date-time value corresponding to the first day of next month.': 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description',
+            'AddMonths(DateTime, MonthsCount)\r\nReturns a date-time value that is the specified number of months away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMonths.Description',
+            'Iif(Expression, TruePart, FalsePart)\r\nReturns either TruePart or FalsePart, depending on the evaluation of the Boolean Expression.': 'XtraEditorsExpressionEditor.Iif.Description',
+            'GetMilliSecond(DateTime)\r\nExtracts milliseconds from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMilliSecond.Description',
+            'LocalDateTimeLastMonth()\r\nReturns a date-time value corresponding to the first day of the previous month.': 'XtraEditorsExpressionEditor.LocalDateTimeLastMonth.Description',
+            'buttonCancel': 'XtraEditorsExpressionEditor.>>buttonCancel.Name',
+            'PadLeft(String, Length)\r\nLeft-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft.Description',
+            'descriptionControl': 'XtraEditorsExpressionEditor.>>descriptionControl.Name',
+            'DevExpress.XtraEditors.LabelControl, DevExpress.Utils.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>descriptionControl.Type',
+            '5': 'XtraEditorsExpressionEditor.>>labelControl3.ZOrder',
+            'Min(Value1, Value2)\r\nReturns the minimum value from the specified values.': 'XtraEditorsExpressionEditor.Min.Description',
+            '14': 'XtraEditorsExpressionEditor.>>layoutItemButton7.ZOrder',
+            'Condition Editor': 'XtraEditorsExpressionEditor.Condition.Text',
+            'Cosh(Value)\r\nReturns the hyperbolic cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cosh.Description',
+            'Performs logical negation on an expression.': 'XtraEditorsExpressionEditor.Not.Description',
+            'GetYear(DateTime)\r\nExtracts a year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetYear.Description',
+            'DateDiffYear(startDate, endDate)\r\nReturns the number of year boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffYear.Description'
         };
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="localization_values.ts" />
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var CollectionItemWrapper = (function () {
+                function CollectionItemWrapper(editor, array, index, displayNameField) {
+                    var _this = this;
+                    if (displayNameField === void 0) { displayNameField = ""; }
+                    this.collapsed = ko.observable(true);
+                    this.selected = ko.observable(false);
+                    this.value = ko.computed({
+                        read: function () {
+                            return array.peek()[index()];
+                        },
+                        write: function (val) {
+                            array.peek()[index()] = val;
+                        }
+                    });
+                    this.editor = editor;
+                    this.index = index;
+                    this.name = ko.computed(function () {
+                        return displayNameField && _this.value() && _this.value()[displayNameField] ? ko.unwrap(_this.value()[displayNameField]) : index();
+                    });
+                }
+                return CollectionItemWrapper;
+            })();
+            Widgets.CollectionItemWrapper = CollectionItemWrapper;
+            var CollectionEditorViewModel = (function () {
+                function CollectionEditorViewModel(options, disabled) {
+                    var _this = this;
+                    if (disabled === void 0) { disabled = ko.observable(false); }
+                    this.selectedIndex = ko.observable(null);
+                    this.alwaysShow = ko.observable(false);
+                    this.collapsed = ko.observable(options.collapsed !== false);
+                    var addHandler = options.addHandler || options.info && options.info() && options.info()["addHandler"];
+                    var hideButtons = options.hideButtons || options.info && options.info() && options.info()["hideButtons"];
+                    this.displayPropertyName = options.info && options.info() && options.info()["displayPropertyName"] || options.displayName;
+                    this.showButtons = ko.computed(function () {
+                        return !ko.unwrap(hideButtons) && !_this.collapsed();
+                    });
+                    this.padding = options.level !== void 0 ? options.level * Widgets.propertiesGridEditorsPaddingLeft : 0;
+                    this.displayName = options.displayName;
+                    this.options = options;
+                    if (!options.displayName) {
+                        this.collapsed(false);
+                        this.alwaysShow(true);
+                    }
+                    this.values = ko.computed(function () {
+                        return ko.unwrap(options.values());
+                    });
+                    this.add = function (model) {
+                        options.undoEngine && options.undoEngine().start();
+                        options.values().push(addHandler());
+                        options.undoEngine && options.undoEngine().end();
+                        model.jQueryEvent.stopPropagation();
+                    };
+                    this.up = function (model) {
+                        _this._move(options.values(), -1);
+                        model.jQueryEvent.stopPropagation();
+                    };
+                    this.down = function (model) {
+                        _this._move(options.values(), 1);
+                        model.jQueryEvent.stopPropagation();
+                    };
+                    this.remove = function (model) {
+                        if (_this.selectedIndex() >= 0) {
+                            options.values().splice(_this.selectedIndex(), 1);
+                            _this.selectedIndex(null);
+                        }
+                        model.jQueryEvent.stopPropagation();
+                    };
+                    this.select = function (event) {
+                        _this.selectedIndex(event.model.index());
+                    };
+                    this.disabled = disabled;
+                }
+                CollectionEditorViewModel.prototype._move = function (array, offset) {
+                    if (this.selectedIndex() >= 0) {
+                        var old_index = this.selectedIndex(), new_index = old_index + offset;
+                        if ((new_index >= array().length) || (new_index < 0)) {
+                            return;
+                        }
+                        array.splice(new_index, 0, array.splice(old_index, 1)[0]);
+                        this.selectedIndex(new_index);
+                    }
+                };
+                return CollectionEditorViewModel;
+            })();
+            Widgets.CollectionEditorViewModel = CollectionEditorViewModel;
+            ko.bindingHandlers['dxCollectionEditor'] = {
+                init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+                    var values = valueAccessor(), gridViewModel = new CollectionEditorViewModel(values, viewModel.disabled), templateHtml = $(values.editorTemplate || '#dx-collectioneditor').text(), $templateHtml = $(templateHtml), itemTemplateName = values.info && values.info() && values.info()["template"] || values.template;
+                    if (itemTemplateName) {
+                        var itemTemplateHtml = $(itemTemplateName).text();
+                        $templateHtml.find(".dx-collection-item").append($(itemTemplateHtml));
+                    }
+                    else {
+                        $templateHtml.find(".dx-collection-item").append($(element).children());
+                    }
+                    var $element = $(element).append($templateHtml);
+                    var childContext = bindingContext.createChildContext(gridViewModel);
+                    ko.applyBindings(childContext, $element.children()[0]);
+                    return { controlsDescendantBindings: true };
+                }
+            };
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var editor_prefix = "dx-ellipsiseditor", EDITOR_CLASS = editor_prefix + " dx-dropdowneditor", EDITOR_BUTTON_CLASS = editor_prefix + "-button dx-widget dx-button-normal dx-dropdowneditor-button dx-ellipsis-button", EDITOR_BUTTON_ICON = editor_prefix + "-icon dx-ellipsis-image dx-dropdowneditor-icon";
+            var dxEllipsisEditor = (function (_super) {
+                __extends(dxEllipsisEditor, _super);
+                function dxEllipsisEditor(element, options) {
+                    _super.call(this, element, options);
+                }
+                dxEllipsisEditor.prototype._init = function () {
+                    _super.prototype._init.call(this);
+                    this.element().addClass(EDITOR_CLASS);
+                };
+                dxEllipsisEditor.prototype._render = function () {
+                    _super.prototype._render.call(this);
+                    this._renderButton();
+                };
+                dxEllipsisEditor.prototype._renderButton = function () {
+                    this._button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
+                    this._attachButtonEvents();
+                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON).height("100%").appendTo(this._button);
+                    var buttonsContainer = _super.prototype._buttonsContainer.call(this);
+                    this._button.prependTo(buttonsContainer);
+                };
+                dxEllipsisEditor.prototype._updateButtonSize = function () {
+                    this._buttonIcon.height(this.element().height());
+                };
+                dxEllipsisEditor.prototype._attachButtonEvents = function () {
+                    var _this = this;
+                    this._button.off("click");
+                    if (!this.option("disabled")) {
+                        this._button.on("click", function (e) {
+                            if (_this.option("buttonAction")) {
+                                _this.option("buttonAction")();
+                                e.stopPropagation();
+                            }
+                        });
+                    }
+                };
+                dxEllipsisEditor.prototype._optionChanged = function (obj, value) {
+                    var name = obj.name || obj;
+                    switch (name) {
+                        case "disabled":
+                            this._attachButtonEvents();
+                            break;
+                    }
+                    _super.prototype._optionChanged.apply(this, arguments);
+                };
+                return dxEllipsisEditor;
+            })(DevExpress.ui.dxTextBox);
+            Widgets.dxEllipsisEditor = dxEllipsisEditor;
+            DevExpress.registerComponent("dxEllipsisEditor", dxEllipsisEditor);
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var editor_prefix = "dx-fileimage", EDITOR_INPUT_WRAPPER_CLASS = editor_prefix + "-input-wrapper";
+            var dxFileImagePicker = (function (_super) {
+                __extends(dxFileImagePicker, _super);
+                function dxFileImagePicker(element, options) {
+                    _super.call(this, element, options);
+                }
+                dxFileImagePicker.prototype._handleFiles = function (filesHolder) {
+                    var _this = this;
+                    var files = filesHolder.files;
+                    for (var i = 0; i < files.length; i++) {
+                        var file = files[i];
+                        if (this.option("type") === "img") {
+                            var imageType = /image.*/;
+                            if (!file.type.match(imageType)) {
+                                continue;
+                            }
+                        }
+                        var fr = new FileReader();
+                        if (this.option("readMode") !== "text") {
+                            fr.onload = function (args) {
+                                var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
+                                _this.option("value", encodedContent);
+                            };
+                            fr.readAsDataURL(file);
+                        }
+                        else {
+                            fr.onload = function (args) {
+                                _this.option("value", fr.result);
+                            };
+                            fr.readAsText(file);
+                        }
+                    }
+                };
+                dxFileImagePicker.prototype._$getInput = function () {
+                    var accept = this.option('accept') ? "accept = '" + this.option('accept') + "'" : "";
+                    return $("<input type='file' " + accept + " style='display:none' />");
+                };
+                dxFileImagePicker.prototype._render = function () {
+                    _super.prototype._render.call(this);
+                    var _this = this;
+                    this._filesinput = this._$getInput().on("change", function (e) {
+                        _this._handleFiles(_this._filesinput.get(0));
+                    }).appendTo(this.element());
+                };
+                dxFileImagePicker.prototype._renderInput = function (inputContainer) {
+                    this._inputContainer = inputContainer || $("<div />");
+                    this._inputContainer.addClass(EDITOR_INPUT_WRAPPER_CLASS);
+                    this.element().append(this["_inputContainer"]);
+                    _super.prototype._renderInput.call(this, inputContainer);
+                };
+                dxFileImagePicker.prototype._attachButtonEvents = function () {
+                    var _this = this;
+                    this._button.off("click");
+                    if (!this.option("disabled")) {
+                        this._button.on("click", function (e) {
+                            if (!_this.option("value")) {
+                                _this._filesinput.val("");
+                            }
+                            _this._filesinput.click();
+                        });
+                    }
+                };
+                dxFileImagePicker.prototype._renderValue = function () {
+                    this.option("text", this.option("value") ? this.option("placeHolder") : DevExpress.JS.Utils.getLocalization("(none)"));
+                    _super.prototype._renderValue.call(this);
+                };
+                return dxFileImagePicker;
+            })(Widgets.dxEllipsisEditor);
+            Widgets.dxFileImagePicker = dxFileImagePicker;
+            DevExpress.registerComponent("dxFileImagePicker", dxFileImagePicker);
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            Widgets.availableFonts = {
+                "Times New Roman": "Times New Roman",
+                "Arial": "Arial",
+                "Arial Black": "Arial Black",
+                "Comic Sans MS": "Comic Sans MS",
+                "Courier New": "Courier New",
+                "Georgia": "Georgia",
+                "Impact": "Impact",
+                "Lucida Console": "Lucida Console",
+                "Lucida Sans Unicode": "Lucida Sans Unicode",
+                "Tahoma": "Tahoma",
+                "Trebuchet MS": "Trebuchet MS",
+                "Verdana": "Verdana",
+                "MS Sans Serif": "MS Sans Serif",
+                "MS Serif": "MS Serif",
+                "Symbol": "Symbol",
+                "Webdings": "Webdings",
+                "Wingdings": "Wingdings"
+            };
+            Widgets.availableUnits = {
+                "pt": "Point",
+                "world": "World",
+                "px": "Pixel",
+                "in": "Inch",
+                "doc": "Document",
+                "mm": "Millimetr"
+            };
+            var FontModel = (function () {
+                function FontModel(value) {
+                    var _this = this;
+                    this.family = ko.observable("Times New Roman");
+                    this.unit = ko.observable("pt");
+                    this.isUpdateModel = false;
+                    this.size = ko.observable(9);
+                    this.modificators = {
+                        bold: ko.observable(false),
+                        italic: ko.observable(false),
+                        strikeout: ko.observable(false),
+                        underline: ko.observable(false)
+                    };
+                    this.updateModel(value());
+                    value.subscribe(function (newVal) {
+                        _this.isUpdateModel = true;
+                        _this.updateModel(newVal);
+                        _this.isUpdateModel = false;
+                    });
+                    this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.family.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.size.subscribe(function (newVal) { return _this.updateValue(value); });
+                    this.unit.subscribe(function (newVal) { return _this.updateValue(value); });
+                }
+                FontModel.prototype.updateModel = function (value) {
+                    if (value) {
+                        var components = value.split(',');
+                        this.family(components[0]);
+                        var self = this;
+                        Object.keys(Widgets.availableUnits).forEach(function (element) {
+                            if (components[1].indexOf(element) != -1) {
+                                self.size(parseFloat(components[1].split(element)[0]));
+                                self.unit(element);
+                            }
+                        });
+                        this.modificators.bold(value.indexOf("Bold") !== -1);
+                        this.modificators.italic(value.indexOf("Italic") !== -1);
+                        this.modificators.underline(value.indexOf("Underline") !== -1);
+                        this.modificators.strikeout(value.indexOf("Strikeout") !== -1);
+                    }
+                };
+                FontModel.prototype.updateValue = function (value) {
+                    if (!this.isUpdateModel) {
+                        var leftPart = [this.family(), this.size() + this.unit()].join(", ");
+                        var modificators = [];
+                        if (this.modificators.bold())
+                            modificators.push("Bold");
+                        if (this.modificators.italic())
+                            modificators.push("Italic");
+                        if (this.modificators.underline())
+                            modificators.push("Underline");
+                        if (this.modificators.strikeout())
+                            modificators.push("Strikeout");
+                        var rightPart = modificators.join(', ');
+                        value(!!rightPart ? [leftPart, rightPart].join(", style=") : leftPart);
+                    }
+                };
+                return FontModel;
+            })();
+            Widgets.FontModel = FontModel;
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            function getLocalization(value) {
+                return DevExpress.JS.Localization && DevExpress.JS.Localization.localize(value) || value;
+            }
+            Utils.getLocalization = getLocalization;
+            var PopupService = (function () {
+                function PopupService() {
+                    this.data = ko.observable();
+                    this.title = ko.observable();
+                    this.visible = ko.observable(false);
+                    this.actions = ko.observableArray([]);
+                    this.target = ko.observable();
+                }
+                return PopupService;
+            })();
+            Utils.PopupService = PopupService;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        ko.virtualElements.allowedBindings["lazy"] = true;
+        ko.bindingHandlers['lazy'] = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var parsedBindings = valueAccessor();
+                $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
+                    var innerBinding = ko.bindingHandlers[innerBindingKey];
+                    setTimeout(function () {
+                        var isInitialized = false;
+                        ko.computed({
+                            read: function () {
+                                if (!isInitialized && innerBinding.init) {
+                                    innerBinding.init(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                    isInitialized = true;
+                                }
+                                if (innerBinding.update) {
+                                    innerBinding.update(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                }
+                            },
+                            disposeWhenNodeIsRemoved: element
+                        });
+                    }, 1);
+                });
+                return { controlsDescendantBindings: true };
+            }
+        };
+        ko.bindingHandlers["dxdAccordion"] = {
+            init: function (element, valueAccessor) {
+                var options = valueAccessor(), $element = $(element), $accordionContent = $element.find(".dx-accordion-content").first(), scrollUpdateCallback = function () {
+                    var scrollView = $element.parents(".dx-scrollview").dxScrollView("instance");
+                    scrollView && scrollView["update"]();
+                };
+                $element
+                    .find(".dx-accordion-header,.dx-accordion-button").first()
+                    .off("dxclick")
+                    .on("dxclick", function () {
+                    var newCollapsed = options.alwaysShow && options.alwaysShow() ? false : !options.collapsed();
+                    if (newCollapsed) {
+                        options.collapsed(true);
+                        $accordionContent.slideUp(options.timeout, function () {
+                            scrollUpdateCallback();
+                        });
+                    }
+                    else {
+                        options.collapsed(false);
+                        $accordionContent.slideDown(options.timeout, function () {
+                            scrollUpdateCallback();
+                        });
+                    }
+                });
+                options.collapsed() ? $accordionContent.hide() : $accordionContent.show();
+            }
+        };
+        ko.bindingHandlers["dxdAccordionExt"] = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var options = valueAccessor(), $element = $(element), scrollUpdateCallback = function () {
+                    var scrollView = $element.parents(".dx-scrollview").dxScrollView("instance");
+                    scrollView && scrollView["update"]();
+                }, $accordionContent = $element.find(".dx-accordion-content").first(), accordionContentHTML = null;
+                if (options.collapsed() && options.lazyContentRendering === true) {
+                    accordionContentHTML = $accordionContent.html();
+                    $accordionContent.empty();
+                }
+                options.collapsed.subscribe(function (newVal) {
+                    if (newVal) {
+                        $accordionContent.slideUp(options.timeout, function () {
+                            scrollUpdateCallback();
+                        });
+                    }
+                    else {
+                        if (accordionContentHTML) {
+                            $accordionContent.html(accordionContentHTML);
+                            ko.applyBindingsToDescendants(bindingContext, $accordionContent.get(0));
+                            accordionContentHTML = null;
+                        }
+                        $accordionContent.slideDown(options.timeout, function () {
+                            scrollUpdateCallback();
+                        });
+                    }
+                });
+                options.collapsed() ? $accordionContent.hide() : $accordionContent.show();
+            }
+        };
+        ko.bindingHandlers["dxLocalizedSelectBox"] = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var options = valueAccessor();
+                var prevDisplayExpr = options.displayExpr;
+                options.displayExpr = function (value) {
+                    if (!value)
+                        return value;
+                    if (!prevDisplayExpr)
+                        return JS.Utils.getLocalization(value);
+                    return JS.Utils.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr]);
+                };
+                ko.bindingHandlers["dxSelectBox"].init(element, function () { return options; }, allBindings, viewModel, bindingContext);
+                return { controlsDescendantBindings: true };
+            }
+        };
+        ko.bindingHandlers["styleunit"] = {
+            'update': function (element, valueAccessor) {
+                var value = ko.utils.unwrapObservable(valueAccessor() || {});
+                $.each(value, function (styleName, styleValue) {
+                    styleValue = ko.utils.unwrapObservable(styleValue) || 0;
+                    element.style[styleName] = styleValue + "px";
+                });
+            }
+        };
+        ko.bindingHandlers["service"] = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var value = ko.unwrap(valueAccessor() || {}), findService = function (serviceName) {
+                    var context = bindingContext.$parents.filter(function (item) { return item[serviceName] !== undefined; })[0];
+                    if (context) {
+                        return context[serviceName];
+                    }
+                    return null;
+                }, service = findService(value.name);
+                if (service) {
+                    var entity = service(viewModel);
+                    var childContext = bindingContext.createChildContext(entity.data);
+                    ko.renderTemplate(entity.templateName, childContext, {}, element, 'replaceNode');
+                }
+            }
+        };
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+/// <reference path="utils.ts" />
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var EditorAddOn = (function () {
+                function EditorAddOn(editor, popupService) {
+                    var _this = this;
+                    this.showPopup = function (args) {
+                        _this._popupService.title(_this._editor.displayName());
+                        _this._updateActions(_this._editor._model());
+                        _this._popupService.target(args.element);
+                        _this._popupService.visible(true);
+                    };
+                    this.templateName = "dx-editor-addons";
+                    this._editor = editor;
+                    this._popupService = popupService;
+                    this.visible = ko["pureComputed"](function () {
+                        if (editor.disabled()) {
+                            return false;
+                        }
+                        var actions = editor._model() && editor._model().actions;
+                        return actions && actions.length > 0 && actions.some(function (x) { return x.visible(editor.name); });
+                    });
+                    this.editorMenuButtonCss = ko["pureComputed"](function () {
+                        return editor._model() && editor._model()["getActionClassName"] && editor._model()["getActionClassName"](editor.name) || "";
+                    });
+                }
+                EditorAddOn.prototype._updateActions = function (viewModel) {
+                    var _this = this;
+                    this._popupService.actions([]);
+                    if (viewModel.actions) {
+                        viewModel.actions.forEach(function (modelAction) {
+                            if (modelAction.visible(_this._editor.name)) {
+                                _this._popupService.actions.push({
+                                    action: function () {
+                                        modelAction.action(_this._editor.name);
+                                        _this._popupService.visible(false);
+                                    },
+                                    title: modelAction.title,
+                                    visible: function () { return true; }
+                                });
+                            }
+                        });
+                    }
+                };
+                return EditorAddOn;
+            })();
+            Widgets.EditorAddOn = EditorAddOn;
+            Widgets.propertiesGridEditorsPaddingLeft = 19;
+            function compareEditorInfo(editor1, editor2) {
+                return !!editor1 && !!editor2 &&
+                    editor1.header === editor2.header
+                    && editor1.content === editor2.content
+                    && editor1.editorType === editor2.editorType;
+            }
+            var ObjectProperties = (function () {
+                function ObjectProperties(target, editorsInfo, level, parentDisabled) {
+                    var _this = this;
+                    if (level === void 0) { level = 0; }
+                    if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
+                    this.level = 0;
+                    this.rtl = DevExpress['config']()['rtlEnabled'];
+                    this._editors = ko.observableArray([]);
+                    this.level = level;
+                    this._parentDisabled = parentDisabled;
+                    ko.computed(function () {
+                        var viewModel = target();
+                        var serializationInfo = editorsInfo && editorsInfo.editors || viewModel && viewModel["getInfo"] && viewModel["getInfo"]();
+                        _this._createEditors(viewModel, serializationInfo);
+                        _this.update(viewModel);
+                    });
+                }
+                ObjectProperties.prototype.update = function (viewModel) {
+                    if (viewModel) {
+                        this._editors().forEach(function (editor) {
+                            editor.update(viewModel);
+                        });
+                    }
+                };
+                ObjectProperties.prototype.createEditor = function (modelPropertyInfo) {
+                    var editorType = modelPropertyInfo.editor && modelPropertyInfo.editor.editorType || Editor;
+                    return new editorType(modelPropertyInfo, this.level, this._parentDisabled);
+                };
+                ObjectProperties.prototype.createEditors = function (serializationInfo) {
+                    var _this = this;
+                    var self = this;
+                    return (serializationInfo || [])
+                        .filter(function (info) { return !!info.editor && self._editors().filter(function (editor) { return editor.name === info.propertyName && compareEditorInfo(editor.info().editor, info.editor); }).length === 0; })
+                        .map(function (info) { return _this.createEditor(info); });
+                };
+                ObjectProperties.prototype._createEditors = function (target, serializationInfo) {
+                    var _this = this;
+                    if (!serializationInfo)
+                        return false;
+                    this.createEditors(serializationInfo).forEach(function (editor) { return _this._editors.push(editor); });
+                    var propertyNames = serializationInfo.map(function (info) { return info.propertyName; });
+                    this._editors.sort(function (a, b) {
+                        return propertyNames.indexOf(a.name) - propertyNames.indexOf(b.name);
+                    });
+                };
+                ObjectProperties.prototype.getEditors = function () {
+                    return this._editors();
+                };
+                return ObjectProperties;
+            })();
+            Widgets.ObjectProperties = ObjectProperties;
+            var Editor = (function () {
+                function Editor(modelPropertyInfo, level, parentDisabled) {
+                    var _this = this;
+                    if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
+                    this._model = ko.observable();
+                    this.isVisibleByContent = ko.observable(true);
+                    this.rtl = DevExpress["config"]()["rtlEnabled"];
+                    this.isEditorSelected = ko.observable(false);
+                    this.isPropertyModified = ko.computed(function () {
+                        return _this._model() && _this._model().isPropertyModified && _this._model().isPropertyModified(_this.name);
+                    });
+                    this.collapsed = ko.observable(true);
+                    this.info = ko.observable(modelPropertyInfo);
+                    this.displayName = ko.computed(function () { return _this.info() && _this.info().displayName; });
+                    this.padding = this._setPadding(this.rtl ? "right" : "left", level * Widgets.propertiesGridEditorsPaddingLeft);
+                    var defaultValue = ko.observable(null), propertyName = modelPropertyInfo.propertyName;
+                    this["localizationId"] = modelPropertyInfo.localizationId;
+                    this.editorOptions = modelPropertyInfo.editorOptions;
+                    if (modelPropertyInfo.defaultVal !== undefined) {
+                        defaultValue = ko.observable(modelPropertyInfo.defaultVal);
+                    }
+                    if (modelPropertyInfo.from) {
+                        defaultValue = modelPropertyInfo.from(modelPropertyInfo.defaultVal);
+                    }
+                    if (modelPropertyInfo.array) {
+                        defaultValue = ko.observableArray();
+                    }
+                    this.values = ko.computed(function () {
+                        var _values = _this.info().valueStore;
+                        if (_values) {
+                            return _values;
+                        }
+                        _values = _this.info().values;
+                        if (_values) {
+                            return $.map(_values, function (displayValue, value) {
+                                return { value: value, displayValue: displayValue };
+                            });
+                        }
+                        _values = _this.info().valuesArray;
+                        if (_values) {
+                            return $.map(_values, function (value) {
+                                return { value: value.value, displayValue: value.displayValue };
+                            });
+                        }
+                    });
+                    this.level = level;
+                    this._init(modelPropertyInfo.editor, defaultValue, propertyName);
+                    var calculateAccessibleByPropertyInfo = function (model, propertyInfo, defaultValue) {
+                        var result;
+                        if (ko.isObservable(propertyInfo)) {
+                            result = propertyInfo();
+                        }
+                        else if (typeof propertyInfo === 'function') {
+                            result = propertyInfo(model);
+                        }
+                        else {
+                            result = propertyInfo !== undefined ? propertyInfo : defaultValue;
+                        }
+                        return result;
+                    };
+                    this.disabled = ko.computed(function () {
+                        var model = _this._model(), result = parentDisabled() || model && (model.isPropertyDisabled && model.isPropertyDisabled(_this.name));
+                        if (!result) {
+                            result = calculateAccessibleByPropertyInfo(model, _this.info().disabled, false);
+                        }
+                        return result;
+                    });
+                    this.visible = ko.computed(function () {
+                        var model = _this._model(), result = (model && model.isPropertyVisible) ? model.isPropertyVisible(_this.name) : _this.isVisibleByContent();
+                        if (result) {
+                            result = calculateAccessibleByPropertyInfo(model, _this.info().visible, true);
+                        }
+                        return result;
+                    });
+                }
+                Editor.prototype._setPadding = function (position, value) {
+                    var obj = {};
+                    obj["padding-" + position] = value;
+                    return obj;
+                };
+                Editor.prototype._init = function (editorTemplate, value, name) {
+                    var _this = this;
+                    editorTemplate = editorTemplate || Widgets.editorTemplates.text;
+                    this.templateName = editorTemplate.header;
+                    this.contentTemplateName = editorTemplate.content;
+                    this.defaultValue = editorTemplate === Widgets.editorTemplates.color ? "transparent" : null;
+                    this.value = ko.computed({
+                        read: function () {
+                            var model = _this._model();
+                            var modelValue = model && model[name] !== undefined ? model[name] : value;
+                            if (ko.isObservable(modelValue) && !modelValue["push"]) {
+                                var hasValueInModel = modelValue() !== undefined && modelValue() !== null;
+                                return hasValueInModel ? modelValue() : _this.defaultValue;
+                            }
+                            else {
+                                return modelValue;
+                            }
+                        },
+                        write: function (val) {
+                            var model = _this._model();
+                            if (!model) {
+                                return;
+                            }
+                            var modelValue = model[name];
+                            if (ko.isObservable(modelValue)) {
+                                modelValue(val);
+                            }
+                            else {
+                                model[name] = val;
+                            }
+                        }
+                    });
+                    this.name = name;
+                    this.editorTemplate = editorTemplate && editorTemplate.custom || 'dx-property-editor';
+                };
+                Editor.prototype.findInfo = function (viewModel) {
+                    var _this = this;
+                    var modelInfo = viewModel["getInfo"] && viewModel["getInfo"]();
+                    if (modelInfo) {
+                        return modelInfo.filter(function (property) { return property.propertyName === _this.name; })[0];
+                    }
+                    return null;
+                };
+                Editor.prototype.updateInfo = function (propertyInfo) {
+                    if (propertyInfo && compareEditorInfo(propertyInfo.editor, this.info().editor)) {
+                        this.info(propertyInfo);
+                        return true;
+                    }
+                    return !propertyInfo;
+                };
+                Editor.prototype.update = function (viewModel) {
+                    var propertyInfo = this.findInfo(viewModel);
+                    this.isVisibleByContent(viewModel[this.name] !== undefined && this.updateInfo(propertyInfo));
+                    this._model(this.isVisibleByContent() ? viewModel : null);
+                };
+                Editor.prototype.localizingDisplayName = function () {
+                    return this["localizationId"] ? (DevExpress.JS.Localization.localize(this["localizationId"]) || this.displayName()) : DevExpress.JS.Utils.getLocalization(this.displayName());
+                };
+                Object.defineProperty(Editor.prototype, "validationRules", {
+                    get: function () {
+                        return !!this.info && !!this.info() && this.info().validationRules || [];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(Editor.prototype, "isComplexEditor", {
+                    get: function () { return !!this.contentTemplateName; },
+                    enumerable: true,
+                    configurable: true
+                });
+                return Editor;
+            })();
+            Widgets.Editor = Editor;
+            var PropertyGridEditor = (function (_super) {
+                __extends(PropertyGridEditor, _super);
+                function PropertyGridEditor(info, level, parentDisabled) {
+                    var _this = this;
+                    _super.call(this, info, level, parentDisabled);
+                    this.editorCreated = ko.observable(false);
+                    this.collapsed.subscribe(function () {
+                        if (!_this.editorCreated()) {
+                            _this.viewmodel = new ObjectProperties(_this.value, { editors: info.info }, level + 1, _this.disabled);
+                            _this.editorCreated(true);
+                        }
+                    });
+                    this.viewmodel = {};
+                }
+                return PropertyGridEditor;
+            })(Editor);
+            Widgets.PropertyGridEditor = PropertyGridEditor;
+            var FontEditor = (function (_super) {
+                __extends(FontEditor, _super);
+                function FontEditor(info, level, parentDisabled) {
+                    _super.call(this, info, level, parentDisabled);
+                    var model = new Widgets.FontModel(this.value);
+                    var grid = new ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, level + 1, this.disabled);
+                    this.viewmodel = grid;
+                }
+                return FontEditor;
+            })(Editor);
+            Widgets.FontEditor = FontEditor;
+            Widgets.editorTemplates = {
+                color: { header: "dx-color" },
+                bool: { header: "dx-boolean" },
+                boolSelect: { header: "dx-boolean-select" },
+                numeric: { header: "dx-numeric" },
+                date: { header: "dx-date" },
+                modificators: { custom: "dx-modificators" },
+                font: { header: "dx-emptyHeader", content: "dx-objectEditorContent", editorType: FontEditor },
+                combobox: { header: "dx-combobox" },
+                comboboxEditable: { header: "dx-combobox-editable" },
+                text: { header: "dx-text" },
+                image: { header: "dx-image" },
+                file: { header: "dx-file" },
+                objecteditor: { header: "dx-emptyHeader", content: "dx-objectEditorContent", editorType: PropertyGridEditor },
+                commonCollection: { custom: "dx-commonCollection" },
+                stringArray: { header: "dx-emptyHeader", content: "dx-string-array" }
+            };
+            Widgets.fontInfo = [
+                {
+                    propertyName: "family", displayName: "Font Name",
+                    editor: Widgets.editorTemplates.combobox, values: Widgets.availableFonts
+                },
+                { propertyName: "size", displayName: "Size", editor: Widgets.editorTemplates.numeric },
+                {
+                    propertyName: "unit", displayName: "Unit", editor: Widgets.editorTemplates.combobox,
+                    values: Widgets.availableUnits
+                },
+                { propertyName: "modificators", editor: Widgets.editorTemplates.modificators },
+            ];
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+//# sourceMappingURL=dx-ko-propertygrid.js.map
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            function knockoutArrayWrapper(items) {
+                var onChange = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    onChange[_i - 1] = arguments[_i];
+                }
+                var array = ko.observableArray(items);
+                var notifySubscribers = array.notifySubscribers;
+                array.notifySubscribers = function (valueToNotify, event) {
+                    if (onChange) {
+                        for (var i = 0, len = onChange.length; i < len; i++) {
+                            onChange[i](valueToNotify, event);
+                        }
+                    }
+                    return notifySubscribers.call(array, valueToNotify, event);
+                };
+                return array;
+            }
+            Utils.knockoutArrayWrapper = knockoutArrayWrapper;
+            function isWindow(obj) {
+                return obj != null && obj === obj.window;
+            }
+            var class2type = {};
+            var hasOwn = class2type.hasOwnProperty;
+            ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object", "Error"].forEach(function (name) { return class2type["[object " + name + "]"] = name.toLowerCase(); });
+            function type(obj) {
+                if (obj == null) {
+                    return obj + "";
+                }
+                return typeof obj === "object" || typeof obj === "function" ?
+                    class2type[class2type.toString.call(obj)] || "object" :
+                    typeof obj;
+            }
+            function isNumeric(obj) {
+                return !Array.isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+            }
+            function isPlainObject(obj) {
+                if (type(obj) !== "object" || obj.nodeType || isWindow(obj)) {
+                    return false;
+                }
+                return !(obj.constructor && !hasOwn.call(obj.constructor.prototype, "isPrototypeOf"));
+            }
+            Utils.isPlainObject = isPlainObject;
+            function isEmptyObject(obj) {
+                for (var name in obj) {
+                    return false;
+                }
+                return true;
+            }
+            Utils.isEmptyObject = isEmptyObject;
+            function isFunction(obj) {
+                return type(obj) === "function";
+            }
+            function extend(target, object1) {
+                var objectN = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    objectN[_i - 2] = arguments[_i];
+                }
+                var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length, deep = false;
+                if (typeof target === "boolean") {
+                    deep = target;
+                    target = arguments[i] || {};
+                    i++;
+                }
+                if (typeof target !== "object" && !isFunction(target)) {
+                    target = {};
+                }
+                if (i === length) {
+                    target = this;
+                    i--;
+                }
+                for (; i < length; i++) {
+                    if ((options = arguments[i]) != null) {
+                        for (name in options) {
+                            src = target[name];
+                            copy = options[name];
+                            if (target === copy) {
+                                continue;
+                            }
+                            if (deep && copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+                                if (copyIsArray) {
+                                    copyIsArray = false;
+                                    clone = src && Array.isArray(src) ? src : [];
+                                }
+                                else {
+                                    clone = src && isPlainObject(src) ? src : {};
+                                }
+                                target[name] = extend(deep, clone, copy);
+                            }
+                            else if (copy !== undefined) {
+                                target[name] = copy;
+                            }
+                        }
+                    }
+                }
+                return target;
+            }
+            Utils.extend = extend;
+            ;
+            function getPropertyValues(target) {
+                if (target === void 0) { target = {}; }
+                var result = [];
+                for (var propertyName in target) {
+                    result.push(target[propertyName]);
+                }
+                return result;
+            }
+            Utils.getPropertyValues = getPropertyValues;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+/// <reference path="utils.ts" />
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            function deserializeArray(model, creator) {
+                var result = [];
+                Utils.getPropertyValues(model).forEach(function (item) {
+                    var createdItem = creator(item);
+                    result.push(createdItem);
+                });
+                return ko.observableArray(result);
+            }
+            Utils.deserializeArray = deserializeArray;
+            function toStringWithDelimiter(values, delimiter) {
+                return (values || []).map(function (value) {
+                    var str = value !== undefined && value !== null ? value.toString() : "00";
+                    if (str.length === 1) {
+                        str = "0" + str;
+                    }
+                    return str;
+                }).join(delimiter);
+            }
+            function serializeDate(date) {
+                var datePart = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
+                var timePart = toStringWithDelimiter([date.getHours(), date.getMinutes(), date.getSeconds()], ":");
+                return timePart === "00:00:00" ? toStringWithDelimiter([datePart[2], datePart[0], datePart[1]], "-")
+                    : toStringWithDelimiter(datePart, "/") + " " + timePart;
+            }
+            Utils.serializeDate = serializeDate;
+            var ModelSerializer = (function () {
+                function ModelSerializer(options) {
+                    this._refTable = {};
+                    this._linkTable = {};
+                    this._options = Utils.extend({
+                        useRefs: true,
+                        serializeDate: serializeDate
+                    }, options);
+                }
+                ModelSerializer.prototype.linkObjects = function () {
+                    for (var index in this._linkTable) {
+                        var val = this._refTable[index];
+                        if (val) {
+                            var properties = this._linkTable[index];
+                            properties.forEach(function (property) { return property(val); });
+                        }
+                    }
+                    ;
+                };
+                ModelSerializer.prototype.deserializeProperty = function (modelPropertyInfo, model) {
+                    var _this = this;
+                    var modelValue = modelPropertyInfo.defaultVal, propertyName = modelPropertyInfo.propertyName, propName = modelPropertyInfo.modelName;
+                    if (!propName) {
+                        return;
+                    }
+                    if (model[propName] !== undefined) {
+                        modelValue = model[propName];
+                    }
+                    if (typeof modelPropertyInfo === "string") {
+                        return ko.observable(modelValue);
+                    }
+                    else if (modelPropertyInfo.link) {
+                        var value = ko.observable(null);
+                        if (modelValue) {
+                            var refVal = modelValue && modelValue.slice("#Ref-".length);
+                            this._linkTable[refVal] = this._linkTable[refVal] || [];
+                            this._linkTable[refVal].push(value);
+                        }
+                        return value;
+                    }
+                    else if (modelPropertyInfo.array) {
+                        if (modelPropertyInfo.from) {
+                            return modelPropertyInfo.from(modelValue, this);
+                        }
+                        else if (modelPropertyInfo.info) {
+                            var result = [];
+                            Utils.getPropertyValues(modelValue).forEach(function (item) {
+                                var object = {};
+                                _this.deserialize(object, item || {}, modelPropertyInfo.info);
+                                result.push(object);
+                            });
+                            return ko.observableArray(result);
+                        }
+                    }
+                    else if (modelPropertyInfo.from) {
+                        return modelPropertyInfo.from(modelValue, this);
+                    }
+                    else if (modelPropertyInfo.type) {
+                        var ctorResult = new modelPropertyInfo.type(modelValue, this, modelPropertyInfo.info);
+                        if (!ctorResult._model) {
+                            this.deserialize(ctorResult, modelValue || {}, modelPropertyInfo.info);
+                        }
+                        return ctorResult;
+                    }
+                    else if (modelPropertyInfo.info) {
+                        var object = {};
+                        this.deserialize(object, modelValue || {}, modelPropertyInfo.info);
+                        return object;
+                    }
+                    else if (modelPropertyInfo.modelName) {
+                        return ko.observable(modelValue);
+                    }
+                    else {
+                        throw new Error("Invalid info '" + JSON.stringify(modelPropertyInfo) + "'");
+                    }
+                };
+                ModelSerializer.prototype.deserialize = function (viewModel, model, serializationsInfo) {
+                    var _this = this;
+                    if (serializationsInfo === void 0) { serializationsInfo = null; }
+                    if (!model) {
+                        return;
+                    }
+                    viewModel._model = Utils.extend({}, model);
+                    var serializationsInfo = viewModel.getInfo ? viewModel.getInfo() : serializationsInfo;
+                    var refValue = model["@Ref"];
+                    if (refValue) {
+                        this._refTable[refValue] = viewModel;
+                    }
+                    serializationsInfo.forEach(function (modelPropertyInfo) {
+                        var propertyName = modelPropertyInfo.propertyName, propName = modelPropertyInfo.modelName;
+                        if (model[propName] !== undefined) {
+                            delete viewModel._model[propName];
+                        }
+                        viewModel[propertyName] = _this.deserializeProperty(modelPropertyInfo, model);
+                    });
+                    this.linkObjects();
+                };
+                ModelSerializer.prototype.serialize = function (viewModel, serializationsInfo, refs) {
+                    if (refs === void 0) { refs = null; }
+                    if (!serializationsInfo && !refs) {
+                        return this._serialize(viewModel, null, null);
+                    }
+                    return this._serialize(viewModel, serializationsInfo, refs);
+                };
+                ModelSerializer.prototype._isSerializableValue = function (resultValue) {
+                    return (Utils.isPlainObject(resultValue) && !Utils.isEmptyObject(resultValue)) || (Array.isArray(resultValue) && resultValue["length"] > 0) || (!Array.isArray(resultValue) && !Utils.isPlainObject(resultValue));
+                };
+                ModelSerializer.prototype._serialize = function (viewModel, serializationsInfo, refs) {
+                    var _this = this;
+                    var result = Utils.extend({}, viewModel._model), isInitial = refs === null;
+                    refs = refs || { linkObjTable: [], objects: [] };
+                    serializationsInfo = viewModel.getInfo ? viewModel.getInfo() : serializationsInfo;
+                    delete result["@Ref"];
+                    if (viewModel["isEmpty"] && viewModel["isEmpty"]())
+                        return {};
+                    serializationsInfo.forEach(function (modelPropertyInfo) {
+                        var propertyName = modelPropertyInfo.propertyName, value = ko.unwrap(viewModel["_" + propertyName] || viewModel[propertyName]), defaultVal = modelPropertyInfo.defaultVal;
+                        var resultValue = {};
+                        if (!modelPropertyInfo.modelName) {
+                            return;
+                        }
+                        if ((value !== undefined && value !== null) && ((Utils.isPlainObject(value) || !Utils.isEmptyObject(value)) || (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && !Utils.isPlainObject(value))) && (value !== defaultVal)) {
+                            if (modelPropertyInfo.link) {
+                                refs.linkObjTable.push({
+                                    obj: value,
+                                    setRef: function (index) {
+                                        if (index < 0) {
+                                            delete result[modelPropertyInfo.modelName];
+                                        }
+                                        else {
+                                            result[modelPropertyInfo.modelName] = "#Ref-" + index;
+                                        }
+                                    }
+                                });
+                                resultValue = undefined;
+                            }
+                            else if (modelPropertyInfo.array) {
+                                resultValue = {};
+                                var index = 1;
+                                value.forEach(function (item) {
+                                    var info = modelPropertyInfo.info || null;
+                                    var item_ = _this._serialize(item, info, refs);
+                                    if (_this._isSerializableValue(item_)) {
+                                        resultValue["Item" + index] = item_;
+                                        if (_this._options.useRefs) {
+                                            item_["@Ref"] = (refs.objects.push(item) - 1).toString();
+                                        }
+                                        index++;
+                                    }
+                                });
+                            }
+                            else if (modelPropertyInfo.from) {
+                                if (value["isEmpty"] && value["isEmpty"]()) {
+                                    resultValue = {};
+                                }
+                                else {
+                                    resultValue = modelPropertyInfo.toJsonObject ? modelPropertyInfo.toJsonObject(value, _this, refs) : value.toString();
+                                }
+                            }
+                            else if (modelPropertyInfo.info || value["getInfo"]) {
+                                resultValue = _this._serialize(value, modelPropertyInfo.info, refs);
+                            }
+                            else if (modelPropertyInfo.modelName) {
+                                if (value instanceof Date) {
+                                    resultValue = _this._options.serializeDate(value);
+                                }
+                                else {
+                                    resultValue = value;
+                                }
+                            }
+                            else {
+                                throw new Error("Invalid info '" + serializationsInfo.stringify() + "'");
+                            }
+                            if (_this._isSerializableValue(resultValue)) {
+                                result[modelPropertyInfo.modelName] = resultValue;
+                            }
+                        }
+                    });
+                    if (isInitial) {
+                        refs.linkObjTable.forEach(function (item) {
+                            var refValue = refs.objects.indexOf(item.obj);
+                            item.setRef(refValue);
+                        });
+                    }
+                    return result;
+                };
+                return ModelSerializer;
+            })();
+            Utils.ModelSerializer = ModelSerializer;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+//# sourceMappingURL=dx-ko-serializer.js.map
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            function checkModelReady(model) {
+                return model.isModelReady ? model.isModelReady() : true;
+            }
+            Utils.DEBUG = true;
+            var wrappedConsole = (function (console) {
+                var getWrappedMethod = function (methodName) { return (function () {
+                    var args = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        args[_i - 0] = arguments[_i];
+                    }
+                    if (console && $.isFunction(console[methodName])) {
+                        console[methodName].apply(console, arguments);
+                    }
+                }); };
+                return {
+                    info: getWrappedMethod("info"),
+                    warn: getWrappedMethod("warn"),
+                    error: getWrappedMethod("error")
+                };
+            })(window.console);
+            function NotifyAboutWarning(msg) {
+                if (Utils.DEBUG) {
+                    throw new Error(msg);
+                }
+                else {
+                    wrappedConsole.warn(msg);
+                }
+            }
+            Utils.NotifyAboutWarning = NotifyAboutWarning;
+            function propertiesVisitor(target, visitor, visited, skip) {
+                if (visited === void 0) { visited = []; }
+                if (skip === void 0) { skip = ["surface"]; }
+                if (target && target !== undefined) {
+                    var properties = [];
+                    for (var propertyName in target) {
+                        if (propertyName.indexOf("_") !== 0 && skip.indexOf(propertyName) === -1) {
+                            var realPropertyName = propertyName;
+                            if (ko.isComputed(target[propertyName]) && ko.isWriteableObservable(target["_" + propertyName])) {
+                                realPropertyName = "_" + realPropertyName;
+                            }
+                            if (visited.indexOf(target[realPropertyName]) === -1 && !ko.isComputed(target[realPropertyName])) {
+                                properties.push(target[realPropertyName]);
+                            }
+                        }
+                    }
+                    visitor(properties);
+                    visited.push.apply(visited, properties);
+                    properties.forEach(function (property) {
+                        property = ko.unwrap(property);
+                        if (typeof property === 'object') {
+                            propertiesVisitor(property, visitor, visited, skip);
+                        }
+                    });
+                }
+            }
+            Utils.propertiesVisitor = propertiesVisitor;
+            var UndoEngine = (function () {
+                function UndoEngine(target, ignoredProperties, getInfoMethodName) {
+                    var _this = this;
+                    if (ignoredProperties === void 0) { ignoredProperties = ["surface"]; }
+                    this._disposeUndoEngineSubscriptionsName = "___dispose___UndoEngine___Subscriptions___";
+                    this._groupObservers = [];
+                    this._getInfoMethodName = null;
+                    this._groupPosition = -1;
+                    this._observers = [];
+                    this._subscriptions = [];
+                    this._visited = [];
+                    this._position = -1;
+                    this._inUndoRedo = false;
+                    this.redoEnabled = ko.observable(false);
+                    this.undoEnabled = ko.observable(false);
+                    this.isIngroup = -1;
+                    this.isDirty = ko.observable(false);
+                    this._model = ko.unwrap(target);
+                    this._getInfoMethodName = getInfoMethodName;
+                    this._ignoredProperties = ignoredProperties;
+                    if (this._getInfoMethodName) {
+                        if (ko.isSubscribable(target)) {
+                            this._targetSubscription = this.subscribeProperty(target, true);
+                        }
+                        else {
+                            this._createDisposeFunction(target);
+                        }
+                    }
+                    else {
+                        var innerSubscriptions = this.subscribe(this._model);
+                        if (ko.isSubscribable(target)) {
+                            var prevVal = target();
+                            this._targetSubscription = target.subscribe(function (newTargetValue) {
+                                _this._removePropertiesSubscriptions();
+                                if (!_this._inUndoRedo) {
+                                    _this.properyChanged({
+                                        observable: target, propertyChanged: { oldVal: prevVal, val: newTargetValue }
+                                    });
+                                    prevVal = newTargetValue;
+                                }
+                                _this._cleanSubscribtions(innerSubscriptions);
+                                _this._model = newTargetValue;
+                                innerSubscriptions = _this.subscribe(_this._model);
+                            });
+                        }
+                    }
+                }
+                Object.defineProperty(UndoEngine.prototype, "_modelReady", {
+                    get: function () {
+                        return checkModelReady(this._model);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                UndoEngine.prototype.properyChanged = function (undoRecord) {
+                    if (this._inUndoRedo) {
+                        return;
+                    }
+                    var currentPosition = this._position + 1;
+                    if (currentPosition < this._observers.length) {
+                        this._observers = this._observers.splice(0, currentPosition);
+                    }
+                    this._observers.push(undoRecord);
+                    this.isDirty(true);
+                    this._position = currentPosition;
+                    this.undoEnabled(true);
+                    this.redoEnabled(false);
+                };
+                UndoEngine.prototype.visitProperties = function (target, info) {
+                    var subscribtions = [];
+                    if (target && info) {
+                        for (var i = 0; i < info.length; i++) {
+                            if (info[i].modelName || info[i].editor || info[i].info) {
+                                var propertyName = info[i].propertyName;
+                                if (propertyName.indexOf("_") !== 0) {
+                                    var realPropertyName = propertyName;
+                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
+                                        realPropertyName = "_" + realPropertyName;
+                                    }
+                                    if (!ko.isComputed(target[realPropertyName])) {
+                                        if (!ko.isObservable(target[realPropertyName])) {
+                                            this._createDisposeFunction(target[realPropertyName], info[i].info);
+                                        }
+                                        else {
+                                            subscribtions.push(this.subscribeProperty(target[realPropertyName], !info[i].link));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return subscribtions;
+                };
+                UndoEngine.prototype.undoChangeSet = function (changeSet) {
+                    if (changeSet.propertyChanged) {
+                        changeSet.observable(changeSet.propertyChanged.oldVal);
+                    }
+                    else {
+                        var array = changeSet.observable();
+                        for (var i = 0; i < changeSet.arrayChanges.length; i++) {
+                            if (changeSet.arrayChanges[i].status === "added") {
+                                array.splice(array.indexOf(changeSet.arrayChanges[i].value), 1);
+                            }
+                            else if (changeSet.arrayChanges[i].status === "deleted") {
+                                array.splice(changeSet.arrayChanges[i].index, 0, changeSet.arrayChanges[i].value);
+                            }
+                            else
+                                NotifyAboutWarning("Unsupported array modification status: " + changeSet.arrayChanges[i].status);
+                        }
+                        changeSet.observable.valueHasMutated();
+                    }
+                };
+                UndoEngine.prototype.redoChangeSet = function (changeSet) {
+                    if (changeSet.propertyChanged) {
+                        changeSet.observable(changeSet.propertyChanged.val);
+                    }
+                    else {
+                        var array = changeSet.observable();
+                        for (var i = 0; i < changeSet.arrayChanges.length; i++) {
+                            if (changeSet.arrayChanges[i].status === "added") {
+                                array.splice(changeSet.arrayChanges[i].index, 0, changeSet.arrayChanges[i].value);
+                            }
+                            else if (changeSet.arrayChanges[i].status === "deleted") {
+                                array.splice(array.indexOf(changeSet.arrayChanges[i].value), 1);
+                            }
+                            else
+                                NotifyAboutWarning("Unsupported array modification status: " + changeSet.arrayChanges[i].status);
+                        }
+                        changeSet.observable.valueHasMutated();
+                    }
+                };
+                UndoEngine.prototype._disposeChilds = function (target, info) {
+                    if (target && info) {
+                        for (var i = 0; i < info.length; i++) {
+                            if (info[i].modelName || info[i].editor || info[i].info) {
+                                var propertyName = info[i].propertyName;
+                                if (propertyName.indexOf("_") !== 0) {
+                                    var realPropertyName = propertyName;
+                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
+                                        realPropertyName = "_" + realPropertyName;
+                                    }
+                                    if (!ko.isComputed(target[realPropertyName])) {
+                                        var val = ko.unwrap(target[realPropertyName]);
+                                        if (!!val && typeof val === "object") {
+                                            if (!info[i].link) {
+                                                this._callDisposeFunction(val);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                UndoEngine.prototype._createDisposeFunction = function (val, info) {
+                    var _this = this;
+                    var subscriptions = [];
+                    if (val && typeof val === "object") {
+                        var objectInfo = info || (val[this._getInfoMethodName] && val[this._getInfoMethodName]());
+                        if (!!objectInfo) {
+                            if (val[this._disposeUndoEngineSubscriptionsName]) {
+                                val[this._disposeUndoEngineSubscriptionsName].inc++;
+                            }
+                            else {
+                                val[this._disposeUndoEngineSubscriptionsName] = { inc: 1 };
+                                subscriptions = this.subscribe(val, objectInfo);
+                                val[this._disposeUndoEngineSubscriptionsName]["func"] = function () {
+                                    val[_this._disposeUndoEngineSubscriptionsName].inc--;
+                                    _this._disposeChilds(val, objectInfo);
+                                    if (val[_this._disposeUndoEngineSubscriptionsName].inc === 0) {
+                                        _this._cleanSubscribtions(subscriptions);
+                                        delete val[_this._disposeUndoEngineSubscriptionsName];
+                                    }
+                                };
+                            }
+                        }
+                    }
+                    return subscriptions;
+                };
+                UndoEngine.prototype._callDisposeFunction = function (val) {
+                    val && val[this._disposeUndoEngineSubscriptionsName] && val[this._disposeUndoEngineSubscriptionsName].func();
+                };
+                UndoEngine.prototype._cleanSubscribtions = function (subscribtionArray) {
+                    if (subscribtionArray) {
+                        if (subscribtionArray.length) {
+                            for (var i = 0; i < subscribtionArray.length; i++) {
+                                this._cleanSubscribtions(subscribtionArray[i]);
+                            }
+                        }
+                        else {
+                            subscribtionArray.dispose && subscribtionArray.dispose();
+                        }
+                    }
+                };
+                UndoEngine.prototype.subscribeProperty = function (property, subscribeChilds) {
+                    var _this = this;
+                    if (ko.isObservable(property)) {
+                        var prevVal = property();
+                        if (Array.isArray(prevVal)) {
+                            for (var i = 0; i < property().length; i++) {
+                                this._createDisposeFunction(property()[i]);
+                            }
+                            return property.subscribe(function (args) {
+                                if (_this._modelReady) {
+                                    var addedItems = args.filter(function (x) { return x.status === "added"; });
+                                    var removedItems = args.filter(function (x) { return x.status === "deleted"; });
+                                    for (var i = 0; i < removedItems.length; i++) {
+                                        _this._callDisposeFunction(removedItems[i].value);
+                                    }
+                                    for (var i = 0; i < addedItems.length; i++) {
+                                        _this._createDisposeFunction(addedItems[i].value);
+                                    }
+                                    _this.properyChanged({ observable: property, arrayChanges: args });
+                                }
+                            }, null, "arrayChange");
+                        }
+                        else {
+                            if (ko.isWriteableObservable(property)) {
+                                if (subscribeChilds) {
+                                    this._createDisposeFunction(property());
+                                }
+                                return property.subscribe(function (val) {
+                                    if (_this._modelReady) {
+                                        if (subscribeChilds) {
+                                            _this._callDisposeFunction(prevVal);
+                                        }
+                                        _this.properyChanged({
+                                            observable: property, propertyChanged: { oldVal: prevVal, val: val }
+                                        });
+                                        prevVal = val;
+                                        if (subscribeChilds) {
+                                            _this._createDisposeFunction(val);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                };
+                UndoEngine.prototype.subscribeProperties = function (properties) {
+                    var _this = this;
+                    properties.forEach(function (property) {
+                        if (ko.isObservable(property)) {
+                            var prevVal = property();
+                            if (property["push"]) {
+                                _this._subscriptions.push(property.subscribe(function (args) {
+                                    if (_this._modelReady) {
+                                        if (!_this._inUndoRedo) {
+                                            _this.properyChanged({ observable: property, arrayChanges: args });
+                                            _this.subscribe(args.map(function (item) { return item.value; }));
+                                        }
+                                    }
+                                }, null, "arrayChange"));
+                            }
+                            else {
+                                if (ko.isWriteableObservable(property)) {
+                                    _this._subscriptions.push(property.subscribe(function (val) {
+                                        if (_this._modelReady) {
+                                            _this.properyChanged({
+                                                observable: property, propertyChanged: { oldVal: prevVal, val: val }
+                                            });
+                                            prevVal = property();
+                                        }
+                                    }));
+                                }
+                            }
+                        }
+                    });
+                };
+                UndoEngine.prototype.subscribe = function (target, info) {
+                    var _this = this;
+                    if (this._getInfoMethodName) {
+                        return this.visitProperties(target, info || (target && target[this._getInfoMethodName] && target[this._getInfoMethodName]()));
+                    }
+                    else {
+                        propertiesVisitor(target, function (properties) { _this.subscribeProperties(properties); }, this._visited, this._ignoredProperties);
+                    }
+                };
+                UndoEngine.prototype._removePropertiesSubscriptions = function () {
+                    this._subscriptions.forEach(function (subscription) { return subscription.dispose(); });
+                    this._subscriptions = [];
+                    this._visited = [];
+                };
+                UndoEngine.prototype.removeTargetSubscription = function () {
+                    this._targetSubscription.dispose();
+                    this.reset();
+                };
+                UndoEngine.prototype.undoAll = function () {
+                    if (this.undoEnabled()) {
+                        this.undo();
+                        this.undoAll();
+                    }
+                };
+                UndoEngine.prototype.reset = function () {
+                    this._removePropertiesSubscriptions();
+                    this.clearHistory();
+                };
+                UndoEngine.prototype.clearHistory = function () {
+                    this._groupObservers = [];
+                    this._observers = [];
+                    this.redoEnabled(false);
+                    this.undoEnabled(false);
+                    this._inUndoRedo = false;
+                    this._groupPosition = -1;
+                    this._position = -1;
+                    this.isDirty(false);
+                };
+                UndoEngine.prototype.undo = function () {
+                    var _this = this;
+                    try {
+                        this._inUndoRedo = true;
+                        if (this.undoEnabled()) {
+                            var changeSet = this._observers[this._position];
+                            if (Array.isArray(changeSet)) {
+                                changeSet.reverse().forEach(function (item) { return _this.undoChangeSet(item); });
+                            }
+                            else {
+                                this.undoChangeSet(changeSet);
+                            }
+                            this._position = this._position - 1;
+                            this.isDirty(true);
+                            this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
+                            this.redoEnabled(true);
+                        }
+                    }
+                    finally {
+                        this._inUndoRedo = false;
+                    }
+                };
+                UndoEngine.prototype.redo = function () {
+                    var _this = this;
+                    try {
+                        this._inUndoRedo = true;
+                        if (this.redoEnabled()) {
+                            var changeSet = this._observers[this._position + 1];
+                            if (Array.isArray(changeSet)) {
+                                changeSet.reverse().forEach(function (item) { return _this.redoChangeSet(item); });
+                            }
+                            else {
+                                this.redoChangeSet(changeSet);
+                            }
+                            this._position = this._position + 1;
+                            this.isDirty(true);
+                            this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
+                            this.redoEnabled(this._position + 1 < this._observers.length);
+                        }
+                    }
+                    finally {
+                        this._inUndoRedo = false;
+                    }
+                };
+                UndoEngine.prototype.start = function () {
+                    this.isIngroup++;
+                    if (this.isIngroup !== 0)
+                        return;
+                    this._groupObservers = this._observers;
+                    this._observers = [];
+                    this._groupPosition = this._position;
+                    this._position = -1;
+                };
+                UndoEngine.prototype.end = function () {
+                    this.isIngroup--;
+                    if (this.isIngroup !== -1) {
+                        return;
+                    }
+                    if (this._observers.length > 0) {
+                        this._position = this._groupPosition + 1;
+                        this._groupObservers.splice(this._position, this._groupObservers.length - this._position, this._observers);
+                    }
+                    else {
+                        this._position = this._groupPosition;
+                    }
+                    this._observers = this._groupObservers;
+                };
+                return UndoEngine;
+            })();
+            Utils.UndoEngine = UndoEngine;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+//# sourceMappingURL=dx-ko-undoengine.js.map
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            var Disposable = (function () {
+                function Disposable() {
+                    this._disposables = [];
+                    this.isDisposing = false;
+                }
+                Disposable.prototype.dispose = function () {
+                    this.isDisposing = true;
+                    ko.utils.arrayForEach(this._disposables, this.disposeOne);
+                    this._disposables = [];
+                };
+                Disposable.prototype.disposeOne = function (propOrValue, value) {
+                    var disposable = value || propOrValue;
+                    if (disposable && !disposable.isDisposing && typeof disposable.dispose === "function") {
+                        disposable.dispose();
+                    }
+                };
+                return Disposable;
+            })();
+            Utils.Disposable = Disposable;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Data;
+        (function (Data) {
+            var CriteriaOperator = (function () {
+                function CriteriaOperator() {
+                    var _this = this;
+                    this.type = "Default";
+                    this.operands = null;
+                    this.changeValueType = function (type, location) {
+                        var result = new type();
+                        if (location.index !== null) {
+                            _this[location.name][location.index] = result;
+                        }
+                        else {
+                            _this[location.name] = result;
+                        }
+                        return result;
+                    };
+                    this.changeValue = function (operand, reverse, location) {
+                        var result = reverse ? new UnaryOperator(UnaryOperatorType.Minus, operand) : operand;
+                        if (location.index !== null) {
+                            _this[location.name][location.index] = result;
+                        }
+                        else {
+                            _this[location.name] = result;
+                        }
+                        return result;
+                    };
+                    this.assignLeftPart = function (criteriaOperator) { return void 0; };
+                    this.assignRightPart = function (criteriaOperator) { return void 0; };
+                    this.assignType = function (type) {
+                        _this.operatorType = type;
+                    };
+                    this.resetrightPart = function (value) { return void 0; };
+                }
+                CriteriaOperator.operators = function (enums) {
+                    var result = [].concat.apply([], enums.map(function (enumType) {
+                        return getEnumNames(enumType).map(function (enumName) {
+                            return { name: enumName, value: enumType[enumName], type: enumType };
+                        });
+                    }));
+                    return result;
+                };
+                CriteriaOperator.parse = function (stringCriteria) {
+                    if (stringCriteria && stringCriteria !== "") {
+                        return window["criteriaparser"].parse(stringCriteria);
+                    }
+                    return null;
+                };
+                CriteriaOperator.create = function (operatorType) {
+                    var operator = null;
+                    switch (operatorType.type) {
+                        case BinaryOperatorType:
+                            operator = new BinaryOperator(new OperandProperty(), new OperandValue(), operatorType.value);
+                            break;
+                        case GroupOperatorType:
+                            operator = new GroupOperator(operatorType.value, []);
+                            break;
+                        case FunctionOperatorType:
+                            operator = new FunctionOperator(operatorType.value, [new OperandProperty()]);
+                            break;
+                        case BetweenOperator:
+                            operator = new BetweenOperator(new OperandProperty(), new OperandValue(), new OperandValue());
+                            break;
+                        case InOperator:
+                            operator = new InOperator(new OperandProperty(), [new OperandValue()]);
+                            break;
+                        case UnaryOperatorType:
+                            operator = new UnaryOperator(operatorType.value, new OperandProperty());
+                            break;
+                        case Aggregate:
+                            var result = new AggregateOperand(new OperandProperty(), null, operatorType.value, new GroupOperator(GroupOperatorType.And, []));
+                            if (operatorType.value === Aggregate.Exists) {
+                                operator = result;
+                            }
+                            else {
+                                if (operatorType.value !== Aggregate.Count) {
+                                    result.aggregatedExpression = new OperandProperty();
+                                }
+                                operator = new BinaryOperator(result, new OperandValue(), BinaryOperatorType.Equal);
+                            }
+                            break;
+                        default:
+                            throw Error("Unsupported operator type");
+                    }
+                    if (operatorType.reverse) {
+                        return new UnaryOperator(UnaryOperatorType.Not, operator);
+                    }
+                    return operator;
+                };
+                CriteriaOperator.and = function (left, right) {
+                    return GroupOperator.combine(GroupOperatorType.Or, [left, right]);
+                };
+                CriteriaOperator.or = function (left, right) {
+                    return GroupOperator.combine(GroupOperatorType.Or, [left, right]);
+                };
+                CriteriaOperator.getNotValidRange = function (value, errorMessage) {
+                    var start = 0;
+                    var end = 0;
+                    var parts = errorMessage.split('\n');
+                    var errorText = parts[1];
+                    var errorLength = parts[2].length;
+                    if (errorText.indexOf('...') === 0) {
+                        errorText = errorText.split("...")[1];
+                    }
+                    var start = value.indexOf(errorText);
+                    var end = start + errorLength;
+                    return { start: start, end: end };
+                };
+                Object.defineProperty(CriteriaOperator.prototype, "displayType", {
+                    get: function () {
+                        return this.operatorType;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperator.prototype, "enumType", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperator.prototype, "leftPart", {
+                    get: function () { return null; },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperator.prototype, "rightPart", {
+                    get: function () { return null; },
+                    enumerable: true,
+                    configurable: true
+                });
+                CriteriaOperator.prototype.assignFrom = function (criteriaOperator, incorrectSpecificsForAggregate) {
+                    if (incorrectSpecificsForAggregate === void 0) { incorrectSpecificsForAggregate = false; }
+                    var operator = criteriaOperator;
+                    if (criteriaOperator instanceof UnaryOperator && !(criteriaOperator.leftPart instanceof OperandProperty)) {
+                        operator = criteriaOperator.leftPart;
+                    }
+                    if (incorrectSpecificsForAggregate) {
+                        this.assignLeftPart(operator.leftPart);
+                    }
+                    else {
+                        this.assignLeftPart(operator);
+                    }
+                    if (operator.rightPart) {
+                        this.assignRightPart(operator);
+                    }
+                };
+                CriteriaOperator.prototype.children = function () {
+                    var operands = [];
+                    if (this.leftPart)
+                        operands.push.apply(operands, $.isArray(this.leftPart) ? this.leftPart : [this.leftPart]);
+                    if (this.rightPart)
+                        operands.push.apply(operands, $.isArray(this.rightPart) ? this.rightPart : [this.rightPart]);
+                    return operands;
+                };
+                return CriteriaOperator;
+            })();
+            Data.CriteriaOperator = CriteriaOperator;
+            function getEnumNames(enumType) {
+                var result = [];
+                for (var enumValue in enumType) {
+                    if (isNaN(enumValue)) {
+                        result.push(enumValue);
+                    }
+                }
+                return result;
+            }
+            (function (GroupOperatorType) {
+                GroupOperatorType[GroupOperatorType["And"] = 0] = "And";
+                GroupOperatorType[GroupOperatorType["Or"] = 1] = "Or";
+            })(Data.GroupOperatorType || (Data.GroupOperatorType = {}));
+            var GroupOperatorType = Data.GroupOperatorType;
+            var GroupOperator = (function (_super) {
+                __extends(GroupOperator, _super);
+                function GroupOperator(operation, operands) {
+                    var _this = this;
+                    _super.call(this);
+                    this.create = function (isGroup, property, specifics) {
+                        var operator = new BinaryOperator(property, new OperandValue(""), BinaryOperatorType.Equal);
+                        if (isGroup) {
+                            operator = new GroupOperator(GroupOperatorType.And, []);
+                        }
+                        else if (specifics && specifics === "list") {
+                            operator = new AggregateOperand(property, null, Aggregate.Exists, new GroupOperator(GroupOperatorType.And, []));
+                        }
+                        _this.operands.push(operator);
+                        return _this.operands[_this.operands.indexOf(operator)];
+                    };
+                    this.change = function (operationType, item, incorrectSpecificsForAggregate) {
+                        if (incorrectSpecificsForAggregate === void 0) { incorrectSpecificsForAggregate = false; }
+                        var position = _this.operands.indexOf(item);
+                        if (position !== -1) {
+                            var operator = CriteriaOperator.create(operationType);
+                            if (operationType.type !== operator.enumType) {
+                                operator.leftPart.assignFrom(item);
+                            }
+                            else {
+                                operator.assignFrom(item, incorrectSpecificsForAggregate);
+                            }
+                            _this.operands[position] = operator;
+                        }
+                        else {
+                            throw Error("dont have this element in operands collection");
+                        }
+                        item = null;
+                        return _this.operands[position];
+                    };
+                    this.remove = function (operator) {
+                        _this.operands.splice(_this.operands.indexOf(operator), 1);
+                    };
+                    this.assignLeftPart = function (operator) {
+                        _this.operands = operator.operands;
+                    };
+                    this.operands = [];
+                    this.type = "Group";
+                    this.operatorType = operation;
+                    operands = operands || [new CriteriaOperator(), new CriteriaOperator()];
+                    operands.forEach(function (operand) { return _this.operands.push(operand); });
+                }
+                GroupOperator.combine = function (operation, operands) {
+                    var combinedOperands = [];
+                    (operands || []).forEach(function (operand) {
+                        if (operand instanceof GroupOperator && operand.operatorType === operation) {
+                            combinedOperands.push.apply(combinedOperands, operand.operands);
+                        }
+                        else {
+                            combinedOperands.push(operand);
+                        }
+                    });
+                    if (combinedOperands.length === 1) {
+                        return combinedOperands[0];
+                    }
+                    return new GroupOperator(operation, combinedOperands);
+                };
+                GroupOperator.prototype.children = function () {
+                    return this.operands;
+                };
+                Object.defineProperty(GroupOperator.prototype, "displayType", {
+                    get: function () {
+                        return GroupOperatorType[this.operatorType];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(GroupOperator.prototype, "enumType", {
+                    get: function () {
+                        return GroupOperatorType;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return GroupOperator;
+            })(CriteriaOperator);
+            Data.GroupOperator = GroupOperator;
+            var OperandProperty = (function (_super) {
+                __extends(OperandProperty, _super);
+                function OperandProperty(propertyName, startColumn, startLine) {
+                    if (propertyName === void 0) { propertyName = ""; }
+                    if (startColumn === void 0) { startColumn = -1; }
+                    if (startLine === void 0) { startLine = -1; }
+                    _super.call(this);
+                    this.type = "Property";
+                    this.propertyName = propertyName;
+                    this.startPosition = { column: startColumn, line: startLine };
+                }
+                Object.defineProperty(OperandProperty.prototype, "displayType", {
+                    get: function () {
+                        return '[' + this.propertyName + ']';
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return OperandProperty;
+            })(CriteriaOperator);
+            Data.OperandProperty = OperandProperty;
+            var OperandValue = (function (_super) {
+                __extends(OperandValue, _super);
+                function OperandValue(value) {
+                    _super.call(this);
+                    this.type = "Value";
+                    var result = value !== null && value !== undefined ? value : "";
+                    if (value && value["length"] && value[0] === "'" && value[value.length - 1] === "'") {
+                        result = value.slice(1, value.length - 1);
+                    }
+                    else if (value && value["length"] && value[0] === "#" && value[value.length - 1] === "#") {
+                        result = value.slice(1, value.length - 1);
+                        result = JS.Localization.parseDate(result);
+                        if (!result) {
+                            result = JS.Localization.parseDate(value.slice(1, value.length - 1));
+                        }
+                    }
+                    else if (String(value).toLowerCase() === "true" || String(value).toLowerCase() === "false") {
+                        result = String(value).toLowerCase() === "true" ? "True" : "False";
+                    }
+                    this.value = result;
+                }
+                Object.defineProperty(OperandValue.prototype, "displayType", {
+                    get: function () {
+                        return this.value || "?";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return OperandValue;
+            })(CriteriaOperator);
+            Data.OperandValue = OperandValue;
+            var ConstantValue = (function (_super) {
+                __extends(ConstantValue, _super);
+                function ConstantValue(value) {
+                    _super.call(this, value);
+                }
+                return ConstantValue;
+            })(OperandValue);
+            Data.ConstantValue = ConstantValue;
+            var OperandParameter = (function (_super) {
+                __extends(OperandParameter, _super);
+                function OperandParameter(parameterName, value) {
+                    _super.call(this, value);
+                    this.type = "Parameter";
+                    this.parameterName = parameterName || "";
+                }
+                Object.defineProperty(OperandParameter.prototype, "displayType", {
+                    get: function () {
+                        return '?' + this.parameterName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return OperandParameter;
+            })(OperandValue);
+            Data.OperandParameter = OperandParameter;
+            (function (Aggregate) {
+                Aggregate[Aggregate["Count"] = 0] = "Count";
+                Aggregate[Aggregate["Exists"] = 1] = "Exists";
+                Aggregate[Aggregate["Min"] = 2] = "Min";
+                Aggregate[Aggregate["Max"] = 3] = "Max";
+                Aggregate[Aggregate["Avg"] = 4] = "Avg";
+                Aggregate[Aggregate["Sum"] = 5] = "Sum";
+                Aggregate[Aggregate["Single"] = 6] = "Single";
+            })(Data.Aggregate || (Data.Aggregate = {}));
+            var Aggregate = Data.Aggregate;
+            var AggregateOperand = (function (_super) {
+                __extends(AggregateOperand, _super);
+                function AggregateOperand(property, aggregatedExpression, aggregateType, condition) {
+                    var _this = this;
+                    _super.call(this);
+                    this.change = function (operationType, item) {
+                        var operator = null;
+                        if (operationType.type === GroupOperatorType) {
+                            operator = CriteriaOperator.create(operationType);
+                            if (operationType.type !== operator.enumType) {
+                                operator.leftPart.assignFrom(item);
+                            }
+                            else {
+                                operator.assignFrom(item);
+                            }
+                            _this.condition = operator;
+                        }
+                        return operator;
+                    };
+                    this.assignLeftPart = function (criteriaOperator) {
+                        if (criteriaOperator.leftPart instanceof AggregateOperand) {
+                            _this.assignFrom(criteriaOperator.leftPart);
+                        }
+                        else {
+                            if (CriteriaOperator instanceof AggregateOperand) {
+                                _this.property = criteriaOperator.property;
+                                if (_this.aggregatedExpression && criteriaOperator.aggregatedExpression) {
+                                    _this.aggregatedExpression = criteriaOperator.aggregatedExpression;
+                                }
+                                _this.condition = criteriaOperator.property;
+                            }
+                            else {
+                                _this.property = criteriaOperator.leftPart;
+                            }
+                        }
+                    };
+                    this.type = "Aggregate";
+                    this.property = property;
+                    if (condition instanceof GroupOperator) {
+                        this.condition = condition;
+                    }
+                    else {
+                        if (condition instanceof UnaryOperator && condition.operatorType === UnaryOperatorType.Not) {
+                            if (condition.operand instanceof GroupOperator) {
+                                this.condition = new UnaryOperator(UnaryOperatorType.Not, condition.operand);
+                            }
+                            else {
+                                this.condition = new UnaryOperator(UnaryOperatorType.Not, new GroupOperator(GroupOperatorType.And, condition.operand ? [condition.operand] : []));
+                            }
+                        }
+                        else {
+                            this.condition = new GroupOperator(GroupOperatorType.And, condition ? [condition] : []);
+                        }
+                    }
+                    this.operatorType = aggregateType;
+                    this.aggregatedExpression = aggregatedExpression;
+                }
+                Object.defineProperty(AggregateOperand.prototype, "displayType", {
+                    get: function () {
+                        return Aggregate[this.operatorType];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(AggregateOperand.prototype, "enumType", {
+                    get: function () {
+                        return Aggregate;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(AggregateOperand.prototype, "leftPart", {
+                    get: function () {
+                        return this.property;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                AggregateOperand.prototype.children = function () {
+                    var operands = [];
+                    this.property && operands.push(this.property);
+                    this.condition && operands.push(this.condition);
+                    this.aggregatedExpression && operands.push(this.aggregatedExpression);
+                    return operands;
+                };
+                return AggregateOperand;
+            })(CriteriaOperator);
+            Data.AggregateOperand = AggregateOperand;
+            var JoinOperand = (function (_super) {
+                __extends(JoinOperand, _super);
+                function JoinOperand(joinTypeName, condition, type, aggregated) {
+                    _super.call(this);
+                    this.type = "Join";
+                    this.joinTypeName = joinTypeName;
+                    this.condition = condition;
+                    this.operatorType = type;
+                    this.aggregatedExpression = aggregated;
+                }
+                JoinOperand.joinOrAggregate = function (collectionProperty, condition, type, aggregated) {
+                    if (collectionProperty === null || collectionProperty.propertyName.length < 2 || collectionProperty.propertyName[0] != '<' || collectionProperty.propertyName[collectionProperty.propertyName.length - 1] != '>') {
+                        return new AggregateOperand(collectionProperty, aggregated, type, condition);
+                    }
+                    else {
+                        return new JoinOperand(collectionProperty.propertyName.substring(1, collectionProperty.propertyName.length - 2), condition, type, aggregated);
+                    }
+                };
+                return JoinOperand;
+            })(CriteriaOperator);
+            Data.JoinOperand = JoinOperand;
+            var BetweenOperator = (function (_super) {
+                __extends(BetweenOperator, _super);
+                function BetweenOperator(property, begin, end) {
+                    var _this = this;
+                    _super.call(this);
+                    this.resetRightPart = function (newVal) {
+                        _this.begin = new OperandValue(newVal);
+                        _this.end = new OperandValue(newVal);
+                    };
+                    this.assignLeftPart = function (criteriaOperator) {
+                        _this.property = criteriaOperator.leftPart;
+                    };
+                    this.assignRightPart = function (criteriaOperator) {
+                        if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
+                            if (criteriaOperator.rightPart.length) {
+                                _this.begin = criteriaOperator.rightPart[0];
+                                _this.end = criteriaOperator.rightPart.length > 1 ? criteriaOperator.rightPart[1] : new OperandValue();
+                            }
+                            else {
+                                _this.begin = new OperandValue();
+                                _this.end = new OperandValue();
+                            }
+                        }
+                        else {
+                            _this.begin = criteriaOperator.rightPart;
+                            _this.end = new OperandValue();
+                        }
+                    };
+                    this.operatorType = "Between";
+                    this.type = "Between";
+                    this.property = property;
+                    this.begin = begin || new OperandValue();
+                    this.end = end || new OperandValue();
+                }
+                Object.defineProperty(BetweenOperator.prototype, "leftPart", {
+                    get: function () {
+                        return this.property;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BetweenOperator.prototype, "rightPart", {
+                    get: function () {
+                        return [this.begin, this.end];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BetweenOperator.prototype, "displayType", {
+                    get: function () {
+                        return "Between";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BetweenOperator.prototype, "enumType", {
+                    get: function () {
+                        return BetweenOperator;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return BetweenOperator;
+            })(CriteriaOperator);
+            Data.BetweenOperator = BetweenOperator;
+            var InOperator = (function (_super) {
+                __extends(InOperator, _super);
+                function InOperator(criteriaOperator, operands) {
+                    var _this = this;
+                    _super.call(this);
+                    this.assignLeftPart = function (criteriaOperator) {
+                        _this.criteriaOperator = criteriaOperator.leftPart;
+                    };
+                    this.assignRightPart = function (criteriaOperator) {
+                        _this.operands = [].concat(criteriaOperator.rightPart);
+                    };
+                    this.operatorType = "In";
+                    this.type = "In";
+                    this.operands = [];
+                    this.criteriaOperator = criteriaOperator || new CriteriaOperator();
+                    (operands || []).forEach(function (operand) { return _this.operands.push(operand); });
+                }
+                Object.defineProperty(InOperator.prototype, "leftPart", {
+                    get: function () {
+                        return this.criteriaOperator;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(InOperator.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(InOperator.prototype, "displayType", {
+                    get: function () {
+                        return "In";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(InOperator.prototype, "enumType", {
+                    get: function () {
+                        return InOperator;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return InOperator;
+            })(CriteriaOperator);
+            Data.InOperator = InOperator;
+            (function (BinaryOperatorType) {
+                BinaryOperatorType[BinaryOperatorType["Equal"] = 0] = "Equal";
+                BinaryOperatorType[BinaryOperatorType["NotEqual"] = 1] = "NotEqual";
+                BinaryOperatorType[BinaryOperatorType["Greater"] = 2] = "Greater";
+                BinaryOperatorType[BinaryOperatorType["Less"] = 3] = "Less";
+                BinaryOperatorType[BinaryOperatorType["LessOrEqual"] = 4] = "LessOrEqual";
+                BinaryOperatorType[BinaryOperatorType["GreaterOrEqual"] = 5] = "GreaterOrEqual";
+                BinaryOperatorType[BinaryOperatorType["Like"] = 6] = "Like";
+                BinaryOperatorType[BinaryOperatorType["BitwiseAnd"] = 7] = "BitwiseAnd";
+                BinaryOperatorType[BinaryOperatorType["BitwiseOr"] = 8] = "BitwiseOr";
+                BinaryOperatorType[BinaryOperatorType["BitwiseXor"] = 9] = "BitwiseXor";
+                BinaryOperatorType[BinaryOperatorType["Divide"] = 10] = "Divide";
+                BinaryOperatorType[BinaryOperatorType["Modulo"] = 11] = "Modulo";
+                BinaryOperatorType[BinaryOperatorType["Multiply"] = 12] = "Multiply";
+                BinaryOperatorType[BinaryOperatorType["Plus"] = 13] = "Plus";
+                BinaryOperatorType[BinaryOperatorType["Minus"] = 14] = "Minus";
+            })(Data.BinaryOperatorType || (Data.BinaryOperatorType = {}));
+            var BinaryOperatorType = Data.BinaryOperatorType;
+            var BinaryOperator = (function (_super) {
+                __extends(BinaryOperator, _super);
+                function BinaryOperator(left, right, operatorType) {
+                    var _this = this;
+                    _super.call(this);
+                    this.assignLeftPart = function (criteriaOperator) {
+                        _this.leftOperand = criteriaOperator.leftPart;
+                    };
+                    this.assignRightPart = function (criteriaOperator) {
+                        if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
+                            if (criteriaOperator.rightPart.length) {
+                                _this.rightOperand = criteriaOperator.rightPart[0];
+                            }
+                        }
+                        else {
+                            _this.rightOperand = criteriaOperator.rightPart;
+                        }
+                    };
+                    this.type = "Binary";
+                    this.leftOperand = left || new CriteriaOperator();
+                    this.rightOperand = right || new CriteriaOperator();
+                    this.operatorType = operatorType;
+                }
+                Object.defineProperty(BinaryOperator.prototype, "leftPart", {
+                    get: function () {
+                        return this.leftOperand;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BinaryOperator.prototype, "rightPart", {
+                    get: function () {
+                        return this.rightOperand;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BinaryOperator.prototype, "displayType", {
+                    get: function () {
+                        return Data.operatorTokens[BinaryOperatorType[this.operatorType]] || BinaryOperatorType[this.operatorType];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BinaryOperator.prototype, "enumType", {
+                    get: function () {
+                        return BinaryOperatorType;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return BinaryOperator;
+            })(CriteriaOperator);
+            Data.BinaryOperator = BinaryOperator;
+            (function (UnaryOperatorType) {
+                UnaryOperatorType[UnaryOperatorType["Minus"] = 0] = "Minus";
+                UnaryOperatorType[UnaryOperatorType["Plus"] = 1] = "Plus";
+                UnaryOperatorType[UnaryOperatorType["BitwiseNot"] = 2] = "BitwiseNot";
+                UnaryOperatorType[UnaryOperatorType["Not"] = 3] = "Not";
+                UnaryOperatorType[UnaryOperatorType["IsNull"] = 4] = "IsNull";
+            })(Data.UnaryOperatorType || (Data.UnaryOperatorType = {}));
+            var UnaryOperatorType = Data.UnaryOperatorType;
+            var UnaryOperator = (function (_super) {
+                __extends(UnaryOperator, _super);
+                function UnaryOperator(operatorType, operand) {
+                    _super.call(this);
+                    this.type = "Unary";
+                    this.operand = operand || new CriteriaOperator();
+                    this.operatorType = operatorType;
+                }
+                Object.defineProperty(UnaryOperator.prototype, "leftPart", {
+                    get: function () {
+                        return this.operand;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                UnaryOperator.prototype.assignFrom = function (criteriaOperator) {
+                    if (this.operatorType === UnaryOperatorType.Not) {
+                        if (criteriaOperator instanceof UnaryOperator) {
+                            this.operand.assignFrom(criteriaOperator.operand);
+                        }
+                        else {
+                            this.operand.assignFrom(criteriaOperator);
+                        }
+                    }
+                    else {
+                        if (criteriaOperator instanceof UnaryOperator) {
+                            this.operand = criteriaOperator.operand.leftPart;
+                        }
+                        else {
+                            this.operand = criteriaOperator.leftPart || criteriaOperator;
+                        }
+                    }
+                };
+                Object.defineProperty(UnaryOperator.prototype, "displayType", {
+                    get: function () {
+                        return UnaryOperatorType[this.operatorType];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(UnaryOperator.prototype, "enumType", {
+                    get: function () {
+                        return UnaryOperatorType;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return UnaryOperator;
+            })(CriteriaOperator);
+            Data.UnaryOperator = UnaryOperator;
+            (function (FunctionOperatorType) {
+                FunctionOperatorType[FunctionOperatorType["None"] = 0] = "None";
+                FunctionOperatorType[FunctionOperatorType["Custom"] = 1] = "Custom";
+                FunctionOperatorType[FunctionOperatorType["CustomNonDeterministic"] = 2] = "CustomNonDeterministic";
+                FunctionOperatorType[FunctionOperatorType["Iif"] = 3] = "Iif";
+                FunctionOperatorType[FunctionOperatorType["IsNull"] = 4] = "IsNull";
+                FunctionOperatorType[FunctionOperatorType["IsNullOrEmpty"] = 5] = "IsNullOrEmpty";
+                FunctionOperatorType[FunctionOperatorType["Trim"] = 6] = "Trim";
+                FunctionOperatorType[FunctionOperatorType["Len"] = 7] = "Len";
+                FunctionOperatorType[FunctionOperatorType["Substring"] = 8] = "Substring";
+                FunctionOperatorType[FunctionOperatorType["Upper"] = 9] = "Upper";
+                FunctionOperatorType[FunctionOperatorType["Lower"] = 10] = "Lower";
+                FunctionOperatorType[FunctionOperatorType["Concat"] = 11] = "Concat";
+                FunctionOperatorType[FunctionOperatorType["Ascii"] = 12] = "Ascii";
+                FunctionOperatorType[FunctionOperatorType["Char"] = 13] = "Char";
+                FunctionOperatorType[FunctionOperatorType["ToStr"] = 14] = "ToStr";
+                FunctionOperatorType[FunctionOperatorType["Replace"] = 15] = "Replace";
+                FunctionOperatorType[FunctionOperatorType["Reverse"] = 16] = "Reverse";
+                FunctionOperatorType[FunctionOperatorType["Insert"] = 17] = "Insert";
+                FunctionOperatorType[FunctionOperatorType["CharIndex"] = 18] = "CharIndex";
+                FunctionOperatorType[FunctionOperatorType["Remove"] = 19] = "Remove";
+                FunctionOperatorType[FunctionOperatorType["Abs"] = 20] = "Abs";
+                FunctionOperatorType[FunctionOperatorType["Sqr"] = 21] = "Sqr";
+                FunctionOperatorType[FunctionOperatorType["Cos"] = 22] = "Cos";
+                FunctionOperatorType[FunctionOperatorType["Sin"] = 23] = "Sin";
+                FunctionOperatorType[FunctionOperatorType["Atn"] = 24] = "Atn";
+                FunctionOperatorType[FunctionOperatorType["Exp"] = 25] = "Exp";
+                FunctionOperatorType[FunctionOperatorType["Log"] = 26] = "Log";
+                FunctionOperatorType[FunctionOperatorType["Rnd"] = 27] = "Rnd";
+                FunctionOperatorType[FunctionOperatorType["Tan"] = 28] = "Tan";
+                FunctionOperatorType[FunctionOperatorType["Power"] = 29] = "Power";
+                FunctionOperatorType[FunctionOperatorType["Sign"] = 30] = "Sign";
+                FunctionOperatorType[FunctionOperatorType["Round"] = 31] = "Round";
+                FunctionOperatorType[FunctionOperatorType["Ceiling"] = 32] = "Ceiling";
+                FunctionOperatorType[FunctionOperatorType["Floor"] = 33] = "Floor";
+                FunctionOperatorType[FunctionOperatorType["Max"] = 34] = "Max";
+                FunctionOperatorType[FunctionOperatorType["Min"] = 35] = "Min";
+                FunctionOperatorType[FunctionOperatorType["Acos"] = 36] = "Acos";
+                FunctionOperatorType[FunctionOperatorType["Asin"] = 37] = "Asin";
+                FunctionOperatorType[FunctionOperatorType["Atn2"] = 38] = "Atn2";
+                FunctionOperatorType[FunctionOperatorType["BigMul"] = 39] = "BigMul";
+                FunctionOperatorType[FunctionOperatorType["Cosh"] = 40] = "Cosh";
+                FunctionOperatorType[FunctionOperatorType["Log10"] = 41] = "Log10";
+                FunctionOperatorType[FunctionOperatorType["Sinh"] = 42] = "Sinh";
+                FunctionOperatorType[FunctionOperatorType["Tanh"] = 43] = "Tanh";
+                FunctionOperatorType[FunctionOperatorType["PadLeft"] = 44] = "PadLeft";
+                FunctionOperatorType[FunctionOperatorType["PadRight"] = 45] = "PadRight";
+                FunctionOperatorType[FunctionOperatorType["StartsWith"] = 46] = "StartsWith";
+                FunctionOperatorType[FunctionOperatorType["EndsWith"] = 47] = "EndsWith";
+                FunctionOperatorType[FunctionOperatorType["Contains"] = 48] = "Contains";
+                FunctionOperatorType[FunctionOperatorType["ToInt"] = 49] = "ToInt";
+                FunctionOperatorType[FunctionOperatorType["ToLong"] = 50] = "ToLong";
+                FunctionOperatorType[FunctionOperatorType["ToFloat"] = 51] = "ToFloat";
+                FunctionOperatorType[FunctionOperatorType["ToDouble"] = 52] = "ToDouble";
+                FunctionOperatorType[FunctionOperatorType["ToDecimal"] = 53] = "ToDecimal";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeThisYear"] = 54] = "LocalDateTimeThisYear";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeThisMonth"] = 55] = "LocalDateTimeThisMonth";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeLastWeek"] = 56] = "LocalDateTimeLastWeek";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeThisWeek"] = 57] = "LocalDateTimeThisWeek";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeYesterday"] = 58] = "LocalDateTimeYesterday";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeToday"] = 59] = "LocalDateTimeToday";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNow"] = 60] = "LocalDateTimeNow";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeTomorrow"] = 61] = "LocalDateTimeTomorrow";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeDayAfterTomorrow"] = 62] = "LocalDateTimeDayAfterTomorrow";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNextWeek"] = 63] = "LocalDateTimeNextWeek";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeTwoWeeksAway"] = 64] = "LocalDateTimeTwoWeeksAway";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNextMonth"] = 65] = "LocalDateTimeNextMonth";
+                FunctionOperatorType[FunctionOperatorType["LocalDateTimeNextYear"] = 66] = "LocalDateTimeNextYear";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalBeyondThisYear"] = 67] = "IsOutlookIntervalBeyondThisYear";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLaterThisYear"] = 68] = "IsOutlookIntervalLaterThisYear";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLaterThisMonth"] = 69] = "IsOutlookIntervalLaterThisMonth";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalNextWeek"] = 70] = "IsOutlookIntervalNextWeek";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLaterThisWeek"] = 71] = "IsOutlookIntervalLaterThisWeek";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalTomorrow"] = 72] = "IsOutlookIntervalTomorrow";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalToday"] = 73] = "IsOutlookIntervalToday";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalYesterday"] = 74] = "IsOutlookIntervalYesterday";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalEarlierThisWeek"] = 75] = "IsOutlookIntervalEarlierThisWeek";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalLastWeek"] = 76] = "IsOutlookIntervalLastWeek";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalEarlierThisMonth"] = 77] = "IsOutlookIntervalEarlierThisMonth";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalEarlierThisYear"] = 78] = "IsOutlookIntervalEarlierThisYear";
+                FunctionOperatorType[FunctionOperatorType["IsOutlookIntervalPriorThisYear"] = 79] = "IsOutlookIntervalPriorThisYear";
+                FunctionOperatorType[FunctionOperatorType["IsThisWeek"] = 80] = "IsThisWeek";
+                FunctionOperatorType[FunctionOperatorType["IsThisMonth"] = 81] = "IsThisMonth";
+                FunctionOperatorType[FunctionOperatorType["IsThisYear"] = 82] = "IsThisYear";
+                FunctionOperatorType[FunctionOperatorType["DateDiffTick"] = 83] = "DateDiffTick";
+                FunctionOperatorType[FunctionOperatorType["DateDiffSecond"] = 84] = "DateDiffSecond";
+                FunctionOperatorType[FunctionOperatorType["DateDiffMilliSecond"] = 85] = "DateDiffMilliSecond";
+                FunctionOperatorType[FunctionOperatorType["DateDiffMinute"] = 86] = "DateDiffMinute";
+                FunctionOperatorType[FunctionOperatorType["DateDiffHour"] = 87] = "DateDiffHour";
+                FunctionOperatorType[FunctionOperatorType["DateDiffDay"] = 88] = "DateDiffDay";
+                FunctionOperatorType[FunctionOperatorType["DateDiffMonth"] = 89] = "DateDiffMonth";
+                FunctionOperatorType[FunctionOperatorType["DateDiffYear"] = 90] = "DateDiffYear";
+                FunctionOperatorType[FunctionOperatorType["GetDate"] = 91] = "GetDate";
+                FunctionOperatorType[FunctionOperatorType["GetMilliSecond"] = 92] = "GetMilliSecond";
+                FunctionOperatorType[FunctionOperatorType["GetSecond"] = 93] = "GetSecond";
+                FunctionOperatorType[FunctionOperatorType["GetMinute"] = 94] = "GetMinute";
+                FunctionOperatorType[FunctionOperatorType["GetHour"] = 95] = "GetHour";
+                FunctionOperatorType[FunctionOperatorType["GetDay"] = 96] = "GetDay";
+                FunctionOperatorType[FunctionOperatorType["GetMonth"] = 97] = "GetMonth";
+                FunctionOperatorType[FunctionOperatorType["GetYear"] = 98] = "GetYear";
+                FunctionOperatorType[FunctionOperatorType["GetDayOfWeek"] = 99] = "GetDayOfWeek";
+                FunctionOperatorType[FunctionOperatorType["GetDayOfYear"] = 100] = "GetDayOfYear";
+                FunctionOperatorType[FunctionOperatorType["GetTimeOfDay"] = 101] = "GetTimeOfDay";
+                FunctionOperatorType[FunctionOperatorType["Now"] = 102] = "Now";
+                FunctionOperatorType[FunctionOperatorType["UtcNow"] = 103] = "UtcNow";
+                FunctionOperatorType[FunctionOperatorType["Today"] = 104] = "Today";
+                FunctionOperatorType[FunctionOperatorType["AddTimeSpan"] = 105] = "AddTimeSpan";
+                FunctionOperatorType[FunctionOperatorType["AddTicks"] = 106] = "AddTicks";
+                FunctionOperatorType[FunctionOperatorType["AddMilliSeconds"] = 107] = "AddMilliSeconds";
+                FunctionOperatorType[FunctionOperatorType["AddSeconds"] = 108] = "AddSeconds";
+                FunctionOperatorType[FunctionOperatorType["AddMinutes"] = 109] = "AddMinutes";
+                FunctionOperatorType[FunctionOperatorType["AddHours"] = 110] = "AddHours";
+                FunctionOperatorType[FunctionOperatorType["AddDays"] = 111] = "AddDays";
+                FunctionOperatorType[FunctionOperatorType["AddMonths"] = 112] = "AddMonths";
+                FunctionOperatorType[FunctionOperatorType["AddYears"] = 113] = "AddYears";
+                FunctionOperatorType[FunctionOperatorType["OrderDescToken"] = 114] = "OrderDescToken";
+            })(Data.FunctionOperatorType || (Data.FunctionOperatorType = {}));
+            var FunctionOperatorType = Data.FunctionOperatorType;
+            var FunctionOperator = (function (_super) {
+                __extends(FunctionOperator, _super);
+                function FunctionOperator(operatorType, operands) {
+                    var _this = this;
+                    _super.call(this);
+                    this.toString = function (reverse) {
+                        var result = (Data.operatorTokens[_this.displayType] || _this.displayType) + '(' + _this.operands.map(function (operand) {
+                            return operand.toString();
+                        }).join(", ") + ')';
+                        return reverse ? "Not " + result : result;
+                    };
+                    this.assignLeftPart = function (criteriaOperator) {
+                        _this.operands = [criteriaOperator.leftPart];
+                    };
+                    this.assignRightPart = function (criteriaOperator) {
+                        if (_this.operatorType !== FunctionOperatorType.IsNullOrEmpty &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalBeyondThisYear &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisYear &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisMonth &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalNextWeek &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisWeek &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalTomorrow &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalToday &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalYesterday &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalEarlierThisWeek &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLastWeek &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalEarlierThisMonth &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalEarlierThisYear &&
+                            _this.operatorType !== FunctionOperatorType.IsOutlookIntervalPriorThisYear) {
+                            if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
+                                if (criteriaOperator.rightPart.length) {
+                                    _this.operands.push(criteriaOperator.rightPart[0]);
+                                }
+                                else {
+                                    _this.operands.push(new OperandValue());
+                                }
+                            }
+                            else {
+                                _this.operands.push(criteriaOperator.rightPart);
+                            }
+                        }
+                    };
+                    this.operands = [];
+                    this.type = "Function";
+                    this.operatorType = operatorType;
+                    operands = operands || [new CriteriaOperator()];
+                    operands.forEach(function (operand) { return _this.operands.push(operand); });
+                }
+                Object.defineProperty(FunctionOperator.prototype, "leftPart", {
+                    get: function () {
+                        return this.operands[0];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FunctionOperator.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands.filter(function (_, index) { return index !== 0; });
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FunctionOperator.prototype, "displayType", {
+                    get: function () {
+                        return FunctionOperatorType[this.operatorType] || this.operatorType.toString();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FunctionOperator.prototype, "enumType", {
+                    get: function () {
+                        return FunctionOperatorType;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return FunctionOperator;
+            })(CriteriaOperator);
+            Data.FunctionOperator = FunctionOperator;
+            Data.operatorTokens = {
+                "Plus": "+",
+                "Minus": "-",
+                "Equal": "=",
+                "NotEqual": "<>",
+                "Greater": ">",
+                "Less": "<",
+                "LessOrEqual": "<=",
+                "GreaterOrEqual": ">="
+            };
+            function criteriaForEach(operator, callback) {
+                callback(operator);
+                operator.children().forEach(function (item) { return criteriaForEach(item, callback); });
+            }
+            Data.criteriaForEach = criteriaForEach;
+        })(Data = JS.Data || (JS.Data = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var PathRequest = (function () {
+                function PathRequest(fullPath, pathParts) {
+                    if (pathParts === void 0) { pathParts = []; }
+                    this.pathParts = pathParts;
+                    this.path = "";
+                    this.fullPath = fullPath;
+                    if (fullPath) {
+                        if (fullPath.indexOf('.') !== -1) {
+                            var pathComponents = fullPath.split('.');
+                            this.id = this.ref = pathComponents[0];
+                            pathComponents.splice(0, 1);
+                            this.path = pathComponents.join('.');
+                        }
+                        else {
+                            this.id = this.ref = fullPath;
+                        }
+                    }
+                }
+                return PathRequest;
+            })();
+            Widgets.PathRequest = PathRequest;
+            var TreeListItemViewModel = (function () {
+                function TreeListItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
+                    var _this = this;
+                    if (path === void 0) { path = []; }
+                    if (hasItems === void 0) { hasItems = true; }
+                    if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
+                    if (rtl === void 0) { rtl = false; }
+                    this._rtl = false;
+                    this.level = -1;
+                    this.hasItems = true;
+                    this.items = ko.observableArray();
+                    this.collapsed = ko.observable(true);
+                    this.data = null;
+                    this.isSelected = ko.observable(false);
+                    this._path = path;
+                    this._rtl = rtl;
+                    this.hasItems = hasItems;
+                    this._treeListController = options.treeListController;
+                    this._templateName = options.templateName;
+                    this._onItemsVisibilityChanged = onItemsVisibilityChanged;
+                    this.dragDropHandler = options.treeListController.dragDropHandler;
+                    this.getItems = function () {
+                        return _this._loadItems(options);
+                    };
+                    this.toggleSelected = function () {
+                        if (_this._treeListController.canSelect(_this)) {
+                            options.treeListController["clickHandler"] && options.treeListController["clickHandler"](_this);
+                            options.selectedPath(_this.path);
+                        }
+                    };
+                    if (options.treeListController.dblClickHandler) {
+                        this.dblClickHandler = function (item) {
+                            options.treeListController.dblClickHandler && options.treeListController.dblClickHandler(item);
+                        };
+                    }
+                    this.toggleCollapsed = function () {
+                        if (_this.hasItems) {
+                            _this.collapsed(!_this.collapsed.peek());
+                            if (!_this.collapsed.peek() && _this.items().length === 0) {
+                                _this._loadItems(options).always(function () { onItemsVisibilityChanged(); });
+                            }
+                            else {
+                                onItemsVisibilityChanged();
+                            }
+                        }
+                    };
+                    this.nodeImageClass = this._getNodeImageClassName();
+                }
+                TreeListItemViewModel.prototype._getImageClassName = function (field) {
+                    return ko.computed(function () {
+                        return "dx-image-fieldlist-" + (ko.unwrap(field.icon || field.specifics) || "default").toLowerCase();
+                    });
+                };
+                TreeListItemViewModel.prototype._getNodeImageClassName = function () {
+                    var _this = this;
+                    var imageClassName = ko.observable("dx-collapsing-image");
+                    return ko.computed({
+                        read: function () {
+                            if (!_this.hasItems) {
+                                return 'dx-image-leaf-node';
+                            }
+                            return _this.collapsed() ? 'dx-collapsing-image' : imageClassName();
+                        },
+                        write: function (newValue) {
+                            imageClassName(newValue);
+                        }
+                    });
+                };
+                TreeListItemViewModel.prototype._loadItems = function (options) {
+                    var _this = this;
+                    var deferred = $.Deferred();
+                    if (this._loader) {
+                        this._loader.dispose();
+                    }
+                    var promise = ko.observable();
+                    promise.subscribe(function (value) {
+                        if (!value)
+                            return;
+                        value.done(function (data) {
+                            var _data = data;
+                            _this.items.peek().forEach(function (item) { return item.dispose(); });
+                            _this.items($.map(_data, function (item) {
+                                var newItem = new TreeListItemViewModel(options, _this.pathParts, options.treeListController.hasItems(item), _this._onItemsVisibilityChanged, _this._rtl);
+                                newItem.data = item;
+                                newItem.level = _this.level + 1;
+                                newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
+                                newItem.imageClassName = _this._getImageClassName(item);
+                                return newItem;
+                            }));
+                            _this.nodeImageClass(_this.items.peek().filter(function (x) { return x.visible; }).length > 0 ? "dx-collapsing-image dx-image-expanded" : "dx-image-leaf-node");
+                            deferred.resolve(_this.items.peek());
+                            var selectedPath = options.selectedPath.peek();
+                            if (selectedPath) {
+                                var item2Select = _this.items.peek().filter(function (item) { return selectedPath.indexOf(item.path) === 0; })[0];
+                                if (item2Select) {
+                                    _this._selectItem(item2Select.name + selectedPath.substring(item2Select.path.length));
+                                }
+                            }
+                        });
+                    });
+                    this._loader = ko.computed(function () {
+                        promise(options.itemsProvider.getItems(new PathRequest(_this.path, _this.pathParts)));
+                    });
+                    return deferred.promise();
+                };
+                TreeListItemViewModel.prototype._selectItem = function (itemPath) {
+                    var _this = this;
+                    if (!this.hasItems) {
+                        return;
+                    }
+                    var selectItemDelegate = function () {
+                        _this._find(itemPath);
+                        if (_this.collapsed.peek()) {
+                            _this.toggleCollapsed();
+                        }
+                    };
+                    if (this.items.peek().length === 0) {
+                        this.getItems().done(function (items) {
+                            selectItemDelegate();
+                        });
+                    }
+                    else {
+                        selectItemDelegate();
+                    }
+                };
+                TreeListItemViewModel.prototype._find = function (itemPath) {
+                    var item = itemPath && this.items.peek().filter(function (childItem) {
+                        return itemPath === childItem.name
+                            || itemPath.indexOf(childItem.name) === 0 && itemPath[childItem.name.length] === '.';
+                    })[0];
+                    if (item) {
+                        if (itemPath.length > item.name.length) {
+                            item._selectItem(itemPath.substr(item.name.length + 1));
+                        }
+                        else {
+                            this._treeListController.select(item);
+                        }
+                    }
+                };
+                TreeListItemViewModel.prototype._applyPadding = function (position, value) {
+                    var padding = {};
+                    padding["padding-" + position] = value;
+                    return padding;
+                };
+                Object.defineProperty(TreeListItemViewModel.prototype, "name", {
+                    get: function () {
+                        return ko.unwrap(this.data && this.data.name);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "path", {
+                    get: function () {
+                        return this.pathParts.join(".");
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "pathParts", {
+                    get: function () {
+                        if (this.name) {
+                            return (ko.unwrap(this._path) || []).concat([this.name]);
+                        }
+                        else {
+                            return ko.unwrap(this._path);
+                        }
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "text", {
+                    get: function () {
+                        return this.data && this.data.displayName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "templateName", {
+                    get: function () {
+                        return this._templateName || this.data && this.data.templateName || "dx-treelist-item";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "hasContent", {
+                    get: function () {
+                        return this.data && this.data["contenttemplate"];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "actions", {
+                    get: function () {
+                        return this._treeListController.getActions ? this._treeListController.getActions(this) : [];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "isDraggable", {
+                    get: function () {
+                        if (this.data && this.data["dragData"]) {
+                            return !this.data["dragData"].noDragable;
+                        }
+                        if (this._treeListController.isDraggable) {
+                            return this._treeListController.isDraggable(this);
+                        }
+                        return false;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                TreeListItemViewModel.prototype.dispose = function () {
+                    if (this._loader) {
+                        this._loader.dispose();
+                    }
+                    this.items().forEach(function (item) { return item.dispose(); });
+                };
+                Object.defineProperty(TreeListItemViewModel.prototype, "visible", {
+                    get: function () {
+                        return !this._treeListController.itemsFilter || this._treeListController.itemsFilter(this.data, this.path);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return TreeListItemViewModel;
+            })();
+            Widgets.TreeListItemViewModel = TreeListItemViewModel;
+            var TreeListRootItemViewModel = (function (_super) {
+                __extends(TreeListRootItemViewModel, _super);
+                function TreeListRootItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
+                    var _this = this;
+                    if (path === void 0) { path = []; }
+                    if (hasItems === void 0) { hasItems = true; }
+                    if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
+                    if (rtl === void 0) { rtl = false; }
+                    _super.call(this, options, path, hasItems, onItemsVisibilityChanged, rtl);
+                    var selectedPathSubscriptions = options.selectedPath.subscribe(function (newPath) {
+                        _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
+                    });
+                    this._selectItem(!!this.path ? this.path + "." + options.selectedPath() : options.selectedPath());
+                    this.dispose = function () {
+                        selectedPathSubscriptions.dispose();
+                        _super.prototype.dispose.call(_this);
+                    };
+                }
+                return TreeListRootItemViewModel;
+            })(TreeListItemViewModel);
+            Widgets.TreeListRootItemViewModel = TreeListRootItemViewModel;
+            var TreeListController = (function () {
+                function TreeListController() {
+                    this.selectedItem = null;
+                }
+                TreeListController.prototype.itemsFilter = function (item) {
+                    return true;
+                };
+                TreeListController.prototype.hasItems = function (item) {
+                    return item.specifics !== "none" && (item.specifics === "List" || item.specifics === "ListSource" || item.isList === true);
+                };
+                TreeListController.prototype.canSelect = function (value) {
+                    return !value.hasItems;
+                };
+                TreeListController.prototype.select = function (value) {
+                    if (this.canSelect(value)) {
+                        this.selectedItem && this.selectedItem.isSelected(false);
+                        this.selectedItem = value;
+                        value.isSelected(true);
+                    }
+                };
+                return TreeListController;
+            })();
+            Widgets.TreeListController = TreeListController;
+            ko.bindingHandlers['treelist'] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var treeListViewModel = null;
+                    var values = valueAccessor(), options = ko.unwrap(values), pathArray, updateScrollBar = function () {
+                        var $scrollView = $(element).closest(".dx-scrollview");
+                        if ($scrollView.data("dxScrollView")) {
+                            var scrollView = $scrollView.dxScrollView("instance");
+                            scrollView && scrollView["update"]();
+                        }
+                        if (options.onItemsVisibilityChanged) {
+                            options.onItemsVisibilityChanged();
+                        }
+                    }, updateTreeList = function (options) {
+                        options.treeListController = options.treeListController ? options.treeListController : new TreeListController();
+                        if (!options.treeListController.dragDropHandler) {
+                            options.treeListController.dragDropHandler = bindingContext.$root.fieldDragHandler;
+                        }
+                        treeListViewModel && treeListViewModel.dispose();
+                        if (!options.rtl) {
+                            options.rtl = $(element).closest('.dx-rtl').length > 0;
+                        }
+                        pathArray = ko.computed(function () {
+                            var result = ko.unwrap(options.path);
+                            if (!Array.isArray(result)) {
+                                return !!result ? result.split('.') : [];
+                            }
+                            return result;
+                        });
+                        treeListViewModel = new TreeListRootItemViewModel(options, pathArray, true, updateScrollBar, options.rtl);
+                        var templateHtml = $('#dx-treelist').text() || options.templateHtml, $element = $(element).html(templateHtml);
+                        var childContext = bindingContext.createChildContext(treeListViewModel.items);
+                        ko.applyBindings(childContext, $element.children()[0]);
+                    };
+                    updateTreeList($.extend({}, options));
+                    var subscribtion = null;
+                    if (ko.isSubscribable(values)) {
+                        subscribtion = values.subscribe(function (newValue) {
+                            updateTreeList(newValue);
+                        });
+                    }
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        treeListViewModel && treeListViewModel.dispose();
+                        subscribtion && subscribtion.dispose();
+                        pathArray && pathArray.dispose();
+                    });
+                    return { controlsDescendantBindings: true };
+                }
+            };
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var FilterEditorHelper = (function () {
+                function FilterEditorHelper(serializer) {
+                    this.rtl = false;
+                    this.parameters = ko.observable(null);
+                    this.canSelectLists = true;
+                    this.canCreateParameters = false;
+                    this.canChoiceParameters = true;
+                    this.canChoiceProperty = true;
+                    this.handlers = {
+                        create: function (criteria, popupService) {
+                            return {
+                                data: new FilterEditorAddOn(criteria, popupService, "create", "createItems"),
+                                templateName: "dx-filtereditor-create"
+                            };
+                        },
+                        change: function (criteria, popupService) {
+                            return {
+                                data: new FilterEditorAddOn(criteria, popupService, "change", "items"),
+                                templateName: "dx-filtereditor-change"
+                            };
+                        },
+                        changeProperty: function (criteria, popupService) {
+                            return {
+                                data: new FilterEditorAddOn(criteria, popupService, "changeProperty", "items", "dx-filtereditor-popup-treelist"),
+                                templateName: "dx-filtereditor-changeProperty"
+                            };
+                        },
+                        changeValueType: function (criteria, popupService) {
+                            return {
+                                data: new FilterEditorAddOn(criteria, popupService, "changeValueType", "changeTypeItems"),
+                                templateName: "dx-filtereditor-changeValueType"
+                            };
+                        },
+                        changeParameter: function (criteria, popupService) {
+                            return {
+                                data: new FilterEditorAddOn(criteria, popupService, "changeParameter", "items"),
+                                templateName: "dx-filtereditor-changeParameter"
+                            };
+                        }
+                    };
+                    this.mapper = {
+                        Aggregate: AggregateOperandSurface,
+                        Property: OperandPropertySurface,
+                        Parameter: OperandParameterSurface,
+                        Value: OperandValueSurface,
+                        Group: GroupOperandSurface,
+                        Between: BetweenOperandSurface,
+                        Binary: BinaryOperandSurface,
+                        Function: FunctionOperandSurface,
+                        In: InOperandSurface,
+                        Unary: UnaryOperandSurface,
+                        Default: CriteriaOperatorSurface
+                    };
+                    this.serializer = serializer || new FilterEditorSerializer();
+                }
+                FilterEditorHelper.prototype.generateTreelistOptions = function (fieldListProvider, path) {
+                    var _this = this;
+                    var treeListOptions = ko.observable(null);
+                    var selected = ko.observable(null);
+                    ko.computed(function () {
+                        treeListOptions({
+                            itemsProvider: ko.unwrap(fieldListProvider),
+                            selectedPath: ko.observable(""),
+                            selected: selected,
+                            path: ko.unwrap(path),
+                            treeListController: new FilterEditorTreeListController(selected),
+                            rtl: _this.rtl
+                        });
+                    });
+                    return treeListOptions;
+                };
+                return FilterEditorHelper;
+            })();
+            Widgets.FilterEditorHelper = FilterEditorHelper;
+            var FilterStringOptions = (function () {
+                function FilterStringOptions(filterString, dataMember, disabled) {
+                    var _this = this;
+                    this.popupContainer = ".dx-viewport";
+                    this.itemsProvider = null;
+                    this.resetValue = function () {
+                        _this.value("");
+                    };
+                    this.value = filterString;
+                    this.path = dataMember || ko.observable("");
+                    this.disabled = disabled || ko.observable(false);
+                    this.helper = new FilterEditorHelper();
+                }
+                return FilterStringOptions;
+            })();
+            Widgets.FilterStringOptions = FilterStringOptions;
+            var FilterEditorAddOn = (function () {
+                function FilterEditorAddOn(criteria, popupService, action, propertyName, templateName) {
+                    var _this = this;
+                    this.showPopup = function (args) {
+                        if (_this._popupService["subscription"]) {
+                            _this._popupService["subscription"].dispose();
+                        }
+                        _this._popupService.title("");
+                        _this.target.isSelected(true);
+                        _this._updateActions(_this.target);
+                        _this._popupService.target(args.element);
+                        setTimeout(function () {
+                            _this._popupService.visible(true);
+                        }, 10);
+                    };
+                    this.popupContentTemplate = "dx-filtereditor-popup-common";
+                    this.target = criteria;
+                    this._action = action;
+                    this.propertyName = propertyName;
+                    this._popupService = popupService;
+                    this.popupContentTemplate = templateName || this.popupContentTemplate;
+                }
+                FilterEditorAddOn.prototype._updateActions = function (viewModel) {
+                    var _this = this;
+                    this._popupService.data(null);
+                    if (viewModel) {
+                        this._popupService["subscription"] = this._popupService.visible.subscribe(function (newVal) {
+                            _this.target.isSelected(newVal);
+                        });
+                        this._popupService["viewModel"] = viewModel;
+                        this._popupService.data({
+                            data: ko.unwrap(viewModel[this.propertyName]),
+                            template: this.popupContentTemplate,
+                            click: function (data) { viewModel[_this._action](data); _this._popupService.visible(false); },
+                        });
+                    }
+                };
+                return FilterEditorAddOn;
+            })();
+            Widgets.FilterEditorAddOn = FilterEditorAddOn;
+            var FilterEditorSerializer = (function () {
+                function FilterEditorSerializer(operatorTokens) {
+                    if (operatorTokens === void 0) { operatorTokens = JS.Data.operatorTokens; }
+                    this.operatorTokens = operatorTokens;
+                }
+                FilterEditorSerializer.prototype.serializeGroupOperand = function (groupOperator, reverse) {
+                    var _this = this;
+                    var result = groupOperator.operands.map(function (operand) {
+                        if (operand instanceof JS.Data.GroupOperator) {
+                            return "(" + _this.serialize(operand) + ")";
+                        }
+                        else {
+                            return _this.serialize(operand);
+                        }
+                    }).filter(function (serialize) { return serialize !== "" && serialize !== "()"; }).join(' ' + (this.operatorTokens[groupOperator.displayType] || groupOperator.displayType) + ' ');
+                    return reverse && result ? "Not(" + result + ")" : result;
+                };
+                FilterEditorSerializer.prototype.serializeAggregateOperand = function (aggregateOperand, reverse) {
+                    var operatorTypeSuffix = aggregateOperand.operatorType === JS.Data.Aggregate.Exists ? "" : "." + JS.Data.Aggregate[aggregateOperand.operatorType];
+                    var condition = aggregateOperand.condition ? this.serialize(aggregateOperand.condition) : "";
+                    var result = this.serialize(aggregateOperand.property) + '[' + condition + ']';
+                    var aggregateSuffix = aggregateOperand.operatorType !== JS.Data.Aggregate.Exists ?
+                        '(' + (aggregateOperand.aggregatedExpression && this.serialize(aggregateOperand.aggregatedExpression) || "") + ')' : '';
+                    return result + operatorTypeSuffix + aggregateSuffix;
+                };
+                FilterEditorSerializer.prototype.serializeOperandProperty = function (operandProperty) {
+                    return operandProperty.displayType;
+                };
+                FilterEditorSerializer.prototype.serializeOperandValue = function (operandValue) {
+                    var result = operandValue.value;
+                    if (result !== null && result !== undefined && ($.isNumeric(result) || String(result).toLowerCase() === "true" || String(result).toLowerCase() === "false")) {
+                        return operandValue.specifics === "string" ? "'" + result + "'" : result;
+                    }
+                    else if (result && operandValue.value instanceof Date) {
+                        return "#" + JS.Utils.serializeDate(result) + "#";
+                    }
+                    return result ? "'" + result + "'" : "?";
+                };
+                FilterEditorSerializer.prototype.serializeOperandParameter = function (operandParameter) {
+                    return operandParameter.displayType;
+                };
+                FilterEditorSerializer.prototype.serializeBetweenOperator = function (betweenOperator, reverse) {
+                    var result = this.serialize(betweenOperator.property) + " " + betweenOperator.displayType +
+                        "(" + this.serialize(betweenOperator.begin) + ", " + this.serialize(betweenOperator.end) + ")";
+                    return reverse ? "Not " + result : result;
+                };
+                FilterEditorSerializer.prototype.serializeInOperator = function (inOperator, reverse) {
+                    var _this = this;
+                    var result = this.serialize(inOperator.criteriaOperator) + " " + inOperator.displayType + "(" +
+                        inOperator.operands.map(function (operand) { return _this.serialize(operand); }).join(', ') + ")";
+                    return reverse ? "Not " + result : result;
+                };
+                FilterEditorSerializer.prototype.serializeBinaryOperator = function (binaryOperator, reverse) {
+                    var separator = reverse ? " Not " : " ";
+                    return this.serialize(binaryOperator.leftOperand) + separator + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
+                };
+                FilterEditorSerializer.prototype.serializeUnaryOperator = function (unaryOperator, reverse) {
+                    if (unaryOperator.operatorType === JS.Data.UnaryOperatorType.IsNull) {
+                        var separator = reverse ? " Not " : " ";
+                        return this.serialize(unaryOperator.operand) + " Is" + separator + "Null";
+                    }
+                    else if (unaryOperator.operatorType === JS.Data.UnaryOperatorType.Not) {
+                        return this.serialize(unaryOperator.operand, true);
+                    }
+                    var result = (this.operatorTokens[unaryOperator.displayType] || unaryOperator.displayType) + this.serialize(unaryOperator.operand);
+                    return reverse ? "Not " + result : result;
+                };
+                FilterEditorSerializer.prototype.serializeFunctionOperator = function (functionOperator, reverse) {
+                    var _this = this;
+                    var result = (this.operatorTokens[functionOperator.displayType] || functionOperator.displayType) + '(' + functionOperator.operands.map(function (operand) {
+                        return _this.serialize(operand);
+                    }).join(", ") + ')';
+                    return reverse ? "Not " + result : result;
+                };
+                FilterEditorSerializer.prototype.serialize = function (criteriaOperator, reverse) {
+                    if (reverse === void 0) { reverse = false; }
+                    if (criteriaOperator instanceof JS.Data.AggregateOperand) {
+                        return this.serializeAggregateOperand(criteriaOperator, reverse);
+                    }
+                    if (criteriaOperator instanceof JS.Data.BetweenOperator) {
+                        return this.serializeBetweenOperator(criteriaOperator, reverse);
+                    }
+                    if (criteriaOperator instanceof JS.Data.BinaryOperator) {
+                        return this.serializeBinaryOperator(criteriaOperator, reverse);
+                    }
+                    if (criteriaOperator instanceof JS.Data.ConstantValue) {
+                        return this.serializeOperandValue(criteriaOperator);
+                    }
+                    if (criteriaOperator instanceof JS.Data.FunctionOperator) {
+                        return this.serializeFunctionOperator(criteriaOperator, reverse);
+                    }
+                    if (criteriaOperator instanceof JS.Data.GroupOperator) {
+                        return this.serializeGroupOperand(criteriaOperator, reverse);
+                    }
+                    if (criteriaOperator instanceof JS.Data.InOperator) {
+                        return this.serializeInOperator(criteriaOperator, reverse);
+                    }
+                    if (criteriaOperator instanceof JS.Data.OperandParameter) {
+                        return this.serializeOperandParameter(criteriaOperator);
+                    }
+                    if (criteriaOperator instanceof JS.Data.OperandProperty) {
+                        return this.serializeOperandProperty(criteriaOperator);
+                    }
+                    if (criteriaOperator instanceof JS.Data.OperandValue) {
+                        return this.serializeOperandValue(criteriaOperator);
+                    }
+                    if (criteriaOperator instanceof JS.Data.UnaryOperator) {
+                        return this.serializeUnaryOperator(criteriaOperator, reverse);
+                    }
+                    throw Error("Undefined type criteria operator");
+                };
+                FilterEditorSerializer.prototype.deserialize = function (stringCriteria) {
+                    var operand = JS.Data.CriteriaOperator.parse(stringCriteria);
+                    if (operand instanceof JS.Data.GroupOperator) {
+                        return operand;
+                    }
+                    else if (operand instanceof JS.Data.UnaryOperator && operand.operatorType === JS.Data.UnaryOperatorType.Not) {
+                        var child = operand["operand"];
+                        if (child instanceof JS.Data.GroupOperator) {
+                            return operand;
+                        }
+                        return new JS.Data.UnaryOperator(JS.Data.UnaryOperatorType.Not, new JS.Data.GroupOperator(JS.Data.GroupOperatorType.And, child ? [child] : []));
+                    }
+                    return new JS.Data.GroupOperator(JS.Data.GroupOperatorType.And, operand ? [operand] : []);
+                };
+                return FilterEditorSerializer;
+            })();
+            Widgets.FilterEditorSerializer = FilterEditorSerializer;
+            var FilterEditorTreeListController = (function (_super) {
+                __extends(FilterEditorTreeListController, _super);
+                function FilterEditorTreeListController(selectedItem) {
+                    _super.call(this);
+                    this.selectedItem = selectedItem;
+                }
+                FilterEditorTreeListController.prototype.itemsFilter = function (item) {
+                    return true;
+                };
+                FilterEditorTreeListController.prototype.hasItems = function (item) {
+                    return item.specifics !== "none" && (item.specifics !== "List" && item.isList === true);
+                };
+                FilterEditorTreeListController.prototype.canSelect = function (value) {
+                    return !value.data.isList || (value.data.isList === true && value.data.specifics === "List");
+                };
+                FilterEditorTreeListController.prototype.select = function (value) {
+                    if (this.canSelect(value)) {
+                        this.selectedItem(value.data);
+                        value.isSelected(true);
+                    }
+                };
+                return FilterEditorTreeListController;
+            })(Widgets.TreeListController);
+            Widgets.FilterEditorTreeListController = FilterEditorTreeListController;
+            var FilterEditor = (function () {
+                function FilterEditor(options, fieldListProvider, rtl) {
+                    var _this = this;
+                    if (rtl === void 0) { rtl = false; }
+                    this.isValid = ko.observable(true);
+                    this.operandSurface = ko.observable(null);
+                    this.operand = null;
+                    this.popupVisible = ko.observable(false);
+                    this.buttonItems = [];
+                    this.popupService = new JS.Utils.PopupService();
+                    this.rtl = rtl;
+                    options() && options().helper && (options().helper.rtl = rtl);
+                    this.options = options;
+                    this.save = function () {
+                        _this.options().value(options().helper.serializer.serialize(_this.operandSurface().model, false));
+                        _this.popupVisible(false);
+                    };
+                    this.fieldListProvider = fieldListProvider;
+                    this.isValid = ko.computed(function () {
+                        try {
+                            _this.operand = _this.options().helper.serializer.deserialize(_this.options().value());
+                            return true;
+                        }
+                        catch (e) {
+                            return false;
+                        }
+                    });
+                    this.popupVisible.subscribe(function (newVal) {
+                        _this.operand = _this.options().helper.serializer.deserialize(_this.options().value());
+                        if (newVal) {
+                            var type = null;
+                            if (_this.operand instanceof JS.Data.UnaryOperator) {
+                                type = _this.options().helper.mapper.Unary;
+                            }
+                            else {
+                                type = _this.options().helper.mapper.Group;
+                            }
+                            var surface = new type(_this.operand, _this, _this.fieldListProvider, _this.path);
+                            surface.canRemove = false;
+                            if (surface instanceof UnaryOperandSurface) {
+                                surface.operand().canRemove = false;
+                            }
+                            _this.operandSurface(surface);
+                        }
+                        else {
+                            _this.operandSurface(null);
+                        }
+                    });
+                    this.createAddButton = function (criteria) { return options().helper.handlers.create(criteria, _this.popupService); };
+                    this.createChangeType = function (criteria) { return options().helper.handlers.change(criteria, _this.popupService); };
+                    this.createChangeProperty = function (criteria) { return options().helper.handlers.changeProperty(criteria, _this.popupService); };
+                    this.createChangeParameter = function (criteria) { return options().helper.handlers.changeParameter(criteria, _this.popupService); };
+                    this.createChangeValueType = function (criteria) { return options().helper.handlers.changeValueType(criteria, _this.popupService); };
+                    this._createMainPopupButtons();
+                }
+                FilterEditor.prototype._createMainPopupButtons = function () {
+                    var self = this;
+                    this.buttonItems = [
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: JS.Utils.getLocalization('Save'), onClick: function () { self.save(); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: JS.Utils.getLocalization('Cancel'), onClick: function () { self.popupVisible(false); } } }
+                    ];
+                };
+                FilterEditor.prototype.change = function (type, surface) {
+                    this.operand = JS.Data.CriteriaOperator.create(type);
+                    this.operand.assignFrom(surface.model);
+                    var type = null;
+                    if (this.operand instanceof JS.Data.UnaryOperator) {
+                        type = this.options().helper.mapper.Unary;
+                    }
+                    else {
+                        type = this.options().helper.mapper.Group;
+                    }
+                    var surface = new type(this.operand, this, this.fieldListProvider, this.path);
+                    surface.canRemove = false;
+                    if (surface instanceof UnaryOperandSurface) {
+                        surface.operand().canRemove = false;
+                    }
+                    this.operandSurface(surface);
+                };
+                Object.defineProperty(FilterEditor.prototype, "helper", {
+                    get: function () {
+                        return this.options().helper;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FilterEditor.prototype, "path", {
+                    get: function () {
+                        return this.options().path;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return FilterEditor;
+            })();
+            Widgets.FilterEditor = FilterEditor;
+            var CriteriaOperatorSurface = (function () {
+                function CriteriaOperatorSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    this.canRemove = true;
+                    this.operatorType = ko.observable(null);
+                    this.templateName = "dx-filtereditor-common";
+                    this.isSelected = ko.observable(false);
+                    this.operatorClass = "criteria-operator-item-operator";
+                    this.popupService = parent.popupService || { visible: ko.observable(false) };
+                    this.model = operator;
+                    this.helper = parent.helper;
+                    this.fieldListProvider = fieldListProvider;
+                    this.path = path;
+                    this.parent = parent;
+                    this.operatorType(operator.operatorType);
+                    this.operatorType.subscribe(function (newVal) {
+                        _this.model.assignType(newVal);
+                    });
+                }
+                CriteriaOperatorSurface.filterEditorOperators = function (specific) {
+                    if (specific === void 0) { specific = "string"; }
+                    var common = [{ name: "Equals", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType },
+                        { name: "Does not equal", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType },
+                        { name: "Is greater than", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType },
+                        { name: "Is greater than or equal to", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType },
+                        { name: "Is less than", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType },
+                        { name: "Is less than or equal to", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType },
+                        { name: "Is between", value: "Between", type: JS.Data.BetweenOperator },
+                        { name: "Is not between", value: "Between", type: JS.Data.BetweenOperator, reverse: true }];
+                    switch (specific) {
+                        case "guid":
+                        case "string":
+                            return [].concat(common, [
+                                { name: "Contains", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType },
+                                { name: "Does not contain", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, reverse: true },
+                                { name: "Begins with", value: JS.Data.FunctionOperatorType.StartsWith, type: JS.Data.FunctionOperatorType },
+                                { name: "Ends with", value: JS.Data.FunctionOperatorType.EndsWith, type: JS.Data.FunctionOperatorType },
+                                { name: "Is like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType },
+                                { name: "Is not like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, reverse: true },
+                                { name: "Is any of", value: "In", type: JS.Data.InOperator },
+                                { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
+                                { name: "Is blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType },
+                                { name: "Is not blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, reverse: true }
+                            ]);
+                        case "integer":
+                        case "float":
+                            return [].concat(common, [
+                                { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType },
+                                { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true },
+                                { name: "Is any of", value: "In", type: JS.Data.InOperator },
+                                { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
+                            ]);
+                        case "date":
+                            return [].concat(common, [
+                                { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType },
+                                { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true },
+                                { name: "Is any of", value: "In", type: JS.Data.InOperator },
+                                { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
+                                { name: "Is beyond this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalBeyondThisYear, type: JS.Data.FunctionOperatorType },
+                                { name: "Is later this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisYear, type: JS.Data.FunctionOperatorType },
+                                { name: "Is later this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisMonth, type: JS.Data.FunctionOperatorType },
+                                { name: "Is next week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalNextWeek, type: JS.Data.FunctionOperatorType },
+                                { name: "Is later this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisWeek, type: JS.Data.FunctionOperatorType },
+                                { name: "Is tomorrow", value: JS.Data.FunctionOperatorType.IsOutlookIntervalTomorrow, type: JS.Data.FunctionOperatorType },
+                                { name: "Is today", value: JS.Data.FunctionOperatorType.IsOutlookIntervalToday, type: JS.Data.FunctionOperatorType },
+                                { name: "Is yesterday", value: JS.Data.FunctionOperatorType.IsOutlookIntervalYesterday, type: JS.Data.FunctionOperatorType },
+                                { name: "Is earlier this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisWeek, type: JS.Data.FunctionOperatorType },
+                                { name: "Is last week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLastWeek, type: JS.Data.FunctionOperatorType },
+                                { name: "Is earlier this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisMonth, type: JS.Data.FunctionOperatorType },
+                                { name: "Is earlier this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisYear, type: JS.Data.FunctionOperatorType },
+                                { name: "Is prior this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalPriorThisYear, type: JS.Data.FunctionOperatorType },
+                            ]);
+                        case "list":
+                            return [
+                                { name: "Exists", value: JS.Data.Aggregate.Exists, type: JS.Data.Aggregate },
+                                { name: "Count", value: JS.Data.Aggregate.Count, type: JS.Data.Aggregate },
+                                { name: "Max", value: JS.Data.Aggregate.Max, type: JS.Data.Aggregate },
+                                { name: "Min", value: JS.Data.Aggregate.Min, type: JS.Data.Aggregate },
+                                { name: "Sum", value: JS.Data.Aggregate.Sum, type: JS.Data.Aggregate },
+                                { name: "Avg", value: JS.Data.Aggregate.Avg, type: JS.Data.Aggregate }
+                            ];
+                        case "group":
+                            return [
+                                { name: "And", value: JS.Data.GroupOperatorType.And, type: JS.Data.GroupOperatorType },
+                                { name: "Or", value: JS.Data.GroupOperatorType.Or, type: JS.Data.GroupOperatorType },
+                                { name: "Not And", value: JS.Data.GroupOperatorType.And, reverse: true, type: JS.Data.GroupOperatorType },
+                                { name: "Not Or", value: JS.Data.GroupOperatorType.Or, reverse: true, type: JS.Data.GroupOperatorType },
+                            ];
+                    }
+                    return [].concat(common);
+                };
+                CriteriaOperatorSurface.prototype._createLeftPartProperty = function (value) {
+                    if (value instanceof JS.Data.OperandProperty) {
+                        var surface = this.createChildSurface(value);
+                    }
+                    else {
+                        var surface = this.createChildSurface(value);
+                    }
+                    surface["canChange"] = false;
+                    surface.canRemove = false;
+                    if (surface instanceof AggregateOperandSurface) {
+                        this.specifics = ko.computed(function () {
+                            return surface["aggregatedExpression"]() && surface["aggregatedExpression"]().specifics() || "integer";
+                        });
+                    }
+                    else {
+                        this.specifics = surface.specifics;
+                    }
+                    return surface;
+                };
+                CriteriaOperatorSurface.prototype.createChildSurface = function (item, path, actions) {
+                    return new this.helper.mapper[item.type](item, this, this.fieldListProvider, path || this.path);
+                };
+                Object.defineProperty(CriteriaOperatorSurface.prototype, "items", {
+                    get: function () {
+                        return CriteriaOperatorSurface.filterEditorOperators(this.specifics());
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperatorSurface.prototype, "displayType", {
+                    get: function () {
+                        var _this = this;
+                        var item = this.items.filter(function (item) { return _this.operatorType() === item.value && _this.reverse === item.reverse && _this.model.enumType === item.type; })[0];
+                        return item && item.name || this.operatorType && this.operatorType() || "";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperatorSurface.prototype, "leftPart", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperatorSurface.prototype, "rightPart", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(CriteriaOperatorSurface.prototype, "css", {
+                    get: function () {
+                        return this.operatorClass + (this.isSelected() ? " selected" : "");
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                CriteriaOperatorSurface.prototype.change = function (type, surface) {
+                    if (!surface && type && this.model.enumType === type.type && this.reverse === type.reverse && type.type !== JS.Data.FunctionOperatorType) {
+                        this.operatorType(type.value);
+                    }
+                    else {
+                        this.parent.change(type, this);
+                    }
+                };
+                CriteriaOperatorSurface.prototype.remove = function (surface) {
+                    this.parent.remove(this);
+                };
+                return CriteriaOperatorSurface;
+            })();
+            Widgets.CriteriaOperatorSurface = CriteriaOperatorSurface;
+            var BinaryOperandSurface = (function (_super) {
+                __extends(BinaryOperandSurface, _super);
+                function BinaryOperandSurface(operator, parent, fieldListProvider, path) {
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.contentTemplateName = "dx-filtereditor-binary";
+                    this.leftOperand = ko.observable(null);
+                    this.rightOperand = ko.observable(null);
+                    this.leftOperand(this._createLeftPartProperty(operator.leftOperand));
+                    this.rightOperand(this.createChildSurface(operator.rightOperand));
+                }
+                Object.defineProperty(BinaryOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.leftOperand();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BinaryOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.rightOperand();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return BinaryOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.BinaryOperandSurface = BinaryOperandSurface;
+            var OperandSurfaceBase = (function (_super) {
+                __extends(OperandSurfaceBase, _super);
+                function OperandSurfaceBase(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.canChange = true;
+                    this.canRemove = false;
+                    this.changeValueType = function (type) {
+                        var parent = _this.getRealParent(_this.parent);
+                        var property = _this.getRealProperty(_this);
+                        var propertyLocation = _this.getPropertyName(parent, property);
+                        var model = parent.model.changeValueType(type.instance, propertyLocation);
+                        if (propertyLocation.index !== null) {
+                            parent[propertyLocation.name].splice(propertyLocation.index, 1, parent.createChildSurface(model));
+                        }
+                        else {
+                            parent[propertyLocation.name](parent.createChildSurface(model));
+                        }
+                    };
+                }
+                OperandSurfaceBase.prototype.getRealParent = function (parent) {
+                    if (parent instanceof UnaryOperandSurface) {
+                        return this.getRealParent(parent.parent);
+                    }
+                    else {
+                        return parent;
+                    }
+                };
+                OperandSurfaceBase.prototype.getRealProperty = function (property) {
+                    if (property.parent instanceof UnaryOperandSurface) {
+                        return this.getRealProperty(property.parent);
+                    }
+                    else {
+                        return property;
+                    }
+                };
+                OperandSurfaceBase.prototype.getPropertyName = function (parent, searchProperty) {
+                    var position = null;
+                    var name = null;
+                    $.each(parent, function (propertyName, property) {
+                        if (Array.isArray(ko.unwrap(property)) && ko.isObservable(property)) {
+                            var index = ko.unwrap(property).indexOf(searchProperty);
+                            if (index > -1) {
+                                position = index;
+                                name = propertyName;
+                                return;
+                            }
+                        }
+                        else if (searchProperty === ko.unwrap(property) && ko.isObservable(property)) {
+                            name = propertyName;
+                            return;
+                        }
+                    });
+                    return { index: position, name: name };
+                };
+                Object.defineProperty(OperandSurfaceBase.prototype, "changeTypeItems", {
+                    get: function () {
+                        var _this = this;
+                        var items = [{ name: "Value", instance: JS.Data.OperandValue }];
+                        if (this.helper.canChoiceProperty) {
+                            items.push({ name: "Property", instance: JS.Data.OperandProperty });
+                        }
+                        if (this.helper.canChoiceParameters && (this.helper.parameters() && this.helper.parameters().filter(function (item) { return item.specifics && item.specifics.toLowerCase() === _this.parent.specifics(); }).length > 0 || this.helper.canCreateParameters)) {
+                            items.push({ name: "Parameter", instance: JS.Data.OperandParameter });
+                        }
+                        return items;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return OperandSurfaceBase;
+            })(CriteriaOperatorSurface);
+            Widgets.OperandSurfaceBase = OperandSurfaceBase;
+            var FunctionOperandSurface = (function (_super) {
+                __extends(FunctionOperandSurface, _super);
+                function FunctionOperandSurface(operator, parent, fieldListProvider, path) {
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.canRemove = true;
+                    this.contentTemplateName = "dx-filtereditor-function";
+                    this.operands = ko.observableArray([]);
+                    if (operator.operands.length === 0) {
+                        if (parent instanceof UnaryOperandSurface) {
+                            this.specifics = parent.parent.specifics;
+                        }
+                        else {
+                            this.specifics = parent.specifics;
+                        }
+                        this.contentTemplateName = "dx-filtereditor-function-lightweight";
+                        this.canRemove = false;
+                    }
+                    else {
+                        this.operands.push(this._createLeftPartProperty(operator.operands[0]));
+                        for (var i = 1; i < operator.operands.length; i++) {
+                            this.operands.push(this.createChildSurface(operator.operands[i]));
+                        }
+                    }
+                }
+                Object.defineProperty(FunctionOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.operands && this.operands()[0];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FunctionOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands && this.operands().filter(function (_, index) { return index !== 0; });
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return FunctionOperandSurface;
+            })(OperandSurfaceBase);
+            Widgets.FunctionOperandSurface = FunctionOperandSurface;
+            var InOperandSurface = (function (_super) {
+                __extends(InOperandSurface, _super);
+                function InOperandSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.contentTemplateName = "dx-filtereditor-in";
+                    this.operands = ko.observableArray([]);
+                    this.criteriaOperator = ko.observable(null);
+                    this.criteriaOperator(this._createLeftPartProperty(operator.criteriaOperator));
+                    this.operands((operator.operands || []).map(function (operand) {
+                        return _this.createChildSurface(operand);
+                    }));
+                    this.addValue = function () {
+                        var value = new JS.Data.OperandValue(null);
+                        _this.model.operands.push(value);
+                        _this.operands.push(_this.createChildSurface(value));
+                    };
+                }
+                Object.defineProperty(InOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.criteriaOperator();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(InOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return InOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.InOperandSurface = InOperandSurface;
+            var BetweenOperandSurface = (function (_super) {
+                __extends(BetweenOperandSurface, _super);
+                function BetweenOperandSurface(operator, parent, fieldListProvider, path) {
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.property = ko.observable(null);
+                    this.end = ko.observable(null);
+                    this.begin = ko.observable(null);
+                    this.contentTemplateName = "dx-filtereditor-between";
+                    this.property(this._createLeftPartProperty(operator.property));
+                    this.begin(this.createChildSurface(operator.begin));
+                    this.end(this.createChildSurface(operator.end));
+                }
+                Object.defineProperty(BetweenOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.property && this.property();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(BetweenOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return [this.begin(), this.end()];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return BetweenOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.BetweenOperandSurface = BetweenOperandSurface;
+            var OperandValueSurface = (function (_super) {
+                __extends(OperandValueSurface, _super);
+                function OperandValueSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this._value = ko.observable(null);
+                    this._updateDate = function (specifics) {
+                        if (specifics === "date") {
+                            if (!(this._value() instanceof Date)) {
+                                this._value(new Date(new Date().setHours(0, 0, 0, 0)));
+                            }
+                        }
+                        else {
+                            this._value("");
+                        }
+                    };
+                    this.changeValue = function () {
+                        var parent = _this.getRealParent(_this.parent);
+                        var property = _this.getRealProperty(_this);
+                        var propertyLocation = _this.getPropertyName(parent, property);
+                        var model = parent.model.changeValue(_this.model, _this.reverse, propertyLocation);
+                        if (propertyLocation.index !== null) {
+                            parent[propertyLocation.name].splice(propertyLocation.index, 1, parent.createChildSurface(model));
+                        }
+                        else {
+                            parent[propertyLocation.name](parent.createChildSurface(model));
+                        }
+                    };
+                    this.values = ko.observable([]);
+                    this.isEditable = ko.observable(false);
+                    this.templateName = "dx-filtereditor-value";
+                    if (parent instanceof UnaryOperandSurface) {
+                        this.specifics = parent.parent.specifics;
+                        if (parent.model.operatorType === JS.Data.UnaryOperatorType.Minus) {
+                            this.reverse = true;
+                        }
+                    }
+                    else {
+                        this.specifics = parent.specifics;
+                    }
+                    this.specifics.subscribe(function (newVal) {
+                        operator.specifics = newVal;
+                        _this._updateDate(newVal);
+                    });
+                    this._value(operator.value);
+                    this._value.subscribe(function (newVal) {
+                        _this.model.value = newVal;
+                    });
+                    if (this._value() === null || this._value() === undefined || this._value() === "") {
+                        this._updateDate(this.specifics());
+                    }
+                    this.value = ko.computed({
+                        read: function () {
+                            var value = _this._value();
+                            if (value instanceof Date) {
+                                value = Globalize["formatDate"](value);
+                            }
+                            if (_this.items.length > 0) {
+                                var result = _this.items.filter(function (item) { return item.value === value; })[0];
+                                if (result) {
+                                    return result.display;
+                                }
+                            }
+                            if (_this.reverse) {
+                                value = "-" + value;
+                            }
+                            return value !== null && value !== undefined && value !== "" ? value : OperandValueSurface.defaultDisplay;
+                        },
+                        write: function (newVal) {
+                            if (newVal > 0 && !_this.reverse || newVal < 0 && _this.reverse) {
+                                _this._value(newVal);
+                            }
+                            else if (newVal > 0 && _this.reverse || newVal < 0 && !_this.reverse) {
+                                _this.reverse = !_this.reverse;
+                                _this._value(newVal < 0 ? 0 - newVal : newVal);
+                                _this.changeValue();
+                            }
+                        }
+                    });
+                    ko.computed(function () {
+                        var itemsProvider = ko.unwrap(fieldListProvider);
+                        if (itemsProvider && itemsProvider.getValues && _this.parent.leftPart instanceof OperandPropertySurface) {
+                            if (_this.parent.leftPart.propertyName()) {
+                                itemsProvider.getValues(new Widgets.PathRequest(ko.unwrap(_this.path) + "." + _this.parent.leftPart.propertyName())).done(function (result) {
+                                    _this.values(result);
+                                });
+                            }
+                        }
+                    });
+                    operator.specifics = this.specifics();
+                }
+                Object.defineProperty(OperandValueSurface.prototype, "items", {
+                    get: function () {
+                        return this.values();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(OperandValueSurface.prototype, "displayType", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                OperandValueSurface.defaultDisplay = "Enter a value";
+                return OperandValueSurface;
+            })(OperandSurfaceBase);
+            Widgets.OperandValueSurface = OperandValueSurface;
+            var GroupOperandSurface = (function (_super) {
+                __extends(GroupOperandSurface, _super);
+                function GroupOperandSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.templateName = "dx-filtereditor-group";
+                    this.operatorClass = "criteria-operator-item-group";
+                    this.operands = ko.observableArray([]);
+                    this.createItems = null;
+                    this.createItems = [
+                        { name: JS.Utils.getLocalization("Add group"), value: true },
+                        { name: JS.Utils.getLocalization("Add condition"), value: false }
+                    ];
+                    this.operands((operator.operands || []).map(function (operand) {
+                        return _this.createChildSurface(operand);
+                    }));
+                    this.specifics = ko.observable("group");
+                }
+                GroupOperandSurface.prototype.change = function (type, surface) {
+                    if (surface) {
+                        var specifics = surface.specifics() || "integer";
+                        var operators = CriteriaOperatorSurface.filterEditorOperators(specifics);
+                        if (!type) {
+                            var item = operators.filter(function (item) {
+                                return surface.operatorType() === item.value && surface.reverse === item.reverse && surface.model.enumType === item.type;
+                            })[0];
+                            if (item) {
+                                type = item;
+                            }
+                            else {
+                                type = operators[0];
+                            }
+                        }
+                        var newModel = this.model.change(type, surface.model, surface.leftPart instanceof AggregateOperandSurface && surface.leftPart.leftPart.specifics() !== "list");
+                        var position = this.operands().indexOf(surface);
+                        var operand = this.createChildSurface(newModel);
+                        this.operands.splice(position, 1, operand);
+                    }
+                    else {
+                        _super.prototype.change.call(this, type, surface);
+                    }
+                };
+                GroupOperandSurface.prototype.remove = function (surface) {
+                    if (surface) {
+                        this.model.remove(surface.model);
+                        this.operands.remove(surface);
+                    }
+                    else {
+                        this.parent.remove(this);
+                    }
+                };
+                GroupOperandSurface.prototype.create = function (type) {
+                    var newModel = this.model.create(type.value, new JS.Data.OperandProperty());
+                    this.operands.push(this.createChildSurface(newModel));
+                };
+                Object.defineProperty(GroupOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.operands();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return GroupOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.GroupOperandSurface = GroupOperandSurface;
+            var AggregateOperandSurface = (function (_super) {
+                __extends(AggregateOperandSurface, _super);
+                function AggregateOperandSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.contentTemplateName = "dx-filtereditor-aggregate";
+                    this.property = ko.observable(null);
+                    this.aggregatedExpression = ko.observable(null);
+                    this.condition = ko.observable(null);
+                    this.property(this._createLeftPartProperty(operator.property));
+                    var childPath = ko.computed(function () {
+                        return _this.path() + "." + _this.property().propertyName();
+                    });
+                    if (operator.aggregatedExpression) {
+                        this.aggregatedExpression(this.createChildSurface(operator.aggregatedExpression, childPath));
+                        this.templateName = "dx-filtereditor-aggregate-common";
+                    }
+                    if (operator.operatorType === JS.Data.Aggregate.Count) {
+                        this.templateName = "dx-filtereditor-aggregate-common";
+                    }
+                    var surface = this.createChildSurface(operator.condition, childPath);
+                    surface.canRemove = false;
+                    if (surface instanceof UnaryOperandSurface) {
+                        surface.operand().canRemove = false;
+                    }
+                    this.condition(surface);
+                    this.change = function (type, surface) {
+                        if (surface) {
+                            var newModel = _this.model.change(type, surface.model);
+                            var condition = _this.createChildSurface(newModel, childPath);
+                            condition.canRemove = false;
+                            if (condition instanceof UnaryOperandSurface) {
+                                condition.operand().canRemove = false;
+                            }
+                            _this.condition(condition);
+                        }
+                        else {
+                            if (_this.operatorType() === JS.Data.Aggregate.Exists || _this.operatorType() === JS.Data.Aggregate.Count) {
+                                _this.parent.change(type, _this);
+                            }
+                            else {
+                                if (type && (type.value === JS.Data.Aggregate.Exists || type.value === JS.Data.Aggregate.Count)) {
+                                    _this.parent.change(type, _this);
+                                }
+                                else {
+                                    _super.prototype.change.call(_this, type, surface);
+                                }
+                            }
+                        }
+                    };
+                }
+                Object.defineProperty(AggregateOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        return this.property && this.property();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(AggregateOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.aggregatedExpression();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return AggregateOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.AggregateOperandSurface = AggregateOperandSurface;
+            var OperandParameterSurface = (function (_super) {
+                __extends(OperandParameterSurface, _super);
+                function OperandParameterSurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.changeParameter = function (item) {
+                        _this.model.parameterName = item.name;
+                        _this.parameterName(item.name);
+                    };
+                    this.operatorClass = "criteria-operator-item-parameter";
+                    this.parameterName = ko.observable("");
+                    this.templateName = "dx-filtereditor-parameter";
+                    this.specifics = parent.specifics;
+                    this.parameterName(operator.parameterName);
+                }
+                Object.defineProperty(OperandParameterSurface.prototype, "items", {
+                    get: function () {
+                        var _this = this;
+                        return this.helper.parameters().filter(function (item) { return item.specifics.toLocaleLowerCase() === _this.specifics(); });
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(OperandParameterSurface.prototype, "displayType", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return OperandParameterSurface;
+            })(OperandSurfaceBase);
+            Widgets.OperandParameterSurface = OperandParameterSurface;
+            var UnaryOperandSurface = (function (_super) {
+                __extends(UnaryOperandSurface, _super);
+                function UnaryOperandSurface(operator, parent, fieldListProvider, path) {
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this.contentTemplateName = "dx-filtereditor-unary";
+                    this.operand = ko.observable(null);
+                    var operand = this.createChildSurface(operator.operand);
+                    if (operator.operatorType === JS.Data.UnaryOperatorType.Not) {
+                        this.templateName = "dx-filtereditor-not";
+                        operand.reverse = true;
+                        this.specifics = operand.specifics;
+                    }
+                    else {
+                        operand = this._createLeftPartProperty(operator.operand);
+                    }
+                    this.operand(operand);
+                }
+                Object.defineProperty(UnaryOperandSurface.prototype, "leftPart", {
+                    get: function () {
+                        var leftPart = this.operand();
+                        if (this.operand() && this.operand().reverse && this.operand().leftPart) {
+                            leftPart = this.operand().leftPart;
+                        }
+                        return leftPart;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(UnaryOperandSurface.prototype, "rightPart", {
+                    get: function () {
+                        return this.operand() && this.operand().reverse ? this.operand().rightPart : null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return UnaryOperandSurface;
+            })(CriteriaOperatorSurface);
+            Widgets.UnaryOperandSurface = UnaryOperandSurface;
+            var OperandPropertySurface = (function (_super) {
+                __extends(OperandPropertySurface, _super);
+                function OperandPropertySurface(operator, parent, fieldListProvider, path) {
+                    var _this = this;
+                    _super.call(this, operator, parent, fieldListProvider, path);
+                    this._displayName = ko.observable("");
+                    this.propertyName = ko.observable("");
+                    this.specifics = ko.observable("integer");
+                    this.valueType = ko.observable("");
+                    this.changeProperty = function (item) {
+                        _this.fieldsOptions().selected(item);
+                    };
+                    this.templateName = "dx-filtereditor-property";
+                    this.operatorClass = "criteria-operator-item-field";
+                    this.propertyName(operator.propertyName);
+                    this.fieldsOptions = this.helper.generateTreelistOptions(fieldListProvider, path);
+                    this.fieldsOptions().selectedPath.subscribe(function (newVal) {
+                        var realName = _this.fieldsOptions().selectedPath().substr(_this.path && _this.path().length > 0 ? _this.path().length + 1 : 0);
+                        _this.propertyName(realName);
+                        _this.model.propertyName = realName;
+                        _this.popupService.visible(false);
+                    });
+                    this.fieldsOptions().selected.subscribe(function (newVal) {
+                        _this._updateDisplayName(path, _this.propertyName(), newVal.displayName);
+                        var specifics = newVal.specifics.toLowerCase();
+                        if (specifics.indexOf("calc") === 0) {
+                            specifics = specifics.split("calc")[1];
+                        }
+                        if (_this.specifics() !== specifics) {
+                            _this.specifics(specifics);
+                            _this.parent.change();
+                        }
+                    });
+                    this.fieldsOptions().selectedPath(this.path && !!ko.unwrap(this.path) ? [ko.unwrap(this.path), this.propertyName()].join('.') : this.propertyName());
+                    this._updateSpecifics();
+                    this.displayName = ko.computed(function () {
+                        return _this._displayName() || _this.propertyName();
+                    });
+                }
+                OperandPropertySurface.prototype._updateDisplayName = function (path, propertyName, displayName) {
+                    var _this = this;
+                    if (!!this.helper.getDisplayPropertyName) {
+                        this.helper.getDisplayPropertyName(ko.unwrap(path), propertyName).done(function (newVal) {
+                            _this._displayName(newVal);
+                        });
+                    }
+                    else {
+                        this._displayName(displayName);
+                    }
+                };
+                OperandPropertySurface.prototype._updateSpecifics = function () {
+                    var _this = this;
+                    var self = this;
+                    var propertyPath = this.propertyName().split('.');
+                    var realPropertyName = propertyPath.pop();
+                    if (ko.unwrap(this.fieldsOptions).itemsProvider) {
+                        ko.unwrap(this.fieldsOptions).itemsProvider.getItems(new Widgets.PathRequest([this.path()].concat(propertyPath).join('.'))).done(function (result) {
+                            var notListProperties = result.filter(function (item) { return item.specifics !== "List" && !item.isList; });
+                            if (!_this.propertyName() && notListProperties.length > 0) {
+                                _this.model.propertyName = notListProperties[0].name;
+                                _this.propertyName(notListProperties[0].name);
+                                realPropertyName = notListProperties[0].name;
+                            }
+                            var item = result.filter(function (item) { return item.name === realPropertyName; })[0];
+                            if (item) {
+                                var specifics = item.specifics.toLowerCase();
+                                if (specifics.indexOf("calc") === 0) {
+                                    specifics = specifics.split("calc")[1];
+                                }
+                                _this.specifics(specifics);
+                                _this._updateDisplayName(_this.path, _this.propertyName(), item.displayName);
+                            }
+                        });
+                    }
+                };
+                Object.defineProperty(OperandPropertySurface.prototype, "items", {
+                    get: function () {
+                        return this.fieldsOptions;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(OperandPropertySurface.prototype, "displayType", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return OperandPropertySurface;
+            })(OperandSurfaceBase);
+            Widgets.OperandPropertySurface = OperandPropertySurface;
+            ko.bindingHandlers['dxFilterEditor'] = {
+                init: function (element, valueAccessor) {
+                    $(element).children().remove();
+                    $(element).addClass("dx-popup-general");
+                    var templateHtml = $('#dx-filtereditor').text(), $element = $(element).append(templateHtml), values = valueAccessor();
+                    var itemsProvider = ko.observable(ko.unwrap(values.fieldListProvider));
+                    ko.computed(function () {
+                        if (values.options().itemsProvider) {
+                            itemsProvider(ko.unwrap(values.options().itemsProvider));
+                        }
+                        else {
+                            itemsProvider(ko.unwrap(values.fieldListProvider));
+                        }
+                    });
+                    ko.computed(function () {
+                        if (values.getDisplayNameByPath && values.options() && values.options().helper && !values.options().helper.getDisplayPropertyName) {
+                            values.options().helper.getDisplayPropertyName = values.getDisplayNameByPath;
+                        }
+                    });
+                    ko.applyBindings(new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0), $element.children()[0]);
+                    return { controlsDescendantBindings: true };
+                }
+            };
+            ko.components.register("dx-filtereditor-plain", {
+                viewModel: {
+                    createViewModel: function (params, componentInfo) {
+                        var viewModel = new FilterEditor(params.options, ko.observable(params.fieldListProvider));
+                        viewModel.popupVisible(true);
+                        params.options().value.subscribe(function () {
+                            viewModel.popupVisible(false);
+                            viewModel.popupVisible(true);
+                        });
+                        return viewModel;
+                    }
+                },
+                template: { element: 'dx-filtereditor-plain' }
+            });
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+/// <reference path="treelist.ts" />
+/// <reference path="filtereditor.ts" />
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var operatorNames = [
+                { text: "+", image: "addition", descriptionStringId: 'XtraEditorsExpressionEditor.Plus.Description' },
+                { text: "-", image: "subtraction", descriptionStringId: 'XtraEditorsExpressionEditor.Minus.Description' },
+                { text: "*", image: "multiplication", descriptionStringId: 'XtraEditorsExpressionEditor.Multiply.Description' },
+                { text: "/", image: "division", descriptionStringId: 'XtraEditorsExpressionEditor.Divide.Description' },
+                { text: "%", image: "modulus", hasSeparator: true, descriptionStringId: 'XtraEditorsExpressionEditor.Modulo.Description' },
+                { text: "()", image: "parenthesis", hasSeparator: true },
+                { text: "|", descriptionStringId: 'XtraEditorsExpressionEditor.BitwiseOr.Description' },
+                { text: "&", descriptionStringId: 'XtraEditorsExpressionEditor.BitwiseAnd.Description' },
+                { text: "^", descriptionStringId: 'XtraEditorsExpressionEditor.BitwiseXor.Description' },
+                { text: "==", image: "equal", descriptionStringId: 'XtraEditorsExpressionEditor.Equal.Description' },
+                { text: "!=", image: "not_equal", descriptionStringId: 'XtraEditorsExpressionEditor.NotEqual.Description' },
+                { text: "<", image: "less", descriptionStringId: 'XtraEditorsExpressionEditor.Less.Description' },
+                { text: "<=", image: "less_or_equal", descriptionStringId: 'XtraEditorsExpressionEditor.LessOrEqual.Description' },
+                { text: ">=", image: "greater_or_equal", descriptionStringId: 'XtraEditorsExpressionEditor.GreaterOrEqual.Description' },
+                { text: ">", hasSeparator: true, image: "greater", descriptionStringId: 'XtraEditorsExpressionEditor.Greater.Description' },
+                { text: "In", descriptionStringId: 'XtraEditorsExpressionEditor.In.Description' },
+                { text: "Like", descriptionStringId: 'XtraEditorsExpressionEditor.Like.Description' },
+                { text: "Between", descriptionStringId: 'XtraEditorsExpressionEditor.Between.Description' },
+                { text: "And", image: "and", descriptionStringId: 'XtraEditorsExpressionEditor.And.Description' },
+                { text: "Or", image: "or", descriptionStringId: 'XtraEditorsExpressionEditor.Or.Description' },
+                { text: "Not", image: "not", descriptionStringId: 'XtraEditorsExpressionEditor.Not.Description' }
+            ];
+            Widgets.functionDisplay = [
+                {
+                    display: DevExpress.Designer.getLocalization("Aggregate", 'XtraEditorsExpressionEditor.functionsTypes.Properties.AggregateItems'),
+                    items: {
+                        Avg: [{ paramCount: 0, text: "[].Avg()", displayName: "Avg()", descriptionStringId: 'XtraEditorsExpressionEditor.AvgAggregate.Description' }],
+                        Count: [{ paramCount: 0, text: "[].Count()", displayName: "Count()", descriptionStringId: 'XtraEditorsExpressionEditor.CountAggregate.Description' }],
+                        Exists: [{ paramCount: 0, text: "[].Exists()", displayName: "Exists()", descriptionStringId: 'XtraEditorsExpressionEditor.ExistsAggregate.Description' }],
+                        Max: [{ paramCount: 0, text: "[].Max()", displayName: "Max()", descriptionStringId: 'XtraEditorsExpressionEditor.MaxAggregate.Description' }],
+                        Min: [{ paramCount: 0, text: "[].Min()", displayName: "Min()", descriptionStringId: 'XtraEditorsExpressionEditor.MinAggregate.Description' }],
+                        Single: [{ paramCount: 0, text: "[].Single()", displayName: "Single()", descriptionStringId: 'XtraEditorsExpressionEditor.SingleAggregate.Description' }],
+                        Sum: [{ paramCount: 0, text: "[].Sum()", displayName: "Sum()", descriptionStringId: 'XtraEditorsExpressionEditor.SumAggregate.Description' }],
+                    }
+                }, {
+                    display: DevExpress.Designer.getLocalization("Date-Time", 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems'),
+                    items: {
+                        LocalDateTimeThisYear: [{ paramCount: 0, text: "LocalDateTimeThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description' }],
+                        LocalDateTimeThisMonth: [{ paramCount: 0, text: "LocalDateTimeThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description' }],
+                        LocalDateTimeLastWeek: [{ paramCount: 0, text: "LocalDateTimeLastWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description' }],
+                        LocalDateTimeThisWeek: [{ paramCount: 0, text: "LocalDateTimeThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description' }],
+                        LocalDateTimeYesterday: [{ paramCount: 0, text: "LocalDateTimeYesterday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description' }],
+                        LocalDateTimeToday: [{ paramCount: 0, text: "LocalDateTimeToday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description' }],
+                        LocalDateTimeNow: [{ paramCount: 0, text: "LocalDateTimeNow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNow.Description' }],
+                        LocalDateTimeTomorrow: [{ paramCount: 0, text: "LocalDateTimeTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description' }],
+                        LocalDateTimeDayAfterTomorrow: [{ paramCount: 0, text: "LocalDateTimeDayAfterTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description' }],
+                        LocalDateTimeNextWeek: [{ paramCount: 0, text: "LocalDateTimeNextWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description' }],
+                        LocalDateTimeTwoWeeksAway: [{ paramCount: 0, text: "LocalDateTimeTwoWeeksAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description' }],
+                        LocalDateTimeNextMonth: [{ paramCount: 0, text: "LocalDateTimeNextMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description' }],
+                        LocalDateTimeNextYear: [{ paramCount: 0, text: "LocalDateTimeNextYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description' }],
+                        IsOutlookIntervalBeyondThisYear: null,
+                        IsOutlookIntervalLaterThisYear: null,
+                        IsOutlookIntervalLaterThisMonth: null,
+                        IsOutlookIntervalNextWeek: null,
+                        IsOutlookIntervalLaterThisWeek: null,
+                        IsOutlookIntervalTomorrow: null,
+                        IsOutlookIntervalToday: null,
+                        IsOutlookIntervalYesterday: null,
+                        IsOutlookIntervalEarlierThisWeek: null,
+                        IsOutlookIntervalLastWeek: null,
+                        IsOutlookIntervalEarlierThisMonth: null,
+                        IsOutlookIntervalEarlierThisYear: null,
+                        IsOutlookIntervalPriorThisYear: null,
+                        IsThisWeek: [{ paramCount: 1, text: "IsThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisWeek.Description' }],
+                        IsThisMonth: [{ paramCount: 1, text: "IsThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisMonth.Description' }],
+                        IsThisYear: [{ paramCount: 1, text: "IsThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisYear.Description' }],
+                        DateDiffTick: [{ paramCount: 2, text: "DateDiffTick(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffTick.Description' }],
+                        DateDiffSecond: [{ paramCount: 2, text: "DateDiffSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffSecond.Description' }],
+                        DateDiffMilliSecond: [{ paramCount: 2, text: "DateDiffMilliSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description' }],
+                        DateDiffMinute: [{ paramCount: 2, text: "DateDiffMinute(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMinute.Description' }],
+                        DateDiffHour: [{ paramCount: 2, text: "DateDiffHour(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffHour.Description' }],
+                        DateDiffDay: [{ paramCount: 2, text: "DateDiffDay(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffDay.Description' }],
+                        DateDiffMonth: [{ paramCount: 2, text: "DateDiffMonth(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMonth.Description' }],
+                        DateDiffYear: [{ paramCount: 2, text: "DateDiffYear(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffYear.Description' }],
+                        GetDate: [{ paramCount: 1, text: "GetDate()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDate.Description' }],
+                        GetMilliSecond: [{ paramCount: 1, text: "GetMilliSecond()", descriptionStringId: 'XtraEditorsExpressionEditor.GetMilliSecond.Description' }],
+                        GetSecond: [{ paramCount: 1, text: "GetSecond()", descriptionStringId: 'XtraEditorsExpressionEditor.GetSecond.Description' }],
+                        GetMinute: [{ paramCount: 1, text: "GetMinute()", descriptionStringId: 'XtraEditorsExpressionEditor.GetMinute.Description' }],
+                        GetHour: [{ paramCount: 1, text: "GetHour()", descriptionStringId: 'XtraEditorsExpressionEditor.GetHour.Description' }],
+                        GetDay: [{ paramCount: 1, text: "GetDay()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDay.Description' }],
+                        GetMonth: [{ paramCount: 1, text: "GetMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.GetMonth.Description' }],
+                        GetYear: [{ paramCount: 1, text: "GetYear()", descriptionStringId: 'XtraEditorsExpressionEditor.GetYear.Description' }],
+                        GetDayOfWeek: [{ paramCount: 1, text: "GetDayOfWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDayOfWeek.Description' }],
+                        GetDayOfYear: [{ paramCount: 1, text: "GetDayOfYear()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDayOfYear.Description' }],
+                        GetTimeOfDay: [{ paramCount: 1, text: "GetTimeOfDay()", descriptionStringId: 'XtraEditorsExpressionEditor.GetTimeOfDay.Description' }],
+                        Now: [{ paramCount: 0, text: "Now()", descriptionStringId: 'XtraEditorsExpressionEditor.Now.Description' }],
+                        UtcNow: [{ paramCount: 0, text: "UtcNow()", descriptionStringId: 'XtraEditorsExpressionEditor.UtcNow.Description' }],
+                        Today: [{ paramCount: 0, text: "Today()", descriptionStringId: 'XtraEditorsExpressionEditor.Today.Description' }],
+                        AddTimeSpan: [{ paramCount: 2, text: "AddTimeSpan(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddTimeSpan.Description' }],
+                        AddTicks: [{ paramCount: 2, text: "AddTicks(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddTicks.Description' }],
+                        AddMilliSeconds: [{ paramCount: 2, text: "AddMilliSeconds(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddMilliSeconds.Description' }],
+                        AddSeconds: [{ paramCount: 2, text: "AddSeconds(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddSeconds.Description' }],
+                        AddMinutes: [{ paramCount: 2, text: "AddMinutes(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddMinutes.Description' }],
+                        AddHours: [{ paramCount: 2, text: "AddHours(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddHours.Description' }],
+                        AddDays: [{ paramCount: 2, text: "AddDays(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddDays.Description' }],
+                        AddMonths: [{ paramCount: 2, text: "AddMonths(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddMonths.Description' }],
+                        AddYears: [{ paramCount: 2, text: "AddYears(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddYears.Description' }],
+                    },
+                }, {
+                    display: DevExpress.Designer.getLocalization("Logical", 'XtraEditorsExpressionEditor.functionsTypes.Properties.LogicalItems'),
+                    items: {
+                        Iif: [{ paramCount: 3, text: "Iif(, , )", descriptionStringId: 'XtraEditorsExpressionEditor.Iif.Description' }],
+                        IsNull: [{ paramCount: 1, text: "IsNull()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNull.Description' }],
+                        IsNullOrEmpty: [{ paramCount: 1, text: "IsNullOrEmpty()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNullOrEmpty.Description' }],
+                    }
+                }, {
+                    display: DevExpress.Designer.getLocalization("Math", 'XtraEditorsExpressionEditor.functionsTypes.Properties.MathItems'),
+                    items: {
+                        Abs: [{ paramCount: 1, text: "Abs()", descriptionStringId: 'XtraEditorsExpressionEditor.Abs.Description' }],
+                        Sqr: [{ paramCount: 1, text: "Sqr()", descriptionStringId: 'XtraEditorsExpressionEditor.Sqr.Description' }],
+                        Cos: [{ paramCount: 1, text: "Cos()", descriptionStringId: 'XtraEditorsExpressionEditor.Cos.Description' }],
+                        Sin: [{ paramCount: 1, text: "Sin()", descriptionStringId: 'XtraEditorsExpressionEditor.Sin.Description' }],
+                        Atn: [{ paramCount: 1, text: "Atn()", descriptionStringId: 'XtraEditorsExpressionEditor.Atn.Description' }],
+                        Exp: [{ paramCount: 1, text: "Exp()", descriptionStringId: 'XtraEditorsExpressionEditor.Exp.Description' }],
+                        Log: [
+                            { paramCount: 1, text: "Log()", descriptionStringId: 'XtraEditorsExpressionEditor.Log.Description' },
+                            { paramCount: 2, text: "Log(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Log2Param.Description' },
+                        ],
+                        Rnd: [{ paramCount: 0, text: "Rnd()", descriptionStringId: 'XtraEditorsExpressionEditor.Rnd.Description' }],
+                        Tan: [{ paramCount: 1, text: "Tan()", descriptionStringId: 'XtraEditorsExpressionEditor.Tan.Description' }],
+                        Power: [{ paramCount: 2, text: "Power(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Power.Description' }],
+                        Sign: [{ paramCount: 1, text: "Sign()", descriptionStringId: 'XtraEditorsExpressionEditor.Sign.Description' }],
+                        Round: [
+                            { paramCount: 1, text: "Round()", descriptionStringId: 'XtraEditorsExpressionEditor.Round.Description' },
+                            { paramCount: 2, text: "Round(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Round2Param.Description' },
+                        ],
+                        Ceiling: [{ paramCount: 1, text: "Ceiling()", descriptionStringId: 'XtraEditorsExpressionEditor.Ceiling.Description' }],
+                        Floor: [{ paramCount: 1, text: "Floor()", descriptionStringId: 'XtraEditorsExpressionEditor.Floor.Description' }],
+                        Max: [{ paramCount: 2, text: "Max(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Max.Description' }],
+                        Min: [{ paramCount: 2, text: "Min(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Min.Description' }],
+                        Acos: [{ paramCount: 1, text: "Acos()", descriptionStringId: 'XtraEditorsExpressionEditor.Acos.Description' }],
+                        Asin: [{ paramCount: 1, text: "Asin()", descriptionStringId: 'XtraEditorsExpressionEditor.Asin.Description' }],
+                        Atn2: [{ paramCount: 2, text: "Atn2(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Atn2.Description' }],
+                        BigMul: [{ paramCount: 2, text: "BigMul(, )", descriptionStringId: 'XtraEditorsExpressionEditor.BigMul.Description' }],
+                        Cosh: [{ paramCount: 1, text: "Cosh()", descriptionStringId: 'XtraEditorsExpressionEditor.Cosh.Description' }],
+                        Log10: [{ paramCount: 1, text: "Log10()", descriptionStringId: 'XtraEditorsExpressionEditor.Log10.Description' }],
+                        Sinh: [{ paramCount: 1, text: "Sinh()", descriptionStringId: 'XtraEditorsExpressionEditor.Sinh.Description' }],
+                        Tanh: [{ paramCount: 1, text: "Tanh()", descriptionStringId: 'XtraEditorsExpressionEditor.Tanh.Description' }],
+                        ToInt: [{ paramCount: 1, text: "ToInt()", descriptionStringId: 'XtraEditorsExpressionEditor.ToInt.Description' }],
+                        ToLong: [{ paramCount: 1, text: "ToLong()", descriptionStringId: 'XtraEditorsExpressionEditor.ToLong.Description' }],
+                        ToFloat: [{ paramCount: 1, text: "ToFloat()", descriptionStringId: 'XtraEditorsExpressionEditor.ToFloat.Description' }],
+                        ToDouble: [{ paramCount: 1, text: "ToDouble()", descriptionStringId: 'XtraEditorsExpressionEditor.ToDouble.Description' }],
+                        ToDecimal: [{ paramCount: 1, text: "ToDecimal()", descriptionStringId: 'XtraEditorsExpressionEditor.ToDecimal.Description' }],
+                    }
+                }, {
+                    display: DevExpress.Designer.getLocalization("String", 'XtraEditorsExpressionEditor.functionsTypes.Properties.StringItems'),
+                    items: {
+                        Trim: [{ paramCount: 1, text: "Trim()", descriptionStringId: 'XtraEditorsExpressionEditor.Trim.Description' }],
+                        Len: [{ paramCount: 1, text: "Len()", descriptionStringId: 'XtraEditorsExpressionEditor.Len.Description' }],
+                        Substring: [
+                            { paramCount: 3, text: "Substring('', , )", descriptionStringId: 'XtraEditorsExpressionEditor.Substring3param.Description' },
+                            { paramCount: 2, text: "Substring('', )", descriptionStringId: 'XtraEditorsExpressionEditor.Substring2param.Description' }
+                        ],
+                        Upper: [{ paramCount: 1, text: "Upper()", descriptionStringId: 'XtraEditorsExpressionEditor.Upper.Description' }],
+                        Lower: [{ paramCount: 1, text: "Lower()", descriptionStringId: 'XtraEditorsExpressionEditor.Lower.Description' }],
+                        Concat: [{ paramCount: Infinity, text: "Concat(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Concat.Description' }],
+                        Ascii: [{ paramCount: 1, text: "Ascii('')", descriptionStringId: 'XtraEditorsExpressionEditor.Ascii.Description' }],
+                        Char: [{ paramCount: 1, text: "Char()", descriptionStringId: 'XtraEditorsExpressionEditor.Char.Description' }],
+                        ToStr: [{ paramCount: 1, text: "ToStr()", descriptionStringId: 'XtraEditorsExpressionEditor.ToStr.Description' }],
+                        Replace: [{ paramCount: 3, text: "Replace('','', '')", descriptionStringId: 'XtraEditorsExpressionEditor.Replace.Description' }],
+                        Reverse: [{ paramCount: 1, text: "Reverse('')", descriptionStringId: 'XtraEditorsExpressionEditor.Reverse.Description' }],
+                        Insert: [{ paramCount: 3, text: "Insert('', , '')", descriptionStringId: 'XtraEditorsExpressionEditor.Insert.Description' }],
+                        CharIndex: [
+                            { paramCount: 2, text: "CharIndex('','')", descriptionStringId: 'XtraEditorsExpressionEditor.CharIndex.Description' },
+                            { paramCount: 3, text: "CharIndex('','', )", descriptionStringId: 'XtraEditorsExpressionEditor.CharIndex3Param.Description' }],
+                        Remove: [
+                            { paramCount: 2, text: "Remove('', )", descriptionStringId: 'XtraEditorsExpressionEditor.Remove2Param.Description' },
+                            { paramCount: 3, text: "Remove('', , )", descriptionStringId: 'XtraEditorsExpressionEditor.Remove3Param.Description' }],
+                        PadLeft: [
+                            { paramCount: 2, text: "PadLeft(, )", descriptionStringId: 'XtraEditorsExpressionEditor.PadLeft.Description' },
+                            { paramCount: 3, text: "PadLeft(, , '')", descriptionStringId: 'XtraEditorsExpressionEditor.PadLeft3Param.Description' }
+                        ],
+                        PadRight: [
+                            { paramCount: 2, text: "PadRight(, )", descriptionStringId: 'XtraEditorsExpressionEditor.PadRight.Description' },
+                            { paramCount: 3, text: "PadRight(, , '')", descriptionStringId: 'XtraEditorsExpressionEditor.PadRight3Param.Description' }
+                        ],
+                        StartsWith: [{ paramCount: 2, text: "StartsWith('', '')", descriptionStringId: 'XtraEditorsExpressionEditor.StartsWith.Description' }],
+                        EndsWith: [{ paramCount: 2, text: "EndsWith('', '')", descriptionStringId: 'XtraEditorsExpressionEditor.EndsWith.Description' }],
+                        Contains: [{ paramCount: 0, text: "Contains('', '')", descriptionStringId: 'XtraEditorsExpressionEditor.Contains.Description' }],
+                    }
+                }
+            ];
+            var Tools = (function () {
+                function Tools(onClick, parametersOptions, fieldListOptions, functionGroups) {
+                    var _this = this;
+                    if (functionGroups === void 0) { functionGroups = Widgets.functionDisplay; }
+                    this.popularItems = [];
+                    this.toolBox = [];
+                    this.description = ko.observable();
+                    this._defaultClick = onClick;
+                    operatorNames.filter(function (item) { return !!item.descriptionStringId; }).forEach(function (item) { return _this._initDescription(item); });
+                    this.popularItems = this._generatePopularItems(operatorNames.filter(function (item) { return !!item.image; }));
+                    this.toolBox = [
+                        this._generateList(DevExpress.Designer.getLocalization("FUNCTIONS", 'XtraEditorsExpressionEditor.Functions.Text'), functionGroups.map(function (funtionGroup) {
+                            var result = {
+                                display: funtionGroup.display,
+                                collapsed: ko.observable(true),
+                                items: []
+                            };
+                            $.map(funtionGroup.items, (function (item) {
+                                if (item) {
+                                    item.forEach(function (functionItem) {
+                                        _this._initDescription(functionItem);
+                                        result.items.push(functionItem);
+                                    });
+                                }
+                            }));
+                            return result;
+                        }), "dx-expressioneditor-functions"),
+                        this._generateList(DevExpress.Designer.getLocalization("OPERATORS", 'XtraEditorsExpressionEditor.Operators.Text'), operatorNames.filter(function (item) { return !!item.descriptionStringId; }))
+                    ];
+                    this.toolBox.push(this._generateList(DevExpress.Designer.getLocalization("FIELDS", 'XtraEditorsExpressionEditor.Fields.Text'), { fields: fieldListOptions, parameters: parametersOptions }, "dx-expressioneditor-fields", "37%"));
+                }
+                Tools.prototype._generateList = function (title, content, templateName, width, click) {
+                    var _this = this;
+                    if (templateName === void 0) { templateName = null; }
+                    return {
+                        templateName: templateName,
+                        width: width || "30%",
+                        title: title,
+                        content: content,
+                        click: click || this._defaultClick,
+                        selection: function (item) { _this.description(item.description || item.text); }
+                    };
+                };
+                Tools.prototype._initDescription = function (expressionEditorItem) {
+                    expressionEditorItem.description = DevExpress.Designer.getLocalization(expressionEditorItem.text, expressionEditorItem.descriptionStringId);
+                };
+                Tools.prototype._generatePopularItems = function (values, click) {
+                    var _this = this;
+                    return values.map(function (item) {
+                        return {
+                            templateName: item.templateName || null,
+                            text: item.text || item,
+                            imgClassName: "dx-image-expressioneditor-" + item.image,
+                            hasSeparator: item.hasSeparator,
+                            description: item.description,
+                            click: click || _this._defaultClick
+                        };
+                    });
+                };
+                return Tools;
+            })();
+            Widgets.Tools = Tools;
+            var ExpressionEditorTreeListController = (function (_super) {
+                __extends(ExpressionEditorTreeListController, _super);
+                function ExpressionEditorTreeListController(fieldName, putSelectionHandler, selectionHandler) {
+                    _super.call(this);
+                    this.fieldName = fieldName;
+                    this.putSelectionHandler = putSelectionHandler;
+                    this.selectionHandler = selectionHandler;
+                }
+                ExpressionEditorTreeListController.prototype.itemsFilter = function (item) {
+                    return item.specifics !== "none" && item.name !== ko.unwrap(this.fieldName);
+                };
+                ExpressionEditorTreeListController.prototype.select = function (value) {
+                    this.selectionHandler(ko.unwrap(value.data["type"]));
+                };
+                ExpressionEditorTreeListController.prototype.getActions = function (item) {
+                    var _this = this;
+                    return [{ clickAction: function (element) { _this.putSelectionHandler(item.path, element); } }];
+                };
+                ExpressionEditorTreeListController.prototype.canSelect = function (value) {
+                    return true;
+                };
+                return ExpressionEditorTreeListController;
+            })(Widgets.TreeListController);
+            Widgets.ExpressionEditorTreeListController = ExpressionEditorTreeListController;
+            var ExpressionEditor = (function () {
+                function ExpressionEditor(options, fieldListProvider, disabled, rtl, _displayConverter) {
+                    var _this = this;
+                    if (disabled === void 0) { disabled = ko.observable(false); }
+                    if (rtl === void 0) { rtl = false; }
+                    this.options = options;
+                    this._displayConverter = _displayConverter;
+                    this._updateTextAreaValue = function (item, element) {
+                        var textArea = _this._getTextArea(element), textAreaValue = _this.textAreaValue().toString(), cursorPosition = textArea && textArea.selectionStart || textAreaValue.length, newAddedText = textAreaValue[cursorPosition - 1] == " " ? (item.text || item) + " " : " " + (item.text || item) + " ";
+                        _this.textAreaValue([textAreaValue.slice(0, cursorPosition), newAddedText, textAreaValue.slice(cursorPosition)].join(''));
+                        if (textArea && textArea.setSelectionRange) {
+                            textArea.focus();
+                            var posisition = cursorPosition + (newAddedText.indexOf("(") !== -1 ? newAddedText.indexOf("(") + 1 : newAddedText.length);
+                            textArea.setSelectionRange(posisition, posisition);
+                        }
+                    };
+                    this.patchFieldName = function (fieldName) { return fieldName; };
+                    this._parametersPutSelectionHandler = function (selectedItemPath, element) {
+                        var proposedFieldName = selectedItemPath;
+                        var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
+                        _this._updateTextAreaValue(newAddedString, element);
+                    };
+                    this._fieldsPutSelectionHandler = function (selectedItemPath, element) {
+                        var path = _this.options.path.peek();
+                        var proposedFieldName = selectedItemPath.substring(path.length + 1);
+                        var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
+                        if (_this._displayConverter) {
+                            _this._displayConverter.toDisplayExpression(path, newAddedString)
+                                .done(function (result) { _this._updateTextAreaValue(result, element); })
+                                .fail(function () { _this._updateTextAreaValue(newAddedString, element); });
+                        }
+                        else {
+                            _this._updateTextAreaValue(newAddedString, element);
+                        }
+                    };
+                    this.popupVisible = ko.observable(false);
+                    this.value = ko.observable("");
+                    this.textAreaValue = ko.observable("");
+                    this.isValid = ko.observable(true);
+                    this.buttonItems = [];
+                    this.rtl = false;
+                    if (options.patchFieldName) {
+                        this.patchFieldName = options.patchFieldName;
+                    }
+                    this.value = options.value;
+                    this.rtl = rtl;
+                    this.textAreaValue(this.value());
+                    this.popupVisible.subscribe(function (newVal) {
+                        _this.textAreaValue(_this.value());
+                    });
+                    this.fieldListProvider = ko.unwrap(fieldListProvider);
+                    this.disabled = disabled;
+                    var self = this;
+                    this.save = function (sender) {
+                        try {
+                            JS.Data.CriteriaOperator.parse(_this.textAreaValue());
+                            options.value(_this.textAreaValue());
+                            _this.popupVisible(false);
+                        }
+                        catch (exception) {
+                            var result = JS.Data.CriteriaOperator.getNotValidRange(_this.textAreaValue(), exception.message);
+                            var textArea = _this._getTextArea(sender.element);
+                            textArea && textArea.setSelectionRange(result.start, result.end);
+                            _this.isValid(false);
+                        }
+                    };
+                    var fieldsTreeListOptions = options.path && ko.pureComputed(function () {
+                        return options.path() && _this._createToolsOptions("field", options.path(), _this._fieldsPutSelectionHandler, options.fieldName);
+                    });
+                    this.tools = new Tools(this._updateTextAreaValue, this._createToolsOptions("parameter", "parameters", this._parametersPutSelectionHandler), fieldsTreeListOptions, options.functions);
+                    this._createMainPopupButtons();
+                }
+                ExpressionEditor.prototype._createMainPopupButtons = function () {
+                    var self = this;
+                    this.buttonItems = [
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Save', 'XtraEditorsExpressionEditor.buttonOK.Text'), onClick: function (sender) { self.save(sender); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Cancel', 'XtraEditorsExpressionEditor.buttonCancel.Text'), onClick: function () { self.popupVisible(false); } } },
+                        { toolbar: 'bottom', location: 'before', template: function () { return $('#dx-expressioneditor-description'); }, text: self.tools.description }
+                    ];
+                };
+                ExpressionEditor.prototype._getTextArea = function (element) {
+                    return element && element.parents(".dx-expressioneditor").find(":input")[0];
+                };
+                ExpressionEditor.prototype._createToolsOptions = function (objectName, path, putSelectionHandler, fieldName) {
+                    var _this = this;
+                    var selectionHandler = function (selectedItemType) {
+                        _this.tools.description(selectedItemType && selectedItemType !== "None" ? DevExpress.Designer.getLocalization("The type of this " + objectName + " is: ", 'XtraEditorsExpressionEditor.Fields Description Prefix') + " " + selectedItemType : "");
+                    };
+                    return {
+                        itemsProvider: this.fieldListProvider,
+                        selectedPath: ko.observable(""),
+                        path: path,
+                        templateName: "dx-ee-treelist-item",
+                        treeListController: new ExpressionEditorTreeListController(fieldName || "", putSelectionHandler, selectionHandler),
+                        rtl: this.rtl
+                    };
+                };
+                return ExpressionEditor;
+            })();
+            Widgets.ExpressionEditor = ExpressionEditor;
+            function wrapExpressionOptionsValue(options, converter, element) {
+                if (!(converter && options.path))
+                    return options;
+                var _displayValue = ko.observable(options.value());
+                converter.toDisplayExpression(options.path(), options.value()).done(function (result) {
+                    _displayValue(result);
+                });
+                var subscription = options.value.subscribe(function (newValue) {
+                    converter.toDisplayExpression(options.path(), newValue).done(function (result) {
+                        _displayValue(result);
+                    });
+                });
+                var displayValue = ko.pureComputed({
+                    read: function () { return _displayValue(); },
+                    write: function (newValue) {
+                        converter.toRealExpression(options.path(), newValue).done(function (result) {
+                            options.value(result);
+                        }).fail(function () {
+                            options.value(newValue);
+                        });
+                    }
+                });
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    subscription.dispose();
+                    displayValue.dispose();
+                });
+                return $.extend({}, options, { value: displayValue });
+            }
+            Widgets.wrapExpressionOptionsValue = wrapExpressionOptionsValue;
+            ko.bindingHandlers['dxExpressionEditor'] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var $element = $(element);
+                    $element.children().remove();
+                    $(element).addClass("dx-popup-general");
+                    var templateHtml = $('#dx-expressioneditor').text(), $element = $element.append(templateHtml), values = valueAccessor();
+                    var editorOptions = wrapExpressionOptionsValue(ko.unwrap(values.options), values.displayExpressionConverter, element);
+                    ko.applyBindings(new ExpressionEditor(editorOptions, values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayExpressionConverter), $element.children()[0]);
+                    return { controlsDescendantBindings: true };
+                }
+            };
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            Widgets.formatStringStandardPatterns = {
+                'DateTime': { type: 'System.DateTime', value: new Date(Date.now()), patterns: [] },
+                'Number': { type: 'System.Int32', value: '123456789', patterns: ['#.00', '#, #', '0.E+0.0', '0.e+0.0', 'n', 'n1', 'n2', 'e', 'e1', 'f', 'f1'] },
+                'Percent': { type: 'System.Int32', value: '100', patterns: ['0.00%', '0%'] },
+                'Currency': { type: 'System.Int32', value: '100', patterns: ['$0.00', '$0', 'c', 'c1', 'c2'] },
+                'Special': { type: 'System.Int32', value: '123456789', patterns: ['(###) ### - ####', '### - ## - ####'] },
+                'General': { type: 'System.String', value: '', patterns: ['General format have no specific number format'] }
+            };
+            var FormatStringEditor = (function (_super) {
+                __extends(FormatStringEditor, _super);
+                function FormatStringEditor(value, disabled, defaultPatterns, customPatterns, actions, rtl, popupContainer) {
+                    _super.call(this);
+                    this.currentType = ko.observable();
+                    this.patternList = ko.observableArray([]);
+                    this.canAddCustomFormat = ko.observable(false);
+                    this.formatPrefix = ko.observable("");
+                    this.formatSuffix = ko.observable("");
+                    this.previewString = ko.observable("Preview string");
+                    this.formatResult = ko.observable("");
+                    this.selectedFormats = ko.observable([]);
+                    this.selectedTypes = ko.observable([]);
+                    this.popupVisible = ko.observable(false);
+                    this.option("value", value);
+                    this.option("disabled", disabled || false);
+                    this.option("rtl", rtl || false);
+                    this.option("popupContainer", popupContainer || ".dx-viewport");
+                    var self = this;
+                    this.popupService = new JS.Utils.PopupService();
+                    this._standardPatternSource = defaultPatterns || Widgets.formatStringStandardPatterns;
+                    this._customPatternSource = customPatterns || {};
+                    this.types = this._convertArray(Object.keys(this._standardPatternSource));
+                    this._disposables.push(this.currentType.subscribe(function (newVal) {
+                        if (self.isGeneralType) {
+                            self.formatResult("");
+                            self.selectedFormats([]);
+                        }
+                        else {
+                            self._updateFormatList();
+                        }
+                    }));
+                    this.currentType(this.types[0].name);
+                    this._disposables.push(this.formatResult.subscribe(function (newVal) {
+                        self._updateCanAddCustomFormat(newVal);
+                        self._updatePreview();
+                    }));
+                    this._disposables.push(this.formatPrefix.subscribe(function (newVal) {
+                        self._updatePreview();
+                    }));
+                    this._disposables.push(this.formatSuffix.subscribe(function (newVal) {
+                        self._updatePreview();
+                    }));
+                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
+                        if (!newVal)
+                            return;
+                        self._initEditor(value());
+                        self.selectedTypes(self.types.filter(function (item) { return item.name === self.currentType(); }));
+                    }));
+                    this._createMainPopupButtons();
+                    actions && actions.updatePreview && (this.updatePreview = actions.updatePreview);
+                    this.setType = function (e) {
+                        self.currentType(e.itemData.name);
+                        self._updateSelection();
+                    };
+                    this.setFormat = function (e) {
+                        self.formatResult(e.itemData.name);
+                    };
+                    this.addCustomFormat = function () {
+                        if (self.formatResult() && self.canAddCustomFormat()) {
+                            self.customPatterns.push(self.formatResult());
+                            self._updateFormatList();
+                            self._scrollToBottom();
+                            actions && actions.saveCustomPattern(self.currentType(), self.formatResult());
+                            self._updateSelection(self.patternList().length - 1);
+                            self.canAddCustomFormat(false);
+                        }
+                    };
+                    this.removeCustomFormat = function (data) {
+                        var currentSelection = self.selectedFormats()[0];
+                        var patternList = self.patternList();
+                        var removedItemIndex = patternList.map(function (item) { return item.name; }).indexOf(data.name);
+                        self.customPatterns.splice(self.customPatterns.indexOf(data.name), 1);
+                        self._updateFormatList();
+                        actions && actions.removeCustomPattern(self.currentType(), data.name);
+                        if (currentSelection.name === data.name) {
+                            self._updateSelection(removedItemIndex === (patternList.length - 1) ? (self.patternList().length - 1) : removedItemIndex);
+                        }
+                        else {
+                            self.selectedFormats(self.patternList().filter(function (item) { return item.name === currentSelection.name; }));
+                        }
+                    };
+                }
+                FormatStringEditor.prototype.okAction = function () {
+                    var result = this.isGeneralType ? this._getGeneralPreview('{0}') : this._wrapFormat();
+                    this.option("value", result);
+                    this.popupVisible(false);
+                };
+                FormatStringEditor.prototype._createMainPopupButtons = function () {
+                    var self = this;
+                    this.buttonItems = [
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: 'OK', onClick: function () { self.okAction(); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: 'Cancel', onClick: function () { self.popupVisible(false); } } }
+                    ];
+                };
+                FormatStringEditor.prototype._convertArray = function (array, canRemove) {
+                    return array.map(function (item) { return { name: item, canRemove: !!canRemove }; });
+                };
+                FormatStringEditor.prototype._scrollToBottom = function () {
+                    var $scrollView = $(".dx-format-string .dx-format-string-formats").find(".dx-scrollview").filter(":visible");
+                    var scrollViewInstance = $scrollView.data("dxScrollView") && $scrollView.dxScrollView("instance");
+                    scrollViewInstance && scrollViewInstance["scrollTo"] && scrollViewInstance["scrollTo"](scrollViewInstance["scrollHeight"]());
+                };
+                FormatStringEditor.prototype._updateFormatList = function () {
+                    this.selectedFormats([]);
+                    var currentTypeInfo = this._standardPatternSource[this.currentType()];
+                    this.patternList(this._convertArray(currentTypeInfo.patterns).concat(this._convertArray(this.customPatterns, true)));
+                };
+                FormatStringEditor.prototype._updateSelection = function (selectedItemIndex) {
+                    var currectFormat = this.patternList()[selectedItemIndex || 0];
+                    if (currectFormat) {
+                        this.selectedFormats([currectFormat]);
+                        this.formatResult(currectFormat.name);
+                    }
+                };
+                FormatStringEditor.prototype._updatePreview = function () {
+                    var _this = this;
+                    if (this.isGeneralType) {
+                        this.previewString(this._getGeneralPreview(undefined));
+                        return;
+                    }
+                    var category = this._standardPatternSource[this.currentType()];
+                    var updatedPreviewPromise = this.updatePreview(category.value, category.type, this._wrapFormat());
+                    this._lastUpdatePreviewPromise = updatedPreviewPromise;
+                    updatedPreviewPromise
+                        .done(function (previewString) {
+                        if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
+                            _this.previewString(previewString);
+                    }).fail(function (error) {
+                        if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
+                            _this.previewString('Preview string is not available');
+                    });
+                };
+                FormatStringEditor.prototype._getGeneralPreview = function (value) {
+                    if (value === void 0) { value = '###'; }
+                    return this.formatPrefix() + value + this.formatSuffix();
+                };
+                FormatStringEditor.prototype._wrapFormat = function (format) {
+                    var pattern = format || this.formatResult();
+                    if (pattern && pattern.indexOf("{0:") !== -1) {
+                        return pattern;
+                    }
+                    return pattern ? "{0:" + pattern + "}" : "";
+                };
+                FormatStringEditor.prototype._updateCanAddCustomFormat = function (newFormat) {
+                    if (!newFormat) {
+                        this.canAddCustomFormat(false);
+                        return;
+                    }
+                    var canAddCustomFormat = true;
+                    for (var name in this._standardPatternSource) {
+                        canAddCustomFormat = this._standardPatternSource[name].patterns.indexOf(newFormat) === -1;
+                        if (!canAddCustomFormat) {
+                            break;
+                        }
+                    }
+                    this.canAddCustomFormat(canAddCustomFormat ? this.customPatterns.indexOf(newFormat) === -1 : canAddCustomFormat);
+                };
+                FormatStringEditor.prototype._initEditor = function (formatStringValue) {
+                    var _this = this;
+                    if (!formatStringValue) {
+                        this.setType({ itemData: this.types[0] });
+                        return;
+                    }
+                    if (formatStringValue.indexOf("{0}") !== -1) {
+                        this.currentType("General");
+                        this.formatPrefix(formatStringValue.substring(0, formatStringValue.indexOf("{0}")));
+                        this.formatSuffix(formatStringValue.substring(formatStringValue.indexOf("{0}") + 3));
+                        return;
+                    }
+                    var startIndex = formatStringValue.indexOf("{0:"), closingBracketIndex = formatStringValue.indexOf("}", startIndex), formatPattern = formatStringValue.substring(startIndex + 3, closingBracketIndex), isFormatPatternFind;
+                    var selectTypePatternPair = function () {
+                        _this.currentType(name);
+                        if (startIndex === 0 && closingBracketIndex === (formatStringValue.length - 1)) {
+                            _this.selectedFormats(_this.patternList().filter(function (item) { return item.name === formatPattern; }));
+                            _this.formatResult(formatPattern);
+                            isFormatPatternFind = true;
+                        }
+                    };
+                    for (var name in this._standardPatternSource) {
+                        if (this._standardPatternSource[name].patterns.indexOf(formatPattern) !== -1) {
+                            selectTypePatternPair();
+                            break;
+                        }
+                        var customPatterns = this._customPatternSource[this._standardPatternSource[name].type];
+                        if (customPatterns && customPatterns.indexOf(formatPattern) !== -1) {
+                            selectTypePatternPair();
+                            break;
+                        }
+                    }
+                    if (!isFormatPatternFind) {
+                        this.currentType(this.types[0].name);
+                        this.selectedFormats([]);
+                        this.formatResult(formatStringValue);
+                    }
+                };
+                FormatStringEditor.prototype.updateInputText = function (propertyName, componentInstance) {
+                    this[propertyName](componentInstance.option("text"));
+                };
+                FormatStringEditor.prototype.option = function (name, value) {
+                    if (value !== void 0) {
+                        if (ko.isObservable(this[name])) {
+                            this[name](value);
+                        }
+                        else {
+                            this[name] = value;
+                        }
+                    }
+                    return ko.unwrap(this[name]);
+                };
+                FormatStringEditor.prototype.updatePreview = function (value, category, pattern) {
+                    return $.Deferred().resolve(value || "preview string").promise();
+                };
+                Object.defineProperty(FormatStringEditor.prototype, "customPatterns", {
+                    get: function () {
+                        var currentTypeInfo = this._standardPatternSource[this.currentType()];
+                        return this._customPatternSource[currentTypeInfo.type] = this._customPatternSource[currentTypeInfo.type] || [];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(FormatStringEditor.prototype, "isGeneralType", {
+                    get: function () {
+                        return this.currentType() === "General";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return FormatStringEditor;
+            })(DevExpress.JS.Utils.Disposable);
+            Widgets.FormatStringEditor = FormatStringEditor;
+            ko.bindingHandlers['dxFormatEditor'] = {
+                init: function (element, valueAccessor) {
+                    $(element).children().remove();
+                    $(element).addClass("dx-popup-general");
+                    var templateHtml = $('#dx-format-string').text(), $element = $(element).append(templateHtml), values = valueAccessor();
+                    var formatEditor = new FormatStringEditor(values.value, values['disabled'], values['standardPatterns'], values['customPatterns'], values['actions'], values['rtl'], values['popupContainer']);
+                    ko.applyBindings(formatEditor, $element.children()[0]);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        formatEditor.dispose();
+                    });
+                    return { controlsDescendantBindings: true };
+                }
+            };
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var dxPopupWithAutoHeight = (function (_super) {
+                __extends(dxPopupWithAutoHeight, _super);
+                function dxPopupWithAutoHeight(element, options) {
+                    _super.call(this, element, options);
+                }
+                dxPopupWithAutoHeight.prototype._setContentHeight = function () {
+                    this["_$popupContent"].css({
+                        height: "100%"
+                    });
+                };
+                return dxPopupWithAutoHeight;
+            })(DevExpress.ui.dxPopup);
+            Widgets.dxPopupWithAutoHeight = dxPopupWithAutoHeight;
+            DevExpress.registerComponent("dxPopupWithAutoHeight", dxPopupWithAutoHeight);
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Utils;
+        (function (Utils) {
+            ko.bindingHandlers["focus"] = {
+                init: function (element, valueAccessor) {
+                    var visible = valueAccessor().on || valueAccessor();
+                    var subscription = visible.subscribe(function (newVal) {
+                        if (newVal) {
+                            if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
+                                $(element).find(":input").focus();
+                            }
+                        }
+                    });
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        subscription.dispose();
+                    });
+                }
+            };
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+//# sourceMappingURL=dx-ko-widgets.js.map
+/* parser generated by jison 0.4.17 */
+/*
+  Returns a Parser object of the following structure:
+
+  Parser: {
+    yy: {}
+  }
+
+  Parser.prototype: {
+    yy: {},
+    trace: function(),
+    symbols_: {associative list: name ==> number},
+    terminals_: {associative list: number ==> name},
+    productions_: [...],
+    performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate, $$, _$),
+    table: [...],
+    defaultActions: {...},
+    parseError: function(str, hash),
+    parse: function(input),
+
+    lexer: {
+        EOF: 1,
+        parseError: function(str, hash),
+        setInput: function(input),
+        input: function(),
+        unput: function(str),
+        more: function(),
+        less: function(n),
+        pastInput: function(),
+        upcomingInput: function(),
+        showPosition: function(),
+        test_match: function(regex_match_array, rule_index),
+        next: function(),
+        lex: function(),
+        begin: function(condition),
+        popState: function(),
+        _currentRules: function(),
+        topState: function(),
+        pushState: function(condition),
+
+        options: {
+            ranges: boolean           (optional: true ==> token location info will include a .range[] member)
+            flex: boolean             (optional: true ==> flex-like lexing behaviour where the rules are tested exhaustively to find the longest match)
+            backtrack_lexer: boolean  (optional: true ==> lexer regexes are tested in order and for each matching regex the action code is invoked; the lexer terminates the scan when a token is returned by the action code)
+        },
+
+        performAction: function(yy, yy_, $avoiding_name_collisions, YY_START),
+        rules: [...],
+        conditions: {associative list: name ==> set},
+    }
+  }
+
+
+  token location info (@$, _$, etc.): {
+    first_line: n,
+    last_line: n,
+    first_column: n,
+    last_column: n,
+    range: [start_number, end_number]       (where the numbers are indexes into the input string, regular zero-based)
+  }
+
+
+  the parseError function receives a 'hash' object with these members for lexer and parser errors: {
+    text:        (matched text)
+    token:       (the produced terminal token, if any)
+    line:        (yylineno)
+  }
+  while parser (grammar) errors will also provide these members, i.e. parser errors deliver a superset of attributes: {
+    loc:         (yylloc)
+    expected:    (string describing the set of expected tokens)
+    recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
+  }
+*/
+var criteriaparser = (function(){
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,19],$V8=[1,30],$V9=[1,32],$Va=[1,25],$Vb=[1,24],$Vc=[1,34],$Vd=[1,31],$Ve=[1,33],$Vf=[1,13],$Vg=[1,5],$Vh=[1,14],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,39],$Vq=[1,50],$Vr=[1,52],$Vs=[1,53],$Vt=[1,56],$Vu=[1,55],$Vv=[1,51],$Vw=[1,54],$Vx=[1,36],$Vy=[1,37],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$V71=[5,11,41,42,50,56],$V81=[1,145],$V91=[16,50],$Va1=[15,16,17,22,25,26,27,28,50],$Vb1=[16,17,20],$Vc1=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$Vd1=[5,11,40,41,42,45,46,50,56,66,67],$Ve1=[5,11,19,20,40,41,42,45,46,50,56,66,67,68,69],$Vf1=[11,56],$Vg1=[5,11,16,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69];
+var parser = {trace: function trace() { },
+yy: {},
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"-":26,"[":27,"=":28,"param":29,"?":30,"property":31,"columnOrAggregate":32,"AGG_COUNT":33,"AGG_AVG":34,"AGG_MAX":35,"AGG_MIN":36,"AGG_SINGLE":37,"AGG_EXISTS":38,"AGG_SUM":39,"OP_LIKE":40,"AND":41,"OR":42,"OP_BETWEEN":43,"OP_IN":44,"NOT":45,"IS":46,"NULL":47,"propertyWithAggregate":48,"compositeProperty":49,"]":50,"field":51,"aggregate":52,"aggregateSuffix":53,"topLevelAggregate":54,"(":55,")":56,"MinStart":57,"MaxStart":58,"CONST":59,"*":60,"/":61,"%":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"-",27:"[",28:"=",30:"?",33:"AGG_COUNT",34:"AGG_AVG",35:"AGG_MAX",36:"AGG_MIN",37:"AGG_SINGLE",38:"AGG_EXISTS",39:"AGG_SUM",40:"OP_LIKE",41:"AND",42:"OR",43:"OP_BETWEEN",44:"OP_IN",45:"NOT",46:"IS",47:"NULL",50:"]",55:"(",56:")",59:"CONST",60:"*",61:"/",62:"%",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
+productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[29,2],[29,1],[31,1],[31,3],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[48,1],[48,3],[49,3],[49,5],[51,1],[51,2],[52,4],[52,3],[52,6],[52,5],[52,4],[52,3],[52,1],[54,1],[53,1],[53,1],[53,3],[53,3],[53,4],[53,4],[53,3],[53,4],[53,2],[53,2],[57,3],[58,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
+performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
+/* this == yyval */
+
+var $0 = $$.length - 1;
+switch (yystate) {
+case 1:
+ return $$[$0-1]; 
+break;
+case 2:
+ result = new DevExpress.JS.Data.CriteriaOperator(); 
+break;
+case 3:
+ result = $$[$0-1]; 
+break;
+case 4:
+ this.$ = [ $$[$0] ]; 
+break;
+case 5: case 6:
+ this.$ = $$[$0-2]; this.$.push($$[$0]); 
+break;
+case 7: case 10: case 17: case 39: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 86: case 87: case 88: case 89:
+ this.$ = $$[$0]; 
+break;
+case 8: case 79: case 80: case 112: case 122:
+ this.$ = $$[$0-1]; 
+break;
+case 9:
+ this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.OrderDescToken, $$[$0-1]); 
+break;
+case 11: case 40:
+ this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '.' + $$[$0].propertyName); 
+break;
+case 12:
+ this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '+' + $$[$0].propertyName); 
+break;
+case 13:
+ this.$ = new DevExpress.JS.Data.OperandProperty('<' + $$[$0-2].propertyName + '>' + $$[$0].propertyName); 
+break;
+case 14: case 20:
+ this.$ = new DevExpress.JS.Data.OperandProperty($$[$0]); 
+break;
+case 15: case 16: case 21:
+ this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-1].propertyName + ' ' + $$[$0]); 
+break;
+case 18:
+ this.$ = new DevExpress.JS.Data.OperandProperty("^"); 
+break;
+case 19:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0]); 
+break;
+case 22: case 23:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-1].propertyName + ' ' + $$[$0]); 
+break;
+case 24:
+  this.$ = new DevExpress.JS.Data.OperandProperty("^"); 
+break;
+case 25: case 26: case 27:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '-' + $$[$0]); 
+break;
+case 28: case 29:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '[' + $$[$0]); 
+break;
+case 30: case 31: case 32: case 33:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '+' + $$[$0]); 
+break;
+case 34: case 35: case 36:
+  this.$ = new DevExpress.JS.Data.OperandProperty($$[$0-2].propertyName + '=' + $$[$0]); 
+break;
+case 37:
+ this.$ = new DevExpress.JS.Data.OperandParameter($$[$0]); 
+break;
+case 38:
+ this.$ = new DevExpress.JS.Data.OperandValue(undefined); 
+break;
+case 41:
+ this.$ = $$[$0].propertyName; 
+break;
+case 58:
+ this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
+break;
+case 59:
+
+  var lst = [];
+  lst.push($$[$0-1]);
+  this.$ = {
+   column: _$[$0-1].first_column,
+   line: _$[$0-1].first_line - 1,
+   names: lst
+  };
+ 
+break;
+case 60:
+
+  var propertyNameObject = $$[$0-4];
+  propertyNameObject.names.push($$[$0-1]);
+  this.$ = propertyNameObject;
+ 
+break;
+case 61:
+ this.$ = new DevExpress.JS.Data.OperandProperty($$[$0].names.join('.'), $$[$0].column, $$[$0].line); 
+break;
+case 62:
+ this.$ = new DevExpress.JS.Data.OperandProperty(); 
+break;
+case 63:
+
+		var agg = $$[$0];
+		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty(), null, agg.operatorType, agg.aggregatedExpression);
+	
+break;
+case 64:
+
+		var agg = $$[$0];
+		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty($$[$0-2].names.join('.'), $$[$0-2].column, $$[$0-2].line), null, agg.operatorType, agg.aggregatedExpression);
+	
+break;
+case 65:
+
+		var agg = $$[$0];
+		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
+	
+break;
+case 66:
+
+		var agg = $$[$0];
+		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
+	
+break;
+case 67:
+ this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
+break;
+case 68:
+ this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
+break;
+case 71: case 73:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Count, null); 
+break;
+case 72: case 74:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Exists, null); 
+break;
+case 75:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Avg, null); 
+break;
+case 76:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Sum, null); 
+break;
+case 77:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, new DevExpress.JS.Data.OperandProperty("This"), DevExpress.JS.Data.Aggregate.Single, null); 
+break;
+case 78:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Single, null); 
+break;
+case 81:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Min, null); 
+break;
+case 82:
+ this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Max, null); 
+break;
+case 83:
+ this.$ = new DevExpress.JS.Data.ConstantValue($$[$0]); 
+break;
+case 84:
+ this.$ = new DevExpress.JS.Data.ConstantValue(parseFloat($$[$0])); 
+break;
+case 85:
+ this.$ = new DevExpress.JS.Data.ConstantValue(null); 
+break;
+case 90:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Multiply); 
+break;
+case 91:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Divide); 
+break;
+case 92:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Plus); 
+break;
+case 93:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Minus); 
+break;
+case 94:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Modulo); 
+break;
+case 95:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseOr); 
+break;
+case 96:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd); 
+break;
+case 97:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseXor); 
+break;
+case 98:
+
+								this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Minus, $$[$0]);
+							
+break;
+case 99:
+ this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Plus, $$[$0]); 
+break;
+case 100:
+ this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, $$[$0]); 
+break;
+case 101:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Equal); 
+break;
+case 102:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.NotEqual); 
+break;
+case 103:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Greater); 
+break;
+case 104:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Less); 
+break;
+case 105:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual); 
+break;
+case 106:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.LessOrEqual); 
+break;
+case 107:
+ this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like); 
+break;
+case 108:
+ this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.BinaryOperator($$[$0-3], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like)); 
+break;
+case 109:
+ this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, $$[$0]); 
+break;
+case 110:
+ this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
+break;
+case 111:
+ this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
+break;
+case 113:
+ this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-2]); 
+break;
+case 114:
+ this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-3])); 
+break;
+case 115:
+ this.$ = new DevExpress.JS.Data.InOperator($$[$0-2], $$[$0]); 
+break;
+case 116:
+ this.$ = new DevExpress.JS.Data.BetweenOperator($$[$0-6], $$[$0-3], $$[$0-1]); 
+break;
+case 117: case 118:
+  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], $$[$0]); 
+break;
+case 119:
+ this.$ = null; 
+break;
+case 120:
+ this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Min, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
+break;
+case 121:
+ this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Max, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
+break;
+case 123:
+ this.$ = []; 
+break;
+case 124:
+
+							var lst = [];
+							lst.push($$[$0]);
+							this.$ = lst;
+						
+break;
+case 125:
+
+							var lst = $$[$0-2];
+							lst.push($$[$0]);
+							this.$ = lst;
+						
+break;
+}
+},
+table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,83]),o($VG,[2,84]),o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87],{27:[1,57]}),o($VG,[2,88],{16:[1,58]}),o($VG,[2,89]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,64],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{55:$VH,70:65},o($VI,$VJ,{70:67,55:$VH}),{11:[1,68],56:$VK},{11:[1,70],56:$VL},o($VG,[2,38],{15:[1,72]}),o($VM,[2,61],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:75,50:[1,74]},o($V31,[2,39],{15:$V41,22:$V51}),o($VG,[2,69]),{55:[1,98]},{55:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,70]),{14:100,15:[1,101]},o($VG,[2,71],{55:[1,102]}),o($VG,[2,72],{55:[1,103]}),{55:[1,104]},{55:[1,105]},{55:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{40:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{45:[1,126],47:[1,125]},{55:$VH,70:127},{55:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,50:[1,130],51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,98]),o($VG,[2,99]),o($V61,[2,100],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o($V71,[2,109],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,133],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,119]),o($VG,[2,117]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,135],57:17,58:18,59:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,118]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,79]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,80]),o($VG,[2,37]),{27:[1,140],33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:139,57:141,58:142},o($VM,[2,62],{16:[1,143]}),{16:$V81,50:[1,144]},o($V91,[2,57]),o($V91,[2,41],{15:[1,146],17:[1,151],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,152]}),o($V91,[2,42]),o($V91,[2,43]),o($V91,[2,44]),o($V91,[2,45]),o($V91,[2,46]),o($V91,[2,47]),o($V91,[2,48]),o($V91,[2,49]),o($V91,[2,50]),o($V91,[2,51]),o($V91,[2,52]),o($V91,[2,53]),o($V91,[2,54]),o($V91,[2,55]),o($V91,[2,56]),o($Va1,[2,19]),o($Va1,[2,20]),o($Va1,[2,24]),o($VI,[2,15]),o($VI,[2,16]),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:154,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{16:[1,156],17:[1,157],20:[1,155]},o($Vb1,[2,10]),{56:[1,158]},{56:[1,159]},{4:160,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:161,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,162],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,90]),o($VG,[2,91]),o($Vc1,[2,92],{60:$Vx,61:$Vy,62:$Vz}),o($Vc1,[2,93],{60:$Vx,61:$Vy,62:$Vz}),o($VG,[2,94]),o([5,11,19,20,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,95],{17:$Vl,23:$Vo,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,96],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o([5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,97],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($Vd1,[2,101],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,102],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Ve1,[2,103],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,104],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,105],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,106],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,107],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($V71,[2,110],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,42,50,56],[2,111],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,113]),{47:[1,165]},o($VG,[2,115]),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,50:[1,167],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,68],{16:[1,168]}),o($V31,[2,40],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,112]),{11:[1,170],56:[1,169]},o($VG,[2,123]),o($Vf1,[2,124],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,171],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,172],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,64]),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:173},{56:$VK},{56:$VL},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:174,57:141,58:142},o($Vg1,[2,59]),{15:$VN,23:$VO,24:77,25:$VP,32:175,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21},o($Va1,[2,21]),o($Va1,[2,22]),o($Va1,[2,23]),{15:[1,176],22:[1,178],25:[1,177]},{15:[1,179],22:[1,181],25:[1,180]},{15:[1,182],22:[1,184],25:[1,183]},{15:[1,185],22:[1,187],25:[1,186]},o($Vf1,[2,81],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,82],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,188]},{15:[1,189]},{15:[1,190]},o($VG,[2,73]),o($VG,[2,74]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,191],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,192],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,77]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,193],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vd1,[2,108],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,114]),{11:[1,194],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,67],{16:[1,195]}),{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:196,57:141,58:142},o($VG,[2,122]),{4:197,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,120]),o($VG,[2,121]),{16:$V81,50:[1,198]},o($VG,[2,63]),o($V91,[2,58]),o($Va1,[2,25]),o($Va1,[2,26]),o($Va1,[2,27]),o($Va1,[2,28]),o($Va1,[2,29]),o($Va1,[2,30]),o($Va1,[2,31]),o($Va1,[2,32]),o($Va1,[2,33]),o($Va1,[2,34]),o($Va1,[2,35]),o($Va1,[2,36]),o($VI,[2,13]),o($Vb1,[2,11]),o($Vb1,[2,12]),o($VG,[2,75]),o($VG,[2,76]),o($VG,[2,78]),{4:199,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:200,57:141,58:142},o($VG,[2,66]),o($Vf1,[2,125],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vg1,[2,60]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,201],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,65]),o($VG,[2,116])],
+defaultActions: {35:[2,1]},
+parseError: function parseError(str, hash) {
+    if (hash.recoverable) {
+        this.trace(str);
+    } else {
+        function _parseError (msg, hash) {
+            this.message = msg;
+            this.hash = hash;
+        }
+        _parseError.prototype = Error;
+
+        throw new _parseError(str, hash);
+    }
+},
+parse: function parse(input) {
+    var self = this, stack = [0], tstack = [], vstack = [null], lstack = [], table = this.table, yytext = '', yylineno = 0, yyleng = 0, recovering = 0, TERROR = 2, EOF = 1;
+    var args = lstack.slice.call(arguments, 1);
+    var lexer = Object.create(this.lexer);
+    var sharedState = { yy: {} };
+    for (var k in this.yy) {
+        if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
+            sharedState.yy[k] = this.yy[k];
+        }
+    }
+    lexer.setInput(input, sharedState.yy);
+    sharedState.yy.lexer = lexer;
+    sharedState.yy.parser = this;
+    if (typeof lexer.yylloc == 'undefined') {
+        lexer.yylloc = {};
+    }
+    var yyloc = lexer.yylloc;
+    lstack.push(yyloc);
+    var ranges = lexer.options && lexer.options.ranges;
+    if (typeof sharedState.yy.parseError === 'function') {
+        this.parseError = sharedState.yy.parseError;
+    } else {
+        this.parseError = Object.getPrototypeOf(this).parseError;
+    }
+    function popStack(n) {
+        stack.length = stack.length - 2 * n;
+        vstack.length = vstack.length - n;
+        lstack.length = lstack.length - n;
+    }
+    _token_stack:
+        var lex = function () {
+            var token;
+            token = lexer.lex() || EOF;
+            if (typeof token !== 'number') {
+                token = self.symbols_[token] || token;
+            }
+            return token;
+        };
+    var symbol, preErrorSymbol, state, action, a, r, yyval = {}, p, len, newState, expected;
+    while (true) {
+        state = stack[stack.length - 1];
+        if (this.defaultActions[state]) {
+            action = this.defaultActions[state];
+        } else {
+            if (symbol === null || typeof symbol == 'undefined') {
+                symbol = lex();
+            }
+            action = table[state] && table[state][symbol];
+        }
+                    if (typeof action === 'undefined' || !action.length || !action[0]) {
+                var errStr = '';
+                expected = [];
+                for (p in table[state]) {
+                    if (this.terminals_[p] && p > TERROR) {
+                        expected.push('\'' + this.terminals_[p] + '\'');
+                    }
+                }
+                if (lexer.showPosition) {
+                    errStr = 'Parse error on line ' + (yylineno + 1) + ':\n' + lexer.showPosition() + '\nExpecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
+                } else {
+                    errStr = 'Parse error on line ' + (yylineno + 1) + ': Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
+                }
+                this.parseError(errStr, {
+                    text: lexer.match,
+                    token: this.terminals_[symbol] || symbol,
+                    line: lexer.yylineno,
+                    loc: yyloc,
+                    expected: expected
+                });
+            }
+        if (action[0] instanceof Array && action.length > 1) {
+            throw new Error('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol);
+        }
+        switch (action[0]) {
+        case 1:
+            stack.push(symbol);
+            vstack.push(lexer.yytext);
+            lstack.push(lexer.yylloc);
+            stack.push(action[1]);
+            symbol = null;
+            if (!preErrorSymbol) {
+                yyleng = lexer.yyleng;
+                yytext = lexer.yytext;
+                yylineno = lexer.yylineno;
+                yyloc = lexer.yylloc;
+                if (recovering > 0) {
+                    recovering--;
+                }
+            } else {
+                symbol = preErrorSymbol;
+                preErrorSymbol = null;
+            }
+            break;
+        case 2:
+            len = this.productions_[action[1]][1];
+            yyval.$ = vstack[vstack.length - len];
+            yyval._$ = {
+                first_line: lstack[lstack.length - (len || 1)].first_line,
+                last_line: lstack[lstack.length - 1].last_line,
+                first_column: lstack[lstack.length - (len || 1)].first_column,
+                last_column: lstack[lstack.length - 1].last_column
+            };
+            if (ranges) {
+                yyval._$.range = [
+                    lstack[lstack.length - (len || 1)].range[0],
+                    lstack[lstack.length - 1].range[1]
+                ];
+            }
+            r = this.performAction.apply(yyval, [
+                yytext,
+                yyleng,
+                yylineno,
+                sharedState.yy,
+                action[1],
+                vstack,
+                lstack
+            ].concat(args));
+            if (typeof r !== 'undefined') {
+                return r;
+            }
+            if (len) {
+                stack = stack.slice(0, -1 * len * 2);
+                vstack = vstack.slice(0, -1 * len);
+                lstack = lstack.slice(0, -1 * len);
+            }
+            stack.push(this.productions_[action[1]][0]);
+            vstack.push(yyval.$);
+            lstack.push(yyval._$);
+            newState = table[stack[stack.length - 2]][stack[stack.length - 1]];
+            stack.push(newState);
+            break;
+        case 3:
+            return true;
+        }
+    }
+    return true;
+}};
+/* generated by jison-lex 0.3.4 */
+var lexer = (function(){
+var lexer = ({
+
+EOF:1,
+
+parseError:function parseError(str, hash) {
+        if (this.yy.parser) {
+            this.yy.parser.parseError(str, hash);
+        } else {
+            throw new Error(str);
+        }
+    },
+
+// resets the lexer, sets new input
+setInput:function (input, yy) {
+        this.yy = yy || this.yy || {};
+        this._input = input;
+        this._more = this._backtrack = this.done = false;
+        this.yylineno = this.yyleng = 0;
+        this.yytext = this.matched = this.match = '';
+        this.conditionStack = ['INITIAL'];
+        this.yylloc = {
+            first_line: 1,
+            first_column: 0,
+            last_line: 1,
+            last_column: 0
+        };
+        if (this.options.ranges) {
+            this.yylloc.range = [0,0];
+        }
+        this.offset = 0;
+        return this;
+    },
+
+// consumes and returns one char from the input
+input:function () {
+        var ch = this._input[0];
+        this.yytext += ch;
+        this.yyleng++;
+        this.offset++;
+        this.match += ch;
+        this.matched += ch;
+        var lines = ch.match(/(?:\r\n?|\n).*/g);
+        if (lines) {
+            this.yylineno++;
+            this.yylloc.last_line++;
+        } else {
+            this.yylloc.last_column++;
+        }
+        if (this.options.ranges) {
+            this.yylloc.range[1]++;
+        }
+
+        this._input = this._input.slice(1);
+        return ch;
+    },
+
+// unshifts one char (or a string) into the input
+unput:function (ch) {
+        var len = ch.length;
+        var lines = ch.split(/(?:\r\n?|\n)/g);
+
+        this._input = ch + this._input;
+        this.yytext = this.yytext.substr(0, this.yytext.length - len);
+        //this.yyleng -= len;
+        this.offset -= len;
+        var oldLines = this.match.split(/(?:\r\n?|\n)/g);
+        this.match = this.match.substr(0, this.match.length - 1);
+        this.matched = this.matched.substr(0, this.matched.length - 1);
+
+        if (lines.length - 1) {
+            this.yylineno -= lines.length - 1;
+        }
+        var r = this.yylloc.range;
+
+        this.yylloc = {
+            first_line: this.yylloc.first_line,
+            last_line: this.yylineno + 1,
+            first_column: this.yylloc.first_column,
+            last_column: lines ?
+                (lines.length === oldLines.length ? this.yylloc.first_column : 0)
+                 + oldLines[oldLines.length - lines.length].length - lines[0].length :
+              this.yylloc.first_column - len
+        };
+
+        if (this.options.ranges) {
+            this.yylloc.range = [r[0], r[0] + this.yyleng - len];
+        }
+        this.yyleng = this.yytext.length;
+        return this;
+    },
+
+// When called from action, caches matched text and appends it on next action
+more:function () {
+        this._more = true;
+        return this;
+    },
+
+// When called from action, signals the lexer that this rule fails to match the input, so the next matching rule (regex) should be tested instead.
+reject:function () {
+        if (this.options.backtrack_lexer) {
+            this._backtrack = true;
+        } else {
+            return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. You can only invoke reject() in the lexer when the lexer is of the backtracking persuasion (options.backtrack_lexer = true).\n' + this.showPosition(), {
+                text: "",
+                token: null,
+                line: this.yylineno
+            });
+
+        }
+        return this;
+    },
+
+// retain first n characters of the match
+less:function (n) {
+        this.unput(this.match.slice(n));
+    },
+
+// displays already matched input, i.e. for error messages
+pastInput:function () {
+        var past = this.matched.substr(0, this.matched.length - this.match.length);
+        return (past.length > 20 ? '...':'') + past.substr(-20).replace(/\n/g, "");
+    },
+
+// displays upcoming input, i.e. for error messages
+upcomingInput:function () {
+        var next = this.match;
+        if (next.length < 20) {
+            next += this._input.substr(0, 20-next.length);
+        }
+        return (next.substr(0,20) + (next.length > 20 ? '...' : '')).replace(/\n/g, "");
+    },
+
+// displays the character position where the lexing error occurred, i.e. for error messages
+showPosition:function () {
+        var pre = this.pastInput();
+        var c = new Array(pre.length + 1).join("-");
+        return pre + this.upcomingInput() + "\n" + c + "^";
+    },
+
+// test the lexed token: return FALSE when not a match, otherwise return token
+test_match:function (match, indexed_rule) {
+        var token,
+            lines,
+            backup;
+
+        if (this.options.backtrack_lexer) {
+            // save context
+            backup = {
+                yylineno: this.yylineno,
+                yylloc: {
+                    first_line: this.yylloc.first_line,
+                    last_line: this.last_line,
+                    first_column: this.yylloc.first_column,
+                    last_column: this.yylloc.last_column
+                },
+                yytext: this.yytext,
+                match: this.match,
+                matches: this.matches,
+                matched: this.matched,
+                yyleng: this.yyleng,
+                offset: this.offset,
+                _more: this._more,
+                _input: this._input,
+                yy: this.yy,
+                conditionStack: this.conditionStack.slice(0),
+                done: this.done
+            };
+            if (this.options.ranges) {
+                backup.yylloc.range = this.yylloc.range.slice(0);
+            }
+        }
+
+        lines = match[0].match(/(?:\r\n?|\n).*/g);
+        if (lines) {
+            this.yylineno += lines.length;
+        }
+        this.yylloc = {
+            first_line: this.yylloc.last_line,
+            last_line: this.yylineno + 1,
+            first_column: this.yylloc.last_column,
+            last_column: lines ?
+                         lines[lines.length - 1].length - lines[lines.length - 1].match(/\r?\n?/)[0].length :
+                         this.yylloc.last_column + match[0].length
+        };
+        this.yytext += match[0];
+        this.match += match[0];
+        this.matches = match;
+        this.yyleng = this.yytext.length;
+        if (this.options.ranges) {
+            this.yylloc.range = [this.offset, this.offset += this.yyleng];
+        }
+        this._more = false;
+        this._backtrack = false;
+        this._input = this._input.slice(match[0].length);
+        this.matched += match[0];
+        token = this.performAction.call(this, this.yy, this, indexed_rule, this.conditionStack[this.conditionStack.length - 1]);
+        if (this.done && this._input) {
+            this.done = false;
+        }
+        if (token) {
+            return token;
+        } else if (this._backtrack) {
+            // recover context
+            for (var k in backup) {
+                this[k] = backup[k];
+            }
+            return false; // rule action called reject() implying the next rule should be tested instead.
+        }
+        return false;
+    },
+
+// return next match in input
+next:function () {
+        if (this.done) {
+            return this.EOF;
+        }
+        if (!this._input) {
+            this.done = true;
+        }
+
+        var token,
+            match,
+            tempMatch,
+            index;
+        if (!this._more) {
+            this.yytext = '';
+            this.match = '';
+        }
+        var rules = this._currentRules();
+        for (var i = 0; i < rules.length; i++) {
+            tempMatch = this._input.match(this.rules[rules[i]]);
+            if (tempMatch && (!match || tempMatch[0].length > match[0].length)) {
+                match = tempMatch;
+                index = i;
+                if (this.options.backtrack_lexer) {
+                    token = this.test_match(tempMatch, rules[i]);
+                    if (token !== false) {
+                        return token;
+                    } else if (this._backtrack) {
+                        match = false;
+                        continue; // rule action called reject() implying a rule MISmatch.
+                    } else {
+                        // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
+                        return false;
+                    }
+                } else if (!this.options.flex) {
+                    break;
+                }
+            }
+        }
+        if (match) {
+            token = this.test_match(match, rules[index]);
+            if (token !== false) {
+                return token;
+            }
+            // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
+            return false;
+        }
+        if (this._input === "") {
+            return this.EOF;
+        } else {
+            return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. Unrecognized text.\n' + this.showPosition(), {
+                text: "",
+                token: null,
+                line: this.yylineno
+            });
+        }
+    },
+
+// return next match that has a token
+lex:function lex() {
+        var r = this.next();
+        if (r) {
+            return r;
+        } else {
+            return this.lex();
+        }
+    },
+
+// activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
+begin:function begin(condition) {
+        this.conditionStack.push(condition);
+    },
+
+// pop the previously active lexer condition state off the condition stack
+popState:function popState() {
+        var n = this.conditionStack.length - 1;
+        if (n > 0) {
+            return this.conditionStack.pop();
+        } else {
+            return this.conditionStack[0];
+        }
+    },
+
+// produce the lexer rule set which is active for the currently active lexer condition state
+_currentRules:function _currentRules() {
+        if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
+            return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
+        } else {
+            return this.conditions["INITIAL"].rules;
+        }
+    },
+
+// return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
+topState:function topState(n) {
+        n = this.conditionStack.length - 1 - Math.abs(n || 0);
+        if (n >= 0) {
+            return this.conditionStack[n];
+        } else {
+            return "INITIAL";
+        }
+    },
+
+// alias for begin(condition)
+pushState:function pushState(condition) {
+        this.begin(condition);
+    },
+
+// return the number of states currently on the stack
+stateStackSize:function stateStackSize() {
+        return this.conditionStack.length;
+    },
+options: {},
+performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
+var YYSTATE=YY_START;
+switch($avoiding_name_collisions) {
+case 0:/* skip whitespace */
+break;
+case 1:return 43
+break;
+case 2:return 44
+break;
+case 3:return 45
+break;
+case 4:return 46
+break;
+case 5:return 47
+break;
+case 6:return 60
+break;
+case 7:return 61
+break;
+case 8:return 26
+break;
+case 9:return 17
+break;
+case 10:return 23
+break;
+case 11:return 67
+break;
+case 12:return '!'
+break;
+case 13:return 62
+break;
+case 14:return 55
+break;
+case 15:return 56
+break;
+case 16:return 27
+break;
+case 17:return 50
+break;
+case 18:return 67
+break;
+case 19:return 68
+break;
+case 20:return 69
+break;
+case 21:return 20
+break;
+case 22:return 19
+break;
+case 23:return 42
+break;
+case 24:return 41
+break;
+case 25:return 34
+break;
+case 26:return 35
+break;
+case 27:return 36
+break;
+case 28:return 37
+break;
+case 29:return 33
+break;
+case 30:return 38
+break;
+case 31:return 39
+break;
+case 32:return 66
+break;
+case 33:return 66
+break;
+case 34:return 40
+break;
+case 35:return 41
+break;
+case 36:return 42
+break;
+case 37:return 5
+break;
+case 38:return 22
+break;
+case 39:return 16
+break;
+case 40:return 11
+break;
+case 41:return 30
+break;
+case 42:return 59
+break;
+case 43:return 59
+break;
+case 44:return 15	
+break;
+case 45:return 59	
+break;
+case 46:return 59
+break;
+case 47:return 25   
+break;
+case 48:return 'INVALID'
+break;
+}
+},
+rules: [/^(?:\s+)/,/^(?:Between\b)/,/^(?:In\b)/,/^(?:Not\b)/,/^(?:Is\b)/,/^(?:Null\b)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\^)/,/^(?:!=)/,/^(?:!)/,/^(?:%)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:Avg\b)/,/^(?:Max\b)/,/^(?:Min\b)/,/^(?:Single\b)/,/^(?:Count\b)/,/^(?:Exists\b)/,/^(?:Sum\b)/,/^(?:==)/,/^(?:=)/,/^(?:Like\b)/,/^(?:And\b)/,/^(?:Or\b)/,/^(?:$)/,/^(?:(?:\d*\.)?\d+)/,/^(?:\.)/,/^(?:,)/,/^(?:\?)/,/^(?:True\b)/,/^(?:False\b)/,/^(?:^[a-zA-Z_][a-zA-Z0-9_]*)/,/^(?:'[^']*')/,/^(?:#[^#]*#)/,/^(?:.+(?=\]))/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],"inclusive":true}}
+});
+return lexer;
+})();
+parser.lexer = lexer;
+function Parser () {
+  this.yy = {};
+}
+Parser.prototype = parser;parser.Parser = Parser;
+return new Parser;
+})();
+
+
+if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
+exports.parser = criteriaparser;
+exports.Parser = criteriaparser.Parser;
+exports.parse = function () { return criteriaparser.parse.apply(criteriaparser, arguments); };
+exports.main = function commonjsMain(args) {
+    if (!args[1]) {
+        console.log('Usage: '+args[0]+' FILE');
+        process.exit(1);
+    }
+    var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
+    return exports.parser.parse(source);
+};
+if (typeof module !== 'undefined' && require.main === module) {
+  exports.main(process.argv.slice(1));
+}
+}
 var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
-        function _getLocalization(text) {
-            return (DevExpress.JS.Localization.localize(Designer.localization_values[text]) || DevExpress.JS.Localization.localize(text)) || text;
-        }
-        var custom_localization_values = {};
-        function getLocalization(text, id) {
-            if (id === void 0) { id = null; }
-            var result;
-            if (id && !custom_localization_values[text]) {
-                result = DevExpress.JS.Localization.localize(id);
+        var BaseActionsProvider = (function () {
+            function BaseActionsProvider() {
             }
-            return result || _getLocalization(text);
-        }
-        Designer.getLocalization = getLocalization;
-        function updateLocalization(object) {
-            $.extend(custom_localization_values, object);
-            var messages = {};
-            for (var name in object) {
-                messages[Designer.localization_values[name] ? Designer.localization_values[name] : name] = object[name];
-            }
-            DevExpress.JS.Localization.addCultureInfo({
-                messages: messages
-            });
-        }
-        Designer.updateLocalization = updateLocalization;
-        ;
+            BaseActionsProvider.prototype.initActions = function (actions) {
+                this.actions = actions;
+                this.actions.forEach(function (action) {
+                    if (!action.disabled)
+                        action.disabled = ko.observable(false);
+                });
+            };
+            BaseActionsProvider.prototype.getActions = function (context) {
+                if (this.condition(context)) {
+                    this.setDisabled && this.setDisabled(context);
+                    return this.actions;
+                }
+                return [];
+            };
+            BaseActionsProvider.prototype.condition = function (context) {
+                return true;
+            };
+            return BaseActionsProvider;
+        })();
+        Designer.BaseActionsProvider = BaseActionsProvider;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../localization/localization.ts" />
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        ko.bindingHandlers["selectable"] = {
+            update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var values = valueAccessor(), isUpdate = false, selection = ko.unwrap(values.selection), options = $.extend({ filter: '.dxd-selectable', distance: 1 }, ko.unwrap(values), {
+                    selecting: function (event, ui) {
+                        var _event = { control: ko.dataFor(ui.selecting), cancel: false, ctrlKey: event.ctrlKey };
+                        selection.selecting(_event);
+                        if (_event.cancel) {
+                            $(ui.selecting).removeClass('ui-selecting');
+                        }
+                    },
+                    start: function (event, ui) {
+                        selection.clickHandler(null, event);
+                        selection.started = true;
+                        event.stopPropagation();
+                    },
+                    stop: function () {
+                        selection.started = false;
+                        selection.applySelection();
+                    },
+                    unselecting: function (event, ui) {
+                        selection.unselecting(ko.dataFor(ui.unselecting));
+                    }
+                });
+                $(element).selectable(options);
+            }
+        };
+        ko.bindingHandlers["updateTop"] = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var value = valueAccessor();
+                var updateTop = function (value) {
+                    var top = (value === 0 || !!value) ? value : $(element).prev().position().top + $(element).prev().height();
+                    $(element).css('top', top + "px");
+                };
+                var subscription = value.subscribe(function (newVal) {
+                    updateTop(newVal);
+                });
+                updateTop(value());
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    subscription.dispose();
+                });
+            }
+        };
+        ko.bindingHandlers["draggable"] = {
+            init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+                var values = valueAccessor();
+                if (!values)
+                    return;
+                var $element = $(element), parent = $($(element).parents(".dx-designer")[0]), containment = values.containment || ".dxrd-ghost-container", initialScroll = { left: 0, top: 0 }, attachDelta = function (ui) {
+                    var $containment = parent.find(containment), $ghost_container = parent.find(".dxrd-ghost-container");
+                    ui["delta"] = { left: $ghost_container.offset().left - $containment.offset().left, top: $ghost_container.offset().top - $containment.offset().top };
+                    var $viewport = parent.find(".dxrd-viewport");
+                    ui["scroll"] = { left: $viewport.scrollLeft() - initialScroll.left, top: $viewport.scrollTop() - initialScroll.top };
+                }, options = $.extend({ snap: '.dxrd-drag-snap-line', snapTolerance: Designer.SnapLinesHelper.snapTolerance }, ko.unwrap(values), {
+                    start: function (event, ui) {
+                        Designer.DragDropHandler.started(true);
+                        var draggable = $element.data("ui-draggable");
+                        var $viewport = parent.find(".dxrd-viewport");
+                        initialScroll.left = $viewport.scrollLeft();
+                        initialScroll.top = $viewport.scrollTop();
+                        values.startDrag && values.startDrag(ko.dataFor(event.currentTarget || event.toElement));
+                    },
+                    stop: function (event, ui) {
+                        attachDelta(ui);
+                        values.stopDrag(ui, ko.dataFor(event.target));
+                        Designer.DragDropHandler.started(false);
+                    },
+                    drag: function (event, ui) {
+                        if (event.altKey === true || values.alwaysAlt) {
+                            $element.draggable("option", "snap", false);
+                        }
+                        else {
+                            $element.draggable("option", "snap", ".dxrd-drag-snap-line");
+                        }
+                        attachDelta(ui);
+                        values.drag && values.drag(event, ui);
+                    },
+                    helper: function (event) {
+                        $element.draggable("option", "snap", ".dxrd-drag-snap-line");
+                        values.helper && values.helper(ko.dataFor(event.currentTarget || event["toElement"]));
+                        var $container = parent.find('.dxrd-drag-helper-source').clone().css({ 'display': 'block' });
+                        $container.prependTo(parent.find(options.containment));
+                        ko.applyBindings(bindingContext.$root, $container[0]);
+                        return $container;
+                    }
+                });
+                options.containment = parent.find(options.containment);
+                $element.draggable(options);
+            }
+        };
+        ko.bindingHandlers["resizable"] = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var values = valueAccessor(), $element = $(element), $selectedNodes = null, options = $.extend({
+                    handles: values.handles || "all", ghost: false,
+                    stop: function (event, ui) {
+                        $selectedNodes.each(function (_, el) {
+                            var control = ko.dataFor(el), surface = ko.contextFor(el).$root.surface(), $el = $(el);
+                            var rect = control.rect();
+                            control.rect(Designer.getControlRect($el, control, surface));
+                            if (JSON.stringify(rect) === JSON.stringify(control.rect())) {
+                                $el.css({
+                                    left: rect.left,
+                                    top: rect.top,
+                                    width: rect.width,
+                                    height: rect.height
+                                });
+                            }
+                            $el.removeData("originalPosition");
+                            $el.removeData("originalSize");
+                        });
+                        values.stopped();
+                        values.started = false;
+                    },
+                    start: function () {
+                        values.started = true;
+                        values.starting();
+                        $selectedNodes = values.$selectedNodes || $(".dxrd-viewport > .dxrd-focused, .dxrd-selected").filter(":visible");
+                        $selectedNodes
+                            .each(function (_, el) {
+                            var $el = $(el);
+                            var bounds = el.getBoundingClientRect();
+                            $el.data("originalPosition", { top: parseFloat($el.css("top")), left: parseFloat($el.css("left")) });
+                            $el.data("originalSize", { width: bounds.width, height: bounds.height });
+                        });
+                    },
+                    resize: function (event, ui) {
+                        var dw = ui.size.width - ui.originalSize.width, dh = ui.size.height - ui.originalSize.height, dx = ui.position.left - ui.originalPosition.left, dy = ui.position.top - ui.originalPosition.top;
+                        if (values.forceResize) {
+                            values.forceResize({ size: new Designer.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
+                        }
+                        $selectedNodes
+                            .each(function (key, el) {
+                            if (el === event.target)
+                                return;
+                            var $el = $(el);
+                            var originalPosition = $el.data("originalPosition"), originalSize = $el.data("originalSize");
+                            $el.css({
+                                left: originalPosition.left + dx,
+                                top: originalPosition.top + dy,
+                                width: originalSize.width + dw,
+                                height: originalSize.height + dh
+                            });
+                        });
+                    }
+                }, ko.unwrap(values));
+                var subscription = null;
+                if (!values.disabled) {
+                    subscription = Designer.DragDropHandler.started.subscribe(function (newVal) {
+                        $element.resizable("option", "disabled", newVal);
+                        newVal ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
+                    });
+                }
+                $element.resizable(options);
+                $element.resizable().on("resize", function (event) {
+                    event.stopPropagation();
+                });
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    $element = null;
+                    subscription && subscription.dispose();
+                });
+            },
+            update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+                var $element = $(element);
+                var disabled = !!(ko.unwrap(valueAccessor().disabled) || false || viewModel.locked);
+                $element.resizable("option", "disabled", disabled);
+                $element.resizable("option", "minHeight", ko.unwrap(valueAccessor()).minimumHeight) || 1;
+                disabled ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
+            }
+        };
+        var trackCursorData = "dxd-track-cursor-data";
+        var trackCursorClass = "dxd-track-cursor";
+        var trackCursorSelector = "." + trackCursorClass;
+        var dragHelperLineClass = "dxrd-drag-helper-item";
+        ko.bindingHandlers["trackCursor"] = {
+            init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+                var $element = $(element);
+                $element.addClass(trackCursorClass);
+                var value = valueAccessor();
+                var bounds = null;
+                var selection = valueAccessor().dropTarget, subscriptionTarget = valueAccessor().subscriptionTarget || '.dx-designer', body = document.body, docElem = document.documentElement, overHandler = function (event) {
+                    if (!(bindingContext.$root.selection.started && bindingContext.$root.resizeHandler.started)) {
+                        bounds = element.getBoundingClientRect();
+                        if (!value().isNotDropTarget) {
+                            bindingContext.$root.selection.dropTarget = ko.dataFor(element);
+                            event.stopPropagation();
+                        }
+                    }
+                }, enterHandler = function (event) {
+                    value($.extend(value(), { isOver: true }));
+                }, leaveHandler = function (event) {
+                    bindingContext.$root.selection.dropTarget = null;
+                    value($.extend(value(), { isOver: false }));
+                }, handler = function (event) {
+                    if (!(bindingContext.$root.selection.started && bindingContext.$root.resizeHandler.started)) {
+                        bounds = element.getBoundingClientRect();
+                        var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop, scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft, clientTop = docElem.clientTop || body.clientTop || 0, clientLeft = docElem.clientLeft || body.clientLeft || 0, y = event.pageY - (bounds.top + scrollTop - clientTop), x = event.pageX - (bounds.left + scrollLeft - clientLeft);
+                        value($.extend(value(), { x: x, y: y }));
+                    }
+                };
+                $element.bind("mousemove", handler);
+                $element.bind("mouseenter", enterHandler);
+                $element.bind("mouseover", overHandler);
+                $element.bind("mouseleave", leaveHandler);
+                $element.bind("dragover", function (event) { handler(event.originalEvent); });
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    $element.unbind("dragover", function (event) { handler(event.originalEvent); });
+                    $element.unbind("mousemove", handler);
+                    $element.unbind("mouseover", overHandler);
+                    $element.unbind("mouseleave", leaveHandler);
+                    $element.unbind("mouseenter", enterHandler);
+                    $element.removeClass(trackCursorClass);
+                });
+            }
+        };
+        ko.bindingHandlers["templates"] = {
+            init: function (element, valueAccessor) {
+                var templateHtml = $(valueAccessor()).text(), $templateHtml = $(templateHtml);
+                $(element).append($templateHtml);
+                return { controlsDescendantBindings: true };
+            }
+        };
+        Designer.cssTransform = ["-webkit-transform", "-moz-transform", "-ms-transform", "-o-transform", "transform"];
+        ko.bindingHandlers["zoom"] = {
+            update: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor() || {});
+                for (var i = 0; i < Designer.cssTransform.length; i++) {
+                    element.style[Designer.cssTransform[i]] = "scale(" + (value) + ")";
+                }
+                $(element).addClass("dxrd-transform-origin-left-top");
+            }
+        };
+        var KeyDownHandlersManager = (function () {
+            function KeyDownHandlersManager(targetElement) {
+                this._handlers = [];
+                this._targetElement = targetElement;
+            }
+            Object.defineProperty(KeyDownHandlersManager.prototype, "_activeHandler", {
+                get: function () {
+                    return this._handlers.length > 0 ? this._handlers[this._handlers.length - 1] : null;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            KeyDownHandlersManager.prototype._removeHandler = function (handler) {
+                var index = this._handlers.indexOf(handler);
+                if (index < 0)
+                    return;
+                this._handlers.splice(index, 1);
+                if (index === this._handlers.length) {
+                    this._targetElement.off("keydown", handler);
+                    if (this._activeHandler)
+                        this._targetElement.on("keydown", this._activeHandler);
+                }
+            };
+            KeyDownHandlersManager.prototype.bindHandler = function (element, handler) {
+                var _this = this;
+                if (this._activeHandler)
+                    this._targetElement.off("keydown", this._activeHandler);
+                this._handlers.push(handler);
+                this._targetElement.on("keydown", handler);
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () { _this._removeHandler(handler); });
+            };
+            return KeyDownHandlersManager;
+        })();
+        ko.bindingHandlers["keyDownActions"] = (function () {
+            var handlersManager = new KeyDownHandlersManager($(window));
+            return {
+                init: function (element, valueAccessor) {
+                    var actionLists = valueAccessor(), handler = function (e) { actionLists.processShortcut(actionLists.toolbarItems, e); };
+                    handlersManager.bindHandler(element, handler);
+                }
+            };
+        })();
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Disposable = (function () {
+            function Disposable() {
+                this._disposables = [];
+                this.isDisposing = false;
+            }
+            Disposable.prototype.dispose = function () {
+                this.isDisposing = true;
+                ko.utils.arrayForEach(this._disposables, this.disposeOne);
+                ko.utils["objectForEach"](this, this.disposeOne);
+                this._disposables = [];
+            };
+            Disposable.prototype.disposeOne = function (propOrValue, value) {
+                var disposable = value || propOrValue;
+                if (disposable && !disposable.isDisposing && typeof disposable.dispose === "function") {
+                    disposable.dispose();
+                }
+            };
+            return Disposable;
+        })();
+        Designer.Disposable = Disposable;
+        function copyObservables(from, to) {
+            for (var name in (from || {})) {
+                if (ko.isObservable(from[name])) {
+                    to[name](from[name]());
+                }
+                else {
+                    copyObservables(from[name], to[name]);
+                }
+            }
+            ;
+        }
+        Designer.copyObservables = copyObservables;
+        function compareObjects(a, b) {
+            var result = a && b && !(a instanceof Array) && !(b instanceof Array);
+            result = result && (Object.getOwnPropertyNames(a).length === Object.getOwnPropertyNames(b).length);
+            if (result) {
+                for (var name in (a || {})) {
+                    if (name.indexOf("_") !== 0 && (typeof a[name] !== "function" || ko.isObservable(a[name]))) {
+                        if (ko.isObservable(a[name])) {
+                            result = ko.unwrap(a[name]) === ko.unwrap(b[name]);
+                        }
+                        else if (a[name] instanceof Array) {
+                            if ((b[name] instanceof Array) && a[name].length === b[name].length) {
+                                for (var i = 0; i < a[name].length; i++) {
+                                    result = compareObjects(a[name][i], b[name][i]);
+                                    if (result === false)
+                                        break;
+                                }
+                            }
+                            else {
+                                result = false;
+                            }
+                        }
+                        else if (a[name] instanceof Object) {
+                            result = compareObjects(a[name], b[name]);
+                        }
+                        else {
+                            result = a[name] === b[name];
+                        }
+                        if (result === false)
+                            break;
+                    }
+                }
+            }
+            return result;
+        }
+        Designer.compareObjects = compareObjects;
+        var ElementViewModel = (function (_super) {
+            __extends(ElementViewModel, _super);
+            function ElementViewModel(model, parent, serializer) {
+                var _this = this;
+                _super.call(this);
+                this.actions = [];
+                this.update = ko.observable(false);
+                this.parentModel = ko.observable(parent);
+                this.controlType = this.controlType || this.getControlFactory().getControlType(model);
+                serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                serializer.deserialize(this, model);
+                this["displayName"] = ko.pureComputed(function () {
+                    var result = _this.name && _this.name();
+                    if (!result) {
+                        result = "unnamed " + _this.controlType;
+                    }
+                    return result;
+                });
+                this.resetValue = function (propertyName) {
+                    if (_this[propertyName].resetValue) {
+                        _this[propertyName].resetValue();
+                    }
+                    else {
+                        var defaultValue = _this.getPropertyDefaultValue(propertyName);
+                        if (ko.isObservable(_this[propertyName])) {
+                            _this[propertyName](defaultValue);
+                        }
+                        else {
+                            copyObservables(defaultValue, _this[propertyName]);
+                        }
+                    }
+                };
+                this.actions.push({ action: this.resetValue, title: "Reset", visible: this.isResettableProperty });
+            }
+            ElementViewModel.prototype.getPropertyDefaultValue = function (propertyName) {
+                var info = this.getPropertyInfo(propertyName);
+                return ko.unwrap(info && new DevExpress.JS.Utils.ModelSerializer().deserializeProperty(info, {}));
+            };
+            ElementViewModel.prototype.getPropertyInfo = function (propertyName) {
+                return this.getInfo().filter(function (info) { return info.propertyName === propertyName; })[0];
+            };
+            ElementViewModel.prototype.getInfo = function () {
+                return this.getControlFactory().controlsMap[this.controlType].info;
+            };
+            ElementViewModel.prototype.createControl = function (model, serializer) {
+                return this.getControlFactory().createControl(model, this, serializer);
+            };
+            ElementViewModel.prototype.getNearestParent = function (target) {
+                return target.getMetaData().isContainer ? target : target.getNearestParent(target.parentModel());
+            };
+            ElementViewModel.prototype.getControlInfo = function () {
+                return this.getControlFactory().controlsMap[this.controlType || "Unknown"];
+            };
+            ElementViewModel.prototype.getMetaData = function () {
+                var controlType = this.controlType ? this.controlType : "Unknown", data = this.getControlFactory().controlsMap[controlType];
+                return {
+                    isContainer: data.isContainer || false,
+                    isCopyDeny: data.isCopyDeny || false,
+                    isDeleteDeny: data.isDeleteDeny || false,
+                    canDrop: data.canDrop || (function () { return true; })
+                };
+            };
+            ElementViewModel.prototype._hasModifiedValue = function (name) {
+                return this["_" + name] && this["_" + name]() && this.isPropertyModified(name);
+            };
+            ElementViewModel.prototype.createChild = function (info) {
+                var newControl = this.getControlFactory().createControl(info, this);
+                this.addChild(newControl);
+                return newControl;
+            };
+            ElementViewModel.prototype.removeChilds = function (controls) {
+                if (this["controls"]) {
+                    var childs = this["controls"]();
+                    for (var i = 0; i < controls.length; i++) {
+                        childs.splice(childs.indexOf(controls[i]), 1);
+                    }
+                    this["controls"].valueHasMutated();
+                }
+            };
+            ElementViewModel.prototype.addChilds = function (controls) {
+                if (this["controls"]) {
+                    var childs = this["controls"]();
+                    for (var i = 0; i < controls.length; i++) {
+                        childs.splice(0, 0, controls[i]);
+                    }
+                    this["controls"].valueHasMutated();
+                }
+            };
+            ElementViewModel.prototype.removeChild = function (control) {
+                if (this["controls"]) {
+                    this["controls"].splice(this["controls"]().indexOf(control), 1);
+                }
+            };
+            ElementViewModel.prototype.addChild = function (control) {
+                if (this["controls"] && this["controls"]().indexOf(control) === -1) {
+                    control.parentModel(this);
+                    this["controls"].splice(0, 0, control);
+                }
+            };
+            ElementViewModel.prototype.isPropertyDisabled = function (name) {
+                return false;
+            };
+            ElementViewModel.prototype.isPropertyModified = function (name) {
+                var needName = this["_" + name] ? "_" + name : name;
+                if (this[needName].isPropertyModified) {
+                    return this[needName].isPropertyModified();
+                }
+                else if (this[needName].isEmpty) {
+                    return !this[needName].isEmpty();
+                }
+                else {
+                    var defaultValue = this.getPropertyDefaultValue(name), propertyValue = ko.unwrap(this[needName]);
+                    if (defaultValue instanceof Object) {
+                        return !compareObjects(defaultValue, propertyValue);
+                    }
+                    else {
+                        return defaultValue !== propertyValue;
+                    }
+                }
+            };
+            ElementViewModel.prototype.getControlFactory = function () {
+                throw Error("Virtual method getControlFactory");
+            };
+            ElementViewModel.prototype.isResettableProperty = function (propertyName) {
+                return ["name", "size", "location"].indexOf(propertyName) === -1;
+            };
+            Object.defineProperty(ElementViewModel.prototype, "root", {
+                get: function () {
+                    var root = this;
+                    while (root && root.parentModel()) {
+                        root = root.parentModel();
+                    }
+                    return root;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ElementViewModel.prototype.rtl = function () {
+                return false;
+            };
+            return ElementViewModel;
+        })(Disposable);
+        Designer.ElementViewModel = ElementViewModel;
+        ;
+        function findSurface(viewModel) {
+            return viewModel["surface"];
+        }
+        Designer.findSurface = findSurface;
+        function unitsToPixel(val, measureUnit, zoom) {
+            if (zoom === void 0) { zoom = 1; }
+            var result;
+            if (measureUnit === "Test" || measureUnit === "Pixels") {
+                result = 1 * val;
+            }
+            else if (measureUnit === "TenthsOfAMillimeter") {
+                result = val * 3.78 / 10;
+            }
+            else {
+                result = val * 96 / 100;
+            }
+            result = result * (zoom);
+            return Math.floor(result * 100) / 100;
+        }
+        Designer.unitsToPixel = unitsToPixel;
+        function pixelToUnits(val, measureUnit, zoom) {
+            var result;
+            if (measureUnit === "Test" || measureUnit === "Pixels") {
+                result = 1 * val;
+            }
+            else if (measureUnit === "TenthsOfAMillimeter") {
+                result = val / 3.78 * 10;
+            }
+            else {
+                result = val / 96 * 100;
+            }
+            result = result / (zoom);
+            return Math.floor(result * 100) / 100;
+        }
+        Designer.pixelToUnits = pixelToUnits;
+        var HoverInfo = (function () {
+            function HoverInfo() {
+                this._x = 0;
+                this._y = 0;
+                this.isOver = false;
+            }
+            Object.defineProperty(HoverInfo.prototype, "x", {
+                get: function () {
+                    return this._x;
+                },
+                set: function (newX) {
+                    this._x = newX;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(HoverInfo.prototype, "y", {
+                get: function () {
+                    return this._y;
+                },
+                set: function (newY) {
+                    this._y = newY;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return HoverInfo;
+        })();
+        Designer.HoverInfo = HoverInfo;
+        function createObservableReverseArrayMapCollection(elementModels, target, createItem) {
+            elementModels.peek().forEach(function (item) {
+                var surface = createItem(item);
+                target.splice(0, 0, surface);
+            });
+            elementModels.subscribe(function (args) {
+                var unwrapedTarget = target();
+                var targetLength = unwrapedTarget.length;
+                args.forEach(function (changeSet) {
+                    if (changeSet.status === "deleted") {
+                        unwrapedTarget.splice(unwrapedTarget.indexOf(changeSet.value.surface), 1);
+                    }
+                });
+                args.forEach(function (changeSet) {
+                    if (changeSet.status === "added") {
+                        unwrapedTarget.splice(targetLength - changeSet.index, 0, createItem(changeSet.value));
+                    }
+                });
+                target.valueHasMutated();
+            }, null, "arrayChange");
+        }
+        Designer.createObservableReverseArrayMapCollection = createObservableReverseArrayMapCollection;
+        function createObservableArrayMapCollection(elementModels, target, createItem) {
+            elementModels.peek().forEach(function (item) {
+                var surface = createItem(item);
+                target.push(surface);
+            });
+            elementModels.subscribe(function (args) {
+                var startIndex = target().length, deleteCount = 0, valuesToAdd = [];
+                args.forEach(function (changeSet) {
+                    if (changeSet.status === "deleted") {
+                        deleteCount++;
+                        if (changeSet.index < startIndex) {
+                            startIndex = changeSet.index;
+                        }
+                    }
+                });
+                args.forEach(function (changeSet) {
+                    if (changeSet.status === "added") {
+                        if (changeSet.index < startIndex) {
+                            startIndex = changeSet.index;
+                        }
+                        valuesToAdd.push(createItem(changeSet.value));
+                    }
+                });
+                target.splice.apply(target, [startIndex, deleteCount].concat(valuesToAdd));
+            }, null, "arrayChange");
+        }
+        Designer.createObservableArrayMapCollection = createObservableArrayMapCollection;
+        var SurfaceElementArea = (function (_super) {
+            __extends(SurfaceElementArea, _super);
+            function SurfaceElementArea(control, context, unitProperties) {
+                var _this = this;
+                _super.call(this);
+                this._createSurface = function (item) {
+                    return item["surface"] || new (item.getControlFactory()).controlsMap[item.controlType].surfaceType(item, _this._context);
+                };
+                this._control = control;
+                this._context = context;
+                control["surface"] = this;
+                if (this._context) {
+                    Designer.createUnitProperties(control, this, unitProperties, this._context.measureUnit, this._context.zoom);
+                }
+                this["_x"] = this["_x"] || ko.observable(0);
+                this["_y"] = this["_y"] || ko.observable(0);
+                this["_width"] = this["_width"] || ko.observable(0);
+                this["_height"] = this["_height"] || ko.observable(0);
+                var container = ko.pureComputed(function () { return _this.container(); });
+                this._container = container();
+                container.subscribe(function (value) {
+                    if (_this._container !== value && _this.rtlLayout()) {
+                        var x = _this._getX();
+                        _this._container = value;
+                        _this._setX(x);
+                    }
+                    else {
+                        _this._container = value;
+                    }
+                });
+                var x = ko.computed({
+                    read: function () { return _this._getX(); },
+                    write: function (value) {
+                        _this._setX(value);
+                    }
+                }), y = this["_y"], width = this["_width"], height = this["_height"];
+                this["position"] = {
+                    top: y,
+                    left: x,
+                    width: width,
+                    height: height,
+                    lineHeight: height
+                };
+                var _rect = ko.observable();
+                this._disposables.push(ko.computed(function () {
+                    if (!_this._control.update()) {
+                        _rect({ top: y(), left: x(), right: x() + width(), bottom: y() + height(), width: width(), height: height() });
+                    }
+                }));
+                this.rect = ko.pureComputed({
+                    read: function () {
+                        return _rect();
+                    },
+                    write: function (newRect) {
+                        newRect = _this.beforeRectUpdated(newRect);
+                        _this._control.update(true);
+                        try {
+                            if (newRect.left !== undefined) {
+                                _this._setX(newRect.left, newRect.width);
+                            }
+                            else if (newRect.width !== undefined) {
+                                _this._setX(x(), newRect.width);
+                            }
+                            if (newRect.top !== undefined) {
+                                y(newRect.top);
+                            }
+                            if (newRect.right !== undefined && newRect.left === undefined && newRect.width === undefined) {
+                                width(newRect.right - x());
+                            }
+                            if (newRect.bottom !== undefined && newRect.top === undefined) {
+                                height(newRect.bottom - y());
+                            }
+                            if (newRect.right !== undefined && newRect.left !== undefined && newRect.width === undefined) {
+                                width(newRect.right - newRect.left);
+                            }
+                            if (newRect.bottom !== undefined && newRect.top !== undefined) {
+                                height(newRect.bottom - newRect.top);
+                            }
+                            if (newRect.width !== undefined) {
+                                width(newRect.width);
+                            }
+                            if (newRect.height !== undefined) {
+                                height(newRect.height);
+                            }
+                        }
+                        finally {
+                            _this._control.update(false);
+                        }
+                    }
+                });
+            }
+            SurfaceElementArea.prototype._getX = function () {
+                if (this.rtlLayout() && this._container) {
+                    return this._container.rect().width - this["_x"]() - this["_width"]();
+                }
+                else {
+                    return this["_x"]();
+                }
+            };
+            SurfaceElementArea.prototype._setX = function (value, width) {
+                width = width || this["_width"]();
+                if (this.rtlLayout() && this._container) {
+                    this["_x"](this._container.rect().width - value - width);
+                }
+                else {
+                    this["_x"](value);
+                }
+            };
+            SurfaceElementArea.prototype.getRoot = function () {
+                return this._context;
+            };
+            SurfaceElementArea.prototype.container = function () {
+                return this["parent"];
+            };
+            SurfaceElementArea.prototype.beforeRectUpdated = function (rect) {
+                rect.left = rect.left < 0 ? 0 : rect.left;
+                rect.top = rect.top < 0 ? 0 : rect.top;
+                return rect;
+            };
+            SurfaceElementArea.prototype.rtlLayout = function () {
+                return !!ko.unwrap(this._context.rtl);
+            };
+            SurfaceElementArea.prototype.getControlModel = function () {
+                return this._control;
+            };
+            return SurfaceElementArea;
+        })(Disposable);
+        Designer.SurfaceElementArea = SurfaceElementArea;
+        var SurfaceElementBase = (function (_super) {
+            __extends(SurfaceElementBase, _super);
+            function SurfaceElementBase(control, context, unitProperties) {
+                var _this = this;
+                _super.call(this, control, context, unitProperties);
+                this._countSelectedChildren = ko.observable(0);
+                this.focused = ko.observable(false);
+                this.selected = ko.observable(false);
+                this.underCursor = ko.observable(new HoverInfo());
+                this.allowMultiselect = true;
+                this.absolutePosition = new Designer.Point(0, 0);
+                this.snapLines = ko.observableArray([]);
+                this.getControlModel = function () {
+                    return control;
+                };
+                this.cssCalculator = new Designer.CssCalculator(control, context.rtl);
+                if (this._getChildrenHolderName() && control[this._getChildrenHolderName()]) {
+                    var collection = ko.observableArray();
+                    if (this._getChildrenHolderName() === "controls") {
+                        createObservableReverseArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface);
+                    }
+                    else {
+                        createObservableArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface);
+                    }
+                    this[this._getChildrenHolderName()] = collection;
+                    this.isSelected = ko.pureComputed(function () {
+                        if (!(_this.focused() || _this.selected())) {
+                            return collection().some(function (item) {
+                                return item.isSelected();
+                            });
+                        }
+                        return true;
+                    });
+                }
+                else {
+                    this.isSelected = ko.pureComputed(function () {
+                        return _this.focused() || _this.selected();
+                    });
+                }
+                this.css = ko.pureComputed(function () {
+                    return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.backGroundCss(), _this.cssCalculator.textAlignmentCss());
+                });
+                this.contentCss = ko.pureComputed(function () {
+                    return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.textAlignmentCss(), _this.cssCalculator.angle(), _this.cssCalculator.paddingsCss());
+                });
+                this._disposables.push(ko.computed(function () {
+                    _this.updateAbsolutePosition();
+                }));
+                this.absoluteRect = ko.pureComputed(function () {
+                    var controlRect = _this.rect(), absolutePositionY = _this.absolutePosition.y();
+                    return { top: absolutePositionY, left: controlRect.left, right: controlRect.right, bottom: absolutePositionY + controlRect.height, width: controlRect.width, height: controlRect.height };
+                });
+                this.locked = control["lockedInUserDesigner"] ? control["lockedInUserDesigner"]() : false;
+            }
+            Object.defineProperty(SurfaceElementBase.prototype, "parent", {
+                get: function () {
+                    return this.getControlModel().parentModel() && this.getControlModel().parentModel().surface;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            SurfaceElementBase.prototype.checkParent = function (surfaceParent) {
+                return this.parent === surfaceParent;
+            };
+            SurfaceElementBase.prototype._getChildrenHolderName = function () { return "controls"; };
+            SurfaceElementBase.prototype.getChildrenCollection = function () {
+                return this._getChildrenHolderName() && this[this._getChildrenHolderName()] || ko.observableArray([]);
+            };
+            SurfaceElementBase.prototype.updateAbsolutePosition = function () {
+                if (this.parent && this.parent.absolutePosition) {
+                    var parentX = this.parent.absolutePosition.x(), parentY = this.parent.absolutePosition.y(), newX = parentX + this.rect().left, newY = parentY + this.rect().top;
+                    this.absolutePosition.x(newX);
+                    this.absolutePosition.y(newY);
+                }
+                else {
+                    this.absolutePosition.x(0);
+                    this.absolutePosition.y(0);
+                }
+                this.afterUpdateAbsolutePosition();
+            };
+            SurfaceElementBase.prototype.canDrop = function () { return !this.locked && this._control.getMetaData().isContainer; };
+            SurfaceElementBase.prototype.afterUpdateAbsolutePosition = function () {
+            };
+            return SurfaceElementBase;
+        })(SurfaceElementArea);
+        Designer.SurfaceElementBase = SurfaceElementBase;
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
     var Designer;
@@ -11013,17 +11091,11 @@ var DevExpress;
         Designer.loadTemplates = loadTemplates;
         function getControlRect(element, control, surface) {
             var curleft = num(element.css("left")), curtop = num(element.css("top"));
-            if (curtop < 0) {
-                curtop = 0;
-            }
             if (surface.rtl()) {
                 var posLeft = surface.pageWidth() - surface.margins.left() - element.width();
                 if (curleft > posLeft) {
                     curleft = posLeft;
                 }
-            }
-            else if (curleft < 0) {
-                curleft = 0;
             }
             var bounds = element[0].getBoundingClientRect();
             return { top: curtop, left: curleft, width: bounds.width, height: bounds.height };
@@ -11090,24 +11162,25 @@ var DevExpress;
             if (showForUser) {
                 ShowMessage(msg);
             }
-            if (Designer.DEBUG) {
-                throw new Error(msg);
-            }
-            else {
-                console.warn(msg);
-            }
+            DevExpress.JS.Utils.NotifyAboutWarning(msg);
         }
         Designer.NotifyAboutWarning = NotifyAboutWarning;
         function getErrorMessage(jqXHR) {
             return jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.error ? jqXHR.responseJSON.error : '';
         }
         Designer.getErrorMessage = getErrorMessage;
+        function minHeightWithoutScroll(element) {
+            return Math.min(element.scrollHeight, element.offsetHeight, element.clientHeight) + element.offsetTop;
+        }
+        function chooseBetterPositionOf(html, designer) {
+            return minHeightWithoutScroll(html) <= minHeightWithoutScroll(designer) ? window : designer;
+        }
         function ShowMessage(msg, type, displayTime, debugInfo) {
             if (type === void 0) { type = "error"; }
             DevExpress.ui.notify({
                 message: msg,
                 type: type,
-                position: { of: $(".dx-designer")[0], my: "bottom", at: "bottom", offset: "0 -10" },
+                position: { of: chooseBetterPositionOf(document.documentElement, $(".dx-designer")[0]), my: "bottom", at: "bottom", offset: "0 -10" },
                 targetContainer: $(".dx-designer")[0],
                 closeOnOutsideClick: true,
                 displayTime: displayTime || (type === "error" ? 60000 : 3000)
@@ -11925,7 +11998,7 @@ var DevExpress;
                 return fontStyles;
             };
             CssCalculator.prototype.createPadding = function (paddings) {
-                var padding = {}, paddingModel = new Designer.Widgets.PaddingModel({ value: ko.observable(paddings) });
+                var padding = {}, paddingModel = new Designer.Widgets.PaddingModel(ko.observable(paddings));
                 padding["paddingLeft"] = paddingModel.left() + "px";
                 padding["paddingTop"] = paddingModel.top() + "px";
                 padding["paddingRight"] = paddingModel.right() + "px";
@@ -14163,56 +14236,47 @@ var DevExpress;
         (function (Widgets) {
             var PaddingModel = (function (_super) {
                 __extends(PaddingModel, _super);
-                function PaddingModel(object) {
+                function PaddingModel(value) {
                     var _this = this;
                     _super.call(this);
-                    var isUpdated = false;
                     this.left = ko.observable(0);
                     this.right = ko.observable(0);
                     this.top = ko.observable(0);
                     this.bottom = ko.observable(0);
                     this.dpi = 100;
-                    this._disposables.push(ko.computed(function () {
-                        if (isUpdated)
-                            return;
-                        isUpdated = true;
-                        if (object.value()) {
-                            var val = object.value();
-                            var components = val.split(',');
-                            _this.left(parseFloat(components[0]) || 0);
-                            _this.right(parseFloat(components[1]) || 0);
-                            _this.top(parseFloat(components[2]) || 0);
-                            _this.bottom(parseFloat(components[3]) || 0);
-                            _this.dpi = parseFloat(components[4]) || 100;
-                        }
-                        isUpdated = false;
+                    this.isUpdate = false;
+                    var isUpdate = false;
+                    this._updateModel(value());
+                    this._disposables.push(value.subscribe(function (newVal) {
+                        isUpdate = true;
+                        _this._updateModel(newVal);
+                        isUpdate = false;
                     }));
-                    this._disposables.push(ko.computed(function () {
-                        if (_this.left() || _this.right() || _this.top() || _this.bottom()) {
-                            var result = _this.left() + "," + _this.right() + "," + _this.top() + "," + _this.bottom() + "," + 100;
-                            if (!isUpdated) {
-                                object.value(result);
+                    ["left", "right", "bottom", "top"].forEach(function (val) {
+                        _this._disposables.push(_this[val].subscribe(function (newVal) {
+                            if (!isUpdate) {
+                                value(_this._updateValue(newVal));
                             }
-                        }
-                    }));
+                        }));
+                    });
                 }
+                PaddingModel.prototype._updateModel = function (newVal) {
+                    var components = (newVal || "").split(',');
+                    this.left(parseFloat(components[0]) || 0);
+                    this.right(parseFloat(components[1]) || 0);
+                    this.top(parseFloat(components[2]) || 0);
+                    this.bottom(parseFloat(components[3]) || 0);
+                    this.dpi = parseFloat(components[4]) || 100;
+                };
+                PaddingModel.prototype._updateValue = function (value) {
+                    if (value !== null && value !== undefined) {
+                        return this.left() + "," + this.right() + "," + this.top() + "," + this.bottom() + "," + this.dpi;
+                    }
+                };
                 return PaddingModel;
             })(Designer.Disposable);
             Widgets.PaddingModel = PaddingModel;
         })(Widgets = Designer.Widgets || (Designer.Widgets = {}));
-    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var Designer;
-    (function (Designer) {
-        Designer.StringId = {
-            MasterDetailRelationsEditor: "DataAccessUIStringId.MasterDetailEditorForm_Title",
-            DataAccessBtnOK: "DataAccessUIStringId.Button_OK",
-            DataAccessBtnCancel: "DataAccessUIStringId.Button_Cancel",
-            DataSourceWizardTitle: "DataAccessUIStringId.WizardTitleDatasource",
-            WizardPageConfigureQuery: 'DataAccessUIStringId.WizardPageConfigureQuery'
-        };
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-designer-core.js.map
