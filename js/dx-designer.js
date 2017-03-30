@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
+/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -2358,6 +2358,42 @@ var DevExpress;
             'Flat Light': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeTheme.FlatLight',
             'Flat Dark': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeTheme.FlatDark',
             'Quarter Left': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeStyle.QuarterLeft',
+            'Connection Parameters': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionParameters',
+            'Group Filter String': 'DevExpress.DataAccess.Sql.TableQuery.GroupFilterString',
+            'Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.NewlineType',
+            'Skip Hidden Rows': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenRows',
+            'Import Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ImportSettings',
+            'Constructor': 'DevExpress.DataAccess.ObjectBinding.ObjectDataSource.Constructor',
+            'Worksheet Name': 'DevExpress.DataAccess.Excel.ExcelWorksheetSettings.WorksheetName',
+            'Connection String Name': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.ConnectionStringName',
+            'Distinct': 'DevExpress.DataAccess.Sql.SelectQuery.Distinct',
+            'Scope': 'DevExpress.DataAccess.Excel.ExcelDefinedNameSettings.Scope',
+            'Connection': 'DevExpress.DataAccess.EntityFramework.EFDataSource.Connection',
+            'Stored Procedure Name': 'DevExpress.DataAccess.Sql.StoredProcQuery.StoredProcName',
+            'Detect Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectNewlineType',
+            'Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.SourceOptions',
+            'Cell Range': 'DevExpress.DataAccess.Excel.ExcelWorksheetSettings.CellRange',
+            'Value Separator': 'DevExpress.DataAccess.Excel.CsvSourceOptions.ValueSeparator',
+            'File Name': 'DevExpress.DataAccess.Excel.ExcelDataSource.FileName',
+            'Stored Procedures': 'DevExpress.DataAccess.EntityFramework.EFDataSource.StoredProcedures',
+            'Connection Name': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionName',
+            'Detect Encoding': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectEncoding',
+            'Use First Row As Header': 'DevExpress.DataAccess.Excel.ExcelSourceOptionsBase.UseFirstRowAsHeader',
+            'Detect Value Separator': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectValueSeparator',
+            'Source': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.Source',
+            'Queries': 'DevExpress.DataAccess.Sql.SqlDataSource.Queries',
+            'ExcelDataSource': 'DevExpress.DataAccess.Excel.ExcelDataSource',
+            'Defined Name': 'DevExpress.DataAccess.Excel.ExcelDefinedNameSettings.DefinedName',
+            'Culture': 'DevExpress.DataAccess.Excel.CsvSourceOptions.Culture',
+            'Skip Hidden Columns': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenColumns',
+            'Connection String': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.ConnectionString',
+            'EFDataSource': 'DevExpress.DataAccess.EntityFramework.EFDataSource',
+            'Trim Blanks': 'DevExpress.DataAccess.Excel.CsvSourceOptions.TrimBlanks',
+            'SqlDataSource': 'DevExpress.DataAccess.Sql.SqlDataSource',
+            'Text Qualifier': 'DevExpress.DataAccess.Excel.CsvSourceOptions.TextQualifier',
+            'Table Name': 'DevExpress.DataAccess.Excel.ExcelTableSettings.TableName',
+            'Connection Options': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionOptions',
+            'SQL': 'DevExpress.DataAccess.Sql.CustomSqlQuery.Sql',
             'Align to Grid': 'ReportStringId.RibbonXRDesign_AlignToGrid_STipTitle',
             'Save the current report.': 'ReportStringId.RibbonXRDesign_SaveFile_Description',
             'Make Same Width': 'ReportStringId.RibbonXRDesign_SizeToControlWidth_STipTitle',
@@ -3918,6 +3954,172 @@ var DevExpress;
             'Print Report': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintReport',
             'Add Column Fields Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddColumnFields',
             'Choose a Data Source': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Title',
+            'The selected assembly does not contain Entity Framework data contexts.': 'DataAccessStringId.WizardNoEFDataContextsMessage',
+            'The default constructor of an ITypedList implementation has thrown an exception.': 'DataAccessStringId.ODSWizardErrorExceptionInCtor',
+            'Views': 'DataAccessStringId.ConfigureMultiQueryPage_ViewCategory',
+            'A data connection with the specified name already exists. Please specify a different connection name.': 'DataAccessStringId.WizardDataConnectionNameExistsMessage',
+            'A table cannot be null.': 'DataAccessStringId.TableNullValidationException',
+            'Grouping requires at least one aggregated column.': 'DataAccessStringId.GroupByWithoutAggregateValidationException',
+            'CSV Files': 'DataAccessStringId.FileNameFilter_CSV',
+            'Constants': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Constants',
+            'Loading data source': 'DataAccessStringId.LoadingDataSourcePanelText',
+            'Functions': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions',
+            'Please wait': 'DataAccessStringId.ConnectingToDatabaseCaption',
+            'Table Selection': 'DataAccessStringId.QueryPropertyGridTableSelectionCategoryName',
+            'Cannot set relation between columns \'{0}\'.\'{1}\' of type {2} and \'{3}\'.\'{4}\' of type {5}.': 'DataAccessStringId.RelationException',
+            'Operators': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Operators',
+            'Column{0}': 'DataAccessStringId.EmptyColumnAliasPattern',
+            'Space': 'DataAccessStringId.ExcelWizard_ValueSeparator_Space',
+            'The collection already contains the \'{0}\' item': 'DataAccessStringId.MessageDuplicateItem',
+            'Comma': 'DataAccessStringId.ExcelWizard_ValueSeparator_Comma',
+            'One or more queries have failed to execute.': 'DataAccessStringId.QueriesFailedToExecute_ExceptionMessage',
+            '{0} of {1}...': 'DataAccessStringId.LoadingDataSourcePanelCounter',
+            ' (from the Server Explorer)': 'DataAccessStringId.ConnectionStringPostfixServerExplorer',
+            'Type: {0}': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_ColumnDescriptionFormat',
+            'column': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Columns_Tooltip',
+            'The column name is not specified.': 'DataAccessStringId.UnnamedColumnValidationException',
+            'There are no tables containing column [{0}], which is used in the custom expression.': 'DataAccessStringId.CustomExpressionWithColumnOfMissingTableValidationException',
+            'Invalid column: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_InvalidColumn',
+            'Connection name: {0}\r\n Error message:\r\n{1}\r\n': 'DataAccessStringId.DatabaseConnectionExceptionMessage',
+            'The following column is used as a sorting criterion more than once: "{0}"."{1}".': 'DataAccessStringId.SortingBySameColumnTwiceValidationException',
+            'Left outer join': 'DataAccessStringId.RelationEditorRelationTypeLeftOuterJoin',
+            'Semicolon': 'DataAccessStringId.ExcelWizard_ValueSeparator_Semicolon',
+            'The following database provider is not supported: {0}.': 'DataAccessStringId.ProviderNotSupportedException',
+            'Parameter name mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcParamNameValidationException',
+            'The specified alias already exists.': 'DataAccessStringId.QueryBuilderAliasAlreadyExists',
+            'Item name \'{0}\' contains wrong characters': 'DataAccessStringId.MessageWrongCharacterItemName',
+            'Cannot group by an aggregate column: "{0}"."{1}".': 'DataAccessStringId.GroupByAggregateColumnValidationException',
+            'Char': 'DataAccessStringId.Type_Char',
+            'Non-negative number (8 bit integer)': 'DataAccessStringId.Type_Byte',
+            'Non-negative number (32 bit integer)': 'DataAccessStringId.Type_UInt',
+            'The reference table has not been selected: "{0}".': 'DataAccessStringId.RelationTableNotSelectedValidationException',
+            'The SQL string is null or empty.': 'DataAccessStringId.SqlStringEmptyValidationException',
+            'function': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions_Tooltip',
+            'Non-negative number (16 bit integer)': 'DataAccessStringId.Type_UShort',
+            'A relation cannot be null.': 'DataAccessStringId.RelationNullValidationException',
+            'A column with the following name already exists: "{0}"."{1}".': 'DataAccessStringId.DuplicatingColumnNamesValidationException',
+            'Logical': 'DataAccessStringId.ExpressionEditor_FunctionCategory_Logical',
+            'The column name [{0}], which is used in the filter string, is ambiguous. Columns with this name exist in the following tables: {1}.': 'DataAccessStringId.FilterByAmbiguousColumnValidationException',
+            'Cannot find the following connection in the config file: {0}.': 'DataAccessStringId.ConnectionNotFoundInConfig_ExceptionMessage',
+            'Invalid port number. A port number should be between 0 and 65535 inclusive.': 'DataAccessStringId.InvalidPortErrorMessage',
+            'Invalid expression.': 'DataAccessStringId.ExpressionEditor_InvalidExpression',
+            'Rebuilding the Result Schema...': 'DataAccessStringId.RebuildResultSchemaWaitFormText',
+            'Common': 'DataAccessStringId.QueryPropertyGridCommonCategoryName',
+            'Not all parts of the expression are specified.': 'DataAccessStringId.QueryBuilderJoinEditorMissingData',
+            'Connection parameters were discarded because the {0} provider is not supported. \r\nSelect one of the available data providers and specify connection parameters or close the wizard \r\nusing the Close button to undo this change.': 'DataAccessStringId.ConnectionPropertiesPage_ProviderNotSupported',
+            'The protected file cannot be opened.': 'DataAccessStringId.ExcelEncryptedFileException_EncryptionTypeNotSupported',
+            'The collection of tables cannot be empty.': 'DataAccessStringId.NoTablesValidationException',
+            'Group filtering cannot be applied to data that is not grouped. Please apply data grouping first.': 'DataAccessStringId.GroupFilterStringEditorNoGroups',
+            'The SKIP setting is set while records are not sorted. Please apply sorting to be able to skip the first N records or reset the SKIP setting in the Filter Editor dialog.': 'DataAccessStringId.SkipWithoutSortingValidationException',
+            'The connection has been cancelled.': 'DataAccessStringId.ConnectionAborted_ExceptionMessage',
+            'Custom connection string': 'DataAccessStringId.WizardCustomConnectionString',
+            'Column [{0}].[{1}] is used in the custom expression, but is missing in DBSchema.': 'DataAccessStringId.CustomExpressionWithMissingInSchemaColumnValidationException',
+            'Stored Procedure': 'DataAccessStringId.QueryPropertyGridStoredProcCategoryName',
+            'Some of the query features are not supported for XML files.': 'DataAccessStringId.XmlProviderNotSupportedLabel',
+            'The column name [{0}], which is used in the custom expression, is ambiguous. Columns with this name exist in the following tables: {1}.': 'DataAccessStringId.CustomExpressionWithAmbiguousColumnValidationException',
+            'The name of a stored procedure cannot be null.': 'DataAccessStringId.StoredProcNameNullValidationException',
+            'An expression cannot be null, either column or custom expression expected.': 'DataAccessStringId.ExpressionNullValidationException',
+            'Column [{0}].[{1}] is used in the filter string, but is missing in DBSchema.': 'DataAccessStringId.FilterByMissingInSchemaColumnValidationException',
+            'Inner join': 'DataAccessStringId.RelationEditorRelationTypeInnerJoin',
+            'Schema loading...': 'DataAccessStringId.ExcelDataSource_SchemaLoadingText',
+            'The specified relation is incomplete: "{0}".': 'DataAccessStringId.IncompleteRelationValidationException',
+            'Number (8 bit integer)': 'DataAccessStringId.Type_SByte',
+            'The password is not correct. Please try again.': 'DataAccessStringId.ExcelEncryptedFileException_WrongPassword',
+            'Non-negative number (64 bit integer)': 'DataAccessStringId.Type_ULong',
+            'Master-detail relation': 'DataAccessStringId.RelationEditorRelationTypeMasterDetail',
+            'Column not found: \'{0}\'.\'{1}\'.': 'DataAccessStringId.ResultRelation_ColumnNotFoundError',
+            'A query with the specified name already exists: {0}.': 'DataAccessStringId.MessageDuplicateQueryName',
+            ' (in the config file)': 'DataAccessStringId.ConnectionStringPostfixAppConfig',
+            'The query name cannot be empty.': 'DataAccessStringId.MessageEmptyQueryName',
+            'A grouping criteria cannot be null.': 'DataAccessStringId.GroupNullValidationException',
+            'Unable to load the {0} assembly for the {1} context. Please choose an existing external assembly and/or existing context.': 'DataAccessStringId.MessageCannotLoadCustomAssembly',
+            'Unknown': 'DataAccessStringId.UnknownType',
+            'Manual editing of custom SQL is not allowed. The current query is represented by a custom SQL query string, \r\nwhich will be lost if you proceed with editing the query using the Query Builder dialog. \r\n\r\nDo you want to discard the custom SQL and proceed with the Query Builder?': 'DataAccessStringId.ConfigureQueryPage_CustomSqlWillBeLost',
+            'The specified relation does not contain key columns: "{0}".': 'DataAccessStringId.NoRelationColumnsValidationException',
+            'The following aggregate function is not supported: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_NotSupportedAggregateFunction',
+            'A database does not contain tables or views and does not support SQL editing. To be able to run the Query Builder, make sure that your database contains at least one table or supports SQL editing.': 'DataAccessStringId.QueryBuilderNoTablesAndViews',
+            'Group filtering criteria are defined while data is not grouped. Please apply data grouping or remove group filtering criteria on the Group Filter tab of the Filter Editor dialog.': 'DataAccessStringId.HavingWithoutGroupByValidationException',
+            'default': 'DataAccessStringId.ParameterlessConstructor',
+            'A sorting criteria cannot be null.': 'DataAccessStringId.SortingNullValidationException',
+            'The schema does not contain the specified table: "{0}".': 'DataAccessStringId.TableNotInSchemaValidationException',
+            'There are no tables containing column [{0}], which is used in the filter string.': 'DataAccessStringId.FilterByColumnOfMissingTableValidationException',
+            'Cannot parse the following expression string: "{0}".': 'DataAccessStringId.InvalidExpressionStringValidationException',
+            'Certain columns on the select list are invalid because they are not contained in either an aggregate function or in the Group By clause. Apply aggregation/grouping either to all columns or to none of them.': 'DataAccessStringId.PartialAggregationValidationException',
+            'none': 'DataAccessStringId.ParameterListEmpty',
+            'Cannot sort by an aggregate column: {0}({1}), because the query is not aggregated.': 'DataAccessStringId.SortByAggregateColumnValidationException',
+            '(All Tables)': 'DataAccessStringId.QueryBuilder_AllTables',
+            'Invalid function: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_InvalidCustomFunction',
+            '{0} on {1}': 'DataAccessStringId.QueryDesignerJoinExpressionPattern',
+            'Top and Skip properties should be non-negative integer.': 'DataAccessStringId.NegativeTopSkipValidationException',
+            '{0}\r\nFile not found.\r\nCheck the file name and try again.': 'DataAccessStringId.ExcelDataSource_FileNotFoundMessage',
+            'Parameter count mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcParamCountValidationException',
+            'null': 'DataAccessStringId.ParameterListNull',
+            'The following query features are not supported for XML files:\r\n\t• custom expression in columns;\r\n\t• asterisk;\r\n\t• records count;\r\n\t• distinct.\r\nTo proceed, remove these features from the query or switch to the use of another data provider.': 'DataAccessStringId.XmlProviderNotSupportedFeatureException',
+            'Excel Workbooks': 'DataAccessStringId.FileNameFilter_Excel',
+            'Cannot get item properties from IListSource without default constructor.': 'DataAccessStringId.ODSWizardErrorNoDefaultCtor',
+            'Only non-negative numeric values are allowed.': 'DataAccessStringId.PositiveIntegerError',
+            'Aggregate': 'DataAccessStringId.ExpressionEditor_FunctionCategory_Aggregate',
+            'A custom SQL query should contain only SELECT statements.': 'DataAccessStringId.CustomSqlQueryValidationException',
+            'Gathering types information...': 'DataAccessStringId.GatheringTypesPanelText',
+            'The table name is not specified.': 'DataAccessStringId.UnnamedTableValidationException',
+            'The name cannot be null, empty or contain only whitespaces.': 'DataAccessStringId.WizardEmptyConnectionNameMessage',
+            'The schema does not contain the following column: "{0}"."{1}".': 'DataAccessStringId.ColumnNotInSchemaValidationException',
+            'Parameter type mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcParamTypeValidationException',
+            'One or more queries have failed to validate.': 'DataAccessStringId.QueriesFailedToValidate_ExceptionMessage',
+            'Incorrect file format': 'DataAccessStringId.ExcelInvalidFileException_WrongFormat',
+            'Loading Data...': 'DataAccessStringId.LoadingDataPanelText',
+            'Can join {0}': 'DataAccessStringId.QueryBuilderCanJoin',
+            'Query \'{0}\' does not exist.': 'DataAccessStringId.MessageNonexistentQuery',
+            'Custom SQL': 'DataAccessStringId.QueryPropertyGridCustomSqlCategoryName',
+            'No column has been selected. Please select at least one column to proceed.': 'DataAccessStringId.QueryBuilderNothingSelected',
+            'Parameter name \'{0}\' contains wrong characters': 'DataAccessStringId.MessageWrongCharacterParameterName',
+            'This collection already contains an item with the \'{0}\' name': 'DataAccessStringId.MessageDuplicateItemName',
+            'Failed to connect to the database. To learn more, see the exception details. \r\n\r\nException details:\r\n {0}': 'DataAccessStringId.DatabaseConnectionExceptionStringId',
+            'Cannot add a null value to the collection': 'DataAccessStringId.MessageNullItem',
+            'One or more relations are invalid. \r\nTo learn about the error details, click Manage Relations.': 'DataAccessStringId.ConfigureMultiQueryPage_ValidateRelationError',
+            'Column \'{0}\'.\'{1}\' does not exist.': 'DataAccessStringId.MessageNonexistentColumn',
+            'Joined on {0}': 'DataAccessStringId.QueryBuilderJoinedOn',
+            'A parameter cannot be null.': 'DataAccessStringId.StoredProcParamNullValidationException',
+            'A table with the following name already exists: "{0}".': 'DataAccessStringId.DuplicatingTableNamesValidationException',
+            'Query {0} failed to execute.': 'DataAccessStringId.SqlQueryExecutionException',
+            'Connecting to the database...': 'DataAccessStringId.ConnectingToDatabaseMessage',
+            'parameter': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Parameters_Tooltip',
+            'A password is required to open this workbook.': 'DataAccessStringId.ExcelEncryptedFileException_PasswordRequired',
+            '* (All Columns)': 'DataAccessStringId.QueryBuilder_AllColumns',
+            'constant': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Constants_Tooltip',
+            'None of the tables contain any columns.': 'DataAccessStringId.NoColumnsValidationException',
+            'Cannot load this assembly for security reasons.': 'DataAccessStringId.WizardAssemblyLoadingDisallowed',
+            'No connection has been specified.': 'DataAccessStringId.ConnectionNotSpecified_ExceptionMessage',
+            'The following tables have no relations: "{0}".': 'DataAccessStringId.TablesNotRelatedValidationException',
+            'XML Files': 'DataAccessStringId.XmlFileStrategy_FileNameFilter',
+            'Error trying to execute an SQL query{0}{1}.{2}Error: {3}': 'DataAccessStringId.SqlExecutionException',
+            'The schema does not contain the following relation column: "{0}"."{1}".': 'DataAccessStringId.RelationColumnNotInSchemaValidationException',
+            'A data member \'{0}\' does not exist.': 'DataAccessStringId.ODSErrorMissingMember',
+            'Item name cannot be null or an empty string': 'DataAccessStringId.MessageInvalidItemName',
+            ', ': 'DataAccessStringId.QueryDesignerJoinExpressionElementSeparator',
+            '[{0}] {1} join [{2}] on {3}': 'DataAccessStringId.QueryDesignerJoinTooltipPattern',
+            'The relation column cannot be null.': 'DataAccessStringId.RelationColumnNullValidationException',
+            'No table has been selected. Please select at least one table to proceed.': 'DataAccessStringId.QueryBuilderNoTablesSelected',
+            'Cannot find the specified stored procedure: "{0}".': 'DataAccessStringId.StoredProcNotInSchemaValidationException',
+            'Math': 'DataAccessStringId.ExpressionEditor_FunctionCategory_Math',
+            'The file is corrupt.': 'DataAccessStringId.ExcelInvalidFileException_CorruptedFile',
+            'All Supported Formats': 'DataAccessStringId.FileNameFilter_AllFormats',
+            ' with parameters:{0}{1}': 'DataAccessStringId.SqlExecutionException_WithParameters',
+            'operator': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Operators_Tooltip',
+            'Circular relations have been detected.': 'DataAccessStringId.CircularRelationsValidationException',
+            'BIFF5 (Excel 5.0/95) XLS file format is not supported.': 'DataAccessStringId.ExcelInvalidFileException_BIFF5Format',
+            'An expression string cannot be null': 'DataAccessStringId.ExpressionStringNullValidationException',
+            'Please click the \'Filter...\' button to correct the filter string.': 'DataAccessStringId.QueryBuilderInvalidFilter',
+            'Invalid sorting column "{0}"."{1}". Results of a TableQuery containing aggregate functions can only be sorted by columns used as grouping criteria.': 'DataAccessStringId.AggregateQueryInvalidSortingValidationException',
+            'The type is static and it does not have any members returning IEnumerable.': 'DataAccessStringId.ODSWizardErrorStaticValue',
+            'The following table is not in tables list, but its column is used: "{0}".': 'DataAccessStringId.TableNotSelectedValidationException',
+            'The GetItemProperties method of an ITypedList has thrown an exception.': 'DataAccessStringId.ODSWizardErrorExceptionInGetItemProperties',
+            'Tab': 'DataAccessStringId.ExcelWizard_ValueSeparator_Tab',
+            'A column cannot be null.': 'DataAccessStringId.ColumnNullValidationException',
+            'Invalid parameter: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_InvalidParameter',
+            'An aggregate column should have an alias.': 'DataAccessStringId.AggregationWithoutAliasValidationException',
+            'The connection string contains no XpoProvider key or the specified key is invalid. \r\n\r\nException details:\r\n {0}': 'DataAccessStringId.NoXpoProviderStringId',
+            'The SKIP setting is set while records are not sorted. Please apply sorting to be able to skip the first N records.': 'DataAccessStringId.SkipWithoutSortingPropertyGridError',
             'Data Preview': 'DataAccessUIStringId.DataPreviewForm_Title',
             'Select the data provider and specify the connection properties.': 'DataAccessUIStringId.WizardPageConnectionProperties',
             'Edit...': 'DataAccessUIStringId.EFDataSourceDesignerVerbEdit',
@@ -3949,7 +4151,6 @@ var DevExpress;
             'records starting with index': 'DataAccessUIStringId.FiltersView_TopAndSkipText',
             'Newline type:': 'DataAccessUIStringId.WizardPageChooseFileOptions_NewLineType',
             'Unable to load data into one or several datasources. See information below for details.': 'DataAccessUIStringId.ErrorFormDatasourceInitializationText',
-            'Loading Data...': 'DataAccessUIStringId.WaitFormWithCancel_Loading',
             'Edit Relation': 'DataAccessUIStringId.MasterDetailEditorEditRelation',
             'Create Query Parameter': 'DataAccessUIStringId.QueryFilter_CreateQueryParameter',
             'Query': 'DataAccessUIStringId.ParametersColumn_QueryName',
@@ -3977,7 +4178,6 @@ var DevExpress;
             'Warning': 'DataAccessUIStringId.MessageBoxWarningTitle',
             'Specify the method parameters.': 'DataAccessUIStringId.WizardPageObjectMemberParameters',
             'Cannot use a constructor to create an object of the {0} type that is a static or abstract class, or interface.': 'DataAccessUIStringId.ODSEditorsAbstractTypeMessage',
-            'No connection has been specified.': 'DataAccessUIStringId.MessageMissingConnection',
             'Validating query...': 'DataAccessUIStringId.QueryEditorWaitFormValidating',
             'Select a member to bind.': 'DataAccessUIStringId.WizardPageChooseObjectMember_BindToMember',
             'Skip empty rows': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipEmptyRows',
@@ -4016,7 +4216,6 @@ var DevExpress;
             'Enter the data source name': 'DataAccessUIStringId.WizardPageChooseDataSourceName',
             'Use values of the first row as field names': 'DataAccessUIStringId.WizardPageChooseFileOptions_FirstRowAsFieldNames',
             'Save the connection string.': 'DataAccessUIStringId.WizardPageSaveConnection',
-            'No column has been selected. Please select at least one column to proceed.': 'DataAccessUIStringId.QueryDesignControlNoSelection',
             'Do you want to select a connection string from the list of available settings?': 'DataAccessUIStringId.WizardPageChooseEFConnectionString',
             'Client ID:': 'DataAccessUIStringId.ConnectionProperties_ClientID',
             'The {0} data source type does not provide any members suitable for binding.': 'DataAccessUIStringId.ODSEditorsNoMembersInType',
@@ -4029,7 +4228,6 @@ var DevExpress;
             'Server name:': 'DataAccessUIStringId.ConnectionProperties_ServerName',
             'Show only highlighted assemblies': 'DataAccessUIStringId.WizardPageChooseObjectAssembly_ShowOnlyHighlighted',
             'Hostname:': 'DataAccessUIStringId.ConnectionProperties_Hostname',
-            'Defined Name': 'DataAccessUIStringId.ExcelDataSourceWizard_DefinedNameItem',
             'Configure Connection...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbEditConnection',
             'Remote': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeRemote',
             'Manage Queries...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbManageQueries',
@@ -4115,7 +4313,6 @@ var DevExpress;
             'Specify a connection string.': 'DataAccessUIStringId.WizardPageEFConnectionProperties',
             'Manage Relations...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbManageRelations',
             'Join Information': 'DataAccessUIStringId.JoinInformation',
-            'Stored Procedure': 'DataAccessUIStringId.WizardPageConfigureQuery_StoredProcedure',
             'Database schema is updated successfully.': 'DataAccessUIStringId.UpdateDBSchemaComplete',
             'No, specify a custom connection string': 'DataAccessUIStringId.WizardPageChooseEFConnectionString_CustomConnection',
             'Authentication type:': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType',
@@ -4157,7 +4354,6 @@ var DevExpress;
             'Browse...': 'DataAccessUIStringId.Button_Browse',
             'No, skip credentials for security reasons': 'DataAccessUIStringId.WizardPageSaveConnection_SkipSaveCredentials',
             'The following tables will be removed from the query.\r\n\r\n{0}\r\nDo you want to continue?': 'DataAccessUIStringId.QueryDesignControlRemoveTables',
-            'Aggregate': 'DataAccessUIStringId.QueryBuilderColumns_Aggregate',
             'File name:': 'DataAccessUIStringId.PasswordRequest_FileName',
             'Cannot connect to the database. See the details below.': 'DataAccessUIStringId.WizardCannotConnectMessage',
             'Master-Detail Relation Editor': 'DataAccessUIStringId.MasterDetailEditorForm_Title',
@@ -4181,7 +4377,6 @@ var DevExpress;
             'Compares each bit of its first operand to the corresponding bit of its second operand. If either bit is 1, the corresponding result bit is set to 1. Otherwise, the corresponding result bit is set to 0.': 'XtraEditorsExpressionEditor.BitwiseOr.Description',
             'IsJune(DateTime)\r\nReturns True if the specified date falls within June.': 'XtraEditorsExpressionEditor.IsJune.Description',
             'DateDiffMilliSecond(startDate, endDate)\r\nReturns the number of millisecond boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description',
-            'Math': 'XtraEditorsExpressionEditor.functionsTypes.Properties.MathItems',
             'expressionEdit': 'XtraEditorsExpressionEditor.>>expressionEdit.Name',
             'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>expressionEdit.Type',
             'Date-time': 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems',
@@ -4205,7 +4400,6 @@ var DevExpress;
             'Lower(String)\r\nReturns the String in lowercase.': 'XtraEditorsExpressionEditor.Lower.Description',
             '13': 'XtraEditorsExpressionEditor.>>layoutItemButton8.ZOrder',
             '8': 'XtraEditorsExpressionEditor.>>layoutItemButton14.ZOrder',
-            'Operators': 'XtraEditorsExpressionEditor.Operators.Text',
             'Format rule expression editor': 'XtraEditorsExpressionEditor.FormatRule.Caption',
             'LocalDateTimeTwoWeeksAway()\r\nReturns a date-time value corresponding to the first day of the week that is after next week.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description',
             'IsMay(DateTime)\r\nReturns True if the specified date falls within May.': 'XtraEditorsExpressionEditor.IsMay.Description',
@@ -4216,7 +4410,6 @@ var DevExpress;
             '9': 'XtraEditorsExpressionEditor.>>labelControl2.ZOrder',
             'layoutItemButton9': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Name',
             'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Type',
-            'Constants': 'XtraEditorsExpressionEditor.Constants.Text',
             'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'XtraEditorsExpressionEditor.ToInt.Description',
             '19': 'XtraEditorsExpressionEditor.>>layoutItemButton3.ZOrder',
             'layoutItemButton8': 'XtraEditorsExpressionEditor.>>layoutItemButton8.Name',
@@ -4247,7 +4440,6 @@ var DevExpress;
             'Field Information\r\nCaption: {1}\r\nThe type of this field is: {2}': 'XtraEditorsExpressionEditor.GridFields Description Prefix',
             'DateDiffMinute(startDate, endDate)\r\nReturns the number of minute boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMinute.Description',
             'layoutItemButton3': 'XtraEditorsExpressionEditor.>>layoutItemButton3.Name',
-            'Logical': 'XtraEditorsExpressionEditor.functionsTypes.Properties.LogicalItems',
             'DateDiffMonth(startDate, endDate)\r\nReturns the number of month boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMonth.Description',
             'layoutItemButton2': 'XtraEditorsExpressionEditor.>>layoutItemButton2.Name',
             '2': 'XtraEditorsExpressionEditor.>>listOfInputParameters.ZOrder',
@@ -4266,7 +4458,6 @@ var DevExpress;
             'LocalDateTimeThisWeek()\r\nReturns a date-time value corresponding to the first day of the current week.': 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description',
             'IsLastMonth(DateTime)\r\nReturns True if the specified date falls within the previous month.': 'XtraEditorsExpressionEditor.IsLastMonth.Description',
             'ToDouble(Value)\r\nConverts Value to an equivalent 64-bit double-precision floating-point number.': 'XtraEditorsExpressionEditor.ToDouble.Description',
-            'Functions': 'XtraEditorsExpressionEditor.Functions.Text',
             'Now()\r\nReturns the current system date and time.': 'XtraEditorsExpressionEditor.Now.Description',
             'IsNullOrEmpty(String)\r\nReturns True if the specified String object is NULL or an empty string; otherwise, False is returned.': 'XtraEditorsExpressionEditor.IsNullOrEmpty.Description',
             'IsDecember(DateTime)\r\nReturns True if the specified date falls within December.': 'XtraEditorsExpressionEditor.IsDecember.Description',
@@ -4876,7 +5067,8 @@ var DevExpress;
                         return JS.Utils.getLocalization(value);
                     return JS.Utils.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr]);
                 };
-                ko.bindingHandlers["dxSelectBox"].init(element, function () { return options; }, allBindings, viewModel, bindingContext);
+                var extendedOptions = viewModel.getOptions ? viewModel.getOptions(options) : options;
+                ko.bindingHandlers["dxSelectBox"].init(element, function () { return extendedOptions; }, allBindings, viewModel, bindingContext);
                 return { controlsDescendantBindings: true };
             }
         };
@@ -5152,7 +5344,11 @@ var DevExpress;
                     this._model(this.isVisibleByContent() ? viewModel : null);
                 };
                 Editor.prototype.localizingDisplayName = function () {
-                    return this["localizationId"] ? (DevExpress.JS.Localization.localize(this["localizationId"]) || this.displayName()) : DevExpress.JS.Utils.getLocalization(this.displayName());
+                    return DevExpress.Designer.getLocalization(this.displayName(), this["localizationId"]);
+                };
+                Editor.prototype.getOptions = function (templateOptions) {
+                    var extendedOptions = this.info.peek().editor.extendedOptions;
+                    return $.extend({}, templateOptions, this.editorOptions, extendedOptions);
                 };
                 Object.defineProperty(Editor.prototype, "validationRules", {
                     get: function () {
@@ -10504,8 +10700,16 @@ var DevExpress;
             var handlersManager = new KeyDownHandlersManager($(window));
             return {
                 init: function (element, valueAccessor) {
-                    var actionLists = valueAccessor(), handler = function (e) { actionLists.processShortcut(actionLists.toolbarItems, e); };
-                    handlersManager.bindHandler(element, handler);
+                    var actionLists = valueAccessor(), handler = function (e) { actionLists.processShortcut(ko.unwrap(actionLists.toolbarItems), e); };
+                    if (ko.isSubscribable(actionLists.enabled)) {
+                        var subscribe = actionLists.enabled.subscribe(function (newVal) {
+                            if (newVal)
+                                handlersManager.bindHandler(element, handler);
+                        });
+                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () { return subscribe.dispose(); });
+                    }
+                    if (ko.unwrap(actionLists.enabled))
+                        handlersManager.bindHandler(element, handler);
                 }
             };
         })();
@@ -11137,20 +11341,27 @@ var DevExpress;
                 deferred.reject(jqXHR, textStatus, errorThrown);
             }
         }
-        function ajax(uri, action, arg, processErrorCallback) {
+        function ajax(uri, action, arg, processErrorCallback, ignoreError) {
             var deferred = $.Deferred();
-            $.post(uri, {
+            var requestData = {
                 actionKey: action,
                 arg: arg
-            })
+            };
+            $.post(uri, requestData)
                 .fail(function (jqXHR, textStatus, errorThrown) {
+                var _failData = requestData;
+                if (ignoreError && ignoreError())
+                    return;
                 _processError(errorThrown, deferred, jqXHR, textStatus, processErrorCallback);
             })
                 .done(function (data, textStatus, jqXHR) {
+                var _doneData = requestData;
                 if (data.success) {
                     deferred.resolve(data.result);
                 }
                 else {
+                    if (ignoreError && ignoreError())
+                        return;
                     _processError("Internal Server Error", deferred, jqXHR, textStatus, processErrorCallback);
                 }
             });
@@ -11489,6 +11700,9 @@ var DevExpress;
                 this.right = ko.observable(right);
                 this.top = ko.observable(top);
             }
+            Margins.prototype.getInfo = function () {
+                return Designer.Widgets.paddingSerializationsInfo;
+            };
             Margins.prototype.isEmpty = function () {
                 return this.toString() === Margins.defaultVal;
             };
@@ -11868,7 +12082,13 @@ var DevExpress;
                     return _this.createFont(control["font"] && control["font"]() || "");
                 };
                 this.paddingsCss = function () {
-                    return _this.createPadding(control["padding"] && control["padding"]() || "");
+                    var controlPaddings = ko.unwrap(control["padding"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
+                    var paddings = {};
+                    paddings["paddingLeft"] = _this._getPixelValueFromUnit(controlPaddings.left(), control) + "px";
+                    paddings["paddingTop"] = _this._getPixelValueFromUnit(controlPaddings.top(), control) + "px";
+                    paddings["paddingRight"] = _this._getPixelValueFromUnit(controlPaddings.right(), control) + "px";
+                    paddings["paddingBottom"] = _this._getPixelValueFromUnit(controlPaddings.bottom(), control) + "px";
+                    return paddings;
                 };
                 this.textAlignmentCss = function () {
                     var align = control["textAlignment"] && control["textAlignment"]() || "";
@@ -11911,6 +12131,12 @@ var DevExpress;
                     return $.extend(_this.createVerticalAlignment(align), _this.createHorizontalAlignment(align));
                 };
             }
+            CssCalculator.prototype._getPixelValueFromUnit = function (value, control) {
+                if (control["root"] && control["root"].measureUnit) {
+                    return Designer.unitsToPixel(value, control["root"].measureUnit());
+                }
+                return value;
+            };
             CssCalculator.prototype._patchPosition = function (position) {
                 return patchPositionByRTL(position, this._rtlLayout());
             };
@@ -11972,7 +12198,7 @@ var DevExpress;
                 var fontStyles = {};
                 fontString = fontString || "";
                 var components = fontString.split(',');
-                fontStyles["fontFamily"] = components[0];
+                fontStyles["fontFamily"] = components[0] ? '"' + components[0] + '"' : "";
                 fontStyles["fontSize"] = components[1];
                 if (components.length > 2) {
                     for (var i = 2; i < components.length; i++) {
@@ -11996,14 +12222,6 @@ var DevExpress;
                     fontStyles["textDecoration"] = "";
                 }
                 return fontStyles;
-            };
-            CssCalculator.prototype.createPadding = function (paddings) {
-                var padding = {}, paddingModel = new Designer.Widgets.PaddingModel(ko.observable(paddings));
-                padding["paddingLeft"] = paddingModel.left() + "px";
-                padding["paddingTop"] = paddingModel.top() + "px";
-                padding["paddingRight"] = paddingModel.right() + "px";
-                padding["paddingBottom"] = paddingModel.bottom() + "px";
-                return padding;
             };
             CssCalculator.prototype.createVerticalAlignment = function (alignment) {
                 var result = {};
@@ -12980,19 +13198,19 @@ var DevExpress;
             SelectionDragDropHandler.prototype.doStopDrag = function (ui, _) {
                 if (this.selection.dropTarget) {
                     var dropTarget = this.selection.dropTarget.getControlModel(), dropTargetSurface = dropTarget.getNearestParent(dropTarget).surface;
-                    if (!dropTargetSurface || !dropTargetSurface.canDrop()) {
+                    var focusedSurface = this.selection.focused();
+                    var adjustedTarget = this.adjustDropTarget(dropTargetSurface), focusedModel = focusedSurface.getControlModel(), parent = focusedModel.getNearestParent(adjustedTarget.getControlModel()), adjustedTarget = Designer.findSurface(parent), changeParent = adjustedTarget !== focusedSurface.parent;
+                    if (!adjustedTarget || !adjustedTarget.canDrop()) {
                         return;
                     }
-                    var focusedSurface = this.selection.focused();
                     var dropPointRelativeX = ui.position.left;
                     var dropPointRelativeY = ui.position.top;
-                    if (dropTargetSurface["absolutePosition"]) {
-                        dropPointRelativeX -= dropTargetSurface["absolutePosition"].x();
-                        dropPointRelativeY -= dropTargetSurface["absolutePosition"].y();
-                        dropTargetSurface.underCursor().x = dropPointRelativeX - focusedSurface.underCursor().offsetX;
-                        dropTargetSurface.underCursor().y = dropPointRelativeY - focusedSurface.underCursor().offsetY;
+                    if (adjustedTarget["absolutePosition"]) {
+                        dropPointRelativeX -= adjustedTarget["absolutePosition"].x();
+                        dropPointRelativeY -= adjustedTarget["absolutePosition"].y();
+                        adjustedTarget.underCursor().x = dropPointRelativeX - focusedSurface.underCursor().offsetX;
+                        adjustedTarget.underCursor().y = dropPointRelativeY - focusedSurface.underCursor().offsetY;
                     }
-                    var adjustedTarget = this.adjustDropTarget(dropTargetSurface), focusedModel = focusedSurface.getControlModel(), parent = focusedModel.getNearestParent(adjustedTarget.getControlModel()), adjustedTarget = Designer.findSurface(parent), changeParent = adjustedTarget !== focusedSurface.parent;
                     var itemsToDrop = this.selection.selectedItems
                         .filter(function (item) { return !item.locked && item.parent === focusedSurface.parent; })
                         .map(function (item) {
@@ -13641,16 +13859,44 @@ var DevExpress;
                 };
             }
         };
-        var ActionLists = (function () {
-            function ActionLists(surfaceContext, selection, undoEngine, customizeActions, copyPasteStrategy) {
-                var _this = this;
+        var ActionListsBase = (function () {
+            function ActionListsBase(enabled) {
                 this.toolbarItems = [];
+                this.enabled = enabled || ko.observable(true);
+            }
+            ActionListsBase.prototype.processShortcut = function (actions, e) {
+                for (var i = 0; i < actions.length; i++) {
+                    if (actions[i].hotKey && (actions[i].disabled && !actions[i].disabled() || !actions[i].disabled) && ($.isFunction(actions[i].visible) ? actions[i].visible() : actions[i].visible)) {
+                        if (actions[i].hotKey.ctrlKey === e.ctrlKey && actions[i].hotKey.keyCode === e.keyCode) {
+                            actions[i].clickAction();
+                            e.preventDefault();
+                        }
+                    }
+                }
+            };
+            ActionListsBase.prototype.shouldIgnoreProcessing = function (e) {
+                if (e.altKey || !this.enabled.peek())
+                    return true;
+                var activeElement = $(document.activeElement);
+                if (activeElement.is("textarea") || activeElement.is(":input") && (activeElement.attr("type") === "text" || activeElement.attr("type") === "number")) {
+                    return true;
+                }
+                return false;
+            };
+            return ActionListsBase;
+        })();
+        Designer.ActionListsBase = ActionListsBase;
+        var ActionLists = (function (_super) {
+            __extends(ActionLists, _super);
+            function ActionLists(surfaceContext, selection, undoEngine, customizeActions, enabled, copyPasteStrategy) {
+                var _this = this;
+                _super.call(this, enabled);
                 this.menuItems = [];
                 var copyPasteHandler = new CopyPasteHandler(selection, copyPasteStrategy), actions = [];
                 var selectionControlsLocked = ko.computed(function () {
                     return selection.selectedItems.some(function (item) { return item.locked; });
                 });
-                this.keyboardHelper = new KeyboardHelper(selection, undoEngine);
+                this._keyboardHelper = new KeyboardHelper(selection, undoEngine);
                 var zoomStep = ko.observable(0.01);
                 actions.push({
                     id: Designer.ActionId.Cut,
@@ -13784,7 +14030,7 @@ var DevExpress;
                     customizeActions(actions);
                 }
                 actions.forEach(function (action) {
-                    _this._registerAction(action["container"] === "menu" ? _this.menuItems : _this.toolbarItems, action);
+                    _this._registerAction(action["container"] === "menu" ? _this.menuItems : ko.unwrap(_this.toolbarItems), action);
                 });
             }
             ActionLists.prototype._registerAction = function (container, action) {
@@ -13796,26 +14042,17 @@ var DevExpress;
                 }
             };
             ActionLists.prototype.processShortcut = function (actions, e) {
-                var activeElement = $(document.activeElement);
-                if (activeElement.is("textarea") || activeElement.is(":input") && (activeElement.attr("type") === "text" || activeElement.attr("type") === "number")) {
+                if (this.shouldIgnoreProcessing(e))
                     return;
-                }
-                if (!this.keyboardHelper.processShortcut(e)) {
-                    for (var i = 0; i < actions.length; i++) {
-                        if (actions[i].hotKey && (actions[i].disabled && !actions[i].disabled() || !actions[i].disabled)) {
-                            if (actions[i].hotKey.ctrlKey === e.ctrlKey && actions[i].hotKey.keyCode === e.keyCode) {
-                                actions[i].clickAction();
-                                e.preventDefault();
-                            }
-                        }
-                    }
+                if (!this._keyboardHelper.processShortcut(e)) {
+                    _super.prototype.processShortcut.call(this, actions, e);
                 }
                 else {
                     e.preventDefault();
                 }
             };
             return ActionLists;
-        })();
+        })(ActionListsBase);
         Designer.ActionLists = ActionLists;
         var CopyPasteHandler = (function () {
             function CopyPasteHandler(selectionProvider, _copyPasteStrategy) {
@@ -14234,45 +14471,62 @@ var DevExpress;
     (function (Designer) {
         var Widgets;
         (function (Widgets) {
+            Widgets.left = {
+                propertyName: "left", modelName: "@Left", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Left", displayName: "Left", editor: DevExpress.JS.Widgets.editorTemplates.numeric
+            }, Widgets.right = { propertyName: "right", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Right", modelName: "@Right", displayName: "Right", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Widgets.top = { propertyName: "top", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Top", modelName: "@Top", displayName: "Top", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Widgets.bottom = { propertyName: "bottom", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Bottom", modelName: "@Bottom", displayName: "Bottom", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Widgets.paddingSerializationsInfo = [Widgets.left, Widgets.right, Widgets.top, Widgets.bottom];
             var PaddingModel = (function (_super) {
                 __extends(PaddingModel, _super);
-                function PaddingModel(value) {
-                    var _this = this;
+                function PaddingModel(left, right, top, bottom, dpi) {
+                    if (left === void 0) { left = ko.observable(0); }
+                    if (right === void 0) { right = ko.observable(0); }
+                    if (top === void 0) { top = ko.observable(0); }
+                    if (bottom === void 0) { bottom = ko.observable(0); }
+                    if (dpi === void 0) { dpi = ko.observable(100); }
                     _super.call(this);
-                    this.left = ko.observable(0);
-                    this.right = ko.observable(0);
-                    this.top = ko.observable(0);
-                    this.bottom = ko.observable(0);
-                    this.dpi = 100;
-                    this.isUpdate = false;
-                    var isUpdate = false;
-                    this._updateModel(value());
-                    this._disposables.push(value.subscribe(function (newVal) {
-                        isUpdate = true;
-                        _this._updateModel(newVal);
-                        isUpdate = false;
-                    }));
-                    ["left", "right", "bottom", "top"].forEach(function (val) {
-                        _this._disposables.push(_this[val].subscribe(function (newVal) {
-                            if (!isUpdate) {
-                                value(_this._updateValue(newVal));
-                            }
-                        }));
-                    });
+                    this.left = left;
+                    this.right = right;
+                    this.top = top;
+                    this.bottom = bottom;
+                    this.dpi = dpi;
                 }
-                PaddingModel.prototype._updateModel = function (newVal) {
-                    var components = (newVal || "").split(',');
-                    this.left(parseFloat(components[0]) || 0);
-                    this.right(parseFloat(components[1]) || 0);
-                    this.top(parseFloat(components[2]) || 0);
-                    this.bottom(parseFloat(components[3]) || 0);
-                    this.dpi = parseFloat(components[4]) || 100;
+                PaddingModel.prototype.getInfo = function () {
+                    return Widgets.paddingSerializationsInfo;
                 };
-                PaddingModel.prototype._updateValue = function (value) {
-                    if (value !== null && value !== undefined) {
-                        return this.left() + "," + this.right() + "," + this.top() + "," + this.bottom() + "," + this.dpi;
+                PaddingModel.prototype.isEmpty = function () {
+                    return this._toString(true).indexOf("0, 0, 0, 0") === 0;
+                };
+                PaddingModel.prototype.applyFromString = function (value) {
+                    var components = (value || "").split(',');
+                    this.left(parseInt(components[0]) || 0);
+                    this.right(parseInt(components[1]) || 0);
+                    this.top(parseInt(components[2]) || 0);
+                    this.bottom(parseInt(components[3]) || 0);
+                    return this;
+                };
+                PaddingModel.from = function (val) {
+                    return new PaddingModel().applyFromString(val);
+                };
+                PaddingModel.prototype.toString = function () {
+                    var value = this._toString();
+                    if (value.indexOf("0,0,0,0") === 0) {
+                        return {};
+                    }
+                    else {
+                        return value;
                     }
                 };
+                PaddingModel.prototype._getProperty = function (name, inner) {
+                    if (inner === void 0) { inner = false; }
+                    return parseInt(ko.unwrap(inner ? (this["_" + name] || this[name]) : this[name]));
+                };
+                PaddingModel.prototype._toString = function (inner) {
+                    var _this = this;
+                    if (inner === void 0) { inner = false; }
+                    return ["left", "right", "top", "bottom"].map(function (x) { return _this._getProperty(x, inner); }).concat(this.dpi()).join(', ');
+                };
+                PaddingModel.defaultVal = "0, 0, 0, 0, 100";
+                PaddingModel.unitProperties = ["left", "right", "top", "bottom"];
                 return PaddingModel;
             })(Designer.Disposable);
             Widgets.PaddingModel = PaddingModel;

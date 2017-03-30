@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
+/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -3225,6 +3225,10 @@
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text.dxrp-editing-field-text-wordwrap {
   white-space: pre;
 }
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text .dxrp-editing-field-text-html {
+  position: absolute;
+  width: 100%;
+}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-mask {
   border: none;
   outline: none;
@@ -3299,6 +3303,7 @@
   background: transparent;
   position: absolute;
   box-sizing: border-box;
+  overflow: hidden;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-borders {
   display: none;
@@ -3335,6 +3340,10 @@
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text.dxrp-editing-field-text-wordwrap {
   white-space: pre;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text .dxrp-editing-field-text-html {
+  position: absolute;
+  width: 100%;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-mask {
   border: none;

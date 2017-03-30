@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
+/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -3519,9 +3519,11 @@
 .dxrd-wizard .dxrd-wizard-navigation .dxrd-wizard-btn.left {
   float: left;
   margin-left: 0;
+  margin-right: 10px;
 }
 .dxrd-wizard .dxrd-wizard-navigation .dxrd-wizard-btn.right {
   float: right;
+  margin-left: 10px;
   margin-right: 0;
 }
 .dxrd-datasource-parameters {
@@ -3662,9 +3664,11 @@
 .dxrd-querybuilder-popup .dxrd-wizard-navigation .dxrd-wizard-btn.left {
   float: left;
   margin-left: 0;
+  margin-right: 10px;
 }
 .dxrd-querybuilder-popup .dxrd-wizard-navigation .dxrd-wizard-btn.right {
   float: right;
+  margin-left: 10px;
   margin-right: 0;
 }
 .dxrd-querybuilder-popup .dx-rtl .dxrd-wizard-content .dxrd-wizard-create-query-page .dx-radiogroup {
@@ -3710,20 +3714,24 @@
 .dxrd-querybuilder-popup .dxrd-querybuilder-popup-buttons .dxrd-wizard-btn.left {
   float: left;
   margin-left: 0;
+  margin-right: 10px;
 }
 .dxrd-querybuilder-popup .dxrd-querybuilder-popup-buttons .dxrd-wizard-btn.right {
   float: right;
+  margin-left: 10px;
   margin-right: 0;
 }
 .dxrd-querybuilder-popup .dxrd-querybuilder-popup-buttons .dxrd-querybuilder-popup-button {
   text-align: center;
   margin-top: 10px;
   float: right;
+  margin: 10px;
 }
 .dxrd-querybuilder-popup .dxrd-querybuilder-popup-buttons .dxrd-querybuilder-popup-button-left {
   text-align: center;
   margin-top: 10px;
   float: left;
+  margin: 10px;
 }
 .dxrd-querybuilder-popup .dx-rtl .dxrd-querybuilder-popup-button {
   float: left;
@@ -4651,6 +4659,10 @@
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text.dxrp-editing-field-text-wordwrap {
   white-space: pre;
 }
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-readonly-text .dxrp-editing-field-text-html {
+  position: absolute;
+  width: 100%;
+}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-mask {
   border: none;
   outline: none;
@@ -4725,6 +4737,7 @@
   background: transparent;
   position: absolute;
   box-sizing: border-box;
+  overflow: hidden;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-borders {
   display: none;
@@ -4761,6 +4774,10 @@
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text.dxrp-editing-field-text-wordwrap {
   white-space: pre;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-readonly-text .dxrp-editing-field-text-html {
+  position: absolute;
+  width: 100%;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-mask {
   border: none;

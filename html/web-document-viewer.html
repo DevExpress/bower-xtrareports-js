@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.2.5 - 2017-02-20
+<!-- /*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -117,11 +117,11 @@
 </script>
 
 <script type="text/html" id="dx-combobox-editable">
-    <div data-bind="dxSelectBox: { items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', editEnabled: true, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', editEnabled: true, disabled: disabled })"></div>
 </script>
 
 <script type="text/html" id="dx-boolean">
-    <div class="propertygrid-editor-checkbox" data-bind="dxCheckBox: { value: value, disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
+    <div class="propertygrid-editor-checkbox" data-bind="dxCheckBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-boolean-select">
@@ -129,7 +129,7 @@
 </script>
 
 <script type="text/html" id="dx-text">
-    <div data-bind="dxTextBox: $.extend({ value: value, disabled: disabled }, $data.editorOptions), dxValidator: { validationRules: validationRules || [] }"></div>
+    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-image">
@@ -159,15 +159,11 @@
 </script>
 
 <script type="text/html" id="dx-numeric">
-    <div data-bind="dxNumberBox: $.extend({ value:value, showSpinButtons:true, disabled:disabled }, $data.editorOptions), dxValidator: { validationRules: validationRules || [] }"></div>
+    <div data-bind="dxNumberBox: getOptions({ value:value, showSpinButtons:true, disabled:disabled }), dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-date">
-    <div data-bind="dxDateBox: { value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
-</script>
-
-<script type="text/html" id="dx-guid">
-    <div data-bind="dxTextBox: { value: value, disabled: disabled }, dxValidator: { validationRules: (validationRules || []).concat( DevExpress.Designer.guidValidationRules ) }"></div>
+    <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dx-emptyHeader">
@@ -1114,7 +1110,7 @@
 </script>
 
 <script type="text/html" id="dxrd-guid">
-    <div data-bind="dxTextBox: { value: value, disabled: disabled }, dxValidator: { validationRules: (validationRules || []).concat( DevExpress.Designer.guidValidationRules ) }"></div>
+    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: (validationRules || []).concat( DevExpress.Designer.guidValidationRules ) }"></div>
 </script>
 
 <script type="text/html" id="dxrd-emptyHeader">
@@ -1158,7 +1154,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxSelectBox: { dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } }">
+    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">
         <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
             <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
             <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
@@ -1185,7 +1181,9 @@
         <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>
         <div class="dxrp-editing-field-content" data-bind="click: activateEditor">
             <!-- ko if: !active() || field.readOnly()  -->
-            <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap},  text: field.editValue"></div>
+            <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap}">
+                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), html: htmlValue() || field.editValue()"></div>
+            </div>
             <!--/ko-->
             <!-- ko if: active() && !field.readOnly() -->
             <!-- ko template: { name: editorTemplate, data: data } -->
@@ -1307,8 +1305,8 @@
         <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
         <!--/ko-->
         <!--/ko-->
-        <!-- ko ifnot: pageLoading -->
-        <!-- ko foreach: editingFields() -->
+        <!-- ko if: !pageLoading() && $data.editingFields-->
+        <!-- ko foreach: editingFields -->
         <!-- ko template: template -->
         <!--/ko-->
         <!--/ko-->
@@ -1452,8 +1450,8 @@
         <!-- ko template: { name: "dxrd-page-brick", data: brick } -->
         <!--/ko-->
         <!--/ko-->
-        <!-- ko ifnot: pageLoading -->
-        <!-- ko foreach: editingFields() -->
+        <!-- ko if: !brickLoading() && $data.editingFields-->
+        <!-- ko foreach: editingFields -->
         <!-- ko template: template -->
         <!--/ko-->
         <!--/ko-->
@@ -1569,7 +1567,7 @@
 
 <script type="text/html" id="dxrd-report-preview">
     <div class="dxrd-preview dxrd-designer-wrapper" data-bind="visible: reportPreview.previewVisible, cssArray: [ $data.rootStyle , { 'dx-rtl' : $data.rtl, 'dx-ltr': !$data.rtl } ]">
-        <!-- ko template: { name: 'dxrd-preview-toolbar-scrollable', data: { actionLists: { toolbarItems: globalActions } } } -->
+        <!-- ko template: { name: 'dxrd-preview-toolbar-scrollable', data: { actionLists: actionLists } } -->
         <!-- /ko -->
         <!-- ko template: { name: 'dxrdp-surface', data: reportPreview } -->
         <!-- /ko -->
@@ -1580,7 +1578,7 @@
 
 <script type="text/html" id="dxrd-preview-toolbar-scrollable">
     <div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: 'onHover', direction: 'horizontal', useNative: false, scrollByThumb: true }">
-        <div class="dxrd-toolbar" data-bind="template: {name: 'dxrd-toolbar-tmplt', data: actionLists.toolbarItems }"></div>
+        <div class="dxrd-toolbar" data-bind="template: {name: 'dxrd-toolbar-tmplt', data: actionLists.toolbarItems }, keyDownActions: actionLists"></div>
     </div>
 </script>
 
