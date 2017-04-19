@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
+/*! DevExpress HTML/JS Designer - v17.1.2 - 2017-04-12
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -330,6 +330,7 @@
 }
 .dx-editors .dx-collectioneditor .dx-collectioneditor-actions-wrapper .dx-collectioneditor-action {
   margin-left: 4px;
+  margin-right: 0;
 }
 .dx-editors .dx-collectioneditor .dx-collectioneditor-actions-wrapper .dx-collectioneditor-action .dx-button-content {
   padding: 0;
@@ -607,17 +608,22 @@
   box-sizing: content-box;
   margin-right: 4px;
 }
+.dx-treelist .dx-treelist-item .dx-treelist-image-empty {
+  position: absolute;
+}
 .dx-treelist .dx-treelist-item .dx-treelist-collapsedbutton {
   float: left;
-  -width: 38px;
   height: 30px;
   display: inline-block;
   margin-right: 9px;
   padding: 0 4.5px 0 4.5px;
   background-position: center;
+  position: relative;
+  z-index: 1;
 }
 .dx-treelist .dx-treelist-item .dx-treelist-caption {
   line-height: 30px;
+  position: relative;
 }
 .dx-treelist .dx-treelist-item .dx-treelist-caption .dx-treelist-action-container {
   float: right;
@@ -1379,7 +1385,7 @@
   background: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCA2aDR2NEgwek02IDZoNHY0SDZ6TTEyIDZoNHY0aC00ek0xOCA2aDR2NGgtNHpNMCAxMmg0djRIMHpNNiAxMmg0djRINnpNMCAxOGg0djRIMHpNNiAxOGg0djRINnpNMCAwaDIydjRIMHpNMTggMTJjLTMuMyAwLTYgMi43LTYgNnMyLjcgNiA2IDYgNi0yLjcgNi02LTIuNy02LTYtNnptMyA3aC0ydjJoLTJ2LTJoLTJ2LTJoMnYtMmgydjJoMnYyeiIvPjwvc3ZnPg==") no-repeat;
 }
 .dx-icon-dxrd-image-recycle-bin {
-  background: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNNiAyMGMwIC41LjUgMSAxIDFoOGMuNSAwIDEtLjUgMS0xVjlINnYxMXpNMTcgNWgtM1Y0YzAtLjUtLjUtMS0xLTFIOWMtLjUgMC0xIC41LTEgMXYxSDVjLS42IDAtMSAuNC0xIDF2MWgxNFY2YzAtLjYtLjQtMS0xLTF6Ii8+PC9zdmc+") no-repeat;
+  background: url("data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNNiAxOWMwIC41LjUgMSAxIDFoMTBjLjUgMCAxLS41IDEtMVY4SDZ2MTF6TTE5IDRoLTVWM2MwLS41LS41LTEtMS0xaC0yYy0uNSAwLTEgLjUtMSAxdjFINWMtLjYgMC0xIC40LTEgMXYxaDE2VjVjMC0uNi0uNC0xLTEtMXoiLz48L3N2Zz4=") no-repeat;
 }
 .dxrd-bordereditor {
   width: 100%;
@@ -2977,6 +2983,9 @@
 .dxrd-preview.dxrd-designer-wrapper .dxrd-toolbar-wrapper .dxrd-toolbar .dxrd-toolbar-item {
   padding-left: 4px;
   padding-right: 4px;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-toolbar-wrapper .dxrd-toolbar .dxrd-toolbar-item-zoom .dxrd-toolbar-item-zoom-editor {
+  width: 100px;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-toolbar-wrapper .dxrd-preview-pager.dxrd-toolbar-item {
   padding: 18px 4px 16px 4px;

@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
+/*! DevExpress HTML/JS Designer - v17.1.2 - 2017-04-12
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -19,11 +19,7 @@ var DevExpress;
             Report.inlineCss = { propertyName: "inlineCss", modelName: "@InlineCss", displayName: "Inline Css", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             Report.removeSecondarySymbols = { propertyName: "removeSecondarySymbols", modelName: "@RemoveSecondarySymbols", displayName: "Remove Secondary Symbols", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
             Report.characterSet = {
-                propertyName: "characterSet",
-                modelName: "@CharacterSet",
-                displayName: "Character Set",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                defaultVal: "utf-8",
+                propertyName: "characterSet", modelName: "@CharacterSet", displayName: "Character Set", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "utf-8",
                 values: {
                     "windows-1256": "Arabic (Windows)",
                     "iso-8859-4": "Baltic (ISO)",
@@ -50,70 +46,43 @@ var DevExpress;
                 "DifferentFiles": "Different Files"
             };
             Report.rtfExportMode = {
-                propertyName: "rtfExportMode",
-                modelName: "@ExportMode",
-                defaultVal: "SingleFilePageByPage",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Export Mode",
+                propertyName: "rtfExportMode", modelName: "@ExportMode", defaultVal: "SingleFilePageByPage",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.htmlExportMode = {
-                propertyName: "htmlExportMode",
-                modelName: "@ExportMode",
-                defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Export Mode",
+                propertyName: "htmlExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportMode)
             };
             Report.embedImagesInHTML = {
-                propertyName: "embedImagesInHTML",
-                modelName: "@EmbedImagesInHTML",
-                defaultVal: false,
-                editor: DevExpress.JS.Widgets.editorTemplates.bool,
-                from: Designer.parseBool,
-                displayName: "Embed Images In HTML"
+                propertyName: "embedImagesInHTML", modelName: "@EmbedImagesInHTML", defaultVal: false,
+                editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, displayName: "Embed Images In HTML"
             };
             Report.imageExportMode = {
-                propertyName: "imageExportMode",
-                modelName: "@ExportMode",
-                defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Export Mode",
+                propertyName: "imageExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportMode)
             };
             Report.xlsExportMode = {
-                propertyName: "xlsExportMode",
-                modelName: "@ExportMode",
-                defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Export Mode",
+                propertyName: "xlsExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportMode)
             };
             Report.xlsxExportMode = {
-                propertyName: "xlsxExportMode",
-                modelName: "@ExportMode",
-                defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Export Mode",
+                propertyName: "xlsxExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportMode)
             };
             Report.textExportMode = {
-                propertyName: "textExportMode",
-                modelName: "@TextExportMode",
-                displayName: "Text Export Mode",
-                defaultVal: "Text",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", defaultVal: "Text", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 values: {
                     "Text": "Text",
                     "Value": "Value"
                 }
             };
             Report.xlsTextExportMode = {
-                propertyName: "textExportMode",
-                modelName: "@TextExportMode",
-                displayName: "Text Export Mode",
-                defaultVal: "Value",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", defaultVal: "Value", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 values: {
                     "Text": "Text",
                     "Value": "Value"
@@ -121,12 +90,7 @@ var DevExpress;
             };
             Report.csvTextSeparator = { propertyName: "separator", modelName: "@Separator", displayName: "Separator", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "," };
             Report.textEncodingType = {
-                propertyName: "encodingType",
-                modelName: "@EncodingType",
-                displayName: "Encoding",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                defaultVal: "Default",
-                from: Designer.fromEnum,
+                propertyName: "encodingType", modelName: "@EncodingType", displayName: "Encoding", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Default", from: Designer.fromEnum,
                 values: {
                     "Default": "Windows-1252",
                     "ASCII": "us-ascii",
@@ -138,74 +102,39 @@ var DevExpress;
                 }
             };
             Report.xlsExportHyperlinks = {
-                propertyName: "exportHyperlinks",
-                modelName: "@ExportHyperlinks",
-                displayName: "Export Hyperlinks",
-                defaultVal: true,
-                editor: DevExpress.JS.Widgets.editorTemplates.bool,
-                from: Designer.parseBool
+                propertyName: "exportHyperlinks", modelName: "@ExportHyperlinks", displayName: "Export Hyperlinks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
             };
             Report.xlsRawDataMode = {
-                propertyName: "rawDataMode",
-                modelName: "@RawDataMode",
-                displayName: "Raw Data Mode",
-                defaultVal: false,
-                editor: DevExpress.JS.Widgets.editorTemplates.bool,
-                from: Designer.parseBool
+                propertyName: "rawDataMode", modelName: "@RawDataMode", displayName: "Raw Data Mode", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
             };
             Report.xlsShowGridLines = {
-                propertyName: "showGridLines",
-                modelName: "@ShowGridLines",
-                displayName: "Show Grid Lines",
-                defaultVal: false,
-                editor: DevExpress.JS.Widgets.editorTemplates.bool,
-                from: Designer.parseBool
+                propertyName: "showGridLines", modelName: "@ShowGridLines", displayName: "Show Grid Lines", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
             };
             Report.xlsExportOptionsSheetName = {
-                propertyName: "sheetName",
-                modelName: "@SheetName",
-                displayName: "Sheet Name",
-                defaultVal: "Sheet",
-                editor: DevExpress.JS.Widgets.editorTemplates.text
+                propertyName: "sheetName", modelName: "@SheetName", displayName: "Sheet Name", defaultVal: "Sheet", editor: DevExpress.JS.Widgets.editorTemplates.text
             };
             function excludeDifferentFilesMode(val) {
                 return ko.observable(val === "DifferentFiles" ? "SingleFile" : val);
             }
             Report.excludeDifferentFilesMode = excludeDifferentFilesMode;
             Report.htmlExportModePreview = {
-                propertyName: Report.htmlExportMode.propertyName,
-                modelName: Report.htmlExportMode.modelName,
-                defaultVal: Report.htmlExportMode.defaultVal,
-                editor: Report.htmlExportMode.editor,
-                displayName: Report.htmlExportMode.displayName,
-                from: excludeDifferentFilesMode,
+                propertyName: Report.htmlExportMode.propertyName, modelName: Report.htmlExportMode.modelName, defaultVal: Report.htmlExportMode.defaultVal,
+                editor: Report.htmlExportMode.editor, displayName: Report.htmlExportMode.displayName, from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.xlsExportModePreview = {
-                propertyName: Report.xlsExportMode.propertyName,
-                modelName: Report.xlsExportMode.modelName,
-                defaultVal: Report.xlsExportMode.defaultVal,
-                editor: Report.xlsExportMode.editor,
-                displayName: Report.xlsExportMode.displayName,
-                from: excludeDifferentFilesMode,
+                propertyName: Report.xlsExportMode.propertyName, modelName: Report.xlsExportMode.modelName, defaultVal: Report.xlsExportMode.defaultVal,
+                editor: Report.xlsExportMode.editor, displayName: Report.xlsExportMode.displayName, from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.imageExportModePreview = {
-                propertyName: Report.imageExportMode.propertyName,
-                modelName: Report.imageExportMode.modelName,
-                defaultVal: Report.imageExportMode.defaultVal,
-                editor: Report.imageExportMode.editor,
-                displayName: Report.imageExportMode.displayName,
-                from: excludeDifferentFilesMode,
+                propertyName: Report.imageExportMode.propertyName, modelName: Report.imageExportMode.modelName, defaultVal: Report.imageExportMode.defaultVal,
+                editor: Report.imageExportMode.editor, displayName: Report.imageExportMode.displayName, from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.xlsxExportModePreview = {
-                propertyName: Report.xlsxExportMode.propertyName,
-                modelName: Report.xlsxExportMode.modelName,
-                defaultVal: Report.xlsxExportMode.defaultVal,
-                editor: Report.xlsxExportMode.editor,
-                displayName: Report.xlsxExportMode.displayName,
-                from: excludeDifferentFilesMode,
+                propertyName: Report.xlsxExportMode.propertyName, modelName: Report.xlsxExportMode.modelName, defaultVal: Report.xlsxExportMode.defaultVal,
+                editor: Report.xlsxExportMode.editor, displayName: Report.xlsxExportMode.displayName, from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
             };
             Report.previewBackColor = { propertyName: "backColor", modelName: "@BackColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
@@ -233,11 +162,10 @@ var DevExpress;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var DevExpress;
 (function (DevExpress) {
@@ -246,6 +174,18 @@ var DevExpress;
         var Preview;
         (function (Preview) {
             Preview.AsyncExportApproach = false;
+            Preview.ExportFormatID = {
+                PDF: { text: "PDF", format: "pdf" },
+                XLS: { text: "XLS", format: "xls" },
+                XLSX: { text: "XLSX", format: "xlsx" },
+                RTF: { text: "RTF", format: "rtf" },
+                MHT: { text: "MHT", format: "mht" },
+                HTML: { text: "HTML", format: "html" },
+                Text: { text: "Text", format: "txt" },
+                CSV: { text: "CSV", format: "csv" },
+                Image: { text: "Image", format: "image" },
+                Docx: { text: "Docx", format: "docx" }
+            };
             var ExportOptionsModel = (function () {
                 function ExportOptionsModel(reportPreview) {
                     var _this = this;
@@ -265,10 +205,10 @@ var DevExpress;
                         items: ko.pureComputed(function () {
                             var result = _this._getExportFormatItems();
                             return [{
-                                text: "Export To",
-                                imageClassName: "dxrd-image-export-to",
-                                items: result
-                            }];
+                                    text: "Export To",
+                                    imageClassName: "dxrd-image-export-to",
+                                    items: result
+                                }];
                         }),
                         templateName: "dxrd-preview-export-to"
                     });
@@ -277,15 +217,16 @@ var DevExpress;
                     var result = [];
                     var exportOptionsModel = this._reportPreview.exportOptionsModel();
                     if (exportOptionsModel) {
-                        exportOptionsModel.pdf && result.push({ text: 'PDF', format: 'pdf' });
-                        exportOptionsModel.xls && result.push({ text: 'XLS', format: 'xls' });
-                        exportOptionsModel.xlsx && result.push({ text: 'XLSX', format: 'xlsx' });
-                        exportOptionsModel.rtf && result.push({ text: 'RTF', format: 'rtf' });
-                        exportOptionsModel.mht && result.push({ text: 'MHT', format: 'mht' });
-                        exportOptionsModel.html && result.push({ text: 'HTML', format: 'html' });
-                        exportOptionsModel.textExportOptions && result.push({ text: 'Text', format: 'txt' });
-                        exportOptionsModel.csv && result.push({ text: 'CSV', format: 'csv' });
-                        exportOptionsModel.image && result.push({ text: 'Image', format: 'image' });
+                        exportOptionsModel.pdf && result.push(Preview.ExportFormatID.PDF);
+                        exportOptionsModel.xls && result.push(Preview.ExportFormatID.XLS);
+                        exportOptionsModel.xlsx && result.push(Preview.ExportFormatID.XLSX);
+                        exportOptionsModel.rtf && result.push(Preview.ExportFormatID.RTF);
+                        exportOptionsModel.mht && result.push(Preview.ExportFormatID.MHT);
+                        exportOptionsModel.html && result.push(Preview.ExportFormatID.HTML);
+                        exportOptionsModel.textExportOptions && result.push(Preview.ExportFormatID.Text);
+                        exportOptionsModel.csv && result.push(Preview.ExportFormatID.CSV);
+                        exportOptionsModel.image && result.push(Preview.ExportFormatID.Image);
+                        exportOptionsModel.docx && result.push(Preview.ExportFormatID.Docx);
                     }
                     ;
                     return result;
@@ -359,12 +300,7 @@ var DevExpress;
                 Report.pageRange,
                 { propertyName: "resolution", modelName: "@Resolution", displayName: "Resolution", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 96 },
                 {
-                    propertyName: "format",
-                    modelName: "@Format",
-                    displayName: "Format",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    defaultVal: "Png",
-                    from: Designer.fromEnum,
+                    propertyName: "format", modelName: "@Format", displayName: "Format", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Png", from: Designer.fromEnum,
                     values: {
                         "Bmp": "BMP",
                         "Gif": "GIF",
@@ -376,22 +312,20 @@ var DevExpress;
                     }
                 }
             ];
-            var imageExportOptionsSerializationInfo = [Report.imageExportMode, { propertyName: "retainBackgroundTransparency", modelName: "@RetainBackgroundTransparency", displayName: "Retain Background Transparency", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, {
-                propertyName: "textRenderingMode",
-                modelName: "@TextRenderingMode",
-                displayName: "Text Rendering Mode",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                defaultVal: "SystemDefault",
-                from: Designer.fromEnum,
-                values: {
-                    "SystemDefault": "SystemDefault",
-                    "SingleBitPerPixelGridFit": "SingleBitPerPixelGridFit",
-                    "SingleBitPerPixel": "SingleBitPerPixel",
-                    "AntiAliasGridFit": "AntiAliasGridFit",
-                    "AntiAlias": "AntiAlias",
-                    "ClearTypeGridFit": "ClearTypeGridFit"
+            var imageExportOptionsSerializationInfo = [Report.imageExportMode,
+                { propertyName: "retainBackgroundTransparency", modelName: "@RetainBackgroundTransparency", displayName: "Retain Background Transparency", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                {
+                    propertyName: "textRenderingMode", modelName: "@TextRenderingMode", displayName: "Text Rendering Mode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "SystemDefault", from: Designer.fromEnum,
+                    values: {
+                        "SystemDefault": "SystemDefault",
+                        "SingleBitPerPixelGridFit": "SingleBitPerPixelGridFit",
+                        "SingleBitPerPixel": "SingleBitPerPixel",
+                        "AntiAliasGridFit": "AntiAliasGridFit",
+                        "AntiAlias": "AntiAlias",
+                        "ClearTypeGridFit": "ClearTypeGridFit"
+                    }
                 }
-            }].concat(imageExportOptionsSerializationInfoBase);
+            ].concat(imageExportOptionsSerializationInfoBase);
             var htmlExportOptionsSerializationInfoBase = [
                 Report.pageBorderColor,
                 Report.pageBorderWidth,
@@ -477,10 +411,7 @@ var DevExpress;
             Report.PdfExportDocumentOptions = PdfExportDocumentOptions;
             var author = { propertyName: "author", modelName: "@Author", displayName: "Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, application = { propertyName: "application", modelName: "@Application", displayName: "Application", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, title = { propertyName: "title", modelName: "@Title", displayName: "Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, subject = { propertyName: "subject", modelName: "@Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
             var pdfExportDocumentOptionsSerializationInfo = [
-                author,
-                application,
-                title,
-                subject,
+                author, application, title, subject,
                 { propertyName: "keywords", modelName: "@Keywords", displayName: "Keywords", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
             ];
             var PdfPermissionsOptions = (function () {
@@ -502,11 +433,7 @@ var DevExpress;
             Report.PdfPermissionsOptions = PdfPermissionsOptions;
             var pdfExportPermissionsOptionsSerializationInfo = [
                 {
-                    propertyName: "printingPermissions",
-                    modelName: "@PrintingPermissions",
-                    displayName: "Printing Permissions",
-                    defaultVal: "None",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    propertyName: "printingPermissions", modelName: "@PrintingPermissions", displayName: "Printing Permissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                     values: {
                         "None": "None",
                         "LowResolution": "LowResolution",
@@ -514,11 +441,7 @@ var DevExpress;
                     }
                 },
                 {
-                    propertyName: "changingPermissions",
-                    modelName: "@ChangingPermissions",
-                    displayName: "Changing Permissions",
-                    defaultVal: "None",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    propertyName: "changingPermissions", modelName: "@ChangingPermissions", displayName: "Changing Permissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                     values: {
                         "None": "None",
                         "InsertingDeletingRotating": "InsertingDeletingRotating",
@@ -549,6 +472,14 @@ var DevExpress;
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
                 { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                {
+                    propertyName: "encryptionLevel", modelName: "@EncryptionLevel", displayName: "Encryption Level", defaultVal: "AES128", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    values: {
+                        "ARC4": "ARC4",
+                        "AES128": "AES128",
+                        "AES256": "AES256",
+                    }
+                },
                 { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
@@ -578,12 +509,7 @@ var DevExpress;
                 { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "neverEmbeddedFonts", modelName: "@NeverEmbeddedFonts", displayName: "Never Embedded Fonts", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
-                    propertyName: "imageQuality",
-                    modelName: "@ImageQuality",
-                    displayName: "Image Quality",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    defaultVal: "Highest",
-                    from: Designer.fromEnum,
+                    propertyName: "imageQuality", modelName: "@ImageQuality", displayName: "Image Quality", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Highest", from: Designer.fromEnum,
                     values: {
                         "Lowest": "Lowest",
                         "Low": "Low",
@@ -593,12 +519,7 @@ var DevExpress;
                     }
                 },
                 {
-                    propertyName: "pdfACompatibility",
-                    modelName: "@PdfACompatibility",
-                    displayName: "PDF A Compatibility",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    defaultVal: "None",
-                    from: Designer.fromEnum,
+                    propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
                     values: {
                         "Hight": "None",
                         "PdfA1b": "PdfA1b",
@@ -635,10 +556,11 @@ var DevExpress;
                 Report.pageRange,
                 Report.exportWatermarks
             ];
+            var emptyFirstPageHeaderFooter = { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, keepRowHeight = { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var rtfExportOptionsSerializationInfo = [
-                { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                emptyFirstPageHeaderFooter,
                 { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+                keepRowHeight
             ].concat(rtfExportOptionsSerializationInfoBase);
             var TextExportOptions = (function () {
                 function TextExportOptions(model, serializer) {
@@ -664,10 +586,7 @@ var DevExpress;
                 Report.textExportMode
             ];
             var documentOptionsSerializationsInfo = [
-                author,
-                application,
-                title,
-                subject,
+                author, application, title, subject,
                 { propertyName: "tags", modelName: "@Tags", displayName: "Tags", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { propertyName: "category", modelName: "@Category", displayName: "Category", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { propertyName: "comments", modelName: "@Comments", displayName: "Comments", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
@@ -676,12 +595,7 @@ var DevExpress;
             var documentOptions = { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", info: documentOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var encryptionOptionsSerializationsInfo = [
                 {
-                    propertyName: "type",
-                    modelName: "@Type",
-                    displayName: "Type",
-                    defaultVal: "Strong",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    from: Designer.fromEnum,
+                    propertyName: "type", modelName: "@Type", displayName: "Type", defaultVal: "Strong", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
                     values: {
                         "Strong": "Strong",
                         "Compatible": "Compatible"
@@ -696,25 +610,13 @@ var DevExpress;
                 { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "fitToPrintedPageHeight", modelName: "@FitToPrintedPageHeight", displayName: "Fit To Printed Page Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
-                    propertyName: "ignoreErrors",
-                    modelName: "@IgnoreErrors",
-                    displayName: "Ignore Errors",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    defaultVal: "None",
-                    from: Designer.fromEnum,
-                    values: {
+                    propertyName: "ignoreErrors", modelName: "@IgnoreErrors", displayName: "Ignore Errors", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum, values: {
                         "None": "None",
                         "NumberStoredAsText": "Number Stored As Text"
                     }
                 },
                 {
-                    propertyName: "rightToLeftDocument",
-                    modelName: "@RightToLeftDocument",
-                    displayName: "Right To Left Document",
-                    defaultVal: "Default",
-                    from: Designer.fromEnum,
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
+                    propertyName: "rightToLeftDocument", modelName: "@RightToLeftDocument", displayName: "Right To Left Document", defaultVal: "Default", from: Designer.fromEnum, editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
                         "True": "True",
                         "False": "False",
                         "Default": "Default"
@@ -733,12 +635,7 @@ var DevExpress;
                 { propertyName: "suppress65536RowsWarning", modelName: "@Suppress65536RowsWarning", displayName: "Suppress 65536 Rows Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 Report.xlsTextExportMode,
                 {
-                    propertyName: "workbookColorPaletteCompliance",
-                    modelName: "@WorkbookColorPaletteCompliance",
-                    displayName: "Workbook Color Palette Compliance",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    defaultVal: "ReducePaletteForExactColors",
-                    from: Designer.fromEnum,
+                    propertyName: "workbookColorPaletteCompliance", modelName: "@WorkbookColorPaletteCompliance", displayName: "Workbook Color Palette Compliance", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "ReducePaletteForExactColors", from: Designer.fromEnum,
                     values: {
                         "ReducePaletteForExactColors": "ReducePaletteForExactColors",
                         "AdjustColorsToDefaultPalette": "AdjustColorsToDefaultPalette"
@@ -795,6 +692,27 @@ var DevExpress;
                 return XlsxExportOptions;
             })();
             Report.XlsxExportOptions = XlsxExportOptions;
+            var docxExportOptionsSerializationInfo = [Report.rtfExportMode, Report.exportWatermarks, Report.pageRange, emptyFirstPageHeaderFooter, keepRowHeight];
+            var DocxExportOptions = (function () {
+                function DocxExportOptions(model, serializer) {
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model);
+                }
+                DocxExportOptions.from = function (model, serializer) {
+                    return new DocxExportOptions(model || {}, serializer);
+                };
+                DocxExportOptions.toJson = function (value, serializer, refs) {
+                    return serializer.serialize(value, docxExportOptionsSerializationInfo, refs);
+                };
+                DocxExportOptions.prototype.getInfo = function () {
+                    return docxExportOptionsSerializationInfo;
+                };
+                DocxExportOptions.prototype.isPropertyDisabled = function (name) {
+                    return name === "pageRange" && this.rtfExportMode() === "SingleFile";
+                };
+                return DocxExportOptions;
+            })();
+            Report.DocxExportOptions = DocxExportOptions;
             var ExportOptions = (function () {
                 function ExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -821,12 +739,7 @@ var DevExpress;
                 { propertyName: "Address", modelName: "@Address", displayName: "Address", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { propertyName: "Prefix", modelName: "@Prefix", displayName: "Prefix", defaultVal: "SMTP:", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
-                    propertyName: "fieldType",
-                    modelName: "@FieldType",
-                    displayName: "Field Type",
-                    defaultVal: "TO",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    from: Designer.fromEnum,
+                    propertyName: "fieldType", modelName: "@FieldType", displayName: "Field Type", defaultVal: "TO", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
                     values: {
                         "TO": "TO",
                         "CC": "CC",
@@ -869,7 +782,8 @@ var DevExpress;
                 { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: RtfExportOptions.from, toJsonObject: RtfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: XlsExportOptions.from, toJsonObject: XlsExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptions.from, toJsonObject: XlsxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptions.from, toJsonObject: XlsxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                { propertyName: "docx", modelName: "Docx", displayName: "Docx Export Options", from: DocxExportOptions.from, toJsonObject: DocxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var htmlExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(htmlExportOptionsSerializationInfoBase);
             var HtmlExportOptionsPreview = (function (_super) {
@@ -884,12 +798,9 @@ var DevExpress;
                 HtmlExportOptionsPreview.prototype.getInfo = function () {
                     var info = [].concat(htmlExportOptionsSerializationInfoPreview);
                     if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
                         info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
+                            defaultVal: "SingleFilePageByPage", values: {
                                 "SingleFilePageByPage": "Single File PageByPage"
                             }
                         }));
@@ -912,12 +823,9 @@ var DevExpress;
                 ImageExportOptionsPreview.prototype.getInfo = function () {
                     var info = [].concat(imageExportOptionsSerializationInfoPreview);
                     if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
                         info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.imageExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
+                            defaultVal: "SingleFilePageByPage", values: {
                                 "SingleFilePageByPage": "Single File PageByPage"
                             }
                         }));
@@ -940,12 +848,9 @@ var DevExpress;
                 MhtExportOptionsPreview.prototype.getInfo = function () {
                     var info = [].concat(mhtExportOptionsSerializationInfoPreview);
                     if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
                         info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
+                            defaultVal: "SingleFilePageByPage", values: {
                                 "SingleFilePageByPage": "Single File PageByPage"
                             }
                         }));
@@ -968,9 +873,7 @@ var DevExpress;
                 RtfExportOptionsPreview.prototype.getInfo = function () {
                     var info = [].concat(rtfExportOptionsSerializationInfoPreview);
                     if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
                         info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.rtfExportMode, { values: { "SingleFilePageByPage": "Single File PageByPage" } }));
                     }
                     return info;
@@ -991,12 +894,9 @@ var DevExpress;
                 XlsExportOptionsPreview.prototype.getInfo = function () {
                     var info = [].concat(xlsExportOptionsSerializationInfoPreview);
                     if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
                         info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
+                            defaultVal: "SingleFilePageByPage", values: {
                                 "SingleFilePageByPage": "Single File PageByPage"
                             }
                         }));
@@ -1019,12 +919,9 @@ var DevExpress;
                 XlsxExportOptionsPreview.prototype.getInfo = function () {
                     var info = [].concat(xlsxExportOptionsSerializationInfoPreview);
                     if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
                         info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsxExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
+                            defaultVal: "SingleFilePageByPage", values: {
                                 "SingleFilePageByPage": "Single File PageByPage"
                             }
                         }));
@@ -1034,6 +931,27 @@ var DevExpress;
                 return XlsxExportOptionsPreview;
             })(XlsxExportOptions);
             Report.XlsxExportOptionsPreview = XlsxExportOptionsPreview;
+            var docxExportOptionsSerializationInfoPreview = [].concat(docxExportOptionsSerializationInfo);
+            var DocxExportOptionsPreview = (function (_super) {
+                __extends(DocxExportOptionsPreview, _super);
+                function DocxExportOptionsPreview(value, isMerged, serializer) {
+                    this._isMerged = isMerged;
+                    _super.call(this, value, serializer);
+                }
+                DocxExportOptionsPreview.toJson = function (value, serializer, refs) {
+                    return serializer.serialize(value, value.getInfo(), refs);
+                };
+                DocxExportOptionsPreview.prototype.getInfo = function () {
+                    var info = [].concat(docxExportOptionsSerializationInfoPreview);
+                    if (this._isMerged) {
+                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
+                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.rtfExportMode, { values: { "SingleFilePageByPage": "Single File PageByPage" } }));
+                    }
+                    return info;
+                };
+                return DocxExportOptionsPreview;
+            })(DocxExportOptions);
+            Report.DocxExportOptionsPreview = DocxExportOptionsPreview;
             var ExportOptionsPreview = (function (_super) {
                 __extends(ExportOptionsPreview, _super);
                 function ExportOptionsPreview(model, isMerged, serializer) {
@@ -1056,7 +974,8 @@ var DevExpress;
                         { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: this._generateFromFunction(RtfExportOptionsPreview), toJsonObject: RtfExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: this._generateFromFunction(XlsExportOptionsPreview), toJsonObject: XlsExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                        { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: this._generateFromFunction(XlsxExportOptionsPreview), toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                        { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: this._generateFromFunction(XlsxExportOptionsPreview), toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "docx", modelName: "Docx", displayName: "Docx Export Options", from: this._generateFromFunction(DocxExportOptionsPreview), toJsonObject: DocxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
                     ];
                 };
                 ExportOptionsPreview.prototype.getInfo = function () {
@@ -1075,10 +994,10 @@ var DevExpress;
         var Preview;
         (function (Preview) {
             Preview.previewDefaultResolution = 96;
-            function convetToPercent(childSize, parentSize) {
+            function convertToPercent(childSize, parentSize) {
                 return childSize * 100 / parentSize + '%';
             }
-            Preview.convetToPercent = convetToPercent;
+            Preview.convertToPercent = convertToPercent;
             function brickText(brick, editingFieldsProvider) {
                 var fields = editingFieldsProvider ? editingFieldsProvider() : [];
                 if (brick.efIndex && brick.efIndex > 0 && brick.efIndex <= fields.length && fields[brick.efIndex - 1].type() === "text") {
@@ -1095,14 +1014,12 @@ var DevExpress;
                     return;
                 }
                 !!brick.active && !!brick.active(false) || (brick.active = ko.observable(false));
-                brick["onClick"] = function () {
-                    processClick && processClick(brick);
-                };
+                brick["onClick"] = function () { processClick && processClick(brick); };
                 brick.bricks && brick.bricks.forEach(function (childBrick) {
-                    childBrick[brick.rtl ? 'rightP' : 'leftP'] = convetToPercent(childBrick.left, brick.width);
-                    childBrick.widthP = convetToPercent(childBrick.width, brick.width);
-                    childBrick.topP = convetToPercent(childBrick.top, brick.height);
-                    childBrick.heightP = convetToPercent(childBrick.height, brick.height);
+                    childBrick[brick.rtl ? 'rightP' : 'leftP'] = convertToPercent(childBrick.left, brick.width);
+                    childBrick.widthP = convertToPercent(childBrick.width, brick.width);
+                    childBrick.topP = convertToPercent(childBrick.top, brick.height);
+                    childBrick.heightP = convertToPercent(childBrick.height, brick.height);
                     initializeBrick(childBrick, processClick, zoom, editingFieldBricks);
                 });
                 if (brick.efIndex > 0) {
@@ -1126,10 +1043,9 @@ var DevExpress;
             Preview.getCurrentResolution = getCurrentResolution;
             var PreviewPage = (function (_super) {
                 __extends(PreviewPage, _super);
-                function PreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, previewEditingFields) {
+                function PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, previewEditingFields) {
                     var _this = this;
                     _super.call(this);
-                    this.editingFields = null;
                     this.isClientVisible = ko.observable(false);
                     this.originalHeight = ko.observable(0);
                     this.originalWidth = ko.observable(0);
@@ -1148,6 +1064,7 @@ var DevExpress;
                     this._selectedBrickPath = null;
                     this.pageIndex = pageIndex;
                     this.documentId = documentId || ko.observable(null);
+                    unifier = ko.isObservable(unifier) ? unifier : ko.observable(unifier || Preview.generateGuid());
                     this.brickProvider = brickProvider;
                     this.pageLoading = loading || ko.observable(true);
                     this.originalHeight(ko.unwrap(height));
@@ -1155,7 +1072,7 @@ var DevExpress;
                     this.zoom = zoom;
                     this.isClientVisible.subscribe(function (newVal) {
                         if (_this.isClientVisible()) {
-                            _this._setPageImgSrc(documentId(), _this.zoom());
+                            _this._setPageImgSrc(_this.documentId(), unifier(), _this.zoom());
                         }
                     });
                     this.color = color;
@@ -1174,7 +1091,8 @@ var DevExpress;
                             _self.originalHeight() && ko.isObservable(height) && height(_self.originalHeight());
                             _self.originalWidth() && ko.isObservable(width) && width(_self.originalWidth());
                             if (!_self.brick() && _self.brickProvider) {
-                                _self.brickProvider.getBricks(_self.pageIndex).done(function (result) {
+                                _self.brickProvider.getBricks(_self.pageIndex)
+                                    .done(function (result) {
                                     try {
                                         if (!result || !result.brick) {
                                             return;
@@ -1211,9 +1129,7 @@ var DevExpress;
                         if (brick && brick.active) {
                             brick.active(false);
                             if (brick.bricks) {
-                                brick.bricks.forEach(function (childBrick) {
-                                    _self.resetBrickRecusive(childBrick);
-                                });
+                                brick.bricks.forEach(function (childBrick) { _self.resetBrickRecusive(childBrick); });
                             }
                         }
                     };
@@ -1272,7 +1188,7 @@ var DevExpress;
                     this.brick(null);
                     this.brickLoading(true);
                 };
-                PreviewPage.prototype._setPageImgSrc = function (documentId, zoom) {
+                PreviewPage.prototype._setPageImgSrc = function (documentId, unifier, zoom) {
                     this.pageLoadFailed(false);
                     if (!documentId || this.pageIndex === -1) {
                         this.imageSrc(null);
@@ -1294,14 +1210,21 @@ var DevExpress;
                     }
                     this.actualResolution = newResolution;
                     var imageResolution = Math.floor(newResolution * (window["devicePixelRatio"] || 1));
-                    this.imageSrc(Preview.HandlerUri + "?actionKey=getPage&unifier=" + Preview.generateGuid() + "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution })));
+                    this.imageSrc(Preview.HandlerUri +
+                        "?actionKey=getPage&unifier=" + unifier +
+                        "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution })));
+                };
+                PreviewPage.prototype._clear = function () {
+                    this.pageIndex = -1;
+                    this.brick(null);
+                    this._setPageImgSrc(null, null, 1);
                 };
                 PreviewPage.prototype.initializeBrick = function (brick, processClick, zoom, editingFieldBricks) {
                     initializeBrick(brick, processClick, this.zoom, editingFieldBricks);
-                    brick['leftP'] = convetToPercent(brick.left, this.originalWidth());
-                    brick.topP = convetToPercent(brick.top, this.originalHeight());
-                    brick.widthP = convetToPercent(brick.width, this.originalWidth());
-                    brick.heightP = convetToPercent(brick.height, this.originalHeight());
+                    brick['leftP'] = convertToPercent(brick.left, this.originalWidth());
+                    brick.topP = convertToPercent(brick.top, this.originalHeight());
+                    brick.widthP = convertToPercent(brick.width, this.originalWidth());
+                    brick.heightP = convertToPercent(brick.height, this.originalHeight());
                     this.brick(brick);
                 };
                 return PreviewPage;
@@ -1316,9 +1239,7 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
-            Preview.formatSearchResult = function (value) {
-                return value && ('page ' + (value.pageIndex + 1));
-            };
+            Preview.formatSearchResult = function (value) { return value && ('page ' + (value.pageIndex + 1)); };
             Preview.searchAvailable = ko.observable(true);
             var SearchViewModel = (function (_super) {
                 __extends(SearchViewModel, _super);
@@ -1335,9 +1256,7 @@ var DevExpress;
                     this.loading = ko.observable(false);
                     this.resetSearchResult();
                     this._resultNavigator = SearchViewModel.createResultNavigator(this, reportPreview);
-                    this.clean = function () {
-                        _this.searchText("");
-                    };
+                    this.clean = function () { _this.searchText(""); };
                     var lastMatchCase = this.matchCase();
                     var lastMatchWholeWord = this.matchWholeWord();
                     this._disposables.push(reportPreview._currentDocumentId.subscribe(function (newVal) {
@@ -1346,17 +1265,9 @@ var DevExpress;
                     this._disposables.push(reportPreview._currentReportId.subscribe(function (newVal) {
                         _this.resetSearchResult();
                     }));
-                    this.findUp = function () {
-                        _this.searchUp(true);
-                        _this.findNext();
-                    };
-                    this.findDown = function () {
-                        _this.searchUp(false);
-                        _this.findNext();
-                    };
-                    this.goToResult = function (result) {
-                        _this._resultNavigator.goToResult(result.id);
-                    };
+                    this.findUp = function () { _this.searchUp(true); _this.findNext(); };
+                    this.findDown = function () { _this.searchUp(false); _this.findNext(); };
+                    this.goToResult = function (result) { _this._resultNavigator.goToResult(result.id); };
                     var newSearch = function (text) {
                         _this.searchResult([]);
                         _this._resultNavigator.currentResult(null);
@@ -1368,7 +1279,9 @@ var DevExpress;
                         }
                         var mCase = _this.matchCase();
                         var text = mCase ? _this.searchText() : _this.searchText().toLocaleLowerCase();
-                        var cache = _this.matchWholeWord() ? mCase ? _this._cachedWholeWordWithCaseRequests : _this._cachedWholeWordRequests : mCase ? _this._cachedCaseSensitiveRequests : _this._cachedRequests;
+                        var cache = _this.matchWholeWord()
+                            ? mCase ? _this._cachedWholeWordWithCaseRequests : _this._cachedWholeWordRequests
+                            : mCase ? _this._cachedCaseSensitiveRequests : _this._cachedRequests;
                         if (cache[text]) {
                             _this.searchResult(cache[text]);
                             return;
@@ -1388,9 +1301,7 @@ var DevExpress;
                         }
                         (lastMatchCase === _this.matchCase() || _this.searchText().toUpperCase() === _this.searchText().toLowerCase()) && lastMatchWholeWord === _this.matchWholeWord() && _this._resultNavigator.next(_this.searchUp()) || newSearch(_this.searchText());
                     };
-                    this._disposables.push(this.searchText.subscribe(function (newVal) {
-                        newSearch(newVal);
-                    }));
+                    this._disposables.push(this.searchText.subscribe(function (newVal) { newSearch(newVal); }));
                     var disabled = ko.pureComputed(function () {
                         var documentId = reportPreview["_currentDocumentId"]();
                         var pageIndex = reportPreview.pageIndex();
@@ -1439,9 +1350,7 @@ var DevExpress;
                     return this.actions;
                 };
                 Object.defineProperty(SearchViewModel.prototype, "disabled", {
-                    get: function () {
-                        return this.loading();
-                    },
+                    get: function () { return this.loading(); },
                     enumerable: true,
                     configurable: true
                 });
@@ -1490,7 +1399,9 @@ var DevExpress;
                     };
                     var _setCurrentResult = function (highlight, resultId, thisPageOnly) {
                         if (searchModel.searchResult() && searchModel.searchResult().length !== 0) {
-                            var currentResult = (resultId >= 0 && searchModel.searchResult().length > resultId) ? searchModel.searchResult()[resultId] : _this.getFirstMatchFromPage(reportPreview.pageIndex.peek(), searchModel.searchUp.peek(), thisPageOnly);
+                            var currentResult = (resultId >= 0 && searchModel.searchResult().length > resultId) ?
+                                searchModel.searchResult()[resultId] :
+                                _this.getFirstMatchFromPage(reportPreview.pageIndex.peek(), searchModel.searchUp.peek(), thisPageOnly);
                             _this.currentResult(currentResult);
                             highlight && goToMatchedResult(_this.currentResult.peek());
                         }
@@ -1550,9 +1461,7 @@ var DevExpress;
                     };
                     _super.call(this, element, options);
                     this._activeStateUnit = EDITOR_BUTTON_SELECTOR;
-                    this._focusRequestRaised = function () {
-                        _this.focus();
-                    };
+                    this._focusRequestRaised = function () { _this.focus(); };
                     this._searchModel = options.searchModel;
                     this._searchModel.focusRequested.subscribe(function (val) { return _this._focusRequestRaised(); });
                 }
@@ -1642,6 +1551,13 @@ var DevExpress;
                 return DocumentMapModel;
             })();
             Preview.DocumentMapModel = DocumentMapModel;
+            (function (ColumnSortOrder) {
+                ColumnSortOrder[ColumnSortOrder["None"] = 0] = "None";
+                ColumnSortOrder[ColumnSortOrder["Ascending"] = 1] = "Ascending";
+                ColumnSortOrder[ColumnSortOrder["Descending"] = 2] = "Descending";
+            })(Preview.ColumnSortOrder || (Preview.ColumnSortOrder = {}));
+            var ColumnSortOrder = Preview.ColumnSortOrder;
+            ;
             var DocumentMapItemsProvider = (function () {
                 function DocumentMapItemsProvider(bookmark) {
                     var _this = this;
@@ -1687,9 +1603,7 @@ var DevExpress;
                     if (!bookmark || !bookmark.nodes || bookmark.nodes.length <= 0) {
                         return null;
                     }
-                    return bookmark.nodes.map(function (node, i) {
-                        return { name: i + "", displayName: node.text, isList: node.nodes && node.nodes.length > 0, bookmark: node, specifics: "node" };
-                    });
+                    return bookmark.nodes.map(function (node, i) { return { name: i + "", displayName: node.text, isList: node.nodes && node.nodes.length > 0, bookmark: node, specifics: "node" }; });
                 };
                 DocumentMapItemsProvider.prototype._getRootNode = function (bookmark) {
                     return [{ name: "0", displayName: bookmark.text, isList: bookmark.nodes && bookmark.nodes.length > 0, bookmark: bookmark, specifics: "node" }];
@@ -1718,6 +1632,9 @@ var DevExpress;
                         value.isSelected(true);
                     }
                 };
+                DocumentMapTreeListController.prototype.showIconsForChildItems = function () {
+                    return false;
+                };
                 return DocumentMapTreeListController;
             })();
             Preview.DocumentMapTreeListController = DocumentMapTreeListController;
@@ -1735,9 +1652,7 @@ var DevExpress;
                     this._customizeParameterEditors = ko.observable();
                 }
                 ParameterHelper.prototype._isKnownEnumType = function (type) {
-                    return !!this._knownEnums && this._knownEnums.some(function (knownEnumType) {
-                        return knownEnumType.enumType === type;
-                    });
+                    return !!this._knownEnums && this._knownEnums.some(function (knownEnumType) { return knownEnumType.enumType === type; });
                 };
                 ParameterHelper.getSerializationValue = function (value, dateConverter) {
                     if (value instanceof Array) {
@@ -1777,9 +1692,7 @@ var DevExpress;
                     if (value !== null && value !== void 0) {
                         newValue(value);
                     }
-                    return { value: newValue, getInfo: function () {
-                        return [parameter.multiValueInfo()];
-                    } };
+                    return { value: newValue, getInfo: function () { return [parameter.multiValueInfo()]; } };
                 };
                 ParameterHelper.prototype.createMultiValueArray = function (fromArray, parameter, convertSingleValue) {
                     var _this = this;
@@ -1807,13 +1720,9 @@ var DevExpress;
                 ParameterHelper.prototype.getEnumCollection = function (parameter) {
                     var type = ko.unwrap(parameter.type);
                     if (this._isKnownEnumType(type)) {
-                        var currentKnownEnumInfo = this._knownEnums.filter(function (knownEnumType) {
-                            return knownEnumType.enumType === type;
-                        })[0];
+                        var currentKnownEnumInfo = this._knownEnums.filter(function (knownEnumType) { return knownEnumType.enumType === type; })[0];
                         if (currentKnownEnumInfo && currentKnownEnumInfo.values && currentKnownEnumInfo.values.length !== 0) {
-                            return currentKnownEnumInfo.values.map(function (val) {
-                                return { value: val.value, displayValue: val.displayName };
-                            });
+                            return currentKnownEnumInfo.values.map(function (val) { return { value: val.value, displayValue: val.displayName }; });
                         }
                     }
                 };
@@ -1823,9 +1732,7 @@ var DevExpress;
                     parameter.multiValueInfo($.extend(true, {}, valueInfo, { propertyName: "value" }));
                     if (ko.unwrap(parameter.isMultiValue)) {
                         valueInfo.editor = DevExpress.Designer.getEditorType(parameter["isMultiValueWithLookUp"] ? "multiValueWithLookUp" : "multiValue");
-                        valueInfo["addHandler"] = function () {
-                            return _this.createMultiValue(parameter);
-                        };
+                        valueInfo["addHandler"] = function () { return _this.createMultiValue(parameter); };
                     }
                     if (this._customizeParameterEditors()) {
                         this._customizeParameterEditors()(parameter.getParameterDescriptor(), valueInfo);
@@ -1833,9 +1740,7 @@ var DevExpress;
                     return valueInfo;
                 };
                 ParameterHelper.prototype.getValueConverter = function (type) {
-                    return (function (val) {
-                        return val;
-                    });
+                    return (function (val) { return val; });
                 };
                 return ParameterHelper;
             })();
@@ -1844,13 +1749,12 @@ var DevExpress;
                 __extends(PreviewParameterHelper, _super);
                 function PreviewParameterHelper(knownEnums, callbacks) {
                     _super.call(this);
+                    this.callbacks = callbacks;
                     this.initialize(knownEnums, callbacks);
                 }
                 PreviewParameterHelper.prototype.mapLookUpValues = function (type, lookUpValues) {
                     var converter = this.getValueConverter(type);
-                    return $.map(lookUpValues || [], function (lookUpValue) {
-                        return { value: converter(lookUpValue.Value), displayValue: lookUpValue.Description };
-                    });
+                    return $.map(lookUpValues || [], function (lookUpValue) { return { value: converter(lookUpValue.Value), displayValue: lookUpValue.Description }; });
                 };
                 PreviewParameterHelper.fixPropertyName = function (propertyName) {
                     return propertyName.replace(/\./g, '_');
@@ -1859,7 +1763,7 @@ var DevExpress;
                     var info = _super.prototype.createInfo.call(this, parameter);
                     info.propertyName = PreviewParameterHelper.fixPropertyName(parameter.path);
                     if (parameter.lookUpValues() && !parameter.isMultiValue || this.isEnumType(parameter))
-                        info.editorOptions = { searchEnabled: false };
+                        info.editorOptions = { searchEnabled: true };
                     if (parameter.type === "System.DateTime") {
                         info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty') }];
                     }
@@ -1897,9 +1801,7 @@ var DevExpress;
                 };
                 PreviewParameterHelper.prototype.getValueConverter = function (type) {
                     if (type === "System.DateTime") {
-                        return function (dateString) {
-                            return DevExpress.JS.Localization.parseDate(dateString);
-                        };
+                        return function (dateString) { return DevExpress.JS.Localization.parseDate(dateString); };
                     }
                     return _super.prototype.getValueConverter.call(this, type);
                 };
@@ -1921,9 +1823,7 @@ var DevExpress;
                     this.isFilteredLookUpSettings = parameterInfo.IsFilteredLookUpSettings;
                     this._originalLookUpValues = parameterInfo.LookUpValues ? parameterHelper.mapLookUpValues(this.type, parameterInfo.LookUpValues || []) : null;
                     this.lookUpValues(this._originalLookUpValues);
-                    this.lookUpValues.subscribe(function () {
-                        _this.valueStoreCache = null;
-                    });
+                    this.lookUpValues.subscribe(function () { _this.valueStoreCache = null; });
                     this.isMultiValue = parameterInfo.MultiValue;
                     this.isMultiValueWithLookUp = this.isMultiValue && !!this.lookUpValues();
                     this.getParameterDescriptor = function () {
@@ -1998,9 +1898,7 @@ var DevExpress;
                                     return;
                                 }
                                 response.parameters.forEach(function (lookUpCollection) {
-                                    var matchedParameter = parametersViewModel._parameters.filter(function (p) {
-                                        return p.path === lookUpCollection.Key;
-                                    })[0];
+                                    var matchedParameter = parametersViewModel._parameters.filter(function (p) { return p.path === lookUpCollection.Key; })[0];
                                     if (!parametersViewModel._shouldProcessParameter(matchedParameter))
                                         return;
                                     parametersViewModel._setLookUpValues(matchedParameter, lookUpCollection.Value, matchedParameter.visible);
@@ -2025,16 +1923,17 @@ var DevExpress;
                     this.parametersLoading = ko.observable(false);
                     this._reportPreview = reportPreview;
                     this.parameterHelper = parameterHelper || new PreviewParameterHelper();
-                    var _self = this;
+                    this.validateAndSubmit = function (params) {
+                        var result = params && params.validationGroup && params.validationGroup.validate && params.validationGroup.validate();
+                        if (!result || result.isValid)
+                            _this.submit();
+                    };
                     this.submit = function () {
-                        if (_self.parametersLoading()) {
+                        if (_this.parametersLoading())
                             return;
-                        }
-                        _self.parametersLoading(true);
+                        _this.parametersLoading(true);
                         var promise = reportPreview.startBuild();
-                        promise && promise.done(function (val) {
-                            _self.parametersLoading(false);
-                        });
+                        promise && promise.done(function (val) { _this.parametersLoading(false); });
                     };
                     this._disposables.push(reportPreview.originalParametersInfo.subscribe(function (originalParametersInfo) {
                         _this.initialize(originalParametersInfo);
@@ -2055,9 +1954,7 @@ var DevExpress;
                 }
                 Object.defineProperty(PreviewParametersViewModel.prototype, "_visibleParameters", {
                     get: function () {
-                        return this._parameters.filter(function (p) {
-                            return p.visible;
-                        });
+                        return this._parameters.filter(function (p) { return p.visible; });
                     },
                     enumerable: true,
                     configurable: true
@@ -2102,9 +1999,7 @@ var DevExpress;
                     var _this = this;
                     if (parameterLookUpValues) {
                         if (parameter.isMultiValue) {
-                            var selectedItems = (parameter.value() && parameter.value().selectedItems() || []).map(function (item) {
-                                return item.value;
-                            });
+                            var selectedItems = (parameter.value() && parameter.value().selectedItems() || []).map(function (item) { return item.value; });
                             return selectedItems.filter(function (item) { return _this._filterParameterValuesContainsInLookups(parameterLookUpValues, parameter.type, item).length > 0; });
                         }
                         else {
@@ -2115,7 +2010,9 @@ var DevExpress;
                 };
                 PreviewParametersViewModel.prototype._filterParameterValuesContainsInLookups = function (parameterLookUpValues, parameterType, value) {
                     var _this = this;
-                    return parameterLookUpValues.filter(function (x) { return _this._compareValues(_this.parameterHelper.getValueConverter(parameterType)(x.Value), value); });
+                    return parameterLookUpValues.filter(function (x) {
+                        return _this._compareValues(_this.parameterHelper.getValueConverter(parameterType)(x.Value), value);
+                    });
                 };
                 PreviewParametersViewModel.prototype._compareValues = function (value1, value2) {
                     if (value1 instanceof Date && value2 instanceof Date) {
@@ -2166,9 +2063,11 @@ var DevExpress;
                             break;
                         }
                     }
-                    var paths = this._parameters.filter(function (param, index) {
+                    var paths = this._parameters
+                        .filter(function (param, index) {
                         return (_this._shouldProcessParameter(param) && param.isFilteredLookUpSettings && (index >= startIndex));
-                    }).map(function (x) { return x.path; });
+                    })
+                        .map(function (x) { return x.path; });
                     return paths || [];
                 };
                 PreviewParametersViewModel.prototype.serializeParameters = function () {
@@ -2197,6 +2096,7 @@ var DevExpress;
                         });
                     }
                     finally {
+                        this.parameterHelper.callbacks && this.parameterHelper.callbacks.parametersReset && this.parameterHelper.callbacks.parametersReset(this, this._parameters);
                         this.parametersLoading(false);
                     }
                 };
@@ -2215,7 +2115,9 @@ var DevExpress;
                         parameters: this.serializeParameters(),
                         timeZoneOffset: 0 - new Date().getTimezoneOffset()
                     };
-                    this._getLookUpValueRequest(argsObject).done(this._getDoneGetLookUpValueHandler()).fail(this._getFailGetLookUpValueHandler());
+                    this._getLookUpValueRequest(argsObject)
+                        .done(this._getDoneGetLookUpValueHandler())
+                        .fail(this._getFailGetLookUpValueHandler());
                 };
                 return PreviewParametersViewModel;
             })(DevExpress.Designer.Disposable);
@@ -2233,15 +2135,14 @@ var DevExpress;
             Preview.HandlerUri = "DXXRDV.axd";
             Preview.TimeOut = 120000;
             Preview.MessageHandler = {
-                processError: function (message, showForUser) {
-                    DevExpress.Designer.NotifyAboutWarning(message, showForUser);
-                },
-                processMessage: function (message, showForUser) {
-                    DevExpress.Designer.NotifyAboutWarning(message, showForUser);
-                },
-                processWarning: function (message, showForUser) {
-                    DevExpress.Designer.NotifyAboutWarning(message, showForUser);
-                }
+                processError: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); },
+                processMessage: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); },
+                processWarning: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); }
+            };
+            Preview.ZoomAutoBy = {
+                None: 1,
+                WholePage: 0,
+                PageWidth: -1
             };
             Preview.generateGuid = function () {
                 var getNewQuartet = function (i) {
@@ -2251,7 +2152,7 @@ var DevExpress;
             };
             var ReportPreview = (function (_super) {
                 __extends(ReportPreview, _super);
-                function ReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, rtl) {
+                function ReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl) {
                     var _this = this;
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this);
@@ -2267,6 +2168,7 @@ var DevExpress;
                     this._pageBackColor = ko.observable('');
                     this._currentReportId = ko.observable(null);
                     this._currentDocumentId = ko.observable(null);
+                    this._unifier = ko.observable("");
                     this._currentOperationId = ko.observable(null);
                     this._stopBuildRequests = {};
                     this._closeDocumentRequests = {};
@@ -2274,6 +2176,7 @@ var DevExpress;
                     this._startBuildOperationId = "";
                     this._editingValuesSubscriptions = [];
                     this._drillDownState = [];
+                    this._sortingState = [];
                     this.rtlReport = ko.observable(false);
                     this.currentPage = ko.observable(null);
                     this.originalParametersInfo = ko.observable(null);
@@ -2286,6 +2189,7 @@ var DevExpress;
                     this.progressBar = new Preview.ProgressViewModel();
                     this.pages = ko.observableArray([]).extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
                     this.isAutoFit = ko.observable(true);
+                    this.autoFitBy = ko.observable(Preview.ZoomAutoBy.WholePage);
                     this.exportDisabled = ko.pureComputed(function () {
                         var inProgress = _this.progressBar.inProgress();
                         var documentBuilding = _this.documentBuilding();
@@ -2294,18 +2198,19 @@ var DevExpress;
                     this._zoom = ko.observable(1);
                     this.zoom = ko.pureComputed({
                         read: function () {
-                            if (_this.isAutoFit() || _this._zoom() === 0) {
-                                return 0;
+                            var autoFitBy = _this.autoFitBy();
+                            if (autoFitBy != Preview.ZoomAutoBy.None || _this._zoom() === 0) {
+                                return autoFitBy;
                             }
                             return _this._zoom();
                         },
                         write: function (val) {
-                            if (val !== 0) {
+                            if (val > 0) {
                                 _this._zoom(val);
-                                _this.isAutoFit(false);
+                                _this.autoFitBy(Preview.ZoomAutoBy.None);
                             }
                             else {
-                                _this.isAutoFit(true);
+                                _this.autoFitBy(val);
                             }
                         }
                     });
@@ -2319,9 +2224,7 @@ var DevExpress;
                             return (_this.pageIndex() + 1) + " " + ofText + " " + _this.pages().length;
                         }
                     });
-                    this._raiseOnSizeChanged = function () {
-                        _this.onSizeChanged() && _this.onSizeChanged()();
-                    };
+                    this._raiseOnSizeChanged = function () { _this.onSizeChanged() && _this.onSizeChanged()(); };
                     this.previewSize = ko.observable(0);
                     this.onSizeChanged = ko.observable();
                     this.previewVisible = ko.observable(false);
@@ -2330,18 +2233,29 @@ var DevExpress;
                     this.allowURLsWithJSContent = false;
                     Preview.HandlerUri = handlerUri || Preview.HandlerUri;
                     this.previewHandlersHelper = previewHandlersHelper || new Preview.PreviewHandlersHelper(this);
-                    this.requestWrapper = previewRequestWrapper || new Preview.PreviewRequestWrapper();
+                    this.requestWrapper = previewRequestWrapper || new Preview.PreviewRequestWrapper(null, callbacks);
                     this.rtlViewer = rtl;
+                    if (callbacks) {
+                        this.customProcessBrickClick = callbacks.previewClick;
+                    }
                     this.documentBuilding.subscribe(function (newVal) {
                         if (!newVal) {
-                            for (var i = 0; i < _this.pages().length; i++) {
+                            var pageCount = _this.pages().length;
+                            for (var i = 0; i < pageCount; i++) {
                                 var page = _this.pages()[i];
                                 if (!page.pageLoading()) {
                                     page.clearBricks();
                                 }
                             }
+                            if (callbacks && callbacks.documentReady) {
+                                var documentId = _this._currentDocumentId();
+                                documentId && callbacks.documentReady(documentId, _this._currentReportId(), pageCount);
+                            }
                         }
                     });
+                    this._disposables.push(this._currentDocumentId.subscribe(function (newVal) {
+                        _this._unifier(newVal ? Preview.generateGuid() : '');
+                    }));
                     this._disposables.push(this.previewSize.subscribe(function () { return _this._raiseOnSizeChanged(); }));
                     this._disposables.push(this._zoom.subscribe(function () {
                         if (_this.showMultipagePreview()) {
@@ -2369,7 +2283,7 @@ var DevExpress;
                     });
                 }
                 ReportPreview.prototype._doDrillDown = function (drillDownKey) {
-                    this._drillDownState.filter(function (x) { return x.Key === drillDownKey && (x.Value = !x.Value); });
+                    this._drillDownState.forEach(function (x) { return x.Key === drillDownKey && (x.Value = !x.Value); });
                     this.closeDocument();
                     this.progressBar.complete();
                     this.documentMap(null);
@@ -2379,12 +2293,17 @@ var DevExpress;
                             this.pages.remove(page);
                         }
                         else {
-                            page.pageIndex = -1;
-                            page.brick(null);
-                            page._setPageImgSrc(null, 1);
+                            page._clear();
                         }
                     }
                     this._startBuildRequest();
+                };
+                ReportPreview.prototype._doSorting = function (sortKey) {
+                    this.closeDocument();
+                    this.progressBar.complete();
+                    this.documentMap(null);
+                    this.pages().forEach(function (page) { return page._clear(); });
+                    this._startBuildRequest(sortKey);
                 };
                 ReportPreview.prototype.removeEmptyPages = function (all) {
                     all && this.pages.removeAll();
@@ -2395,21 +2314,17 @@ var DevExpress;
                 };
                 ReportPreview.prototype._initialize = function () {
                     this._drillDownState = [];
+                    this._sortingState = [];
                     this.closeDocument();
-                    this._clearEditingFields();
+                    this._editingFields([]);
                     this.documentMap(null);
                     this.pageIndex(-1);
                     this.pageLoading(true);
                     this.progressBar.complete();
-                    this.pages([this.createPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, this._pageBackColor.peek(), null, this.pageLoading)]);
+                    this.pages([this.createPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, this._unifier, this._pageBackColor.peek(), null, this.pageLoading)]);
                 };
-                ReportPreview.prototype._clearEditingFields = function () {
-                    this._editingFields([]);
-                    this._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
-                    this._editingValuesSubscriptions = [];
-                };
-                ReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick) {
-                    return new Preview.PreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, this._editingFields);
+                ReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick) {
+                    return new Preview.PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, this._editingFields);
                 };
                 ReportPreview.prototype._cleanTabInfo = function () {
                     this.exportOptionsModel(null);
@@ -2427,14 +2342,10 @@ var DevExpress;
                         var self = this;
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
-                        this.progressBar.startProgress(function () {
-                            _this._currentOperationId(null);
-                        });
-                        this.requestWrapper.getStartExportOperation(args).done(function (response) {
-                            self.previewHandlersHelper.doneStartExportHandler(deffered, printable, response);
-                        }).fail(function (error) {
-                            self.previewHandlersHelper.errorStartExportHandler(deffered, error);
-                        });
+                        this.progressBar.startProgress(function () { _this._currentOperationId(null); });
+                        this.requestWrapper.getStartExportOperation(args)
+                            .done(function (response) { self.previewHandlersHelper.doneStartExportHandler(deffered, printable, response); })
+                            .fail(function (error) { self.previewHandlersHelper.errorStartExportHandler(deffered, error); });
                     }
                     else {
                         deffered.resolve(true);
@@ -2452,35 +2363,40 @@ var DevExpress;
                     var _self = this;
                     return function (brick) {
                         _self.goToPage(cyclePageIndex, true);
-                        brick && _self.pages()[cyclePageIndex].selectBrick("");
-                        if (_self.customProcessBrickClick && _self.customProcessBrickClick(cyclePageIndex, brick)) {
+                        if (!brick)
                             return;
-                        }
-                        if (brick && brick.navigation) {
-                            brick.navigation.drillDownKey && _self.reportId && _self._doDrillDown && _self._doDrillDown(brick.navigation.drillDownKey);
-                            if (brick.navigation.pageIndex >= 0) {
-                                var targetPage = _self.pages().filter(function (page) { return page.pageIndex === brick.navigation.pageIndex; })[0];
-                                if (targetPage) {
-                                    _self.goToPage(brick.navigation.pageIndex);
-                                    targetPage.selectBrick(brick.navigation.indexes);
+                        _self.pages()[cyclePageIndex].selectBrick("");
+                        var defaultHandler = function () {
+                            if (brick && brick.navigation) {
+                                brick.navigation.drillDownKey && _self.reportId && _self._doDrillDown && _self._drillDownState.length > 0 && _self._doDrillDown(brick.navigation.drillDownKey);
+                                brick.navigation.sortKey && _self.reportId && _self._doSorting && _self._sortingState.length > 0 && _self._doSorting(brick.navigation.sortKey);
+                                if (brick.navigation.pageIndex >= 0) {
+                                    var targetPage = _self.pages().filter(function (page) { return page.pageIndex === brick.navigation.pageIndex; })[0];
+                                    if (targetPage) {
+                                        _self.goToPage(brick.navigation.pageIndex);
+                                        targetPage.selectBrick(brick.navigation.indexes);
+                                    }
+                                }
+                                else {
+                                    var validateUrl = function (url) {
+                                        var isUrlString = typeof url === "string";
+                                        if (isUrlString) {
+                                            url = url.toLocaleLowerCase();
+                                        }
+                                        if (url === "empty") {
+                                            return false;
+                                        }
+                                        return _self.allowURLsWithJSContent || (isUrlString && (url.indexOf("javascript:") === -1));
+                                    };
+                                    if (brick.navigation.url && validateUrl(brick.navigation.url)) {
+                                        _self._safelyRunWindowOpen(brick.navigation.url, brick.navigation.target || "_blank");
+                                    }
                                 }
                             }
-                            else {
-                                var validateUrl = function (url) {
-                                    var isUrlString = typeof url === "string";
-                                    if (isUrlString) {
-                                        url = url.toLocaleLowerCase();
-                                    }
-                                    if (url === "empty") {
-                                        return false;
-                                    }
-                                    return _self.allowURLsWithJSContent || (isUrlString && (url.indexOf("javascript:") === -1));
-                                };
-                                if (brick.navigation.url && validateUrl(brick.navigation.url)) {
-                                    _self._safelyRunWindowOpen(brick.navigation.url, brick.navigation.target || "_blank");
-                                }
-                            }
-                        }
+                        };
+                        if (_self.customProcessBrickClick && _self.customProcessBrickClick(cyclePageIndex, brick, defaultHandler))
+                            return;
+                        defaultHandler();
                     };
                 };
                 ReportPreview.prototype.openReport = function (reportName) {
@@ -2567,36 +2483,28 @@ var DevExpress;
                     this._currentDocumentId(null);
                     this.progressBar.text(DevExpress.Designer.getLocalization('Document is building...'));
                     this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
-                    this.progressBar.startProgress(function () {
-                        _this.documentBuilding(false);
-                    }, function () {
-                        _this.stopBuild();
-                    });
+                    this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
                     this.documentBuilding(true);
                     return true;
                 };
-                ReportPreview.prototype._startBuildRequest = function () {
+                ReportPreview.prototype._startBuildRequest = function (sortKey) {
                     var _this = this;
                     if (!this._initializeStartBuild()) {
                         return null;
                     }
                     var deffered = $.Deferred();
-                    this.requestWrapper.startBuildRequest().done(function (response) {
-                        _this.previewHandlersHelper.doneStartBuildHandler(deffered, response);
-                    }).fail(function (error) {
-                        _this.previewHandlersHelper.errorStartBuildHandler(deffered, error, _this._startBuildOperationId);
-                    });
+                    this.requestWrapper.startBuildRequest(sortKey)
+                        .done(function (response) { _this.previewHandlersHelper.doneStartBuildHandler(deffered, response); })
+                        .fail(function (error) { _this.previewHandlersHelper.errorStartBuildHandler(deffered, error, _this._startBuildOperationId); });
                     return deffered.promise();
                 };
                 ReportPreview.prototype.getExportStatus = function (operationId) {
                     var _this = this;
                     var deffered = $.Deferred();
                     setTimeout(function () {
-                        _this.requestWrapper.getExportStatusRequest(operationId).done(function (response) {
-                            _this.previewHandlersHelper.doneExportStatusHandler(deffered, operationId, response);
-                        }).fail(function (error) {
-                            _this.previewHandlersHelper.errorExportStatusHandler(deffered, error);
-                        });
+                        _this.requestWrapper.getExportStatusRequest(operationId)
+                            .done(function (response) { _this.previewHandlersHelper.doneExportStatusHandler(deffered, operationId, response); })
+                            .fail(function (error) { _this.previewHandlersHelper.errorExportStatusHandler(deffered, error); });
                     }, 250);
                     return deffered.promise();
                 };
@@ -2609,11 +2517,9 @@ var DevExpress;
                     var deffered = $.Deferred();
                     setTimeout(function () {
                         var ignorePredicate = function () { return _this._closeDocumentRequests[documentId]; };
-                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate).done(function (response) {
-                            _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate);
-                        }).fail(function (error) {
-                            _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate);
-                        });
+                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
+                            .done(function (response) { _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
+                            .fail(function (error) { _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
                     }, 250);
                     return deffered.promise();
                 };
@@ -2627,6 +2533,7 @@ var DevExpress;
                             }
                             else {
                                 try {
+                                    preview._unifier(Preview.generateGuid());
                                     if (result.error || !result.requestAgain && !result.pageCount) {
                                         preview.removeEmptyPages(!result.pageCount);
                                         return;
@@ -2640,7 +2547,7 @@ var DevExpress;
                                         var isCurrentPage = page.pageIndex === preview.pageIndex();
                                         page.actualResolution = 0;
                                         page.isClientVisible(isCurrentPage);
-                                        isCurrentPage && page._setPageImgSrc(documentId, preview._zoom());
+                                        isCurrentPage && page._setPageImgSrc(documentId, preview._unifier(), preview._zoom());
                                     });
                                 }
                                 finally {
@@ -2655,23 +2562,25 @@ var DevExpress;
                 ReportPreview.prototype.getDocumentData = function (documentId) {
                     var _this = this;
                     var ignoreErrorPredicate = function () { return _this._closeDocumentRequests[documentId]; };
-                    this.requestWrapper.getDocumentData(documentId, ignoreErrorPredicate).done(function (response) {
+                    this.requestWrapper.getDocumentData(documentId, ignoreErrorPredicate)
+                        .done(function (response) {
                         if (!response) {
                             return;
                         }
                         _this._drillDownState = response.drillDownKeys || [];
+                        _this._sortingState = response.sortingState || [];
                         _this.documentMap(response.documentMap);
-                        _this._clearEditingFields();
+                        _this._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
+                        _this._editingValuesSubscriptions = [];
                         _this._editingFields((response.editingFields || []).map(function (item, index) {
-                            var field = new Preview.EditingField(item, index);
-                            var subscription = field.editValue.subscribe(function (newValue) {
-                                field.refreshHtmlValue(_this.requestWrapper, newValue);
-                                _this.editingFieldChanged && _this.editingFieldChanged(field);
-                            });
-                            _this._editingValuesSubscriptions.push(subscription);
+                            var field = new Preview.EditingField(item, index, _this.requestWrapper);
+                            if (_this.editingFieldChanged) {
+                                field.editingFieldChanged = _this.editingFieldChanged;
+                            }
                             return field;
                         }));
-                    }).fail(function (error) {
+                    })
+                        .fail(function (error) {
                         if (!ignoreErrorPredicate())
                             _this._processError(DevExpress.Designer.getLocalization("Cannot obtain additional document data for the current document"), error);
                     });
@@ -2755,9 +2664,7 @@ var DevExpress;
                             return;
                         }
                         currentBrick.active() && currentBrick.genlIndex != -1 && activeBricks.push(currentBrick);
-                        currentBrick.bricks && currentBrick.bricks.length != 0 && currentBrick.bricks.forEach(function (innerBrick) {
-                            getActiveBricks(innerBrick, resultArray);
-                        });
+                        currentBrick.bricks && currentBrick.bricks.length != 0 && currentBrick.bricks.forEach(function (innerBrick) { getActiveBricks(innerBrick, resultArray); });
                     };
                     getActiveBricks(currentPage.brick(), activeBricks);
                     if (!activeBricks) {
@@ -2831,8 +2738,8 @@ var DevExpress;
                 };
             }
             Preview.updatePreviewContentSize = updatePreviewContentSize;
-            function updatePreviewZoomWithAutoFit(width, height, element, direction) {
-                if (direction === void 0) { direction = "both"; }
+            function updatePreviewZoomWithAutoFit(width, height, element, autoFitBy) {
+                if (autoFitBy === void 0) { autoFitBy = Preview.ZoomAutoBy.WholePage; }
                 var $element = $(element);
                 var $previewWrapper = $element.closest(".dxrd-preview-wrapper");
                 var $preview = $element.closest(".dxrd-preview");
@@ -2844,19 +2751,25 @@ var DevExpress;
                 var topAreaHeight = parseFloat($previewWrapper.css("top").split("px")[0]);
                 var designerHeight = $preview.outerHeight();
                 var surfaceHeight = designerHeight - topAreaHeight;
+                if (autoFitBy === Preview.ZoomAutoBy.PageWidth) {
+                    return (surfaceWidth - 12 - (rightAreaWidth ? 0 : 10)) / width;
+                }
                 var heightZoom = surfaceHeight / (height + 6);
                 var widthZoom = surfaceWidth / width;
-                if (direction === 'horizontal') {
-                    return widthZoom;
-                }
                 return Math.min(heightZoom, widthZoom);
             }
             Preview.updatePreviewZoomWithAutoFit = updatePreviewZoomWithAutoFit;
+            Preview.PreviewElements = {
+                Toolbar: 'dxrd-preview-toolbar-scrollable',
+                Surface: 'dxrdp-surface',
+                RightPanel: 'dxrd-right-panel-template-base',
+            };
             function createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl) {
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                var previewWrapper = new Preview.PreviewRequestWrapper(), reportPreview = new ReportPreview(handlerUri, previewWrapper, undefined, rtl), searchModel = new Preview.SearchViewModel(reportPreview);
+                var previewWrapper = new Preview.PreviewRequestWrapper(null, callbacks), reportPreview = new ReportPreview(handlerUri, previewWrapper, undefined, callbacks, rtl), searchModel = new Preview.SearchViewModel(reportPreview);
+                reportPreview.editingFieldChanged = callbacks && callbacks.editingFieldChanged;
                 var documentMapModel = new Preview.DocumentMapModel(reportPreview);
                 var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks));
                 var exportModel = new Preview.ExportOptionsModel(reportPreview);
@@ -2885,10 +2798,11 @@ var DevExpress;
                     rtl: reportPreview.rtlViewer
                 };
                 designerModel.parts = [
-                    { templateName: 'dxrd-preview-toolbar-scrollable', model: { actionLists: actionLists } },
-                    { templateName: 'dxrdp-surface', model: designerModel.reportPreview },
-                    { templateName: 'dxrd-right-panel-template-base', model: designerModel }
+                    { templateName: Preview.PreviewElements.Toolbar, model: { actionLists: actionLists } },
+                    { templateName: Preview.PreviewElements.Surface, model: designerModel.reportPreview },
+                    { templateName: Preview.PreviewElements.RightPanel, model: designerModel }
                 ];
+                callbacks && callbacks.customizeParts && callbacks.customizeParts(designerModel.parts);
                 var updatePreviewContentSize_ = updatePreviewContentSize(reportPreview.previewSize, element, rtl);
                 $(window).bind("resize", function () {
                     updatePreviewContentSize_();
@@ -2904,6 +2818,38 @@ var DevExpress;
                     $(element).children().remove();
                     ko.applyBindings(designerModel, element);
                 }
+                designerModel.GetParametersModel = function () {
+                    return designerModel.parametersModel;
+                };
+                designerModel.OpenReport = function (reportName) {
+                    designerModel.reportPreview.openReport(reportName);
+                };
+                designerModel.Print = function (pageIndex) {
+                    return designerModel.reportPreview.printDocument(pageIndex);
+                };
+                designerModel.ExportTo = function (format) {
+                    if (designerModel.reportPreview.exportDisabled()) {
+                        designerModel.reportPreview.exportDocumentTo(format || 'pdf');
+                    }
+                },
+                    designerModel.GetCurrentPageIndex = function () {
+                        return designerModel.reportPreview.pageIndex();
+                    },
+                    designerModel.GoToPage = function (pageIndex) {
+                        designerModel.reportPreview.goToPage(pageIndex);
+                    },
+                    designerModel.Close = function () {
+                        designerModel.reportPreview.deactivate();
+                    },
+                    designerModel.ResetParameters = function () {
+                        designerModel.parametersModel && designerModel.parametersModel.restore();
+                    },
+                    designerModel.StartBuild = function () {
+                        var parametersModel = designerModel.parametersModel;
+                        if (!parametersModel)
+                            return;
+                        return designerModel.parametersModel.submit();
+                    };
                 return designerModel;
             }
             Preview.createDesktopPreview = createDesktopPreview;
@@ -2911,12 +2857,6 @@ var DevExpress;
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                if (!localization) {
-                    localization = {};
-                    Object.keys(DevExpress.Designer.localization_values).forEach(function (value) {
-                        localization[DevExpress.Designer.localization_values[value]] = value;
-                    });
-                }
                 DevExpress.JS.Localization.addCultureInfo({
                     messages: localization
                 });
@@ -2930,6 +2870,7 @@ var DevExpress;
             }
             Preview.createPreview = createPreview;
             function createAndInitPreviewModel(viewerModel, element, callbacks, applyBindings) {
+                DevExpress.Designer.initGlobalize(viewerModel);
                 var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent);
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
@@ -2940,6 +2881,13 @@ var DevExpress;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
 })(DevExpress || (DevExpress = {}));
+/// <reference path="sources/metadata.ts" />
+/// <reference path="sources/exportoptions.ts" />
+/// <reference path="sources/preview-page.ts" />
+/// <reference path="sources/preview-search.ts" />
+/// <reference path="sources/preview-document-map.ts" />
+/// <reference path="sources/preview-parameters.ts" />
+/// <reference path="sources/preview.ts" /> 
 var DevExpress;
 (function (DevExpress) {
     var Report;
@@ -3021,12 +2969,8 @@ var DevExpress;
                         id: Preview.ActionId.FirstPage,
                         text: DevExpress.Designer.getLocalization("First Page"),
                         imageClassName: "dxrd-image-preview-first",
-                        disabled: ko.pureComputed(function () {
-                            return reportPreview.pageIndex() < 1;
-                        }),
-                        visible: ko.pureComputed(function () {
-                            return reportPreview.previewVisible();
-                        }),
+                        disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 1; }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: true, keyCode: 37 },
                         clickAction: function () {
                             if (reportPreview.pageIndex() > 0) {
@@ -3038,12 +2982,8 @@ var DevExpress;
                         id: Preview.ActionId.PrevPage,
                         text: DevExpress.Designer.getLocalization("Previous Page"),
                         imageClassName: "dxrd-image-preview-prev",
-                        disabled: ko.pureComputed(function () {
-                            return reportPreview.pageIndex() < 1;
-                        }),
-                        visible: ko.pureComputed(function () {
-                            return reportPreview.previewVisible();
-                        }),
+                        disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 1; }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: false, keyCode: 37 },
                         clickAction: function () {
                             if (reportPreview.pageIndex() >= 1) {
@@ -3056,9 +2996,7 @@ var DevExpress;
                         text: "Pagination",
                         imageClassName: "dxrd-image-pager",
                         disabled: ko.observable(false),
-                        visible: ko.pureComputed(function () {
-                            return reportPreview.previewVisible();
-                        }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         clickAction: $.noop,
                         selectedItem: ko.pureComputed({
                             read: function () {
@@ -3120,9 +3058,7 @@ var DevExpress;
                                 return value.text;
                             }
                         },
-                        itemTemplate: function (value) {
-                            return value.text;
-                        },
+                        itemTemplate: function (value) { return value.text; },
                         searchMode: 'startswith',
                         searchEnabled: ko.observable(true),
                         searchTimeout: 10,
@@ -3134,12 +3070,8 @@ var DevExpress;
                         id: Preview.ActionId.NextPage,
                         text: DevExpress.Designer.getLocalization("Next Page"),
                         imageClassName: "dxrd-image-preview-next",
-                        disabled: ko.pureComputed(function () {
-                            return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1;
-                        }),
-                        visible: ko.pureComputed(function () {
-                            return reportPreview.previewVisible();
-                        }),
+                        disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: false, keyCode: 39 },
                         clickAction: function () {
                             if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
@@ -3151,12 +3083,8 @@ var DevExpress;
                         id: Preview.ActionId.LastPage,
                         text: DevExpress.Designer.getLocalization("Last Page"),
                         imageClassName: "dxrd-image-preview-last",
-                        disabled: ko.pureComputed(function () {
-                            return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1;
-                        }),
-                        visible: ko.pureComputed(function () {
-                            return reportPreview.previewVisible();
-                        }),
+                        disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: true, keyCode: 39 },
                         clickAction: function () {
                             if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
@@ -3167,13 +3095,9 @@ var DevExpress;
                     this.actions.push({
                         id: Preview.ActionId.MultipageToggle,
                         text: DevExpress.Designer.getLocalization("Toggle Multipage Mode"),
-                        imageClassName: ko.pureComputed(function () {
-                            return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage";
-                        }),
+                        imageClassName: ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage"; }),
                         disabled: ko.observable(false),
-                        visible: ko.pureComputed(function () {
-                            return reportPreview.previewVisible();
-                        }),
+                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: true, keyCode: 77 },
                         clickAction: function () {
                             var zoom = reportPreview._zoom();
@@ -3191,7 +3115,8 @@ var DevExpress;
                         zoomStep: zoomStep,
                         hotKey: { ctrlKey: false, keyCode: 109 },
                         clickAction: function () {
-                            var zoomLevel = reportPreview.zoom() || reportPreview._zoom();
+                            var currentZoom = reportPreview.zoom();
+                            var zoomLevel = currentZoom > 0 ? currentZoom : reportPreview._zoom();
                             reportPreview.zoom(Math.max(zoomLevel - zoomStep(), 0.01));
                         },
                         hasSeparator: true
@@ -3207,12 +3132,24 @@ var DevExpress;
                             reportPreview.zoom(0);
                         },
                         templateName: "dxrd-zoom-autofit-select-template",
+                        displayExpr: function (val) {
+                            if (val === Preview.ZoomAutoBy.PageWidth) {
+                                return DevExpress.Designer.getLocalization('Page Width');
+                            }
+                            else if (Math.round(val * 100) === 0) {
+                                return DevExpress.Designer.getLocalization('Whole Page');
+                            }
+                            else {
+                                return Math.round((val || reportPreview.zoom.peek()) * 100) + '%';
+                            }
+                        },
                         zoom: reportPreview.zoom,
                         zoomLevels: reportPreview.predefinedZoomLevels,
                         zoomItems: ko.pureComputed(function () {
                             var items = reportPreview.predefinedZoomLevels.slice(0);
                             if (reportPreview.showMultipagePreview() === false && items.indexOf(0) === -1) {
-                                items.push(0);
+                                items.push(Preview.ZoomAutoBy.PageWidth);
+                                items.push(Preview.ZoomAutoBy.WholePage);
                             }
                             return items;
                         })
@@ -3226,7 +3163,8 @@ var DevExpress;
                         zoomStep: zoomStep,
                         hotKey: { ctrlKey: false, keyCode: 107 },
                         clickAction: function () {
-                            var zoomLevel = reportPreview.zoom() || reportPreview._zoom();
+                            var currentZoom = reportPreview.zoom();
+                            var zoomLevel = currentZoom > 0 ? currentZoom : reportPreview._zoom();
                             reportPreview.zoom(Math.min(zoomLevel + zoomStep(), 10));
                         }
                     });
@@ -3264,7 +3202,6 @@ var DevExpress;
                         imageClassName: "dxrd-image-print-page",
                         disabled: printDisabled,
                         visible: true,
-                        hotKey: { ctrlKey: true, keyCode: 49 },
                         clickAction: function () {
                             if (printDisabled()) {
                                 return;
@@ -3289,30 +3226,50 @@ var DevExpress;
         var Preview;
         (function (Preview) {
             var EditingField = (function () {
-                function EditingField(model, index) {
+                function EditingField(model, index, htmlProvider) {
+                    var _this = this;
                     this._needToUseHtml = false;
                     this._index = -1;
                     this._model = model;
                     this._index = index;
                     this.readOnly = ko.observable(model.readOnly);
-                    this.editValue = ko.observable(model.editValue);
+                    this.modelValue = ko.observable(model.editValue);
+                    this.editValue = ko.computed({
+                        read: function () {
+                            return _this.modelValue();
+                        },
+                        write: function (newVal) {
+                            var oldVal = _this.modelValue();
+                            var val = _this.editingFieldChanged(_this, oldVal, newVal);
+                            val = val == null ? newVal : val;
+                            _this.modelValue(newVal);
+                            if (val !== oldVal) {
+                                _this._refreshHtmlValue(val);
+                            }
+                            var self = _this;
+                            setTimeout(function () { self.modelValue(val); }, 1);
+                        }
+                    });
                     this.htmlValue = ko.observable(model.htmlValue);
+                    this._htmlProvider = htmlProvider;
                 }
-                EditingField.prototype.editorName = function () {
-                    return this._model.editorName;
+                EditingField.prototype._refreshHtmlValue = function (newValue) {
+                    var _this = this;
+                    this.htmlValue(null);
+                    if (this._needToUseHtml) {
+                        this._htmlProvider.getEditingFieldHtml(newValue, this._index).done(function (html) {
+                            _this.htmlValue(html);
+                        });
+                    }
                 };
-                EditingField.prototype.id = function () {
-                    return this._model.id;
+                EditingField.prototype.editingFieldChanged = function (field, oldVal, newVal) {
+                    return newVal;
                 };
-                EditingField.prototype.groupID = function () {
-                    return this._model.groupID;
-                };
-                EditingField.prototype.pageIndex = function () {
-                    return this._model.pageIndex;
-                };
-                EditingField.prototype.type = function () {
-                    return this._model.type;
-                };
+                EditingField.prototype.editorName = function () { return this._model.editorName; };
+                EditingField.prototype.id = function () { return this._model.id; };
+                EditingField.prototype.groupID = function () { return this._model.groupID; };
+                EditingField.prototype.pageIndex = function () { return this._model.pageIndex; };
+                EditingField.prototype.type = function () { return this._model.type; };
                 EditingField.prototype.model = function () {
                     return $.extend({}, this._model, {
                         readOnly: this.readOnly.peek(),
@@ -3329,19 +3286,10 @@ var DevExpress;
                         if (!this._needToUseHtml) {
                             this.htmlValue(null);
                         }
-                        return new Preview.TextEditFieldViewModel(this, pageWidth, pageHeight, zoom, bounds);
+                        return new Preview.TextEditingFieldViewModel(this, pageWidth, pageHeight, zoom, bounds);
                     }
                     else if (this._model.type === "charactercomb") {
                         return new Preview.CharacterCombEditingFieldViewModel(this, pageWidth, pageHeight, zoom, bounds);
-                    }
-                };
-                EditingField.prototype.refreshHtmlValue = function (htmlProvider, newValue) {
-                    var _this = this;
-                    this.htmlValue(null);
-                    if (this._needToUseHtml) {
-                        htmlProvider.getEditingFieldHtml(newValue, this._index).done(function (html) {
-                            _this.htmlValue(html);
-                        });
                     }
                 };
                 return EditingField;
@@ -3383,10 +3331,10 @@ var DevExpress;
                 return EditingFieldExtensions._instance;
             };
             EditingFieldExtensions.prototype._registerStandartEditors = function () {
-                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d+$/, "0");
-                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/, "0");
-                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?\d+([\.,]?\d*)?$/, "0");
-                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d*$/, /^-?\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/, /^\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?(\d+([\.,]?\d*)?)?$/, /^-?\d+([\.,]?\d*)?$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/, /^\d+([\.,]?\d*)?$/, "0");
                 EditingFieldExtensions.registerEditor("Date", "Date", Report.Categories.DateTime(), {
                     onPreRender: function (data) {
                         data.options.value(Globalize["formatDate"](Globalize.parseDate(data.options.value()) || new Date(Date.now())));
@@ -3395,7 +3343,7 @@ var DevExpress;
                         e.model.value(e.component.option("text"));
                     }
                 }, "dxrp-editing-field-datetime");
-                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, "");
+                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, /^[a-zA-Z]*$/, "");
             };
             EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template) {
                 EditingFieldExtensions.instance()._editors[name] = {
@@ -3409,48 +3357,8 @@ var DevExpress;
             EditingFieldExtensions.registerMaskEditor = function (editorID, displayName, category, mask) {
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
             };
-            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExp, defaultVal) {
-                var options = {
-                    onFocusIn: function (e) {
-                        var $input = $(e.element).find("input").eq(0);
-                        var currentValue = $input.val();
-                        if (!regExp.test(currentValue))
-                            $input.val(defaultVal);
-                        $input = null;
-                    },
-                    onKeyPress: function (e) {
-                        var char = getCharFromKeyCode(e.jQueryEvent);
-                        if (!char)
-                            return;
-                        var $input = $(e.element).find("input").eq(0);
-                        var caretPosition = getCaretPosition($input.get(0)).start;
-                        var currentValue = $input.val();
-                        if (caretPosition < 0) {
-                            caretPosition = currentValue ? currentValue.length : 0;
-                        }
-                        var result = [currentValue.slice(0, caretPosition), char, currentValue.slice(caretPosition)].join('');
-                        if (!regExp.test(result))
-                            e.jQueryEvent.preventDefault();
-                        $input = null;
-                    },
-                    onPaste: function (e) {
-                        var clipboardData = e.jQueryEvent.originalEvent.clipboardData || window["clipboardData"] || {};
-                        var pastedData = clipboardData && clipboardData.getData && clipboardData.getData('Text');
-                        if (typeof pastedData !== "string")
-                            return;
-                        var $input = $(e.element).find("input").eq(0);
-                        var caretPosition = getCaretPosition($input.get(0));
-                        var currentValue = $input.val();
-                        if (caretPosition.start < 0) {
-                            caretPosition.end = caretPosition.start = currentValue ? currentValue.length : 0;
-                        }
-                        var result = [currentValue.slice(0, caretPosition.start), pastedData, currentValue.slice(caretPosition.end)].join('');
-                        if (!regExp.test(result))
-                            e.jQueryEvent.preventDefault();
-                        $input = null;
-                    }
-                };
-                EditingFieldExtensions.registerEditor(editorID, displayName, category, options);
+            EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExpEditing, regExpFinal, defaultVal) {
+                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, regExpFinal.test, defaultVal));
             };
             EditingFieldExtensions.unregisterEditor = function (editorID) {
                 delete EditingFieldExtensions.instance()._editors[editorID];
@@ -3539,8 +3447,8 @@ var DevExpress;
             })(Preview.CheckState || (Preview.CheckState = {}));
             var CheckState = Preview.CheckState;
             ;
-            var TextEditFieldViewModel = (function () {
-                function TextEditFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
+            var TextEditingFieldViewModel = (function () {
+                function TextEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
                     var _this = this;
                     this.template = "dxrp-editing-field-container";
                     this.htmlValue = function () { return _this.field.htmlValue(); };
@@ -3617,7 +3525,7 @@ var DevExpress;
                         }
                     });
                 }
-                TextEditFieldViewModel.prototype.activateEditor = function (viewModel, e) {
+                TextEditingFieldViewModel.prototype.activateEditor = function (viewModel, e) {
                     if (this.field.readOnly()) {
                         return;
                     }
@@ -3634,9 +3542,9 @@ var DevExpress;
                         $(e && e.currentTarget).find(":focusable").eq(0).focus();
                     }
                 };
-                return TextEditFieldViewModel;
+                return TextEditingFieldViewModel;
             })();
-            Preview.TextEditFieldViewModel = TextEditFieldViewModel;
+            Preview.TextEditingFieldViewModel = TextEditingFieldViewModel;
             ko.bindingHandlers["childStyle"] = {
                 init: function (element, valueAccessor) {
                     var values = valueAccessor();
@@ -3672,11 +3580,11 @@ var DevExpress;
                     };
                 }
                 CheckEditingFieldViewModel.prototype._toggleCheckState = function () {
-                    if (this.field.editValue() === 1 /* Checked */) {
-                        this.field.editValue(0 /* Unchecked */);
+                    if (this.field.editValue() === CheckState.Checked) {
+                        this.field.editValue(CheckState.Unchecked);
                     }
                     else {
-                        this.field.editValue(1 /* Checked */);
+                        this.field.editValue(CheckState.Checked);
                     }
                 };
                 CheckEditingFieldViewModel.prototype.onKeyDown = function (_, e) {
@@ -3696,10 +3604,10 @@ var DevExpress;
                     this.toggleCheckState();
                 };
                 CheckEditingFieldViewModel.prototype.checked = function () {
-                    if (this.field.editValue() === 1 /* Checked */) {
+                    if (this.field.editValue() === CheckState.Checked) {
                         return true;
                     }
-                    if (this.field.editValue() === 0 /* Unchecked */) {
+                    if (this.field.editValue() === CheckState.Unchecked) {
                         return false;
                     }
                 };
@@ -3713,7 +3621,7 @@ var DevExpress;
                     else if (this.checked() === false) {
                         this._editingFieldsProvider().forEach(function (value) {
                             if (value.groupID() === _this.field.groupID()) {
-                                value.editValue(0 /* Unchecked */);
+                                value.editValue(CheckState.Unchecked);
                             }
                         });
                         this._toggleCheckState();
@@ -3882,7 +3790,8 @@ var DevExpress;
                     };
                     this.isLeftMove = false;
                     this.isRightMove = false;
-                    this.$element = $(element), this.$gallery = this.$element.find(".dxrd-mobile-gallery");
+                    this.$element = $(element),
+                        this.$gallery = this.$element.find(".dxrd-mobile-gallery");
                     this.$galleryblocks = this.$gallery.find(".dxrd-gallery-blocks");
                     this.firstMobilePageOffset = $(this.$galleryblocks.find(".dxrd-mobile-page")[0]).offset();
                     this.slideOptions.searchPanel.height.subscribe(function (newVal) {
@@ -4000,11 +3909,9 @@ var DevExpress;
                         this.slideOptions.searchPanel.height(0);
                     }
                     if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
-                        this.slideOptions.isAutoFit(true);
+                        this.slideOptions.autoFitBy(Preview.ZoomAutoBy.WholePage);
                     }
-                    setTimeout(function () {
-                        _this.slideOptions.brickEventsDisabled(false);
-                    }, 10);
+                    setTimeout(function () { _this.slideOptions.brickEventsDisabled(false); }, 10);
                 };
                 EventProcessor.prototype.applySearchAnimation = function (value) {
                     var _this = this;
@@ -4088,14 +3995,21 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
-            function getPreviewActionsMobile(preview, exportModel, parametersModel, searchModel) {
+            function getPreviewActionsMobile(preview, exportModel, parametersModel, searchModel, exportTypes) {
                 var exportToModel = {
                     visible: ko.observable(false),
                     items: ko.pureComputed(function () {
-                        return exportModel._getExportFormatItems().map(function (item) {
-                            item.action = function (e) {
-                                exportModel._exportDocumentByFormat(e.model && e.model.format);
-                            };
+                        var allFormats = exportModel._getExportFormatItems();
+                        var availableFormats = allFormats.filter(function (x) { return exportTypes().indexOf(x) !== -1; });
+                        if (availableFormats.length > 9) {
+                            availableFormats.splice(9, availableFormats.length - 9);
+                        }
+                        else if (availableFormats.length < 9) {
+                            var notUsedFormats = allFormats.filter(function (x) { return availableFormats.indexOf(x) === -1; });
+                            availableFormats.push.apply(availableFormats, notUsedFormats.slice(0, 9 - availableFormats.length));
+                        }
+                        return availableFormats.map(function (item) {
+                            item.action = function (e) { exportModel._exportDocumentByFormat(e.model && e.model.format); };
                             return item;
                         });
                     })
@@ -4112,9 +4026,7 @@ var DevExpress;
                         visible: true
                     },
                     {
-                        action: function () {
-                            exportToModel.visible(!exportToModel.visible());
-                        },
+                        action: function () { exportToModel.visible(!exportToModel.visible()); },
                         image: "dxrd-image-export-to",
                         visible: true,
                         content: {
@@ -4146,15 +4058,18 @@ var DevExpress;
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                var previewWrapper = new Preview.PreviewRequestWrapper(), reportPreview = new Preview.MobileReportPreview(handlerUri, previewWrapper, undefined, undefined, mobileModeSettings), searchModel = new Preview.MobileSearchViewModel(reportPreview);
+                var previewWrapper = new Preview.PreviewRequestWrapper(null, callbacks), reportPreview = new Preview.MobileReportPreview(handlerUri, previewWrapper, undefined, callbacks, undefined, mobileModeSettings), searchModel = new Preview.MobileSearchViewModel(reportPreview);
                 var parametersModel = new Preview.PreviewParametersViewModel(reportPreview, new Preview.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks));
                 var exportModel = new Preview.ExportOptionsModel(reportPreview);
                 reportPreview.allowURLsWithJSContent = allowURLsWithJSContent;
                 previewWrapper.initialize(reportPreview, parametersModel, searchModel);
-                var mobileActions = getPreviewActionsMobile(reportPreview, exportModel, parametersModel, searchModel);
-                reportPreview.pageIndex.subscribe(function (newVal) {
-                    mobileActions.visible(false);
-                });
+                var exportTypes = ko.observableArray([
+                    Preview.ExportFormatID.PDF, Preview.ExportFormatID.XLS, Preview.ExportFormatID.XLSX,
+                    Preview.ExportFormatID.RTF, Preview.ExportFormatID.MHT, Preview.ExportFormatID.HTML,
+                    Preview.ExportFormatID.Text, Preview.ExportFormatID.CSV, Preview.ExportFormatID.Image
+                ]);
+                var mobileActions = getPreviewActionsMobile(reportPreview, exportModel, parametersModel, searchModel, exportTypes);
+                reportPreview.pageIndex.subscribe(function (newVal) { mobileActions.visible(false); });
                 reportPreview.actionsVisible = mobileActions.visible;
                 var contentSize = ko.observable({ width: 0, height: 0 });
                 var updatePreviewContentSize_ = updatePreviewContentSizeMobile(contentSize, element);
@@ -4170,9 +4085,8 @@ var DevExpress;
                     brickEventsDisabled: ko.observable(false),
                     gallery: gallery,
                     paginator: new Preview.MobilePaginator(reportPreview, gallery),
-                    updateSurfaceSize: function () {
-                        updatePreviewContentSize_();
-                    }
+                    updateSurfaceSize: function () { updatePreviewContentSize_(); },
+                    availableFormats: exportTypes
                 };
                 designerModel.slideOptions = {
                     readerMode: reportPreview.readerMode,
@@ -4183,7 +4097,8 @@ var DevExpress;
                     reachedLeft: reportPreview.scrollReachedLeft,
                     reachedRight: reportPreview.scrollReachedRight,
                     scrollAvailable: ko.computed(function () {
-                        return !(reportPreview.scrollReachedTop() && reportPreview.scrollReachedLeft() && reportPreview.scrollReachedRight() && reportPreview.scrollReachedBottom());
+                        return !(reportPreview.scrollReachedTop() && reportPreview.scrollReachedLeft()
+                            && reportPreview.scrollReachedRight() && reportPreview.scrollReachedBottom());
                     }),
                     swipeEnabled: ko.computed(function () {
                         if (reportPreview.zoomUpdating()) {
@@ -4197,7 +4112,7 @@ var DevExpress;
                         }
                         return true;
                     }),
-                    isAutoFit: reportPreview.isAutoFit,
+                    autoFitBy: reportPreview.autoFitBy,
                     galleryIsAnimated: gallery.isAnimated,
                     zoomUpdating: reportPreview.zoomUpdating,
                     brickEventsDisabled: designerModel.brickEventsDisabled
@@ -4215,12 +4130,8 @@ var DevExpress;
                     cancelDisabled: ko.computed(function () {
                         return reportPreview._currentDocumentId() === null;
                     }),
-                    reset: function () {
-                        parametersModel.restore();
-                    },
-                    cancel: function () {
-                        parametersModel.popupInfo.visible(false);
-                    }
+                    reset: function () { parametersModel.restore(); },
+                    cancel: function () { parametersModel.popupInfo.visible(false); }
                 };
                 designerModel.parts = [
                     { templateName: 'dxrdp-surface-mobile', model: designerModel.reportPreview },
@@ -4253,9 +4164,7 @@ var DevExpress;
                     var _this = this;
                     this.visible = ko.observable(false).extend({ notify: 'always' });
                     this.text = ko.computed(function () {
-                        setTimeout(function () {
-                            _this.visible(true);
-                        }, 1);
+                        setTimeout(function () { _this.visible(true); }, 1);
                         if (reportPreview.pageIndex() === -1) {
                             return DevExpress.Designer.getLocalization('0 pages');
                         }
@@ -4279,9 +4188,7 @@ var DevExpress;
                         if (newVal) {
                             $element.removeClass("dxrdp-hide").addClass("dxrdp-show");
                             timeoutId && clearTimeout(timeoutId);
-                            timeoutId = setTimeout(function () {
-                                values.visible(false);
-                            }, 2000);
+                            timeoutId = setTimeout(function () { values.visible(false); }, 2000);
                         }
                         else {
                             $element.removeClass("dxrdp-show").addClass("dxrdp-hide");
@@ -4306,10 +4213,10 @@ var DevExpress;
                 if (!brick) {
                     return;
                 }
-                brick[brick.rtl ? 'rightP' : 'leftP'] = Preview.convetToPercent(brick.left, width);
-                brick.widthP = Preview.convetToPercent(brick.width, width);
-                brick.topP = Preview.convetToPercent(brick.top, height);
-                brick.heightP = Preview.convetToPercent(brick.height, height);
+                brick[brick.rtl ? 'rightP' : 'leftP'] = Preview.convertToPercent(brick.left, width);
+                brick.widthP = Preview.convertToPercent(brick.width, width);
+                brick.topP = Preview.convertToPercent(brick.top, height);
+                brick.heightP = Preview.convertToPercent(brick.height, height);
                 brick.bricks && brick.bricks.forEach(function (childBrick) {
                     updateBricksPosition(childBrick, height, width);
                 });
@@ -4320,9 +4227,7 @@ var DevExpress;
                     return;
                 }
                 !!brick.active && !!brick.active(false) || (brick.active = ko.observable(false));
-                brick["onClick"] = function () {
-                    processClick && processClick(brick);
-                };
+                brick["onClick"] = function () { processClick && processClick(brick); };
                 brick.bricks && brick.bricks.forEach(function (childBrick) {
                     childBrick.top += brick.top;
                     childBrick.left += brick.left;
@@ -4336,16 +4241,14 @@ var DevExpress;
             Preview.initializeBrickMobile = initializeBrickMobile;
             var MobilePreviewPage = (function (_super) {
                 __extends(MobilePreviewPage, _super);
-                function MobilePreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFields) {
+                function MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, editingFields) {
                     var _this = this;
-                    _super.call(this, pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, editingFields);
+                    _super.call(this, pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, editingFields);
                     this.bricks = ko.computed(function () {
                         return _this.getBricksFlatList(_this.brick());
                     });
                     this.activeBricks = ko.computed(function () {
-                        return _this.bricks().filter(function (x) {
-                            return x.active();
-                        });
+                        return _this.bricks().filter(function (x) { return x.active(); });
                     });
                     this.selectBrick = function (path, ctrlKey) {
                         var currentBrick = _this.brick();
@@ -4357,9 +4260,7 @@ var DevExpress;
                             _this["_selectedBrickPath"] = path;
                             return;
                         }
-                        _this.bricks().forEach(function (brick) {
-                            brick.indexes === path && brick.active(true);
-                        });
+                        _this.bricks().forEach(function (brick) { brick.indexes === path && brick.active(true); });
                     };
                 }
                 MobilePreviewPage.prototype.clickToBrick = function (s, e) {
@@ -4369,7 +4270,8 @@ var DevExpress;
                     var yPerc = (e.clientY - offset.top) / target.height() * 100;
                     var bricks = s.bricks();
                     for (var i = 0; i < bricks.length; i++) {
-                        if (parseFloat(bricks[i].topP) < yPerc && parseFloat(bricks[i].topP) + parseFloat(bricks[i].heightP) > yPerc && parseFloat(bricks[i].leftP) < xPerc && parseFloat(bricks[i].leftP) + parseFloat(bricks[i].widthP) > xPerc) {
+                        if (parseFloat(bricks[i].topP) < yPerc && parseFloat(bricks[i].topP) + parseFloat(bricks[i].heightP) > yPerc
+                            && parseFloat(bricks[i].leftP) < xPerc && parseFloat(bricks[i].leftP) + parseFloat(bricks[i].widthP) > xPerc) {
                             bricks[i]["onClick"] && bricks[i]["onClick"]();
                             break;
                         }
@@ -4406,20 +4308,18 @@ var DevExpress;
         (function (Preview) {
             var MobileReportPreview = (function (_super) {
                 __extends(MobileReportPreview, _super);
-                function MobileReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, rtl, mobileSettings) {
+                function MobileReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl, mobileSettings) {
                     var _this = this;
                     if (rtl === void 0) { rtl = false; }
                     if (mobileSettings === void 0) { mobileSettings = { readerMode: true, animationEnabled: true }; }
-                    _super.call(this, handlerUri, previewRequestWrapper, previewHandlersHelper, rtl);
+                    _super.call(this, handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl);
                     this.availablePages = ko.observable(null);
                     this.visiblePages = ko.computed(function () {
                         if (!_this.availablePages()) {
                             return _this.pages();
                         }
                         else {
-                            return _this.pages().filter(function (x) {
-                                return _this.availablePages().indexOf(x.pageIndex) !== -1;
-                            });
+                            return _this.pages().filter(function (x) { return _this.availablePages().indexOf(x.pageIndex) !== -1; });
                         }
                     });
                     this.topOffset = ko.observable(0);
@@ -4432,7 +4332,8 @@ var DevExpress;
                     this.zoomUpdating = ko.observable(false);
                     this.mobileZoom = ko.computed({
                         read: function () {
-                            return _this.zoom() || _this._zoom();
+                            var currentZoom = _this.zoom();
+                            return currentZoom > 0 ? currentZoom : _this._zoom();
                         },
                         write: function (newVal) {
                             _this.zoom(newVal);
@@ -4442,7 +4343,7 @@ var DevExpress;
                     var globalAnimationEnabled = mobileSettings.animationEnabled;
                     this.animationSettings = { zoomEnabled: ko.observable(globalAnimationEnabled), swipeEnabled: ko.observable(globalAnimationEnabled) };
                     this.canSwitchToDesigner = false;
-                    this.isAutoFit(true);
+                    this.autoFitBy(Preview.ZoomAutoBy.PageWidth);
                     this.showMultipagePreview(true);
                     this.searchPanelVisible.subscribe(function (newVal) {
                         if (newVal) {
@@ -4450,8 +4351,8 @@ var DevExpress;
                         }
                     });
                 }
-                MobileReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick) {
-                    return new Preview.MobilePreviewPage(pageIndex, width, height, zoom, documentId, color, brickProvider, loading, processClick, this._editingFields);
+                MobileReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick) {
+                    return new Preview.MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, this._editingFields);
                 };
                 MobileReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
                     var _this = this;
@@ -4484,8 +4385,8 @@ var DevExpress;
                 MobileReportPreview.prototype.onSlide = function (e) {
                     this.scrollReachedLeft(true);
                     this.scrollReachedRight(true);
-                    if (!this.isAutoFit() && e.removedItems && e.removedItems[0].blocks().length === 1 && e.addedItems && e.addedItems[0].blocks().length === 1)
-                        this.isAutoFit(true);
+                    if (this.autoFitBy() === Preview.ZoomAutoBy.None && e.removedItems && e.removedItems[0].blocks().length === 1 && e.addedItems && e.addedItems[0].blocks().length === 1)
+                        this.autoFitBy(Preview.ZoomAutoBy.PageWidth);
                 };
                 MobileReportPreview.prototype.setScrollReached = function (e) {
                     this.scrollReachedLeft(e.reachedLeft);
@@ -4511,9 +4412,7 @@ var DevExpress;
                     var _this = this;
                     _super.call(this, reportPreview);
                     this.height = ko.observable(0);
-                    this["_resultNavigator"]["_disposables"].forEach(function (x) {
-                        x.dispose();
-                    });
+                    this["_resultNavigator"]["_disposables"].forEach(function (x) { x.dispose(); });
                     reportPreview.currentPage.subscribe(function (page) {
                         if (page && _this.searchResult() && _this.searchResult().length > 0) {
                             _this._updateBricks(page, _this.searchResult());
@@ -4559,9 +4458,7 @@ var DevExpress;
                 MobileSearchViewModel.prototype._updateBricks = function (page, searchResult) {
                     var _this = this;
                     if (page.brick() && searchResult && searchResult.length > 0) {
-                        var results = searchResult.filter(function (x) {
-                            return x.pageIndex === page.pageIndex;
-                        });
+                        var results = searchResult.filter(function (x) { return x.pageIndex === page.pageIndex; });
                         for (var i = 0; i < results.length; i++) {
                             page.selectBrick(results[i].indexes, true);
                         }
@@ -5161,10 +5058,7 @@ var DevExpress;
                         if (load) {
                             clearTimeout(load);
                         }
-                        load = setTimeout(function () {
-                            loadVisibleImages();
-                            load = undefined;
-                        }, 700);
+                        load = setTimeout(function () { loadVisibleImages(); load = undefined; }, 700);
                     };
                     var subscribtion = enabled.subscribe(function (newVal) {
                         if (newVal) {
@@ -5238,12 +5132,18 @@ var DevExpress;
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var keyDownHandler = function (e) {
                         var value = viewModel.getSelectedContent();
-                        if (!value || !(e.ctrlKey || e.metaKey) || $(e.target).is("input:visible,textarea:visible") || window.getSelection && window.getSelection() && window.getSelection().toString() || document["selection"] && document["selection"].createRange().text) {
+                        if (!value || !(e.ctrlKey || e.metaKey)
+                            || $(e.target).is("input:visible,textarea:visible")
+                            || window.getSelection && window.getSelection() && window.getSelection().toString()
+                            || document["selection"] && document["selection"].createRange().text) {
                             return;
                         }
                         var $clipboardContainer = $("#clipboard-container");
                         $clipboardContainer.empty().show();
-                        $("<textarea id='clipboard'></textarea>").val(value).appendTo($clipboardContainer).focus().select();
+                        $("<textarea id='clipboard'></textarea>").val(value)
+                            .appendTo($clipboardContainer)
+                            .focus()
+                            .select();
                     };
                     var keyUpHandler = function (e) {
                         if ($(e.target).is("#clipboard")) {
@@ -5263,8 +5163,9 @@ var DevExpress;
                     var options = valueAccessor();
                     var subscriptions = [];
                     var updateZoom = function (newOptions) {
-                        if (newOptions.isAutoFit() && ((!newOptions.brickLoading || (newOptions.brickLoading && !newOptions.brickLoading())) || options.alwaysRecalculate)) {
-                            var newZoom = Math.floor(Preview.updatePreviewZoomWithAutoFit(newOptions.width(), newOptions.height(), element, newOptions.resolution) * 100) / 100;
+                        var autoFitBy = newOptions.autoFitBy();
+                        if (autoFitBy != Preview.ZoomAutoBy.None && ((!newOptions.brickLoading || (newOptions.brickLoading && !newOptions.brickLoading())) || options.alwaysRecalculate)) {
+                            var newZoom = Math.floor(Preview.updatePreviewZoomWithAutoFit(newOptions.width(), newOptions.height(), element, autoFitBy) * 100) / 100;
                             newOptions.zoom(Math.max(newZoom, 0.1));
                         }
                     };
@@ -5283,7 +5184,7 @@ var DevExpress;
                     subscribe(options.rightPanelWidth);
                     subscribe(options.width);
                     subscribe(options.height);
-                    subscribe(options.isAutoFit);
+                    subscribe(options.autoFitBy);
                     subscribe(options.brickLoading);
                     subscribe(options.previewSize);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
@@ -5296,9 +5197,12 @@ var DevExpress;
             };
             ko.bindingHandlers['dxReportViewer'] = {
                 init: function (element, valueAccessor) {
-                    var $element = $(element), values = ko.unwrap(valueAccessor()) || {}, getDesignerTemplate = function () {
-                        return $('#dxrd-designer').text();
-                    }, templateHtml = getDesignerTemplate(), processBinding = function () {
+                    var $element = $(element);
+                    var values = ko.unwrap(valueAccessor()) || {};
+                    var getDesignerTemplate = function () { return $('#dxrd-designer').text(); };
+                    var templateHtml = getDesignerTemplate();
+                    $element.addClass("dx-designer");
+                    var processBinding = function () {
                         if (!templateHtml)
                             templateHtml = getDesignerTemplate();
                         $element.children().remove();
@@ -5480,7 +5384,8 @@ var DevExpress;
                                 this._preview._processError(response.faultMessage, null);
                             return;
                         }
-                        this._preview.progressBar.progress() < response.progress && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate() && this._preview.progressBar.progress(response.progress);
+                        this._preview.progressBar.progress() < response.progress && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate()
+                            && this._preview.progressBar.progress(response.progress);
                         var wereNoPagesAndNewOnesExist = this._preview.pageIndex() === -1 && response.pageCount > 0;
                         if (wereNoPagesAndNewOnesExist) {
                             this._preview.pageIndex(0);
@@ -5488,7 +5393,7 @@ var DevExpress;
                         var brickProvider = this._preview.getPreviewPageBrickProvider(Preview.HandlerUri, documentId);
                         for (var i = 0; i < response.pageCount && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate(); i++) {
                             var createNewPage = function (index) {
-                                return _this._preview.createPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, _this._preview._pageBackColor.peek(), brickProvider, null, _this._preview.createBrickClickProcessor(index));
+                                return _this._preview.createPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, _this._preview._unifier, _this._preview._pageBackColor.peek(), brickProvider, null, _this._preview.createBrickClickProcessor(index));
                             };
                             if (i < this._preview.pages().length) {
                                 var page = this._preview.pages()[i];
@@ -5583,7 +5488,8 @@ var DevExpress;
         var Preview;
         (function (Preview) {
             var PreviewRequestWrapper = (function () {
-                function PreviewRequestWrapper(handlers) {
+                function PreviewRequestWrapper(handlers, _callbacks) {
+                    this._callbacks = _callbacks;
                     for (var name in handlers || {}) {
                         this[name] = handlers[name];
                     }
@@ -5611,12 +5517,16 @@ var DevExpress;
                         documentId: documentId
                     })), undefined, function () { return true; });
                 };
-                PreviewRequestWrapper.prototype.startBuildRequest = function () {
+                PreviewRequestWrapper.prototype.startBuildRequest = function (sortKey) {
+                    var parameters = this._parametersModel.serializeParameters();
+                    this._callbacks && this._callbacks.parametersSubmitted && this._callbacks.parametersSubmitted(this._parametersModel, parameters);
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'startBuild', encodeURIComponent(JSON.stringify({
                         reportId: this._reportPreview.reportId,
+                        sortKey: sortKey,
                         drillDownKeys: this._reportPreview["_drillDownState"],
+                        sortingState: this._reportPreview["_sortingState"],
                         timeZoneOffset: 0 - new Date().getTimezoneOffset(),
-                        parameters: this._parametersModel.serializeParameters()
+                        parameters: parameters
                     })));
                 };
                 PreviewRequestWrapper.prototype.getBuildStatusRequest = function (documentId, shouldIgnoreError) {
