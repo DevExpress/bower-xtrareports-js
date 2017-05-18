@@ -1,8 +1,7 @@
-/*! DevExpress HTML/JS Designer - v17.1.2 - 2017-04-12
+/*! DevExpress HTML/JS Designer - v17.1.3 - 2017-05-03
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 "use strict";
-
 ! function(root, factory) {
     factory(DevExpress.JS.Localization)
 }(this, function(localization) {

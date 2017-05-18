@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v17.1.2 - 2017-04-12
+/*! DevExpress HTML/JS Designer - v17.1.3 - 2017-05-02
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -1098,15 +1098,45 @@ var DevExpress;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-diagram-designer.js.map
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
         var QueryBuilder;
         (function (QueryBuilder) {
+            var UndoEditor = (function (_super) {
+                __extends(UndoEditor, _super);
+                function UndoEditor(info, level, parentDisabled) {
+                    _super.call(this, info, level, parentDisabled);
+                }
+                UndoEditor.prototype.generateValue = function (undoEngine) {
+                    var _this = this;
+                    if (!this.undoValue) {
+                        this.undoValue = ko.computed({
+                            read: function () {
+                                return _this.value();
+                            },
+                            write: function (val) {
+                                undoEngine().start();
+                                _this.value(val);
+                                undoEngine().end();
+                            }
+                        });
+                    }
+                    return this.undoValue;
+                };
+                return UndoEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            QueryBuilder.UndoEditor = UndoEditor;
             QueryBuilder.editorTemplates = {
                 bool: { header: "dx-boolean-select", custom: "dxqb-property-editor" },
                 combobox: { header: "dx-combobox", custom: "dxqb-property-editor" },
+                comboboxUndo: { header: "dx-combobox-undo", custom: "dxqb-property-editor", editorType: UndoEditor },
                 text: { header: "dx-text", custom: "dxqb-property-editor" },
                 filterEditor: { header: "dxrd-filterstring", custom: "dxqb-property-editor" },
                 filterGroupEditor: { header: "dxrd-filterstringgroup", custom: "dxqb-property-editor" },
@@ -1295,11 +1325,6 @@ var DevExpress;
         Data.DBColumn = DBColumn;
     })(Data = DevExpress.Data || (DevExpress.Data = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Data;
@@ -1709,6 +1734,7 @@ var DevExpress;
                     var _this = this;
                     if (parametersEditingEnabled === void 0) { parametersEditingEnabled = true; }
                     _super.call(this, $.extend(true, querySource, QueryViewModel.emptyModel, querySource), null, serializer);
+                    this.aggregatedColumnsCount = ko.observable(0);
                     this._findAncestorsRelations = function (table) {
                         var relations;
                         var result = { inner: 0, outer: 0, relations: [] };
@@ -1748,6 +1774,22 @@ var DevExpress;
                     });
                     this.filterString = new DevExpress.JS.Widgets.FilterStringOptions(this._filterString, null, ko.pureComputed(function () { return (_this.tables().length === 0) && (_this.filterString && _this.filterString.value().length === 0); }));
                     this._initializeFilterStringHelper(this.filterString.helper, this.parameters, parametersEditingEnabled);
+                    var inProcess = false;
+                    this._disposables.push(ko.computed(function () {
+                        if (!inProcess) {
+                            inProcess = true;
+                            var allColumns = _this.getAllColumns();
+                            var withoutAggregate = allColumns.filter(function (x) { return x.aggregate() === QueryBuilder.AggregationType.None; });
+                            _this.aggregatedColumnsCount(allColumns.length - withoutAggregate.length);
+                            if (allColumns.length !== withoutAggregate.length) {
+                                withoutAggregate.filter(function (x) { return x.selected() && !x.groupBy.peek(); }).forEach(function (x) { return x.groupBy(true); });
+                            }
+                            else {
+                                allColumns.filter(function (x) { return x.groupBy.peek(); }).forEach(function (x) { return x.groupBy(false); });
+                            }
+                            inProcess = false;
+                        }
+                    }));
                     this.groupFilterString = new DevExpress.JS.Widgets.FilterStringOptions(this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.isAggregatedExpression) && (_this.groupFilterString && _this.groupFilterString.value().length === 0); }));
                     this._initializeFilterStringHelper(this.groupFilterString.helper, this.parameters, parametersEditingEnabled, new QueryBuilder.GroupFilterEditorSerializer(this.columns));
                     var _pageWidth = ko.observable(0);
@@ -1826,6 +1868,9 @@ var DevExpress;
                     this._initializeTable(table);
                     this.addChild(table);
                     return table;
+                };
+                QueryViewModel.prototype.getAllColumns = function () {
+                    return [].concat.apply([], this.tables().map(function (x) { return x.columns(); }));
                 };
                 QueryViewModel.prototype.tryToCreateRelationsByFK = function (sourceTable) {
                     var _this = this;
@@ -3442,13 +3487,11 @@ var DevExpress;
         }
         Data.storedProcParameterSerializationsInfo = storedProcParameterSerializationsInfo;
         function integerValueConverter(val) {
-            var stringValue = "" + val;
-            return DevExpress.JS.Widgets.ValueEditorHelper.isValid(this.value, "integer", stringValue) ? stringValue : this.defaultValue;
+            return DevExpress.JS.Utils.integerValueConverter(val, this.defaultValue);
         }
         Data.integerValueConverter = integerValueConverter;
         function floatValueConverter(val) {
-            var stringValue = "" + val;
-            return DevExpress.JS.Widgets.ValueEditorHelper.isValid(this.value, "float", stringValue) ? stringValue : this.defaultValue;
+            return DevExpress.JS.Utils.floatValueConverter(val, this.defaultValue);
         }
         Data.floatValueConverter = floatValueConverter;
         var DataSourceParameterTypeValue = (function () {
@@ -4029,15 +4072,12 @@ var DevExpress;
                 };
                 OperandPropertyQBSurface.updateSpecifics = function (propertySurface) {
                     var fieldList = ko.unwrap(propertySurface.fieldListProvider);
-                    if (fieldList) {
-                        var path = propertySurface.propertyName().split('.')[0];
-                        fieldList.getItems(new DevExpress.JS.Widgets.PathRequest(path)).done(function (result) {
-                            var item = Designer.findFirstItemMatchesCondition(result, function (item) { return path + "." + item.name === propertySurface.propertyName(); });
-                            if (item) {
-                                propertySurface.specifics(item.specifics.toLowerCase());
-                                propertySurface.dataType(item.dataType);
-                            }
-                        });
+                    if (fieldList && fieldList.getColumnInfo) {
+                        var item = fieldList.getColumnInfo(propertySurface.propertyName());
+                        if (item) {
+                            propertySurface.specifics(item.specifics.toLowerCase());
+                            propertySurface.dataType(item.dataType);
+                        }
                     }
                 };
                 return OperandPropertyQBSurface;
@@ -4083,28 +4123,12 @@ var DevExpress;
                         var items = [];
                         if (pathRequest.fullPath === "") {
                             items = objectFilter.filterTables(query().tables())
-                                .map(function (table) {
-                                return {
-                                    displayName: table.actualName(),
-                                    name: table.actualName(),
-                                    isList: true,
-                                    specifics: "Default",
-                                    collapsed: ko.observable(true)
-                                };
-                            });
+                                .map(QueryBuilderObjectsProvider._createTableInfo);
                         }
                         else {
                             var table = Designer.findFirstItemMatchesCondition(query().tables(), function (table) { return table.actualName() === pathRequest.fullPath; });
                             items = objectFilter.filterColumns(table && table.columns() || [])
-                                .map(function (column) {
-                                return {
-                                    displayName: objectFilter.getColumnName(column),
-                                    isList: false,
-                                    specifics: objectFilter.getSpecifics(column),
-                                    dataType: objectFilter.getDataType(column),
-                                    name: objectFilter.getColumnName(column)
-                                };
-                            });
+                                .map(function (column) { return QueryBuilderObjectsProvider._createColumnInfo(column, objectFilter); });
                         }
                         result.resolve(items);
                         return result.promise();
@@ -4115,7 +4139,35 @@ var DevExpress;
                             query().parameters.push(parameter);
                         }
                     };
+                    this.getColumnInfo = function (propertyName) {
+                        if (propertyName) {
+                            var table = Designer.find(query().tables(), function (t) { return propertyName.indexOf(t.name() + ".") === 0; });
+                            if (table) {
+                                var column = Designer.find(objectFilter.filterColumns(table.columns() || []), function (c) { return propertyName === table.name() + "." + objectFilter.getColumnName(c); });
+                                return column ? QueryBuilderObjectsProvider._createColumnInfo(column, objectFilter) : null;
+                            }
+                        }
+                        return null;
+                    };
                 }
+                QueryBuilderObjectsProvider._createTableInfo = function (table) {
+                    return {
+                        displayName: table.actualName(),
+                        name: table.actualName(),
+                        isList: true,
+                        specifics: "Default",
+                        collapsed: ko.observable(true)
+                    };
+                };
+                QueryBuilderObjectsProvider._createColumnInfo = function (column, objectFilter) {
+                    return {
+                        displayName: objectFilter.getColumnName(column),
+                        isList: false,
+                        specifics: objectFilter.getSpecifics(column),
+                        dataType: objectFilter.getDataType(column),
+                        name: objectFilter.getColumnName(column)
+                    };
+                };
                 QueryBuilderObjectsProvider.whereClauseObjectsFilter = {
                     filterColumns: function (columns) { return columns; },
                     filterTables: function (tables) { return tables; },
@@ -4151,15 +4203,20 @@ var DevExpress;
                     _super.call(this);
                     this._columns = _columns;
                     this._aggregatePropertyName = function (operand) {
-                        var itemColumnAggregate = Designer.findFirstItemMatchesCondition(_this._columns(), function (column) { return column.actualName() === operand.propertyName && isAggregatedExpression(column); });
-                        if (itemColumnAggregate)
-                            return itemColumnAggregate.table() + "." + operand.propertyName;
-                        return operand.propertyName;
+                        var itemColumnAggregate = _this._findAggregatedColumn(function (c) { return c.actualName() === operand.propertyName; });
+                        return itemColumnAggregate ? _this._columnDisplayName(itemColumnAggregate) : operand.propertyName;
                     };
                 }
-                GroupFilterEditorSerializer.prototype.serializeOperandProperty = function (operandProperty) {
-                    var propertyNameParts = operandProperty.propertyName.split(".");
-                    return "[" + (propertyNameParts[1] ? propertyNameParts[1] : propertyNameParts[0]) + "]";
+                GroupFilterEditorSerializer.prototype._columnDisplayName = function (column) {
+                    return column.table() + "." + column.actualName();
+                };
+                GroupFilterEditorSerializer.prototype._findAggregatedColumn = function (predicate) {
+                    return Designer.find(this._columns(), function (c) { return isAggregatedExpression(c) && predicate(c); });
+                };
+                GroupFilterEditorSerializer.prototype.serializeOperandProperty = function (operand) {
+                    var _this = this;
+                    var column = this._findAggregatedColumn(function (c) { return operand.propertyName === _this._columnDisplayName(c); });
+                    return "[" + (column ? column.actualName() : operand.propertyName) + "]";
                 };
                 GroupFilterEditorSerializer.prototype.deserialize = function (stringCriteria) {
                     var _this = this;
@@ -4279,7 +4336,7 @@ var DevExpress;
                 {
                     propertyName: "aggregate",
                     displayName: "Aggregate",
-                    editor: QueryBuilder.editorTemplates.combobox,
+                    editor: QueryBuilder.editorTemplates.comboboxUndo,
                     values: QueryBuilder.AggregationType,
                     defaultVal: QueryBuilder.AggregationType.None,
                     localizationId: "DataAccessUIStringId.QueryBuilderColumns_Aggregate"
@@ -4400,7 +4457,7 @@ var DevExpress;
                     });
                 }
                 ColumnViewModel.prototype._isAliasAutoGenerated = function (addedTableName) {
-                    if (addedTableName && this.alias().indexOf(addedTableName + '_') === 0) {
+                    if (addedTableName && this.alias() && this.alias().indexOf(addedTableName + '_') === 0) {
                         if (this.alias().substring(addedTableName.length + 1) === this.name())
                             return true;
                     }
@@ -4421,6 +4478,12 @@ var DevExpress;
                     else if (name === "aggregate" || name === "alias") {
                         return !this.selected();
                     }
+                    else if (name === "groupBy") {
+                        var query = this.root;
+                        return this.aggregate() && query.aggregatedColumnsCount() === 1;
+                    }
+                    else
+                        return false;
                 };
                 Object.defineProperty(ColumnViewModel.prototype, "specifics", {
                     get: function () {
@@ -4615,9 +4678,10 @@ var DevExpress;
                         $.extend(data, { "ConnectionOptions": serializer.serialize(connection.options) });
                     return JSON.stringify(data);
                 };
-                RequestWrapper.rebuildResultSchema = function (dataSource) {
+                RequestWrapper.rebuildResultSchema = function (dataSource, queryName) {
                     var requestJson = JSON.stringify({
-                        sqlDataSourceJSON: JSON.stringify({ "SqlDataSource": new DevExpress.JS.Utils.ModelSerializer().serialize(dataSource) })
+                        sqlDataSourceJSON: JSON.stringify({ "SqlDataSource": new DevExpress.JS.Utils.ModelSerializer().serialize(dataSource) }),
+                        queryName: queryName
                     });
                     return RequestWrapper.sendRequest("rebuildResultSchema", encodeURIComponent(requestJson));
                 };
@@ -5267,6 +5331,7 @@ var DevExpress;
                         this.editor = DevExpress.JS.Widgets.editorTemplates.commonCollection;
                         this.isList = false;
                         this.contenttemplate = "dx-treelist-accordion-contenttemplate-custom-with-actions";
+                        this.actionsTemplate = "dx-treelist-item-actions";
                         this.dataSorceParameter = ko.observable(parameter);
                         this._name = parameter.name;
                     }
@@ -5317,7 +5382,7 @@ var DevExpress;
                     ParametersTreeListController.prototype.getActions = function (treeListItem) {
                         var _this = this;
                         if (treeListItem.data.query().type() === DevExpress.Data.SqlQueryType.storedProcQuery) {
-                            return [];
+                            return treeListItem.data.isList ? [] : [DevExpress.JS.Widgets.treeListEditAction];
                         }
                         var actions = [];
                         if (treeListItem.data.isList) {
@@ -5339,6 +5404,7 @@ var DevExpress;
                                 imageClassName: "dxrd-image-recycle-bin",
                                 text: Designer.getLocalization("Remove parameter", "DataAccessUIStringId.Button_Remove"),
                             });
+                            actions.push(DevExpress.JS.Widgets.treeListEditAction);
                         }
                         return actions;
                     };
@@ -5800,7 +5866,8 @@ var DevExpress;
                 axisX: { header: "dxcd-axisX-editor" },
                 axisY: { header: "dxcd-axisY-editor" },
                 legends: { header: "dxcd-legends-editor" },
-                summaryFunction: { header: "dx-emptyHeader", content: "dxcd-summaryFunction-content", editorType: Chart.SummaryFunctionEditor }
+                summaryFunction: { header: "dx-emptyHeader", content: "dxcd-summaryFunction-content", editorType: Chart.SummaryFunctionEditor },
+                points: { custom: "dxcd-pointscollection" }
             };
             Chart.defaultBooleanValues = {
                 "True": "True",
@@ -6010,7 +6077,7 @@ var DevExpress;
             var crossAxis = { propertyName: "crossAxis", modelName: "@CrossAxis", displayName: "Cross Axis", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool }, minorThickness = { propertyName: "minorThickness", modelName: "@MinorThickness", displayName: "Minor Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 }, minorLenght = { propertyName: "minorLength", modelName: "@MinorLength", displayName: "Minor Length", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2 }, lenghtinfo = { propertyName: "lenght", modelName: "@Length", displayName: "Length", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5 }, tickmarksMinorVisible = { propertyName: "minorVisible", modelName: "@MinorVisible", displayName: "Minor Visible", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, tickmarksBaseSerializationsInfo = [Chart.visible, tickmarksMinorVisible, crossAxis, Chart.thickness, minorThickness, lenghtinfo, minorLenght], tickmarksSerializationsInfo = [].concat(tickmarksBaseSerializationsInfo);
             Chart.tickmarks = { propertyName: "tickmarks", modelName: "Tickmarks", displayName: "Tickmarks", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: tickmarksSerializationsInfo };
             Chart.axisAlignment = {
-                propertyName: "axisAlignment", modelName: "@AxisAlignment",
+                propertyName: "axisAlignment", modelName: "@Alignment",
                 displayName: "Alignment", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 values: {
                     "Near": "Near",
@@ -6749,18 +6816,72 @@ var DevExpress;
             })();
             Chart.DataFilterModel = DataFilterModel;
             Chart.DefaultDataFilterModel = DataFilterModel;
-            var SeriesPointModel = (function () {
-                function SeriesPointModel(model, serializer) {
-                    serializer.deserialize(this, model);
+            var SeriesPointModel = (function (_super) {
+                __extends(SeriesPointModel, _super);
+                function SeriesPointModel(model, series, serializer) {
+                    var _this = this;
+                    _super.call(this, model, serializer, Chart.seriesPointSerializationsInfo);
+                    this.series = series;
+                    this.arrayValueDataMemberNames = series.valueDataMembers().arrayValueDataMemberNames;
+                    this._assignValueDataMembers(this, this.valuesSerializable(), null);
+                    this._disposables.push(this.series.valueDataMembers.subscribe(function (newValue) { _this.arrayValueDataMemberNames = newValue.arrayValueDataMemberNames; }));
+                    this._disposables.push(this.series.valueScaleType.subscribe(function (newValue) {
+                        _this._assignValueDataMembers(_this, null, null);
+                    }));
+                    this.valuesSerializable = ko.computed(function () {
+                        return _this.arrayValueDataMemberNames.map(function (name) { return _this[name]; });
+                    });
+                    this.getInfo = function () {
+                        var dataMember = _this.series && _this.series.valueDataMembers();
+                        if (!dataMember)
+                            return Chart.seriesPointSerializationsInfo;
+                        var valueDataMemberInfo = dataMember.getInfo().map(function (info) { return $.extend({}, info, { editor: _this.isDateType ? DevExpress.JS.Widgets.editorTemplates.date : DevExpress.JS.Widgets.editorTemplates.numeric }); });
+                        return Chart.seriesPointSerializationsInfo.concat(valueDataMemberInfo);
+                    };
                 }
-                SeriesPointModel.createNew = function () {
-                    return new SeriesPointModel({}, new DevExpress.JS.Utils.ModelSerializer());
+                SeriesPointModel.getSerializationValue = function (array, dateConverter) {
+                    return array.map(function (item) {
+                        var value = ko.unwrap(item);
+                        return (value instanceof Date) ? dateConverter(value) : value;
+                    });
                 };
-                SeriesPointModel.prototype.getInfo = function () {
-                    return Chart.seriesPointSerializationsInfo;
+                SeriesPointModel.createNew = function (series) {
+                    return new SeriesPointModel({}, series, new DevExpress.JS.Utils.ModelSerializer());
                 };
+                SeriesPointModel.valueToJsonObject = function (value) {
+                    var result = SeriesPointModel.getSerializationValue(value, Chart.serializeDate);
+                    return (result instanceof Array) ? result.join(SeriesPointModel.separator) : result;
+                };
+                SeriesPointModel.prototype._valueDataMembersToString = function (valueDataMember, isDateType) {
+                    var result = [];
+                    valueDataMember.arrayValueDataMemberNames.forEach(function (name) {
+                        if (isDateType)
+                            result.push(Chart.serializeDate(valueDataMember[name]() || ""));
+                        result.push(valueDataMember[name]() || "");
+                    });
+                    return result.join(SeriesPointModel.separator);
+                };
+                SeriesPointModel.prototype._assignValueDataMembers = function (valueDataMember, value, defaultValue) {
+                    var _this = this;
+                    var values = (value || "").split(SeriesPointModel.separator);
+                    valueDataMember.arrayValueDataMemberNames.forEach(function (name, index) {
+                        var newValue = _this.isDateType ? Chart.parseDate(values[index] || defaultValue) : (values[index] || defaultValue);
+                        if (valueDataMember[name])
+                            valueDataMember[name](newValue);
+                        else
+                            valueDataMember[name] = ko.observable(newValue);
+                    });
+                };
+                Object.defineProperty(SeriesPointModel.prototype, "isDateType", {
+                    get: function () {
+                        return this.series.valueScaleType() === "DateTime";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                SeriesPointModel.separator = ';';
                 return SeriesPointModel;
-            })();
+            })(Designer.SerializableModel);
             Chart.SeriesPointModel = SeriesPointModel;
             var SeriesTemplateViewModel = (function (_super) {
                 __extends(SeriesTemplateViewModel, _super);
@@ -6770,7 +6891,7 @@ var DevExpress;
                     if (this.valueDataMembers) {
                         ko.unwrap(this.valueDataMembers).dispose();
                     }
-                    this.valueDataMembers = ko.observable(new (viewTypesDataMembers[this.view.typeName()] || CommonValueDataMembers)(this.valueDataMembers.toString(), this["valueScaleType"]));
+                    this.valueDataMembers = ko.observable(new (viewTypesDataMembers[this.view.typeName()] || CommonValueDataMembers)(this.valueDataMembers.toString(), this.valueScaleType));
                     this.dataFilters = DevExpress.JS.Utils.deserializeArray(model.DataFilters, function (item) { return new Chart.DefaultDataFilterModel(item, serializer); });
                     this._disposables.push(ko.computed(function () {
                         _this.dataFilters().forEach(function (dataFilter) {
@@ -6786,14 +6907,17 @@ var DevExpress;
                             _this.label.typeNameSerializable(mapTypes[_this.view.typeName()]);
                         }
                     }));
-                    this.argumentScaleType.subscribe(function (newVal) {
+                    this._disposables.push(this.argumentScaleType.subscribe(function (newVal) {
                         if (newVal !== "Auto" && newVal !== "Qualitative")
                             _this.argumentDataMember("");
-                    });
+                    }));
                     this._disposables.push(ko.computed(function () {
                         _this.valueDataMembers.peek().dispose();
-                        _this.valueDataMembers(new (viewTypesDataMembers[_this.view.typeName()] || CommonValueDataMembers)(_this.valueDataMembers.peek().toString(), _this["valueScaleType"]));
+                        _this.valueDataMembers(new (viewTypesDataMembers[_this.view.typeName()] || CommonValueDataMembers)(_this.valueDataMembers.peek().toString(), _this.valueScaleType));
                     }));
+                    this.summaryFunction["getPath"] = function (propertyName) {
+                        return _this["getPath"] && _this["getPath"]("summaryFunction") || "";
+                    };
                 }
                 SeriesTemplateViewModel.from = function (model, serializer) {
                     return new SeriesTemplateViewModel(model || {}, serializer, Chart.seriesTemplateSerializationsInfo);
@@ -6811,11 +6935,13 @@ var DevExpress;
                     _super.call(this, model, serializer, Chart.seriesSerializationsInfo);
                     this.isIncompatible = ko.observable(false);
                     Chart.initCollectionItem(this, parent)();
-                    this["displayName"] = ko.pureComputed(function () {
+                    this._disposables.push(this["displayName"] = ko.pureComputed(function () {
                         return _this.isIncompatible() ? "(incompatible) " + _this["name"]() : _this["name"]();
-                    });
+                    }));
                     this.points = ko.observableArray([]);
-                    this.points(DevExpress.JS.Utils.deserializeArray(model.Points || [], function (item) { return new SeriesPointModel(item, serializer); })());
+                    this._disposables.push(this.points.subscribe(function (newValue) { newValue["owner"] = _this; }));
+                    this.points(DevExpress.JS.Utils.deserializeArray(model.Points || [], function (item) { return new SeriesPointModel(item, _this, serializer); })());
+                    this._disposables.push(this.view.typeName.subscribe(function () { _this.points([]); }));
                 }
                 SeriesViewModel.from = function (model, serializer) {
                     return new SeriesViewModel(model || {}, null, serializer);
@@ -7230,11 +7356,11 @@ var DevExpress;
                 propertyName: "summaryFunction", displayName: "Summary Function", modelName: "@SummaryFunction", from: Chart.SummaryFunctionModel.from, toJsonObject: Chart.SummaryFunctionModel.toJson, editor: Chart.editorTemplates.summaryFunction
             };
             var colorDataMember = { propertyName: "colorDataMember", displayName: "Color Data Member", defaultVal: "", modelName: "@ColorDataMember", editor: ko.bindingHandlers["displayNameExtender"] ? Designer.Widgets.editorTemplates.field : Chart.editorTemplates.fieldChart };
-            var valuesSerializable = { propertyName: "valuesSerializable", modelName: "@ValuesSerializable", displayName: Designer.getLocalization('Values', 'DevExpress.XtraCharts.SeriesPoint.Values'), editor: DevExpress.JS.Widgets.editorTemplates.text }, argumentSerializable = { propertyName: "argumentSerializable", modelName: "@ArgumentSerializable", displayName: Designer.getLocalization('Argument', 'DevExpress.XtraCharts.SeriesPoint.Argument'), editor: DevExpress.JS.Widgets.editorTemplates.text }, colorSerializable = { propertyName: "colorSerializable", modelName: "@ColorSerializable", displayName: Designer.getLocalization('Color', 'DevExpress.XtraCharts.SeriesPoint.Color'), editor: DevExpress.JS.Widgets.editorTemplates.color };
+            var valuesSerializable = { propertyName: "valuesSerializable", modelName: "@ValuesSerializable", from: function (val) { return ko.observable(val); }, toJsonObject: SeriesPointModel.valueToJsonObject }, argumentSerializable = { propertyName: "argumentSerializable", modelName: "@ArgumentSerializable", displayName: Designer.getLocalization('Argument', 'DevExpress.XtraCharts.SeriesPoint.Argument'), editor: DevExpress.JS.Widgets.editorTemplates.text }, colorSerializable = { propertyName: "colorSerializable", modelName: "@ColorSerializable", displayName: Designer.getLocalization('Color', 'DevExpress.XtraCharts.SeriesPoint.Color'), from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor };
             Chart.seriesPointSerializationsInfo = [argumentSerializable, valuesSerializable, colorSerializable];
             Chart.points = {
                 propertyName: "points", modelName: "Points", displayName: Designer.getLocalization('Points', 'DevExpress.XtraCharts.Series.Points'),
-                editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, array: true, addHandler: DevExpress.Designer.Chart.SeriesPointModel.createNew, template: '#dxrd-commonCollectionItem'
+                editor: Chart.editorTemplates.points, array: true
             };
             Chart.view = {
                 propertyName: "view", modelName: "View", displayName: "View", defaultVal: {},
@@ -7549,6 +7675,35 @@ var DevExpress;
                 return array;
             }
             Chart.deserializeModelArray = deserializeModelArray;
+            function parseDate(val) {
+                if (!val)
+                    return null;
+                if (val instanceof Date)
+                    return val;
+                var date = DevExpress.JS.Localization.parseDate(val);
+                if (!date) {
+                    var enGlobalize = new window["Globalize"]("en");
+                    date = enGlobalize["parseDate"](val, { raw: "MM/dd/yyyy HH:mm:ss SSS" });
+                }
+                return date;
+            }
+            Chart.parseDate = parseDate;
+            function serializeDate(date) {
+                var milliseconds = date.getMilliseconds().toString();
+                var zeros;
+                switch (3 - milliseconds.length) {
+                    case 2:
+                        zeros = "00";
+                        break;
+                    case 1:
+                        zeros = "0";
+                        break;
+                    default:
+                        zeros = "";
+                }
+                return DevExpress.JS.Utils.serializeDate(date) + "." + zeros + milliseconds;
+            }
+            Chart.serializeDate = serializeDate;
             Chart.HandlerUri = "DXXCD.axd";
             function customizeDesignerActions(designerModel, nextCustomizer) {
                 var chart = designerModel.model;
@@ -7569,15 +7724,18 @@ var DevExpress;
                     nextCustomizer && nextCustomizer(actions);
                 });
             }
-            function updateChartSurfaceContentSize(element, surfaceSize) {
+            function updateChartSurfaceContentSize(element, surfaceSize, rtl) {
+                if (rtl === void 0) { rtl = false; }
                 var $element = $(element);
                 return function () {
                     var rightAreaWidth = $element.find(".dxrd-right-panel")[0].offsetWidth;
                     var leftAreaWidth = $element.find(".dx-chart-left-panel")[0].offsetWidth;
-                    $element.find(".dxrd-surface-wrapper").css("right", rightAreaWidth);
-                    $element.find(".dxrd-surface-wrapper").css("left", leftAreaWidth);
                     var otherWidth = rightAreaWidth + leftAreaWidth, surfaceWidth = $element.find(".dxrd-designer")[0].offsetWidth - (otherWidth + 5);
-                    $element.find(".dxrd-surface-wrapper").css("width", surfaceWidth);
+                    $element.find(".dxrd-surface-wrapper").eq(0).css({
+                        "right": !rtl ? rightAreaWidth : leftAreaWidth,
+                        "left": rtl ? rightAreaWidth : leftAreaWidth,
+                        "width": surfaceWidth
+                    });
                     surfaceSize(surfaceWidth);
                 };
             }
@@ -7623,13 +7781,15 @@ var DevExpress;
                 return info;
             }
             Chart.getPropertyInfo = getPropertyInfo;
-            function wrapSelectedElement(selectedElement, selectedElementInfo, displayName) {
-                return {
-                    element: selectedElement,
-                    getInfo: function () {
-                        return [$.extend({}, selectedElementInfo, { displayName: displayName, propertyName: "element" })];
-                    }
+            function wrapSelectedElement(selectedElement, selectedElementInfo, displayName, propertyName) {
+                if (propertyName === void 0) { propertyName = "element"; }
+                var object = {};
+                object[propertyName] = selectedElement;
+                object["owner"] = ko.unwrap(selectedElement)["owner"];
+                object["getInfo"] = function () {
+                    return [$.extend({}, selectedElementInfo, { displayName: displayName, propertyName: propertyName })];
                 };
+                return object;
             }
             function createChartStructure(chart, selectedItem, subscriptions) {
                 var fakeChart = {
@@ -7656,7 +7816,7 @@ var DevExpress;
                     "defaultPane", "panes", "axisX", "axisY", "secondaryAxesX", "secondaryAxesY", "constantLines", "scaleBreaks", "strips", "seriesTemplate", "label", "points"], ["chart", "diagram", "axisX", "axisY", "titles", "legends", "series", "panes", "secondaryAxesX", "secondaryAxesY", "constantLines", "scaleBreaks", "strips", "SeriesViewModel", "SecondaryAxisViewModel"], function (newItem) {
                     var selectedElement = chartStructureProvider.selectedMember();
                     if (newItem.data.specifics === "points") {
-                        selectedElement = wrapSelectedElement(ko.observableArray(selectedElement), Chart.points, newItem.data.displayName);
+                        selectedElement = wrapSelectedElement(ko.observableArray(selectedElement), Chart.points, newItem.data.displayName, "points");
                     }
                     else if (Array.isArray(selectedElement)) {
                         selectedElement = wrapSelectedElement(selectedElement, { editor: Chart.editorTemplates.collection }, newItem.data.displayName);
@@ -7766,7 +7926,8 @@ var DevExpress;
                     undoEngine: ko.observable(new DevExpress.JS.Utils.UndoEngine(chartControlModel)),
                     tabPanel: new Designer.TabPanel([new Designer.TabInfo("Properties", "dxrd-propertygridtab", new DevExpress.JS.Widgets.ObjectProperties(chartSelectedItem))], undefined, options.rtl),
                     surfaceSize: ko.observable(0),
-                    isLoading: ko.observable(true)
+                    isLoading: ko.observable(true),
+                    rtl: options.rtl
                 };
                 if (options.data.chartSource) {
                     chartSourceSubscription = options.data.chartSource.subscribe(function (newValue) {
@@ -7817,7 +7978,7 @@ var DevExpress;
                     $(element).children().remove();
                     ko.applyBindings(designerModel, element);
                 }
-                var updateSurfaceContentSize_ = updateChartSurfaceContentSize(element, designerModel.surfaceSize);
+                var updateSurfaceContentSize_ = updateChartSurfaceContentSize(element, designerModel.surfaceSize, designerModel.rtl);
                 designerModel.tabPanel.width.subscribe(function () {
                     updateSurfaceContentSize_();
                 });
@@ -7892,16 +8053,24 @@ var DevExpress;
                 "SingleFile": "Single File",
                 "SingleFilePageByPage": "Single File PageByPage"
             };
+            Report.defaultExportModeMerdedPreview = {
+                "SingleFilePageByPage": "Single File PageByPage"
+            };
             Report.defaultExportMode = {
                 "SingleFile": "Single File",
                 "SingleFilePageByPage": "Single File PageByPage",
                 "DifferentFiles": "Different Files"
             };
+            Report.exportPageBreaks = { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             Report.rtfExportMode = {
                 propertyName: "rtfExportMode", modelName: "@ExportMode", defaultVal: "SingleFilePageByPage",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportModePreview)
             };
+            Report.rtfExportModeMergedPreview = $.extend({}, Report.rtfExportMode, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
             Report.htmlExportMode = {
                 propertyName: "htmlExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
@@ -7965,30 +8134,62 @@ var DevExpress;
             Report.xlsExportOptionsSheetName = {
                 propertyName: "sheetName", modelName: "@SheetName", displayName: "Sheet Name", defaultVal: "Sheet", editor: DevExpress.JS.Widgets.editorTemplates.text
             };
+            function excludeModesForMergedDocuments(val) {
+                return ko.observable("SingleFilePageByPage");
+            }
+            Report.excludeModesForMergedDocuments = excludeModesForMergedDocuments;
             function excludeDifferentFilesMode(val) {
                 return ko.observable(val === "DifferentFiles" ? "SingleFile" : val);
             }
             Report.excludeDifferentFilesMode = excludeDifferentFilesMode;
-            Report.htmlExportModePreview = {
+            Report.htmlExportModePreviewBase = {
                 propertyName: Report.htmlExportMode.propertyName, modelName: Report.htmlExportMode.modelName, defaultVal: Report.htmlExportMode.defaultVal,
-                editor: Report.htmlExportMode.editor, displayName: Report.htmlExportMode.displayName, from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                editor: Report.htmlExportMode.editor, displayName: Report.htmlExportMode.displayName
             };
-            Report.xlsExportModePreview = {
+            Report.htmlExportModePreview = $.extend({}, Report.htmlExportModePreviewBase, {
+                from: excludeDifferentFilesMode,
+                values: $.extend({}, Report.defaultExportModePreview)
+            });
+            Report.htmlExportModeMergedPreview = $.extend({}, Report.htmlExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
+            Report.xlsExportModePreviewBase = {
                 propertyName: Report.xlsExportMode.propertyName, modelName: Report.xlsExportMode.modelName, defaultVal: Report.xlsExportMode.defaultVal,
-                editor: Report.xlsExportMode.editor, displayName: Report.xlsExportMode.displayName, from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                editor: Report.xlsExportMode.editor, displayName: Report.xlsExportMode.displayName
             };
-            Report.imageExportModePreview = {
+            Report.xlsExportModePreview = $.extend({}, Report.xlsExportModePreviewBase, {
+                from: excludeDifferentFilesMode,
+                values: $.extend({}, Report.defaultExportModePreview)
+            });
+            Report.xlsExportModeMergedPreview = $.extend({}, Report.xlsExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
+            Report.imageExportModePreviewBase = {
                 propertyName: Report.imageExportMode.propertyName, modelName: Report.imageExportMode.modelName, defaultVal: Report.imageExportMode.defaultVal,
-                editor: Report.imageExportMode.editor, displayName: Report.imageExportMode.displayName, from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                editor: Report.imageExportMode.editor, displayName: Report.imageExportMode.displayName
             };
-            Report.xlsxExportModePreview = {
+            Report.imageExportModePreview = $.extend({}, Report.imageExportModePreviewBase, {
+                from: excludeDifferentFilesMode,
+                values: $.extend({}, Report.defaultExportModePreview)
+            });
+            Report.imageExportModeMergedPreview = $.extend({}, Report.imageExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
+            Report.xlsxExportModePreviewBase = {
                 propertyName: Report.xlsxExportMode.propertyName, modelName: Report.xlsxExportMode.modelName, defaultVal: Report.xlsxExportMode.defaultVal,
-                editor: Report.xlsxExportMode.editor, displayName: Report.xlsxExportMode.displayName, from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                editor: Report.xlsxExportMode.editor, displayName: Report.xlsxExportMode.displayName,
             };
+            Report.xlsxExportModePreview = $.extend({}, Report.xlsxExportModePreviewBase, {
+                from: excludeDifferentFilesMode,
+                values: $.extend({}, Report.defaultExportModePreview)
+            });
+            Report.xlsxExportModeMergedPreview = $.extend({}, Report.xlsxExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
             Report.previewBackColor = { propertyName: "backColor", modelName: "@BackColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
             Report.previewSides = { propertyName: "borders", modelName: "@Sides" };
             Report.previewBorderColor = { propertyName: "borderColor", modelName: "@BorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
@@ -8031,7 +8232,7 @@ var DevExpress;
                 Text: { text: "Text", format: "txt" },
                 CSV: { text: "CSV", format: "csv" },
                 Image: { text: "Image", format: "image" },
-                Docx: { text: "Docx", format: "docx" }
+                DOCX: { text: "DOCX", format: "docx" }
             };
             var ExportOptionsModel = (function () {
                 function ExportOptionsModel(reportPreview) {
@@ -8068,12 +8269,12 @@ var DevExpress;
                         exportOptionsModel.xls && result.push(Preview.ExportFormatID.XLS);
                         exportOptionsModel.xlsx && result.push(Preview.ExportFormatID.XLSX);
                         exportOptionsModel.rtf && result.push(Preview.ExportFormatID.RTF);
+                        exportOptionsModel.docx && result.push(Preview.ExportFormatID.DOCX);
                         exportOptionsModel.mht && result.push(Preview.ExportFormatID.MHT);
                         exportOptionsModel.html && result.push(Preview.ExportFormatID.HTML);
                         exportOptionsModel.textExportOptions && result.push(Preview.ExportFormatID.Text);
                         exportOptionsModel.csv && result.push(Preview.ExportFormatID.CSV);
                         exportOptionsModel.image && result.push(Preview.ExportFormatID.Image);
-                        exportOptionsModel.docx && result.push(Preview.ExportFormatID.Docx);
                     }
                     ;
                     return result;
@@ -8314,20 +8515,33 @@ var DevExpress;
                 PdfPasswordSecurityOptions.prototype.getInfo = function () {
                     return pdfExportPasswordSecurityOptionsSerializationInfo;
                 };
+                PdfPasswordSecurityOptions.prototype.isPropertyDisabled = function (name) {
+                    var openPass = this.openPassword();
+                    if (!this.permissionsPassword()) {
+                        if (name === "permissionsOptions")
+                            return true;
+                        if (!openPass && name === pdfEncryptionLevel.propertyName)
+                            return true;
+                    }
+                };
+                PdfPasswordSecurityOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.openPassword() || this.permissionsPassword());
+                };
                 return PdfPasswordSecurityOptions;
             })();
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
+            var pdfEncryptionLevel = {
+                propertyName: "encryptionLevel", modelName: "@EncryptionLevel", displayName: "Encryption Level", defaultVal: "AES128", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                values: {
+                    "ARC4": "ARC4",
+                    "AES128": "AES128",
+                    "AES256": "AES256",
+                }
+            };
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
-                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                {
-                    propertyName: "encryptionLevel", modelName: "@EncryptionLevel", displayName: "Encryption Level", defaultVal: "AES128", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "ARC4": "ARC4",
-                        "AES128": "AES128",
-                        "AES256": "AES256",
-                    }
-                },
-                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
+                pdfEncryptionLevel,
+                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
                 { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var PdfExportOptions = (function () {
@@ -8346,6 +8560,9 @@ var DevExpress;
                 };
                 PdfExportOptions.prototype.isPropertyDisabled = function (name) {
                     return false;
+                };
+                PdfExportOptions.prototype.hasSensitiveData = function () {
+                    return this.pdfPasswordSecurityOptions && this.pdfPasswordSecurityOptions.hasSensitiveData();
                 };
                 return PdfExportOptions;
             })();
@@ -8393,21 +8610,26 @@ var DevExpress;
                     return rtfExportOptionsSerializationInfo;
                 };
                 RtfExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return ((name === "pageRange") || (name === "exportWatermarks")) && this.rtfExportMode() === "SingleFile";
+                    var exportMode = this.rtfExportMode();
+                    if (name === "pageRange")
+                        return exportMode === "SingleFile";
+                    else if (name === "emptyFirstPageHeaderFooter" || name === "exportPageBreaks" || name === "keepRowHeight") {
+                        return exportMode === "SingleFilePageByPage";
+                    }
                 };
                 return RtfExportOptions;
             })();
             Report.RtfExportOptions = RtfExportOptions;
             var rtfExportOptionsSerializationInfoBase = [
-                Report.rtfExportMode,
                 Report.pageRange,
                 Report.exportWatermarks
             ];
             var emptyFirstPageHeaderFooter = { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, keepRowHeight = { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var rtfExportOptionsSerializationInfo = [
                 emptyFirstPageHeaderFooter,
-                { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                keepRowHeight
+                Report.exportPageBreaks,
+                keepRowHeight,
+                Report.rtfExportMode
             ].concat(rtfExportOptionsSerializationInfoBase);
             var TextExportOptions = (function () {
                 function TextExportOptions(model, serializer) {
@@ -8448,10 +8670,16 @@ var DevExpress;
                         "Compatible": "Compatible"
                     }
                 },
-                { propertyName: "password", modelName: "@Password", displayName: "Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+                { propertyName: "password", modelName: "@Password", displayName: "Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } }
             ];
             var encryptionOptions = { propertyName: "encryptionOptions", modelName: "EncryptionOptions", displayName: "Encryption Options", info: encryptionOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var xlsExportOptionsSerializationInfoCommon = [
+                Report.xlsExportHyperlinks,
+                Report.pageRange,
+                Report.xlsRawDataMode,
+                Report.xlsExportOptionsSheetName,
+                Report.xlsShowGridLines,
+                Report.xlsTextExportMode,
                 { propertyName: "rasterizeImages", modelName: "@RasterizeImages", displayName: "Rasterize Images", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "rasterizationResolution", modelName: "@RasterizationResolution", displayName: "Rasterization Resolution", defaultVal: 96, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
                 { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
@@ -8473,14 +8701,8 @@ var DevExpress;
                 encryptionOptions
             ];
             var xlsExportOptionsSerializationInfoBase = [
-                Report.xlsExportHyperlinks,
-                Report.pageRange,
-                Report.xlsRawDataMode,
-                Report.xlsExportOptionsSheetName,
-                Report.xlsShowGridLines,
                 { propertyName: "suppress256ColumnsWarning", modelName: "@Suppress256ColumnsWarning", displayName: "Suppress 256 Columns Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "suppress65536RowsWarning", modelName: "@Suppress65536RowsWarning", displayName: "Suppress 65536 Rows Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                Report.xlsTextExportMode,
                 {
                     propertyName: "workbookColorPaletteCompliance", modelName: "@WorkbookColorPaletteCompliance", displayName: "Workbook Color Palette Compliance", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "ReducePaletteForExactColors", from: Designer.fromEnum,
                     values: {
@@ -8489,7 +8711,7 @@ var DevExpress;
                     }
                 }
             ];
-            var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
+            var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoCommon, xlsExportOptionsSerializationInfoBase);
             var XlsExportOptions = (function () {
                 function XlsExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -8507,18 +8729,13 @@ var DevExpress;
                 XlsExportOptions.prototype.isPropertyDisabled = function (name) {
                     return name === "pageRange" && this.xlsExportMode() === "SingleFile";
                 };
+                XlsExportOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.encryptionOptions && this.encryptionOptions.password());
+                };
                 return XlsExportOptions;
             })();
             Report.XlsExportOptions = XlsExportOptions;
-            var xlsxExportOptionsSerializationInfoBase = [
-                Report.xlsExportHyperlinks,
-                Report.pageRange,
-                Report.xlsRawDataMode,
-                Report.xlsExportOptionsSheetName,
-                Report.xlsShowGridLines,
-                Report.xlsTextExportMode
-            ];
-            var xlsxExportOptionsSerializationInfo = [Report.xlsxExportMode].concat(xlsxExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
+            var xlsxExportOptionsSerializationInfo = [Report.xlsxExportMode].concat(xlsExportOptionsSerializationInfoCommon);
             var XlsxExportOptions = (function () {
                 function XlsxExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -8536,10 +8753,21 @@ var DevExpress;
                 XlsxExportOptions.prototype.isPropertyDisabled = function (name) {
                     return name === "pageRange" && this.xlsxExportMode() === "SingleFile";
                 };
+                XlsxExportOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.encryptionOptions && this.encryptionOptions.password());
+                };
                 return XlsxExportOptions;
             })();
             Report.XlsxExportOptions = XlsxExportOptions;
-            var docxExportOptionsSerializationInfo = [Report.rtfExportMode, Report.exportWatermarks, Report.pageRange, emptyFirstPageHeaderFooter, keepRowHeight];
+            var docxExportOptionsSerializationInfo = [
+                Report.rtfExportMode,
+                Report.exportWatermarks,
+                Report.pageRange,
+                emptyFirstPageHeaderFooter,
+                keepRowHeight,
+                Report.exportPageBreaks,
+                { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+            ];
             var DocxExportOptions = (function () {
                 function DocxExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -8555,7 +8783,15 @@ var DevExpress;
                     return docxExportOptionsSerializationInfo;
                 };
                 DocxExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return name === "pageRange" && this.rtfExportMode() === "SingleFile";
+                    var exportMode = this.rtfExportMode();
+                    if (name === "pageRange" || name === "tableLayout")
+                        return exportMode === "SingleFile";
+                    else if (name === "emptyFirstPageHeaderFooter" || name === "exportPageBreaks") {
+                        return exportMode === "SingleFilePageByPage";
+                    }
+                    else if (name === "keepRowHeight") {
+                        return exportMode === "SingleFilePageByPage" && !this["tableLayout"]();
+                    }
                 };
                 return DocxExportOptions;
             })();
@@ -8632,183 +8868,248 @@ var DevExpress;
                 { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptions.from, toJsonObject: XlsxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "docx", modelName: "Docx", displayName: "Docx Export Options", from: DocxExportOptions.from, toJsonObject: DocxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
-            var htmlExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(htmlExportOptionsSerializationInfoBase);
+            var htmlExportOptionsSerializationInfoPreview = [].concat(htmlExportOptionsSerializationInfoBase);
             var HtmlExportOptionsPreview = (function (_super) {
                 __extends(HtmlExportOptionsPreview, _super);
-                function HtmlExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function HtmlExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 HtmlExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 HtmlExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(htmlExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
-                            defaultVal: "SingleFilePageByPage", values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(htmlExportOptionsSerializationInfoPreview);
+                };
+                HtmlExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModePreview];
                 };
                 return HtmlExportOptionsPreview;
             })(HtmlExportOptions);
             Report.HtmlExportOptionsPreview = HtmlExportOptionsPreview;
-            var imageExportOptionsSerializationInfoPreview = [Report.imageExportModePreview].concat(imageExportOptionsSerializationInfoBase);
+            var HtmlExportOptionsMergedPreview = (function (_super) {
+                __extends(HtmlExportOptionsMergedPreview, _super);
+                function HtmlExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                HtmlExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModeMergedPreview];
+                };
+                HtmlExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.htmlExportModeMergedPreview.propertyName;
+                };
+                return HtmlExportOptionsMergedPreview;
+            })(HtmlExportOptionsPreview);
+            Report.HtmlExportOptionsMergedPreview = HtmlExportOptionsMergedPreview;
+            var imageExportOptionsSerializationInfoPreview = [].concat(imageExportOptionsSerializationInfoBase);
             var ImageExportOptionsPreview = (function (_super) {
                 __extends(ImageExportOptionsPreview, _super);
-                function ImageExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function ImageExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 ImageExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 ImageExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(imageExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.imageExportModePreview, {
-                            defaultVal: "SingleFilePageByPage", values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(imageExportOptionsSerializationInfoPreview);
+                };
+                ImageExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.imageExportModePreview];
                 };
                 return ImageExportOptionsPreview;
             })(ImageExportOptions);
             Report.ImageExportOptionsPreview = ImageExportOptionsPreview;
-            var mhtExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(mhtExportOptionsSerializationInfoBase);
+            var ImageExportOptionsMergedPreview = (function (_super) {
+                __extends(ImageExportOptionsMergedPreview, _super);
+                function ImageExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                ImageExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.imageExportModeMergedPreview];
+                };
+                ImageExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.imageExportModeMergedPreview.propertyName;
+                };
+                return ImageExportOptionsMergedPreview;
+            })(ImageExportOptionsPreview);
+            Report.ImageExportOptionsMergedPreview = ImageExportOptionsMergedPreview;
+            var mhtExportOptionsSerializationInfoPreview = [].concat(mhtExportOptionsSerializationInfoBase);
             var MhtExportOptionsPreview = (function (_super) {
                 __extends(MhtExportOptionsPreview, _super);
-                function MhtExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function MhtExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 MhtExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 MhtExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(mhtExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
-                            defaultVal: "SingleFilePageByPage", values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(mhtExportOptionsSerializationInfoPreview);
+                };
+                MhtExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModePreview];
                 };
                 return MhtExportOptionsPreview;
             })(MhtExportOptions);
             Report.MhtExportOptionsPreview = MhtExportOptionsPreview;
+            var MhtExportOptionsMergedPreview = (function (_super) {
+                __extends(MhtExportOptionsMergedPreview, _super);
+                function MhtExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                MhtExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModeMergedPreview];
+                };
+                MhtExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.htmlExportModeMergedPreview.propertyName;
+                };
+                return MhtExportOptionsMergedPreview;
+            })(MhtExportOptionsPreview);
+            Report.MhtExportOptionsMergedPreview = MhtExportOptionsMergedPreview;
             var rtfExportOptionsSerializationInfoPreview = [].concat(rtfExportOptionsSerializationInfoBase);
             var RtfExportOptionsPreview = (function (_super) {
                 __extends(RtfExportOptionsPreview, _super);
-                function RtfExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function RtfExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 RtfExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 RtfExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(rtfExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.rtfExportMode, { values: { "SingleFilePageByPage": "Single File PageByPage" } }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(rtfExportOptionsSerializationInfoPreview);
+                };
+                RtfExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.rtfExportMode];
                 };
                 return RtfExportOptionsPreview;
             })(RtfExportOptions);
             Report.RtfExportOptionsPreview = RtfExportOptionsPreview;
-            var xlsExportOptionsSerializationInfoPreview = [Report.xlsExportModePreview].concat(xlsExportOptionsSerializationInfoBase);
+            var RtfExportOptionsMergedPreview = (function (_super) {
+                __extends(RtfExportOptionsMergedPreview, _super);
+                function RtfExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                RtfExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.rtfExportModeMergedPreview];
+                };
+                RtfExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.rtfExportModeMergedPreview.propertyName;
+                };
+                return RtfExportOptionsMergedPreview;
+            })(RtfExportOptionsPreview);
+            Report.RtfExportOptionsMergedPreview = RtfExportOptionsMergedPreview;
+            var xlsExportOptionsSerializationInfoPreview = [].concat(xlsExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
             var XlsExportOptionsPreview = (function (_super) {
                 __extends(XlsExportOptionsPreview, _super);
-                function XlsExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function XlsExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 XlsExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 XlsExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(xlsExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsExportModePreview, {
-                            defaultVal: "SingleFilePageByPage", values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(xlsExportOptionsSerializationInfoPreview);
+                };
+                XlsExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsExportModePreview];
                 };
                 return XlsExportOptionsPreview;
             })(XlsExportOptions);
             Report.XlsExportOptionsPreview = XlsExportOptionsPreview;
-            var xlsxExportOptionsSerializationInfoPreview = [Report.xlsxExportModePreview].concat(xlsxExportOptionsSerializationInfoBase);
+            var XlsExportOptionsMergedPreview = (function (_super) {
+                __extends(XlsExportOptionsMergedPreview, _super);
+                function XlsExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                XlsExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsExportModeMergedPreview];
+                };
+                XlsExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.xlsExportModeMergedPreview.propertyName;
+                };
+                return XlsExportOptionsMergedPreview;
+            })(XlsExportOptionsPreview);
+            Report.XlsExportOptionsMergedPreview = XlsExportOptionsMergedPreview;
+            var xlsxExportOptionsSerializationInfoPreview = [].concat(xlsExportOptionsSerializationInfoCommon);
             var XlsxExportOptionsPreview = (function (_super) {
                 __extends(XlsxExportOptionsPreview, _super);
-                function XlsxExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function XlsxExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 XlsxExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 XlsxExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(xlsxExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsxExportModePreview, {
-                            defaultVal: "SingleFilePageByPage", values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(xlsxExportOptionsSerializationInfoPreview);
+                };
+                XlsxExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsxExportModePreview];
                 };
                 return XlsxExportOptionsPreview;
             })(XlsxExportOptions);
             Report.XlsxExportOptionsPreview = XlsxExportOptionsPreview;
-            var docxExportOptionsSerializationInfoPreview = [].concat(docxExportOptionsSerializationInfo);
+            var XlsxExportOptionsMergedPreview = (function (_super) {
+                __extends(XlsxExportOptionsMergedPreview, _super);
+                function XlsxExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                XlsxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsxExportModeMergedPreview];
+                };
+                XlsxExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.xlsxExportModeMergedPreview.propertyName;
+                };
+                return XlsxExportOptionsMergedPreview;
+            })(XlsxExportOptionsPreview);
+            Report.XlsxExportOptionsMergedPreview = XlsxExportOptionsMergedPreview;
+            var docxExportOptionsSerializationInfoPreview = [
+                Report.pageRange,
+                Report.exportWatermarks
+            ];
             var DocxExportOptionsPreview = (function (_super) {
                 __extends(DocxExportOptionsPreview, _super);
-                function DocxExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function DocxExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 DocxExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 DocxExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(docxExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) { return item.modelName === "@ExportMode"; })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.rtfExportMode, { values: { "SingleFilePageByPage": "Single File PageByPage" } }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(docxExportOptionsSerializationInfoPreview);
+                };
+                DocxExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.rtfExportMode];
                 };
                 return DocxExportOptionsPreview;
             })(DocxExportOptions);
             Report.DocxExportOptionsPreview = DocxExportOptionsPreview;
+            var DocxExportOptionsMergedPreview = (function (_super) {
+                __extends(DocxExportOptionsMergedPreview, _super);
+                function DocxExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                DocxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.rtfExportModeMergedPreview];
+                };
+                DocxExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.rtfExportModeMergedPreview.propertyName;
+                };
+                return DocxExportOptionsMergedPreview;
+            })(DocxExportOptionsPreview);
+            Report.DocxExportOptionsMergedPreview = DocxExportOptionsMergedPreview;
             var ExportOptionsPreview = (function (_super) {
                 __extends(ExportOptionsPreview, _super);
-                function ExportOptionsPreview(model, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, model, serializer);
+                function ExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 ExportOptionsPreview.prototype._generateFromFunction = function (exportType) {
-                    var isMerged = this._isMerged;
                     return function (model, serializer) {
-                        return new exportType(model || {}, isMerged, serializer);
+                        return new exportType(model || {}, serializer);
                     };
                 };
                 ExportOptionsPreview.prototype._generateInfo = function () {
@@ -8825,12 +9126,37 @@ var DevExpress;
                         { propertyName: "docx", modelName: "Docx", displayName: "Docx Export Options", from: this._generateFromFunction(DocxExportOptionsPreview), toJsonObject: DocxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
                     ];
                 };
+                ExportOptionsPreview.prototype.hasSensitiveData = function () {
+                    return this.xls.hasSensitiveData() || this.xlsx.hasSensitiveData() || this.pdf.hasSensitiveData();
+                };
                 ExportOptionsPreview.prototype.getInfo = function () {
                     return this._generateInfo();
                 };
                 return ExportOptionsPreview;
             })(ExportOptions);
             Report.ExportOptionsPreview = ExportOptionsPreview;
+            var ExportOptionsMergedPreview = (function (_super) {
+                __extends(ExportOptionsMergedPreview, _super);
+                function ExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                ExportOptionsMergedPreview.prototype._generateInfo = function () {
+                    return [
+                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: this._generateFromFunction(HtmlExportOptionsMergedPreview), toJsonObject: HtmlExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: this._generateFromFunction(ImageExportOptionsMergedPreview), toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: this._generateFromFunction(MhtExportOptionsMergedPreview), toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: this._generateFromFunction(RtfExportOptionsMergedPreview), toJsonObject: RtfExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: this._generateFromFunction(XlsExportOptionsMergedPreview), toJsonObject: XlsExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: this._generateFromFunction(XlsxExportOptionsMergedPreview), toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "docx", modelName: "Docx", displayName: "Docx Export Options", from: this._generateFromFunction(DocxExportOptionsMergedPreview), toJsonObject: DocxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                    ];
+                };
+                return ExportOptionsMergedPreview;
+            })(ExportOptionsPreview);
+            Report.ExportOptionsMergedPreview = ExportOptionsMergedPreview;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -8861,7 +9187,7 @@ var DevExpress;
                     return;
                 }
                 !!brick.active && !!brick.active(false) || (brick.active = ko.observable(false));
-                brick["onClick"] = function () { processClick && processClick(brick); };
+                brick.onClick = function (e) { processClick && processClick(brick, e); };
                 brick.bricks && brick.bricks.forEach(function (childBrick) {
                     childBrick[brick.rtl ? 'rightP' : 'leftP'] = convertToPercent(childBrick.left, brick.width);
                     childBrick.widthP = convertToPercent(childBrick.width, brick.width);
@@ -9606,10 +9932,13 @@ var DevExpress;
                 PreviewParameterHelper.fixPropertyName = function (propertyName) {
                     return propertyName.replace(/\./g, '_');
                 };
+                PreviewParameterHelper.getPrivatePropertyName = function (propertyName) {
+                    return "_" + PreviewParameterHelper.fixPropertyName(propertyName);
+                };
                 PreviewParameterHelper.prototype.createInfo = function (parameter) {
                     var info = _super.prototype.createInfo.call(this, parameter);
-                    info.propertyName = PreviewParameterHelper.fixPropertyName(parameter.path);
-                    if (parameter.lookUpValues() && !parameter.isMultiValue || this.isEnumType(parameter))
+                    info.propertyName = PreviewParameterHelper.getPrivatePropertyName(parameter.path);
+                    if (!parameter.isMultiValue && (parameter.lookUpValues() || this.isEnumType(parameter)))
                         info.editorOptions = { searchEnabled: true };
                     if (parameter.type === "System.DateTime") {
                         info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty') }];
@@ -9650,6 +9979,12 @@ var DevExpress;
                     if (type === "System.DateTime") {
                         return function (dateString) { return DevExpress.JS.Localization.parseDate(dateString); };
                     }
+                    else if (["System.Int16", "System.Int32", "System.Int64"].indexOf(type) > -1) {
+                        return function (val) { return DevExpress.JS.Utils.integerValueConverter(val, "0"); };
+                    }
+                    else if (["System.Single", "System.Double", "System.Decimal"].indexOf(type) > -1) {
+                        return function (val) { return DevExpress.JS.Utils.floatValueConverter(val, "0"); };
+                    }
                     return _super.prototype.getValueConverter.call(this, type);
                 };
                 return PreviewParameterHelper;
@@ -9664,6 +9999,9 @@ var DevExpress;
                     this.lookUpValues = ko.observableArray();
                     this.valueStoreCache = null;
                     this.multiValueInfo = ko.observable();
+                    this.intTypes = ["System.Int16", "System.Int32", "System.Int64"];
+                    this.floatTypes = ["System.Single", "System.Double", "System.Decimal"];
+                    this.isTypesCurrentType = function (types, type) { return types.indexOf(type) > -1; };
                     this.type = parameterInfo.TypeString;
                     this.path = parameterInfo.Path;
                     this.visible = parameterInfo.Visible;
@@ -9673,23 +10011,26 @@ var DevExpress;
                     this.lookUpValues.subscribe(function () { _this.valueStoreCache = null; });
                     this.isMultiValue = parameterInfo.MultiValue;
                     this.isMultiValueWithLookUp = this.isMultiValue && !!this.lookUpValues();
+                    this._originalValue = parameterInfo.Value;
+                    if (parameterInfo.ValueInfo && this.isTypesCurrentType(this.intTypes.concat(this.floatTypes), this.type)) {
+                        this._originalValue = parameterInfo.ValueInfo;
+                    }
                     this.getParameterDescriptor = function () {
                         return {
                             description: parameterInfo.Description,
                             displayName: parameterInfo.Description || parameterInfo.Name,
                             name: parameterInfo.Name,
                             type: parameterInfo.TypeString,
-                            value: parameterInfo.Value,
+                            value: _this._originalValue,
                             multiValue: parameterInfo.MultiValue,
                             visible: parameterInfo.Visible
                         };
                     };
                     this._disposables.push(ko.computed(function () {
                         var info = parameterHelper.getParameterInfo(_this);
-                        info.propertyName = PreviewParameterHelper.fixPropertyName(parameterInfo.Path);
+                        info.propertyName = PreviewParameterHelper.getPrivatePropertyName(parameterInfo.Path);
                         _this.valueInfo(info);
                     }));
-                    this._originalValue = parameterInfo.Value;
                     this.initialize(this._originalValue, parameterHelper);
                 }
                 PreviewParameter.prototype.safeAssignObservable = function (name, value) {
@@ -9829,8 +10170,38 @@ var DevExpress;
                         return;
                     }
                     this.isEmpty(false);
+                    this[PreviewParameterHelper.getPrivatePropertyName(parameter.path)] = parameter.value;
                     var parameterPropertyName = PreviewParameterHelper.fixPropertyName(parameter.path);
-                    this[parameterPropertyName] = parameter.value;
+                    if (parameter.isMultiValue) {
+                        this[parameterPropertyName] = parameter.value;
+                    }
+                    else {
+                        this[parameterPropertyName] = ko.pureComputed({
+                            read: function () {
+                                var parseValue = parameter.value();
+                                if (parseValue === null || parseValue === undefined) {
+                                    return parseValue;
+                                }
+                                if (parameter.isTypesCurrentType(parameter.intTypes, parameter.type)) {
+                                    parseValue = parseInt(parseValue);
+                                }
+                                else if (parameter.isTypesCurrentType(parameter.floatTypes, parameter.type)) {
+                                    parseValue = parseFloat(parseValue);
+                                }
+                                return parseValue;
+                            },
+                            write: function (newVal) {
+                                var expandValue = newVal;
+                                if (parameter.isTypesCurrentType(parameter.intTypes, parameter.type)) {
+                                    expandValue = DevExpress.JS.Utils.integerValueConverter(expandValue, "0");
+                                }
+                                else if (parameter.isTypesCurrentType(parameter.floatTypes, parameter.type)) {
+                                    expandValue = DevExpress.JS.Utils.floatValueConverter(expandValue, "0");
+                                }
+                                parameter.value(expandValue);
+                            }
+                        });
+                    }
                 };
                 PreviewParametersViewModel.prototype._setLookUpValues = function (parameter, lookUpValues, assignFirstLookUpValue) {
                     parameter.lookUpValues(this.parameterHelper.mapLookUpValues(parameter.type, lookUpValues));
@@ -9871,6 +10242,7 @@ var DevExpress;
                     var _this = this;
                     this._parameters.forEach(function (usedParameter) {
                         delete _this[PreviewParameterHelper.fixPropertyName(usedParameter.path)];
+                        delete _this[PreviewParameterHelper.getPrivatePropertyName(usedParameter.path)];
                     });
                     this._parameters = [];
                     if (!originalParametersInfo) {
@@ -9958,6 +10330,7 @@ var DevExpress;
                     this.parametersLoading(true);
                     var argsObject = {
                         reportId: this._reportPreview.reportId,
+                        reportUrl: this._reportPreview.reportUrl,
                         requiredParameterPaths: requiredParameterPaths,
                         parameters: this.serializeParameters(),
                         timeZoneOffset: 0 - new Date().getTimezoneOffset()
@@ -10014,6 +10387,7 @@ var DevExpress;
                     this._pageHeight = ko.observable(1058);
                     this._pageBackColor = ko.observable('');
                     this._currentReportId = ko.observable(null);
+                    this._currentReportUrl = ko.observable(null);
                     this._currentDocumentId = ko.observable(null);
                     this._unifier = ko.observable("");
                     this._currentOperationId = ko.observable(null);
@@ -10145,12 +10519,64 @@ var DevExpress;
                     }
                     this._startBuildRequest();
                 };
-                ReportPreview.prototype._doSorting = function (sortKey) {
+                ReportPreview.prototype._applySorting = function (sortData) {
+                    var _this = this;
+                    (this._sortingState || []).forEach(function (x) {
+                        if (x && x.Key === sortData.target) {
+                            (x.Value || []).forEach(function (f) {
+                                if (f && (f.fieldName === sortData.field))
+                                    _this._changeSortOrder(f);
+                                else
+                                    f.sortOrder = Preview.ColumnSortOrder.None;
+                            });
+                        }
+                    });
+                };
+                ReportPreview.prototype._appendSorting = function (sortData) {
+                    var _this = this;
+                    (this._sortingState || []).forEach(function (x) {
+                        if (x && x.Key === sortData.target) {
+                            (x.Value || []).forEach(function (f) { f && (f.fieldName === sortData.field) && _this._changeSortOrder(f); });
+                            return;
+                        }
+                    });
+                };
+                ReportPreview.prototype._detachSorting = function (sortData) {
+                    var skipProcessing = false;
+                    (this._sortingState || []).forEach(function (x) {
+                        if (x && x.Key === sortData.target) {
+                            (x.Value || []).forEach(function (f) {
+                                if (f && (f.fieldName === sortData.field)) {
+                                    if (f.sortOrder === Preview.ColumnSortOrder.None)
+                                        skipProcessing = true;
+                                    else
+                                        f.sortOrder = Preview.ColumnSortOrder.None;
+                                }
+                            });
+                            return;
+                        }
+                    });
+                    return skipProcessing;
+                };
+                ReportPreview.prototype._changeSortOrder = function (fieldInfo) {
+                    fieldInfo.sortOrder = fieldInfo.sortOrder === Preview.ColumnSortOrder.Ascending ? Preview.ColumnSortOrder.Descending : Preview.ColumnSortOrder.Ascending;
+                };
+                ReportPreview.prototype._doSorting = function (sortData, shiftKey, ctrlKey) {
+                    if (!sortData)
+                        return;
+                    if (ctrlKey) {
+                        if (this._detachSorting(sortData))
+                            return;
+                    }
+                    else if (shiftKey)
+                        this._appendSorting(sortData);
+                    else
+                        this._applySorting(sortData);
                     this.closeDocument();
                     this.progressBar.complete();
                     this.documentMap(null);
                     this.pages().forEach(function (page) { return page._clear(); });
-                    this._startBuildRequest(sortKey);
+                    this._startBuildRequest();
                 };
                 ReportPreview.prototype.removeEmptyPages = function (all) {
                     all && this.pages.removeAll();
@@ -10182,16 +10608,16 @@ var DevExpress;
                     this.closeReport();
                     this.originalParametersInfo(null);
                 };
-                ReportPreview.prototype._export = function (args, actionUri, printable) {
+                ReportPreview.prototype._export = function (args, actionUri, inlineResult) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    if (this._editingFields().length > 0 || Preview.AsyncExportApproach) {
+                    if (this._editingFields().length > 0 || Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
                         this.progressBar.startProgress(function () { _this._currentOperationId(null); });
                         this.requestWrapper.getStartExportOperation(args)
-                            .done(function (response) { self.previewHandlersHelper.doneStartExportHandler(deffered, printable, response); })
+                            .done(function (response) { self.previewHandlersHelper.doneStartExportHandler(deffered, inlineResult, response); })
                             .fail(function (error) { self.previewHandlersHelper.errorStartExportHandler(deffered, error); });
                     }
                     else {
@@ -10208,20 +10634,27 @@ var DevExpress;
                 };
                 ReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
                     var _self = this;
-                    return function (brick) {
+                    return function (brick, e) {
                         _self.goToPage(cyclePageIndex, true);
                         if (!brick)
                             return;
                         _self.pages()[cyclePageIndex].selectBrick("");
+                        var shiftKey = !!(e && e.shiftKey);
+                        var ctrlKey = !!(e && e.ctrlKey);
+                        var brickNavigation = brick && brick.navigation;
                         var defaultHandler = function () {
-                            if (brick && brick.navigation) {
-                                brick.navigation.drillDownKey && _self.reportId && _self._doDrillDown && _self._drillDownState.length > 0 && _self._doDrillDown(brick.navigation.drillDownKey);
-                                brick.navigation.sortKey && _self.reportId && _self._doSorting && _self._sortingState.length > 0 && _self._doSorting(brick.navigation.sortKey);
-                                if (brick.navigation.pageIndex >= 0) {
-                                    var targetPage = _self.pages().filter(function (page) { return page.pageIndex === brick.navigation.pageIndex; })[0];
+                            if (brickNavigation) {
+                                if (brickNavigation.drillDownKey && _self.reportId && _self._doDrillDown && _self._drillDownState.length > 0) {
+                                    _self._doDrillDown(brickNavigation.drillDownKey);
+                                }
+                                else if (brickNavigation.sortData && _self.reportId && _self._doSorting && _self._sortingState.length > 0) {
+                                    _self._doSorting(brickNavigation.sortData, shiftKey, ctrlKey);
+                                }
+                                if (brickNavigation.pageIndex >= 0) {
+                                    var targetPage = _self.pages().filter(function (page) { return page.pageIndex === brickNavigation.pageIndex; })[0];
                                     if (targetPage) {
-                                        _self.goToPage(brick.navigation.pageIndex);
-                                        targetPage.selectBrick(brick.navigation.indexes);
+                                        _self.goToPage(brickNavigation.pageIndex);
+                                        targetPage.selectBrick(brickNavigation.indexes);
                                     }
                                 }
                                 else {
@@ -10235,8 +10668,8 @@ var DevExpress;
                                         }
                                         return _self.allowURLsWithJSContent || (isUrlString && (url.indexOf("javascript:") === -1));
                                     };
-                                    if (brick.navigation.url && validateUrl(brick.navigation.url)) {
-                                        _self._safelyRunWindowOpen(brick.navigation.url, brick.navigation.target || "_blank");
+                                    if (brickNavigation.url && validateUrl(brickNavigation.url)) {
+                                        _self._safelyRunWindowOpen(brickNavigation.url, brickNavigation.target || "_blank");
                                     }
                                 }
                             }
@@ -10278,11 +10711,13 @@ var DevExpress;
                 ReportPreview.prototype.initialize = function (initializeDataPromise) {
                     var _this = this;
                     this._currentReportId(null);
+                    this._currentReportUrl(null);
                     this._currentDocumentId(null);
                     this._initialize();
                     initializeDataPromise.done(function (previewInitialize) {
                         if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
                             _this._currentReportId(previewInitialize.reportId);
+                            _this._currentReportUrl(previewInitialize.reportUrl);
                             _this._currentDocumentId(previewInitialize.documentId);
                             _this.rtlReport(previewInitialize.rtlReport);
                             var pageSettings = previewInitialize.pageSettings;
@@ -10293,7 +10728,7 @@ var DevExpress;
                                     _this._pageWidth(pageSettings.width);
                                 _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
                             }
-                            var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(previewInitialize.exportOptions && JSON.parse(previewInitialize.exportOptions), !_this.reportId);
+                            var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions);
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
@@ -10310,12 +10745,17 @@ var DevExpress;
                     });
                     return initializeDataPromise;
                 };
+                ReportPreview.prototype._deserializeExportOptions = function (exportOptionsString, isMerged) {
+                    var jsonModel = exportOptionsString && JSON.parse(exportOptionsString);
+                    return (!this.reportId || isMerged) ? new DevExpress.Designer.Report.ExportOptionsMergedPreview(jsonModel) : new DevExpress.Designer.Report.ExportOptionsPreview(jsonModel);
+                };
                 ReportPreview.prototype.deactivate = function () {
                     this._initialize();
                     this._cleanTabInfo();
                     this.closeReport();
                     this._currentDocumentId(null);
                     this._currentReportId(null);
+                    this._currentReportUrl(null);
                 };
                 ReportPreview.prototype.startBuild = function () {
                     this._initialize();
@@ -10334,13 +10774,13 @@ var DevExpress;
                     this.documentBuilding(true);
                     return true;
                 };
-                ReportPreview.prototype._startBuildRequest = function (sortKey) {
+                ReportPreview.prototype._startBuildRequest = function () {
                     var _this = this;
                     if (!this._initializeStartBuild()) {
                         return null;
                     }
                     var deffered = $.Deferred();
-                    this.requestWrapper.startBuildRequest(sortKey)
+                    this.requestWrapper.startBuildRequest()
                         .done(function (response) { _this.previewHandlersHelper.doneStartBuildHandler(deffered, response); })
                         .fail(function (error) { _this.previewHandlersHelper.errorStartBuildHandler(deffered, error, _this._startBuildOperationId); });
                     return deffered.promise();
@@ -10355,9 +10795,9 @@ var DevExpress;
                     }, 250);
                     return deffered.promise();
                 };
-                ReportPreview.prototype.getExportResult = function (operationId, printDisposition) {
-                    var arg = encodeURIComponent(JSON.stringify({ id: operationId, printable: !!printDisposition }));
-                    this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
+                ReportPreview.prototype.getExportResult = function (operationId, inlineDisposition) {
+                    var arg = encodeURIComponent(JSON.stringify({ id: operationId, inlineResult: !!inlineDisposition }));
+                    var newWindow = this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
                 };
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
@@ -10416,6 +10856,10 @@ var DevExpress;
                         }
                         _this._drillDownState = response.drillDownKeys || [];
                         _this._sortingState = response.sortingState || [];
+                        if (response.canRecreatePages === false && _this.reportId) {
+                            var deserializedExportOptions = _this._deserializeExportOptions(response.exportOptions || {}, true);
+                            _this.exportOptionsModel(deserializedExportOptions);
+                        }
                         _this.documentMap(response.documentMap);
                         _this._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
                         _this._editingValuesSubscriptions = [];
@@ -10432,7 +10876,7 @@ var DevExpress;
                             _this._processError(DevExpress.Designer.getLocalization("Cannot obtain additional document data for the current document"), error);
                     });
                 };
-                ReportPreview.prototype.exportDocumentTo = function (format) {
+                ReportPreview.prototype.exportDocumentTo = function (format, inlineResult) {
                     if (!this._currentDocumentId())
                         return;
                     var serializedExportOptions = this.exportOptionsModel() ? JSON.stringify(new DevExpress.JS.Utils.ModelSerializer().serialize(this.exportOptionsModel())) : null;
@@ -10440,14 +10884,15 @@ var DevExpress;
                         documentId: this._currentDocumentId(),
                         exportOptions: serializedExportOptions,
                         format: format,
+                        inlineResult: inlineResult,
                         editingFieldValues: this._editingFields && this._editingFields().map(function (item) { return item.editValue(); })
                     }));
-                    this._export(args, Preview.HandlerUri);
+                    this._export(args, Preview.HandlerUri, inlineResult);
                 };
                 ReportPreview.prototype.printDocument = function (pageIndex) {
                     if (!this._currentDocumentId())
                         return;
-                    var exportOptions = new DevExpress.Designer.Report.ExportOptionsPreview({}, !this.reportId);
+                    var exportOptions = new DevExpress.Designer.Report.ExportOptionsPreview({});
                     exportOptions.pdf["showPrintDialogOnOpen"] = true;
                     pageIndex = parseInt(pageIndex);
                     if ((!!pageIndex && pageIndex > 0 || pageIndex === 0) && (this.pages().length > pageIndex)) {
@@ -10458,6 +10903,7 @@ var DevExpress;
                         documentId: this._currentDocumentId(),
                         exportOptions: serializedExportOptions,
                         format: "printpdf",
+                        inlineResult: true,
                         editingFieldValues: this._editingFields && this._editingFields().map(function (item) { return item.editValue(); })
                     }));
                     this._export(args, Preview.HandlerUri, true);
@@ -10559,6 +11005,13 @@ var DevExpress;
                 Object.defineProperty(ReportPreview.prototype, "reportId", {
                     get: function () {
                         return this._currentReportId();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ReportPreview.prototype, "reportUrl", {
+                    get: function () {
+                        return this._currentReportUrl();
                     },
                     enumerable: true,
                     configurable: true
@@ -10674,9 +11127,10 @@ var DevExpress;
                 designerModel.Print = function (pageIndex) {
                     return designerModel.reportPreview.printDocument(pageIndex);
                 };
-                designerModel.ExportTo = function (format) {
-                    if (designerModel.reportPreview.exportDisabled()) {
-                        designerModel.reportPreview.exportDocumentTo(format || 'pdf');
+                designerModel.ExportTo = function (format, inlineResult) {
+                    var preview = designerModel.reportPreview;
+                    if (!preview.exportDisabled()) {
+                        preview.exportDocumentTo(format || 'pdf', inlineResult);
                     }
                 },
                     designerModel.GetCurrentPageIndex = function () {
@@ -10689,13 +11143,12 @@ var DevExpress;
                         designerModel.reportPreview.deactivate();
                     },
                     designerModel.ResetParameters = function () {
-                        designerModel.parametersModel && designerModel.parametersModel.restore();
+                        var parametersModel = designerModel.parametersModel;
+                        parametersModel && designerModel.parametersModel.restore();
                     },
                     designerModel.StartBuild = function () {
                         var parametersModel = designerModel.parametersModel;
-                        if (!parametersModel)
-                            return;
-                        return designerModel.parametersModel.submit();
+                        parametersModel && designerModel.parametersModel.submit();
                     };
                 return designerModel;
             }
@@ -10807,11 +11260,7 @@ var DevExpress;
                 function PreviewActions(reportPreview) {
                     this.actions = [];
                     var zoomStep = ko.observable(0.01);
-                    var printDisabled = ko.pureComputed(function () {
-                        var inProgress = reportPreview.progressBar.inProgress();
-                        var documentBuilding = reportPreview.documentBuilding();
-                        return reportPreview.pageIndex() === -1 || inProgress || documentBuilding;
-                    });
+                    var printDisabled = reportPreview.exportDisabled;
                     this.actions.push({
                         id: Preview.ActionId.FirstPage,
                         text: DevExpress.Designer.getLocalization("First Page"),
@@ -11087,9 +11536,9 @@ var DevExpress;
                         },
                         write: function (newVal) {
                             var oldVal = _this.modelValue();
+                            _this.modelValue(newVal);
                             var val = _this.editingFieldChanged(_this, oldVal, newVal);
                             val = val == null ? newVal : val;
-                            _this.modelValue(newVal);
                             if (val !== oldVal) {
                                 _this._refreshHtmlValue(val);
                             }
@@ -11205,7 +11654,7 @@ var DevExpress;
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
             };
             EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExpEditing, regExpFinal, defaultVal) {
-                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, regExpFinal.test, defaultVal));
+                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, function (val) { return regExpFinal.test(val); }, defaultVal));
             };
             EditingFieldExtensions.unregisterEditor = function (editorID) {
                 delete EditingFieldExtensions.instance()._editors[editorID];
@@ -11847,7 +12296,7 @@ var DevExpress;
                     visible: ko.observable(false),
                     items: ko.pureComputed(function () {
                         var allFormats = exportModel._getExportFormatItems();
-                        var availableFormats = allFormats.filter(function (x) { return exportTypes().indexOf(x) !== -1; });
+                        var availableFormats = exportTypes().filter(function (x) { return allFormats.indexOf(x) !== -1; });
                         if (availableFormats.length > 9) {
                             availableFormats.splice(9, availableFormats.length - 9);
                         }
@@ -11912,7 +12361,7 @@ var DevExpress;
                 previewWrapper.initialize(reportPreview, parametersModel, searchModel);
                 var exportTypes = ko.observableArray([
                     Preview.ExportFormatID.PDF, Preview.ExportFormatID.XLS, Preview.ExportFormatID.XLSX,
-                    Preview.ExportFormatID.RTF, Preview.ExportFormatID.MHT, Preview.ExportFormatID.HTML,
+                    Preview.ExportFormatID.RTF, Preview.ExportFormatID.DOCX, Preview.ExportFormatID.HTML,
                     Preview.ExportFormatID.Text, Preview.ExportFormatID.CSV, Preview.ExportFormatID.Image
                 ]);
                 var mobileActions = getPreviewActionsMobile(reportPreview, exportModel, parametersModel, searchModel, exportTypes);
@@ -12119,7 +12568,7 @@ var DevExpress;
                     for (var i = 0; i < bricks.length; i++) {
                         if (parseFloat(bricks[i].topP) < yPerc && parseFloat(bricks[i].topP) + parseFloat(bricks[i].heightP) > yPerc
                             && parseFloat(bricks[i].leftP) < xPerc && parseFloat(bricks[i].leftP) + parseFloat(bricks[i].widthP) > xPerc) {
-                            bricks[i]["onClick"] && bricks[i]["onClick"]();
+                            bricks[i].onClick && bricks[i].onClick(e);
                             break;
                         }
                     }
@@ -12555,7 +13004,7 @@ var DevExpress;
                             }
                             else {
                                 if (blocks[0].page) {
-                                    this.currentBlockText((blocks[0].page.pageIndex + 1).toString());
+                                    this.currentBlockText((this.preview.pageIndex() + 1).toString());
                                 }
                             }
                         }
@@ -13103,7 +13552,7 @@ var DevExpress;
                 function PreviewHandlersHelper(preview) {
                     this._preview = preview;
                 }
-                PreviewHandlersHelper.prototype.doneStartExportHandler = function (deffered, printable, response) {
+                PreviewHandlersHelper.prototype.doneStartExportHandler = function (deffered, inlineResult, response) {
                     var _this = this;
                     try {
                         if (!response) {
@@ -13121,7 +13570,7 @@ var DevExpress;
                                 else {
                                     _this._preview.progressBar.complete();
                                     if (!result.requestAgain && result.completed) {
-                                        _this._preview.getExportResult(operationId, printable);
+                                        _this._preview.getExportResult(operationId, inlineResult);
                                     }
                                     if (result.error) {
                                         _this._preview._processError(DevExpress.Designer.getLocalization("Error on retrieving an exporting status: ") + result.error);
@@ -13364,12 +13813,12 @@ var DevExpress;
                         documentId: documentId
                     })), undefined, function () { return true; });
                 };
-                PreviewRequestWrapper.prototype.startBuildRequest = function (sortKey) {
+                PreviewRequestWrapper.prototype.startBuildRequest = function () {
                     var parameters = this._parametersModel.serializeParameters();
                     this._callbacks && this._callbacks.parametersSubmitted && this._callbacks.parametersSubmitted(this._parametersModel, parameters);
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'startBuild', encodeURIComponent(JSON.stringify({
                         reportId: this._reportPreview.reportId,
-                        sortKey: sortKey,
+                        reportUrl: this._reportPreview.reportUrl,
                         drillDownKeys: this._reportPreview["_drillDownState"],
                         sortingState: this._reportPreview["_sortingState"],
                         timeZoneOffset: 0 - new Date().getTimezoneOffset(),
@@ -13391,6 +13840,7 @@ var DevExpress;
                 PreviewRequestWrapper.prototype.drillThrough = function (customData) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'drillThrough', encodeURIComponent(JSON.stringify({
                         reportId: this._reportPreview.reportId,
+                        reportUrl: this._reportPreview.reportUrl,
                         documentId: this._reportPreview.documentId,
                         parameters: this._parametersModel.serializeParameters(),
                         editingFields: this._reportPreview.editingFieldsProvider().map(function (field) { return field.model(); }),
@@ -13847,83 +14297,151 @@ var DevExpress;
                 return newControl;
             }
             function selectTreeListItem(item, event) {
-                if (item instanceof DevExpress.JS.Widgets.TreeListItemViewModel) {
-                    if (!item.isMultiSelected() && !item.isSelected()) {
-                        item.toggleSelected(item, event);
-                    }
-                }
+                if (item instanceof DevExpress.JS.Widgets.TreeListItemViewModel && !item.isMultiSelected() && !item.isSelected())
+                    item.toggleSelected(item, event);
             }
             Report.selectTreeListItem = selectTreeListItem;
+            function getUsefulReportWidth(surface) {
+                var report = surface.getControlModel();
+                return surface ?
+                    Designer.Size.fromString(((report.pageWidth() - report.margins.left() - report.margins.right()) / (surface.dpi() / 100)).toString() + ", 23") :
+                    Designer.Size.fromString("200, 23");
+            }
+            function createSimpleControl(controlType, dropTargetControl) {
+                return dropTargetControl.createChild($.extend({ "@ControlType": controlType }, Report.controlsFactory.controlsMap[controlType].defaultVal));
+            }
+            function assignBinding(control, bindingName, item) {
+                var binding = control.dataBindings().findBinding(bindingName);
+                if (item.path.indexOf("parameters.") === -1) {
+                    binding.dataMember(new DevExpress.JS.Widgets.PathRequest(item.path).path);
+                }
+                else {
+                    binding.dataMember(item.data.name);
+                    binding.parameter(item.data);
+                }
+                return control;
+            }
+            function isList(data) {
+                return data.specifics === "List" || data.specifics === "ListSource" || data.isList === true;
+            }
+            var FieldListDragDropHelper = (function () {
+                function FieldListDragDropHelper() {
+                    var _this = this;
+                    this._initMultiSelectItem = function (treeListItem, parent, control) {
+                        var deferred = $.Deferred();
+                        if (!isList(treeListItem.data)) {
+                            deferred.resolve(_this._initTableControl(control, [treeListItem], true, parent));
+                        }
+                        else {
+                            _this._createTableFromList(treeListItem, parent, control).done(function (control) { return deferred.resolve(control); });
+                        }
+                        return deferred.promise();
+                    };
+                    this._createTableFromList = function (treeListItem, parent, control) {
+                        var deferred = $.Deferred();
+                        treeListItem.getItems().done(function (items) {
+                            var simpleFields = items.filter(function (item) { return !isList(item.data); });
+                            deferred.resolve(_this._initTableControl(control, simpleFields, simpleFields.length !== 0, parent));
+                        });
+                        return deferred.promise();
+                    };
+                }
+                FieldListDragDropHelper.prototype._createTable = function (parent) {
+                    var table = parent.getControlFactory().createControl({ "@ControlType": "XRTable", "@SizeF": "200, 23" }, parent);
+                    var tableRow = table.createChild({ "@ControlType": "XRTableRow", "@Weight": "1" });
+                    return table;
+                };
+                FieldListDragDropHelper.prototype._initTableControl = function (control, items, additionalCondition, parent) {
+                    var table = control && control();
+                    if (!table && additionalCondition) {
+                        table = this._createTable(parent);
+                        control && control(table);
+                    }
+                    !!table && this._initTableCells(table.rows()[0], items);
+                    return table;
+                };
+                FieldListDragDropHelper.prototype._initTableCells = function (tableRow, items) {
+                    items.forEach(function (item) {
+                        var cell = createSimpleControl("XRTableCell", tableRow);
+                        if (item.data.specifics !== "Array") {
+                            assignBinding(cell, "Text", item);
+                        }
+                        else {
+                            var path = new DevExpress.JS.Widgets.PathRequest(item.path).path;
+                            cell.addChild(createPictureBox(cell, path));
+                        }
+                    });
+                };
+                FieldListDragDropHelper.prototype._createTableFromItems = function (treeListItems, parent, initTable) {
+                    var deferred = $.Deferred();
+                    var promises = [];
+                    var control = ko.observable(null);
+                    treeListItems.forEach(function (item) {
+                        promises.push(initTable(item, parent, control));
+                    });
+                    $.when.apply($, promises).done(function () {
+                        deferred.resolve(control());
+                    });
+                    return deferred.promise();
+                };
+                FieldListDragDropHelper.prototype.createTableFromListSource = function (treeListItem, parent) {
+                    var _this = this;
+                    var deferred = $.Deferred();
+                    treeListItem.getItems().done(function (items) {
+                        if (items.length === 0)
+                            deferred.resolve(null);
+                        var simpleFields = items.filter(function (item) { return !isList(item.data); });
+                        if (simpleFields.length === 1) {
+                            var control = (Report.memberControlsMap[simpleFields.specifics] || Report.memberControlsMap["Default"]).drop(simpleFields[0], parent);
+                            deferred.resolve(control);
+                        }
+                        else if (simpleFields.length > 1) {
+                            var table = _this._createTable(parent);
+                            _this._initTableCells(table.rows()[0], simpleFields);
+                            deferred.resolve(table);
+                        }
+                        else {
+                            _this._createTableFromItems(items, parent, _this._createTableFromList).done(function (table) { return deferred.resolve(table); });
+                        }
+                    });
+                    return deferred.promise();
+                };
+                FieldListDragDropHelper.prototype.createTableFromList = function (treeListItem, parent) {
+                    return this._createTableFromList(treeListItem, parent);
+                };
+                FieldListDragDropHelper.prototype.createTableFromMultiList = function (treeListItems, parent) {
+                    return this._createTableFromItems(treeListItems, parent, this._initMultiSelectItem);
+                };
+                return FieldListDragDropHelper;
+            })();
             Report.memberControlsMap = {
                 "Array": {
-                    drop: function (memberInfo, getControlModel, fullPath, getItems) {
-                        return createPictureBox(getControlModel(), new DevExpress.JS.Widgets.PathRequest(fullPath).path);
+                    drop: function (treeListItem, dropTargetControl) {
+                        return createPictureBox(dropTargetControl, new DevExpress.JS.Widgets.PathRequest(treeListItem.path).path);
                     },
                     size: function (surface) {
                         return Designer.Size.fromString("100, 100");
                     }
                 },
                 "Bool": {
-                    drop: function (memberInfo, getControlModel, fullPath, getItems) {
-                        var newControl = getControlModel().createChild($.extend({ "@ControlType": "XRCheckBox" }, Report.controlsFactory.controlsMap["XRCheckBox"].defaultVal));
-                        newControl.text(memberInfo.displayName);
-                        var binding = newControl.dataBindings().findBinding("CheckState");
-                        if (fullPath.indexOf("parameters.") === -1) {
-                            binding.dataMember(new DevExpress.JS.Widgets.PathRequest(fullPath).path);
-                        }
-                        else {
-                            binding.dataMember(memberInfo.name);
-                            binding.parameter(memberInfo);
-                        }
-                        return newControl;
+                    drop: function (treeListItem, dropTargetControl) {
+                        var control = createSimpleControl("XRCheckBox", dropTargetControl);
+                        assignBinding(control, "CheckState", treeListItem);
+                        control.text(treeListItem.data.displayName);
+                        return control;
                     },
                     size: function (surface) {
                         return Designer.Size.fromString("100, 23");
                     }
                 },
                 "List": {
-                    drop: function (memberInfo, getControlModel, fullPath, getItems) {
-                        var deferred = $.Deferred();
-                        var newControl = getControlModel().getControlFactory().createControl({ "@ControlType": "XRTable", "@SizeF": "200, 23" }, getControlModel());
-                        var newRow = newControl.createChild({ "@ControlType": "XRTableRow", "@Weight": "1" });
-                        getItems().done(function (data) {
-                            var path = new DevExpress.JS.Widgets.PathRequest(fullPath).path;
-                            var containsNotList = false;
-                            for (var index = 0; index < data.length; index++) {
-                                if (data[index].data.specifics !== "List" && data[index].data.specifics !== "ListSource" && !(data[index].data.isList === true)) {
-                                    var newCell = newRow.createChild($.extend({ "@ControlType": "XRTableCell" }, Report.controlsFactory.controlsMap["XRTableCell"].defaultVal));
-                                    if (data[index].data.specifics !== "Array") {
-                                        var binding = newCell["dataBindings"]()["findBinding"]("Text");
-                                        binding.dataMember(path + "." + data[index].name);
-                                    }
-                                    else {
-                                        newCell.addChild(createPictureBox(newCell, path + "." + data[index].name));
-                                    }
-                                    containsNotList = true;
-                                }
-                            }
-                            if (!containsNotList) {
-                                var promises = [];
-                                data.forEach(function (treeListItem) {
-                                    var key = "MultiList";
-                                    promises.push((Report.memberControlsMap[key] || Report.memberControlsMap["Default"]).drop(newRow, treeListItem.data, getControlModel, treeListItem.path, treeListItem.getItems));
-                                });
-                                $.when.apply($, promises).done(function () {
-                                    deferred.resolve(newControl);
-                                });
-                            }
-                            else {
-                                deferred.resolve(newControl);
-                            }
-                        });
-                        return deferred.promise();
+                    drop: function (treeListItem, dropTargetControl) {
+                        var helper = new FieldListDragDropHelper();
+                        if (treeListItem.data.specifics === "ListSource")
+                            return helper.createTableFromListSource(treeListItem, dropTargetControl);
+                        return helper.createTableFromList(treeListItem, dropTargetControl);
                     },
-                    size: function (surface) {
-                        var report = surface.getControlModel();
-                        return surface ?
-                            Designer.Size.fromString(((report.pageWidth() - report.margins.left() - report.margins.right()) / (surface.dpi() / 100)).toString() + ", 23") :
-                            Designer.Size.fromString("200, 23");
-                    },
+                    size: getUsefulReportWidth,
                     adjustDropTarget: function (dropTarget) {
                         var targetSurface = getFirstSurfaceParentByType(dropTarget, Report.BandSurface);
                         targetSurface.underCursor().x = 0;
@@ -13931,44 +14449,11 @@ var DevExpress;
                     }
                 },
                 "MultiList": {
-                    drop: function (newRow, memberInfo, getControlModel, fullPath, getItems) {
-                        var deferred = $.Deferred();
-                        var path = new DevExpress.JS.Widgets.PathRequest(fullPath).path;
-                        if (!memberInfo.isList) {
-                            var newCell = newRow.createChild($.extend({ "@ControlType": "XRTableCell" }, Report.controlsFactory.controlsMap["XRTableCell"].defaultVal));
-                            if (memberInfo.specifics !== "Array") {
-                                var binding = newCell["dataBindings"]()["findBinding"]("Text");
-                                binding.dataMember(path);
-                            }
-                            else {
-                                newCell.addChild(createPictureBox(newCell, path));
-                            }
-                            deferred.resolve();
-                            return deferred.promise();
-                        }
-                        getItems().done(function (data) {
-                            for (var index = 0; index < data.length; index++) {
-                                if (data[index].data.specifics !== "List" && data[index].data.specifics !== "ListSource" && !(data[index].data.isList === true)) {
-                                    var newCell = newRow.createChild($.extend({ "@ControlType": "XRTableCell" }, Report.controlsFactory.controlsMap["XRTableCell"].defaultVal));
-                                    if (data[index].data.specifics !== "Array") {
-                                        var binding = newCell["dataBindings"]()["findBinding"]("Text");
-                                        binding.dataMember(path + "." + data[index].name);
-                                    }
-                                    else {
-                                        newCell.addChild(createPictureBox(newCell, path + "." + data[index].name));
-                                    }
-                                }
-                            }
-                            deferred.resolve();
-                        });
-                        return deferred.promise();
+                    drop: function (treeListItem, dropTargetControl) {
+                        var helper = new FieldListDragDropHelper();
+                        return helper.createTableFromMultiList(treeListItem.selectedItems(), dropTargetControl);
                     },
-                    size: function (surface) {
-                        var report = surface.getControlModel();
-                        return surface ?
-                            Designer.Size.fromString(((report.pageWidth() - report.margins.left() - report.margins.right()) / (surface.dpi() / 100)).toString() + ", 23") :
-                            Designer.Size.fromString("200, 23");
-                    },
+                    size: getUsefulReportWidth,
                     adjustDropTarget: function (dropTarget) {
                         var targetSurface = getFirstSurfaceParentByType(dropTarget, Report.BandSurface);
                         targetSurface.underCursor().x = 0;
@@ -13976,17 +14461,10 @@ var DevExpress;
                     }
                 },
                 "Default": {
-                    drop: function (memberInfo, getControlModel, fullPath, getItems) {
-                        var newControl = getControlModel().createChild($.extend({ "@ControlType": "XRLabel" }, Report.controlsFactory.controlsMap["XRLabel"].defaultVal));
-                        var binding = newControl["dataBindings"]().findBinding("Text");
-                        if (fullPath.indexOf("parameters.") === -1) {
-                            binding.dataMember(new DevExpress.JS.Widgets.PathRequest(fullPath).path);
-                        }
-                        else {
-                            binding.dataMember(memberInfo.name);
-                            binding.parameter(memberInfo);
-                        }
-                        return newControl;
+                    drop: function (treeListItem, dropTargetControl) {
+                        var control = createSimpleControl("XRLabel", dropTargetControl);
+                        assignBinding(control, "Text", treeListItem);
+                        return control;
                     },
                     size: function (surface) {
                         return Designer.Size.fromString("100, 23");
@@ -14026,11 +14504,39 @@ var DevExpress;
                 FieldListDragDropHandler.prototype._needToChangeHelperContent = function (dragHelperContent, className) {
                     return dragHelperContent && dragHelperContent.className === className;
                 };
-                FieldListDragDropHandler.prototype._addControlController = function (control, dropTarget) {
+                FieldListDragDropHandler.prototype._updateInnerControlSize = function (control) {
+                    if (!control.rows)
+                        return;
+                    var cells = control.rows()[0].cells();
+                    var innerControls = [];
+                    cells.forEach(function (cell) {
+                        innerControls = innerControls.concat(cell.controls());
+                    });
+                    if (innerControls.length === 0)
+                        return;
+                    var cellWidth = cells[0].width();
+                    var cellHeight = cells[0].height();
+                    innerControls.forEach(function (control) {
+                        control.size.width(cellWidth);
+                        control.size.height(cellHeight);
+                    });
+                };
+                FieldListDragDropHandler.prototype._addControl = function (control, dropTarget) {
+                    if (!control)
+                        return;
                     this._undoEngine().start();
                     this.addControl(control, dropTarget, this._size);
+                    this._updateInnerControlSize(control);
                     this._undoEngine().end();
                     this.onComponentAdded({ parent: dropTarget.getControlModel(), model: control });
+                };
+                FieldListDragDropHandler.prototype._isDefaultBindingAssigned = function (control, treeListItem) {
+                    if (control["defaultDataBinding"] && !isList(treeListItem.data)) {
+                        var dataBinding = control["defaultDataBinding"];
+                        dataBinding.updateBinding(treeListItem.path, this._dataSources.peek());
+                        return true;
+                    }
+                    return false;
                 };
                 FieldListDragDropHandler.prototype.drag = function (event, ui) {
                     if (this.selection.dropTarget) {
@@ -14040,7 +14546,7 @@ var DevExpress;
                         var dropTargetControl = dropTarget.getControlModel();
                         var boundedClass = "dxrd-image-ghost-bounded";
                         var dragHelperContent = this.dragHelperContent.controls()[0];
-                        if (dropTargetControl["defaultDataBinding"] && !draggable.data.isList) {
+                        if (dropTargetControl["defaultDataBinding"] && !isList(draggable.data)) {
                             if (!this._needToChangeHelperContent(dragHelperContent, boundedClass)) {
                                 var rect = new Designer.Rectangle(12, 12, 12, 12);
                                 rect.className = boundedClass;
@@ -14064,49 +14570,23 @@ var DevExpress;
                         this.selection.dropTarget.underCursor().x = position.left - this.selection.dropTarget["absolutePosition"].x();
                         this.selection.dropTarget.underCursor().y = position.top - this.selection.dropTarget["absolutePosition"].y();
                         var item = draggable;
-                        var key;
+                        var key = item.data.isList ? "List" : item.data.specifics;
                         if (this.surface().isFit(this.selection.dropTarget)) {
-                            if (item.selectedItems().length < 2) {
-                                key = draggable.data.isList ? "List" : draggable.data.specifics;
-                                var dropTarget = this._getDropTarget(Report.memberControlsMap[key]), dropTargetControl = dropTarget.getControlModel();
-                                if (dropTargetControl["defaultDataBinding"] && !draggable.data.isList) {
-                                    var dataBinding = dropTargetControl["defaultDataBinding"];
-                                    dataBinding.updateBinding(item.path, this._dataSources.peek());
-                                    return;
-                                }
-                                dropTarget = dropTargetControl.getMetaData().isContainer ? dropTarget : dropTarget.parent;
-                                if (!dropTarget.canDrop()) {
-                                    return;
-                                }
-                                if (key === "List") {
-                                    Report.memberControlsMap[key].drop(item.data, function () { return dropTarget.getControlModel(); }, item.path, item.getItems).done(function (control) {
-                                        _this._addControlController(control, dropTarget);
-                                    });
-                                }
-                                else {
-                                    var control = (Report.memberControlsMap[key] || Report.memberControlsMap["Default"]).drop(item.data, function () { return dropTarget.getControlModel(); }, item.path, item.getItems);
-                                    this._addControlController(control, dropTarget);
-                                }
+                            var dropTarget = this._getDropTarget(Report.memberControlsMap[key]), dropTargetControl = dropTarget.getControlModel();
+                            var isMultiSelect = item.selectedItems().length > 1;
+                            if (!isMultiSelect && this._isDefaultBindingAssigned(dropTargetControl, item))
+                                return;
+                            dropTarget = dropTargetControl.getMetaData().isContainer ? dropTarget : dropTarget.parent;
+                            if (!dropTarget.canDrop())
+                                return;
+                            if (!isMultiSelect && !isList(item.data)) {
+                                var control = (Report.memberControlsMap[key] || Report.memberControlsMap["Default"]).drop(item, dropTarget.getControlModel());
+                                this._addControl(control, dropTarget);
+                                return;
                             }
-                            else {
-                                key = "MultiList";
-                                var dropTarget = this._getDropTarget(Report.memberControlsMap[key]);
-                                dropTarget = dropTarget.getControlModel().getMetaData().isContainer ? dropTarget : dropTarget.parent;
-                                if (!dropTarget.canDrop()) {
-                                    return;
-                                }
-                                var newControl = dropTarget.getControlModel().getControlFactory().createControl({ "@ControlType": "XRTable", "@SizeF": "200, 23" }, dropTarget.getControlModel());
-                                var newRow = newControl.createChild({ "@ControlType": "XRTableRow", "@Weight": "1" });
-                                var promises = [];
-                                item.selectedItems().forEach(function (field) {
-                                    promises.push(Report.memberControlsMap[key].drop(newRow, field.data, function () {
-                                        return dropTarget.getControlModel();
-                                    }, field.path, field.getItems));
-                                });
-                                $.when.apply($, promises).done(function () {
-                                    _this._addControlController(newControl, dropTarget);
-                                });
-                            }
+                            Report.memberControlsMap[isMultiSelect ? "MultiList" : key].drop(item, dropTarget.getControlModel()).done(function (control) {
+                                _this._addControl(control, dropTarget);
+                            });
                         }
                     }
                 };
@@ -16027,24 +16507,31 @@ var DevExpress;
                 };
                 DataSourceHelper.prototype.addDataSource = function (dataSourceInfo) {
                     var _this = this;
-                    return this._addDataSource(dataSourceInfo, Report.ObjectItem.createNew(dataSourceInfo.data, function () { return _this; })).data;
+                    var data = (dataSourceInfo.data instanceof Report.ObjectItem) ? dataSourceInfo.data : Report.ObjectItem.createNew(dataSourceInfo.data, function () { return _this; });
+                    return this._addDataSource(dataSourceInfo, data).data;
                 };
                 DataSourceHelper.prototype.removeDataSource = function (dataSourceInfo) {
                     this._objects.remove(dataSourceInfo.data);
                 };
-                DataSourceHelper.prototype.dataSourceValue = function (value) {
+                DataSourceHelper.prototype.dataSourceValue = function (value, undoEngine) {
                     var _this = this;
                     return ko.pureComputed({
                         read: function () {
                             return _this._getDataSourceName(value());
                         },
                         write: function (val) {
+                            var _undoEngine = undoEngine && undoEngine();
+                            _undoEngine && _undoEngine.start();
                             var newDataSource = _this._getDataSourceInfo(val);
                             if (DataSourceHelper._assignValueInTimeout) {
-                                setTimeout(function () { value(newDataSource && newDataSource.data); }, 1);
+                                setTimeout(function () {
+                                    value(newDataSource && newDataSource.data);
+                                    _undoEngine && _undoEngine.end();
+                                }, 1);
                             }
                             else {
                                 value(newDataSource && newDataSource.data);
+                                _undoEngine && _undoEngine.end();
                             }
                         }
                     });
@@ -16078,19 +16565,32 @@ var DevExpress;
                 return DataSourceHelper;
             })(Designer.Disposable);
             Report.DataSourceHelper = DataSourceHelper;
-            var TreeListControllerCertainRootItems = (function (_super) {
-                __extends(TreeListControllerCertainRootItems, _super);
-                function TreeListControllerCertainRootItems(rootItemName) {
-                    _super.call(this);
-                    this.itemsFilter = function (item, currentPath) {
-                        if (currentPath === "") {
-                            return rootItemName() && item.name === rootItemName() || item.specifics === "none";
+            function addDataSourceToReport(dataSourceHelper, report, undoEngine, itemsProvider, dataSource, forceAssigning) {
+                if (forceAssigning === void 0) { forceAssigning = false; }
+                undoEngine.start();
+                var result = dataSourceHelper.addDataSource(dataSource);
+                if (forceAssigning || !report.dataSource()) {
+                    report.dataSource(result);
+                    itemsProvider
+                        .getItems(new DevExpress.JS.Widgets.PathRequest(dataSource.id || dataSource.ref))
+                        .done(function (dataMembers) {
+                        if (dataMembers.length > 0 && !Designer.find(dataMembers, function (item) { return item.name === report.dataMember(); })) {
+                            report.dataMember(dataMembers[0].name);
                         }
-                        return true;
-                    };
+                    });
                 }
-                return TreeListControllerCertainRootItems;
-            })(DevExpress.JS.Widgets.TreeListController);
+                undoEngine.end();
+            }
+            Report.addDataSourceToReport = addDataSourceToReport;
+            function removeDataSourceFromReport(dataSourceHelper, reportDataSource, undoEngine, dataSource) {
+                undoEngine().start();
+                dataSourceHelper.removeDataSource(dataSource);
+                if (reportDataSource() === dataSource.data) {
+                    reportDataSource(dataSourceHelper.findDataSourceInfoByRef("none").data);
+                }
+                undoEngine().end();
+            }
+            Report.removeDataSourceFromReport = removeDataSourceFromReport;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -16904,6 +17404,11 @@ var DevExpress;
                         _this.pageWidth(_this.pageHeight());
                         _this.pageHeight(width);
                     }));
+                    this._disposables.push(this.dataSource.subscribe(function (newVal) {
+                        if (!newVal) {
+                            _this.dataMember(null);
+                        }
+                    }));
                     this.styles = DevExpress.JS.Utils.deserializeArray(report.StyleSheet, function (item) { return new Report.StyleModel(item, serializer); });
                     this.objectStorage = DevExpress.JS.Utils.deserializeArray(report.ObjectStorage, function (item) { return Report.ObjectItem.createNew(item, _this.dsHelperProvider, serializer); });
                     this.componentStorage = DevExpress.JS.Utils.deserializeArray(report.ComponentStorage, function (item) { return Report.ObjectItem.createNew(item, _this.dsHelperProvider, serializer); });
@@ -17008,6 +17513,9 @@ var DevExpress;
                 ReportViewModel.prototype.isPropertyDisabled = function (name) {
                     if (name === "pageWidth" || name === "pageHeight") {
                         return this.paperKind() !== "Custom";
+                    }
+                    else if (name === "dataMember") {
+                        return this.dataSource() === null;
                     }
                 };
                 ReportViewModel.prototype.getSubreportUrls = function () {
@@ -17832,6 +18340,19 @@ var DevExpress;
                         _super.prototype.removeChild.call(this, control);
                     }
                 };
+                BandViewModel._getSameKindBands = function (bands, band) {
+                    var sameKindBands = bands.filter(function (b) { return b.controlType === band.controlType; });
+                    if (band.controlType === "GroupHeaderBand")
+                        sameKindBands = sameKindBands.reverse();
+                    return sameKindBands;
+                };
+                BandViewModel.isReorderingBand = function (control) {
+                    return ["GroupHeaderBand", "GroupFooterBand", "DetailReportBand"].indexOf(control.controlType) > -1;
+                };
+                BandViewModel.insertBandInPlaceOf = function (replaced, target, bands) {
+                    var index = BandViewModel._getSameKindBands(bands, replaced).indexOf(target);
+                    replaced["level"](index);
+                };
                 BandViewModel.insertBand = function (bands, newBand) {
                     if (newBand.controlType === "GroupHeaderBand" || newBand.controlType === "GroupFooterBand" || newBand.controlType === "DetailReportBand") {
                         newBand["level"](bands().filter(function (band) { return band.controlType === newBand.controlType; }).length);
@@ -17883,10 +18404,7 @@ var DevExpress;
                         bands.splice(selectedIndex, 1);
                     }
                     bands.splice(newIndex, 0, selectedBand);
-                    var sameKindBands = bands().filter(function (b) { return b.controlType === selectedBand.controlType; });
-                    if (selectedBand.controlType === "GroupHeaderBand")
-                        sameKindBands = sameKindBands.reverse();
-                    sameKindBands.forEach(function (b, i) { return b["_level"](i); });
+                    BandViewModel._getSameKindBands(bands(), selectedBand).forEach(function (b, i) { return b["_level"](i); });
                 };
                 BandViewModel.getBandWeight = function (band) {
                     if (band.controlType === "GroupHeaderBand") {
@@ -17909,6 +18427,10 @@ var DevExpress;
                     var _this = this;
                     _super.call(this, band, context, BandSurface._unitProperties);
                     this.isSomeParentCollapsed = ko.observable(false);
+                    this._resize = function (delta, oldDelta) {
+                        _this._height(_this._height() + delta - oldDelta);
+                        return delta;
+                    };
                     this.allowMultiselect = false;
                     this.markerWidth = ko.observable(BandSurface.collapsedHeight);
                     this.bands = ko.observableArray();
@@ -18001,13 +18523,15 @@ var DevExpress;
                         measureUnit: context.measureUnit,
                         flip: context.rtl
                     };
+                    var oldDelta = 0;
                     this["resize"] = function (params) {
-                        _this._height(params.size.height() - _this.subBandsHeight());
+                        oldDelta = _this._resize(params.delta.dh, oldDelta);
                     };
                     this["resizeTheBand"] = function (params) {
-                        _this._height(params.size.height());
+                        oldDelta = _this._resize(params.delta.dh, oldDelta);
                     };
                     this["stopResize"] = function () {
+                        oldDelta = 0;
                     };
                     this["markerClass"] = ko.pureComputed(function () {
                         var cssClass = "dxrd-band-marker-body";
@@ -18700,7 +19224,6 @@ var DevExpress;
                 "Custom": "Custom"
             }, Pivot.summaryType = { propertyName: "summaryType", modelName: "@SummaryType", displayName: "Summary Type", defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Pivot.summaryTypeValues }, Pivot.fieldComponentName = { propertyName: "fieldComponentName", modelName: "@FieldComponentName", displayName: "Field", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "": DevExpress.Designer.getLocalization("(" + "none" + ")") } }, Pivot.sortBySummaryConditionInfo = [
                 Pivot.fieldComponentName,
-                { modelName: "@OLAPUniqueMemberName", propertyName: "olapUniqueMemberName", displayName: "OLAP Unique Member Name", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { modelName: "@Value", propertyName: "value", displayName: "Value", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
                     modelName: "@Value_type", propertyName: "valueType", displayName: "Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "<Null>", values: {
@@ -18785,6 +19308,9 @@ var DevExpress;
                 };
                 PivotGridFieldViewModel.prototype.getPath = function (propertyName) {
                     return Designer.getFullPath(this.parentModel()["getPath"](""), this.parentModel()["dataMember"]());
+                };
+                PivotGridFieldViewModel.prototype.getDisplayName = function () {
+                    return this.caption() || this.fieldName() || this.name() || this["displayName"] && this["displayName"]();
                 };
                 PivotGridFieldViewModel.fieldHeight = 20;
                 return PivotGridFieldViewModel;
@@ -19027,9 +19553,16 @@ var DevExpress;
                     this._initCriteriaString();
                 }
                 XRPivotGridViewModel.prototype._initCriteriaString = function () {
+                    var _this = this;
                     this.prefilter.criteriaString = new DevExpress.JS.Widgets.FilterStringOptions(this.prefilter._criteriaString);
                     this.prefilter.criteriaString.helper.canChoiceParameters = false;
                     this.prefilter.criteriaString.helper.canChoiceProperty = false;
+                    this.prefilter.criteriaString.helper.getDisplayPropertyName = function (path, name) {
+                        var field = Designer.find(_this.fields.peek(), function (f) { return f.name() === name; });
+                        return $.Deferred()
+                            .resolve(field ? field.getDisplayName() : name)
+                            .promise();
+                    };
                     var self = this;
                     this.prefilter.criteriaString.helper.generateTreelistOptions = function (fieldListProvider, path) {
                         var treeListOptions = ko.observable(null);
@@ -19048,7 +19581,7 @@ var DevExpress;
                                             }
                                             var dataMemberInfo = dataSourceItems.filter(function (item) { return item.name === field.fieldName(); })[0];
                                             items.push({
-                                                displayName: field.fieldName() || field["displayName"](),
+                                                displayName: field.getDisplayName(),
                                                 isList: false,
                                                 name: field.name(),
                                                 specifics: dataMemberInfo && dataMemberInfo.specifics.toLowerCase() || "integer"
@@ -22857,7 +23390,7 @@ var DevExpress;
                             visible: true,
                             hotKey: { ctrlKey: true, keyCode: "O".charCodeAt(0) },
                             clickAction: function () {
-                                designerModel.openReportDialog.show();
+                                designerModel.openReportDialog.show(designerModel.navigateByReports.currentTab());
                             }
                         });
                     }
@@ -23215,27 +23748,14 @@ var DevExpress;
                             report.styles.push(value);
                         }
                     });
+                    oldReport.parameters().forEach(function (value) {
+                        if (!report.parameters().some(function (parameter) { return parameter.name === value.name; }))
+                            report.parameters.push(value);
+                    });
                 }
                 return report;
             }
             Report.createReportViewModel = createReportViewModel;
-            function addDataSourceToReport(dataSourceHelper, reportDataSource, undoEngine, dataSource) {
-                undoEngine().start();
-                var result = dataSourceHelper.addDataSource(dataSource);
-                if (!reportDataSource())
-                    reportDataSource(result);
-                undoEngine().end();
-            }
-            Report.addDataSourceToReport = addDataSourceToReport;
-            function removeDataSourceFromReport(dataSourceHelper, reportDataSource, undoEngine, dataSource) {
-                undoEngine().start();
-                dataSourceHelper.removeDataSource(dataSource);
-                if (reportDataSource() === dataSource.data) {
-                    reportDataSource(dataSourceHelper.findDataSourceInfoByRef("none").data);
-                }
-                undoEngine().end();
-            }
-            Report.removeDataSourceFromReport = removeDataSourceFromReport;
             var orig_optionValuesEqual = DevExpress.ui.dxSelectBox.prototype["_optionValuesEqual"];
             DevExpress.ui.dxSelectBox["redefine"]({
                 _optionValuesEqual: function (optionName, oldValue, newValue) {
@@ -23407,9 +23927,6 @@ var DevExpress;
                 var navigation = new Report.NavigateByReports(reportViewModel, data.reportUrl);
                 model = ko.computed({
                     read: function () {
-                        if (navigation.currentTab()) {
-                            designerModel.undoEngine && designerModel.undoEngine(navigation.currentTab().undoEngine);
-                        }
                         return navigation.currentTab().report();
                     },
                     write: function (newVal) {
@@ -23417,11 +23934,14 @@ var DevExpress;
                     }
                 });
                 init(model());
+                var undoEngine = ko.computed(function () {
+                    return navigation.currentTab().undoEngine;
+                });
                 var selection = new Designer.SurfaceSelection();
                 var controlHelper = new Designer.DesignControlsHelper(model, [{
                         added: function (control) { },
                         deleted: function (control) { control.surface == selection.focused() && selection.focused(Designer.findNextSelection(control.surface)); }
-                    }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]), designerModel = DevExpress.Designer.createDesigner(model, surface, Report.controlsFactory, Report.groups, [], undefined, rtl, selection, controlHelper);
+                    }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]), designerModel = DevExpress.Designer.createDesigner(model, surface, Report.controlsFactory, Report.groups, [], undefined, rtl, selection, controlHelper, undoEngine);
                 designerModel.fieldListItemsExtenders = fieldListItemsExtenders;
                 designerModel.rootStyle = "dxrd-designer";
                 designerModel.toolboxDragHandler = new Report.ReportToolboxDragDropHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.snapHelper, designerModel.dragHelperContent, Report.controlsFactory, designerCallbacks.componentAdded);
@@ -23434,7 +23954,6 @@ var DevExpress;
                     }
                 });
                 designerModel.reportUrls = ko.observableArray([]);
-                designerModel.undoEngine().removeTargetSubscription();
                 navigation.init(designerModel);
                 getSubreportUrls();
                 model.subscribe(function (newModel) {
@@ -23450,22 +23969,10 @@ var DevExpress;
                     showPopover: function () {
                         popoverVisible(true);
                     },
-                    dataSourceListItems: function () {
-                        if (data.isReportServer) {
-                            return [{ name: "New Data Source...", id: "addNew" }];
-                        }
-                        return dataSourceHelper().availableDataSources;
-                    },
+                    dataSourceListItems: function () { return dataSourceHelper().availableDataSources; },
                     itemClickAction: function (e) {
                         popoverVisible(false);
-                        if (e.itemData.id === "addNew") {
-                            dataSourceWizard.start();
-                        }
-                        else {
-                            designerModel.undoEngine().start();
-                            dataSourceHelper().dataSourceValue(model().dataSource)(e.itemData.name);
-                            designerModel.undoEngine().end();
-                        }
+                        Report.addDataSourceToReport(dataSourceHelper(), model(), designerModel.undoEngine(), fieldListProvider(), e.itemData, true);
                     }
                 };
                 designerModel.reportPreviewModel = DevExpress.Report.Preview.createPreview(element, callbacks.preview, localization, { knownEnums: knownEnums }, previewHandlerUri, false, rtl);
@@ -23486,7 +23993,7 @@ var DevExpress;
                     selectStatement: Designer.QueryBuilder.RequestWrapper.getSelectStatement,
                     finishCallback: function (data) { return sqlDataSourceEditor.applySqlDataSourceWizardChanges(data); }
                 }, data.disableCustomSql, rtl);
-                sqlDataSourceEditor = new Report.SqlDataSourceEditor(dataSourceHelper, sqlDataSourceWizard, model, designerModel["undoEngine"]);
+                sqlDataSourceEditor = new Report.SqlDataSourceEditor(dataSourceHelper, sqlDataSourceWizard, model, designerModel["undoEngine"], fieldListProvider);
                 completeSqlDataSourceWizard = new Report.Wizard.MultiQueryDataSourceWizard(connections, multipleQueriesWizardCallbacks, data.disableCustomSql, rtl);
                 designerModel.fieldListActionProviders.push(sqlDataSourceEditor);
                 designerModel.wizard = createReportWizard(dataSourceHelper, data, navigation.currentTab, designerCallbacks.fieldLists, designerModel.isLoading, designerModel.isDirty, state, multipleQueriesWizardCallbacks, ko.observableArray(data.connectionStrings));
@@ -23614,7 +24121,7 @@ var DevExpress;
                     visible: chartDesignerOptionsVisible,
                     buttons: [{
                             toolbar: 'bottom', location: 'after', widget: 'button', options: {
-                                text: Designer.getLocalization('Ok'), onClick: function () {
+                                text: Designer.getLocalization('OK'), onClick: function () {
                                     chartIsDirty(false);
                                     chartDesignerOptionsVisible(false);
                                 }
@@ -23657,6 +24164,11 @@ var DevExpress;
                                     chartModel.reportParameters = ko.computed(function () { return parameters().parameters(); });
                                     chartModel.reportDataSource = ko.computed(function () { return dataSourceHelper().findDataSourceInfo(model().dataSource()); });
                                     chartModel.reportDataBindingsProvider = chartValueBindingProvider;
+                                    chartDesignerOptionsVisible.subscribe(function (newVal) {
+                                        if (newVal) {
+                                            chartModel.updateSurfaceSize();
+                                        }
+                                    });
                                 }
                             },
                             data: {
@@ -23665,6 +24177,7 @@ var DevExpress;
                                 width: 500,
                                 height: 500
                             },
+                            rtl: designerModel.rtl,
                             fieldListProvider: designerModel.dataBindingsProvider
                         };
                     }
@@ -25864,7 +26377,7 @@ var DevExpress;
         var Report;
         (function (Report) {
             var SqlDataSourceEditor = (function () {
-                function SqlDataSourceEditor(dsHelper, sqlDataSourceWizard, reportViewModel, undoEngine) {
+                function SqlDataSourceEditor(dsHelper, sqlDataSourceWizard, reportViewModel, undoEngine, itemsProvider) {
                     var _this = this;
                     this.relationsEditor = ko.observable();
                     this.addAction = {
@@ -25906,6 +26419,7 @@ var DevExpress;
                     this._wizard = sqlDataSourceWizard;
                     this._reportViewModel = reportViewModel;
                     this._undoEngine = undoEngine;
+                    this._itemsProvider = itemsProvider;
                 }
                 SqlDataSourceEditor._guid = function () {
                     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -25913,8 +26427,8 @@ var DevExpress;
                         return v.toString(16);
                     });
                 };
-                SqlDataSourceEditor.prototype._applyWizardChanges = function (dataSource, wizardModel) {
-                    return this._applyDataSourceChange(wizardModel.sqlDataSource, dataSource);
+                SqlDataSourceEditor.prototype._applyWizardChanges = function (dataSource, wizardModel, queryName) {
+                    return this._applyDataSourceChange(wizardModel.sqlDataSource, dataSource, queryName);
                 };
                 SqlDataSourceEditor.prototype._createOrEditSqlDataSource = function (requestJson, dataSource, requestName) {
                     var _this = this;
@@ -25926,7 +26440,7 @@ var DevExpress;
                             _this._dsHelper().usedDataSources.notifySubscribers(_this._dsHelper().usedDataSources());
                         }
                         else {
-                            Report.addDataSourceToReport(_this._dsHelper(), _this._reportViewModel().dataSource, _this._undoEngine, result.dataSource);
+                            Report.addDataSourceToReport(_this._dsHelper(), _this._reportViewModel(), _this._undoEngine(), _this._itemsProvider(), result.dataSource);
                         }
                     })
                         .fail(function (result) {
@@ -25934,16 +26448,16 @@ var DevExpress;
                             Designer.ShowMessage(Designer.getErrorMessage(result));
                     });
                 };
-                SqlDataSourceEditor.prototype._applyDataSourceChange = function (source, dest) {
+                SqlDataSourceEditor.prototype._applyDataSourceChange = function (source, dest, queryName) {
                     var _this = this;
-                    return SqlDataSourceEditor.createSqlDataSourceInfo(source)
+                    return SqlDataSourceEditor.createSqlDataSourceInfo(source, queryName)
                         .done(function (result) {
                         if (dest) {
                             dest.data["_model"]["@Base64"] = result.base64();
                             _this._dsHelper().usedDataSources.notifySubscribers(_this._dsHelper().usedDataSources());
                         }
                         else {
-                            Report.addDataSourceToReport(_this._dsHelper(), _this._reportViewModel().dataSource, _this._undoEngine, result);
+                            Report.addDataSourceToReport(_this._dsHelper(), _this._reportViewModel(), _this._undoEngine(), _this._itemsProvider(), result);
                         }
                     });
                 };
@@ -25975,7 +26489,7 @@ var DevExpress;
                     Report.ReportDataSourceService.sqlDataSourceFromBase64(dataSourceInfo.data._model["@Base64"]).done(function (result) {
                         var sqlDataSource = new DevExpress.Data.SqlDataSource(JSON.parse(result.sqlDataSourceJSON));
                         sqlDataSource.queries.remove(function (x) { return x.name() === queryName; });
-                        _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource });
+                        _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource }, "");
                     });
                 };
                 SqlDataSourceEditor.prototype.removeDataSource = function (dataSourceID) {
@@ -25994,18 +26508,19 @@ var DevExpress;
                             return;
                         }
                         _this.relationsEditor(new DevExpress.Data.MasterDetailEditor(sqlDataSource.relations, sqlDataSource.resultSet, function () {
-                            return _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource });
+                            return _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource }, "");
                         }));
                         _this.relationsEditor().popupVisible(true);
                     });
                 };
                 SqlDataSourceEditor.prototype.applySqlDataSourceWizardChanges = function (dataSourceWizardModel) {
                     var dataSource = dataSourceWizardModel.sqlDataSource && this._dsHelper().findDataSourceInfoByName(dataSourceWizardModel.sqlDataSource.name());
-                    return this._applyWizardChanges(dataSource, dataSourceWizardModel);
+                    var queryIndex = dataSourceWizardModel["getQueryIndex"] && dataSourceWizardModel["getQueryIndex"]();
+                    return this._applyWizardChanges(dataSource, dataSourceWizardModel, $.isNumeric(queryIndex) ? dataSourceWizardModel.sqlDataSource.queries()[queryIndex].name() : null);
                 };
-                SqlDataSourceEditor.createSqlDataSourceInfo = function (source) {
+                SqlDataSourceEditor.createSqlDataSourceInfo = function (source, queryName) {
                     var deferred = $.Deferred();
-                    Designer.QueryBuilder.RequestWrapper.rebuildResultSchema(source)
+                    Designer.QueryBuilder.RequestWrapper.rebuildResultSchema(source, queryName)
                         .done(function (result) {
                         var model = JSON.parse(result.resultSchemaJSON);
                         source.resultSet = !!model ? new DevExpress.Data.ResultSet(model) : null;
@@ -26671,10 +27186,10 @@ var DevExpress;
                 function ReportExplorerDragDropHandler(surface, selection, undoEngine, dragHelperContent) {
                     var _this = this;
                     _super.call(this, surface, selection, undoEngine, null, dragHelperContent);
-                    this._isStyleDragDropHandler = function (item) { return item.data && item.data.specifics === "stylemodel"; };
-                    this._isFormatingRuleDragDropHandler = function (item) { return item.data && item.data.specifics === "formattingrule"; };
-                    this._isReportControlsDragDropHandler = function (item) { return !_this._isStyleDragDropHandler(item) && !_this._isFormatingRuleDragDropHandler(item); };
-                    this.dragReportHelper = null;
+                    this._isStyle = function (item) { return item.data && item.data.specifics === "stylemodel"; };
+                    this._isFormatingRule = function (item) { return item.data && item.data.specifics === "formattingrule"; };
+                    this._isReportControl = function (item) { return !_this._isStyle(item) && !_this._isFormatingRule(item); };
+                    this.reportControlsDragDropHelper = null;
                     this.cursor = 'arrow';
                     this.alwaysAlt = true;
                     this.containment = '.dxrd-designer';
@@ -26685,7 +27200,7 @@ var DevExpress;
                     this.helper = function (draggable, event) {
                         var item = draggable;
                         Report.selectTreeListItem(item, event);
-                        if (_this._isReportControlsDragDropHandler(item)) {
+                        if (_this._isReportControl(item)) {
                             var target = $(event.target).closest(".ui-draggable");
                             var rect = new Designer.Rectangle(6, 6, null, target.height());
                             rect.className = "dxrd-image-ghost-report";
@@ -26699,10 +27214,10 @@ var DevExpress;
                         }
                         else {
                             var rect = new Designer.Rectangle(12, 12, 12, 12);
-                            if (_this._isStyleDragDropHandler(item)) {
+                            if (_this._isStyle(item)) {
                                 rect.className = "dxrd-image-ghost-stylemodel";
                             }
-                            else if (_this._isFormatingRuleDragDropHandler(item)) {
+                            else if (_this._isFormatingRule(item)) {
                                 rect.className = "dxrd-image-ghost-formattingrule";
                             }
                             dragHelperContent.setContent(rect);
@@ -26712,19 +27227,19 @@ var DevExpress;
                     };
                 }
                 ReportExplorerDragDropHandler.prototype.startDrag = function (draggable) {
-                    if (this._isReportControlsDragDropHandler(draggable)) {
-                        this.dragReportHelper = new ReportExplorerDragOverHelper(draggable);
+                    if (this._isReportControl(draggable)) {
+                        this.reportControlsDragDropHelper = new ReportControlsDragDropHelper(draggable);
                     }
                     else {
-                        this.dragReportHelper = null;
+                        this.reportControlsDragDropHelper = null;
                     }
                     _super.prototype.startDrag.call(this, draggable);
                 };
                 ReportExplorerDragDropHandler.prototype.drag = function (event, ui) {
-                    if (this.dragReportHelper) {
+                    if (this.reportControlsDragDropHelper) {
                         var target = event["toElement"] || event.relatedTarget || (event.originalEvent && event.originalEvent.target) || null;
                         if (target) {
-                            this.dragReportHelper.setNewDropTarget(ko.dataFor(target), target);
+                            this.reportControlsDragDropHelper.setNewDropTarget(ko.dataFor(target), target);
                         }
                     }
                     this.selection.dropTarget && this.dragHelperContent.isLocked(this.selection.dropTarget.locked);
@@ -26742,103 +27257,146 @@ var DevExpress;
                         }
                         ;
                     }
-                    else if (this.dragReportHelper) {
-                        this.selection.initialize(this.dragReportHelper.doStopDrag());
+                    else if (this.reportControlsDragDropHelper) {
+                        this.selection.initialize(this.reportControlsDragDropHelper.doStopDrag());
                     }
                 };
                 return ReportExplorerDragDropHandler;
             })(Designer.DragDropHandler);
             Report.ReportExplorerDragDropHandler = ReportExplorerDragDropHandler;
-            var ReportExplorerDragOverHelper = (function () {
-                function ReportExplorerDragOverHelper(draggable) {
-                    var _this = this;
-                    this._toElementModel = function () { return _this._currentTarget.data && _this._currentTarget.data["data"]; };
-                    this._dropTarget = function () { return _this._toElementModel().surface; };
+            var ReportControlsDragDropHelper = (function () {
+                function ReportControlsDragDropHelper(draggable) {
                     this._draggable = draggable;
-                    this._draggableModel = this.getElementViewModel(draggable);
-                    this._draggableTarget = this._draggableModel.surface;
-                    this._draggableParent = this._draggableModel.parentModel && this._draggableModel.parentModel();
+                    this._draggableModel = this._getElementViewModel(draggable);
+                    this._draggableParent = this._draggableModel.parentModel();
+                    this._serializer = new DevExpress.JS.Utils.ModelSerializer();
                 }
-                ReportExplorerDragOverHelper.prototype.getElementViewModel = function (item) {
-                    return item.data["data"];
+                ReportControlsDragDropHelper.prototype._getElementViewModel = function (item) {
+                    return item && item.data && item.data["data"];
                 };
-                ReportExplorerDragOverHelper.prototype._canReorder = function (currentTarget) {
+                ReportControlsDragDropHelper.prototype._canReorder = function (currentTarget) {
                     return currentTarget.data.specifics === this._draggable.data.specifics ||
-                        (this._draggableModel.getMetaData().canDrop(this.getElementViewModel(currentTarget).surface, this._draggableModel) &&
-                            !this.getElementViewModel(currentTarget).getMetaData().isContainer &&
-                            !(this.getElementViewModel(currentTarget) instanceof Report.ReportViewModel));
+                        (this._draggableModel.getMetaData().canDrop(this._getElementViewModel(currentTarget).surface, this._draggableModel) &&
+                            !this._getElementViewModel(currentTarget).getMetaData().isContainer &&
+                            !(this._getElementViewModel(currentTarget) instanceof Report.ReportViewModel));
                 };
-                ReportExplorerDragOverHelper.prototype._shiftChildrenCount = function (currentTarget) {
+                ReportControlsDragDropHelper.prototype._shiftChildrenCount = function (currentTarget) {
                     var _this = this;
                     return Designer.find(this._draggable.parent.items(), function (item) { return item === _this._draggable || item === currentTarget; }) === this._draggable ? 1 : 0;
                 };
-                ReportExplorerDragOverHelper.prototype._canDrop = function (targetModel) {
-                    var isReportExplorerTreeListItem = targetModel instanceof DevExpress.JS.Widgets.TreeListItemViewModel && targetModel.data && targetModel.data.data instanceof Designer.ElementViewModel;
+                ReportControlsDragDropHelper.prototype._targetIsClosestOfDraggable = function (target, draggable) {
+                    return target === draggable || (target.parent && this._targetIsClosestOfDraggable(target.parent, draggable));
+                };
+                ReportControlsDragDropHelper.prototype._canDrop = function (target) {
+                    var isReportExplorerTreeListItem = target instanceof DevExpress.JS.Widgets.TreeListItemViewModel && target.data && target.data.data instanceof Designer.ElementViewModel;
                     if (!isReportExplorerTreeListItem) {
                         return false;
                     }
-                    var currentTarget = targetModel, controlModel = this.getElementViewModel(currentTarget);
-                    return (this._draggable !== currentTarget && this._draggableParent !== controlModel && this._draggableModel !== controlModel.parentModel()) &&
+                    var currentTarget = target, controlModel = this._getElementViewModel(currentTarget);
+                    if (["XRTable", "XRTableCell", "XRTableRow"].indexOf(this._draggableModel.controlType) < 0 && ["XRTable", "XRTableRow"].indexOf(controlModel.controlType) > -1)
+                        return false;
+                    return (this._draggableParent !== controlModel && !this._targetIsClosestOfDraggable(currentTarget, this._draggable)) &&
                         (this._canReorder(currentTarget) || (controlModel.getMetaData().isContainer && this._draggableModel.getMetaData().canDrop(controlModel.surface, this._draggableModel)));
                 };
-                ReportExplorerDragOverHelper.prototype._removeClass = function (target) {
+                ReportControlsDragDropHelper.prototype._removeClass = function (target) {
                     $(target).removeClass("dxrd-treelist-droppable dxrd-drop-approve drop-before drop-after");
                 };
-                ReportExplorerDragOverHelper.prototype.setNewDropTarget = function (elementModel, element) {
-                    if (this._currentTarget === elementModel)
+                ReportControlsDragDropHelper.prototype._insertTableChilds = function (parent, selectedEl, position, weightsCells) {
+                    if (weightsCells === void 0) { weightsCells = null; }
+                    var newChild, selectedRowHeight = 0;
+                    if (selectedEl["@ControlType"] === "XRTableRow") {
+                        newChild = new Report.TableRowViewModel(selectedEl, parent);
+                        selectedRowHeight = newChild.height.peek();
+                    }
+                    else if (selectedEl["@ControlType"] === "XRTableCell") {
+                        newChild = new Report.TableCellViewModel(selectedEl, parent);
+                    }
+                    parent.addChild(newChild, position);
+                    if (weightsCells) {
+                        weightsCells.splice(position, 0, parseFloat(selectedEl["@Weight"]));
+                        weightsCells.forEach(function (weight, index) {
+                            parent.cells()[index].weight(weight);
+                        });
+                    }
+                    if (selectedRowHeight) {
+                        parent.size.height(parent.size.height() + selectedRowHeight);
+                    }
+                    return newChild.surface;
+                };
+                ReportControlsDragDropHelper.prototype.setNewDropTarget = function (elementModel, element) {
+                    if (this._target === elementModel)
                         return;
                     this._removeClass(this._targetElement);
                     var $targetElement;
-                    this._currentTarget = elementModel;
+                    this._target = elementModel;
                     $targetElement = $(element).closest(".dx-treelist-item");
                     this._targetElement = $targetElement.get(0);
                     if ($targetElement && $targetElement.length) {
                         var classToAdd = "dxrd-treelist-droppable";
-                        if (this._canDrop(this._currentTarget)) {
+                        if (this._canDrop(this._target)) {
                             classToAdd = classToAdd + " dxrd-drop-approve";
-                            if (this._canReorder(this._currentTarget)) {
-                                classToAdd = classToAdd + " " + (this._shiftChildrenCount(this._currentTarget) ? "drop-after" : "drop-before");
+                            if (this._canReorder(this._target)) {
+                                classToAdd = classToAdd + " " + (this._shiftChildrenCount(this._target) ? "drop-after" : "drop-before");
                             }
                         }
                         $targetElement.addClass(classToAdd);
                     }
                 };
-                ReportExplorerDragOverHelper.prototype.doStopDrag = function () {
+                ReportControlsDragDropHelper.prototype.doStopDrag = function () {
                     var _this = this;
                     this._removeClass(this._targetElement);
-                    if (this._currentTarget && this._toElementModel()) {
-                        var draggablePathName = this._draggable.data && this._draggable.data.name.split(".")[0];
-                        if ((this._draggableModel.controlType !== "XRTable" && this._draggableModel.controlType !== "XRTableRow") &&
-                            (this._toElementModel().controlType === "XRTable" || this._toElementModel().controlType === "XRTableRow"))
-                            return this._draggableTarget;
-                        if (this._canDrop(this._currentTarget)) {
-                            var parentChilds = this.getElementViewModel(this._currentTarget.parent) && this.getElementViewModel(this._currentTarget.parent)[draggablePathName];
-                            var shiftChildrenCount = this._shiftChildrenCount(this._currentTarget);
-                            if (this._draggableModel.controlType === "GroupHeaderBand" || this._draggableModel.controlType === "GroupFooterBand" || this._draggableModel.controlType === "DetailReportBand") {
-                                var cloneParentChilds = parentChilds().slice(0);
-                                if (this._toElementModel().controlType === "GroupHeaderBand")
-                                    cloneParentChilds = cloneParentChilds.reverse();
-                                var result = cloneParentChilds.filter(function (band) {
-                                    return band.controlType === _this._toElementModel().controlType;
-                                }).indexOf(this._toElementModel());
-                                this._draggableModel["level"](result);
+                    var targetModel = this._getElementViewModel(this._target);
+                    if (!this._target || !targetModel || !this._canDrop(this._target)) {
+                        return this._draggableModel.surface;
+                    }
+                    var draggablePathName = this._draggable.data.name.split(".")[0], siblings = this._getElementViewModel(this._target.parent) && this._getElementViewModel(this._target.parent)[draggablePathName], clonedSiblings = siblings && siblings().slice(0);
+                    if (Report.BandViewModel.isReorderingBand(this._draggableModel)) {
+                        Report.BandViewModel.insertBandInPlaceOf(this._draggableModel, targetModel, clonedSiblings);
+                    }
+                    else {
+                        var draggableInfoClone = this._serializer.serialize(this._draggableModel);
+                        var weightsCells = null;
+                        if (draggableInfoClone["@ControlType"] === "XRTableCell" && this._getElementViewModel(this._target).parentModel() === this._draggableParent) {
+                            weightsCells = clonedSiblings.filter(function (cell) {
+                                return cell.name.peek() !== _this._draggableModel.name.peek();
+                            }).map(function (cell) { return cell.weight.peek(); });
+                        }
+                        var shiftChildrenCount = this._shiftChildrenCount(this._target);
+                        this._draggableParent.removeChild(this._draggableModel);
+                        if (this._canReorder(this._target)) {
+                            if (targetModel.parentModel() instanceof Report.TableControlViewModel || targetModel.parentModel() instanceof Report.TableRowViewModel) {
+                                return this._insertTableChilds(targetModel.parentModel(), draggableInfoClone, siblings.indexOf(targetModel) + shiftChildrenCount, weightsCells);
                             }
                             else {
-                                this._draggableParent.removeChild(this._draggableModel);
-                                if (this._canReorder(this._currentTarget)) {
-                                    parentChilds && parentChilds.splice(parentChilds.indexOf(this._toElementModel()) + shiftChildrenCount, 0, this._draggableModel);
-                                }
-                                else {
-                                    this._toElementModel().addChild(this._draggableModel);
-                                }
+                                siblings && siblings.splice(siblings.indexOf(targetModel) + shiftChildrenCount, 0, this._draggableModel);
                             }
                         }
-                        return this._draggableTarget;
+                        else {
+                            if (targetModel instanceof Report.TableControlViewModel || targetModel instanceof Report.TableRowViewModel) {
+                                return this._insertTableChilds(targetModel, draggableInfoClone, 0);
+                            }
+                            else {
+                                var targetRect = targetModel.surface.rect();
+                                var draggableRect = this._draggableModel.surface.rect();
+                                var rect = {};
+                                if (targetRect.width < draggableRect.left + draggableRect.width) {
+                                    rect["left"] = targetRect.width - draggableRect.width;
+                                    rect["left"] = rect["left"] > 0 ? rect["left"] : 0;
+                                }
+                                if (targetRect.height < draggableRect.top + draggableRect.height) {
+                                    rect["top"] = targetRect.height - draggableRect.height;
+                                    rect["top"] = rect["top"] > 0 ? rect["top"] : 0;
+                                }
+                                this._draggableModel.surface.rect(rect);
+                                targetModel.addChild(this._draggableModel);
+                            }
+                        }
                     }
+                    return this._draggableModel.surface;
                 };
-                return ReportExplorerDragOverHelper;
+                return ReportControlsDragDropHelper;
             })();
-            Report.ReportExplorerDragOverHelper = ReportExplorerDragOverHelper;
+            Report.ReportControlsDragDropHelper = ReportControlsDragDropHelper;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -27364,6 +27922,7 @@ var DevExpress;
                             .done(function (result) {
                             self.onSaved({ report: self.tab().report(), url: result });
                             var url = result;
+                            self.tab().url(result);
                             self.tab().undoEngine.clearHistory();
                         });
                     }
