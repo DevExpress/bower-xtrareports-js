@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v17.1.2 - 2017-04-12
+<!-- /*! DevExpress HTML/JS Designer - v17.1.3 - 2017-05-02
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -209,9 +209,13 @@
 <script type="text/html" id="dx-number-editor">
     <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
+
+<script type="text/html" id="dx-combobox-undo">
+    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
+</script>
 <script type="text/html" id="dx-expressioneditor-main">
     <div class="dx-expression-tree">
-        <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, onKeyPress: function() { isValid(true); } }"></div>
+        <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyPress: function() { isValid(true); } }"></div>
         <div class="dx-expressioneditor-tools">
             <!-- ko with: tools-->
             <div class="dx-expressioneditor-tools-popular">
@@ -778,16 +782,8 @@
         <div class="dx-treelist-caption">
             <!-- ko if: actions && actions.length > 0 -->
             <div class="dx-treelist-action-container" data-bind="visible: isSelected">
-                <!-- ko foreach: actions -->
-                <!-- ko if: $data.templateName -->
-                <!-- ko template: templateName  -->
+                <!-- ko template: actionsTemplate() -->
                 <!-- /ko -->
-                <!-- /ko -->
-                <!-- ko if: !$data.templateName -->
-                <div class="dx-treelist-action" data-bind="dxButton: { onClick: function() { clickAction($parent); }, icon: imageClassName, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible), disabled: $data.disabled && $data.disabled() }, attr: { title: DevExpress.JS.Utils.getLocalization(text) }"></div>
-                <!-- /ko -->
-                <!-- /ko -->
-                <div class="dx-treelist-action-edit dx-accordion-button" data-bind="dxButton: { icon: 'dx-image-edit', onClick: function() { collapsed(!collapsed()); } }, visible: hasContent, attr: { title: DevExpress.JS.Utils.getLocalization('Edit') }"></div>
             </div>
             <!-- /ko  -->
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">
@@ -798,6 +794,31 @@
             </div>
         </div>
     </div>
+</script>
+
+<script type="text/html" id="dx-treelist-item-actions">
+    <!-- ko foreach: actions -->
+    <!-- ko if: $data.templateName -->
+    <!-- ko template: templateName  -->
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: !$data.templateName -->
+    <div class="dx-treelist-action" data-bind="dxButton: { onClick: function() { clickAction($parent); }, icon: imageClassName, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible), disabled: $data.disabled && $data.disabled() }, attr: { title: DevExpress.JS.Utils.getLocalization(text) }"></div>
+    <!-- /ko -->
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dx-treelist-edit-action">
+    <!-- ko with: $parent -->
+    <div class="dx-treelist-action-edit dx-accordion-button" data-bind="dxButton: { icon: 'dx-image-edit', onClick: function() { collapsed(!collapsed()); } }, visible: hasContent, attr: { title: DevExpress.JS.Utils.getLocalization('Edit') }"></div>
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dx-treelist-item-actions-with-edit">
+    <!-- ko template: 'dx-treelist-item-actions'  -->
+    <!-- /ko -->
+    <!-- ko template: { name: 'dx-treelist-edit-action', data: DevExpress.JS.Widgets.treeListEditAction }  -->
+    <!-- /ko -->
 </script>
 <script type="text/html" id="dx-treelist">
     <div class="dx-treelist">
@@ -1055,7 +1076,7 @@
         <div data-bind="dxdAccordion: { collapsed: collapsed }">
             <div class="dxrd-group-header dx-accordion-header" data-bind="css: { 'dxrd-group-header-collapsed': collapsed() }">
                 <div class="dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
-                <span class="dxrd-group-header-text" data-bind="text: DevExpress.Designer.getLocalization('Actions')"></span>
+                <span class="dxrd-group-header-text" data-bind="text: DevExpress.Designer.getLocalization('Actions', 'ASPxReportsStringId.ReportDesigner_Actions')"></span>
             </div>
             <div class="dx-accordion-content">
                 <!-- ko template: 'dxrd-shadow' -->
@@ -1743,7 +1764,7 @@
 
 <script type="text/html" id="dxqb-selectstatment-preview">
     <div class="dxqb-show-query-string-content dx-widget">
-        <div class="dxrd-show-query-string-editor" data-bind="dxTextArea: { value: $data, valueChangeEvent: 'keyup', disabled: true }"></div>
+        <div class="dxrd-show-query-string-editor" data-bind="dxTextArea: { value: $data, valueChangeEvent: 'keyup', readOnly: true }"></div>
     </div>
 </script>
 
@@ -2049,7 +2070,7 @@
 
 <script type="text/html" id="dxrd-select-control">
     <div data-bind="text: DevExpress.Designer.getLocalization('SQL string:', 'DataAccessUIStringId.QueryControl_SqlString')"></div>
-    <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: 'keyup input blur', disabled: disableCustomSql() }"></div>
+    <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: 'keyup input blur', readOnly: disableCustomSql() }"></div>
 </script>
 
 <script type="text/html" id="dxrd-procedures-control">
@@ -2224,7 +2245,7 @@
 </script>
 
 <script type="text/html" id="dxcd-toolbar">
-    <div class="dxrd-toolbar-wrapper" style="left: 326px">
+    <div class="dxrd-toolbar-wrapper">
         <div class="dxrd-toolbar" data-bind="template: {name: 'dxrd-toolbar-tmplt', data: actionLists.toolbarItems }"></div>
     </div>
 </script>
@@ -2360,6 +2381,20 @@
         <!-- /ko -->
     </div>
 </script>
+
+<script type="text/html" id="dxcd-pointscollection">
+    <div class="dxrd-editor" data-bind="visible: visible">
+        <div data-bind="dxCollectionEditor: {
+                 values: value,
+                 displayName: displayName,
+                 level: level,
+                 info: info,
+                 addHandler: function(){ return DevExpress.Designer.Chart.SeriesPointModel.createNew(_model()['owner'] || _model()) }
+             }">
+            <div data-bind="template: { name: 'dx-propertieseditor', data: new DevExpress.JS.Widgets.ObjectProperties( $data.value, null, editor.level + 1 ) }"></div>
+        </div>
+    </div>
+</script>
 <script type="text/html" id="dxrp-editing-field-container">
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
         <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>
@@ -2453,7 +2488,7 @@
 </script>
 
 <script type="text/html" id="dxrdp-surface-mobile">
-    <div class="dxrd-preview-wrapper dxrdp-fullscreen" data-bind="styleunit: { top: topOffset }, slide: $root.slideOptions, mobileZoom: { zoom: mobileZoom, zoomUpdating: zoomUpdating }, dxclick: function(s,e) { if(!$root.brickEventsDisabled()) { $data.showActions(s,e); } }">
+    <div class="dxrd-preview-wrapper dxrdp-fullscreen" data-bind="style: { pointerEvents: $data.documentId === null ? 'none' : '', touchEvents: $data.documentId === null ? 'none' : '' }, styleunit: { top: topOffset }, slide: $root.slideOptions, mobileZoom: { zoom: mobileZoom, zoomUpdating: zoomUpdating }, dxclick: function(s,e) { if(!$root.brickEventsDisabled()) { $data.showActions(s,e); } }">
         <!-- ko template: {name: 'dxrd-preview-progress-bar', data: progressBar }-->
         <!-- /ko -->
 
@@ -2733,7 +2768,7 @@
 </script>
 
 <script type="text/html" id="dxrd-page-brick">
-    <div class="dxrd-report-preview-brick" data-bind="dxAction: onClick, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
+    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.jQueryEvent); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
         <!-- ko if: $data.navigation -->
         <div class="dxrd-report-preview-brick-navigation">
             <!-- ko if: navigation.drillDownKey -->
@@ -2993,7 +3028,12 @@
 </script>
 
 <script type='text/html' id='dxrd-chart-selection'>
-<div class="dxrd-control" data-bind="event: { dblclick: function() { $root.runChartDesigner($data._control); } }, visible: selected() || focused(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+<div class="dxrd-control" data-bind="visible: selected() || focused(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+    <div class="dxrd-chart-panel" data-bind="dxAction: function() { $root.runChartDesigner($data._control); }, styleunit: { right: $data.contentSizes().right + 2, top: $data.contentSizes().top + 1, width: 86 * $data._context.zoom(), height: 50 * $data._context.zoom() }">
+        <div class="dxrd-chart-panel-text" data-bind="zoom: _context.zoom">
+            Run Designer
+        </div>
+    </div>
 </div>
 <div class="dxrd-control" data-bind="visible: !(selected() && focused()), styleunit: position, trackCursor: underCursor, style:{ overflow: isSelected() ? 'visible' : 'hidden'}">
 </div>
@@ -3966,7 +4006,7 @@
 </script>
 
 <script type="text/html" id="dxrd-datasource">
-    <div data-bind="dxSelectBox: { items: $root.dataSourceHelper().usedDataSources, value: $root.dataSourceHelper().dataSourceValue(value), valueExpr: 'name', displayExpr: $root.dataSourceHelper().dataSourceDisplayExpr, displayCustomValue: true, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { items: $root.dataSourceHelper().usedDataSources, value: $root.dataSourceHelper().dataSourceValue(value, $root.undoEngine), valueExpr: 'name', displayExpr: $root.dataSourceHelper().dataSourceDisplayExpr, displayCustomValue: true, disabled: disabled }"></div>
 </script>
 
 <script type="text/html" id="dxrd-bands">
