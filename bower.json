@@ -17,7 +17,7 @@
   "homepage": "http://www.devexpress.com/Subscriptions/Reporting",
   "keywords": [ "xtrareports", "devexpress", "developer express", "reporting", "document viewer", "report designer"],
   "dependencies": {
-    "jquery": ">=2.2.3 <3",
+    "jquery": "^2.2.3 || ^3.0.0",
     "jquery-ui": "^1.11.4",
     "knockout": "latest",
     "globalize": "^1.1",
