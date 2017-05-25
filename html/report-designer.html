@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.1.11 - 2017-02-20
+<!-- /*! DevExpress HTML/JS Designer - v16.1.12 - 2017-05-17
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -1117,6 +1117,10 @@
     <div data-bind="dxTextBox: { value: value, disabled: disabled }, dxValidator: { validationRules: (validationRules || []).concat( DevExpress.Designer.guidValidationRules ) }"></div>
 </script>
 
+<script type="text/html" id="dxrd-password">
+    <div data-bind="dxTextBox: { value: value, disabled: disabled, mode: 'password' }, dxValidator: { validationRules: (validationRules || []) }"></div>
+</script>
+
 <script type="text/html" id="dxrd-emptyHeader">
 </script>
 
@@ -1180,6 +1184,7 @@
 <script type="text/html" id="dxrd-colorpicker">
     <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled }"></div>
 </script>
+
 <script type="text/html" id="dx-diagram-surface">
     <div class="dxrd-surface" style="height: 100%; display:inline-block;" data-bind="styleunit: { 'width': Math.min(pageWidth(), $root.surfaceSize()) }, click: function(_, e) { $root.selection.clickHandler(null, e); e.stopPropagation(); }, keyDownActions: $root.actionLists">
         <div class="dxrd-viewport" style="overflow:auto;width:inherit;height:inherit;" data-bind="styleunit: { minWidth: Math.min(pageWidth(), $root.surfaceSize()), maxWidth: pageWidth(),  maxHeight: pageHeight() + 20 }">
@@ -2861,7 +2866,7 @@
     </div>
 </script>
 <script type='text/html' id='dxrd-report'>
-<div class="dxrd-surface" data-bind="styleunit: { 'width': Math.min(pageWidth() + maxMarkerWidth(), $root.surfaceSize()) }, css: { 'dxrd-surface-rtl': rtl() }, click: function(_, e) { $root.selection.clickHandler(null, e); e.stopPropagation(); }, keyDownActions: $root.actionLists">
+<div class="dxrd-surface" data-bind="styleunit: { 'width': Math.min(pageWidth() + maxMarkerWidth(), $root.surfaceSize()) }, css: { 'dxrd-surface-rtl': rtl() }, click: function(surface, e) { $root.selection.clickHandler($root.selection.dropTarget ? null : surface, e); e.stopPropagation(); }, keyDownActions: $root.actionLists">
     <div class="dxrd-content-panel-wrapper">
         <div class="dxrd-content-panel" data-bind="styleunit: DevExpress['config']()['rtlEnabled'] ?  {marginRight: maxMarkerWidth()} : { marginLeft: maxMarkerWidth() } ">
             <div class="dxrd-hruler-wrapper">

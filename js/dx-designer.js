@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.11 - 2017-02-20
+/*! DevExpress HTML/JS Designer - v16.1.12 - 2017-05-17
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -10616,6 +10616,9 @@ var DevExpress;
                 this.right = ko.observable(right);
                 this.top = ko.observable(top);
             }
+            Margins.prototype.getInfo = function () {
+                return Designer.Widgets.paddingSerializationsInfo;
+            };
             Margins.prototype.isEmpty = function () {
                 return this.toString() === Margins.defaultVal;
             };
@@ -10755,7 +10758,7 @@ var DevExpress;
             return "dxrd-image-" + (name ? name : controlType.toLowerCase());
         }
         Designer.getImageClassName = getImageClassName;
-        function getUniqueNameForNamedObjectsArray(objects, prefix) {
+        function getUniqueNameForNamedObjectsArray(objects, prefix, names) {
             if (prefix.indexOf("XR") === 0) {
                 prefix = prefix[2].toLowerCase() + prefix.slice(3);
             }
@@ -10765,7 +10768,7 @@ var DevExpress;
                     prefix = prefix.slice(0, indexBand) + prefix.slice(indexBand + 4);
                 }
             }
-            return getUniqueName(objects.map(function (item) { return ko.unwrap(item.name); }), prefix);
+            return getUniqueName(names || objects.map(function (item) { return ko.unwrap(item.name); }), prefix);
         }
         Designer.getUniqueNameForNamedObjectsArray = getUniqueNameForNamedObjectsArray;
         function getUniqueName(names, prefix) {
@@ -10839,9 +10842,10 @@ var DevExpress;
                 this._visitedCollections = [];
                 this._subscriptions = [];
                 this._setName = function (value) {
-                    if (!value.name()) {
+                    var names = _this.allControls().map(function (item) { return ko.unwrap(item.name); });
+                    if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
                         var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
-                        var newName = getUniqueNameForNamedObjectsArray(_this.allControls(), controlType);
+                        var newName = getUniqueNameForNamedObjectsArray(_this.allControls(), controlType, names);
                         value.name(newName);
                         if (_this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
                             value["text"](value.name());
@@ -10879,17 +10883,18 @@ var DevExpress;
                     unwrappedTarget = target.peek();
                 }
                 this._disposables.push(this.allControls.subscribe(function (args) {
-                    args.forEach(function (value) {
-                        _this._setName(value);
-                    });
-                }));
+                    var addedItems = args.filter(function (x) { return x.status === "added"; });
+                    for (var i = 0; i < addedItems.length; i++) {
+                        _this._setName(addedItems[i].value);
+                    }
+                    ;
+                }, null, "arrayChange"));
                 this._collectControls(unwrappedTarget);
                 this._handlers.push.apply(this._handlers, handlers);
             }
             DesignControlsHelper.prototype._collectControls = function (target) {
                 var _this = this;
-                var allControls = this.allControls();
-                allControls.push(target);
+                var array = [target];
                 DevExpress.Designer.collectionsVisitor(target, function (collection) {
                     if (_this._visitedCollections.indexOf(collection) === -1) {
                         _this._visitedCollections.push(collection);
@@ -10902,9 +10907,9 @@ var DevExpress;
                             });
                         }, null, "arrayChange"));
                     }
-                    allControls.push.apply(allControls, collection());
+                    array.push.apply(array, collection());
                 }, this.collectionNames);
-                this.allControls.valueHasMutated();
+                this.allControls.push.apply(this.allControls, array);
             };
             DesignControlsHelper.prototype.getControls = function (target) {
                 var controls = ko.observableArray();
@@ -10995,7 +11000,13 @@ var DevExpress;
                     return _this.createFont(control["font"] && control["font"]() || "");
                 };
                 this.paddingsCss = function () {
-                    return _this.createPadding(control["padding"] && control["padding"]() || "");
+                    var controlPaddings = ko.unwrap(control["padding"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
+                    var paddings = {};
+                    paddings["paddingLeft"] = _this._getPixelValueFromUnit(controlPaddings.left(), control) + "px";
+                    paddings["paddingTop"] = _this._getPixelValueFromUnit(controlPaddings.top(), control) + "px";
+                    paddings["paddingRight"] = _this._getPixelValueFromUnit(controlPaddings.right(), control) + "px";
+                    paddings["paddingBottom"] = _this._getPixelValueFromUnit(controlPaddings.bottom(), control) + "px";
+                    return paddings;
                 };
                 this.textAlignmentCss = function () {
                     var align = control["textAlignment"] && control["textAlignment"]() || "";
@@ -11038,6 +11049,12 @@ var DevExpress;
                     return $.extend(_this.createVerticalAlignment(align), _this.createHorizontalAlignment(align));
                 };
             }
+            CssCalculator.prototype._getPixelValueFromUnit = function (value, control) {
+                if (control["root"] && control["root"].measureUnit) {
+                    return Designer.unitsToPixel(value, control["root"].measureUnit());
+                }
+                return value;
+            };
             CssCalculator.prototype._patchPosition = function (position) {
                 return patchPositionByRTL(position, this._rtlLayout());
             };
@@ -11099,7 +11116,7 @@ var DevExpress;
                 var fontStyles = {};
                 fontString = fontString || "";
                 var components = fontString.split(',');
-                fontStyles["fontFamily"] = components[0];
+                fontStyles["fontFamily"] = components[0] ? '"' + components[0] + '"' : "";
                 fontStyles["fontSize"] = components[1];
                 if (components.length > 2) {
                     for (var i = 2; i < components.length; i++) {
@@ -11123,14 +11140,6 @@ var DevExpress;
                     fontStyles["textDecoration"] = "";
                 }
                 return fontStyles;
-            };
-            CssCalculator.prototype.createPadding = function (paddings) {
-                var padding = {}, paddingModel = new Designer.Widgets.PaddingModel(ko.observable(paddings));
-                padding["paddingLeft"] = paddingModel.left() + "px";
-                padding["paddingTop"] = paddingModel.top() + "px";
-                padding["paddingRight"] = paddingModel.right() + "px";
-                padding["paddingBottom"] = paddingModel.bottom() + "px";
-                return padding;
             };
             CssCalculator.prototype.createVerticalAlignment = function (alignment) {
                 var result = {};
@@ -12420,6 +12429,7 @@ var DevExpress;
         (function (Widgets) {
             Widgets.editorTemplates = {
                 guid: { header: "dxrd-guid" },
+                password: { header: "dxrd-password" },
                 borders: { header: "dxrd-borders" },
                 controls: { header: "dxrd-controls" },
                 objecteditorCustom: { custom: "dxrd-objectEditorContent", editorType: DevExpress.JS.Widgets.PropertyGridEditor },
@@ -12982,17 +12992,6 @@ var DevExpress;
                 };
                 this._copyInfo(cutInfo);
             };
-            CopyPasteHandler.prototype._removeNames = function (object) {
-                var keys = Object.keys(object);
-                for (var i = keys.length - 1; i >= 0; i--) {
-                    if (keys[i] === "@Name") {
-                        object[keys[i]] = undefined;
-                    }
-                    else if (object[keys[i]] instanceof Object) {
-                        this._removeNames(object[keys[i]]);
-                    }
-                }
-            };
             CopyPasteHandler.prototype.paste = function () {
                 var _this = this;
                 if (this.canPaste()) {
@@ -13007,7 +13006,6 @@ var DevExpress;
                     }
                     var minPoint = new Designer.Point(Number.MAX_VALUE, Number.MAX_VALUE), maxPoint = new Designer.Point(-1, -1);
                     for (var i = 0; i < this._copyInfo().objects.length; i++) {
-                        this._removeNames(this._copyInfo().objects[i]);
                         var newControl = this._copyPasteStrategy.createChild(pasteTarget, this._copyInfo().objects[i]);
                         var newControlSurface = Designer.findSurface(newControl);
                         if (!newControlSurface)
@@ -13359,45 +13357,62 @@ var DevExpress;
     (function (Designer) {
         var Widgets;
         (function (Widgets) {
+            Widgets.left = {
+                propertyName: "left", modelName: "@Left", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Left", displayName: "Left", editor: DevExpress.JS.Widgets.editorTemplates.numeric
+            }, Widgets.right = { propertyName: "right", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Right", modelName: "@Right", displayName: "Right", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Widgets.top = { propertyName: "top", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Top", modelName: "@Top", displayName: "Top", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Widgets.bottom = { propertyName: "bottom", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Bottom", modelName: "@Bottom", displayName: "Bottom", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Widgets.paddingSerializationsInfo = [Widgets.left, Widgets.right, Widgets.top, Widgets.bottom];
             var PaddingModel = (function (_super) {
                 __extends(PaddingModel, _super);
-                function PaddingModel(value) {
-                    var _this = this;
+                function PaddingModel(left, right, top, bottom, dpi) {
+                    if (left === void 0) { left = ko.observable(0); }
+                    if (right === void 0) { right = ko.observable(0); }
+                    if (top === void 0) { top = ko.observable(0); }
+                    if (bottom === void 0) { bottom = ko.observable(0); }
+                    if (dpi === void 0) { dpi = ko.observable(100); }
                     _super.call(this);
-                    this.left = ko.observable(0);
-                    this.right = ko.observable(0);
-                    this.top = ko.observable(0);
-                    this.bottom = ko.observable(0);
-                    this.dpi = 100;
-                    this.isUpdate = false;
-                    var isUpdate = false;
-                    this._updateModel(value());
-                    this._disposables.push(value.subscribe(function (newVal) {
-                        isUpdate = true;
-                        _this._updateModel(newVal);
-                        isUpdate = false;
-                    }));
-                    ["left", "right", "bottom", "top"].forEach(function (val) {
-                        _this._disposables.push(_this[val].subscribe(function (newVal) {
-                            if (!isUpdate) {
-                                value(_this._updateValue(newVal));
-                            }
-                        }));
-                    });
+                    this.left = left;
+                    this.right = right;
+                    this.top = top;
+                    this.bottom = bottom;
+                    this.dpi = dpi;
                 }
-                PaddingModel.prototype._updateModel = function (newVal) {
-                    var components = (newVal || "").split(',');
-                    this.left(parseFloat(components[0]) || 0);
-                    this.right(parseFloat(components[1]) || 0);
-                    this.top(parseFloat(components[2]) || 0);
-                    this.bottom(parseFloat(components[3]) || 0);
-                    this.dpi = parseFloat(components[4]) || 100;
+                PaddingModel.prototype.getInfo = function () {
+                    return Widgets.paddingSerializationsInfo;
                 };
-                PaddingModel.prototype._updateValue = function (value) {
-                    if (value !== null && value !== undefined) {
-                        return this.left() + "," + this.right() + "," + this.top() + "," + this.bottom() + "," + this.dpi;
+                PaddingModel.prototype.isEmpty = function () {
+                    return this._toString(true).indexOf("0, 0, 0, 0") === 0;
+                };
+                PaddingModel.prototype.applyFromString = function (value) {
+                    var components = (value || "").split(',');
+                    this.left(parseInt(components[0]) || 0);
+                    this.right(parseInt(components[1]) || 0);
+                    this.top(parseInt(components[2]) || 0);
+                    this.bottom(parseInt(components[3]) || 0);
+                    return this;
+                };
+                PaddingModel.from = function (val) {
+                    return new PaddingModel().applyFromString(val);
+                };
+                PaddingModel.prototype.toString = function () {
+                    var value = this._toString();
+                    if (value.indexOf("0,0,0,0") === 0) {
+                        return {};
+                    }
+                    else {
+                        return value;
                     }
                 };
+                PaddingModel.prototype._getProperty = function (name, inner) {
+                    if (inner === void 0) { inner = false; }
+                    return parseInt(ko.unwrap(inner ? (this["_" + name] || this[name]) : this[name]));
+                };
+                PaddingModel.prototype._toString = function (inner) {
+                    var _this = this;
+                    if (inner === void 0) { inner = false; }
+                    return ["left", "right", "top", "bottom"].map(function (x) { return _this._getProperty(x, inner); }).concat(this.dpi()).join(', ');
+                };
+                PaddingModel.defaultVal = "0, 0, 0, 0, 100";
+                PaddingModel.unitProperties = ["left", "right", "top", "bottom"];
                 return PaddingModel;
             })(Designer.Disposable);
             Widgets.PaddingModel = PaddingModel;

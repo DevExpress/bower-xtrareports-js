@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.11 - 2017-02-20
+/*! DevExpress HTML/JS Designer - v16.1.12 - 2017-05-17
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -6925,12 +6925,21 @@ var DevExpress;
                 PdfPasswordSecurityOptions.prototype.getInfo = function () {
                     return pdfExportPasswordSecurityOptionsSerializationInfo;
                 };
+                PdfPasswordSecurityOptions.prototype.isPropertyDisabled = function (name) {
+                    if (!this.permissionsPassword()) {
+                        if (name === "permissionsOptions")
+                            return true;
+                    }
+                };
+                PdfPasswordSecurityOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.openPassword() || this.permissionsPassword());
+                };
                 return PdfPasswordSecurityOptions;
             })();
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
-                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: Designer.Widgets.editorTemplates.password },
+                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: Designer.Widgets.editorTemplates.password },
                 { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var PdfExportOptions = (function () {
@@ -6949,6 +6958,9 @@ var DevExpress;
                 };
                 PdfExportOptions.prototype.isPropertyDisabled = function (name) {
                     return false;
+                };
+                PdfExportOptions.prototype.hasSensitiveData = function () {
+                    return this.pdfPasswordSecurityOptions && this.pdfPasswordSecurityOptions.hasSensitiveData();
                 };
                 return PdfExportOptions;
             })();
@@ -7423,6 +7435,9 @@ var DevExpress;
                 };
                 ExportOptionsPreview.prototype.getInfo = function () {
                     return this._generateInfo();
+                };
+                ExportOptionsPreview.prototype.hasSensitiveData = function () {
+                    return this.pdf.hasSensitiveData();
                 };
                 return ExportOptionsPreview;
             })(ExportOptions);
@@ -8704,7 +8719,7 @@ var DevExpress;
                 ReportPreview.prototype._export = function (args, actionUri, printable) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    if (Preview.AsyncExportApproach) {
+                    if (Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
@@ -8862,7 +8877,7 @@ var DevExpress;
                 };
                 ReportPreview.prototype.getExportResult = function (operationId, printDisposition) {
                     var arg = encodeURIComponent(JSON.stringify({ id: operationId, printable: !!printDisposition }));
-                    this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
+                    var newWindow = this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
                 };
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
@@ -8917,6 +8932,10 @@ var DevExpress;
                     this.requestWrapper.getDocumentData(documentId).done(function (response) {
                         if (!response) {
                             return;
+                        }
+                        if (response.canRecreatePages === false && this.reportId) {
+                            var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(response.exportOptions || {}, true);
+                            _self.exportOptionsModel(deserializedExportOptions);
                         }
                         _self._drillDownState = response.drillDownKeys || [];
                         _self.documentMap(response.documentMap);
@@ -10534,6 +10553,29 @@ var DevExpress;
                         this.dragHelperContent.setContent(new Designer.Rectangle(0, 0, width, this._size.height()));
                     }
                 };
+                ReportToolboxDragDropHandler.prototype._processProperty = function (propertyName, target, callback) {
+                    if (target instanceof Object && !$.isFunction(target)) {
+                        !!target[propertyName] && callback(target);
+                        for (var name in target) {
+                            if (target[name] instanceof Object && !$.isFunction(target[name])) {
+                                this._processProperty(propertyName, target[name], callback);
+                            }
+                        }
+                    }
+                };
+                ReportToolboxDragDropHandler.prototype.doStopDrag = function (ui, draggable) {
+                    var reportSurface = this.surface();
+                    var toolboxItem = $.extend(true, {}, draggable);
+                    this._processProperty("@Padding", toolboxItem.info, function (target) {
+                        var model = Designer.Widgets.PaddingModel.from(target["@Padding"]);
+                        Designer.Widgets.PaddingModel.unitProperties.forEach(function (name) {
+                            model[name](model[name]() * reportSurface.dpi() / 100);
+                        });
+                        model.dpi(reportSurface.dpi());
+                        target["@Padding"] = model.toString();
+                    });
+                    _super.prototype.doStopDrag.call(this, ui, toolboxItem);
+                };
                 ReportToolboxDragDropHandler.prototype.addControl = function (control, dropTargetSurface, size) {
                     if (control.controlType === "XRTableOfContents") {
                         var reportSurface = this.surface();
@@ -10689,27 +10731,6 @@ var DevExpress;
                 return DrillDownEditor;
             })(ExplorerEditor);
             Report.DrillDownEditor = DrillDownEditor;
-            var PaddingEditor = (function (_super) {
-                __extends(PaddingEditor, _super);
-                function PaddingEditor(info, level, parentDisabled) {
-                    _super.call(this, info, level, parentDisabled);
-                    var model = ko.observable(new Designer.Widgets.PaddingModel(this.value));
-                    var grid = new DevExpress.JS.Widgets.ObjectProperties(model, { editors: Report.paddingSerializationsInfo }, level + 1, this.disabled);
-                    this.viewmodel = grid;
-                }
-                return PaddingEditor;
-            })(DevExpress.JS.Widgets.Editor);
-            Report.PaddingEditor = PaddingEditor;
-            var MarginsEditor = (function (_super) {
-                __extends(MarginsEditor, _super);
-                function MarginsEditor(info, level, parentDisabled) {
-                    _super.call(this, info, level, parentDisabled);
-                    var grid = new DevExpress.JS.Widgets.ObjectProperties(this.value, { editors: Report.paddingSerializationsInfo }, level + 1, this.disabled);
-                    this.viewmodel = grid;
-                }
-                return MarginsEditor;
-            })(DevExpress.JS.Widgets.Editor);
-            Report.MarginsEditor = MarginsEditor;
             var DataBindingsEditor = (function (_super) {
                 __extends(DataBindingsEditor, _super);
                 function DataBindingsEditor(info, level, parentDisabled) {
@@ -10900,8 +10921,6 @@ var DevExpress;
             Report.editorTemplates = {
                 dataSource: { header: "dxrd-datasource" },
                 chartDataSource: { header: "dxrd-chartdatasource" },
-                padding: { header: "dxrd-emptyHeader", content: "dxrd-objectEditorContent", editorType: Report.PaddingEditor },
-                margins: { header: "dxrd-emptyHeader", content: "dxrd-objectEditorContent", editorType: Report.MarginsEditor },
                 dataBindings: { header: "dxrd-dataBindings", content: "dxrd-dataBindingsContent", editorType: Report.DataBindingsEditor },
                 dataBinding: { header: "dxrd-dataBinding", content: "dxrd-dataBindingContent", editorType: Designer.Widgets.FieldListEditor },
                 reportExplorer: { header: "dxrd-reportexplorer-editor", editorType: Report.ExplorerEditor },
@@ -11019,7 +11038,7 @@ var DevExpress;
                     "Double": "Double"
                 }
             };
-            Report.padding = { propertyName: "padding", modelName: "@Padding", displayName: "Padding", editor: Report.editorTemplates.padding };
+            Report.padding = { propertyName: "padding", modelName: "@Padding", displayName: "Padding", from: Designer.Widgets.PaddingModel.from, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.textAlignment = {
                 propertyName: "textAlignment",
                 modelName: "@TextAlignment",
@@ -11505,6 +11524,12 @@ var DevExpress;
         var Report;
         (function (Report) {
             Report.stylesProperties = ["foreColor", "borderColor", "borderWidth", "backColor", "borders", "borderDashStyle", "padding", "textAlignment", "font"];
+            function _getTargetByPath(target, path) {
+                for (var i = 0; i < path.length - 1; i++) {
+                    target = target[path[i]];
+                }
+                return target;
+            }
             var ReportElementViewModel = (function (_super) {
                 __extends(ReportElementViewModel, _super);
                 function ReportElementViewModel(model, parent, serializer) {
@@ -11515,21 +11540,20 @@ var DevExpress;
                     this.formattingRuleLinks = DevExpress.JS.Utils.deserializeArray(model.FormattingRuleLinks, function (item) {
                         return new Report.FormattingRuleLink(item, serializer);
                     });
-                    this.getStyleProperty = function (name) {
-                        return _this._getStyleProperty(name, _this.root);
-                    };
-                    this._generateProperty = function (name, stylePropertyName) {
-                        _this[name] = ko.pureComputed({
+                    var _generateProperty = function (path, stylePriorityName) {
+                        var name = path[path.length - 1];
+                        var target = _getTargetByPath(_this, path);
+                        target["_" + name] = ko.observable(target[name]());
+                        target[name] = ko.computed({
                             read: function () {
-                                return _this._getStyleProperty(name, _this.root);
+                                return _this._getStyleProperty(path, stylePriorityName, _this.root);
                             },
                             write: function (val) {
-                                if (_this._getStyleProperty(name, _this.root) !== val) {
-                                    var useName = name.charAt(0).toUpperCase() + name.substr(1);
-                                    if (_this.stylePriority && _this.stylePriority[stylePropertyName]) {
-                                        _this.stylePriority[stylePropertyName](false);
+                                if (_this._getStyleProperty(path, stylePriorityName, _this.root) !== val) {
+                                    if (_this.stylePriority && _this.stylePriority[stylePriorityName]) {
+                                        _this.stylePriority[stylePriorityName](false);
                                     }
-                                    _this["_" + name](val);
+                                    target["_" + name](val);
                                 }
                             }
                         });
@@ -11540,11 +11564,26 @@ var DevExpress;
                     if (defaultBinding) {
                         this[defaultBinding.propertyName] = this.dataBindings()["findBinding"](defaultBinding["bindingName"]);
                     }
+                    this.getStyleProperty = function (path, stylePriorityName) {
+                        return _this._getStyleProperty(path, stylePriorityName, _this.root);
+                    };
+                    if (this.padding) {
+                        this.padding.dpi = ko.computed(function () {
+                            return _this.dpi && _this.dpi();
+                        });
+                    }
                     for (var i = 0; i < Report.stylesProperties.length; i++) {
                         if (this[Report.stylesProperties[i]]) {
-                            var stylePropertyName = this._getStylePriorityPropertyName(Report.stylesProperties[i]);
-                            this["_" + Report.stylesProperties[i]] = ko.observable(this[Report.stylesProperties[i]]());
-                            this._generateProperty(Report.stylesProperties[i], stylePropertyName);
+                            var stylePriorityName = this._getStylePriorityPropertyName(Report.stylesProperties[i]);
+                            if (ko.unwrap(this[Report.stylesProperties[i]]) instanceof Object) {
+                                var info = this[Report.stylesProperties[i]].getInfo();
+                                for (var j = 0; j < info.length; j++) {
+                                    _generateProperty([Report.stylesProperties[i], info[j].propertyName], stylePriorityName);
+                                }
+                            }
+                            else {
+                                _generateProperty([Report.stylesProperties[i]], stylePriorityName);
+                            }
                         }
                     }
                     ;
@@ -11571,39 +11610,38 @@ var DevExpress;
                 ReportElementViewModel.prototype._getStylePriorityPropertyName = function (propertyName) {
                     return "use" + propertyName.charAt(0).toUpperCase() + propertyName.substr(1);
                 };
-                ReportElementViewModel.prototype._shouldUseStylePriority = function (name) {
-                    var stylePropertyName = this._getStylePriorityPropertyName(name);
-                    var result = this.stylePriority && this.stylePriority[stylePropertyName] && this.stylePriority[stylePropertyName]();
-                    return result;
-                };
                 ReportElementViewModel.prototype._getStyle = function (root) {
                     var styleName = this.styleName && this.styleName(), style = styleName && root && root.findStyle && root.findStyle(styleName);
                     return style;
                 };
-                ReportElementViewModel.prototype._hasStyle = function (name, root) {
-                    var style = this._getStyle(root);
-                    if (style && style["_" + name]) {
-                        return style && style.isPropertyModified("_" + name) && style["_" + name]() !== null;
-                    }
-                    else
-                        return style && style.isPropertyModified(name) && style[name]() !== null;
+                ReportElementViewModel.prototype._checkModify = function (target, propertyName) {
+                    var property = target && (target["_" + propertyName] || target[propertyName]);
+                    return ko.unwrap(property) && target.isPropertyModified(propertyName);
                 };
-                ReportElementViewModel.prototype._getStyleProperty = function (name, root) {
-                    if (this._shouldUseStylePriority(name)) {
-                        if (this._hasStyle(name, root)) {
-                            return this._getStyle(root)[name]();
+                ReportElementViewModel.prototype._getStyleProperty = function (path, stylePriorityName, root) {
+                    var name = path[path.length - 1];
+                    var target = _getTargetByPath(this, path);
+                    if (this.stylePriority && this.stylePriority[stylePriorityName] && this.stylePriority[stylePriorityName]()) {
+                        var style = this._getStyle(root);
+                        if (this._checkModify(style, path[0])) {
+                            return _getTargetByPath(style, path)[name]();
                         }
                     }
-                    if (this["_" + name] && this["_" + name]() && this._hasModifiedValue(name)) {
-                        return this["_" + name]();
+                    if (this._checkModify(this, path[0])) {
+                        return target["_" + name]();
                     }
-                    var defaultValue = this.getPropertyDefaultValue(name);
-                    if (defaultValue) {
+                    var defaultValue = this.getPropertyDefaultValue(path[0]);
+                    if (defaultValue && !(defaultValue instanceof Object)) {
                         return defaultValue;
                     }
                     var parent = this.parentModel();
                     if (parent) {
-                        return parent.getStyleProperty(name);
+                        return parent.getStyleProperty(path, stylePriorityName);
+                    }
+                    else {
+                        if (defaultValue instanceof Object) {
+                            return ko.unwrap(defaultValue[name]);
+                        }
                     }
                 };
                 ReportElementViewModel.prototype._zOrderChange = function (bringToFront) {
@@ -12882,9 +12920,9 @@ var DevExpress;
                     { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) {
                         return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null);
                     } },
-                    { value: "System.Guid", displayValue: "Guid", icon: "guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) {
+                    { value: "System.Guid", displayValue: "Guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) {
                         return DevExpress.Designer.validateGuid(val) ? val : Parameter.defaultGuidValue;
-                    }, specifics: "String" }
+                    }, specifics: "guid" }
                 ];
                 return Parameter;
             })(Designer.Disposable);
@@ -13248,7 +13286,14 @@ var DevExpress;
                     return Report.styleSerializationInfo;
                 };
                 StyleModel.prototype.isPropertyModified = function (name) {
-                    return !!(this[name] && this[name]());
+                    var needName = this["_" + name] ? "_" + name : name;
+                    var property = ko.unwrap(this[needName]);
+                    if (property instanceof Object) {
+                        return !property.isEmpty();
+                    }
+                    else {
+                        return !!property;
+                    }
                 };
                 StyleModel.defaults = {
                     "backColor": "transparent",
@@ -13445,10 +13490,9 @@ var DevExpress;
                     Designer.objectsVisitor(this, function (target) {
                         if (target && target["constructor"] && target["constructor"].unitProperties) {
                             for (var i = 0; i < target["constructor"].unitProperties.length; i++) {
-                                var propertyValue = target[target["constructor"].unitProperties[i]]();
-                                if (!propertyValue)
-                                    continue;
-                                target[target["constructor"].unitProperties[i]](Math.round(propertyValue * coef * 100) / 100);
+                                var propertyName = target["constructor"].unitProperties[i];
+                                var property = target["_" + propertyName] || target[propertyName];
+                                !!ko.unwrap(property) && property(Math.round(ko.unwrap(property) * coef * 100) / 100);
                             }
                             ;
                         }
@@ -14016,7 +14060,7 @@ var DevExpress;
                 }
             };
             Report.landscape = { propertyName: "landscape", modelName: "@Landscape", displayName: "Landscape", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.margins = { propertyName: "margins", modelName: "@Margins", from: Designer.Margins.fromString, displayName: "Margins", info: Report.paddingSerializationsInfo, editor: Report.editorTemplates.margins };
+            Report.margins = { propertyName: "margins", modelName: "@Margins", from: Designer.Margins.fromString, displayName: "Margins", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.pageColor = { propertyName: "pageColor", modelName: "@PageColor", defaultVal: "White", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Page Color", editor: Designer.Widgets.editorTemplates.customColorEditor };
             Report.measureUnit = {
                 propertyName: "measureUnit",
@@ -14898,8 +14942,8 @@ var DevExpress;
                         return "dxrd-checkbox-checkstate-" + control["checkState"]().toLowerCase();
                     });
                     this.leftPadding = function () {
-                        var padding = control["padding"] && control["padding"]() || "0,0,0,0";
-                        return parseFloat(padding.split(',')[0]);
+                        var padding = ko.unwrap(control["padding"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
+                        return Designer.unitsToPixel(padding.left(), context.measureUnit());
                     };
                     this.textWidth = ko.pureComputed(function () {
                         return _this.contentSizes().width / context.zoom() - _this.checkboxSize - _this.leftPadding();
@@ -15999,15 +16043,18 @@ var DevExpress;
                             img.src = "data:image/x;base64," + _this.image();
                         }
                     }));
+                    var toPixel = function (value) {
+                        return Designer.unitsToPixel(value, _this.root["measureUnit"]());
+                    };
                     this._disposables.push(ko.computed(function () {
                         if (_this.isAutoSize && _this.image.peek()) {
-                            var borders = new Designer.Widgets.BordersModel({ value: _this["borders"] }), borderWidth = _this["borderWidth"]() || 0, top, bottom, left, right, paddings = new Designer.Widgets.PaddingModel(_this["padding"]);
+                            var borders = new Designer.Widgets.BordersModel({ value: _this["borders"] }), borderWidth = _this["borderWidth"]() || 0, top, bottom, left, right, paddings = (_this["padding"]);
                             top = borders.top() ? borderWidth : 0;
                             bottom = borders.bottom() ? borderWidth : 0;
                             left = borders.left() ? borderWidth : 0;
                             right = borders.right() ? borderWidth : 0;
-                            originalWidth(originalImageWidth() + right + left + paddings.left() + paddings.right());
-                            originalHeight(originalImageHeight() + top + bottom + paddings.top() + paddings.bottom());
+                            originalWidth(originalImageWidth() + right + left + toPixel(paddings.left()) + toPixel(paddings.right()));
+                            originalHeight(originalImageHeight() + top + bottom + toPixel(paddings.top()) + toPixel(paddings.bottom()));
                         }
                     }));
                     this.isSmallerImage = ko.pureComputed(function () {

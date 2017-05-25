@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.11 - 2017-02-20
+/*! DevExpress HTML/JS Designer - v16.1.12 - 2017-05-18
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -514,12 +514,21 @@ var DevExpress;
                 PdfPasswordSecurityOptions.prototype.getInfo = function () {
                     return pdfExportPasswordSecurityOptionsSerializationInfo;
                 };
+                PdfPasswordSecurityOptions.prototype.isPropertyDisabled = function (name) {
+                    if (!this.permissionsPassword()) {
+                        if (name === "permissionsOptions")
+                            return true;
+                    }
+                };
+                PdfPasswordSecurityOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.openPassword() || this.permissionsPassword());
+                };
                 return PdfPasswordSecurityOptions;
             })();
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
-                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: Designer.Widgets.editorTemplates.password },
+                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: Designer.Widgets.editorTemplates.password },
                 { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var PdfExportOptions = (function () {
@@ -538,6 +547,9 @@ var DevExpress;
                 };
                 PdfExportOptions.prototype.isPropertyDisabled = function (name) {
                     return false;
+                };
+                PdfExportOptions.prototype.hasSensitiveData = function () {
+                    return this.pdfPasswordSecurityOptions && this.pdfPasswordSecurityOptions.hasSensitiveData();
                 };
                 return PdfExportOptions;
             })();
@@ -1012,6 +1024,9 @@ var DevExpress;
                 };
                 ExportOptionsPreview.prototype.getInfo = function () {
                     return this._generateInfo();
+                };
+                ExportOptionsPreview.prototype.hasSensitiveData = function () {
+                    return this.pdf.hasSensitiveData();
                 };
                 return ExportOptionsPreview;
             })(ExportOptions);
@@ -2293,7 +2308,7 @@ var DevExpress;
                 ReportPreview.prototype._export = function (args, actionUri, printable) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    if (Preview.AsyncExportApproach) {
+                    if (Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
@@ -2451,7 +2466,7 @@ var DevExpress;
                 };
                 ReportPreview.prototype.getExportResult = function (operationId, printDisposition) {
                     var arg = encodeURIComponent(JSON.stringify({ id: operationId, printable: !!printDisposition }));
-                    this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
+                    var newWindow = this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
                 };
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
@@ -2506,6 +2521,10 @@ var DevExpress;
                     this.requestWrapper.getDocumentData(documentId).done(function (response) {
                         if (!response) {
                             return;
+                        }
+                        if (response.canRecreatePages === false && this.reportId) {
+                            var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(response.exportOptions || {}, true);
+                            _self.exportOptionsModel(deserializedExportOptions);
                         }
                         _self._drillDownState = response.drillDownKeys || [];
                         _self.documentMap(response.documentMap);
