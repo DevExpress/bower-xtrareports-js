@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
+<!-- /*! DevExpress HTML/JS Designer - v16.2.7 - 2017-05-17
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -199,7 +199,7 @@
 </script>
 <script type="text/html" id="dx-expressioneditor-main">
     <div class="dx-expression-tree">
-        <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, onKeyPress: function() { isValid(true); } }"></div>
+        <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyPress: function() { isValid(true); } }"></div>
         <div class="dx-expressioneditor-tools">
             <!-- ko with: tools-->
             <div class="dx-expressioneditor-tools-popular">
@@ -1043,7 +1043,7 @@
         <div data-bind="dxdAccordion: { collapsed: collapsed }">
             <div class="dxrd-group-header dx-accordion-header" data-bind="css: { 'dxrd-group-header-collapsed': collapsed() }">
                 <div class="dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
-                <span class="dxrd-group-header-text" data-bind="text: DevExpress.Designer.getLocalization('Actions')"></span>
+                <span class="dxrd-group-header-text" data-bind="text: DevExpress.Designer.getLocalization('Actions', 'ASPxReportsStringId.ReportDesigner_Actions')"></span>
             </div>
             <div class="dx-accordion-content">
                 <!-- ko template: 'dxrd-shadow' -->
@@ -1182,7 +1182,12 @@
         <div class="dxrp-editing-field-content" data-bind="click: activateEditor">
             <!-- ko if: !active() || field.readOnly()  -->
             <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap}">
-                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), html: htmlValue() || field.editValue()"></div>
+                <!-- ko if: htmlValue()  -->
+                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), html: htmlValue()"></div>
+                <!--/ko-->
+                <!-- ko ifnot: htmlValue()  -->
+                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), text: field.editValue()"></div>
+                <!--/ko-->
             </div>
             <!--/ko-->
             <!-- ko if: active() && !field.readOnly() -->

@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
+/*! DevExpress HTML/JS Designer - v16.2.7 - 2017-05-17
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -3915,14 +3915,11 @@ var DevExpress;
                 };
                 OperandPropertyQBSurface.updateSpecifics = function (propertySurface) {
                     var fieldList = ko.unwrap(propertySurface.fieldListProvider);
-                    if (fieldList) {
-                        var path = propertySurface.propertyName().split('.')[0];
-                        fieldList.getItems(new DevExpress.JS.Widgets.PathRequest(path)).done(function (result) {
-                            var item = Designer.findFirstItemMatchesCondition(result, function (item) { return path + "." + item.name === propertySurface.propertyName(); });
-                            if (item) {
-                                propertySurface.specifics(item.specifics.toLowerCase());
-                            }
-                        });
+                    if (fieldList && fieldList.getColumnInfo) {
+                        var item = fieldList.getColumnInfo(propertySurface.propertyName());
+                        if (item) {
+                            propertySurface.specifics(item.specifics.toLowerCase());
+                        }
                     }
                 };
                 return OperandPropertyQBSurface;
@@ -3968,28 +3965,12 @@ var DevExpress;
                         var items = [];
                         if (pathRequest.fullPath === "") {
                             items = objectFilter.filterTables(query().tables())
-                                .map(function (table) {
-                                return {
-                                    displayName: table.actualName(),
-                                    name: table.actualName(),
-                                    isList: true,
-                                    specifics: "Default",
-                                    collapsed: ko.observable(true)
-                                };
-                            });
+                                .map(QueryBuilderObjectsProvider._createTableInfo);
                         }
                         else {
                             var table = Designer.findFirstItemMatchesCondition(query().tables(), function (table) { return table.actualName() === pathRequest.fullPath; });
                             items = objectFilter.filterColumns(table && table.columns() || [])
-                                .map(function (column) {
-                                return {
-                                    displayName: objectFilter.getColumnName(column),
-                                    isList: false,
-                                    specifics: column.specifics,
-                                    dataType: column.dataType.peek(),
-                                    name: objectFilter.getColumnName(column)
-                                };
-                            });
+                                .map(function (column) { return QueryBuilderObjectsProvider._createColumnInfo(column, objectFilter); });
                         }
                         result.resolve(items);
                         return result.promise();
@@ -4000,7 +3981,35 @@ var DevExpress;
                             query().parameters.push(parameter);
                         }
                     };
+                    this.getColumnInfo = function (propertyName) {
+                        if (propertyName) {
+                            var table = Designer.findFirstItemMatchesCondition(query().tables(), function (t) { return propertyName.indexOf(t.name() + ".") === 0; });
+                            if (table) {
+                                var column = Designer.findFirstItemMatchesCondition(objectFilter.filterColumns(table.columns() || []), function (c) { return propertyName === table.name() + "." + objectFilter.getColumnName(c); });
+                                return column ? QueryBuilderObjectsProvider._createColumnInfo(column, objectFilter) : null;
+                            }
+                        }
+                        return null;
+                    };
                 }
+                QueryBuilderObjectsProvider._createTableInfo = function (table) {
+                    return {
+                        displayName: table.actualName(),
+                        name: table.actualName(),
+                        isList: true,
+                        specifics: "Default",
+                        collapsed: ko.observable(true)
+                    };
+                };
+                QueryBuilderObjectsProvider._createColumnInfo = function (column, objectFilter) {
+                    return {
+                        displayName: objectFilter.getColumnName(column),
+                        isList: false,
+                        specifics: column.specifics,
+                        dataType: column.dataType.peek(),
+                        name: objectFilter.getColumnName(column)
+                    };
+                };
                 QueryBuilderObjectsProvider.whereClauseObjectsFilter = {
                     filterColumns: function (columns) { return columns; },
                     filterTables: function (tables) { return tables; },
@@ -5058,19 +5067,51 @@ var DevExpress;
     (function (Designer) {
         var Chart;
         (function (Chart) {
-            var CommonValueDataMembers = (function (_super) {
-                __extends(CommonValueDataMembers, _super);
-                function CommonValueDataMembers(value, valueScaleType) {
+            var DataMemberBase = (function (_super) {
+                __extends(DataMemberBase, _super);
+                function DataMemberBase(value, valueScaleType) {
                     var _this = this;
                     _super.call(this);
-                    this.value = ko.observable();
-                    this.value(value);
+                    this._separator = ';';
+                    this._assignValueDataMembers(this, value);
                     if (valueScaleType) {
                         this.valueScaleType = valueScaleType;
                         this._disposables.push(this.valueScaleType.subscribe(function (newVal) {
-                            _this.value("");
+                            _this._assignValueDataMembers(_this, "");
                         }));
                     }
+                }
+                DataMemberBase.prototype._assignValueDataMembers = function (valueDataMember, value) {
+                    var values = (value || "").split(this._separator);
+                    valueDataMember.arrayValueDataMemberNames.forEach(function (name, index) {
+                        if (valueDataMember[name])
+                            valueDataMember[name](values[index] || "");
+                        else
+                            valueDataMember[name] = ko.observable(values[index] || "");
+                    });
+                };
+                DataMemberBase.prototype._valueDataMembersToString = function (valueDataMember) {
+                    var result = [];
+                    valueDataMember.arrayValueDataMemberNames.forEach(function (name) {
+                        result.push(valueDataMember[name]() || "");
+                    });
+                    return result.join(this._separator);
+                };
+                DataMemberBase.prototype.toString = function () {
+                    var _this = this;
+                    var shouldSerialize = false;
+                    this.arrayValueDataMemberNames.forEach(function (name) {
+                        shouldSerialize = shouldSerialize || _this[name]();
+                    });
+                    return shouldSerialize ? this._valueDataMembersToString(this) : null;
+                };
+                return DataMemberBase;
+            })(Designer.Disposable);
+            Chart.DataMemberBase = DataMemberBase;
+            var CommonValueDataMembers = (function (_super) {
+                __extends(CommonValueDataMembers, _super);
+                function CommonValueDataMembers() {
+                    _super.apply(this, arguments);
                 }
                 CommonValueDataMembers.from = function (value) {
                     return new CommonValueDataMembers(value, null);
@@ -5078,109 +5119,72 @@ var DevExpress;
                 CommonValueDataMembers.toJson = function (value) {
                     return value.toString() || {};
                 };
-                CommonValueDataMembers.prototype.toString = function () {
-                    return this.value();
-                };
                 CommonValueDataMembers.prototype.getInfo = function () {
                     return valueDataMembersSerializationsInfo;
                 };
+                Object.defineProperty(CommonValueDataMembers.prototype, "arrayValueDataMemberNames", {
+                    get: function () {
+                        return ["value"];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return CommonValueDataMembers;
-            })(Designer.Disposable);
+            })(DataMemberBase);
             Chart.CommonValueDataMembers = CommonValueDataMembers;
             var ValueWeightDataMembers = (function (_super) {
                 __extends(ValueWeightDataMembers, _super);
-                function ValueWeightDataMembers(value, valueScaleType) {
-                    var _this = this;
-                    _super.call(this);
-                    this.value = ko.observable();
-                    this.weight = ko.observable();
-                    if (value) {
-                        var result = value.split(';');
-                        this.value(result[0]);
-                        this.weight(result[1]);
-                    }
-                    this.valueScaleType = valueScaleType;
-                    this._disposables.push(this.valueScaleType.subscribe(function (newVal) {
-                        _this.value("");
-                    }));
+                function ValueWeightDataMembers() {
+                    _super.apply(this, arguments);
                 }
-                ValueWeightDataMembers.prototype.toString = function () {
-                    if (this.value() || this.weight()) {
-                        return this.value() + ";" + this.weight();
-                    }
-                    return null;
-                };
                 ValueWeightDataMembers.prototype.getInfo = function () {
                     return valueWeightDataMembersSerializationsInfo;
                 };
+                Object.defineProperty(ValueWeightDataMembers.prototype, "arrayValueDataMemberNames", {
+                    get: function () {
+                        return ["value", "weight"];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return ValueWeightDataMembers;
-            })(Designer.Disposable);
+            })(DataMemberBase);
             Chart.ValueWeightDataMembers = ValueWeightDataMembers;
             var Value1Value2DataMembers = (function (_super) {
                 __extends(Value1Value2DataMembers, _super);
-                function Value1Value2DataMembers(value, valueScaleType) {
-                    var _this = this;
-                    _super.call(this);
-                    this.value1 = ko.observable();
-                    this.value2 = ko.observable();
-                    if (value) {
-                        var result = value.split(';');
-                        this.value1(result[0]);
-                        this.value2(result[1]);
-                    }
-                    this.valueScaleType = valueScaleType;
-                    this._disposables.push(this.valueScaleType.subscribe(function (newVal) {
-                        _this.value1("");
-                        _this.value2("");
-                    }));
+                function Value1Value2DataMembers() {
+                    _super.apply(this, arguments);
                 }
-                Value1Value2DataMembers.prototype.toString = function () {
-                    if (this.value1() || this.value2()) {
-                        return this.value1() + ";" + this.value2();
-                    }
-                    return null;
-                };
                 Value1Value2DataMembers.prototype.getInfo = function () {
                     return value1Value2DataMembersSerializationsInfo;
                 };
+                Object.defineProperty(Value1Value2DataMembers.prototype, "arrayValueDataMemberNames", {
+                    get: function () {
+                        return ["value1", "value2"];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return Value1Value2DataMembers;
-            })(Designer.Disposable);
+            })(DataMemberBase);
             Chart.Value1Value2DataMembers = Value1Value2DataMembers;
             var StockValueDataMembers = (function (_super) {
                 __extends(StockValueDataMembers, _super);
-                function StockValueDataMembers(value, valueScaleType) {
-                    var _this = this;
-                    _super.call(this);
-                    this.close = ko.observable();
-                    this.hight = ko.observable();
-                    this.low = ko.observable();
-                    this.open = ko.observable();
-                    if (value) {
-                        var result = value.split(';');
-                        this.close(result[0]);
-                        this.hight(result[1]);
-                        this.low(result[2]);
-                        this.open(result[3]);
-                    }
-                    this.valueScaleType = valueScaleType;
-                    this._disposables.push(this.valueScaleType.subscribe(function (newVal) {
-                        _this.close("");
-                        _this.hight("");
-                        _this.low("");
-                        _this.open("");
-                    }));
+                function StockValueDataMembers() {
+                    _super.apply(this, arguments);
                 }
-                StockValueDataMembers.prototype.toString = function () {
-                    if (this.close() || this.hight() || this.low() || this.open()) {
-                        return this.close() + ";" + this.hight() + ";" + this.low() + ";" + this.open();
-                    }
-                    return null;
-                };
                 StockValueDataMembers.prototype.getInfo = function () {
                     return stockDataMembersSerializationsInfo;
                 };
+                Object.defineProperty(StockValueDataMembers.prototype, "arrayValueDataMemberNames", {
+                    get: function () {
+                        return ["low", "hight", "open", "close"];
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return StockValueDataMembers;
-            })(Designer.Disposable);
+            })(DataMemberBase);
             Chart.StockValueDataMembers = StockValueDataMembers;
             var viewTypesDataMembers = {
                 "BubbleSeriesView": ValueWeightDataMembers,
@@ -5708,14 +5712,14 @@ var DevExpress;
                 { propertyName: "weight", displayName: "Weight", editor: Chart.editorTemplates.valueDataMember },
             ];
             var value1Value2DataMembersSerializationsInfo = [
-                { propertyName: "value1", displayName: "Value", editor: Chart.editorTemplates.valueDataMember },
-                { propertyName: "value2", displayName: "Value", editor: Chart.editorTemplates.valueDataMember },
+                { propertyName: "value1", displayName: "Value 1", editor: Chart.editorTemplates.valueDataMember },
+                { propertyName: "value2", displayName: "Value 2", editor: Chart.editorTemplates.valueDataMember },
             ];
             var stockDataMembersSerializationsInfo = [
-                { propertyName: "close", displayName: "Close", eeditor: Chart.editorTemplates.valueDataMember },
-                { propertyName: "hight", displayName: "Hight", editor: Chart.editorTemplates.valueDataMember },
                 { propertyName: "low", displayName: "Low", editor: Chart.editorTemplates.valueDataMember },
+                { propertyName: "hight", displayName: "Hight", editor: Chart.editorTemplates.valueDataMember },
                 { propertyName: "open", displayName: "Open", editor: Chart.editorTemplates.valueDataMember },
+                { propertyName: "close", displayName: "Close", editor: Chart.editorTemplates.valueDataMember },
             ];
             var mapTypes = {
                 "SideBySideBarSeriesView": "SideBySideBarSeriesLabel",
@@ -6162,6 +6166,11 @@ var DevExpress;
                         series.valueDataMembers()["getPath"] = function (propertyName) {
                             return _this.getPath("seriesDataMember");
                         };
+                        series.valueDataMembers.subscribe(function (newVal) {
+                            newVal["getPath"] = function (propertyName) {
+                                return _this.getPath("seriesDataMember");
+                            };
+                        });
                     });
                     this._disposables.push(this.chart.dataContainer.series.subscribe(function (args) {
                         if (args[0].status === "added") {
@@ -6176,6 +6185,11 @@ var DevExpress;
                             args[0].value.valueDataMembers()["getPath"] = function (propertyName) {
                                 return _this.getPath("seriesDataMember");
                             };
+                            args[0].value.valueDataMembers.subscribe(function (newVal) {
+                                newVal["getPath"] = function (propertyName) {
+                                    return _this.getPath("seriesDataMember");
+                                };
+                            });
                         }
                     }, null, "arrayChange"));
                     this.chart.dataContainer.seriesTemplate["isPropertyDisabled"] = function (propertyName) {
@@ -6555,6 +6569,9 @@ var DevExpress;
                 "SingleFile": "Single File",
                 "SingleFilePageByPage": "Single File PageByPage"
             };
+            Report.defaultExportModeMerdedPreview = {
+                "SingleFilePageByPage": "Single File PageByPage"
+            };
             Report.defaultExportMode = {
                 "SingleFile": "Single File",
                 "SingleFilePageByPage": "Single File PageByPage",
@@ -6568,6 +6585,10 @@ var DevExpress;
                 displayName: "Export Mode",
                 values: $.extend({}, Report.defaultExportModePreview)
             };
+            Report.rtfExportModeMergedPreview = $.extend({}, Report.rtfExportMode, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
             Report.htmlExportMode = {
                 propertyName: "htmlExportMode",
                 modelName: "@ExportMode",
@@ -6679,46 +6700,74 @@ var DevExpress;
                 defaultVal: "Sheet",
                 editor: DevExpress.JS.Widgets.editorTemplates.text
             };
+            function excludeModesForMergedDocuments(val) {
+                return ko.observable("SingleFilePageByPage");
+            }
+            Report.excludeModesForMergedDocuments = excludeModesForMergedDocuments;
             function excludeDifferentFilesMode(val) {
                 return ko.observable(val === "DifferentFiles" ? "SingleFile" : val);
             }
             Report.excludeDifferentFilesMode = excludeDifferentFilesMode;
-            Report.htmlExportModePreview = {
+            Report.htmlExportModePreviewBase = {
                 propertyName: Report.htmlExportMode.propertyName,
                 modelName: Report.htmlExportMode.modelName,
                 defaultVal: Report.htmlExportMode.defaultVal,
                 editor: Report.htmlExportMode.editor,
-                displayName: Report.htmlExportMode.displayName,
+                displayName: Report.htmlExportMode.displayName
+            };
+            Report.htmlExportModePreview = $.extend({}, Report.htmlExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
-            };
-            Report.xlsExportModePreview = {
+            });
+            Report.htmlExportModeMergedPreview = $.extend({}, Report.htmlExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
+            Report.xlsExportModePreviewBase = {
                 propertyName: Report.xlsExportMode.propertyName,
                 modelName: Report.xlsExportMode.modelName,
                 defaultVal: Report.xlsExportMode.defaultVal,
                 editor: Report.xlsExportMode.editor,
-                displayName: Report.xlsExportMode.displayName,
+                displayName: Report.xlsExportMode.displayName
+            };
+            Report.xlsExportModePreview = $.extend({}, Report.xlsExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
-            };
-            Report.imageExportModePreview = {
+            });
+            Report.xlsExportModeMergedPreview = $.extend({}, Report.xlsExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
+            Report.imageExportModePreviewBase = {
                 propertyName: Report.imageExportMode.propertyName,
                 modelName: Report.imageExportMode.modelName,
                 defaultVal: Report.imageExportMode.defaultVal,
                 editor: Report.imageExportMode.editor,
-                displayName: Report.imageExportMode.displayName,
+                displayName: Report.imageExportMode.displayName
+            };
+            Report.imageExportModePreview = $.extend({}, Report.imageExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
-            };
-            Report.xlsxExportModePreview = {
+            });
+            Report.imageExportModeMergedPreview = $.extend({}, Report.imageExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
+            Report.xlsxExportModePreviewBase = {
                 propertyName: Report.xlsxExportMode.propertyName,
                 modelName: Report.xlsxExportMode.modelName,
                 defaultVal: Report.xlsxExportMode.defaultVal,
                 editor: Report.xlsxExportMode.editor,
                 displayName: Report.xlsxExportMode.displayName,
+            };
+            Report.xlsxExportModePreview = $.extend({}, Report.xlsxExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
                 values: $.extend({}, Report.defaultExportModePreview)
-            };
+            });
+            Report.xlsxExportModeMergedPreview = $.extend({}, Report.xlsxExportModePreviewBase, {
+                from: excludeModesForMergedDocuments,
+                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+            });
             Report.previewBackColor = { propertyName: "backColor", modelName: "@BackColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
             Report.previewSides = { propertyName: "borders", modelName: "@Sides" };
             Report.previewBorderColor = { propertyName: "borderColor", modelName: "@BorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
@@ -7049,12 +7098,37 @@ var DevExpress;
                 PdfPasswordSecurityOptions.prototype.getInfo = function () {
                     return pdfExportPasswordSecurityOptionsSerializationInfo;
                 };
+                PdfPasswordSecurityOptions.prototype.isPropertyDisabled = function (name) {
+                    var openPass = this.openPassword();
+                    if (!this.permissionsPassword()) {
+                        if (name === "permissionsOptions")
+                            return true;
+                        if (!openPass && name === pdfEncryptionLevel.propertyName)
+                            return true;
+                    }
+                };
+                PdfPasswordSecurityOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.openPassword() || this.permissionsPassword());
+                };
                 return PdfPasswordSecurityOptions;
             })();
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
+            var pdfEncryptionLevel = {
+                propertyName: "encryptionLevel",
+                modelName: "@EncryptionLevel",
+                displayName: "Encryption Level",
+                defaultVal: "AES128",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                values: {
+                    "ARC4": "ARC4",
+                    "AES128": "AES128",
+                    "AES256": "AES256",
+                }
+            };
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
-                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
+                pdfEncryptionLevel,
+                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
                 { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var PdfExportOptions = (function () {
@@ -7073,6 +7147,9 @@ var DevExpress;
                 };
                 PdfExportOptions.prototype.isPropertyDisabled = function (name) {
                     return false;
+                };
+                PdfExportOptions.prototype.hasSensitiveData = function () {
+                    return this.pdfPasswordSecurityOptions && this.pdfPasswordSecurityOptions.hasSensitiveData();
                 };
                 return PdfExportOptions;
             })();
@@ -7136,14 +7213,14 @@ var DevExpress;
             })();
             Report.RtfExportOptions = RtfExportOptions;
             var rtfExportOptionsSerializationInfoBase = [
-                Report.rtfExportMode,
                 Report.pageRange,
                 Report.exportWatermarks
             ];
             var rtfExportOptionsSerializationInfo = [
                 { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+                { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                Report.rtfExportMode
             ].concat(rtfExportOptionsSerializationInfoBase);
             var TextExportOptions = (function () {
                 function TextExportOptions(model, serializer) {
@@ -7192,10 +7269,16 @@ var DevExpress;
                         "Compatible": "Compatible"
                     }
                 },
-                { propertyName: "password", modelName: "@Password", displayName: "Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+                { propertyName: "password", modelName: "@Password", displayName: "Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } }
             ];
             var encryptionOptions = { propertyName: "encryptionOptions", modelName: "EncryptionOptions", displayName: "Encryption Options", info: encryptionOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var xlsExportOptionsSerializationInfoCommon = [
+                Report.xlsExportHyperlinks,
+                Report.pageRange,
+                Report.xlsRawDataMode,
+                Report.xlsExportOptionsSheetName,
+                Report.xlsShowGridLines,
+                Report.xlsTextExportMode,
                 { propertyName: "rasterizeImages", modelName: "@RasterizeImages", displayName: "Rasterize Images", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "rasterizationResolution", modelName: "@RasterizationResolution", displayName: "Rasterization Resolution", defaultVal: 96, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
                 { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
@@ -7229,14 +7312,8 @@ var DevExpress;
                 encryptionOptions
             ];
             var xlsExportOptionsSerializationInfoBase = [
-                Report.xlsExportHyperlinks,
-                Report.pageRange,
-                Report.xlsRawDataMode,
-                Report.xlsExportOptionsSheetName,
-                Report.xlsShowGridLines,
                 { propertyName: "suppress256ColumnsWarning", modelName: "@Suppress256ColumnsWarning", displayName: "Suppress 256 Columns Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "suppress65536RowsWarning", modelName: "@Suppress65536RowsWarning", displayName: "Suppress 65536 Rows Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                Report.xlsTextExportMode,
                 {
                     propertyName: "workbookColorPaletteCompliance",
                     modelName: "@WorkbookColorPaletteCompliance",
@@ -7250,7 +7327,7 @@ var DevExpress;
                     }
                 }
             ];
-            var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
+            var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoCommon, xlsExportOptionsSerializationInfoBase);
             var XlsExportOptions = (function () {
                 function XlsExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -7268,18 +7345,13 @@ var DevExpress;
                 XlsExportOptions.prototype.isPropertyDisabled = function (name) {
                     return name === "pageRange" && this.xlsExportMode() === "SingleFile";
                 };
+                XlsExportOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.encryptionOptions && this.encryptionOptions.password());
+                };
                 return XlsExportOptions;
             })();
             Report.XlsExportOptions = XlsExportOptions;
-            var xlsxExportOptionsSerializationInfoBase = [
-                Report.xlsExportHyperlinks,
-                Report.pageRange,
-                Report.xlsRawDataMode,
-                Report.xlsExportOptionsSheetName,
-                Report.xlsShowGridLines,
-                Report.xlsTextExportMode
-            ];
-            var xlsxExportOptionsSerializationInfo = [Report.xlsxExportMode].concat(xlsxExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
+            var xlsxExportOptionsSerializationInfo = [Report.xlsxExportMode].concat(xlsExportOptionsSerializationInfoCommon);
             var XlsxExportOptions = (function () {
                 function XlsxExportOptions(model, serializer) {
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
@@ -7296,6 +7368,9 @@ var DevExpress;
                 };
                 XlsxExportOptions.prototype.isPropertyDisabled = function (name) {
                     return name === "pageRange" && this.xlsxExportMode() === "SingleFile";
+                };
+                XlsxExportOptions.prototype.hasSensitiveData = function () {
+                    return !!(this.encryptionOptions && this.encryptionOptions.password());
                 };
                 return XlsxExportOptions;
             })();
@@ -7376,179 +7451,212 @@ var DevExpress;
                 { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: XlsExportOptions.from, toJsonObject: XlsExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptions.from, toJsonObject: XlsxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
-            var htmlExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(htmlExportOptionsSerializationInfoBase);
+            var htmlExportOptionsSerializationInfoPreview = [].concat(htmlExportOptionsSerializationInfoBase);
             var HtmlExportOptionsPreview = (function (_super) {
                 __extends(HtmlExportOptionsPreview, _super);
-                function HtmlExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function HtmlExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 HtmlExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 HtmlExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(htmlExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(htmlExportOptionsSerializationInfoPreview);
+                };
+                HtmlExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModePreview];
                 };
                 return HtmlExportOptionsPreview;
             })(HtmlExportOptions);
             Report.HtmlExportOptionsPreview = HtmlExportOptionsPreview;
-            var imageExportOptionsSerializationInfoPreview = [Report.imageExportModePreview].concat(imageExportOptionsSerializationInfoBase);
+            var HtmlExportOptionsMergedPreview = (function (_super) {
+                __extends(HtmlExportOptionsMergedPreview, _super);
+                function HtmlExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                HtmlExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModeMergedPreview];
+                };
+                HtmlExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.htmlExportModeMergedPreview.propertyName;
+                };
+                return HtmlExportOptionsMergedPreview;
+            })(HtmlExportOptionsPreview);
+            Report.HtmlExportOptionsMergedPreview = HtmlExportOptionsMergedPreview;
+            var imageExportOptionsSerializationInfoPreview = [].concat(imageExportOptionsSerializationInfoBase);
             var ImageExportOptionsPreview = (function (_super) {
                 __extends(ImageExportOptionsPreview, _super);
-                function ImageExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function ImageExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 ImageExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 ImageExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(imageExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.imageExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(imageExportOptionsSerializationInfoPreview);
+                };
+                ImageExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.imageExportModePreview];
                 };
                 return ImageExportOptionsPreview;
             })(ImageExportOptions);
             Report.ImageExportOptionsPreview = ImageExportOptionsPreview;
-            var mhtExportOptionsSerializationInfoPreview = [Report.htmlExportModePreview].concat(mhtExportOptionsSerializationInfoBase);
+            var ImageExportOptionsMergedPreview = (function (_super) {
+                __extends(ImageExportOptionsMergedPreview, _super);
+                function ImageExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                ImageExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.imageExportModeMergedPreview];
+                };
+                ImageExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.imageExportModeMergedPreview.propertyName;
+                };
+                return ImageExportOptionsMergedPreview;
+            })(ImageExportOptionsPreview);
+            Report.ImageExportOptionsMergedPreview = ImageExportOptionsMergedPreview;
+            var mhtExportOptionsSerializationInfoPreview = [].concat(mhtExportOptionsSerializationInfoBase);
             var MhtExportOptionsPreview = (function (_super) {
                 __extends(MhtExportOptionsPreview, _super);
-                function MhtExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function MhtExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 MhtExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 MhtExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(mhtExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.htmlExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(mhtExportOptionsSerializationInfoPreview);
+                };
+                MhtExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModePreview];
                 };
                 return MhtExportOptionsPreview;
             })(MhtExportOptions);
             Report.MhtExportOptionsPreview = MhtExportOptionsPreview;
+            var MhtExportOptionsMergedPreview = (function (_super) {
+                __extends(MhtExportOptionsMergedPreview, _super);
+                function MhtExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                MhtExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.htmlExportModeMergedPreview];
+                };
+                MhtExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.htmlExportModeMergedPreview.propertyName;
+                };
+                return MhtExportOptionsMergedPreview;
+            })(MhtExportOptionsPreview);
+            Report.MhtExportOptionsMergedPreview = MhtExportOptionsMergedPreview;
             var rtfExportOptionsSerializationInfoPreview = [].concat(rtfExportOptionsSerializationInfoBase);
             var RtfExportOptionsPreview = (function (_super) {
                 __extends(RtfExportOptionsPreview, _super);
-                function RtfExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function RtfExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 RtfExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 RtfExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(rtfExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.rtfExportMode, { values: { "SingleFilePageByPage": "Single File PageByPage" } }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(rtfExportOptionsSerializationInfoPreview);
+                };
+                RtfExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.rtfExportMode];
                 };
                 return RtfExportOptionsPreview;
             })(RtfExportOptions);
             Report.RtfExportOptionsPreview = RtfExportOptionsPreview;
-            var xlsExportOptionsSerializationInfoPreview = [Report.xlsExportModePreview].concat(xlsExportOptionsSerializationInfoBase);
+            var RtfExportOptionsMergedPreview = (function (_super) {
+                __extends(RtfExportOptionsMergedPreview, _super);
+                function RtfExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                RtfExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.rtfExportModeMergedPreview];
+                };
+                RtfExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.rtfExportModeMergedPreview.propertyName;
+                };
+                return RtfExportOptionsMergedPreview;
+            })(RtfExportOptionsPreview);
+            Report.RtfExportOptionsMergedPreview = RtfExportOptionsMergedPreview;
+            var xlsExportOptionsSerializationInfoPreview = [].concat(xlsExportOptionsSerializationInfoBase, xlsExportOptionsSerializationInfoCommon);
             var XlsExportOptionsPreview = (function (_super) {
                 __extends(XlsExportOptionsPreview, _super);
-                function XlsExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function XlsExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 XlsExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 XlsExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(xlsExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(xlsExportOptionsSerializationInfoPreview);
+                };
+                XlsExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsExportModePreview];
                 };
                 return XlsExportOptionsPreview;
             })(XlsExportOptions);
             Report.XlsExportOptionsPreview = XlsExportOptionsPreview;
-            var xlsxExportOptionsSerializationInfoPreview = [Report.xlsxExportModePreview].concat(xlsxExportOptionsSerializationInfoBase);
+            var XlsExportOptionsMergedPreview = (function (_super) {
+                __extends(XlsExportOptionsMergedPreview, _super);
+                function XlsExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                XlsExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsExportModeMergedPreview];
+                };
+                XlsExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.xlsExportModeMergedPreview.propertyName;
+                };
+                return XlsExportOptionsMergedPreview;
+            })(XlsExportOptionsPreview);
+            Report.XlsExportOptionsMergedPreview = XlsExportOptionsMergedPreview;
+            var xlsxExportOptionsSerializationInfoPreview = [].concat(xlsExportOptionsSerializationInfoCommon);
             var XlsxExportOptionsPreview = (function (_super) {
                 __extends(XlsxExportOptionsPreview, _super);
-                function XlsxExportOptionsPreview(value, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, value, serializer);
+                function XlsxExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 XlsxExportOptionsPreview.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
                 XlsxExportOptionsPreview.prototype.getInfo = function () {
-                    var info = [].concat(xlsxExportOptionsSerializationInfoPreview);
-                    if (this._isMerged) {
-                        var exportMode = info.filter(function (item) {
-                            return item.modelName === "@ExportMode";
-                        })[0];
-                        info.splice(info.indexOf(exportMode), 1, $.extend({}, Report.xlsxExportModePreview, {
-                            defaultVal: "SingleFilePageByPage",
-                            values: {
-                                "SingleFilePageByPage": "Single File PageByPage"
-                            }
-                        }));
-                    }
-                    return info;
+                    var variableInfo = this._getVariableInfo();
+                    return variableInfo.concat(xlsxExportOptionsSerializationInfoPreview);
+                };
+                XlsxExportOptionsPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsxExportModePreview];
                 };
                 return XlsxExportOptionsPreview;
             })(XlsxExportOptions);
             Report.XlsxExportOptionsPreview = XlsxExportOptionsPreview;
+            var XlsxExportOptionsMergedPreview = (function (_super) {
+                __extends(XlsxExportOptionsMergedPreview, _super);
+                function XlsxExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                XlsxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
+                    return [Report.xlsxExportModeMergedPreview];
+                };
+                XlsxExportOptionsMergedPreview.prototype.isPropertyDisabled = function (name) {
+                    return _super.prototype.isPropertyDisabled.call(this, name) || name === Report.xlsxExportModeMergedPreview.propertyName;
+                };
+                return XlsxExportOptionsMergedPreview;
+            })(XlsxExportOptionsPreview);
+            Report.XlsxExportOptionsMergedPreview = XlsxExportOptionsMergedPreview;
             var ExportOptionsPreview = (function (_super) {
                 __extends(ExportOptionsPreview, _super);
-                function ExportOptionsPreview(model, isMerged, serializer) {
-                    this._isMerged = isMerged;
-                    _super.call(this, model, serializer);
+                function ExportOptionsPreview() {
+                    _super.apply(this, arguments);
                 }
                 ExportOptionsPreview.prototype._generateFromFunction = function (exportType) {
-                    var isMerged = this._isMerged;
                     return function (model, serializer) {
-                        return new exportType(model || {}, isMerged, serializer);
+                        return new exportType(model || {}, serializer);
                     };
                 };
                 ExportOptionsPreview.prototype._generateInfo = function () {
@@ -7564,12 +7672,36 @@ var DevExpress;
                         { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: this._generateFromFunction(XlsxExportOptionsPreview), toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
                     ];
                 };
+                ExportOptionsPreview.prototype.hasSensitiveData = function () {
+                    return this.xls.hasSensitiveData() || this.xlsx.hasSensitiveData() || this.pdf.hasSensitiveData();
+                };
                 ExportOptionsPreview.prototype.getInfo = function () {
                     return this._generateInfo();
                 };
                 return ExportOptionsPreview;
             })(ExportOptions);
             Report.ExportOptionsPreview = ExportOptionsPreview;
+            var ExportOptionsMergedPreview = (function (_super) {
+                __extends(ExportOptionsMergedPreview, _super);
+                function ExportOptionsMergedPreview() {
+                    _super.apply(this, arguments);
+                }
+                ExportOptionsMergedPreview.prototype._generateInfo = function () {
+                    return [
+                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: this._generateFromFunction(HtmlExportOptionsMergedPreview), toJsonObject: HtmlExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: this._generateFromFunction(ImageExportOptionsMergedPreview), toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: this._generateFromFunction(MhtExportOptionsMergedPreview), toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", from: this._generateFromFunction(RtfExportOptionsMergedPreview), toJsonObject: RtfExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", from: this._generateFromFunction(XlsExportOptionsMergedPreview), toJsonObject: XlsExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: this._generateFromFunction(XlsxExportOptionsMergedPreview), toJsonObject: XlsxExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                    ];
+                };
+                return ExportOptionsMergedPreview;
+            })(ExportOptionsPreview);
+            Report.ExportOptionsMergedPreview = ExportOptionsMergedPreview;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -8363,7 +8495,7 @@ var DevExpress;
                 PreviewParameterHelper.prototype.createInfo = function (parameter) {
                     var info = _super.prototype.createInfo.call(this, parameter);
                     info.propertyName = PreviewParameterHelper.fixPropertyName(parameter.path);
-                    if (parameter.lookUpValues() && !parameter.isMultiValue || this.isEnumType(parameter))
+                    if (!parameter.isMultiValue && (parameter.lookUpValues() || this.isEnumType(parameter)))
                         info.editorOptions = { searchEnabled: false };
                     if (parameter.type === "System.DateTime") {
                         info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty') }];
@@ -8928,7 +9060,7 @@ var DevExpress;
                 ReportPreview.prototype._export = function (args, actionUri, printable) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    if (this._editingFields().length > 0 || Preview.AsyncExportApproach) {
+                    if (this._editingFields().length > 0 || Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel'));
@@ -9035,7 +9167,7 @@ var DevExpress;
                                     _this._pageWidth(pageSettings.width);
                                 _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
                             }
-                            var deserializedExportOptions = new DevExpress.Designer.Report.ExportOptionsPreview(previewInitialize.exportOptions && JSON.parse(previewInitialize.exportOptions), !_this.reportId);
+                            var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions);
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
@@ -9051,6 +9183,10 @@ var DevExpress;
                         _this.removeEmptyPages();
                     });
                     return initializeDataPromise;
+                };
+                ReportPreview.prototype._deserializeExportOptions = function (exportOptionsString, isMerged) {
+                    var jsonModel = exportOptionsString && JSON.parse(exportOptionsString);
+                    return (!this.reportId || isMerged) ? new DevExpress.Designer.Report.ExportOptionsMergedPreview(jsonModel) : new DevExpress.Designer.Report.ExportOptionsPreview(jsonModel);
                 };
                 ReportPreview.prototype.deactivate = function () {
                     this._initialize();
@@ -9107,7 +9243,7 @@ var DevExpress;
                 };
                 ReportPreview.prototype.getExportResult = function (operationId, printDisposition) {
                     var arg = encodeURIComponent(JSON.stringify({ id: operationId, printable: !!printDisposition }));
-                    this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
+                    var newWindow = this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
                 };
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
@@ -9165,6 +9301,10 @@ var DevExpress;
                             return;
                         }
                         _this._drillDownState = response.drillDownKeys || [];
+                        if (response.canRecreatePages === false && _this.reportId) {
+                            var deserializedExportOptions = _this._deserializeExportOptions(response.exportOptions || {}, true);
+                            _this.exportOptionsModel(deserializedExportOptions);
+                        }
                         _this.documentMap(response.documentMap);
                         _this._clearEditingFields();
                         _this._editingFields((response.editingFields || []).map(function (item, index) {
@@ -9196,7 +9336,7 @@ var DevExpress;
                 ReportPreview.prototype.printDocument = function (pageIndex) {
                     if (!this._currentDocumentId())
                         return;
-                    var exportOptions = new DevExpress.Designer.Report.ExportOptionsPreview({}, !this.reportId);
+                    var exportOptions = new DevExpress.Designer.Report.ExportOptionsPreview({});
                     exportOptions.pdf["showPrintDialogOnOpen"] = true;
                     pageIndex = parseInt(pageIndex);
                     if ((!!pageIndex && pageIndex > 0 || pageIndex === 0) && (this.pages().length > pageIndex)) {
@@ -15217,9 +15357,9 @@ var DevExpress;
                     { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) {
                         return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null);
                     } },
-                    { value: "System.Guid", displayValue: "Guid", icon: "guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) {
+                    { value: "System.Guid", displayValue: "Guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) {
                         return DevExpress.Designer.validateGuid(val) ? val : Parameter.defaultGuidValue;
-                    }, specifics: "String" }
+                    }, specifics: "guid" }
                 ];
                 return Parameter;
             })(Designer.Disposable);
@@ -17622,10 +17762,144 @@ var DevExpress;
     (function (Designer) {
         var Pivot;
         (function (Pivot) {
+            var SortBySummaryInfoCondition = (function () {
+                function SortBySummaryInfoCondition(model, fieldsProvider, serializer) {
+                    this._fieldsProvider = fieldsProvider;
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model);
+                }
+                SortBySummaryInfoCondition.prototype.getInfo = function () {
+                    var fields = this._fieldsProvider.fieldsAvailableForCondition();
+                    if (fields.length < 1) {
+                        return Pivot.sortBySummaryConditionInfo;
+                    }
+                    var conditionInfoClone = Pivot.sortBySummaryConditionInfo.slice(0), fieldComponentName = Designer.findFirstItemMatchesCondition(Pivot.sortBySummaryConditionInfo, function (item) { return item.modelName === "@FieldComponentName"; }), fieldComponentNameClone = $.extend(true, {}, fieldComponentName);
+                    fields.forEach(function (fieldName) {
+                        fieldComponentNameClone.values[fieldName] = fieldName;
+                    });
+                    conditionInfoClone.splice(conditionInfoClone.indexOf(fieldComponentName), 1, fieldComponentNameClone);
+                    return conditionInfoClone;
+                };
+                SortBySummaryInfoCondition.createNew = function (parent, serializer) {
+                    return new SortBySummaryInfoCondition({}, parent, serializer);
+                };
+                return SortBySummaryInfoCondition;
+            })();
+            Pivot.SortBySummaryInfoCondition = SortBySummaryInfoCondition;
+            var SortBySummaryInfo = (function () {
+                function SortBySummaryInfo(model, field, serializer) {
+                    var _this = this;
+                    this._field = field;
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model, Pivot.sortBySummaryInfo);
+                    this.conditions = DevExpress.JS.Utils.deserializeArray(model["Conditions"] || {}, function (item) { return new SortBySummaryInfoCondition(item, _this, serializer); });
+                }
+                SortBySummaryInfo.prototype._pivotGridFields = function () {
+                    return this._field.parentModel().fields;
+                };
+                SortBySummaryInfo.prototype.getInfo = function () {
+                    var _this = this;
+                    var fields = this._pivotGridFields();
+                    if (!fields) {
+                        return Pivot.sortBySummaryInfo;
+                    }
+                    var sortBySummaryInfoClone = Pivot.sortBySummaryInfo.slice(0), fieldComponentName = Designer.findFirstItemMatchesCondition(Pivot.sortBySummaryInfo, function (item) { return item.modelName === "@FieldComponentName"; }), fieldComponentNameClone = $.extend(true, {}, fieldComponentName);
+                    fields().forEach(function (field) {
+                        if (field.name() !== _this._field.name()) {
+                            fieldComponentNameClone.values[field.name()] = field.name();
+                        }
+                    });
+                    sortBySummaryInfoClone.splice(Pivot.sortBySummaryInfo.indexOf(fieldComponentName), 1, fieldComponentNameClone);
+                    return sortBySummaryInfoClone;
+                };
+                SortBySummaryInfo.prototype.fieldsAvailableForCondition = function () {
+                    var _this = this;
+                    var fields = this._pivotGridFields();
+                    if (!fields) {
+                        return [];
+                    }
+                    var result = [];
+                    fields().forEach(function (field) {
+                        var condition = Designer.findFirstItemMatchesCondition(_this.conditions(), function (item) { return item.fieldComponentName() === field.name(); });
+                        if (!condition) {
+                            result.push(field.name());
+                        }
+                    });
+                    return result;
+                };
+                SortBySummaryInfo.from = function (model, serializer) {
+                    return model;
+                };
+                SortBySummaryInfo.toJSON = function (viewModel, serializer, refs) {
+                    return (serializer || new DevExpress.JS.Utils.ModelSerializer()).serialize(viewModel, Pivot.sortBySummaryInfo, refs);
+                };
+                return SortBySummaryInfo;
+            })();
+            Pivot.SortBySummaryInfo = SortBySummaryInfo;
+            Pivot.summaryTypeValues = {
+                "Count": "Count",
+                "Sum": "Sum",
+                "Min": "Min",
+                "Max": "Max",
+                "Average": "Average",
+                "StdDev": "Standard Deviation",
+                "StdDevp": "Standard Deviation for Entire Population",
+                "Var": "Variation",
+                "Varp": "Variation for Entire Population",
+                "Custom": "Custom"
+            }, Pivot.summaryType = { propertyName: "summaryType", modelName: "@SummaryType", displayName: "Summary Type", defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Pivot.summaryTypeValues }, Pivot.fieldComponentName = { propertyName: "fieldComponentName", modelName: "@FieldComponentName", displayName: "Field", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "": DevExpress.Designer.getLocalization("(" + "none" + ")") } }, Pivot.sortBySummaryConditionInfo = [
+                Pivot.fieldComponentName,
+                { modelName: "@Value", propertyName: "value", displayName: "Value", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                {
+                    modelName: "@Value_type",
+                    propertyName: "valueType",
+                    displayName: "Type",
+                    editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    defaultVal: "<Null>",
+                    values: {
+                        "System.String": "String",
+                        "System.Byte": "Number (8 bit integer)",
+                        "System.Int16": "Number (16 bit integer)",
+                        "System.Int32": "Number (32 bit integer)",
+                        "System.Int64": "Number (64 bit integer)",
+                        "System.Single": "Number (floating-point)",
+                        "System.Double": "Number (double-precision floating-point)",
+                        "System.Decimal": "Number (decimal)",
+                        "System.Boolean": "Boolean",
+                        "System.Char": "Char",
+                        "System.DateTime": "Date",
+                        "<Null>": "<Null>"
+                    }
+                }
+            ], Pivot.conditions = {
+                propertyName: "conditions",
+                modelName: "Conditions",
+                displayName: "Conditions",
+                array: true,
+                template: "#dxrd-commonCollectionItem",
+                editor: { custom: "dxrd-pivot-sortBySummaryInfo-conditions" }
+            }, Pivot.field = { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.customTotalSummaryType = { propertyName: "customTotalSummaryType", modelName: "@CustomTotalSummaryType", displayName: "Custom Total Summary Type", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: $.extend({ "": Designer.getLocalization("(" + "none" + ")") }, Pivot.summaryTypeValues) }, Pivot.sortBySummaryInfo = [Pivot.conditions, Pivot.customTotalSummaryType, Pivot.fieldComponentName, Pivot.field, Pivot.summaryType];
+        })(Pivot = Designer.Pivot || (Designer.Pivot = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Pivot;
+        (function (Pivot) {
             function comparerFields(firstField, secondField) {
                 return firstField.areaIndex() - secondField.areaIndex();
             }
             Pivot.comparerFields = comparerFields;
+            var CustomEditor = (function (_super) {
+                __extends(CustomEditor, _super);
+                function CustomEditor(modelPropertyInfo, level, parentDisabled) {
+                    _super.call(this, modelPropertyInfo, level, parentDisabled);
+                }
+                return CustomEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Pivot.CustomEditor = CustomEditor;
             var PivotGridFieldViewModel = (function (_super) {
                 __extends(PivotGridFieldViewModel, _super);
                 function PivotGridFieldViewModel(model, parent, serializer) {
@@ -17654,6 +17928,7 @@ var DevExpress;
                     this._disposables.push(this.area.subscribe(function (newValue) {
                         _this.areaIndex(parent["getFieldsFromArea"](_this.area()).length - 1);
                     }));
+                    this.sortBySummaryInfo = new Pivot.SortBySummaryInfo(this.sortBySummaryInfo || {}, this, serializer);
                 }
                 PivotGridFieldViewModel.createNew = function (parent) {
                     return function () {
@@ -17719,18 +17994,6 @@ var DevExpress;
                     "DataArea": "Data Area"
                 }
             }, Pivot.areaIndex = { propertyName: "areaIndex", modelName: "@AreaIndex", defaultVal: -1 }, Pivot.areaIndexEditable = { propertyName: "areaIndexEditable", displayName: "Area Index", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            var summaryTypeValues = {
-                "Count": "Count",
-                "Sum": "Sum",
-                "Min": "Min",
-                "Max": "Max",
-                "Average": "Average",
-                "StdDev": "StdDev",
-                "StdDevp": "StdDevp",
-                "Var": "Var",
-                "Varp": "Varp",
-                "Custom": "Custom"
-            };
             Pivot.unboundType = {
                 propertyName: "unboundType",
                 modelName: "@UnboundType",
@@ -17757,7 +18020,7 @@ var DevExpress;
                     "Percent": "Percent",
                     "Sum": "Sum"
                 }
-            }, Pivot.topValueShowOthers = { propertyName: "topValueShowOthers", modelName: "@TopValueShowOthers", displayName: "Top Value Show Others", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.topValueCount = { propertyName: "topValueCount", modelName: "@TopValueCount", displayName: "Top Value Count", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.summaryType = { propertyName: "summaryType", modelName: "@SummaryType", displayName: "Summary Type", defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: summaryTypeValues }, Pivot.summaryDisplayType = {
+            }, Pivot.topValueShowOthers = { propertyName: "topValueShowOthers", modelName: "@TopValueShowOthers", displayName: "Top Value Show Others", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.topValueCount = { propertyName: "topValueCount", modelName: "@TopValueCount", displayName: "Top Value Count", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.summaryDisplayType = {
                 propertyName: "summaryDisplayType",
                 modelName: "@SummaryDisplayType",
                 displayName: "Summary Display Type",
@@ -17944,7 +18207,7 @@ var DevExpress;
             var allowDrag = { propertyName: "allowDrag", modelName: "@AllowDrag", displayName: "Allow Drag", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowDragInCustomizationForm = { propertyName: "@allowDragInCustomizationForm", modelName: "AllowDragInCustomizationForm", displayName: "Allow Drag In Customization Form", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowExpand = { propertyName: "allowExpand", modelName: "@AllowExpand", displayName: "Allow Expand", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowFilter = { propertyName: "allowFilter", modelName: "@AllowFilter", displayName: "Allow Filter", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowFilterBySummary = { propertyName: "allowFilterBySummary", modelName: "@AllowFilterBySummary", displayName: "Allow Filter By Summary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowRunTimeSummaryChange = { propertyName: "allowRunTimeSummaryChange", modelName: "@AllowRunTimeSummaryChange", displayName: "Allow Run Time Summary Change", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, allowSort = { propertyName: "allowSort", modelName: "@AllowSort", displayName: "Allow Sort", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowSortBySummary = { propertyName: "allowSortBySummary", modelName: "@AllowSortBySummary", displayName: "Allow Sort By Summary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, groupFilterMode = { propertyName: "groupFilterMode", modelName: "@GroupFilterMode", displayName: "Group Filter Mode", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "List": "List", "Tree": "Tree" } }, hideEmptyVariationItems = { propertyName: "hideEmptyVariationItems", modelName: "@HideEmptyVariationItems", displayName: "Hide Empty Variation Items", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showCustomTotals = { propertyName: "showCustomTotals", modelName: "@ShowCustomTotals", displayName: "Show Custom Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showGrandTotal = { propertyName: "showGrandTotal", modelName: "@ShowGrandTotal", displayName: "Show Grand Total", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showSummaryTypeName = { propertyName: "showSummaryTypeName", modelName: "@ShowSummaryTypeName", displayName: "Show Summary Type Name", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showTotals = { propertyName: "showTotals", modelName: "@ShowTotals", displayName: "Show Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showValues = { propertyName: "showValues", modelName: "@ShowValues", displayName: "Show Values", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var optionsInfo = [allowDrag, allowDragInCustomizationForm, allowExpand, allowFilter, allowFilterBySummary, allowRunTimeSummaryChange, allowSort, allowSortBySummary, groupFilterMode, hideEmptyVariationItems, showCustomTotals, showGrandTotal, showSummaryTypeName, showTotals, showValues];
             Pivot.options = { propertyName: "options", modelName: "Options", displayName: "Options", info: optionsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var fieldComponentName = { propertyName: "fieldComponentName", modelName: "@FieldComponentName", displayName: "Field Component Name", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.text }, customTotalSummaryType = { propertyName: "customTotalSummaryType", modelName: "@CustomTotalSummaryType", displayName: "Custom Total Summary Type", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: summaryTypeValues }, sortBySummaryInfo = [fieldComponentName, Pivot.summaryType, customTotalSummaryType], sortBySummary = { propertyName: "sortBySummaryInfo", modelName: "SortBySummaryInfo", displayName: "Sort By Summary Info", info: sortBySummaryInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Pivot.sortBySummary = { propertyName: "sortBySummaryInfo", modelName: "SortBySummaryInfo", displayName: "Sort By Summary Info", from: Pivot.SortBySummaryInfo.from, toJsonObject: Pivot.SortBySummaryInfo.toJSON, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Pivot.pivotGridFieldSerializationsInfo = [
                 appearances,
                 Pivot.allowedAreas,
@@ -17986,6 +18249,7 @@ var DevExpress;
                 Pivot.useNativeFormat,
                 Pivot.valueFormat,
                 Pivot.options,
+                Pivot.sortBySummary
             ].concat(Designer.Report.baseControlProperties), Pivot.popularPropertiesPivotGridField = ["area", "areaIndexEditable", "fieldName", "caption", "groupInterval", "summaryType", "summaryDisplayType", "unboundType", "unboundExpression"];
             Pivot.pivotGridFieldsSerializable = { displayName: "Fields", propertyName: "fields", modelName: "Fields", array: true, editor: Designer.Report.editorTemplates.pivotGridFields, template: "#dxrd-collectionItemWithAccordion", };
         })(Pivot = Designer.Pivot || (Designer.Pivot = {}));
@@ -22261,7 +22525,8 @@ var DevExpress;
                     Report.rtlLayout,
                     Report.editOptions,
                     Report.textEditOptions,
-                    Report.chekEditOptions
+                    Report.chekEditOptions,
+                    Designer.Pivot.sortBySummary
                 ],
                 "Data": [Report.actualValue, Designer.Chart.seriesDataMember, Report.checkState, Report.checked, Report.chartDataSource, Report.dataSource, Report.dataMember, Report.dataAdapter, Designer.Pivot.expandedInFieldsGroup, Designer.Chart.pivotGridDataSourceOptions, Designer.Pivot.fieldName, Report.filterStringEditable, Report.image, Report.imageUrl, Report.maximum, Report.minimum, Report.nullValueText, Report.prefilter, Designer.Pivot.runningTotal, Report.sortFields, Report.summary, Designer.Pivot.showNewValues, Designer.Pivot.sortMode, Designer.Pivot.sortOrder, Designer.Pivot.summaryDisplayType, Designer.Pivot.summaryType, Report.targetValue, Report.tag, Report.text, Report.textArea, Report.rtf, Report.textRtf, Report.serializableRtfString, Designer.Pivot.topValueCount, Designer.Pivot.topValueShowOthers, Designer.Pivot.topValueType, Designer.Pivot.unboundExpression, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat, Report.xlsxFormatString, Designer.Pivot.pivotGridFieldsSerializable, Report.valueMember, Report.reportSourceUrl, Report.calculatedFields, Report.parameterBindings, Report.dataBindings([])],
                 "Design": [Report.name, Report.snapGridSize],
@@ -22954,9 +23219,6 @@ var DevExpress;
                 var navigation = new Report.NavigateByReports(reportViewModel, data.reportUrl);
                 model = ko.computed({
                     read: function () {
-                        if (navigation.currentTab()) {
-                            designerModel.undoEngine && designerModel.undoEngine(navigation.currentTab().undoEngine);
-                        }
                         return navigation.currentTab().report();
                     },
                     write: function (newVal) {
@@ -22964,6 +23226,9 @@ var DevExpress;
                     }
                 });
                 init(model());
+                var undoEngine = ko.computed(function () {
+                    return navigation.currentTab().undoEngine;
+                });
                 var selection = new Designer.SurfaceSelection();
                 var controlHelper = new Designer.DesignControlsHelper(model, [{
                     added: function (control) {
@@ -22971,7 +23236,7 @@ var DevExpress;
                     deleted: function (control) {
                         control.surface == selection.focused() && selection.focused(Designer.findNextSelection(control.surface));
                     }
-                }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]), designerModel = DevExpress.Designer.createDesigner(model, surface, Report.controlsFactory, Report.groups, [], undefined, rtl, selection, controlHelper);
+                }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]), designerModel = DevExpress.Designer.createDesigner(model, surface, Report.controlsFactory, Report.groups, [], undefined, rtl, selection, controlHelper, undoEngine);
                 designerModel.rootStyle = "dxrd-designer";
                 designerModel.toolboxDragHandler = new Report.ReportToolboxDragDropHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.snapHelper, designerModel.dragHelperContent, Report.controlsFactory);
                 designerModel.isDirty = ko.computed({
@@ -22983,7 +23248,6 @@ var DevExpress;
                     }
                 });
                 designerModel.reportUrls = ko.observableArray([]);
-                designerModel.undoEngine().removeTargetSubscription();
                 navigation.init(designerModel);
                 getSubreportUrls();
                 model.subscribe(function (newModel) {

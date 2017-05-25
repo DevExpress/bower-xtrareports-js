@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.6 - 2017-03-27
+/*! DevExpress HTML/JS Designer - v16.2.7 - 2017-05-17
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -280,6 +280,7 @@ var DevExpress;
             'Anchor Vertically': 'DevExpress.XtraReports.UI.XRControl.AnchorVertical',
             'Report Source Url': 'DevExpress.XtraReports.UI.XRSubreport.ReportSourceUrl',
             'Data Source\'s Schema': 'DevExpress.XtraReports.UI.XtraReport.DataSourceSchema',
+            'Snap Grid Step Count': 'DevExpress.XtraReports.UI.XtraReport.SnapGridStepCount',
             'Zip Code': 'DevExpress.XtraReports.UI.XRZipCode',
             'Angle': 'DevExpress.XtraReports.UI.XRLabel.Angle',
             'Process Duplicates': 'DevExpress.XtraReports.UI.XRLabel.ProcessDuplicates',
@@ -2362,12 +2363,16 @@ var DevExpress;
             'Group Filter String': 'DevExpress.DataAccess.Sql.TableQuery.GroupFilterString',
             'Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.NewlineType',
             'Skip Hidden Rows': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenRows',
+            'CSV Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.CsvSourceOptions',
             'Import Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ImportSettings',
             'Constructor': 'DevExpress.DataAccess.ObjectBinding.ObjectDataSource.Constructor',
+            'Excel Worksheet Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ExcelWorksheetSettings',
             'Worksheet Name': 'DevExpress.DataAccess.Excel.ExcelWorksheetSettings.WorksheetName',
             'Connection String Name': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.ConnectionStringName',
             'Distinct': 'DevExpress.DataAccess.Sql.SelectQuery.Distinct',
+            'ObjectDataSource': 'DevExpress.DataAccess.Sql.ObjectDataSource',
             'Scope': 'DevExpress.DataAccess.Excel.ExcelDefinedNameSettings.Scope',
+            'Excel Table Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ExcelTableSettings',
             'Connection': 'DevExpress.DataAccess.EntityFramework.EFDataSource.Connection',
             'Stored Procedure Name': 'DevExpress.DataAccess.Sql.StoredProcQuery.StoredProcName',
             'Detect Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectNewlineType',
@@ -2376,6 +2381,7 @@ var DevExpress;
             'Value Separator': 'DevExpress.DataAccess.Excel.CsvSourceOptions.ValueSeparator',
             'File Name': 'DevExpress.DataAccess.Excel.ExcelDataSource.FileName',
             'Stored Procedures': 'DevExpress.DataAccess.EntityFramework.EFDataSource.StoredProcedures',
+            'Excel Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.ExcelSourceOptions',
             'Connection Name': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionName',
             'Detect Encoding': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectEncoding',
             'Use First Row As Header': 'DevExpress.DataAccess.Excel.ExcelSourceOptionsBase.UseFirstRowAsHeader',
@@ -2387,6 +2393,7 @@ var DevExpress;
             'Culture': 'DevExpress.DataAccess.Excel.CsvSourceOptions.Culture',
             'Skip Hidden Columns': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenColumns',
             'Connection String': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.ConnectionString',
+            'Excel Defined Name Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ExcelDefinedNameSettings',
             'EFDataSource': 'DevExpress.DataAccess.EntityFramework.EFDataSource',
             'Trim Blanks': 'DevExpress.DataAccess.Excel.CsvSourceOptions.TrimBlanks',
             'SqlDataSource': 'DevExpress.DataAccess.Sql.SqlDataSource',
@@ -3795,14 +3802,20 @@ var DevExpress;
             'Path can\'t be created.': 'GaugesCoreStringId.MsgPathCreationError',
             'It\'s impossible to create an instance of a class {0} because specified text is incorrect: ': 'GaugesCoreStringId.MsgTextParsingError',
             'The gauge control can\'t be restored correctly, because the specified layout file contians the following invalid elements: {0}.': 'GaugesCoreStringId.MsgGaugeRestoreError',
+            'Bottom Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_BottomMargin',
             'We have all the information needed to process the report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Description',
-            'What summary function would you like to calculate?': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Description',
+            'What summary functions would you like to calculate?': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Description',
+            'Columns selected from specific tables and/or views will be automatically included into a separate query.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMultiQuery',
             'To be able to run the Document Viewer, the client web browser must support HTML5.': 'ASPxReportsStringId.WebDocumentViewer_PlatformNotSupported_Error',
             'Enter the text to find in the document.': 'ASPxReportsStringId.SearchDialog_EnterText',
             'The specified Report Service has not been found.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceConnection_Error',
             'Report Wizard': 'ASPxReportsStringId.ReportDesigner_Wizard_Header',
+            'Height:': 'ASPxReportsStringId.ReportDesigner_Wizard_Height',
+            'Horizontal Pitch:': 'ASPxReportsStringId.ReportDesigner_Wizard_HorizontalPitch',
             'Next': 'ASPxReportsStringId.ReportDesigner_Wizard_Next',
+            'Inch': 'ASPxReportsStringId.ReportDesigner_Wizard_Inch',
             'Ignore null values': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_IgnoreNullValues',
+            'Choose a data connection.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection',
             'To log in to the Report Server, handle the RequestCredentials event.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorCredentialHandled_Error',
             'Collapsed': 'ASPxReportsStringId.ReportDesigner_Accordion_Collapsed',
             'Align Left 1': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AlignLeft1',
@@ -3812,14 +3825,19 @@ var DevExpress;
             'Last Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_LastPage',
             'Insert Group Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupHeaderBand',
             'The value cannot be empty.': 'ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError',
+            'Label Height:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelHeight',
+            'Label Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_LabelReport',
             'Finish': 'ASPxReportsStringId.ReportDesigner_Wizard_Finish',
             'To be able to run the Report Designer, the client web browser must support HTML5.': 'ASPxReportsStringId.ReportDesigner_PlatformNotSupported_Error',
             'Size to Control Height': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlHeight',
             'Display the specified page.': 'ASPxReportsStringId.DocumentViewer_RibbonCurrentPageToolTip',
+            'Sort Type': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SortType',
             'of': 'ASPxReportsStringId.ToolBarItemText_OfLabel',
             'Delete Row': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
             'Remove calculated field': 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveCalculatedField',
             'Insert Page Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageHeaderBand',
+            'Left Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_LeftMargin',
+            'Selection Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectionProperties',
             'Choose a Report Layout': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Title',
             'Choose a Table or View': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Title',
             'Guid should contain 32 digits delimited with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).': 'ASPxReportsStringId.ParametersPanel_GuidValidationError',
@@ -3827,7 +3845,10 @@ var DevExpress;
             'Insert Field in the Column Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheColumnArea',
             'Loading...': 'ASPxReportsStringId.WebDocumentViewer_Loading',
             'Formal': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Formal',
+            'Write Custom SQL': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_WriteCustomSQL',
             'Specify the print settings and print the document.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PrintReport',
+            'Available tables and views': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_AvailableTables',
+            'Select All (*)': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectAll',
             'Outline 2': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Outline2',
             'Outline 1': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Outline1',
             'Failed to log in with the specified user credentials.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorLogin_Error',
@@ -3835,31 +3856,43 @@ var DevExpress;
             'Create Groups': 'ASPxReportsStringId.ReportDesigner_Wizard_CreateGroups_Title',
             'Cannot create a document for the current report': 'ASPxReportsStringId.WebDocumentViewer_DocumentCreationError',
             'Casual': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Casual',
+            'The report does not contain any parameters.': 'ASPxReportsStringId.WebDocumentViewer_NoParameters',
             'CSV': 'ASPxReportsStringId.ExportName_csv',
             'XLS': 'ASPxReportsStringId.ExportName_xls',
             'PDF': 'ASPxReportsStringId.ExportName_pdf',
             'Save To File': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_SaveToFile',
             'Error obtaining a build status': 'ASPxReportsStringId.WebDocumentViewer_GetBuildStatusError',
             'An error occurred during search': 'ASPxReportsStringId.WebDocumentViewer_SearchError',
+            'Paper Size:': 'ASPxReportsStringId.ReportDesigner_Wizard_PaperSize',
+            'Paper Type:': 'ASPxReportsStringId.ReportDesigner_Wizard_PaperType',
+            'Label Width:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth',
+            'To create an item click the Add button.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParametersEmpty',
             'Insert Group Footer Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupFooterBand',
             'Match whole word only': 'ASPxReportsStringId.SearchDialog_WholeWord',
             'Insert Sub-Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertSubBand',
             'Select the columns you want to display within your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Description',
+            'Width:': 'ASPxReportsStringId.ReportDesigner_Wizard_Width',
             'Down': 'ASPxReportsStringId.SearchDialog_Down',
             'Match case': 'ASPxReportsStringId.SearchDialog_Case',
             '(Select All)': 'ASPxReportsStringId.WebDocumentViewer_SelectAll',
+            'Select distinct': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectDistinct',
+            'Custom SQL Editor': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_CustomSqlEditor',
+            'Add SQL Data Source...': 'ASPxReportsStringId.ReportDesigner_MenuItem_AddSqlDataSource',
             'The DocumentViewerRemoteSourceSettings.CustomTokenStorage property is not assigned.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceSettings_CustomTokenStorage_Error',
             'Print the report': 'ASPxReportsStringId.ToolBarItemText_PrintReport',
             'Parameters Panel': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_ParametersPanel',
             'Portrait': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Portrait',
             'There are no parameters available yet.': 'ASPxReportsStringId.ReportDesigner_FieldList_Parameters',
+            'Create New Query...': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_CreateNewQuery',
             'Page Count:': 'ASPxReportsStringId.DocumentViewer_RibbonPageCountText',
             'Size to Control': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControl',
             'Current Page': 'ASPxReportsStringId.DocumentViewer_RibbonCurrentPageText',
             'Insert Field in the Data Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheDataArea',
             'Create a New Style': 'ASPxReportsStringId.ReportDesigner_StylesEditor_CreateNew',
+            'Select the report type you wish to create.': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Message',
             'Choose a Report Style': 'ASPxReportsStringId.ReportDesigner_Wizard_Report_Style',
             'Insert Field in the Filter Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheFilterArea',
+            'Data-bound Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_DataBoundReport',
             'Insert Page Footer Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageFooterBand',
             'Display the last document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_LastPage',
             'Finished searching the document.': 'ASPxReportsStringId.SearchDialog_Finished',
@@ -3867,9 +3900,12 @@ var DevExpress;
             'Findnbsp;what': 'ASPxReportsStringId.SearchDialog_FindWhat',
             'Export a report and save it to the disk': 'ASPxReportsStringId.ToolBarItemText_SaveToDisk',
             'Export a report and show it in a new window': 'ASPxReportsStringId.ToolBarItemText_SaveToWindow',
+            'Millimeter': 'ASPxReportsStringId.ReportDesigner_Wizard_Millimeter',
             'Add parameter': 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddParameter',
             'Delete Column': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteColumn',
+            'Top Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_TopMargin',
             'Insert Top Margin Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertTopMarginBand',
+            'Empty Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_EmptyReport',
             'Find Text': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_FindText',
             'The report preview initialization has failed': 'ASPxReportsStringId.WebDocumentViewer_InitializationError',
             'Next Page': 'ASPxReportsStringId.ToolBarItemText_NextPage',
@@ -3878,23 +3914,28 @@ var DevExpress;
             'Display the search window': 'ASPxReportsStringId.ToolBarItemText_Search',
             'The document is not found. Please try opening the document once again.': 'ASPxReportsStringId.WebDocumentViewer_DocumentNotFound_Error',
             'Preview Parameters': 'ASPxReportsStringId.ReportDesigner_Preview_ParametersTitle',
+            'Label Product:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelProduct',
             'Display the first document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_FirstPage',
+            'Vertical Pitch:': 'ASPxReportsStringId.ReportDesigner_Wizard_VerticalPitch',
             'Stepped': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Stepped',
             'The report is not found. Please try opening the report once again.': 'ASPxReportsStringId.WebDocumentViewer_ReportNotFound_Error',
             'Delete Cell': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteCell',
             'Choose a Data Source to use in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Description',
             'Specify the report\'s title': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_SpecifyTitle',
+            'Remove query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_RemoveQuery',
             'It is only possible to assign either the Local Report or Remote Source of ASPxDocumentViewer at a time.': 'ASPxReportsStringId.DocumentViewer_LocalAndRemoteSource_Error',
             'Save the document to a file in a specified format.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_SaveToFile',
             'Previous Page': 'ASPxReportsStringId.ToolBarItemText_PreviousPage',
             'Display the next document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_NextPage',
             'Find text in the document.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_FindText',
             'Print Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintPage',
+            'Add query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_AddQuery',
             'Save To Window': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_SaveToWindow',
             'Adjust the field width so all fields fit onto a page': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AdjustFieldWidth',
             'The RequestCredentials event has not been subscribed to.': 'ASPxReportsStringId.DocumentViewer_RemoteRequestCredentials_Error',
             'To view the remote report, specify the ServerUri or EndpointConfigurationName property of the ASPxDocumentViewer.SettingsRemoteSource.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceSettings_Error',
             'Insert Detail Report Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertDetailReportBand',
+            'Operator': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_Operator',
             'To display a report, only one of the following actions can be performed at a time:\r\n- assigning the ASPxWebDocumentViewer.ReportSourceId property;\r\n- calling the ASPxWebDocumentViewer.OpenReport method;\r\n- calling the ASPxWebDocumentViewer.OpenReportXmlLayout method.': 'ASPxReportsStringId.WebDocumentViewer_OpenReport_Error',
             'Specify the print settings and print the current page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PrintPage',
             'Groups': 'ASPxReportsStringId.ReportDesigner_Groups',
@@ -3904,7 +3945,7 @@ var DevExpress;
             'The report layout specifies the manner in which selected data fields are arranged on individual pages.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Description',
             'Run Wizard': 'ASPxReportsStringId.ReportDesigner_MenuButtons_RunWizard',
             'Compact': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Compact',
-            'The table or view you choose determines wich columns will be available in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Description',
+            'The table or view you choose determines which columns will be available in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Description',
             'Insert Bottom Margin Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertBottomMarginBand',
             'To view a remote report, enable the PageByPage property of the SettingsReportViewer.': 'ASPxReportsStringId.DocumentViewer_RemotePageByPage_Error',
             'Access and modify the report parameter values.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_ParametersPanel',
@@ -3914,7 +3955,9 @@ var DevExpress;
             'Choose Columns to Display in Your Report': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Title',
             'Insert Field in the Row Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheRowArea',
             'The user credentials cannot be empty.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorCredential_Error',
+            'Configure master-detail relationships.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations',
             'This command cannot be executed because a document has not yet been generated.': 'ASPxReportsStringId.DocumentViewer_NoRemoteDocumentInformation_Error',
+            'Actions': 'ASPxReportsStringId.ReportDesigner_Actions',
             'Print the current page': 'ASPxReportsStringId.ToolBarItemText_PrintPage',
             'Export To': 'ASPxReportsStringId.WebDocumentViewer_ExportToText',
             'Display the previous document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PreviousPage',
@@ -3927,10 +3970,15 @@ var DevExpress;
             'Insert Column To the Right': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToRight',
             'Corporate': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Corporate',
             'Size to Control Width': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlWidth',
+            'Choose a Report Type': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Title',
             'Access is denied. You are not granted permission to perform this operation.': 'ASPxReportsStringId.WebDocumentViewer_AccessDenied_Error',
             'XLSX': 'ASPxReportsStringId.ExportName_xlsx',
+            'Product Number:': 'ASPxReportsStringId.ReportDesigner_Wizard_ProductNumber',
+            'Edit query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_EditQuery',
             'Toggle Multipage Mode': 'ASPxReportsStringId.WebDocumentViewer_ToggleMultipageMode',
+            'Right Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_RightMargin',
             'Submit': 'ASPxReportsStringId.ParametersPanel_Submit',
+            'Configure query parameters.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters',
             'Previous': 'ASPxReportsStringId.ReportDesigner_Wizard_Previous',
             'Selected fields': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectedFields',
             'Save the document in a specified format and display the result in a new window.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_SaveToWindow',
@@ -3938,6 +3986,7 @@ var DevExpress;
             'Insert Row Above': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
             'Available fields': 'ASPxReportsStringId.ReportDesigner_Wizard_AvailableFields',
             'Add Filter Fields Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddFilterFields',
+            'SQL Data Source Wizard': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_Title',
             'Cannot obtain additional document data for the current document': 'ASPxReportsStringId.WebDocumentViewer_GetDocumentDataError',
             'Add calculated field': 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddCalculatedField',
             'Data Source Wizard': 'ASPxReportsStringId.ReportDesigner_Wizard_DataSourceHeader',
@@ -3950,6 +3999,7 @@ var DevExpress;
             'Insert Report Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertReportHeaderBand',
             'The Report is Complete': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Title',
             'The value is not valid.': 'ASPxReportsStringId.ParametersPanel_GenericRegexValidationError',
+            'Page Size:': 'ASPxReportsStringId.ReportDesigner_Wizard_PageSize',
             'Choose summary options': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Title',
             'Print Report': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintReport',
             'Add Column Fields Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddColumnFields',
@@ -4778,6 +4828,7 @@ var DevExpress;
             var dxFileImagePicker = (function (_super) {
                 __extends(dxFileImagePicker, _super);
                 function dxFileImagePicker(element, options) {
+                    options.placeholder = options.placeholder || DevExpress.JS.Utils.getLocalization("(none)");
                     _super.call(this, element, options);
                 }
                 dxFileImagePicker.prototype._handleFiles = function (filesHolder) {
@@ -4796,12 +4847,14 @@ var DevExpress;
                             fr.onload = function (args) {
                                 var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
                                 _this.option("value", encodedContent);
+                                _this._filesinput.val("");
                             };
                             fr.readAsDataURL(file);
                         }
                         else {
                             fr.onload = function (args) {
                                 _this.option("value", fr.result);
+                                _this._filesinput.val("");
                             };
                             fr.readAsText(file);
                         }
@@ -4837,7 +4890,12 @@ var DevExpress;
                     }
                 };
                 dxFileImagePicker.prototype._renderValue = function () {
-                    this.option("text", this.option("value") ? this.option("placeHolder") : DevExpress.JS.Utils.getLocalization("(none)"));
+                    if (this.option("placeHolder")) {
+                        this.option("text", this.option("value") && this.option("placeHolder"));
+                    }
+                    else {
+                        this.option("text", this.option("value"));
+                    }
                     _super.prototype._renderValue.call(this);
                 };
                 return dxFileImagePicker;
@@ -5903,7 +5961,7 @@ var DevExpress;
                         for (var i = 0; i < info.length; i++) {
                             if (info[i].modelName || info[i].editor || info[i].info) {
                                 var propertyName = info[i].propertyName;
-                                if (propertyName.indexOf("_") !== 0) {
+                                if ((!this._ignoredProperties || (this._ignoredProperties && this._ignoredProperties.indexOf(propertyName) === -1)) && propertyName.indexOf("_") !== 0) {
                                     var realPropertyName = propertyName;
                                     if (ko.isWriteableObservable(target["_" + propertyName])) {
                                         realPropertyName = "_" + realPropertyName;
@@ -9506,12 +9564,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,19],$V8=[1,30],$V9=[1,32],$Va=[1,25],$Vb=[1,24],$Vc=[1,34],$Vd=[1,31],$Ve=[1,33],$Vf=[1,13],$Vg=[1,5],$Vh=[1,14],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,39],$Vq=[1,50],$Vr=[1,52],$Vs=[1,53],$Vt=[1,56],$Vu=[1,55],$Vv=[1,51],$Vw=[1,54],$Vx=[1,36],$Vy=[1,37],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$V71=[5,11,41,42,50,56],$V81=[1,145],$V91=[16,50],$Va1=[15,16,17,22,25,26,27,28,50],$Vb1=[16,17,20],$Vc1=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$Vd1=[5,11,40,41,42,45,46,50,56,66,67],$Ve1=[5,11,19,20,40,41,42,45,46,50,56,66,67,68,69],$Vf1=[11,56],$Vg1=[5,11,16,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,19],$V8=[1,30],$V9=[1,32],$Va=[1,25],$Vb=[1,24],$Vc=[1,34],$Vd=[1,31],$Ve=[1,33],$Vf=[1,13],$Vg=[1,5],$Vh=[1,14],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,39],$Vq=[1,50],$Vr=[1,52],$Vs=[1,53],$Vt=[1,56],$Vu=[1,55],$Vv=[1,51],$Vw=[1,54],$Vx=[1,36],$Vy=[1,37],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$V71=[5,11,41,42,50,56],$V81=[16,50],$V91=[15,16,17,22,25,26,27,28,50],$Va1=[16,17,20],$Vb1=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$Vc1=[5,11,40,41,42,45,46,50,56,66,67],$Vd1=[5,11,19,20,40,41,42,45,46,50,56,66,67,68,69],$Ve1=[11,56],$Vf1=[5,11,16,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69];
 var parser = {trace: function trace() { },
 yy: {},
 symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"-":26,"[":27,"=":28,"param":29,"?":30,"property":31,"columnOrAggregate":32,"AGG_COUNT":33,"AGG_AVG":34,"AGG_MAX":35,"AGG_MIN":36,"AGG_SINGLE":37,"AGG_EXISTS":38,"AGG_SUM":39,"OP_LIKE":40,"AND":41,"OR":42,"OP_BETWEEN":43,"OP_IN":44,"NOT":45,"IS":46,"NULL":47,"propertyWithAggregate":48,"compositeProperty":49,"]":50,"field":51,"aggregate":52,"aggregateSuffix":53,"topLevelAggregate":54,"(":55,")":56,"MinStart":57,"MaxStart":58,"CONST":59,"*":60,"/":61,"%":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
 terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"-",27:"[",28:"=",30:"?",33:"AGG_COUNT",34:"AGG_AVG",35:"AGG_MAX",36:"AGG_MIN",37:"AGG_SINGLE",38:"AGG_EXISTS",39:"AGG_SUM",40:"OP_LIKE",41:"AND",42:"OR",43:"OP_BETWEEN",44:"OP_IN",45:"NOT",46:"IS",47:"NULL",50:"]",55:"(",56:")",59:"CONST",60:"*",61:"/",62:"%",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[29,2],[29,1],[31,1],[31,3],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[48,1],[48,3],[49,3],[49,5],[51,1],[51,2],[52,4],[52,3],[52,6],[52,5],[52,4],[52,3],[52,1],[54,1],[53,1],[53,1],[53,3],[53,3],[53,4],[53,4],[53,3],[53,4],[53,2],[53,2],[57,3],[58,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
+productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[29,2],[29,1],[31,1],[31,3],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[48,1],[48,3],[49,3],[49,4],[49,5],[49,6],[51,1],[51,2],[52,4],[52,3],[52,6],[52,5],[52,4],[52,3],[52,1],[54,1],[53,1],[53,1],[53,3],[53,3],[53,4],[53,4],[53,3],[53,4],[53,2],[53,2],[57,3],[58,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -9532,10 +9590,10 @@ break;
 case 5: case 6:
  this.$ = $$[$0-2]; this.$.push($$[$0]); 
 break;
-case 7: case 10: case 17: case 39: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 86: case 87: case 88: case 89:
+case 7: case 10: case 17: case 39: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 88: case 89: case 90: case 91:
  this.$ = $$[$0]; 
 break;
-case 8: case 79: case 80: case 112: case 122:
+case 8: case 81: case 82: case 114: case 124:
  this.$ = $$[$0-1]; 
 break;
 case 9:
@@ -9605,183 +9663,201 @@ case 59:
 break;
 case 60:
 
+	var lst = [];
+  lst.push($$[$0-2] + '.');
+  this.$ = {
+   column: _$[$0-2].first_column,
+   line: _$[$0-2].first_line - 1,
+   names: lst
+  };
+ 
+break;
+case 61:
+
   var propertyNameObject = $$[$0-4];
   propertyNameObject.names.push($$[$0-1]);
   this.$ = propertyNameObject;
  
 break;
-case 61:
- this.$ = new DevExpress.JS.Data.OperandProperty($$[$0].names.join('.'), $$[$0].column, $$[$0].line); 
-break;
 case 62:
- this.$ = new DevExpress.JS.Data.OperandProperty(); 
+
+  var propertyNameObject = $$[$0-5];
+  propertyNameObject.names.push($$[$0-2] + '.');
+  this.$ = propertyNameObject;
+ 
 break;
 case 63:
+ this.$ = new DevExpress.JS.Data.OperandProperty($$[$0].names.join('.'), $$[$0].column, $$[$0].line); 
+break;
+case 64:
+ this.$ = new DevExpress.JS.Data.OperandProperty(); 
+break;
+case 65:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty(), null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 64:
+case 66:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(new DevExpress.JS.Data.OperandProperty($$[$0-2].names.join('.'), $$[$0-2].column, $$[$0-2].line), null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 65:
+case 67:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 66:
+case 68:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 67:
+case 69:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 68:
+case 70:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 71: case 73:
+case 73: case 75:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Count, null); 
 break;
-case 72: case 74:
+case 74: case 76:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, null, DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 75:
+case 77:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Avg, null); 
 break;
-case 76:
+case 78:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Sum, null); 
 break;
-case 77:
+case 79:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, new DevExpress.JS.Data.OperandProperty("This"), DevExpress.JS.Data.Aggregate.Single, null); 
 break;
-case 78:
+case 80:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0-1], DevExpress.JS.Data.Aggregate.Single, null); 
 break;
-case 81:
+case 83:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Min, null); 
 break;
-case 82:
+case 84:
  this.$ = new DevExpress.JS.Data.AggregateOperand(null, $$[$0], DevExpress.JS.Data.Aggregate.Max, null); 
 break;
-case 83:
+case 85:
  this.$ = new DevExpress.JS.Data.ConstantValue($$[$0]); 
 break;
-case 84:
+case 86:
  this.$ = new DevExpress.JS.Data.ConstantValue(parseFloat($$[$0])); 
 break;
-case 85:
+case 87:
  this.$ = new DevExpress.JS.Data.ConstantValue(null); 
 break;
-case 90:
+case 92:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Multiply); 
 break;
-case 91:
+case 93:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Divide); 
 break;
-case 92:
+case 94:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Plus); 
 break;
-case 93:
+case 95:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Minus); 
 break;
-case 94:
+case 96:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Modulo); 
 break;
-case 95:
+case 97:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseOr); 
 break;
-case 96:
+case 98:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd); 
 break;
-case 97:
+case 99:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.BitwiseXor); 
 break;
-case 98:
+case 100:
 
 								this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Minus, $$[$0]);
 							
 break;
-case 99:
+case 101:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Plus, $$[$0]); 
 break;
-case 100:
+case 102:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, $$[$0]); 
 break;
-case 101:
+case 103:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Equal); 
 break;
-case 102:
+case 104:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.NotEqual); 
 break;
-case 103:
+case 105:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Greater); 
 break;
-case 104:
+case 106:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Less); 
 break;
-case 105:
+case 107:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual); 
 break;
-case 106:
+case 108:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.LessOrEqual); 
 break;
-case 107:
+case 109:
  this.$ = new DevExpress.JS.Data.BinaryOperator($$[$0-2], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like); 
 break;
-case 108:
+case 110:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.BinaryOperator($$[$0-3], $$[$0], DevExpress.JS.Data.BinaryOperatorType.Like)); 
 break;
-case 109:
+case 111:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, $$[$0]); 
 break;
-case 110:
+case 112:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 111:
+case 113:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 113:
+case 115:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-2]); 
 break;
-case 114:
+case 116:
  this.$ = new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.Not, new DevExpress.JS.Data.UnaryOperator(DevExpress.JS.Data.UnaryOperatorType.IsNull, $$[$0-3])); 
 break;
-case 115:
+case 117:
  this.$ = new DevExpress.JS.Data.InOperator($$[$0-2], $$[$0]); 
 break;
-case 116:
+case 118:
  this.$ = new DevExpress.JS.Data.BetweenOperator($$[$0-6], $$[$0-3], $$[$0-1]); 
 break;
-case 117: case 118:
+case 119: case 120:
   this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], $$[$0]); 
 break;
-case 119:
+case 121:
  this.$ = null; 
 break;
-case 120:
+case 122:
  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Min, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
 break;
-case 121:
+case 123:
  this.$ = new DevExpress.JS.Data.FunctionOperator(DevExpress.JS.Data.FunctionOperatorType.Max, [$$[$0-3].aggregatedExpression, $$[$0-1]]); 
 break;
-case 123:
+case 125:
  this.$ = []; 
 break;
-case 124:
+case 126:
 
 							var lst = [];
 							lst.push($$[$0]);
 							this.$ = lst;
 						
 break;
-case 125:
+case 127:
 
 							var lst = $$[$0-2];
 							lst.push($$[$0]);
@@ -9790,7 +9866,7 @@ case 125:
 break;
 }
 },
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,83]),o($VG,[2,84]),o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87],{27:[1,57]}),o($VG,[2,88],{16:[1,58]}),o($VG,[2,89]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,64],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{55:$VH,70:65},o($VI,$VJ,{70:67,55:$VH}),{11:[1,68],56:$VK},{11:[1,70],56:$VL},o($VG,[2,38],{15:[1,72]}),o($VM,[2,61],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:75,50:[1,74]},o($V31,[2,39],{15:$V41,22:$V51}),o($VG,[2,69]),{55:[1,98]},{55:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,70]),{14:100,15:[1,101]},o($VG,[2,71],{55:[1,102]}),o($VG,[2,72],{55:[1,103]}),{55:[1,104]},{55:[1,105]},{55:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{40:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{45:[1,126],47:[1,125]},{55:$VH,70:127},{55:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,50:[1,130],51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,98]),o($VG,[2,99]),o($V61,[2,100],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o($V71,[2,109],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,133],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,119]),o($VG,[2,117]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,135],57:17,58:18,59:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,118]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,79]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,80]),o($VG,[2,37]),{27:[1,140],33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:139,57:141,58:142},o($VM,[2,62],{16:[1,143]}),{16:$V81,50:[1,144]},o($V91,[2,57]),o($V91,[2,41],{15:[1,146],17:[1,151],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,152]}),o($V91,[2,42]),o($V91,[2,43]),o($V91,[2,44]),o($V91,[2,45]),o($V91,[2,46]),o($V91,[2,47]),o($V91,[2,48]),o($V91,[2,49]),o($V91,[2,50]),o($V91,[2,51]),o($V91,[2,52]),o($V91,[2,53]),o($V91,[2,54]),o($V91,[2,55]),o($V91,[2,56]),o($Va1,[2,19]),o($Va1,[2,20]),o($Va1,[2,24]),o($VI,[2,15]),o($VI,[2,16]),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:154,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{16:[1,156],17:[1,157],20:[1,155]},o($Vb1,[2,10]),{56:[1,158]},{56:[1,159]},{4:160,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:161,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,162],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,90]),o($VG,[2,91]),o($Vc1,[2,92],{60:$Vx,61:$Vy,62:$Vz}),o($Vc1,[2,93],{60:$Vx,61:$Vy,62:$Vz}),o($VG,[2,94]),o([5,11,19,20,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,95],{17:$Vl,23:$Vo,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,96],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o([5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,97],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($Vd1,[2,101],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,102],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Ve1,[2,103],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,104],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,105],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Ve1,[2,106],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,107],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($V71,[2,110],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,42,50,56],[2,111],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,113]),{47:[1,165]},o($VG,[2,115]),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,50:[1,167],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,68],{16:[1,168]}),o($V31,[2,40],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,112]),{11:[1,170],56:[1,169]},o($VG,[2,123]),o($Vf1,[2,124],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,171],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,172],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,64]),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:173},{56:$VK},{56:$VL},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:174,57:141,58:142},o($Vg1,[2,59]),{15:$VN,23:$VO,24:77,25:$VP,32:175,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21},o($Va1,[2,21]),o($Va1,[2,22]),o($Va1,[2,23]),{15:[1,176],22:[1,178],25:[1,177]},{15:[1,179],22:[1,181],25:[1,180]},{15:[1,182],22:[1,184],25:[1,183]},{15:[1,185],22:[1,187],25:[1,186]},o($Vf1,[2,81],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,82],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,188]},{15:[1,189]},{15:[1,190]},o($VG,[2,73]),o($VG,[2,74]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,191],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,192],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,77]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,193],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vd1,[2,108],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,114]),{11:[1,194],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,67],{16:[1,195]}),{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:196,57:141,58:142},o($VG,[2,122]),{4:197,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,120]),o($VG,[2,121]),{16:$V81,50:[1,198]},o($VG,[2,63]),o($V91,[2,58]),o($Va1,[2,25]),o($Va1,[2,26]),o($Va1,[2,27]),o($Va1,[2,28]),o($Va1,[2,29]),o($Va1,[2,30]),o($Va1,[2,31]),o($Va1,[2,32]),o($Va1,[2,33]),o($Va1,[2,34]),o($Va1,[2,35]),o($Va1,[2,36]),o($VI,[2,13]),o($Vb1,[2,11]),o($Vb1,[2,12]),o($VG,[2,75]),o($VG,[2,76]),o($VG,[2,78]),{4:199,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:200,57:141,58:142},o($VG,[2,66]),o($Vf1,[2,125],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vg1,[2,60]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,201],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,65]),o($VG,[2,116])],
+table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87]),o($VG,[2,88]),o($VG,[2,89],{27:[1,57]}),o($VG,[2,90],{16:[1,58]}),o($VG,[2,91]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,64],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{55:$VH,70:65},o($VI,$VJ,{70:67,55:$VH}),{11:[1,68],56:$VK},{11:[1,70],56:$VL},o($VG,[2,38],{15:[1,72]}),o($VM,[2,63],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:75,50:[1,74]},o($V31,[2,39],{15:$V41,22:$V51}),o($VG,[2,71]),{55:[1,98]},{55:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,72]),{14:100,15:[1,101]},o($VG,[2,73],{55:[1,102]}),o($VG,[2,74],{55:[1,103]}),{55:[1,104]},{55:[1,105]},{55:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{40:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{45:[1,126],47:[1,125]},{55:$VH,70:127},{55:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,50:[1,130],51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,100]),o($VG,[2,101]),o($V61,[2,102],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o($V71,[2,111],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,133],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,121]),o($VG,[2,119]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,135],57:17,58:18,59:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,120]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,81]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,82]),o($VG,[2,37]),{27:[1,140],33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:139,57:141,58:142},o($VM,[2,64],{16:[1,143]}),{16:[1,145],50:[1,144]},o($V81,[2,57]),o($V81,[2,41],{15:[1,146],17:[1,151],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,152]}),o($V81,[2,42]),o($V81,[2,43]),o($V81,[2,44]),o($V81,[2,45]),o($V81,[2,46]),o($V81,[2,47]),o($V81,[2,48]),o($V81,[2,49]),o($V81,[2,50]),o($V81,[2,51]),o($V81,[2,52]),o($V81,[2,53]),o($V81,[2,54]),o($V81,[2,55]),o($V81,[2,56]),o($V91,[2,19]),o($V91,[2,20]),o($V91,[2,24]),o($VI,[2,15]),o($VI,[2,16]),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:154,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{16:[1,156],17:[1,157],20:[1,155]},o($Va1,[2,10]),{56:[1,158]},{56:[1,159]},{4:160,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:161,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,162],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,92]),o($VG,[2,93]),o($Vb1,[2,94],{60:$Vx,61:$Vy,62:$Vz}),o($Vb1,[2,95],{60:$Vx,61:$Vy,62:$Vz}),o($VG,[2,96]),o([5,11,19,20,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,97],{17:$Vl,23:$Vo,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,98],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o([5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,99],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($Vc1,[2,103],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vc1,[2,104],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,105],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,106],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,107],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,108],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vc1,[2,109],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($V71,[2,112],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,42,50,56],[2,113],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,115]),{47:[1,165]},o($VG,[2,117]),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,50:[1,167],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,70],{16:[1,168]}),o($V31,[2,40],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,114]),{11:[1,170],56:[1,169]},o($VG,[2,125]),o($Ve1,[2,126],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,171],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,172],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,66]),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:173},{56:$VK},{56:$VL},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:174,57:141,58:142},o($Vf1,[2,59]),{15:$VN,23:$VO,24:77,25:$VP,32:176,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,50:[1,175]},o($V91,[2,21]),o($V91,[2,22]),o($V91,[2,23]),{15:[1,177],22:[1,179],25:[1,178]},{15:[1,180],22:[1,182],25:[1,181]},{15:[1,183],22:[1,185],25:[1,184]},{15:[1,186],22:[1,188],25:[1,187]},o($Ve1,[2,83],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Ve1,[2,84],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,189]},{15:[1,190]},{15:[1,191]},o($VG,[2,75]),o($VG,[2,76]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,192],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,193],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,79]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,194],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vc1,[2,110],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,116]),{11:[1,195],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,69],{16:[1,196]}),{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:197,57:141,58:142},o($VG,[2,124]),{4:198,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,122]),o($VG,[2,123]),{16:[1,200],50:[1,199]},o($VG,[2,65]),o($Vf1,[2,60]),o($V81,[2,58]),o($V91,[2,25]),o($V91,[2,26]),o($V91,[2,27]),o($V91,[2,28]),o($V91,[2,29]),o($V91,[2,30]),o($V91,[2,31]),o($V91,[2,32]),o($V91,[2,33]),o($V91,[2,34]),o($V91,[2,35]),o($V91,[2,36]),o($VI,[2,13]),o($Va1,[2,11]),o($Va1,[2,12]),o($VG,[2,77]),o($VG,[2,78]),o($VG,[2,80]),{4:201,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:202,57:141,58:142},o($VG,[2,68]),o($Ve1,[2,127],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,61]),{15:$VN,23:$VO,24:77,25:$VP,32:176,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,50:[1,203]},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,204],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,67]),o($Vf1,[2,62]),o($VG,[2,118])],
 defaultActions: {35:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
@@ -10266,7 +10342,7 @@ pushState:function pushState(condition) {
 stateStackSize:function stateStackSize() {
         return this.conditionStack.length;
     },
-options: {},
+options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
@@ -10370,7 +10446,7 @@ case 48:return 'INVALID'
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:Between\b)/,/^(?:In\b)/,/^(?:Not\b)/,/^(?:Is\b)/,/^(?:Null\b)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\^)/,/^(?:!=)/,/^(?:!)/,/^(?:%)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:<>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:Avg\b)/,/^(?:Max\b)/,/^(?:Min\b)/,/^(?:Single\b)/,/^(?:Count\b)/,/^(?:Exists\b)/,/^(?:Sum\b)/,/^(?:==)/,/^(?:=)/,/^(?:Like\b)/,/^(?:And\b)/,/^(?:Or\b)/,/^(?:$)/,/^(?:(?:\d*\.)?\d+)/,/^(?:\.)/,/^(?:,)/,/^(?:\?)/,/^(?:True\b)/,/^(?:False\b)/,/^(?:^[a-zA-Z_][a-zA-Z0-9_]*)/,/^(?:'[^']*')/,/^(?:#[^#]*#)/,/^(?:.+(?=\]))/,/^(?:.)/],
+rules: [/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:$)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:^[a-zA-Z_][a-zA-Z0-9_]*)/i,/^(?:'[^']*')/i,/^(?:#[^#]*#)/i,/^(?:.+(?=\]))/i,/^(?:.)/i],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],"inclusive":true}}
 });
 return lexer;
@@ -11842,7 +11918,7 @@ var DevExpress;
             return "dxrd-image-" + (name ? name : controlType.toLowerCase());
         }
         Designer.getImageClassName = getImageClassName;
-        function getUniqueNameForNamedObjectsArray(objects, prefix) {
+        function getUniqueNameForNamedObjectsArray(objects, prefix, names) {
             if (prefix.indexOf("XR") === 0) {
                 prefix = prefix[2].toLowerCase() + prefix.slice(3);
             }
@@ -11852,7 +11928,7 @@ var DevExpress;
                     prefix = prefix.slice(0, indexBand) + prefix.slice(indexBand + 4);
                 }
             }
-            return getUniqueName(objects.map(function (item) { return ko.unwrap(item.name); }), prefix);
+            return getUniqueName(names || objects.map(function (item) { return ko.unwrap(item.name); }), prefix);
         }
         Designer.getUniqueNameForNamedObjectsArray = getUniqueNameForNamedObjectsArray;
         function getUniqueName(names, prefix) {
@@ -11926,9 +12002,10 @@ var DevExpress;
                 this._visitedCollections = [];
                 this._subscriptions = [];
                 this._setName = function (value) {
-                    if (!value.name()) {
+                    var names = _this.allControls().map(function (item) { return ko.unwrap(item.name); });
+                    if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
                         var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
-                        var newName = getUniqueNameForNamedObjectsArray(_this.allControls(), controlType);
+                        var newName = getUniqueNameForNamedObjectsArray(_this.allControls(), controlType, names);
                         value.name(newName);
                         if (_this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
                             value["text"](value.name());
@@ -11966,17 +12043,18 @@ var DevExpress;
                     unwrappedTarget = target.peek();
                 }
                 this._disposables.push(this.allControls.subscribe(function (args) {
-                    args.forEach(function (value) {
-                        _this._setName(value);
-                    });
-                }));
+                    var addedItems = args.filter(function (x) { return x.status === "added"; });
+                    for (var i = 0; i < addedItems.length; i++) {
+                        _this._setName(addedItems[i].value);
+                    }
+                    ;
+                }, null, "arrayChange"));
                 this._collectControls(unwrappedTarget);
                 this._handlers.push.apply(this._handlers, handlers);
             }
             DesignControlsHelper.prototype._collectControls = function (target) {
                 var _this = this;
-                var allControls = this.allControls();
-                allControls.push(target);
+                var array = [target];
                 DevExpress.Designer.collectionsVisitor(target, function (collection) {
                     if (_this._visitedCollections.indexOf(collection) === -1) {
                         _this._visitedCollections.push(collection);
@@ -11989,9 +12067,9 @@ var DevExpress;
                             });
                         }, null, "arrayChange"));
                     }
-                    allControls.push.apply(allControls, collection());
+                    array.push.apply(array, collection());
                 }, this.collectionNames);
-                this.allControls.valueHasMutated();
+                this.allControls.push.apply(this.allControls, array);
             };
             DesignControlsHelper.prototype.getControls = function (target) {
                 var controls = ko.observableArray();
@@ -12822,10 +12900,10 @@ var DevExpress;
             };
         }
         Designer.createActionWrappingFunction = createActionWrappingFunction;
-        function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper) {
+        function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper, undoEngine) {
             if (groups === void 0) { groups = {}; }
             if (editors === void 0) { editors = []; }
-            var undoEngine = ko.observable(new DevExpress.JS.Utils.UndoEngine(model)), actionUndoEngineWrappingFunction = createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
+            var undoEngine = undoEngine || ko.observable(new DevExpress.JS.Utils.UndoEngine(model)), actionUndoEngineWrappingFunction = createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
                 undoEngine().start();
                 handler(model);
                 undoEngine().end();
@@ -13878,7 +13956,7 @@ var DevExpress;
                 if (e.altKey || !this.enabled.peek())
                     return true;
                 var activeElement = $(document.activeElement);
-                if (activeElement.is("textarea") || activeElement.is(":input") && (activeElement.attr("type") === "text" || activeElement.attr("type") === "number")) {
+                if (activeElement.is("textarea") || activeElement.is(":input") && (['password', 'text', 'number'].indexOf(activeElement.attr("type")) != -1)) {
                     return true;
                 }
                 return false;
@@ -14093,17 +14171,6 @@ var DevExpress;
                 };
                 this._copyInfo(cutInfo);
             };
-            CopyPasteHandler.prototype._removeNames = function (object) {
-                var keys = Object.keys(object);
-                for (var i = keys.length - 1; i >= 0; i--) {
-                    if (keys[i] === "@Name") {
-                        object[keys[i]] = undefined;
-                    }
-                    else if (object[keys[i]] instanceof Object) {
-                        this._removeNames(object[keys[i]]);
-                    }
-                }
-            };
             CopyPasteHandler.prototype.paste = function () {
                 var _this = this;
                 if (this.canPaste()) {
@@ -14118,7 +14185,6 @@ var DevExpress;
                     }
                     var minPoint = new Designer.Point(Number.MAX_VALUE, Number.MAX_VALUE), maxPoint = new Designer.Point(-1, -1);
                     for (var i = 0; i < this._copyInfo().objects.length; i++) {
-                        this._removeNames(this._copyInfo().objects[i]);
                         var newControl = this._copyPasteStrategy.createChild(pasteTarget, this._copyInfo().objects[i]);
                         var newControlSurface = Designer.findSurface(newControl);
                         if (!newControlSurface)
