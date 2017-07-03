@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v17.1.3 - 2017-05-02
+/*! DevExpress HTML/JS Designer - v17.1.4 - 2017-06-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -1142,8 +1142,8 @@ var DevExpress;
                 filterGroupEditor: { header: "dxrd-filterstringgroup", custom: "dxqb-property-editor" },
                 numeric: { header: "dx-numeric", custom: "dxqb-property-editor" }
             };
-            QueryBuilder.name = { propertyName: "name", modelName: "@Name", displayName: "Name", disabled: true, editor: QueryBuilder.editorTemplates.text };
-            QueryBuilder.alias = { propertyName: "alias", modelName: "@Alias", displayName: "Alias", localizationId: "DataAccessUIStringId.QueryBuilderColumns_Alias", defaultVal: null, editor: QueryBuilder.editorTemplates.text };
+            QueryBuilder.name = { propertyName: "name", modelName: "@Name", displayName: "Name", localizationId: "DevExpress.DataAccess.Sql.SqlQuery.Name", disabled: true, editor: QueryBuilder.editorTemplates.text };
+            QueryBuilder.alias = { propertyName: "alias", modelName: "@Alias", displayName: "Alias", localizationId: "DataAccessUIStringId.QueryBuilderColumns_Alias", defaultVal: "", editor: QueryBuilder.editorTemplates.text };
             QueryBuilder.text = { propertyName: "text", modelName: "@Text", displayName: "Text", editor: QueryBuilder.editorTemplates.text };
             QueryBuilder.selected = { propertyName: "selected", displayName: "Output", editor: QueryBuilder.editorTemplates.bool, localizationId: "DataAccessUIStringId.QueryBuilderColumns_Output" };
             QueryBuilder.size = { propertyName: "size", modelName: "@Size", defaultVal: "100,125", from: Designer.Size.fromString };
@@ -1535,13 +1535,14 @@ var DevExpress;
                 { propertyName: "nestedColumnName", modelName: "@Nested" },
                 {
                     propertyName: "joinType",
-                    displayName: Designer.getLocalization("Join Type", "DataAccessUIStringId.JoinEditor_JoinType").replace(":", ""),
+                    displayName: "Join Type",
                     editor: QueryBuilder.editorTemplates.combobox,
                     defaultVal: "Inner",
-                    values: {
-                        "Inner": Designer.getLocalization("Inner", "DataAccessStringId.RelationEditorRelationTypeInnerJoin"),
-                        "LeftOuter": Designer.getLocalization("Left Outer", "DataAccessStringId.RelationEditorRelationTypeLeftOuterJoin")
-                    }
+                    valuesArray: [
+                        { value: "Inner", displayValue: "Inner join", localizationId: "DataAccessStringId.RelationEditorRelationTypeInnerJoin" },
+                        { value: "LeftOuter", displayValue: "Left outer join", localizationId: "DataAccessStringId.RelationEditorRelationTypeLeftOuterJoin" }
+                    ],
+                    localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_JoinType"
                 },
                 {
                     propertyName: "operator",
@@ -1549,14 +1550,14 @@ var DevExpress;
                     displayName: "Operator",
                     editor: QueryBuilder.editorTemplates.combobox,
                     defaultVal: QueryBuilder.ConditionType.Equal,
-                    values: {
-                        "Equal": Designer.getLocalization("Equals to", "DataAccessUIStringId.JoinEditorEqualOperator"),
-                        "NotEqual": Designer.getLocalization("Does not equal to", "DataAccessUIStringId.JoinEditorNotEqualOperator"),
-                        "Greater": Designer.getLocalization("Is greater than", "DataAccessUIStringId.JoinEditorGreaterOperator"),
-                        "GreaterOrEqual": Designer.getLocalization("Is greater than or equal to", "DataAccessUIStringId.JoinEditorGreaterOrEqualOperator"),
-                        "Less": Designer.getLocalization("Is less than", "DataAccessUIStringId.JoinEditorLessOperator"),
-                        "LessOrEqual": Designer.getLocalization("Is less than or equal to", "DataAccessUIStringId.JoinEditorLessOrEqualOperator")
-                    },
+                    valuesArray: [
+                        { value: "Equal", displayValue: "Equals to", localizationId: "DataAccessUIStringId.JoinEditorEqualOperator" },
+                        { value: "NotEqual", displayValue: "Does not equal to", localizationId: "DataAccessUIStringId.JoinEditorNotEqualOperator" },
+                        { value: "Greater", displayValue: "Is greater than", localizationId: "DataAccessUIStringId.JoinEditorGreaterOperator" },
+                        { value: "GreaterOrEqual", displayValue: "Is greater than or equal to", localizationId: "DataAccessUIStringId.JoinEditorGreaterOrEqualOperator" },
+                        { value: "Less", displayValue: "Is less than", localizationId: "DataAccessUIStringId.JoinEditorLessOperator" },
+                        { value: "LessOrEqual", displayValue: "Is less than or equal to", localizationId: "DataAccessUIStringId.JoinEditorLessOrEqualOperator" }
+                    ],
                     localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_Operator"
                 },
                 { propertyName: "itemType", modelName: "@itemType" }
@@ -2091,11 +2092,11 @@ var DevExpress;
                 { propertyName: "parameters", modelName: "Parameters", array: true },
                 { propertyName: "type", modelName: "@Type" },
                 { propertyName: "name", modelName: "@Name" },
-                { propertyName: "editableName", displayName: "Name", editor: QueryBuilder.editorTemplates.text },
+                { propertyName: "editableName", displayName: "Name", localizationId: "DevExpress.DataAccess.Sql.SqlQuery.Name", editor: QueryBuilder.editorTemplates.text },
                 { propertyName: "_filterString", modelName: "Filter", defaultVal: "" },
                 { propertyName: "filterString", defaultVal: "", displayName: "Filter", localizationId: "DataAccessUIStringId.FiltersView_Filter", editor: QueryBuilder.editorTemplates.filterEditor },
                 { propertyName: "_groupFilterString", modelName: "GroupFilter", defaultVal: "" },
-                { propertyName: "groupFilterString", defaultVal: "", displayName: "Group Filter", editor: QueryBuilder.editorTemplates.filterGroupEditor },
+                { propertyName: "groupFilterString", defaultVal: "", displayName: "Group Filter", localizationId: "DataAccessUIStringId.FiltersView_GroupFilter", editor: QueryBuilder.editorTemplates.filterGroupEditor },
                 { propertyName: "columns", modelName: "Columns", array: true },
                 { propertyName: "sorting", modelName: "Sorting", array: true },
                 { propertyName: "grouping", modelName: "Grouping", array: true },
@@ -2563,7 +2564,8 @@ var DevExpress;
                 designerModel.tabPanel.tabs.push(new Designer.TabInfo("Properties", "dxqb-properties-wrapper", {
                     caption: ko.pureComputed(function () {
                         var text, id;
-                        switch (designerModel.selection.focused().getControlModel().controlType) {
+                        var focused = designerModel.selection.focused();
+                        switch (focused && focused.getControlModel().controlType) {
                             case "Query":
                                 text = "Query Properties";
                                 id = "ASPxReportsStringId.ReportDesigner_QueryBuilder_QueryProperties";
@@ -2575,6 +2577,10 @@ var DevExpress;
                             case "Column":
                                 text = "Column Properties";
                                 id = "ASPxReportsStringId.ReportDesigner_QueryBuilder_ColumnProperties";
+                                break;
+                            case "JoinCondition":
+                                text = "Relation Properties";
+                                id = "ASPxReportsStringId.ReportDesigner_QueryBuilder_RelationProperties";
                                 break;
                             default:
                                 text = "Selection Properties";
@@ -3143,7 +3149,7 @@ var DevExpress;
                         var query = this.queryControl().getQuery();
                         if (query) {
                             if (!query.name())
-                                query.name(Designer.getUniqueName(data.sqlDataSource.queries().map(function (q) { return q.name(); }), query.generateName()));
+                                query.name(DevExpress.Data.generateQueryUniqueName(data.sqlDataSource.queries(), query));
                             data.sqlQuery = query;
                         }
                     };
@@ -3333,7 +3339,7 @@ var DevExpress;
                             displayName: "Parameters",
                             level: 0,
                             info: ko.observable({
-                                displayName: "Parameters",
+                                displayName: "Parameters", localizationId: "DevExpress.DataAccess.Sql.SqlQuery.Parameters",
                                 propertyName: "parameters",
                                 modelName: "Parameter",
                                 array: true,
@@ -3433,7 +3439,7 @@ var DevExpress;
 /// <reference path="sources/queryModel/relation.ts" />
 /// <reference path="sources/queryModel/table.ts" />
 /// <reference path="sources/queryBuilder.ts" />
-/// <reference path="sources/dragDrop.ts" />
+/// <reference path="sources/dragdrop.ts" />
 /// <reference path="sources/initializer.ts" />
 /// <reference path="sources/wizard/wizardCore.ts" />
 /// <reference path="sources/wizard/sqlDataSourceWizard/wizardModel.ts" />
@@ -3450,22 +3456,22 @@ var DevExpress;
                 validationCallback: function (options) { return DataSourceParameter.validateName(options.value); },
                 message: DevExpress.Designer.getLocalization('Name is required and should be a valid identifier.')
             }];
-        Data.parameterValueSerializationsInfo = { propertyName: "value", displayName: "Value", editor: DevExpress.JS.Widgets.editorTemplates.text };
-        var dsParameterName = { propertyName: "name", displayName: "Name", validationRules: Data.dsParameterNameValidationRules, editor: DevExpress.JS.Widgets.editorTemplates.text };
+        Data.parameterValueSerializationsInfo = { propertyName: "value", displayName: "Value", localizationId: "DevExpress.DataAccess.Parameter.Value", editor: DevExpress.JS.Widgets.editorTemplates.text };
+        var dsParameterName = { propertyName: "name", displayName: "Name", localizationId: "DevExpress.DataAccess.Parameter.Name", validationRules: Data.dsParameterNameValidationRules, editor: DevExpress.JS.Widgets.editorTemplates.text };
         var dsParameterType = {
-            propertyName: "type", displayName: "Type", modelName: "@Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                "System.String": "String",
-                "System.DateTime": "Date",
-                "System.Int16": "Number (16 bit integer)",
-                "System.Int32": "Number (32 bit integer)",
-                "System.Int64": "Number (64 bit integer)",
-                "System.Single": "Number (floating-point)",
-                "System.Double": "Number (double-precision floating-point)",
-                "System.Decimal": "Number (decimal)",
-                "System.Boolean": "Boolean",
-                "System.Guid": "Guid",
-                "DevExpress.DataAccess.Expression": "Expression"
-            }
+            propertyName: "type", displayName: "Type", localizationId: "DevExpress.DataAccess.Parameter.Type", modelName: "@Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                { value: "System.String", displayValue: "String", localizationId: "UtilsUIStringId.Parameter_Type_String" },
+                { value: "System.DateTime", displayValue: "Date", localizationId: "UtilsUIStringId.Parameter_Type_DateTime" },
+                { value: "System.Int16", displayValue: "Number (16 bit integer)", localizationId: "UtilsUIStringId.Parameter_Type_Int16" },
+                { value: "System.Int32", displayValue: "Number (32 bit integer)", localizationId: "UtilsUIStringId.Parameter_Type_Int32" },
+                { value: "System.Int64", displayValue: "Number (64 bit integer)", localizationId: "UtilsUIStringId.Parameter_Type_Int64" },
+                { value: "System.Single", displayValue: "Number (floating-point)", localizationId: "UtilsUIStringId.Parameter_Type_Float" },
+                { value: "System.Double", displayValue: "Number (double-precision floating-point)", localizationId: "UtilsUIStringId.Parameter_Type_Double" },
+                { value: "System.Decimal", displayValue: "Number (decimal)", localizationId: "UtilsUIStringId.Parameter_Type_Decimal" },
+                { value: "System.Boolean", displayValue: "Boolean", localizationId: "UtilsUIStringId.Parameter_Type_Boolean" },
+                { value: "System.Guid", displayValue: "Guid", localizationId: "UtilsUIStringId.Parameter_Type_Guid" },
+                { value: "DevExpress.DataAccess.Expression", displayValue: "Expression", localizationId: "DataAccessUIStringId.ParametersColumn_Expression" }
+            ]
         };
         var baseDSParamterSerializationsInfo = [
             { propertyName: "_name", modelName: "@Name" },
@@ -3476,10 +3482,10 @@ var DevExpress;
         Data.dsParameterSerializationInfo = [dsParameterName, dsParameterType].concat(baseDSParamterSerializationsInfo);
         function storedProcParameterSerializationsInfo(type) {
             var copyParamType = $.extend(true, {}, dsParameterType);
-            var newValues = {};
-            newValues[type] = dsParameterType.values[type];
-            newValues["DevExpress.DataAccess.Expression"] = dsParameterType.values["DevExpress.DataAccess.Expression"];
-            copyParamType.values = newValues;
+            var newValuesArray = [];
+            newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === type; })[0]);
+            newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === "DevExpress.DataAccess.Expression"; })[0]);
+            copyParamType.valuesArray = newValuesArray;
             return [
                 $.extend({ disabled: true }, dsParameterName),
                 copyParamType
@@ -3907,7 +3913,7 @@ var DevExpress;
         var ConnectionOptions = (function () {
             function ConnectionOptions(model, serializer) {
                 this.closeConnection = ko.observable(true);
-                this.commandTimeout = ko.observable(0);
+                this.commandTimeout = ko.observable(null);
                 serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
                 serializer.deserialize(this, model);
             }
@@ -3919,7 +3925,7 @@ var DevExpress;
         Data.ConnectionOptions = ConnectionOptions;
         var connectionOptionsSerializationInfo = [
             { propertyName: "closeConnection", modelName: "@CloseConnection" },
-            { propertyName: "commandTimeout", modelName: "@CommandTimeout" },
+            { propertyName: "commandTimeout", modelName: "@DbCommandTimeout", defaultVal: null },
         ];
         Data.masterDetailRelationSerializationsInfo = [
             { propertyName: "masterQuery", modelName: "@Master" },
@@ -4316,7 +4322,7 @@ var DevExpress;
             };
             QueryBuilder.columnSerializationInfo = [
                 QueryBuilder.name,
-                { propertyName: "displayType", displayName: "Type", disabled: true, editor: QueryBuilder.editorTemplates.text },
+                { propertyName: "displayType", displayName: "Type", localizationId: "DataAccessUIStringId.ParametersColumn_Type", disabled: true, editor: QueryBuilder.editorTemplates.text },
                 { propertyName: "alias", displayName: "Alias", localizationId: "DataAccessUIStringId.QueryBuilderColumns_Alias", editor: QueryBuilder.editorTemplates.text },
                 QueryBuilder.selected,
                 {
@@ -4324,11 +4330,11 @@ var DevExpress;
                     displayName: "Sort Type",
                     editor: QueryBuilder.editorTemplates.combobox,
                     defaultVal: "Unsorted",
-                    values: {
-                        "Unsorted": Designer.getLocalization("Unsorted", "DataAccessUIStringId.SortingTypeNone"),
-                        "Ascending": Designer.getLocalization("Ascending", "DataAccessUIStringId.SortingTypeAscending"),
-                        "Descending": Designer.getLocalization("Descending", "DataAccessUIStringId.QueryBuilder_SortDescending")
-                    },
+                    valuesArray: [
+                        { value: "Unsorted", displayValue: "Unsorted", localizationId: "DataAccessUIStringId.SortingTypeNone" },
+                        { value: "Ascending", displayValue: "Ascending", localizationId: "DataAccessUIStringId.SortingTypeAscending" },
+                        { value: "Descending", displayValue: "Descending", localizationId: "DataAccessUIStringId.QueryBuilder_SortDescending" }
+                    ],
                     localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_SortType"
                 },
                 { propertyName: "sortOrder", displayName: "Sort Order", editor: QueryBuilder.editorTemplates.numeric, localizationId: "DataAccessUIStringId.QueryBuilderColumns_SortOrder" },
@@ -4678,10 +4684,12 @@ var DevExpress;
                         $.extend(data, { "ConnectionOptions": serializer.serialize(connection.options) });
                     return JSON.stringify(data);
                 };
-                RequestWrapper.rebuildResultSchema = function (dataSource, queryName) {
+                RequestWrapper.rebuildResultSchema = function (dataSource, queryName, relationsEditing) {
+                    if (relationsEditing === void 0) { relationsEditing = false; }
                     var requestJson = JSON.stringify({
                         sqlDataSourceJSON: JSON.stringify({ "SqlDataSource": new DevExpress.JS.Utils.ModelSerializer().serialize(dataSource) }),
-                        queryName: queryName
+                        queryName: queryName,
+                        relationsEditing: relationsEditing
                     });
                     return RequestWrapper.sendRequest("rebuildResultSchema", encodeURIComponent(requestJson));
                 };
@@ -4857,7 +4865,7 @@ var DevExpress;
                     function MultiQueryConfigurePage(wizard, callbacks, disableCustomSql, rtl) {
                         var _this = this;
                         if (callbacks === void 0) { callbacks = {}; }
-                        if (disableCustomSql === void 0) { disableCustomSql = false; }
+                        if (disableCustomSql === void 0) { disableCustomSql = true; }
                         if (rtl === void 0) { rtl = false; }
                         _super.call(this, wizard);
                         this._selectedPath = ko.observable(null);
@@ -4891,7 +4899,7 @@ var DevExpress;
                             _this.popupSelectStatment.query = query;
                             _this.popupSelectStatment.data(query.sqlString());
                         };
-                        this.disableCustomSql = false;
+                        this.disableCustomSql = true;
                         this.isDataLoadingInProcess = ko.observable(false);
                         this.queryEditIndex = ko.observable(-1);
                         this.showQbCallBack = function (name, isCustomQuery) {
@@ -5309,6 +5317,7 @@ var DevExpress;
                                         return result.promise();
                                     }
                                 },
+                                templateName: "dx-treelist-item-with-hover",
                                 selectedPath: this._selectedPath,
                                 treeListController: new ParametersTreeListController(this._rootItems, this._createNewParameter),
                             });
@@ -5822,6 +5831,25 @@ var DevExpress;
                 return ChartDataMemberEditor;
             })(Designer.Widgets.FieldListEditor);
             Chart.ChartDataMemberEditor = ChartDataMemberEditor;
+            var ChartStructureObjectProvider = (function (_super) {
+                __extends(ChartStructureObjectProvider, _super);
+                function ChartStructureObjectProvider(target, displayName) {
+                    _super.call(this, target, displayName);
+                }
+                ChartStructureObjectProvider.prototype.getClassName = function (instance) {
+                    if (instance instanceof Chart.SeriesViewModel) {
+                        return "SeriesViewModel";
+                    }
+                    else if (instance instanceof Chart.SecondaryAxisViewModel) {
+                        return "SecondaryAxisViewModel";
+                    }
+                    else {
+                        return _super.prototype.getClassName.call(this, instance);
+                    }
+                };
+                return ChartStructureObjectProvider;
+            })(DevExpress.Designer.ObjectStructureProvider);
+            Chart.ChartStructureObjectProvider = ChartStructureObjectProvider;
             var ChartStructureTreeListController = (function (_super) {
                 __extends(ChartStructureTreeListController, _super);
                 function ChartStructureTreeListController(propertyNames, listPropertyNames, selectCallback) {
@@ -5918,9 +5946,9 @@ var DevExpress;
                 __extends(AxisXYViewModel, _super);
                 function AxisXYViewModel(model, serializer, info) {
                     _super.call(this, model, serializer, info || Chart.axisXYSerializationsInfo);
-                    this.constantLines = Chart.deserializeModelArray(model && model.ConstantLines, function (item, parent) { return new Chart.ConstantLineViewModel(item, parent, serializer); });
-                    this.scaleBreaks = Chart.deserializeModelArray(model && model.ScaleBreaks, function (item, parent) { return new Chart.ScaleBreakViewModel(item, parent, serializer); });
-                    this.strips = Chart.deserializeModelArray(model && model.Strips, function (item, parent) { return new Chart.StripViewModel(item, parent, serializer); });
+                    this.constantLines = Chart.deserializeModelArray(model && model.ConstantLines, function (item, parent) { return new Chart.ConstantLineViewModel(item, parent, serializer); }, Chart.ConstantLineViewModel.prefix);
+                    this.scaleBreaks = Chart.deserializeModelArray(model && model.ScaleBreaks, function (item, parent) { return new Chart.ScaleBreakViewModel(item, parent, serializer); }, Chart.ScaleBreakViewModel.prefix);
+                    this.strips = Chart.deserializeModelArray(model && model.Strips, function (item, parent) { return new Chart.StripViewModel(item, parent, serializer); }, Chart.StripViewModel.prefix);
                 }
                 AxisXYViewModel.from = function (info) {
                     return function (model, serializer) {
@@ -5952,7 +5980,6 @@ var DevExpress;
                 __extends(SecondaryAxisViewModel, _super);
                 function SecondaryAxisViewModel(model, parent, serializer) {
                     _super.call(this, model, serializer, Chart.secondaryAxisXYSerializationsInfo);
-                    this.defaultItemName = function (parentName) { return parentName == "secondaryAxesX" ? "Secondary Axis X " : "Secondary Axis Y "; };
                     initCollectionItem(this, parent)();
                 }
                 Object.defineProperty(SecondaryAxisViewModel.prototype, "axisID", {
@@ -5962,6 +5989,8 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                SecondaryAxisViewModel.xPrefix = "Secondary Axis X";
+                SecondaryAxisViewModel.yPrefix = "Secondary Axis Y";
                 return SecondaryAxisViewModel;
             })(AxisXYViewModel);
             Chart.SecondaryAxisViewModel = SecondaryAxisViewModel;
@@ -6421,7 +6450,19 @@ var DevExpress;
                 }
             };
             Chart.fillStyle = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Chart.viewSerializationsInfo = [Chart.typeNameSerializable, Chart.color, Chart.colorEach, Chart.border, Chart.tag];
+            var aggregateFunction = {
+                propertyName: "aggregateFunction", modelName: "@AggregateFunction", displayName: Designer.getLocalization('Aggregate Function', 'DevExpress.XtraCharts.XYDiagram2DSeriesViewBase.AggregateFunction'), defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    'Default': Designer.getLocalization('Default', 'ChartStringId.WizAggregateFunctionDefault'),
+                    'None': Designer.getLocalization('None', 'ChartStringId.WizAggregateFunctionNone'),
+                    'Average': Designer.getLocalization('Average', 'ChartStringId.WizAggregateFunctionAverage'),
+                    'Sum': Designer.getLocalization('Sum', 'ChartStringId.WizAggregateFunctionSum'),
+                    'Minimum': Designer.getLocalization('Minimum', 'ChartStringId.WizAggregateFunctionMinimum'),
+                    'Maximum': Designer.getLocalization('Maximum', 'ChartStringId.WizAggregateFunctionMaximum'),
+                    'Count': Designer.getLocalization('Count', 'ChartStringId.WizAggregateFunctionCount'),
+                    'Financial': Designer.getLocalization('Financial', 'ChartStringId.WizAggregateFunctionFinancial')
+                }
+            };
+            Chart.viewSerializationsInfo = [Chart.typeNameSerializable, Chart.color, Chart.colorEach, Chart.border, aggregateFunction, Chart.tag];
             Chart.barStyle2DMap = {
                 "Empty": [],
                 "Solid": [Chart.tag],
@@ -6581,83 +6622,83 @@ var DevExpress;
                     ko.computed(function () {
                         _this._createDiagram({}, oldType, serializer);
                     });
-                    this.titles = Chart.deserializeModelArray(model && model.Titles, function (title, parent) { return new TitleViewModel(title, parent, serializer); });
-                    this.legends = Chart.deserializeModelArray(model && model.Legends, function (legends, parent) { return new AdditionalLegendViewModel(legends, parent, serializer); });
+                    this.titles = Chart.deserializeModelArray(model && model.Titles, function (title, parent) { return new TitleViewModel(title, parent, serializer); }, TitleViewModel.prefix);
+                    this.legends = Chart.deserializeModelArray(model && model.Legends, function (legends, parent) { return new AdditionalLegendViewModel(legends, parent, serializer); }, AdditionalLegendViewModel.prefix);
                     var actions = [
                         {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-top_left",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Alignment": "Near" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-top_center",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Alignment": "Center" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-top_right",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Alignment": "Far" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-right_top_vertical",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Right", "@Alignment": "Near" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-right_center_vertical",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Right", "@Alignment": "Center" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-right_bottom_vertical",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Right", "@Alignment": "Far" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-bottom_left",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Bottom", "@Alignment": "Near" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-bottom_center",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Bottom", "@Alignment": "Center" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-bottom_right",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Bottom", "@Alignment": "Far" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-left_bottom_vertical",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Left", "@Alignment": "Near" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-left_center_vertical",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Left", "@Alignment": "Center" }); }
                         }, {
-                            text: "Add Title",
+                            text: Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
                             imageClassName: "dxrd-image-chart-title-left_top_vertical",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this.addTitle({ "@Dock": "Left", "@Alignment": "Far" }); }
                         }];
-                    this.titles()["innerActions"] = createInnerActionsWithPopover("Add Title", "addtitles-action", actions);
+                    this.titles()["innerActions"] = createInnerActionsWithPopover(Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'), "addtitles-action", actions);
                 }
                 ChartViewModel.from = function (model, serializer) {
                     return new ChartViewModel(model || {}, serializer);
@@ -6681,6 +6722,7 @@ var DevExpress;
                     }
                 };
                 ChartViewModel.prototype.addTitle = function (model) {
+                    model["@Text"] = model["@Name"] = Designer.getUniqueName(this.titles().map(function (x) { return x["name"](); }), TitleViewModel.prefix);
                     this.titles()["innerActions"][0].closePopover();
                     this.titles.push(new TitleViewModel(model, this.titles));
                 };
@@ -6704,7 +6746,6 @@ var DevExpress;
                 function TitleViewModel(model, parent, serializer) {
                     var _this = this;
                     _super.call(this, model, parent, serializer, Chart.titleSerializationsInfo);
-                    this.defaultItemName = function () { return "Title"; };
                     this.name = ko.pureComputed({
                         read: function () { return _this["text"] ? _this["text"]() : "title"; },
                         write: function (val) { _this["text"](val); }
@@ -6713,6 +6754,7 @@ var DevExpress;
                 TitleViewModel.from = function (model, serializer) {
                     return new TitleViewModel(model || {}, null, serializer);
                 };
+                TitleViewModel.prefix = "Title";
                 return TitleViewModel;
             })(ChartElementCollectionItemBase);
             Chart.TitleViewModel = TitleViewModel;
@@ -6720,11 +6762,11 @@ var DevExpress;
                 __extends(AdditionalLegendViewModel, _super);
                 function AdditionalLegendViewModel(model, parent, serializer) {
                     _super.call(this, model, parent, serializer, Chart.additionalLegendSerializationsInfo);
-                    this.defaultItemName = function () { return "Legend"; };
                 }
                 AdditionalLegendViewModel.from = function (model, serializer) {
                     return new AdditionalLegendViewModel(model || {}, null, serializer);
                 };
+                AdditionalLegendViewModel.prefix = "Legend";
                 return AdditionalLegendViewModel;
             })(ChartElementCollectionItemBase);
             Chart.AdditionalLegendViewModel = AdditionalLegendViewModel;
@@ -6733,7 +6775,7 @@ var DevExpress;
                 function DataContainerViewModel(model, serializer) {
                     var _this = this;
                     _super.call(this, model, serializer, Chart.dataContainerSerializationsInfo);
-                    this.series = Chart.deserializeModelArray(model && model.SeriesSerializable, function (item, parent) { return new SeriesViewModel(item, parent, serializer); });
+                    this.series = Chart.deserializeModelArray(model && model.SeriesSerializable, function (item, parent) { return new SeriesViewModel(item, parent, serializer); }, SeriesViewModel.prefix);
                     var typeArray = Chart.typeNameSerializable.values;
                     var actions = [];
                     for (var name in typeArray) {
@@ -6744,11 +6786,16 @@ var DevExpress;
                             visible: true,
                             clickAction: (function (typeName) { return function (item) {
                                 _this.series()["innerActions"][0].closePopover();
-                                _this.series.push(new SeriesViewModel({ "View": { "@TypeNameSerializable": typeName } }, _this.series));
+                                _this.series.push(new SeriesViewModel({
+                                    "@Name": Designer.getUniqueName(_this.series().map(function (x) { return x["name"](); }), SeriesViewModel.prefix),
+                                    "View": {
+                                        "@TypeNameSerializable": typeName,
+                                    }
+                                }, _this.series));
                             }; })(name)
                         });
                     }
-                    this.series()["innerActions"] = createInnerActionsWithPopover("Add Series", "addseries-action", actions);
+                    this.series()["innerActions"] = createInnerActionsWithPopover(Designer.getLocalization("Add", 'ChartStringId.MenuItemAdd'), "addseries-action", actions);
                 }
                 DataContainerViewModel.from = function (model, serializer) {
                     return new DataContainerViewModel(model || {}, serializer);
@@ -6952,6 +6999,7 @@ var DevExpress;
                 SeriesViewModel.getClassName = function (typeName) {
                     return typeName.toLowerCase().split("seriesview")[0];
                 };
+                SeriesViewModel.prefix = "Series";
                 return SeriesViewModel;
             })(SeriesTemplateViewModel);
             Chart.SeriesViewModel = SeriesViewModel;
@@ -7040,11 +7088,11 @@ var DevExpress;
                     serializer.deserialize(newDiagram, $.extend(model, { "@TypeNameSerializable": Chart.diagramMapper[type].type }));
                     if (info.filter(function (x) { return x.propertyName === Chart.secondaryAxesX.propertyName; }).length > 0) {
                         var createAxes = function (item, parent) { return new Chart.SecondaryAxisViewModel(item, parent, serializer); };
-                        newDiagram.secondaryAxesX = Chart.deserializeModelArray(model && model.SecondaryAxesX, createAxes);
-                        newDiagram.secondaryAxesY = Chart.deserializeModelArray(model && model.SecondaryAxesY, createAxes);
+                        newDiagram.secondaryAxesX = Chart.deserializeModelArray(model && model.SecondaryAxesX, createAxes, Chart.SecondaryAxisViewModel.xPrefix);
+                        newDiagram.secondaryAxesY = Chart.deserializeModelArray(model && model.SecondaryAxesY, createAxes, Chart.SecondaryAxisViewModel.yPrefix);
                     }
                     if (info.filter(function (x) { return x.propertyName === Chart.panes.propertyName; }).length > 0) {
-                        newDiagram.panes = Chart.deserializeModelArray(model && model.Panes, function (item, parent) { return new AdditionalPaneViewModel(item, parent, serializer); });
+                        newDiagram.panes = Chart.deserializeModelArray(model && model.Panes, function (item, parent) { return new AdditionalPaneViewModel(item, parent, serializer); }, AdditionalPaneViewModel.prefix);
                     }
                     return newDiagram;
                 };
@@ -7075,11 +7123,11 @@ var DevExpress;
                 __extends(ConstantLineViewModel, _super);
                 function ConstantLineViewModel(model, parent, serializer) {
                     _super.call(this, model, parent, serializer, Chart.constantLineSerializationsInfo);
-                    this.defaultItemName = function () { return "Constant Line "; };
                 }
                 ConstantLineViewModel.from = function (model, serializer) {
                     return new ConstantLineViewModel(model || {}, null, serializer);
                 };
+                ConstantLineViewModel.prefix = "Constant Line ";
                 return ConstantLineViewModel;
             })(ChartElementCollectionItemBase);
             Chart.ConstantLineViewModel = ConstantLineViewModel;
@@ -7087,11 +7135,11 @@ var DevExpress;
                 __extends(ScaleBreakViewModel, _super);
                 function ScaleBreakViewModel(model, parent, serializer) {
                     _super.call(this, model, parent, serializer, Chart.scaleBreakSerializationsInfo);
-                    this.defaultItemName = function () { return "Scale Break "; };
                 }
                 ScaleBreakViewModel.from = function (model, serializer) {
                     return new ScaleBreakViewModel(model || {}, null, serializer);
                 };
+                ScaleBreakViewModel.prefix = "Scale Break ";
                 return ScaleBreakViewModel;
             })(ChartElementCollectionItemBase);
             Chart.ScaleBreakViewModel = ScaleBreakViewModel;
@@ -7099,11 +7147,11 @@ var DevExpress;
                 __extends(StripViewModel, _super);
                 function StripViewModel(model, parent, serializer) {
                     _super.call(this, model, parent, serializer, Chart.stripSerializationsInfo);
-                    this.defaultItemName = function () { return "Strip "; };
                 }
                 StripViewModel.from = function (model, serializer) {
                     return new StripViewModel(model || {}, null, serializer);
                 };
+                StripViewModel.prefix = "Strip ";
                 return StripViewModel;
             })(ChartElementCollectionItemBase);
             Chart.StripViewModel = StripViewModel;
@@ -7111,11 +7159,11 @@ var DevExpress;
                 __extends(AdditionalPaneViewModel, _super);
                 function AdditionalPaneViewModel(model, parent, serializer) {
                     _super.call(this, model, parent, serializer, Chart.additionalPaneSerializationsInfo);
-                    this.defaultItemName = function () { return "Pane "; };
                 }
                 AdditionalPaneViewModel.from = function (model, serializer) {
                     return new AdditionalPaneViewModel(model || {}, null, serializer);
                 };
+                AdditionalPaneViewModel.prefix = "Pane ";
                 return AdditionalPaneViewModel;
             })(ChartElementCollectionItemBase);
             Chart.AdditionalPaneViewModel = AdditionalPaneViewModel;
@@ -7339,8 +7387,8 @@ var DevExpress;
             var seriesLabelSerializationsInfo = [Chart.typeNameNotShow, Chart.textPattern, Chart.textAlignment, Chart.maxLineCount, Chart.maxWidth, Chart.textOrientation, Chart.resolveOverlappingMode,
                 Chart.lineColor, Chart.lineVisibility, Chart.lineLength, Chart.antialiasing, Chart.backColor, Chart.textColor, Chart.barPosition, Chart.showForZeroValues, Chart.font8, lineStyle, Chart.border];
             Chart.seriesLabel = { propertyName: "label", modelName: "Label", displayName: "Label", info: seriesLabelSerializationsInfo, defaultVal: {}, from: SeriesLabelViewModel.from, toJsonObject: SeriesLabelViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var autoBindingSettingsEnabled = { propertyName: "autoBindingSettingsEnabled", modelName: "@AutoBindingSettingsEnabled", displayName: "Auto Binding Settings Enabled", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool }, autoLayoutSettingsEnabled = { propertyName: "autoLayoutSettingsEnabled", modelName: "@AutoLayoutSettingsEnabled", displayName: "Auto Layout Settings Enabled", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Chart.pivotGridDataSourceOptions = { propertyName: "pivotGridDataSourceOptions", modelName: "PivotGridDataSourceOptions", displayName: "Pivot Grid Data Source Options", info: [autoBindingSettingsEnabled, autoLayoutSettingsEnabled], editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var autoBindingSettingsEnabled = { propertyName: "autoBindingSettingsEnabled", modelName: "@AutoBindingSettingsEnabled", displayName: "Auto Binding Settings Enabled", localizationId: "DevExpress.XtraCharts.PivotGridDataSourceOptions.AutoBindingSettingsEnabled", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool }, autoLayoutSettingsEnabled = { propertyName: "autoLayoutSettingsEnabled", modelName: "@AutoLayoutSettingsEnabled", displayName: "Auto Layout Settings Enabled", localizationId: "DevExpress.XtraCharts.PivotGridDataSourceOptions.AutoLayoutSettingsEnabled", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Chart.pivotGridDataSourceOptions = { propertyName: "pivotGridDataSourceOptions", modelName: "PivotGridDataSourceOptions", displayName: "Pivot Grid Data Source Options", localizationId: "DevExpress.XtraReports.UI.XRChart.PivotGridDataSourceOptions", info: [autoBindingSettingsEnabled, autoLayoutSettingsEnabled], editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var dataFilters = {
                 modelName: "DataFilters", displayName: "Data Filters", propertyName: "dataFilters",
                 editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, array: true, addHandler: DataFilterModel.createNew, template: '#dxrd-collectionItemWithAccordion'
@@ -7367,7 +7415,16 @@ var DevExpress;
                 from: SeriesViewViewModel.from, toJsonObject: SeriesViewViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor
             }, Chart.seriesTemplateSerializationsInfo = [Chart.view, Chart.argumentDataMember, Chart.valueDataMembersSerializable, colorDataMember, Chart.argumentScaleType, Chart.seriesPointsSorting, Chart.seriesPointsSortingKey, Chart.valueScaleType, Chart.checkableInLegend, Chart.checkedInLegend, Chart.showInLegend, Chart.legendName, Chart.legendText, Chart.legendTextPattern, Chart.labelsVisibility, dataFiltersConjunctionMode, Chart.summaryFunctionSerializationInfo, dataFilters, Chart.seriesLabel, topNOptions, Chart.visible], Chart.seriesTemplate = { propertyName: "seriesTemplate", modelName: "SeriesTemplate", displayName: Designer.getLocalization("Series Template", 'DevExpress.XtraReports.UI.XRChart.SeriesTemplate'), info: Chart.seriesTemplateSerializationsInfo, from: SeriesTemplateViewModel.from, toJsonObject: SeriesTemplateViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.seriesSerializationsInfo = [Chart.name, Chart.points].concat(Chart.seriesTemplateSerializationsInfo), Chart.seriesSerializable = { propertyName: "series", modelName: "SeriesSerializable", displayName: "Series", array: true, editor: Chart.editorTemplates.collection }, Chart.seriesDataMember = { propertyName: "seriesDataMember", modelName: "@SeriesDataMember", displayName: "Series Data Member", editor: ko.bindingHandlers["displayNameExtender"] ? Designer.Widgets.editorTemplates.field : Chart.editorTemplates.fieldChart }, Chart.dataContainerSerializationsInfo = [Chart.seriesDataMember, Chart.seriesSerializable, Chart.seriesTemplate, Chart.dataMember, Chart.pivotGridDataSourceOptions], Chart.dataContainer = { propertyName: "dataContainer", modelName: "DataContainer", displayName: "Data Container", info: Chart.dataContainerSerializationsInfo, from: DataContainerViewModel.from, toJsonObject: DataContainerViewModel.toJson, editor: Designer.Widgets.editorTemplates.objecteditorCustom };
             Chart.titleSerializationsInfo = [Chart.chartTitleText, Chart.textColor, Chart.dock, Chart.titleAlignment, Chart.visibility, Chart.font18], Chart.titles = { propertyName: "titles", modelName: "Titles", displayName: Designer.getLocalization("Titles", 'DevExpress.XtraReports.UI.XRChart.Titles'), array: true, editor: Chart.editorTemplates.collection };
-            Chart.legendSerializationsInfo = [Chart.textColor, Chart.backColor, Chart.direction, Chart.alignmentVertical, Chart.alignmentHorizontal, Chart.visibility, Chart.border, Chart.margin, Chart.padding, Chart.font8], Chart.legend = { propertyName: "legend", modelName: "Legend", displayName: Designer.getLocalization("Legend", 'DevExpress.XtraCharts.Legend'), info: Chart.legendSerializationsInfo, from: LegendViewModel.from, toJsonObject: LegendViewModel.toJson, defaultVal: {}, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.additionalLegendSerializationsInfo = [Chart.name].concat(Chart.legendSerializationsInfo), Chart.legends = { propertyName: "legends", modelName: "Legends", displayName: Designer.getLocalization("Legends", 'DevExpress.XtraReports.UI.XRChart.Legends'), array: true, editor: Chart.editorTemplates.collection };
+            var markerMode = {
+                propertyName: "markerMode", modelName: "@MarkerMode", displayName: Designer.getLocalization('Marker Mode', 'DevExpress.XtraCharts.Legend.MarkerMode'), defaultVal: "Marker", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Marker": Designer.getLocalization('Marker', 'DevExpress.XtraCharts.LegendMarkerMode.Marker'),
+                    "CheckBox": Designer.getLocalization('Check Box', 'DevExpress.XtraCharts.LegendMarkerMode.CheckBox'),
+                    "CheckBoxAndMarker": Designer.getLocalization('Check Box and Marker', 'DevExpress.XtraCharts.LegendMarkerMode.CheckBoxAndMarker'),
+                    "MarkerAndCheckBox": Designer.getLocalization('Marker and Check Box', 'DevExpress.XtraCharts.LegendMarkerMode.MarkerAndCheckBox'),
+                    "None": Designer.getLocalization('None', 'DevExpress.XtraCharts.LegendMarkerMode.None')
+                }
+            }, markerOffset = { propertyName: "markerOffset", modelName: "@MarkerOffset", displayName: Designer.getLocalization('Marker Offset', 'DevExpress.XtraCharts.Legend.MarkerOffset'), defaultVal: 2, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Chart.legendSerializationsInfo = [Chart.textColor, Chart.backColor, Chart.direction, Chart.alignmentVertical, Chart.alignmentHorizontal, Chart.visibility, markerMode, markerOffset, Chart.border, Chart.margin, Chart.padding, Chart.font8], Chart.legend = { propertyName: "legend", modelName: "Legend", displayName: Designer.getLocalization("Legend", 'DevExpress.XtraCharts.Legend'), info: Chart.legendSerializationsInfo, from: LegendViewModel.from, toJsonObject: LegendViewModel.toJson, defaultVal: {}, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.additionalLegendSerializationsInfo = [Chart.name].concat(Chart.legendSerializationsInfo), Chart.legends = { propertyName: "legends", modelName: "Legends", displayName: Designer.getLocalization("Legends", 'DevExpress.XtraReports.UI.XRChart.Legends'), array: true, editor: Chart.editorTemplates.collection };
             Chart.appearanceName = {
                 propertyName: "appearanceName", modelName: "@AppearanceNameSerializable", displayName: "Appearance Name", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
                     "Nature Colors": "Nature Colors",
@@ -7662,7 +7719,7 @@ var DevExpress;
                 });
             }
             Chart.registerControls = registerControls;
-            function deserializeModelArray(model, creator) {
+            function deserializeModelArray(model, creator, prefix) {
                 var array = ko.observableArray();
                 array(DevExpress.JS.Utils.deserializeArray(model || {}, function (item) { return creator(item, array); })());
                 array()["innerActions"] = [{
@@ -7670,7 +7727,9 @@ var DevExpress;
                         imageClassName: "dxrd-image-add",
                         disabled: ko.observable(false),
                         visible: true,
-                        clickAction: function () { array.push(creator({}, array)); }
+                        clickAction: function () {
+                            array.push(creator({ "@Name": Designer.getUniqueName(array().map(function (x) { return x["name"] && x["name"](); }), prefix) }, array));
+                        }
                     }];
                 return array;
             }
@@ -7740,40 +7799,25 @@ var DevExpress;
                 };
             }
             Chart.updateChartSurfaceContentSize = updateChartSurfaceContentSize;
-            function createCollectionSubscriptionDelegate(chartStructureProvider, fakeChart, propertyPath, propertyName, newAddesItemSubscriptionDelegate, getPath) {
-                var getObjects = function (object, pathIndex, pathComponets) {
-                    object = ko.unwrap(object[pathComponets[pathIndex]]);
-                    if (++pathIndex < pathComponets.length)
-                        object = getObjects(object, pathIndex, pathComponets);
-                    return object;
-                };
-                return function (args) {
+            function subscribeTreelistArray(chartStructureProvider, array, getPath, subscribeNewItem) {
+                return array.subscribe(function (args) {
                     args.forEach(function (changeSet) {
                         if (changeSet.status) {
-                            var path = getPath ? getPath(propertyName) : [propertyPath, propertyName].join('.');
-                            var selectedPath = path;
-                            var pathComponets = path.split(".");
-                            var objects = getObjects(fakeChart, 1, pathComponets);
-                            if (changeSet.status === "deleted" && objects.length !== 0) {
-                                selectedPath = [path, "0"].join('.');
+                            var selectedPath = "";
+                            var path = getPath();
+                            if (changeSet.status === "deleted") {
+                                selectedPath = array().length === 0 ? path.join('.') : [].concat(path, "0").join('.');
                             }
                             else if (changeSet.status === "added") {
-                                selectedPath = [path, changeSet.index].join(".");
-                                var arrayItem = changeSet.value;
-                                if (arrayItem.name && !arrayItem.name()) {
-                                    var prefix = (arrayItem.defaultItemName ? arrayItem.defaultItemName(propertyName) : propertyName.charAt(0).toUpperCase() + propertyName.substr(1));
-                                    arrayItem.name(Designer.getUniqueNameForNamedObjectsArray(objects, prefix));
-                                    if (newAddesItemSubscriptionDelegate) {
-                                        newAddesItemSubscriptionDelegate(arrayItem, path);
-                                    }
-                                }
+                                selectedPath = [].concat(path, changeSet.index).join(".");
+                                subscribeNewItem && subscribeNewItem(changeSet.value, array, path);
                             }
                             chartStructureProvider.selectedPath(selectedPath);
                         }
                     });
-                };
+                }, null, "arrayChange");
             }
-            Chart.createCollectionSubscriptionDelegate = createCollectionSubscriptionDelegate;
+            Chart.subscribeTreelistArray = subscribeTreelistArray;
             function getPropertyInfo(serializationsInfo, index, pathComponets) {
                 var info = serializationsInfo.filter(function (info) { return info.propertyName === pathComponets[index]; })[0];
                 if (info && info.info && index++ < pathComponets.length)
@@ -7811,7 +7855,7 @@ var DevExpress;
                     isPropertyDisabled: function (propertyName) { return chart.isPropertyDisabled(propertyName); },
                     className: function () { return 'chart'; }
                 };
-                var chartStructureProvider = new Designer.ObjectStructureProvider(fakeChart, "Chart");
+                var chartStructureProvider = new Chart.ChartStructureObjectProvider(fakeChart, "Chart");
                 var chartStructureTreeListController = new Chart.ChartStructureTreeListController(["chart", "Chart", "titles", "legend", "legends", "series", "diagram",
                     "defaultPane", "panes", "axisX", "axisY", "secondaryAxesX", "secondaryAxesY", "constantLines", "scaleBreaks", "strips", "seriesTemplate", "label", "points"], ["chart", "diagram", "axisX", "axisY", "titles", "legends", "series", "panes", "secondaryAxesX", "secondaryAxesY", "constantLines", "scaleBreaks", "strips", "SeriesViewModel", "SecondaryAxisViewModel"], function (newItem) {
                     var selectedElement = chartStructureProvider.selectedMember();
@@ -7831,33 +7875,37 @@ var DevExpress;
                 chartStructureProvider.selectedPath("Chart");
                 selectedItem(null);
                 subscriptions.push(fakeChart.diagram);
-                subscriptions.push(chart.chart.dataContainer.series.subscribe(createCollectionSubscriptionDelegate(chartStructureProvider, fakeChart, "Chart", "series"), null, "arrayChange"));
-                subscriptions.push(chart.chart.titles.subscribe(createCollectionSubscriptionDelegate(chartStructureProvider, fakeChart, "Chart", "titles"), null, "arrayChange"));
-                subscriptions.push(chart.chart.legends.subscribe(createCollectionSubscriptionDelegate(chartStructureProvider, fakeChart, "Chart", "legends"), null, "arrayChange"));
+                subscriptions.push(subscribeTreelistArray(chartStructureProvider, chart.chart.dataContainer.series, function () { return ["Chart", "series"]; }));
+                subscriptions.push(subscribeTreelistArray(chartStructureProvider, chart.chart.titles, function () { return ["Chart", "titles"]; }));
+                subscriptions.push(subscribeTreelistArray(chartStructureProvider, chart.chart.legends, function () { return ["Chart", "legends"]; }));
                 var diagramSubscriptions = [];
                 var subscribeDiagram = function (diagram) {
                     diagramSubscriptions.forEach(function (val) { return val.dispose(); });
-                    var diagramSubscriptionsDelegate = function (object, arrayName, path, newAddesItemSubscriptionDelegate, getPath) {
-                        diagramSubscriptions.push(object[arrayName].subscribe(createCollectionSubscriptionDelegate(chartStructureProvider, fakeChart, path, arrayName, newAddesItemSubscriptionDelegate, getPath), null, "arrayChange"));
-                    };
                     var axisCollectionNames = ["constantLines", "scaleBreaks", "strips"];
-                    var axisArraySubscription = function (arrayItem, path) {
-                        axisCollectionNames.forEach(function (arrayName) {
-                            var getPath = function (collectionName) {
-                                return [path, arrayItem.parent().indexOf(arrayItem), collectionName].join('.');
-                            };
-                            diagramSubscriptionsDelegate(arrayItem, arrayName, path, null, getPath);
+                    var subscribeAxis = function (axis, array, path) {
+                        axisCollectionNames.forEach(function (propertyName) {
+                            diagramSubscriptions.push(subscribeTreelistArray(chartStructureProvider, axis[propertyName], function () { return [].concat(path, array.indexOf(axis), propertyName); }));
                         });
                     };
-                    if (diagram.secondaryAxesX) {
-                        ["axisX", "axisY"].forEach(function (propertyName) {
-                            axisCollectionNames.forEach(function (arrayName) { diagramSubscriptionsDelegate(diagram[propertyName], arrayName, "Chart.diagram." + propertyName); });
-                        });
-                        diagramSubscriptionsDelegate(diagram, "secondaryAxesX", "Chart.diagram", axisArraySubscription);
-                        diagramSubscriptionsDelegate(diagram, "secondaryAxesY", "Chart.diagram", axisArraySubscription);
+                    ["axisX", "axisY"].forEach(function (propertyName) {
+                        if (diagram[propertyName]) {
+                            axisCollectionNames.forEach(function (innerPropertyName) {
+                                diagramSubscriptions.push(subscribeTreelistArray(chartStructureProvider, diagram[propertyName][innerPropertyName], function () { return ["Chart", "diagram", propertyName, innerPropertyName]; }));
+                            });
+                        }
+                    });
+                    ["secondaryAxesX", "secondaryAxesY"].forEach(function (propertyName) {
+                        if (diagram[propertyName]) {
+                            diagramSubscriptions.push(subscribeTreelistArray(chartStructureProvider, diagram[propertyName], function () { return ["Chart", "diagram", propertyName]; }, subscribeAxis));
+                            var axis = ko.unwrap(diagram[propertyName]);
+                            for (var i = 0; i < axis.length; i++) {
+                                subscribeAxis(axis[i], axis, ["Chart", "diagram", propertyName]);
+                            }
+                        }
+                    });
+                    if (diagram.panes) {
+                        diagramSubscriptions.push(subscribeTreelistArray(chartStructureProvider, diagram.panes, function () { return ["Chart", "diagram", "panes"]; }));
                     }
-                    if (diagram.panes)
-                        diagramSubscriptionsDelegate(diagram, "panes", "Chart.diagram");
                     [].push.apply(subscriptions, diagramSubscriptions);
                 };
                 subscribeDiagram(chart.chart.diagram());
@@ -7885,25 +7933,28 @@ var DevExpress;
                 var subscriptions = [];
                 var chartSourceSubscription = null;
                 var initChartControlModel = function (newModel) {
-                    chartControlModel(newModel);
                     surface() && surface()._disposables.forEach(function (item) { item.dispose(); });
-                    surface(new Chart.ChartControlSurface(newModel, ko.observable(1), size));
-                    if (!!options.fieldListProvider) {
-                        dataBindingsProvider(options.fieldListProvider);
-                    }
-                    else {
-                        var _chartSources = options.data.dataSource && options.data.dataSource() ? [options.data.dataSource()] : [];
-                        if (options.data.availableChartDataSources) {
-                            _chartSources = options.data.availableChartDataSources().map(function (x) {
-                                return x.value;
-                            });
-                        }
-                        var realChartSources = ko.observableArray(_chartSources);
-                        dataBindingsProvider(new Designer.FieldListProvider(options.callbacks.fieldLists, realChartSources));
-                    }
                     subscriptions.forEach(function (item) { return item.dispose(); });
                     subscriptions = [];
-                    chartStructure(createChartStructure(newModel, chartSelectedItem, subscriptions));
+                    if (newModel) {
+                        chartControlModel(newModel);
+                        surface() && surface()._disposables.forEach(function (item) { item.dispose(); });
+                        surface(new Chart.ChartControlSurface(newModel, ko.observable(1), size));
+                        if (!!options.fieldListProvider) {
+                            dataBindingsProvider(options.fieldListProvider);
+                        }
+                        else {
+                            var _chartSources = options.data.dataSource && options.data.dataSource() ? [options.data.dataSource()] : [];
+                            if (options.data.availableChartDataSources) {
+                                _chartSources = options.data.availableChartDataSources().map(function (x) {
+                                    return x.value;
+                                });
+                            }
+                            var realChartSources = ko.observableArray(_chartSources);
+                            dataBindingsProvider(new Designer.FieldListProvider(options.callbacks.fieldLists, realChartSources));
+                        }
+                        chartStructure(createChartStructure(newModel, chartSelectedItem, subscriptions));
+                    }
                     designerModel.undoEngine().clearHistory();
                 };
                 var init = function (chartSourceValue) {
@@ -8049,32 +8100,32 @@ var DevExpress;
                     "windows-1252": "Western European (Windows)"
                 }
             };
-            Report.defaultExportModePreview = {
-                "SingleFile": "Single File",
-                "SingleFilePageByPage": "Single File PageByPage"
-            };
-            Report.defaultExportModeMerdedPreview = {
-                "SingleFilePageByPage": "Single File PageByPage"
-            };
-            Report.defaultExportMode = {
-                "SingleFile": "Single File",
-                "SingleFilePageByPage": "Single File PageByPage",
-                "DifferentFiles": "Different Files"
-            };
+            Report.defaultExportModePreview = [
+                { value: "SingleFile", displayValue: "Single File", localizationId: "PreviewStringId.ExportOption_RtfExportMode_SingleFile" },
+                { value: "SingleFilePageByPage", displayValue: "Single File PageByPage", localizationId: "PreviewStringId.ExportOption_RtfExportMode_SingleFilePageByPage" }
+            ];
+            Report.defaultExportModeMerdedPreview = [
+                { value: "SingleFilePageByPage", displayValue: "Single File PageByPage", localizationId: "PreviewStringId.ExportOption_RtfExportMode_SingleFilePageByPage" }
+            ];
+            Report.defaultExportMode = [
+                { value: "SingleFile", displayValue: "Single File", localizationId: "PreviewStringId.ExportOption_HtmlExportMode_SingleFile" },
+                { value: "SingleFilePageByPage", displayValue: "Single File PageByPage", localizationId: "PreviewStringId.ExportOption_HtmlExportMode_SingleFilePageByPage" },
+                { value: "DifferentFiles", displayValue: "Different Files", localizationId: "PreviewStringId.ExportOption_HtmlExportMode_DifferentFiles" }
+            ];
             Report.exportPageBreaks = { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             Report.rtfExportMode = {
                 propertyName: "rtfExportMode", modelName: "@ExportMode", defaultVal: "SingleFilePageByPage",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
-                values: $.extend({}, Report.defaultExportModePreview)
+                valuesArray: Report.defaultExportModePreview
             };
             Report.rtfExportModeMergedPreview = $.extend({}, Report.rtfExportMode, {
                 from: excludeModesForMergedDocuments,
-                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+                valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.htmlExportMode = {
                 propertyName: "htmlExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
-                values: $.extend({}, Report.defaultExportMode)
+                valuesArray: Report.defaultExportMode
             };
             Report.embedImagesInHTML = {
                 propertyName: "embedImagesInHTML", modelName: "@EmbedImagesInHTML", defaultVal: false,
@@ -8083,44 +8134,44 @@ var DevExpress;
             Report.imageExportMode = {
                 propertyName: "imageExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
-                values: $.extend({}, Report.defaultExportMode)
+                valuesArray: Report.defaultExportMode
             };
             Report.xlsExportMode = {
                 propertyName: "xlsExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
-                values: $.extend({}, Report.defaultExportMode)
+                valuesArray: Report.defaultExportMode
             };
             Report.xlsxExportMode = {
                 propertyName: "xlsxExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
-                values: $.extend({}, Report.defaultExportMode)
+                valuesArray: Report.defaultExportMode
             };
             Report.textExportMode = {
                 propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", defaultVal: "Text", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "Text": "Text",
-                    "Value": "Value"
-                }
+                valuesArray: [
+                    { value: "Text", displayValue: "Text", localizationId: "DevExpress.XtraPrinting.TextExportMode.Text" },
+                    { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPrinting.TextExportMode.Value" }
+                ]
             };
             Report.xlsTextExportMode = {
                 propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", defaultVal: "Value", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "Text": "Text",
-                    "Value": "Value"
-                }
+                valuesArray: [
+                    { value: "Text", displayValue: "Text", localizationId: "DevExpress.XtraPrinting.TextExportMode.Text" },
+                    { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPrinting.TextExportMode.Value" }
+                ]
             };
             Report.csvTextSeparator = { propertyName: "separator", modelName: "@Separator", displayName: "Separator", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "," };
             Report.textEncodingType = {
                 propertyName: "encodingType", modelName: "@EncodingType", displayName: "Encoding", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Default", from: Designer.fromEnum,
-                values: {
-                    "Default": "Windows-1252",
-                    "ASCII": "us-ascii",
-                    "Unicode": "utf-16",
-                    "BigEndianUnicode": "utf-16BE",
-                    "UTF7": "utf-7",
-                    "UTF8": "utf-8",
-                    "UTF32": "utf-32"
-                }
+                valuesArray: [
+                    { value: "Default", displayValue: "Windows-1252", localizationId: "DevExpress.XtraPrinting.EncodingType.Default" },
+                    { value: "ASCII", displayValue: "us-ascii", localizationId: "DevExpress.XtraPrinting.EncodingType.ASCII" },
+                    { value: "Unicode", displayValue: "utf-16", localizationId: "DevExpress.XtraPrinting.EncodingType.Unicode" },
+                    { value: "BigEndianUnicode", displayValue: "utf-16BE", localizationId: "DevExpress.XtraPrinting.EncodingType.BigEndianUnicode" },
+                    { value: "UTF7", displayValue: "utf-7", localizationId: "DevExpress.XtraPrinting.EncodingType.UTF7" },
+                    { value: "UTF8", displayValue: "utf-8", localizationId: "DevExpress.XtraPrinting.EncodingType.UTF8" },
+                    { value: "UTF32", displayValue: "utf-32", localizationId: "DevExpress.XtraPrinting.EncodingType.UTF32" }
+                ]
             };
             Report.xlsExportHyperlinks = {
                 propertyName: "exportHyperlinks", modelName: "@ExportHyperlinks", displayName: "Export Hyperlinks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
@@ -8148,11 +8199,11 @@ var DevExpress;
             };
             Report.htmlExportModePreview = $.extend({}, Report.htmlExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                valuesArray: Report.defaultExportModePreview
             });
             Report.htmlExportModeMergedPreview = $.extend({}, Report.htmlExportModePreviewBase, {
                 from: excludeModesForMergedDocuments,
-                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+                valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.xlsExportModePreviewBase = {
                 propertyName: Report.xlsExportMode.propertyName, modelName: Report.xlsExportMode.modelName, defaultVal: Report.xlsExportMode.defaultVal,
@@ -8160,11 +8211,11 @@ var DevExpress;
             };
             Report.xlsExportModePreview = $.extend({}, Report.xlsExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                valuesArray: Report.defaultExportModePreview
             });
             Report.xlsExportModeMergedPreview = $.extend({}, Report.xlsExportModePreviewBase, {
                 from: excludeModesForMergedDocuments,
-                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+                valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.imageExportModePreviewBase = {
                 propertyName: Report.imageExportMode.propertyName, modelName: Report.imageExportMode.modelName, defaultVal: Report.imageExportMode.defaultVal,
@@ -8172,11 +8223,11 @@ var DevExpress;
             };
             Report.imageExportModePreview = $.extend({}, Report.imageExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                valuesArray: Report.defaultExportModePreview
             });
             Report.imageExportModeMergedPreview = $.extend({}, Report.imageExportModePreviewBase, {
                 from: excludeModesForMergedDocuments,
-                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+                valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.xlsxExportModePreviewBase = {
                 propertyName: Report.xlsxExportMode.propertyName, modelName: Report.xlsxExportMode.modelName, defaultVal: Report.xlsxExportMode.defaultVal,
@@ -8184,11 +8235,11 @@ var DevExpress;
             };
             Report.xlsxExportModePreview = $.extend({}, Report.xlsxExportModePreviewBase, {
                 from: excludeDifferentFilesMode,
-                values: $.extend({}, Report.defaultExportModePreview)
+                valuesArray: Report.defaultExportModePreview
             });
             Report.xlsxExportModeMergedPreview = $.extend({}, Report.xlsxExportModePreviewBase, {
                 from: excludeModesForMergedDocuments,
-                values: $.extend({}, Report.defaultExportModeMerdedPreview)
+                valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.previewBackColor = { propertyName: "backColor", modelName: "@BackColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
             Report.previewSides = { propertyName: "borders", modelName: "@Sides" };
@@ -8223,26 +8274,27 @@ var DevExpress;
         (function (Preview) {
             Preview.AsyncExportApproach = false;
             Preview.ExportFormatID = {
-                PDF: { text: "PDF", format: "pdf" },
-                XLS: { text: "XLS", format: "xls" },
-                XLSX: { text: "XLSX", format: "xlsx" },
-                RTF: { text: "RTF", format: "rtf" },
-                MHT: { text: "MHT", format: "mht" },
-                HTML: { text: "HTML", format: "html" },
-                Text: { text: "Text", format: "txt" },
-                CSV: { text: "CSV", format: "csv" },
-                Image: { text: "Image", format: "image" },
-                DOCX: { text: "DOCX", format: "docx" }
+                PDF: { text: "PDF", textId: "ASPxReportsStringId.ExportName_pdf", format: "pdf" },
+                XLS: { text: "XLS", textId: "ASPxReportsStringId.ExportName_xls", format: "xls" },
+                XLSX: { text: "XLSX", textId: "ASPxReportsStringId.ExportName_xlsx", format: "xlsx" },
+                RTF: { text: "RTF", textId: "ASPxReportsStringId.ExportName_rtf", format: "rtf" },
+                MHT: { text: "MHT", textId: "ASPxReportsStringId.ExportName_mht", format: "mht" },
+                HTML: { text: "HTML", textId: "ASPxReportsStringId.ExportName_html", format: "html" },
+                Text: { text: "Text", textId: "ASPxReportsStringId.ExportName_txt", format: "txt" },
+                CSV: { text: "CSV", textId: "ASPxReportsStringId.ExportName_csv", format: "csv" },
+                Image: { text: "Image", textId: "ASPxReportsStringId.ExportName_png", format: "image" },
+                DOCX: { text: "DOCX", textId: "ASPxReportsStringId.ExportName_docx", format: "docx" }
             };
             var ExportOptionsModel = (function () {
                 function ExportOptionsModel(reportPreview) {
                     var _this = this;
                     this.actions = [];
                     this._reportPreview = reportPreview;
-                    this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Export Options"), "dxrd-preview-export-options", reportPreview.exportOptionsModel, "properties", ko.pureComputed(function () { return !!reportPreview.exportOptionsModel(); }));
+                    this.tabInfo = new DevExpress.Designer.TabInfo("Export Options", "dxrd-preview-export-options", reportPreview.exportOptionsModel, 'DevExpress.XtraPrinting.ExportOptions', "properties", ko.pureComputed(function () { return !!reportPreview.exportOptionsModel(); }));
                     this.actions.push({
                         id: Preview.ActionId.ExportTo,
                         text: "Export To",
+                        textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
                         disabled: reportPreview.exportDisabled,
                         visible: true,
                         clickAction: function (model) {
@@ -8254,6 +8306,7 @@ var DevExpress;
                             var result = _this._getExportFormatItems();
                             return [{
                                     text: "Export To",
+                                    textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
                                     imageClassName: "dxrd-image-export-to",
                                     items: result
                                 }];
@@ -8349,29 +8402,29 @@ var DevExpress;
                 { propertyName: "resolution", modelName: "@Resolution", displayName: "Resolution", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 96 },
                 {
                     propertyName: "format", modelName: "@Format", displayName: "Format", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Png", from: Designer.fromEnum,
-                    values: {
-                        "Bmp": "BMP",
-                        "Gif": "GIF",
-                        "Jpeg": "JPEG",
-                        "Png": "PNG",
-                        "Emf": "EMF",
-                        "Wmf": "WMF",
-                        "Tiff": "TIFF"
-                    }
+                    valuesArray: [
+                        { value: "Bmp", displayValue: "BMP" },
+                        { value: "Gif", displayValue: "GIF" },
+                        { value: "Jpeg", displayValue: "JPEG" },
+                        { value: "Png", displayValue: "PNG" },
+                        { value: "Emf", displayValue: "EMF" },
+                        { value: "Wmf", displayValue: "WMF" },
+                        { value: "Tiff", displayValue: "TIFF" }
+                    ]
                 }
             ];
             var imageExportOptionsSerializationInfo = [Report.imageExportMode,
                 { propertyName: "retainBackgroundTransparency", modelName: "@RetainBackgroundTransparency", displayName: "Retain Background Transparency", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
                     propertyName: "textRenderingMode", modelName: "@TextRenderingMode", displayName: "Text Rendering Mode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "SystemDefault", from: Designer.fromEnum,
-                    values: {
-                        "SystemDefault": "SystemDefault",
-                        "SingleBitPerPixelGridFit": "SingleBitPerPixelGridFit",
-                        "SingleBitPerPixel": "SingleBitPerPixel",
-                        "AntiAliasGridFit": "AntiAliasGridFit",
-                        "AntiAlias": "AntiAlias",
-                        "ClearTypeGridFit": "ClearTypeGridFit"
-                    }
+                    valuesArray: [
+                        { value: "SystemDefault", displayValue: "SystemDefault", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.SystemDefault" },
+                        { value: "SingleBitPerPixelGridFit", displayValue: "SingleBitPerPixelGridFit", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.SingleBitPerPixelGridFit" },
+                        { value: "SingleBitPerPixel", displayValue: "SingleBitPerPixel", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.SingleBitPerPixel" },
+                        { value: "AntiAliasGridFit", displayValue: "AntiAliasGridFit", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.AntiAliasGridFit" },
+                        { value: "AntiAlias", displayValue: "AntiAlias", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.AntiAlias" },
+                        { value: "ClearTypeGridFit", displayValue: "ClearTypeGridFit", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.ClearTypeGridFit" }
+                    ]
                 }
             ].concat(imageExportOptionsSerializationInfoBase);
             var htmlExportOptionsSerializationInfoBase = [
@@ -8482,21 +8535,21 @@ var DevExpress;
             var pdfExportPermissionsOptionsSerializationInfo = [
                 {
                     propertyName: "printingPermissions", modelName: "@PrintingPermissions", displayName: "Printing Permissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "None": "None",
-                        "LowResolution": "LowResolution",
-                        "HighResolution": "HighResolution"
-                    }
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.PrintingPermissions.None" },
+                        { value: "LowResolution", displayValue: "LowResolution", localizationId: "DevExpress.XtraPrinting.PrintingPermissions.LowResolution" },
+                        { value: "HighResolution", displayValue: "HighResolution", localizationId: "DevExpress.XtraPrinting.PrintingPermissions.HighResolution" }
+                    ]
                 },
                 {
                     propertyName: "changingPermissions", modelName: "@ChangingPermissions", displayName: "Changing Permissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "None": "None",
-                        "InsertingDeletingRotating": "InsertingDeletingRotating",
-                        "FillingSigning": "FillingSigning",
-                        "CommentingFillingSigning": "CommentingFillingSigning",
-                        "AnyExceptExtractingPages": "AnyExceptExtractingPages"
-                    }
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.None" },
+                        { value: "InsertingDeletingRotating", displayValue: "InsertingDeletingRotating", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.InsertingDeletingRotating" },
+                        { value: "FillingSigning", displayValue: "FillingSigning", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.FillingSigning" },
+                        { value: "CommentingFillingSigning", displayValue: "CommentingFillingSigning", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.CommentingFillingSigning" },
+                        { value: "AnyExceptExtractingPages", displayValue: "AnyExceptExtractingPages", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.AnyExceptExtractingPages" }
+                    ]
                 },
                 { propertyName: "enableCopying", modelName: "@EnableCopying", displayName: "Enable Copying", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "enableScreenReaders", modelName: "@EnableScreenReaders", displayName: "Enable Screen Readers", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
@@ -8532,11 +8585,11 @@ var DevExpress;
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
             var pdfEncryptionLevel = {
                 propertyName: "encryptionLevel", modelName: "@EncryptionLevel", displayName: "Encryption Level", defaultVal: "AES128", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "ARC4": "ARC4",
-                    "AES128": "AES128",
-                    "AES256": "AES256",
-                }
+                valuesArray: [
+                    { value: "ARC4", displayValue: "ARC4", localizationId: "DevExpress.XtraPrinting.PdfEncryptionLevel.ARC4" },
+                    { value: "AES128", displayValue: "AES128", localizationId: "DevExpress.XtraPrinting.PdfEncryptionLevel.AES128" },
+                    { value: "AES256", displayValue: "AES256", localizationId: "DevExpress.XtraPrinting.PdfEncryptionLevel.AES256" },
+                ]
             };
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
                 { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
@@ -8574,22 +8627,22 @@ var DevExpress;
                 { propertyName: "neverEmbeddedFonts", modelName: "@NeverEmbeddedFonts", displayName: "Never Embedded Fonts", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
                     propertyName: "imageQuality", modelName: "@ImageQuality", displayName: "Image Quality", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Highest", from: Designer.fromEnum,
-                    values: {
-                        "Lowest": "Lowest",
-                        "Low": "Low",
-                        "Medium": "Medium",
-                        "Hight": "Hight",
-                        "Highest": "Highest"
-                    }
+                    valuesArray: [
+                        { value: "Lowest", displayValue: "Lowest", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Lowest" },
+                        { value: "Low", displayValue: "Low", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Low" },
+                        { value: "Medium", displayValue: "Medium", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Medium" },
+                        { value: "High", displayValue: "High", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.High" },
+                        { value: "Highest", displayValue: "Highest", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Highest" }
+                    ]
                 },
                 {
                     propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
-                    values: {
-                        "Hight": "None",
-                        "PdfA1b": "PdfA1b",
-                        "PdfA2b": "PdfA2b",
-                        "PdfA3b": "PdfA3b"
-                    }
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.None" },
+                        { value: "PdfA1b", displayValue: "PdfA1b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA1b" },
+                        { value: "PdfA2b", displayValue: "PdfA2b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA2b" },
+                        { value: "PdfA3b", displayValue: "PdfA3b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA3b" }
+                    ]
                 },
                 Report.pageRange,
                 { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
@@ -8665,10 +8718,10 @@ var DevExpress;
             var encryptionOptionsSerializationsInfo = [
                 {
                     propertyName: "type", modelName: "@Type", displayName: "Type", defaultVal: "Strong", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
-                    values: {
-                        "Strong": "Strong",
-                        "Compatible": "Compatible"
-                    }
+                    valuesArray: [
+                        { value: "Strong", displayValue: "Strong", localizationId: "DevExpress.XtraPrinting.XlEncryptionType.Strong" },
+                        { value: "Compatible", displayValue: "Compatible", localizationId: "DevExpress.XtraPrinting.XlEncryptionType.Compatible" }
+                    ]
                 },
                 { propertyName: "password", modelName: "@Password", displayName: "Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } }
             ];
@@ -8685,17 +8738,17 @@ var DevExpress;
                 { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "fitToPrintedPageHeight", modelName: "@FitToPrintedPageHeight", displayName: "Fit To Printed Page Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
-                    propertyName: "ignoreErrors", modelName: "@IgnoreErrors", displayName: "Ignore Errors", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum, values: {
-                        "None": "None",
-                        "NumberStoredAsText": "Number Stored As Text"
-                    }
+                    propertyName: "ignoreErrors", modelName: "@IgnoreErrors", displayName: "Ignore Errors", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum, valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.XlIgnoreErrors.None" },
+                        { value: "NumberStoredAsText", displayValue: "Number Stored As Text", localizationId: "DevExpress.XtraPrinting.XlIgnoreErrors.NumberStoredAsText" }
+                    ]
                 },
                 {
-                    propertyName: "rightToLeftDocument", modelName: "@RightToLeftDocument", displayName: "Right To Left Document", defaultVal: "Default", from: Designer.fromEnum, editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                        "True": "True",
-                        "False": "False",
-                        "Default": "Default"
-                    }
+                    propertyName: "rightToLeftDocument", modelName: "@RightToLeftDocument", displayName: "Right To Left Document", defaultVal: "Default", from: Designer.fromEnum, editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                        { value: "True", displayValue: "True", localizationId: "DevExpress.Utils.DefaultBoolean.True" },
+                        { value: "False", displayValue: "False", localizationId: "DevExpress.Utils.DefaultBoolean.False" },
+                        { value: "Default", displayValue: "Default", localizationId: "DevExpress.Utils.DefaultBoolean.Default" }
+                    ]
                 },
                 documentOptions,
                 encryptionOptions
@@ -8705,10 +8758,10 @@ var DevExpress;
                 { propertyName: "suppress65536RowsWarning", modelName: "@Suppress65536RowsWarning", displayName: "Suppress 65536 Rows Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
                     propertyName: "workbookColorPaletteCompliance", modelName: "@WorkbookColorPaletteCompliance", displayName: "Workbook Color Palette Compliance", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "ReducePaletteForExactColors", from: Designer.fromEnum,
-                    values: {
-                        "ReducePaletteForExactColors": "ReducePaletteForExactColors",
-                        "AdjustColorsToDefaultPalette": "AdjustColorsToDefaultPalette"
-                    }
+                    valuesArray: [
+                        { value: "ReducePaletteForExactColors", displayValue: "ReducePaletteForExactColors", localizationId: "DevExpress.XtraPrinting.WorkbookColorPaletteCompliance.ReducePaletteForExactColors" },
+                        { value: "AdjustColorsToDefaultPalette", displayValue: "AdjustColorsToDefaultPalette", localizationId: "DevExpress.XtraPrinting.WorkbookColorPaletteCompliance.AdjustColorsToDefaultPalette" }
+                    ]
                 }
             ];
             var xlsExportOptionsSerializationInfo = [Report.xlsExportMode].concat(xlsExportOptionsSerializationInfoCommon, xlsExportOptionsSerializationInfoBase);
@@ -8823,11 +8876,11 @@ var DevExpress;
                 { propertyName: "Prefix", modelName: "@Prefix", displayName: "Prefix", defaultVal: "SMTP:", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
                     propertyName: "fieldType", modelName: "@FieldType", displayName: "Field Type", defaultVal: "TO", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
-                    values: {
-                        "TO": "TO",
-                        "CC": "CC",
-                        "BCC": "BCC"
-                    }
+                    valuesArray: [
+                        { value: "TO", displayValue: "TO", localizationId: "DevExpress.XtraPrinting.RecipientFieldType.TO" },
+                        { value: "CC", displayValue: "CC", localizationId: "DevExpress.XtraPrinting.RecipientFieldType.CC" },
+                        { value: "BCC", displayValue: "BCC", localizationId: "DevExpress.XtraPrinting.RecipientFieldType.BCC" }
+                    ]
                 },
             ];
             var AdditionalRecipientModel = (function () {
@@ -9127,7 +9180,9 @@ var DevExpress;
                     ];
                 };
                 ExportOptionsPreview.prototype.hasSensitiveData = function () {
-                    return this.xls.hasSensitiveData() || this.xlsx.hasSensitiveData() || this.pdf.hasSensitiveData();
+                    return (this.xls && this.xls.hasSensitiveData())
+                        || (this.xlsx && this.xlsx.hasSensitiveData())
+                        || (this.pdf && this.pdf.hasSensitiveData());
                 };
                 ExportOptionsPreview.prototype.getInfo = function () {
                     return this._generateInfo();
@@ -9364,7 +9419,6 @@ var DevExpress;
                 PreviewPage.prototype._setPageImgSrc = function (documentId, unifier, zoom) {
                     this.pageLoadFailed(false);
                     if (!documentId || this.pageIndex === -1) {
-                        this.imageSrc(null);
                         return;
                     }
                     if (this.maxZoom && this.maxZoom < zoom) {
@@ -9391,6 +9445,7 @@ var DevExpress;
                     this.pageIndex = -1;
                     this.brick(null);
                     this._setPageImgSrc(null, null, 1);
+                    this.actualResolution = 0;
                 };
                 PreviewPage.prototype.initializeBrick = function (brick, processClick, zoom, editingFieldBricks) {
                     initializeBrick(brick, processClick, this.zoom, editingFieldBricks);
@@ -9483,6 +9538,7 @@ var DevExpress;
                     this.actions.push({
                         id: Preview.ActionId.Search,
                         text: "Search",
+                        textId: 'ASPxReportsStringId.SearchDialog_Header',
                         imageClassName: "dxrd-image-search",
                         disabled: disabled,
                         visible: ko.pureComputed(function () { return Preview.searchAvailable(); }),
@@ -9497,7 +9553,7 @@ var DevExpress;
                             }
                         }
                     });
-                    this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Search"), "dxrd-preview-search", this, "search", ko.pureComputed(function () { return !disabled() && Preview.searchAvailable(); }));
+                    this.tabInfo = new DevExpress.Designer.TabInfo("Search", "dxrd-preview-search", this, 'ASPxReportsStringId.SearchDialog_Header', "search", ko.pureComputed(function () { return !disabled() && Preview.searchAvailable(); }));
                     this._disposables.push(this.tabInfo.active.subscribe(function (newVal) {
                         newVal && setTimeout(function () { return _this.focusRequested.notifySubscribers(); }, 100);
                     }));
@@ -9719,7 +9775,7 @@ var DevExpress;
                             treeListController: treeListController
                         };
                     });
-                    this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Document Map"), "dxrd-preview-document-map", this, "reportexplorer", ko.pureComputed(function () { return !_this.isEmpty(); }));
+                    this.tabInfo = new DevExpress.Designer.TabInfo("Document Map", "dxrd-preview-document-map", this, "DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap", "reportexplorer", ko.pureComputed(function () { return !_this.isEmpty(); }));
                 }
                 return DocumentMapModel;
             })();
@@ -10012,7 +10068,7 @@ var DevExpress;
                     this.isMultiValue = parameterInfo.MultiValue;
                     this.isMultiValueWithLookUp = this.isMultiValue && !!this.lookUpValues();
                     this._originalValue = parameterInfo.Value;
-                    if (parameterInfo.ValueInfo && this.isTypesCurrentType(this.intTypes.concat(this.floatTypes), this.type)) {
+                    if (parameterInfo.ValueInfo && this.isTypesCurrentType(this.intTypes.concat(this.floatTypes), this.type) && !this.isMultiValueWithLookUp) {
                         this._originalValue = parameterInfo.ValueInfo;
                     }
                     this.getParameterDescriptor = function () {
@@ -10128,7 +10184,7 @@ var DevExpress;
                     }));
                     this.initialize(reportPreview.originalParametersInfo());
                     var notEmpty = ko.pureComputed(function () { return !_this.isEmpty(); });
-                    this.tabInfo = new DevExpress.Designer.TabInfo(DevExpress.Designer.getLocalization("Parameters"), "dxrd-preview-parameters", this, "parameters", notEmpty);
+                    this.tabInfo = new DevExpress.Designer.TabInfo("Parameters", "dxrd-preview-parameters", this, 'PreviewStringId.RibbonPreview_Parameters_Caption', "parameters", notEmpty);
                     var popupVisibleSwitch = ko.observable(false);
                     var popupVisible = ko.pureComputed({
                         read: function () {
@@ -10172,7 +10228,7 @@ var DevExpress;
                     this.isEmpty(false);
                     this[PreviewParameterHelper.getPrivatePropertyName(parameter.path)] = parameter.value;
                     var parameterPropertyName = PreviewParameterHelper.fixPropertyName(parameter.path);
-                    if (parameter.isMultiValue) {
+                    if (parameter.isMultiValue || !parameter.isTypesCurrentType(parameter.intTypes.concat(parameter.floatTypes), parameter.type)) {
                         this[parameterPropertyName] = parameter.value;
                     }
                     else {
@@ -10823,6 +10879,13 @@ var DevExpress;
                                     preview._unifier(Preview.generateGuid());
                                     if (result.error || !result.requestAgain && !result.pageCount) {
                                         preview.removeEmptyPages(!result.pageCount);
+                                        var pageCount = preview.pages().length;
+                                        if (!pageCount) {
+                                            preview.pageIndex(-1);
+                                        }
+                                        else if (preview.pageIndex.peek() > pageCount) {
+                                            preview.goToPage(pageCount - 1);
+                                        }
                                         return;
                                     }
                                     if (!result.completed) {
@@ -11216,7 +11279,8 @@ var DevExpress;
                     this.actions = [];
                     this.actions.push({
                         id: Preview.ActionId.Design,
-                        text: DevExpress.Designer.getLocalization("Design"),
+                        text: "Design",
+                        textId: 'ReportStringId.RepTabCtl_Designer',
                         imageClassName: "dxrd-image-design",
                         disabled: ko.observable(false),
                         visible: reportPreview.canSwitchToDesigner,
@@ -11404,7 +11468,7 @@ var DevExpress;
                     });
                     this.actions.push({
                         id: Preview.ActionId.ZoomOut,
-                        text: DevExpress.Designer.getLocalization("Zoom Out"),
+                        text: DevExpress.Designer.getLocalization("Zoom Out", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomOut"),
                         imageClassName: "dxrd-image-zoomout",
                         disabled: ko.observable(false),
                         visible: true,
@@ -11452,7 +11516,7 @@ var DevExpress;
                     });
                     this.actions.push({
                         id: Preview.ActionId.ZoomIn,
-                        text: DevExpress.Designer.getLocalization("Zoom In"),
+                        text: DevExpress.Designer.getLocalization("Zoom In", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomIn"),
                         imageClassName: "dxrd-image-zoomin",
                         disabled: ko.observable(false),
                         visible: true,
@@ -13629,6 +13693,8 @@ var DevExpress;
                         if (!response || !response.documentId) {
                             this._preview.progressBar.complete();
                             removeAllEmptyPages();
+                            if (response && response.faultMessage)
+                                this._preview._processError(response.faultMessage, null);
                             return;
                         }
                         var stopBuildRequest = this._preview._stopBuildRequests[this._preview._startBuildOperationId];
@@ -14096,18 +14162,18 @@ var DevExpress;
                             return styleName();
                         },
                         write: function (newVal) {
-                            if (newVal !== DevExpress.Designer.getLocalization(StylesEditorHeaderModel.newItem)) {
+                            if (newVal !== DevExpress.Designer.getLocalization(StylesEditorHeaderModel.newItem, StylesEditorHeaderModel.newItemTextId)) {
                                 styleName(newVal);
                             }
                         }
                     });
                     this.items = ko.pureComputed(function () {
-                        var result = [new Report.StyleModel({ "@Name": DevExpress.Designer.getLocalization(StylesEditorHeaderModel.newItem) })];
+                        var result = [new Report.StyleModel({ "@Name": DevExpress.Designer.getLocalization(StylesEditorHeaderModel.newItem, StylesEditorHeaderModel.newItemTextId) })];
                         result.push.apply(result, styles());
                         return result;
                     });
                     this.onValueChanged = function (e) {
-                        if (e.value === DevExpress.Designer.getLocalization(StylesEditorHeaderModel.newItem)) {
+                        if (e.value === DevExpress.Designer.getLocalization(StylesEditorHeaderModel.newItem, StylesEditorHeaderModel.newItemTextId)) {
                             var newStyleName = Designer.getUniqueNameForNamedObjectsArray(styles(), "xrControlStyle"), newStyle = new Report.StyleModel({ "@Name": newStyleName });
                             styles.push(newStyle);
                             _this.value(newStyleName);
@@ -14116,6 +14182,7 @@ var DevExpress;
                     this.disabled = disabled;
                 }
                 StylesEditorHeaderModel.newItem = "Create New Style";
+                StylesEditorHeaderModel.newItemTextId = "ASPxReportsStringId.ReportDesigner_StylesEditor_CreateNew";
                 return StylesEditorHeaderModel;
             })();
             Report.StylesEditorHeaderModel = StylesEditorHeaderModel;
@@ -14129,7 +14196,7 @@ var DevExpress;
                         });
                         return filtered.length > 0 ? filtered[0] : null;
                     });
-                    ko.applyBindings(new DevExpress.JS.Widgets.ObjectProperties(style, { editors: Report.styleSerializationInfo }, 1, viewModel.disabled), $element.children()[0]);
+                    ko.applyBindings(bindingContext.createChildContext(new DevExpress.JS.Widgets.ObjectProperties(style, { editors: Report.styleSerializationInfo }, 1, viewModel.disabled)), $element.children()[0]);
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -14228,6 +14295,7 @@ var DevExpress;
                 function DataBinding(model, serializer) {
                     var _this = this;
                     _super.call(this, model, serializer);
+                    this.visible = ko.observable(true);
                     this.disabled = ko.pureComputed(function () {
                         var dataMember = _this.dataMember();
                         return !(_this.parameter() || dataMember);
@@ -14258,13 +14326,6 @@ var DevExpress;
                     _super.prototype.resetValue.call(this);
                     this.formatString("");
                 };
-                Object.defineProperty(DataBinding.prototype, "value", {
-                    get: function () {
-                        return this.formatString;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
                 return DataBinding;
             })(DataBindingBase);
             Report.DataBinding = DataBinding;
@@ -14991,6 +15052,51 @@ var DevExpress;
                 return SortingBandEditor;
             })(BandEditorBase);
             Report.SortingBandEditor = SortingBandEditor;
+            var NameEditor = (function (_super) {
+                __extends(NameEditor, _super);
+                function NameEditor(info, level, parentDisabled) {
+                    _super.call(this, info, level, parentDisabled);
+                    this.nameValidationAdded = false;
+                }
+                NameEditor.prototype.generateRules = function (allControls) {
+                    var self = this;
+                    if (!self.nameValidationAdded) {
+                        self.validationRules.push({
+                            type: "custom",
+                            validationCallback: function (options) { return allControls.filter(function (x) { return ko.unwrap(x.name) === options.value && x !== self._model(); }).length === 0; },
+                            message: DevExpress.Designer.getLocalization('Invalid name')
+                        });
+                        self.nameValidationAdded = true;
+                    }
+                    return self.validationRules;
+                };
+                return NameEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Report.NameEditor = NameEditor;
+            var UndoEditor = (function (_super) {
+                __extends(UndoEditor, _super);
+                function UndoEditor(info, level, parentDisabled) {
+                    _super.call(this, info, level, parentDisabled);
+                }
+                UndoEditor.prototype.generateValue = function (undoEngine) {
+                    var _this = this;
+                    if (!this.generatedValue) {
+                        this.generatedValue = ko.computed({
+                            read: function () {
+                                return _this.value();
+                            },
+                            write: function (val) {
+                                undoEngine().start();
+                                _this.value(val);
+                                undoEngine().end();
+                            }
+                        });
+                    }
+                    return this.generatedValue;
+                };
+                return UndoEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Report.UndoEditor = UndoEditor;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -15089,29 +15195,31 @@ var DevExpress;
                 reportRtlProperty: { header: "dxrd-reportRtlProperty" },
                 comboboxUndo: { header: "dx-combobox-undo", editorType: Report.ComboboxUndoEditor },
                 fontUndo: { header: "dx-emptyHeader", content: "dx-objectEditorContentUndo", editorType: Report.FontEditorUndo },
-                chartValueBinding: { header: "dxrd-chartValueBinding", editorType: Report.ChartValueBindingEditor }
+                chartValueBinding: { header: "dxrd-chartValueBinding", editorType: Report.ChartValueBindingEditor },
+                name: { header: "dxrd-name", editorType: Report.NameEditor },
+                numericUndo: { header: "dx-numeric-undo", editorType: Report.UndoEditor }
             };
-            Report.textAlignmentValues = {
-                "TopLeft": "Top Left",
-                "MiddleLeft": "Middle Left",
-                "BottomLeft": "Bottom Left",
-                "TopCenter": "Top Center",
-                "MiddleCenter": "Middle Center",
-                "BottomCenter": "Bottom Center",
-                "TopJustify": "Top Justify",
-                "MiddleJustify": "Middle Justify",
-                "BottomJustify": "Bottom Justify",
-                "TopRight": "Top Right",
-                "MiddleRight": "Middle Right",
-                "BottomRight": "Bottom Right",
-            };
-            Report.lineStyleValues = {
-                "Solid": "Solid",
-                "Dash": "Dash",
-                "Dot": "Dot",
-                "DashDot": "Dash-Dot",
-                "DashDotDot": "Dash-Dot-Dot"
-            };
+            Report.textAlignmentValues = [
+                { value: "TopLeft", displayValue: "Top Left", localizationId: "DevExpress.XtraPrinting.TextAlignment.TopLeft" },
+                { value: "MiddleLeft", displayValue: "Middle Left", localizationId: "DevExpress.XtraPrinting.TextAlignment.MiddleLeft" },
+                { value: "BottomLeft", displayValue: "Bottom Left", localizationId: "DevExpress.XtraPrinting.TextAlignment.BottomLeft" },
+                { value: "TopCenter", displayValue: "Top Center", localizationId: "DevExpress.XtraPrinting.TextAlignment.TopCenter" },
+                { value: "MiddleCenter", displayValue: "Middle Center", localizationId: "DevExpress.XtraPrinting.TextAlignment.MiddleCenter" },
+                { value: "BottomCenter", displayValue: "Bottom Center", localizationId: "DevExpress.XtraPrinting.TextAlignment.BottomCenter" },
+                { value: "TopJustify", displayValue: "Top Justify", localizationId: "DevExpress.XtraPrinting.TextAlignment.TopJustify" },
+                { value: "MiddleJustify", displayValue: "Middle Justify", localizationId: "DevExpress.XtraPrinting.TextAlignment.MiddleJustify" },
+                { value: "BottomJustify", displayValue: "Bottom Justify", localizationId: "DevExpress.XtraPrinting.TextAlignment.BottomJustify" },
+                { value: "TopRight", displayValue: "Top Right", localizationId: "DevExpress.XtraPrinting.TextAlignment.TopRight" },
+                { value: "MiddleRight", displayValue: "Middle Right", localizationId: "DevExpress.XtraPrinting.TextAlignment.MiddleRight" },
+                { value: "BottomRight", displayValue: "Bottom Right", localizationId: "DevExpress.XtraPrinting.TextAlignment.BottomRight" },
+            ];
+            Report.borderDashStyleValues = [
+                { value: "Solid", displayValue: "Solid", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.Solid" },
+                { value: "Dash", displayValue: "Dash", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.Dash" },
+                { value: "Dot", displayValue: "Dot", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.Dot" },
+                { value: "DashDot", displayValue: "Dash-Dot", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.DashDot" },
+                { value: "DashDotDot", displayValue: "Dash-Dot-Dot", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.DashDotDot" }
+            ];
             Report.stylePrioritySerializationInfo = [
                 { propertyName: "useBackColor", modelName: "@UseBackColor", defaultVal: true, from: Designer.parseBool },
                 { propertyName: "useBorderColor", modelName: "@UseBorderColor", defaultVal: true, from: Designer.parseBool },
@@ -15123,305 +15231,305 @@ var DevExpress;
                 { propertyName: "usePadding", modelName: "@UsePadding", defaultVal: true, from: Designer.parseBool },
                 { propertyName: "useTextAlignment", modelName: "@UseTextAlignment", defaultVal: true, from: Designer.parseBool }
             ];
-            Report.xlsxFormatString = { propertyName: "xlsxFormatString", modelName: "@XlsxFormatString", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, displayName: "Xlsx Format String" };
-            Report.name = { propertyName: "name", modelName: "@Name", displayName: "Name", editor: DevExpress.JS.Widgets.editorTemplates.text, validationRules: Designer.nameValidationRules };
-            Report.displayName = { propertyName: "displayNameObject", modelName: "@DisplayName", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "", displayName: "Display Name" };
-            Report.text = { propertyName: "text", modelName: "@Text", defaultVal: "", displayName: "Text", editor: DevExpress.JS.Widgets.editorTemplates.text };
-            Report.textArea = { propertyName: "textArea", displayName: "Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.stringArray };
+            Report.xlsxFormatString = { propertyName: "xlsxFormatString", modelName: "@XlsxFormatString", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, displayName: "Xlsx Format String", localizationId: "DevExpress.XtraReports.UI.XRControl.XlsxFormatString" };
+            Report.name = { propertyName: "name", modelName: "@Name", displayName: "Name", localizationId: "DevExpress.XtraReports.UI.XRControl.Name", editor: Report.editorTemplates.name, validationRules: Designer.nameValidationRules };
+            Report.displayName = { propertyName: "displayNameObject", modelName: "@DisplayName", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "", displayName: "Display Name", localizationId: "DevExpress.XtraReports.UI.XtraReport.DisplayName" };
+            Report.text = { propertyName: "text", modelName: "@Text", defaultVal: "", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text", editor: DevExpress.JS.Widgets.editorTemplates.text };
+            Report.textArea = { propertyName: "textArea", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.stringArray };
             Report.textTrimming = {
-                propertyName: "textTrimming", modelName: "@TextTrimming", displayName: "Text Trimming", defaultVal: "Character", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "None": "None",
-                    "Character": "Character",
-                    "Word": "Word",
-                    "EllipsisCharacter": "Ellipsis Character",
-                    "EllipsisWord": "Ellipsis Word",
-                    "EllipsisPath": "Ellipsis Path"
-                }
+                propertyName: "textTrimming", modelName: "@TextTrimming", displayName: "Text Trimming", localizationId: "DevExpress.XtraReports.UI.XRControl.TextTrimming", defaultVal: "Character", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "System.Drawing.StringTrimming.None" },
+                    { value: "Character", displayValue: "Character", localizationId: "System.Drawing.StringTrimming.Character" },
+                    { value: "Word", displayValue: "Word", localizationId: "System.Drawing.StringTrimming.Word" },
+                    { value: "EllipsisCharacter", displayValue: "Ellipsis Character", localizationId: "System.Drawing.StringTrimming.EllipsisCharacter" },
+                    { value: "EllipsisWord", displayValue: "Ellipsis Word", localizationId: "System.Drawing.StringTrimming.EllipsisWord" },
+                    { value: "EllipsisPath", displayValue: "Ellipsis Path", localizationId: "System.Drawing.StringTrimming.EllipsisPath" }
+                ]
             };
-            Report.size = { propertyName: "size", modelName: "@SizeF", from: Designer.Size.fromString, displayName: "Size", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.location = { propertyName: "location", modelName: "@LocationFloat", from: Designer.Point.fromString, displayName: "Location", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.tag = { propertyName: "tag", modelName: "@Tag", displayName: "Tag", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
+            Report.size = { propertyName: "size", modelName: "@SizeF", from: Designer.Size.fromString, displayName: "Size", localizationId: "DevExpress.XtraReports.UI.XRControl.Size", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.location = { propertyName: "location", modelName: "@LocationFloat", from: Designer.Point.fromString, displayName: "Location", localizationId: "DevExpress.XtraReports.UI.XRControl.Location", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.defaultBooleanValuesArray = [
+                { value: "True", displayValue: "True", localizationId: "DevExpress.Utils.DefaultBoolean.True" },
+                { value: "False", displayValue: "False", localizationId: "DevExpress.Utils.DefaultBoolean.False" },
+                { value: "Default", displayValue: "Default", localizationId: "DevExpress.Utils.DefaultBoolean.Default" }
+            ];
+            Report.tag = { propertyName: "tag", modelName: "@Tag", displayName: "Tag", localizationId: "DevExpress.XtraReports.UI.XRControl.Tag", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
             Report.lockedInUserDesigner = { propertyName: "_lockedInUserDesigner", modelName: "@LockedInUserDesigner", defaultVal: false, from: Designer.parseBool };
-            Report.visible = { propertyName: "visible", modelName: "@Visible", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Visible" };
+            Report.visible = { propertyName: "visible", modelName: "@Visible", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Visible", localizationId: "DevExpress.XtraReports.UI.XRControl.Visible" };
             Report.defaultBooleanVisible = {
-                propertyName: "visible", modelName: "@Visible", displayName: "Visible", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "True": "True",
-                    "False": "False",
-                    "Default": "Default"
-                }
+                propertyName: "visible", modelName: "@Visible", displayName: "Visible", localizationId: "DevExpress.XtraReports.UI.Formatting.Visible", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray
             };
             Report.backColor = $.extend({ displayName: "Background Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, Report.previewBackColor);
             Report.foreColor = $.extend({ displayName: "Foreground Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, Report.previewForeColor);
             Report.font = $.extend({ displayName: "Font", editor: DevExpress.JS.Widgets.editorTemplates.font }, Report.previewFont);
             Report.borderColor = $.extend({ displayName: "Border Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, Report.previewBorderColor);
-            Report.borders = { propertyName: "borders", modelName: "@Borders", displayName: "Borders", editor: Designer.Widgets.editorTemplates.borders };
-            Report.borderWidth = { propertyName: "borderWidth", modelName: "@BorderWidth", displayName: "Border Width", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.borders = { propertyName: "borders", modelName: "@Borders", displayName: "Borders", localizationId: "DevExpress.XtraReports.UI.XRControl.Borders", editor: Designer.Widgets.editorTemplates.borders };
+            Report.borderWidth = { propertyName: "borderWidth", modelName: "@BorderWidth", displayName: "Border Width", localizationId: "DevExpress.XtraReports.UI.XRControl.BorderWidth", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Report.borderDashStyle = $.extend({
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Border Dash Style",
-                values: {
-                    "Solid": "Solid",
-                    "Dash": "Dash",
-                    "Dot": "Dot",
-                    "DashDot": "Dash-Dot",
-                    "DashDotDot": "Dash-Dot-Dot",
-                    "Double": "Double"
-                }
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Border Dash Style", localizationId: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle",
+                valuesArray: [].concat(Report.borderDashStyleValues, [{ value: "Double", displayValue: "Double", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.Double" }])
             }, Report.previewBorderDashStyle);
             Report.padding = $.extend({ displayName: "Padding", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Report.previewPadding);
             Report.textAlignment = $.extend({
                 displayName: "Text Alignment",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: Report.textAlignmentValues
+                valuesArray: Report.textAlignmentValues
             }, Report.previewTextAlignment);
             Report.anchorVertical = {
                 propertyName: "anchorVertical",
-                modelName: "@AnchorVertical", displayName: "Anchor Vertically", defaultVal: "None",
+                modelName: "@AnchorVertical", displayName: "Anchor Vertically", localizationId: "DevExpress.XtraReports.UI.XRControl.AnchorVertical", defaultVal: "None",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "None": "None",
-                    "Top": "Top",
-                    "Bottom": "Bottom",
-                    "Both": "Both"
-                }
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.VerticalAnchorStyles.None" },
+                    { value: "Top", displayValue: "Top", localizationId: "DevExpress.XtraReports.UI.VerticalAnchorStyles.Top" },
+                    { value: "Bottom", displayValue: "Bottom", localizationId: "DevExpress.XtraReports.UI.VerticalAnchorStyles.Bottom" },
+                    { value: "Both", displayValue: "Both", localizationId: "DevExpress.XtraReports.UI.VerticalAnchorStyles.Both" }
+                ]
             };
             Report.anchorHorizontal = {
                 propertyName: "anchorHorizontal",
-                modelName: "@AnchorHorizontal", displayName: "Anchor Horizontally", defaultVal: "None",
+                modelName: "@AnchorHorizontal", displayName: "Anchor Horizontally", localizationId: "DevExpress.XtraReports.UI.XRControl.AnchorHorizontal", defaultVal: "None",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "None": "None",
-                    "Left": "Left",
-                    "Right": "Right",
-                    "Both": "Both"
-                }
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.HorizontalAnchorStyles.None" },
+                    { value: "Left", displayValue: "Left", localizationId: "DevExpress.XtraReports.UI.HorizontalAnchorStyles.Left" },
+                    { value: "Right", displayValue: "Right", localizationId: "DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right" },
+                    { value: "Both", displayValue: "Both", localizationId: "DevExpress.XtraReports.UI.HorizontalAnchorStyles.Both" }
+                ]
             };
-            Report.angle = { propertyName: "angle", modelName: "@Angle", defaultVal: 0, from: Designer.floatFromModel, displayName: "Angle", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.canGrow = { propertyName: "canGrow", modelName: "@CanGrow", defaultVal: true, from: Designer.parseBool, displayName: "Can Grow", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.canShrink = { propertyName: "canShrink", modelName: "@CanShrink", defaultVal: false, from: Designer.parseBool, displayName: "Can Shrink", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.multiline = { propertyName: "multiline", modelName: "@Multiline", defaultVal: false, from: Designer.parseBool, displayName: "Multiline", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.wordWrap = { propertyName: "wordWrap", modelName: "@WordWrap", defaultVal: true, from: Designer.parseBool, displayName: "Word Wrap", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.autoWidth = { propertyName: "autoWidth", modelName: "@AutoWidth", defaultVal: false, from: Designer.parseBool, displayName: "Auto Width", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.keepTogether = { propertyName: "keepTogether", modelName: "@KeepTogether", defaultVal: true, from: Designer.parseBool, displayName: "Keep Together", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.keepTogetherDefaultValueFalse = { propertyName: "keepTogether", modelName: "@KeepTogether", defaultVal: false, from: Designer.parseBool, displayName: "Keep Together", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.angle = { propertyName: "angle", modelName: "@Angle", defaultVal: 0, from: Designer.floatFromModel, displayName: "Angle", localizationId: "DevExpress.XtraReports.UI.XRLabel.Angle", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.canGrow = { propertyName: "canGrow", modelName: "@CanGrow", defaultVal: true, from: Designer.parseBool, displayName: "Can Grow", localizationId: "DevExpress.XtraReports.UI.XRControl.CanGrow", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.canShrink = { propertyName: "canShrink", modelName: "@CanShrink", defaultVal: false, from: Designer.parseBool, displayName: "Can Shrink", localizationId: "DevExpress.XtraReports.UI.XRControl.CanShrink", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.multiline = { propertyName: "multiline", modelName: "@Multiline", defaultVal: false, from: Designer.parseBool, displayName: "Multiline", localizationId: "DevExpress.XtraReports.UI.XRLabel.Multiline", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.wordWrap = { propertyName: "wordWrap", modelName: "@WordWrap", defaultVal: true, from: Designer.parseBool, displayName: "Word Wrap", localizationId: "DevExpress.XtraReports.UI.XRControl.WordWrap", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.autoWidth = { propertyName: "autoWidth", modelName: "@AutoWidth", defaultVal: false, from: Designer.parseBool, displayName: "Auto Width", localizationId: "DevExpress.XtraReports.UI.XRLabel.AutoWidth", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.keepTogether = { propertyName: "keepTogether", modelName: "@KeepTogether", defaultVal: true, from: Designer.parseBool, displayName: "Keep Together", localizationId: "DevExpress.XtraReports.UI.XRControl.KeepTogether", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.keepTogetherDefaultValueFalse = { propertyName: "keepTogether", modelName: "@KeepTogether", defaultVal: false, from: Designer.parseBool, displayName: "Keep Together", localizationId: "DevExpress.XtraReports.UI.XRControl.KeepTogether", editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.processDuplicatesTarget = {
-                propertyName: "processDuplicatesTarget", modelName: "@ProcessDuplicatesTarget", displayName: "Process Duplicates Target",
+                propertyName: "processDuplicatesTarget", modelName: "@ProcessDuplicatesTarget", displayName: "Process Duplicates Target", localizationId: "DevExpress.XtraReports.UI.XRLabel.ProcessDuplicatesTarget",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Value", from: Designer.fromEnum,
-                values: {
-                    "Value": "Value",
-                    "Tag": "Tag"
-                }
+                valuesArray: [
+                    { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraReports.UI.ProcessDuplicatesTarget.Value" },
+                    { value: "Tag", displayValue: "Tag", localizationId: "DevExpress.XtraReports.UI.ProcessDuplicatesTarget.Tag" }
+                ]
             };
             Report.processDuplicatesMode = {
-                propertyName: "processDuplicatesMode", modelName: "@ProcessDuplicatesMode", displayName: "Process Duplicates Mode",
+                propertyName: "processDuplicatesMode", modelName: "@ProcessDuplicatesMode", displayName: "Process Duplicates Mode", localizationId: "DevExpress.XtraReports.UI.XRLabel.ProcessDuplicatesMode",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Leave", from: Designer.fromEnum,
-                values: {
-                    "Leave": "Leave",
-                    "Merge": "Merge",
-                    "Suppress": "Suppress",
-                    "SuppressAndShrink": "Suppress and Shrink"
-                }
+                valuesArray: [
+                    { value: "Leave", displayValue: "Leave", localizationId: "DevExpress.XtraReports.UI.ProcessDuplicatesMode.Leave" },
+                    { value: "Merge", displayValue: "Merge", localizationId: "DevExpress.XtraReports.UI.ProcessDuplicatesMode.Merge" },
+                    { value: "Suppress", displayValue: "Suppress", localizationId: "DevExpress.XtraReports.UI.ProcessDuplicatesMode.Suppress" },
+                    { value: "SuppressAndShrink", displayValue: "Suppress and Shrink", localizationId: "DevExpress.XtraReports.UI.ProcessDuplicatesMode.SuppressAndShrink" }
+                ]
             };
             Report.processNullValues = {
                 propertyName: "processNullValues",
-                modelName: "@ProcessNullValues", displayName: "Process Null Values",
+                modelName: "@ProcessNullValues", displayName: "Process Null Values", localizationId: "DevExpress.XtraReports.UI.XRLabel.ProcessNullValues",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Leave", from: Designer.fromEnum,
-                values: {
-                    "Leave": "Leave",
-                    "Suppress": "Suppress",
-                    "SuppressAndShrink": "Suppress and Shrink",
-                }
+                valuesArray: [
+                    { value: "Leave", displayValue: "Leave", localizationId: "DevExpress.XtraReports.UI.ValueSuppressType.Leave" },
+                    { value: "Suppress", displayValue: "Suppress", localizationId: "DevExpress.XtraReports.UI.ValueSuppressType.Suppress" },
+                    { value: "SuppressAndShrink", displayValue: "Suppress and Shrink", localizationId: "DevExpress.XtraReports.UI.ValueSuppressType.SuppressAndShrink" },
+                ]
             };
             Report.reportPrintOptionsSerializationInfo = [
-                { propertyName: "printOnEmptyDataSource", defaultVal: true, from: Designer.parseBool, modelName: "@PrintOnEmptyDataSource", displayName: "Print when Data Source is Empty", editor: DevExpress.JS.Widgets.editorTemplates.bool },
-                { propertyName: "detailCountAtDesignTime", defaultVal: 0, from: Designer.floatFromModel, modelName: "@DetailCountAtDesignTime", displayName: "Detail Count at Design Time", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-                { propertyName: "detailCountOnEmptyDataSource", defaultVal: 1, from: Designer.floatFromModel, modelName: "@DetailCountOnEmptyDataSource", displayName: "Detail Count when Data Source is Empty", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-                { propertyName: "blankDetailCount", defaultVal: 0, from: Designer.floatFromModel, modelName: "@BlankDetailCount", displayName: "Blank Detail Count", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-                { propertyName: "detailCount", defaultVal: 0, from: Designer.floatFromModel, modelName: "@DetailCount", displayName: "Detail Count", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
+                { propertyName: "printOnEmptyDataSource", defaultVal: true, from: Designer.parseBool, modelName: "@PrintOnEmptyDataSource", displayName: "Print when Data Source is Empty", localizationId: "DevExpress.XtraReports.UI.ReportPrintOptions.PrintOnEmptyDataSource", editor: DevExpress.JS.Widgets.editorTemplates.bool },
+                { propertyName: "detailCountAtDesignTime", defaultVal: 0, from: Designer.floatFromModel, modelName: "@DetailCountAtDesignTime", displayName: "Detail Count at Design Time", localizationId: "DevExpress.XtraReports.UI.ReportPrintOptions.DetailCountAtDesignTime", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "detailCountOnEmptyDataSource", defaultVal: 1, from: Designer.floatFromModel, modelName: "@DetailCountOnEmptyDataSource", displayName: "Detail Count when Data Source is Empty", localizationId: "DevExpress.XtraReports.UI.ReportPrintOptions.DetailCountOnEmptyDataSource", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "blankDetailCount", defaultVal: 0, from: Designer.floatFromModel, modelName: "@BlankDetailCount", displayName: "Blank Detail Count", localizationId: "DevExpress.XtraReports.UI.ReportPrintOptions.BlankDetailCount", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "detailCount", defaultVal: 0, from: Designer.floatFromModel, modelName: "@DetailCount", displayName: "Detail Count", localizationId: "DevExpress.XtraReports.UI.ReportPrintOptions.DetailCount", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
             ];
             Report.dataAdapter = { propertyName: "dataAdapter", modelName: "@DataAdapter", link: true, editor: null };
-            Report.dataSource = { propertyName: "dataSource", modelName: "@DataSource", displayName: "Data Source", link: true, editor: Report.editorTemplates.dataSource };
-            Report.dataMember = { propertyName: "dataMember", modelName: "@DataMember", displayName: "Data Member", defaultVal: "", editor: Designer.Widgets.editorTemplates.dataMember };
+            Report.dataSource = { propertyName: "dataSource", modelName: "@DataSource", displayName: "Data Source", localizationId: "DevExpress.XtraReports.UI.XtraReportBase.DataSource", link: true, editor: Report.editorTemplates.dataSource };
+            Report.dataMember = { propertyName: "dataMember", modelName: "@DataMember", displayName: "Data Member", localizationId: "DevExpress.XtraReports.UI.XtraReportBase.DataMember", defaultVal: "", editor: Designer.Widgets.editorTemplates.dataMember };
             Report.dataBindings = function (dataBindingsArray) {
                 return {
                     propertyName: "dataBindings",
                     modelName: "DataBindings",
                     array: true,
                     info: Report.dataBindingSerializationInfo,
-                    displayName: "Data Bindings",
+                    displayName: "Data Bindings", localizationId: "DevExpress.XtraReports.UI.XRControl.DataBindings",
                     editor: Report.editorTemplates.dataBindings,
                     allDataBindings: dataBindingsArray,
                     from: Report.DataBinding.initialize
                 };
             };
-            Report.defaultDataBinding = function (bindingName) { return { propertyName: "defaultDataBinding", displayName: "Data Binding", editor: Report.editorTemplates.dataBinding, bindingName: bindingName }; };
+            Report.defaultDataBinding = function (bindingName) { return { propertyName: "defaultDataBinding", displayName: "Data Binding", localizationId: "ReportStringId.STag_Name_DataBinding", editor: Report.editorTemplates.dataBinding, bindingName: bindingName }; };
             Report.filterString = { propertyName: "_filterString", modelName: "@FilterString" };
-            Report.filterStringEditable = { propertyName: "filterString", displayName: "Filter String", defaultVal: "", editor: Designer.Widgets.editorTemplates.filterEditor };
-            Report.bookmark = { propertyName: "bookmark", modelName: "@Bookmark", displayName: "Bookmark", editor: DevExpress.JS.Widgets.editorTemplates.text };
-            Report.bookmarkParent = { propertyName: "bookmarkParent", modelName: "@BookmarkParent", link: true, displayName: "Parent Bookmark", defaultVal: null, editor: Report.editorTemplates.reportExplorer };
-            Report.navigateUrl = { propertyName: "navigateUrl", modelName: "@NavigateUrl", displayName: "Navigation URL", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
-            Report.target = { propertyName: "target", modelName: "@Target", displayName: "Navigation Target", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
-            Report.nullValueText = { propertyName: "nullValueText", modelName: "@NullValueText", displayName: "Null Value Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
-            Report.styleName = { propertyName: "styleName", modelName: "@StyleName", editor: Report.editorTemplates.style, displayName: "Style", defaultVal: null };
-            Report.evenStyleName = { propertyName: "evenStyleName", modelName: "@EvenStyleName", editor: Report.editorTemplates.style, displayName: "Even Style", defaultVal: null };
-            Report.oddStyleName = { propertyName: "oddStyleName", modelName: "@OddStyleName", editor: Report.editorTemplates.style, displayName: "Odd Style", defaultVal: null };
+            Report.filterStringEditable = { propertyName: "filterString", displayName: "Filter String", localizationId: "DevExpress.XtraReports.UI.XtraReportBase.FilterString", defaultVal: "", editor: Designer.Widgets.editorTemplates.filterEditor };
+            Report.bookmark = { propertyName: "bookmark", modelName: "@Bookmark", displayName: "Bookmark", localizationId: "DevExpress.XtraReports.UI.XRControl.Bookmark", editor: DevExpress.JS.Widgets.editorTemplates.text };
+            Report.bookmarkParent = { propertyName: "bookmarkParent", modelName: "@BookmarkParent", link: true, displayName: "Parent Bookmark", localizationId: "DevExpress.XtraReports.UI.XRControl.BookmarkParent", defaultVal: null, editor: Report.editorTemplates.reportExplorer };
+            Report.navigateUrl = { propertyName: "navigateUrl", modelName: "@NavigateUrl", displayName: "Navigation URL", localizationId: "DevExpress.XtraReports.UI.XRControl.NavigateUrl", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
+            Report.target = { propertyName: "target", modelName: "@Target", displayName: "Navigation Target", localizationId: "DevExpress.XtraReports.UI.XRControl.Target", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
+            Report.nullValueText = { propertyName: "nullValueText", modelName: "@NullValueText", displayName: "Null Value Text", localizationId: "DevExpress.XtraReports.UI.XRControl.NullValueText", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
+            Report.styleName = { propertyName: "styleName", modelName: "@StyleName", editor: Report.editorTemplates.style, displayName: "Style", localizationId: "DevExpress.XtraReports.UI.XRLabel.StyleName", defaultVal: null };
+            Report.evenStyleName = { propertyName: "evenStyleName", modelName: "@EvenStyleName", editor: Report.editorTemplates.style, displayName: "Even Style", localizationId: "DevExpress.XtraReports.UI.XRControl.XRControlStyles.EvenStyle", defaultVal: null };
+            Report.oddStyleName = { propertyName: "oddStyleName", modelName: "@OddStyleName", editor: Report.editorTemplates.style, displayName: "Odd Style", localizationId: "DevExpress.XtraReports.UI.XRControl.XRControlStyles.OddStyle", defaultVal: null };
             Report.stylePriority = { propertyName: "stylePriority", modelName: "StylePriority", info: Report.stylePrioritySerializationInfo };
-            Report.summaryFunctionValues = {
-                "Avg": "Average",
-                "Count": "Count",
-                "Sum": "Sum",
-                "RunningSum": "Running Summary",
-                "Percentage": "Percentage",
-                "Max": "Max",
-                "Min": "Min",
-                "Median": "Median",
-                "Var": "Variance",
-                "VarP": "Population Variance",
-                "StdDev": "Standard Deviation",
-                "StdDevP": "Standard Population Deviation",
-                "DAvg": "Average (Distinct)",
-                "DCount": "Count (Distinct)",
-                "DSum": "Summary (Distinct)",
-                "DVar": "Variance (Distinct)",
-                "DVarP": "Population Variance (Distinct)",
-                "DStdDev": "Standard Deviation (Distinct)",
-                "DStdDevP": "Standard Population Deviation (Distinct)",
-                "RecordNumber": "Record Number",
-                "Custom": "Custom"
-            };
+            Report.summaryFunctionValues = [
+                { value: "Avg", displayValue: "Average", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Avg" },
+                { value: "Count", displayValue: "Count", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Count" },
+                { value: "Sum", displayValue: "Sum", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Sum" },
+                { value: "RunningSum", displayValue: "Running Summary", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.RunningSum" },
+                { value: "Percentage", displayValue: "Percentage", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Percentage" },
+                { value: "Max", displayValue: "Max", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Max" },
+                { value: "Min", displayValue: "Min", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Min" },
+                { value: "Median", displayValue: "Median", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Median" },
+                { value: "Var", displayValue: "Variance", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Var" },
+                { value: "VarP", displayValue: "Population Variance", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.VarP" },
+                { value: "StdDev", displayValue: "Standard Deviation", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.StdDev" },
+                { value: "StdDevP", displayValue: "Standard Population Deviation", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.StdDevP" },
+                { value: "DAvg", displayValue: "Average (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DAvg" },
+                { value: "DCount", displayValue: "Count (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DCount" },
+                { value: "DSum", displayValue: "Summary (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DSum" },
+                { value: "DVar", displayValue: "Variance (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DVar" },
+                { value: "DVarP", displayValue: "Population Variance (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DVarP" },
+                { value: "DStdDev", displayValue: "Standard Deviation (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DStdDev" },
+                { value: "DStdDevP", displayValue: "Standard Population Deviation (Distinct)", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.DStdDevP" },
+                { value: "RecordNumber", displayValue: "Record Number", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.RecordNumber" },
+                { value: "Custom", displayValue: "Custom", localizationId: "DevExpress.XtraReports.UI.SummaryFunc.Custom" }
+            ];
             Report.summarySerializationInfo = [
-                { propertyName: "ignoreNullValues", modelName: "@IgnoreNullValues", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Ignore Null Values" },
-                { propertyName: "formatString", modelName: "@FormatString", defaultVal: "", editor: Designer.Widgets.editorTemplates.formatEditor, displayName: "Format String" },
+                { propertyName: "ignoreNullValues", modelName: "@IgnoreNullValues", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Ignore Null Values", localizationId: "DevExpress.XtraReports.UI.XRSummary.IgnoreNullValues" },
+                { propertyName: "formatString", modelName: "@FormatString", defaultVal: "", editor: Designer.Widgets.editorTemplates.formatEditor, displayName: "Format String", localizationId: "DevExpress.XtraReports.UI.XRSummary.FormatString" },
                 {
                     propertyName: "Running", modelName: "@Running", defaultVal: "None",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Running",
-                    values: {
-                        "None": "None",
-                        "Group": "Group",
-                        "Report": "Report",
-                        "Page": "Page"
-                    }
+                    editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Running", localizationId: "DevExpress.XtraReports.UI.XRSummary.Running",
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.SummaryRunning.None" },
+                        { value: "Group", displayValue: "Group", localizationId: "DevExpress.XtraReports.UI.SummaryRunning.Group" },
+                        { value: "Report", displayValue: "Report", localizationId: "DevExpress.XtraReports.UI.SummaryRunning.Report" },
+                        { value: "Page", displayValue: "Page", localizationId: "DevExpress.XtraReports.UI.SummaryRunning.Page" }
+                    ]
                 },
                 {
                     propertyName: "Func", modelName: "@Func", defaultVal: "Sum",
-                    editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Function",
-                    values: Report.summaryFunctionValues
+                    editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Function", localizationId: "DevExpress.XtraReports.UI.XRSummary.Func",
+                    valuesArray: Report.summaryFunctionValues
                 }
             ];
-            Report.summary = { propertyName: "Summary", modelName: "Summary", info: Report.summarySerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, displayName: "Summary" };
-            Report.reportPrintOptions = { propertyName: "reportPrintOptions", modelName: "ReportPrintOptions", info: Report.reportPrintOptionsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, displayName: "Report Print Options" };
-            Report.afterPrint = { propertyName: "onAfterPrint", modelName: "@OnAfterPrint", displayName: "After Print", editor: Report.editorTemplates.scriptsBox }, Report.beforePrint = { propertyName: "onBeforePrint", modelName: "@OnBeforePrint", displayName: "Before Print", editor: Report.editorTemplates.scriptsBox }, Report.sizeChanged = { propertyName: "onSizeChanged", modelName: "@OnSizeChanged", displayName: "Size Changed", editor: Report.editorTemplates.scriptsBox };
+            Report.summary = { propertyName: "Summary", modelName: "Summary", info: Report.summarySerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, displayName: "Summary", localizationId: "DevExpress.XtraReports.UI.XRLabel.Summary" };
+            Report.reportPrintOptions = { propertyName: "reportPrintOptions", modelName: "ReportPrintOptions", info: Report.reportPrintOptionsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, displayName: "Report Print Options", localizationId: "DevExpress.XtraReports.UI.XtraReport.ReportPrintOptions" };
+            Report.afterPrint = { propertyName: "onAfterPrint", modelName: "@OnAfterPrint", displayName: "After Print", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnAfterPrint", editor: Report.editorTemplates.scriptsBox }, Report.beforePrint = { propertyName: "onBeforePrint", modelName: "@OnBeforePrint", displayName: "Before Print", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint", editor: Report.editorTemplates.scriptsBox }, Report.sizeChanged = { propertyName: "onSizeChanged", modelName: "@OnSizeChanged", displayName: "Size Changed", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnSizeChanged", editor: Report.editorTemplates.scriptsBox };
             Report.truncatedControlEventsSerializationInfo = [
                 Report.afterPrint, Report.beforePrint,
-                { propertyName: "onLocationChanged", modelName: "@OnLocationChanged", displayName: "Location Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onParentChanged", modelName: "@OnParentChanged", displayName: "Parent Changed", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onLocationChanged", modelName: "@OnLocationChanged", displayName: "Location Changed", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnLocationChanged", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onParentChanged", modelName: "@OnParentChanged", displayName: "Parent Changed", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnParentChanged", editor: Report.editorTemplates.scriptsBox },
             ];
-            Report.truncatedControlScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: Report.truncatedControlEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.truncatedControlScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRPageBreak.Scripts", info: Report.truncatedControlEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var commonEventsSerializationInfo = Report.truncatedControlEventsSerializationInfo.concat([Report.sizeChanged,
-                { propertyName: "onDraw", modelName: "@OnDraw", displayName: "Draw", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onEvaluateBinding", modelName: "@OnEvaluateBinding", displayName: "Evaluate Binding", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onPrintOnPage", modelName: "@OnPrintOnPage", displayName: "Print on Page", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onDraw", modelName: "@OnDraw", displayName: "Draw", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnDraw", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onEvaluateBinding", modelName: "@OnEvaluateBinding", displayName: "Evaluate Binding", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnEvaluateBinding", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onPrintOnPage", modelName: "@OnPrintOnPage", displayName: "Print on Page", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnPrintOnPage", editor: Report.editorTemplates.scriptsBox }
             ]);
-            Report.commonScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: commonEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.commonScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRControl.Scripts", info: commonEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var controlEventsSerializationInfo = commonEventsSerializationInfo.concat([
-                { propertyName: "onHtmlItemCreated", modelName: "@OnHtmlItemCreated", displayName: "Html Item Created", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onHtmlItemCreated", modelName: "@OnHtmlItemCreated", displayName: "Html Item Created", localizationId: "DevExpress.XtraReports.UI.XRControlScripts.OnHtmlItemCreated", editor: Report.editorTemplates.scriptsBox }
             ]);
-            Report.controlScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: controlEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.controlScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRLine.Scripts", info: controlEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var textControlEventsSerializationInfo = controlEventsSerializationInfo.concat([
-                { propertyName: "onTextChanged", modelName: "@OnTextChanged", displayName: "Text Changed", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onTextChanged", modelName: "@OnTextChanged", displayName: "Text Changed", localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnTextChanged", editor: Report.editorTemplates.scriptsBox }
             ]);
-            Report.textControlScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: textControlEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.textControlScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRLabel.Scripts", info: textControlEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var labelEventsSerializationInfo = textControlEventsSerializationInfo.concat([
-                { propertyName: "onSummaryCalculated", modelName: "@OnSummaryCalculated", displayName: "Summary Calculated", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onSummaryGetResult", modelName: "@OnSummaryGetResult", displayName: "Summary Get Result", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onSummaryReset", modelName: "@OnSummaryReset", displayName: "Summary Reset", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onSummaryRowChanged", modelName: "@OnSummaryRowChanged", displayName: "Summary Row Changed", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onSummaryCalculated", modelName: "@OnSummaryCalculated", displayName: "Summary Calculated", localizationId: "DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryCalculated", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onSummaryGetResult", modelName: "@OnSummaryGetResult", displayName: "Summary Get Result", localizationId: "DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryGetResult", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onSummaryReset", modelName: "@OnSummaryReset", displayName: "Summary Reset", localizationId: "DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryReset", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onSummaryRowChanged", modelName: "@OnSummaryRowChanged", displayName: "Summary Row Changed", localizationId: "DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryRowChanged", editor: Report.editorTemplates.scriptsBox }
             ]);
-            Report.labelScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: labelEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.labelScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRLabel.Scripts", info: labelEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var specificChartEventsSerializationInfo = [
-                { propertyName: "onCustomDrawSeries", modelName: "@OnCustomDrawSeries", displayName: "Custom Draw a Series", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomDrawSeriesPoint", modelName: "@OnCustomDrawSeriesPoint", displayName: "Custom Draw a Series Point", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomDrawCrosshair", modelName: "@OnCustomDrawCrosshair", displayName: "Custom Draw Crosshair", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomDrawAxisLabel", modelName: "@OnCustomDrawAxisLabel", displayName: "Custom Draw an Axis Label", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomPaint", modelName: "@OnCustomPaint", displayName: "Custom Paint", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onBoundDataChanged", modelName: "@OnBoundDataChanged", displayName: "Bound Data Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onPieSeriesPointExploded", modelName: "@OnPieSeriesPointExploded", displayName: "Pie Series Point Exploded", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onAxisScaleChanged", modelName: "@OnAxisScaleChanged", displayName: "Axis Scale Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onAxisWholeRangeChanged", modelName: "@OnAxisWholeRangeChanged", displayName: "Axis Whole Range Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onAxisVisualRangeChanged", modelName: "@OnAxisVisualRangeChanged", displayName: "Axis Visual Range Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onSmallChartTextShowing", modelName: "@OnSmallChartTextShowing", displayName: "Small Chart Text Showing", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onCustomDrawSeries", modelName: "@OnCustomDrawSeries", displayName: "Custom Draw a Series", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawSeries", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomDrawSeriesPoint", modelName: "@OnCustomDrawSeriesPoint", displayName: "Custom Draw a Series Point", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawSeriesPoint", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomDrawCrosshair", modelName: "@OnCustomDrawCrosshair", displayName: "Custom Draw Crosshair", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawCrosshair", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomDrawAxisLabel", modelName: "@OnCustomDrawAxisLabel", displayName: "Custom Draw an Axis Label", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawAxisLabel", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomPaint", modelName: "@OnCustomPaint", displayName: "Custom Paint", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnCustomPaint", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onBoundDataChanged", modelName: "@OnBoundDataChanged", displayName: "Bound Data Changed", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnBoundDataChanged", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onPieSeriesPointExploded", modelName: "@OnPieSeriesPointExploded", displayName: "Pie Series Point Exploded", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnPieSeriesPointExploded", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onAxisScaleChanged", modelName: "@OnAxisScaleChanged", displayName: "Axis Scale Changed", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnAxisScaleChanged", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onAxisWholeRangeChanged", modelName: "@OnAxisWholeRangeChanged", displayName: "Axis Whole Range Changed", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnAxisWholeRangeChanged", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onAxisVisualRangeChanged", modelName: "@OnAxisVisualRangeChanged", displayName: "Axis Visual Range Changed", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnAxisVisualRangeChanged", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onSmallChartTextShowing", modelName: "@OnSmallChartTextShowing", displayName: "Small Chart Text Showing", localizationId: "DevExpress.XtraReports.UI.XRChartScripts.OnSmallChartTextShowing", editor: Report.editorTemplates.scriptsBox }
             ], chartEventsSerializationInfo = controlEventsSerializationInfo.concat(specificChartEventsSerializationInfo);
-            Report.chartScripts = { propertyName: "scripts", modelName: "Scripts", info: chartEventsSerializationInfo, displayName: "Scripts", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.chartScripts = { propertyName: "scripts", modelName: "Scripts", info: chartEventsSerializationInfo, displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRChart.Scripts", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var specificPivotEventsSerializationInfo = [
-                { propertyName: "onCustomCellDisplayText", modelName: "@OnCustomCellDisplayText", displayName: "Custom Cell Display Text", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomCellValue", modelName: "@OnCustomCellValue", displayName: "Custom Cell Value", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomColumnWidth", modelName: "@OnCustomColumnWidth", displayName: "Custom Column Width", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomFieldSort", modelName: "@OnCustomFieldSort", displayName: "Custom Field Sort", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomFieldValueCells", modelName: "@OnCustomFieldValueCells", displayName: "Custom Field Value Cells", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomGroupInterval", modelName: "@OnCustomGroupInterval", displayName: "Custom Group Interval", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomRowHeight", modelName: "@OnCustomRowHeight", displayName: "Custom Row Height", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomSummary", modelName: "@OnCustomSummary", displayName: "Custom Summary", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onCustomUnboundFieldData", modelName: "@OnCustomUnboundFieldData", displayName: "Custom Unbound Field Data", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onFieldValueDisplayText", modelName: "@OnFieldValueDisplayText", displayName: "Field Value Display Text", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onPrefilterCriteriaChanged", modelName: "@OnPrefilterCriteriaChanged", displayName: "Prefilter Criteria Changed", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onPrintCell", modelName: "@OnPrintCell", displayName: "Print Cell", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onPrintFieldValue", modelName: "@OnPrintFieldValue", displayName: "Print Field Value", editor: Report.editorTemplates.scriptsBox },
-                { propertyName: "onPrintHeader", modelName: "@OnPrintHeader", displayName: "Print Header", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onCustomCellDisplayText", modelName: "@OnCustomCellDisplayText", displayName: "Custom Cell Display Text", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomCellDisplayText", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomCellValue", modelName: "@OnCustomCellValue", displayName: "Custom Cell Value", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomCellValue", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomColumnWidth", modelName: "@OnCustomColumnWidth", displayName: "Custom Column Width", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomColumnWidth", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomFieldSort", modelName: "@OnCustomFieldSort", displayName: "Custom Field Sort", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomFieldSort", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomFieldValueCells", modelName: "@OnCustomFieldValueCells", displayName: "Custom Field Value Cells", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomFieldValueCells", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomGroupInterval", modelName: "@OnCustomGroupInterval", displayName: "Custom Group Interval", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomGroupInterval", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomRowHeight", modelName: "@OnCustomRowHeight", displayName: "Custom Row Height", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomRowHeight", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomSummary", modelName: "@OnCustomSummary", displayName: "Custom Summary", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomSummary", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onCustomUnboundFieldData", modelName: "@OnCustomUnboundFieldData", displayName: "Custom Unbound Field Data", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomUnboundFieldData", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onFieldValueDisplayText", modelName: "@OnFieldValueDisplayText", displayName: "Field Value Display Text", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnFieldValueDisplayText", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onPrefilterCriteriaChanged", modelName: "@OnPrefilterCriteriaChanged", displayName: "Prefilter Criteria Changed", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnPrefilterCriteriaChanged", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onPrintCell", modelName: "@OnPrintCell", displayName: "Print Cell", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnPrintCell", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onPrintFieldValue", modelName: "@OnPrintFieldValue", displayName: "Print Field Value", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnPrintFieldValue", editor: Report.editorTemplates.scriptsBox },
+                { propertyName: "onPrintHeader", modelName: "@OnPrintHeader", displayName: "Print Header", localizationId: "DevExpress.XtraReports.UI.XRPivotGridScripts.OnPrintHeader", editor: Report.editorTemplates.scriptsBox }
             ], pivotEventsSerializationInfo = Report.truncatedControlEventsSerializationInfo.concat([Report.sizeChanged], specificPivotEventsSerializationInfo);
-            Report.pivotScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: pivotEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.subreportScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: Report.truncatedControlEventsSerializationInfo.concat(Report.sizeChanged), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.pivotScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.Scripts", info: pivotEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.subreportScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.SubreportBase.Scripts", info: Report.truncatedControlEventsSerializationInfo.concat(Report.sizeChanged), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var commonBandEventsSerializationInfo = [Report.afterPrint, Report.beforePrint];
-            Report.commonBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: commonBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var onBandLevelChanged = { propertyName: "onBandLevelChanged", modelName: "@OnBandLevelChanged", displayName: "Band Level Changed", editor: Report.editorTemplates.scriptsBox }, groupBandEventsSerializationInfo = commonBandEventsSerializationInfo.concat([onBandLevelChanged]);
-            Report.groupBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: groupBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var onSortingSummaryGetResult = { propertyName: "onSortingSummaryGetResult", modelName: "@OnSortingSummaryGetResult", displayName: "Sorting Summary Get Result", editor: Report.editorTemplates.scriptsBox }, onSortingSummaryReset = { propertyName: "onSortingSummaryReset", modelName: "@OnSortingSummaryReset", displayName: "Sorting Summary Reset", editor: Report.editorTemplates.scriptsBox }, onSortingSummaryRowChanged = { propertyName: "onSortingSummaryRowChanged", modelName: "@OnSortingSummaryRowChanged", displayName: "Sorting Summary RowChanged", editor: Report.editorTemplates.scriptsBox }, groupHeaderBandEventsSerializationInfo = groupBandEventsSerializationInfo.concat([onSortingSummaryGetResult, onSortingSummaryReset, onSortingSummaryRowChanged]);
-            Report.groupHeaderBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: groupHeaderBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var onBandHeightChanged = { propertyName: "onBandHeightChanged", modelName: "@OnBandHeightChanged", displayName: "Band's Height Changed", editor: Report.editorTemplates.scriptsBox }, onDataSourceRowChanged = { propertyName: "onDataSourceRowChanged", modelName: "@OnDataSourceRowChanged", displayName: "Data Source's Row Changed", editor: Report.editorTemplates.scriptsBox }, onDataSourceDemanded = { propertyName: "onDataSourceDemanded", modelName: "@OnDataSourceDemanded", displayName: "Data Source Demanded", editor: Report.editorTemplates.scriptsBox }, detailReportBandEventsSerializationInfo = commonBandEventsSerializationInfo.concat([onBandHeightChanged, onDataSourceRowChanged, onDataSourceDemanded]);
-            Report.detailReportBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: detailReportBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var onFillEmptySpace = { propertyName: "onFillEmptySpace", modelName: "@OnFillEmptySpace", displayName: "Fill Empty Space", editor: Report.editorTemplates.scriptsBox }, onPrintProgress = { propertyName: "onPrintProgress", modelName: "@OnPrintProgress", displayName: "Print Progress", editor: Report.editorTemplates.scriptsBox }, onParametersRequestBeforeShow = { propertyName: "onParametersRequestBeforeShow", modelName: "@OnParametersRequestBeforeShow", displayName: "Parameters Request Before Show", editor: Report.editorTemplates.scriptsBox }, onParametersRequestValueChanged = { propertyName: "onParametersRequestValueChanged", modelName: "@OnParametersRequestValueChanged", displayName: "Parameters Changed", editor: Report.editorTemplates.scriptsBox }, onParametersRequestSubmit = { propertyName: "onParametersRequestSubmit", modelName: "@OnParametersRequestSubmit", displayName: "Parameters Submitted", editor: Report.editorTemplates.scriptsBox }, reportEventsSerializationInfo = detailReportBandEventsSerializationInfo.concat([
+            Report.commonBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.Band.Scripts", info: commonBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var onBandLevelChanged = { propertyName: "onBandLevelChanged", modelName: "@OnBandLevelChanged", displayName: "Band Level Changed", localizationId: "DevExpress.XtraReports.UI.GroupBandScripts.OnBandLevelChanged", editor: Report.editorTemplates.scriptsBox }, groupBandEventsSerializationInfo = commonBandEventsSerializationInfo.concat([onBandLevelChanged]);
+            Report.groupBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBand.Scripts", info: groupBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var onSortingSummaryGetResult = { propertyName: "onSortingSummaryGetResult", modelName: "@OnSortingSummaryGetResult", displayName: "Sorting Summary Get Result", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryGetResult", editor: Report.editorTemplates.scriptsBox }, onSortingSummaryReset = { propertyName: "onSortingSummaryReset", modelName: "@OnSortingSummaryReset", displayName: "Sorting Summary Reset", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryReset", editor: Report.editorTemplates.scriptsBox }, onSortingSummaryRowChanged = { propertyName: "onSortingSummaryRowChanged", modelName: "@OnSortingSummaryRowChanged", displayName: "Sorting Summary RowChanged", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryRowChanged", editor: Report.editorTemplates.scriptsBox }, groupHeaderBandEventsSerializationInfo = groupBandEventsSerializationInfo.concat([onSortingSummaryGetResult, onSortingSummaryReset, onSortingSummaryRowChanged]);
+            Report.groupHeaderBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBand.Scripts", info: groupHeaderBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var onBandHeightChanged = { propertyName: "onBandHeightChanged", modelName: "@OnBandHeightChanged", displayName: "Band's Height Changed", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnBandHeightChanged", editor: Report.editorTemplates.scriptsBox }, onDataSourceRowChanged = { propertyName: "onDataSourceRowChanged", modelName: "@OnDataSourceRowChanged", displayName: "Data Source's Row Changed", localizationId: "DevExpress.XtraReports.UI.XtraReportBase.DataSource", editor: Report.editorTemplates.scriptsBox }, onDataSourceDemanded = { propertyName: "onDataSourceDemanded", modelName: "@OnDataSourceDemanded", displayName: "Data Source Demanded", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnDataSourceDemanded", editor: Report.editorTemplates.scriptsBox }, detailReportBandEventsSerializationInfo = commonBandEventsSerializationInfo.concat([onBandHeightChanged, onDataSourceRowChanged, onDataSourceDemanded]);
+            Report.detailReportBandScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.DetailReportBand.Scripts", info: detailReportBandEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var onFillEmptySpace = { propertyName: "onFillEmptySpace", modelName: "@OnFillEmptySpace", displayName: "Fill Empty Space", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnFillEmptySpace", editor: Report.editorTemplates.scriptsBox }, onPrintProgress = { propertyName: "onPrintProgress", modelName: "@OnPrintProgress", displayName: "Print Progress", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnPrintProgress", editor: Report.editorTemplates.scriptsBox }, onParametersRequestBeforeShow = { propertyName: "onParametersRequestBeforeShow", modelName: "@OnParametersRequestBeforeShow", displayName: "Parameters Request Before Show", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnParametersRequestBeforeShow", editor: Report.editorTemplates.scriptsBox }, onParametersRequestValueChanged = { propertyName: "onParametersRequestValueChanged", modelName: "@OnParametersRequestValueChanged", displayName: "Parameters Changed", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnParametersRequestValueChanged", editor: Report.editorTemplates.scriptsBox }, onParametersRequestSubmit = { propertyName: "onParametersRequestSubmit", modelName: "@OnParametersRequestSubmit", displayName: "Parameters Submitted", localizationId: "DevExpress.XtraReports.UI.XtraReportScripts.OnParametersRequestSubmit", editor: Report.editorTemplates.scriptsBox }, reportEventsSerializationInfo = detailReportBandEventsSerializationInfo.concat([
                 onFillEmptySpace, onPrintProgress, onParametersRequestBeforeShow, onParametersRequestValueChanged, onParametersRequestSubmit
             ]);
-            Report.reportScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: reportEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.reportScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XtraReport.Scripts", info: reportEventsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.allScripts = {
-                propertyName: "scripts", displayName: "Scripts", info: labelEventsSerializationInfo.concat(specificChartEventsSerializationInfo, specificPivotEventsSerializationInfo, [
+                propertyName: "scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.XRControl.Scripts", info: labelEventsSerializationInfo.concat(specificChartEventsSerializationInfo, specificPivotEventsSerializationInfo, [
                     onBandLevelChanged, onSortingSummaryGetResult, onSortingSummaryReset, onSortingSummaryRowChanged, onBandHeightChanged, onDataSourceRowChanged, onDataSourceDemanded,
                     onFillEmptySpace, onPrintProgress, onParametersRequestBeforeShow, onParametersRequestValueChanged, onParametersRequestSubmit
                 ]), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor
             };
-            Report.lineWidth = { propertyName: "lineWidth", modelName: "@LineWidth", defaultVal: 1, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Line Width" };
+            Report.lineWidth = { propertyName: "lineWidth", modelName: "@LineWidth", defaultVal: 1, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Line Width", localizationId: "DevExpress.XtraReports.UI.XRLine.LineWidth" };
             Report.lineStyle = {
                 propertyName: "lineStyle",
-                modelName: "@LineStyle", defaultVal: "Solid", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Line Style",
-                values: Report.lineStyleValues
+                modelName: "@LineStyle", defaultVal: "Solid", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Line Style", localizationId: "DevExpress.XtraReports.UI.XRLine.LineStyle",
+                valuesArray: [
+                    { value: "Solid", displayValue: "Solid", localizationId: "DevExpress.XtraCharts.DashStyle.Solid" },
+                    { value: "Dash", displayValue: "Dash", localizationId: "DevExpress.XtraCharts.DashStyle.Dash" },
+                    { value: "Dot", displayValue: "Dot", localizationId: "DevExpress.XtraCharts.DashStyle.Dot" },
+                    { value: "DashDot", displayValue: "Dash-Dot", localizationId: "DevExpress.XtraCharts.DashStyle.DashDot" },
+                    { value: "DashDotDot", displayValue: "Dash-Dot-Dot", localizationId: "DevExpress.XtraCharts.DashStyle.DashDotDot" }
+                ]
             };
             Report.dpi = { propertyName: "dpi", modelName: "@Dpi", defaultVal: 100, from: Designer.floatFromModel };
-            var borderWidthSerializable = { propertyName: "borderWidthSerializable", modelName: "@BorderWidthSerializable", displayName: "Border Width", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, sides = $.extend({ displayName: "Borders", editor: Designer.Widgets.editorTemplates.borders }, Report.previewSides);
+            var borderWidthSerializable = { propertyName: "borderWidthSerializable", modelName: "@BorderWidthSerializable", displayName: "Border Width", localizationId: "DevExpress.XtraReports.UI.Formatting.BorderWidthSerializable", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, sides = $.extend({ displayName: "Borders", editor: Designer.Widgets.editorTemplates.borders }, Report.previewSides);
             Report.formattingSerializationsInfo = [Report.backColor, sides, Report.borderColor, Report.borderDashStyle, borderWidthSerializable,
                 Report.foreColor, Report.font, Report.padding, Report.textAlignment, Report.defaultBooleanVisible
             ];
-            Report.conditionObj = { propertyName: "conditionObj", displayName: "Condition", editor: Designer.Widgets.editorTemplates.expressionEditor }, Report.formatting = { propertyName: "formatting", modelName: "Formatting", displayName: "Formatting", info: Report.formattingSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.conditionObj = { propertyName: "conditionObj", displayName: "Condition", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Condition", editor: Designer.Widgets.editorTemplates.expressionEditor }, Report.formatting = { propertyName: "formatting", modelName: "Formatting", displayName: "Formatting", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Formatting", info: Report.formattingSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.formattingRuleSerializationsInfo = [
-                { propertyName: "name", modelName: "@Name", displayName: "Name", editor: DevExpress.JS.Widgets.editorTemplates.text, validationRules: Designer.nameValidationRules },
-                { propertyName: "condition", modelName: "@Condition", displayName: "Condition", defaultVal: "" },
+                { propertyName: "name", modelName: "@Name", displayName: "Name", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Name", editor: DevExpress.JS.Widgets.editorTemplates.text, validationRules: Designer.nameValidationRules },
+                { propertyName: "condition", modelName: "@Condition", displayName: "Condition", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Condition", defaultVal: "" },
                 Report.conditionObj,
                 Report.dataSource, Report.dataMember,
                 Report.formatting
             ];
             Report.formattingRuleLinks = {
-                propertyName: "formattingRuleLinks", modelName: "FormattingRuleLinks", displayName: "Formatting Rules", array: true,
+                propertyName: "formattingRuleLinks", modelName: "FormattingRuleLinks", displayName: "Formatting Rules", localizationId: "DevExpress.XtraReports.UI.XRControl.FormattingRules", array: true,
                 editor: Report.editorTemplates.formattingRule, addHandler: DevExpress.Designer.Report.FormattingRule.createNew,
                 displayPropertyName: "name"
             };
-            Report.canPublish = { propertyName: "canPublish", modelName: "@CanPublish", displayName: "Can Publish", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            var sortingFieldName = { propertyName: "fieldName", modelName: "@FieldName", displayName: Designer.getLocalization('Field Name', 'DevExpress.XtraReports.UI.SortingOptions.FieldName'), defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox }, targetBand = { propertyName: "targetBand", modelName: "@TargetBand", link: true, displayName: Designer.getLocalization('Target Band', 'DevExpress.XtraReports.UI.SortingOptions.TargetBand'), editor: Report.editorTemplates.sortingBand };
-            Report.sortingOptionsSerializationsInfo = [targetBand, sortingFieldName], Report.interactiveSorting = { propertyName: "interactiveSorting", modelName: "InteractiveSorting", displayName: Designer.getLocalization('Interactive Sorting', 'DevExpress.XtraReports.UI.XRLabel.InteractiveSorting'), info: Report.sortingOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.canPublish = { propertyName: "canPublish", modelName: "@CanPublish", displayName: "Can Publish", localizationId: "DevExpress.XtraReports.UI.XRControl.CanPublish", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            var sortingFieldName = { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", localizationId: "DevExpress.XtraReports.UI.SortingOptions.FieldName", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox }, targetBand = { propertyName: "targetBand", modelName: "@TargetBand", link: true, displayName: "Target Band", localizationId: "DevExpress.XtraReports.UI.SortingOptions.TargetBand", editor: Report.editorTemplates.sortingBand };
+            Report.sortingOptionsSerializationsInfo = [targetBand, sortingFieldName], Report.interactiveSorting = { propertyName: "interactiveSorting", modelName: "InteractiveSorting", displayName: "Interactive Sorting", localizationId: "DevExpress.XtraReports.UI.XRLabel.InteractiveSorting", info: Report.sortingOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.rtl = {
-                propertyName: "rightToLeft", modelName: "@RightToLeft", displayName: "Right To Left", defaultVal: "Inherit", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "No": "No",
-                    "Yes": "Yes",
-                    "Inherit": "Inherit"
-                }
+                propertyName: "rightToLeft", modelName: "@RightToLeft", displayName: "Right To Left", localizationId: "DevExpress.XtraReports.UI.XRControl.RightToLeft", defaultVal: "Inherit", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "No", displayValue: "No", localizationId: "DevExpress.XtraReports.UI.RightToLeft.No" },
+                    { value: "Yes", displayValue: "Yes", localizationId: "DevExpress.XtraReports.UI.RightToLeft.Yes" },
+                    { value: "Inherit", displayValue: "Inherit", localizationId: "DevExpress.XtraReports.UI.RightToLeft.Inherit" }
+                ]
             };
             Report.sizeLocation = [Report.size, Report.location];
             Report.bordersProperties = [Report.borders, Report.borderWidth, Report.borderDashStyle, Report.borderColor];
@@ -15438,7 +15546,7 @@ var DevExpress;
             Report.editOptions = {
                 propertyName: "editOptions",
                 modelName: "EditOptions",
-                displayName: "Edit Options",
+                displayName: "Edit Options", localizationId: "DevExpress.XtraReports.UI.XRLabel.EditOptions",
                 editor: DevExpress.JS.Widgets.editorTemplates.objecteditor,
                 from: function (model, serializer) { return new Report.EditOptions(model, serializer); },
                 toJsonObject: function (value, serializer) { return serializer.serialize(value); }
@@ -15459,7 +15567,7 @@ var DevExpress;
                 { propertyName: "controls", modelName: "Controls", array: true },
                 Report.rtl
             ].concat(Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
-            Report.rtf = { propertyName: "_rtf", defaultVal: "", displayName: "RTF", editor: DevExpress.JS.Widgets.editorTemplates.stringArray }, Report.textRtf = { propertyName: "textRtf", defaultVal: "", displayName: "Text", editor: DevExpress.JS.Widgets.editorTemplates.stringArray }, Report.serializableRtfString = { propertyName: "_serializableRtfString", modelName: "@SerializableRtfString", displayName: "Load file", editor: DevExpress.JS.Widgets.editorTemplates.file };
+            Report.rtf = { propertyName: "_rtf", defaultVal: "", displayName: "RTF", editor: DevExpress.JS.Widgets.editorTemplates.stringArray }, Report.textRtf = { propertyName: "textRtf", defaultVal: "", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text", editor: DevExpress.JS.Widgets.editorTemplates.stringArray }, Report.serializableRtfString = { propertyName: "_serializableRtfString", modelName: "@SerializableRtfString", displayName: "Load file", localizationId: "DevExpress.XtraReports.UI.XRRichText.SerializableRtfString", editor: DevExpress.JS.Widgets.editorTemplates.file };
             Report.richTextSerializationsInfo = [
                 Report.serializableRtfString,
                 Report.rtf, Report.textRtf,
@@ -15470,35 +15578,35 @@ var DevExpress;
             Report.unknownSerializationsInfo = [].concat(Report.baseControlProperties, Report.sizeLocation);
             ;
             Report.dataBindingsSerializationInfo = [
-                { propertyName: "ActualValue", editor: Report.editorTemplates.dataBinding, displayName: "Actual Value" },
-                { propertyName: "Bookmark", editor: Report.editorTemplates.dataBinding, displayName: "Bookmark" },
-                { propertyName: "CheckState", editor: Report.editorTemplates.dataBinding, displayName: "Check State" },
+                { propertyName: "ActualValue", editor: Report.editorTemplates.dataBinding, displayName: "Actual Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.ActualValue" },
+                { propertyName: "Bookmark", editor: Report.editorTemplates.dataBinding, displayName: "Bookmark", localizationId: "DevExpress.XtraReports.UI.XRControl.Bookmark" },
+                { propertyName: "CheckState", editor: Report.editorTemplates.dataBinding, displayName: "Check State", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState" },
                 { propertyName: "Html", editor: Report.editorTemplates.dataBinding, displayName: "HTML" },
-                { propertyName: "Image", editor: Report.editorTemplates.dataBinding, displayName: "Image" },
-                { propertyName: "ImageUrl", editor: Report.editorTemplates.dataBinding, displayName: "Image URL" },
-                { propertyName: "Maximum", editor: Report.editorTemplates.dataBinding, displayName: "Maximum" },
-                { propertyName: "Minimum", editor: Report.editorTemplates.dataBinding, displayName: "Minimum" },
-                { propertyName: "NavigateUrl", editor: Report.editorTemplates.dataBinding, displayName: "Navigation URL" },
+                { propertyName: "Image", editor: Report.editorTemplates.dataBinding, displayName: "Image", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image" },
+                { propertyName: "ImageUrl", editor: Report.editorTemplates.dataBinding, displayName: "Image URL", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl" },
+                { propertyName: "Maximum", editor: Report.editorTemplates.dataBinding, displayName: "Maximum", localizationId: "DevExpress.XtraReports.UI.XRGauge.Maximum" },
+                { propertyName: "Minimum", editor: Report.editorTemplates.dataBinding, displayName: "Minimum", localizationId: "DevExpress.XtraReports.UI.XRGauge.Minimum" },
+                { propertyName: "NavigateUrl", editor: Report.editorTemplates.dataBinding, displayName: "Navigation URL", localizationId: "DevExpress.XtraReports.UI.XRControl.NavigateUrl" },
                 { propertyName: "Rtf", editor: Report.editorTemplates.dataBinding, displayName: "RTF" },
-                { propertyName: "Tag", editor: Report.editorTemplates.dataBinding, displayName: "Tag" },
-                { propertyName: "TargetValue", editor: Report.editorTemplates.dataBinding, displayName: "Target Value" },
-                { propertyName: "Text", editor: Report.editorTemplates.dataBinding, displayName: "Text" }
+                { propertyName: "Tag", editor: Report.editorTemplates.dataBinding, displayName: "Tag", localizationId: "DevExpress.XtraReports.UI.XRControl.Tag" },
+                { propertyName: "TargetValue", editor: Report.editorTemplates.dataBinding, displayName: "Target Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.TargetValue" },
+                { propertyName: "Text", editor: Report.editorTemplates.dataBinding, displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text" }
             ];
             Report.popularPropertiesLabel = ["text", "textArea", "defaultDataBinding", "Summary", "angle", "bookmark", "bookmarkParent", "autoWidth", "canGrow", "canShrink", "multiline", "wordWrap"];
             Report.popularPropertiesRichText = ["defaultDataBinding", "bookmark", "bookmarkParent", "canGrow", "canShrink"];
             Report.rtlLayout = {
-                propertyName: "rtlLayout", modelName: "@RightToLeftLayout", displayName: "Right To Left Layout", defaultVal: "No", editor: Report.editorTemplates.reportRtlProperty,
-                values: {
-                    "No": "No",
-                    "Yes": "Yes"
-                }
+                propertyName: "rtlLayout", modelName: "@RightToLeftLayout", displayName: "Right To Left Layout", localizationId: "DevExpress.XtraReports.UI.XtraReport.RightToLeftLayout", defaultVal: "No", editor: Report.editorTemplates.reportRtlProperty,
+                valuesArray: [
+                    { value: "No", displayValue: "No", localizationId: "DevExpress.XtraReports.UI.RightToLeftLayout.No" },
+                    { value: "Yes", displayValue: "Yes", localizationId: "DevExpress.XtraReports.UI.RightToLeftLayout.Yes" }
+                ]
             };
             Report.rtlReport = $.extend({}, Report.rtl, { defaultVal: "No", editor: Report.editorTemplates.reportRtlProperty });
             Report.imageType = {
-                propertyName: "imageType", displayName: "Image Type", modelName: "@ImageType", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Metafile", values: {
-                    "Metafile": "Metafile",
-                    "Bitmap": "Bitmap"
-                }
+                propertyName: "imageType", displayName: "Image Type", localizationId: "DevExpress.XtraReports.UI.XRChart.ImageType", modelName: "@ImageType", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Metafile", valuesArray: [
+                    { value: "Metafile", displayValue: "Metafile", localizationId: "DevExpress.XtraReports.UI.ChartImageType.Metafile" },
+                    { value: "Bitmap", displayValue: "Bitmap", localizationId: "DevExpress.XtraReports.UI.ChartImageType.Bitmap" }
+                ]
             };
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -16207,33 +16315,33 @@ var DevExpress;
             })();
             Report.CalculatedField = CalculatedField;
             var calculatedFieldScriptsInfo = [
-                { propertyName: "onGetValue", modelName: "@OnGetValue", displayName: "Get a Value", editor: Report.editorTemplates.scriptsBox }
+                { propertyName: "onGetValue", modelName: "@OnGetValue", displayName: "Get a Value", localizationId: "DevExpress.XtraReports.UI.CalculatedFieldScripts.OnGetValue", editor: Report.editorTemplates.scriptsBox }
             ];
-            var calculatedFieldScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", info: calculatedFieldScriptsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var calculatedFieldScripts = { propertyName: "scripts", modelName: "Scripts", displayName: "Scripts", localizationId: "DevExpress.XtraReports.UI.CalculatedField.Scripts", info: calculatedFieldScriptsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var calculatedFieldSerializationInfo = [
                 { propertyName: "calculatedFieldName", modelName: "@Name" },
                 { propertyName: "nameEditable", displayName: "Name", editor: DevExpress.JS.Widgets.editorTemplates.text, validationRules: Designer.nameValidationRules },
                 Report.displayName,
                 {
-                    propertyName: "fieldType", modelName: "@FieldType", displayName: "Field Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
-                    values: {
-                        "None": "None",
-                        "String": "String",
-                        "DateTime": "DateTime",
-                        "TimeSpan": "TimeSpan",
-                        "Byte": "Byte",
-                        "Int16": "Int16",
-                        "Int32": "Int32",
-                        "Float": "Float",
-                        "Double": "Double",
-                        "Decimal": "Decimal",
-                        "Boolean": "Boolean"
-                    }
+                    propertyName: "fieldType", modelName: "@FieldType", displayName: "Field Type", localizationId: "DevExpress.XtraReports.UI.CalculatedField.FieldType", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.FieldType.None" },
+                        { value: "String", displayValue: "String", localizationId: "DevExpress.XtraReports.UI.FieldType.String" },
+                        { value: "DateTime", displayValue: "DateTime", localizationId: "DevExpress.XtraReports.UI.FieldType.DateTime" },
+                        { value: "TimeSpan", displayValue: "TimeSpan", localizationId: "DevExpress.XtraReports.UI.FieldType.TimeSpan" },
+                        { value: "Byte", displayValue: "Byte", localizationId: "DevExpress.XtraReports.UI.FieldType.Byte" },
+                        { value: "Int16", displayValue: "Int16", localizationId: "DevExpress.XtraReports.UI.FieldType.Int16" },
+                        { value: "Int32", displayValue: "Int32", localizationId: "DevExpress.XtraReports.UI.FieldType.Int32" },
+                        { value: "Float", displayValue: "Float", localizationId: "DevExpress.XtraReports.UI.FieldType.Float" },
+                        { value: "Double", displayValue: "Double", localizationId: "DevExpress.XtraReports.UI.FieldType.Double" },
+                        { value: "Decimal", displayValue: "Decimal", localizationId: "DevExpress.XtraReports.UI.FieldType.Decimal" },
+                        { value: "Boolean", displayValue: "Boolean", localizationId: "DevExpress.XtraReports.UI.FieldType.Boolean" }
+                    ]
                 },
                 Report.dataSource,
                 Report.dataMember,
-                { propertyName: "expression", modelName: "@Expression", displayName: "Expression", defaultVal: "" },
-                { propertyName: "expressionObj", displayName: "Expression", editor: Designer.Widgets.editorTemplates.expressionEditor },
+                { propertyName: "expression", modelName: "@Expression", displayName: "Expression", localizationId: "DevExpress.XtraReports.UI.CalculatedField.Expression", defaultVal: "" },
+                { propertyName: "expressionObj", displayName: "Expression", localizationId: "DevExpress.XtraReports.UI.CalculatedField.Expression", editor: Designer.Widgets.editorTemplates.expressionEditor },
                 calculatedFieldScripts
             ];
             var CalculatedFieldsSource = (function (_super) {
@@ -16249,14 +16357,16 @@ var DevExpress;
                             return _this.addCalculatedField(item.path);
                         },
                         imageClassName: "dxrd-image-add-calcfield",
-                        text: Designer.getLocalization("Add calculated field")
+                        text: "Add calculated field",
+                        textId: 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddCalculatedField'
                     };
                     this.removeAction = {
                         clickAction: function (item) {
                             _this.removeCalculatedField(item.path);
                         },
                         imageClassName: "dxrd-image-recycle-bin",
-                        text: Designer.getLocalization("Remove calculated field")
+                        text: "Remove calculated field",
+                        textId: "ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveCalculatedField"
                     };
                     this._calculatedFieldsInfo = {};
                     this._calculatedFields = calculatedFields;
@@ -16428,13 +16538,13 @@ var DevExpress;
                     _super.call(this);
                     this.usedDataSources = ko.observableArray();
                     this.allDataSources = ko.observableArray();
-                    this.usedDataSources.push({ ref: "none", name: "none", specifics: "none", data: null });
+                    this.usedDataSources.push({ ref: "none", name: "none", specifics: "none", data: null, dataSerializer: null });
                     this._objects = objects;
                     for (var i = 0; i < objects().length; i++) {
                         var ref = objects()[i]["_model"]["@Ref"];
                         var dataSourceRef = dataSourceRefs.filter(function (ds) { return ds.ref === ref; })[0];
                         if (dataSourceRef) {
-                            objects()[i]["dataSourceInfo"] = { ref: ref, data: objects()[i], name: dataSourceRef.name, isSqlDataSource: dataSourceRef.isSqlDataSource };
+                            objects()[i]["dataSourceInfo"] = { ref: ref, data: objects()[i], name: dataSourceRef.name, isSqlDataSource: dataSourceRef.isSqlDataSource, dataSerializer: dataSourceRef.dataSerializer };
                             this._addUsedDataSource(objects()[i]["dataSourceInfo"]);
                         }
                     }
@@ -16561,6 +16671,7 @@ var DevExpress;
                 DataSourceHelper.prototype.findDataSourceInfoByName = function (name) {
                     return this.usedDataSources().filter(function (item) { return item.name === name; })[0];
                 };
+                DataSourceHelper.defaultReportExtensionKey = "DataSerializationExtension";
                 DataSourceHelper._assignValueInTimeout = true;
                 return DataSourceHelper;
             })(Designer.Disposable);
@@ -16568,7 +16679,19 @@ var DevExpress;
             function addDataSourceToReport(dataSourceHelper, report, undoEngine, itemsProvider, dataSource, forceAssigning) {
                 if (forceAssigning === void 0) { forceAssigning = false; }
                 undoEngine.start();
+                var findFirstDataSourceWithSerializer = Designer.findFirstItemMatchesCondition(dataSourceHelper.usedDataSources.peek(), function (item) { return !!item.dataSerializer && item.dataSerializer !== dataSource.dataSerializer; });
                 var result = dataSourceHelper.addDataSource(dataSource);
+                if (!findFirstDataSourceWithSerializer && dataSource.dataSerializer) {
+                    report.extensions.peek().forEach(function (item, index) {
+                        if (item.key.peek() === DataSourceHelper.defaultReportExtensionKey) {
+                            report.extensions.splice(index, 1);
+                        }
+                    });
+                    var newDataSerializer = new Report.ExtensionModel({});
+                    newDataSerializer.key = ko.observable(DataSourceHelper.defaultReportExtensionKey);
+                    newDataSerializer.value = ko.observable(dataSource.dataSerializer);
+                    report.extensions.push(newDataSerializer);
+                }
                 if (forceAssigning || !report.dataSource()) {
                     report.dataSource(result);
                     itemsProvider
@@ -16657,8 +16780,8 @@ var DevExpress;
             })();
             Report.GroupFieldModel = GroupFieldModel;
             var groupFieldSerializationInfo = [
-                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", editor: Report.editorTemplates.dataBinding },
-                { propertyName: "sortOrder", modelName: "@SortOrder", displayName: "Sort Order", defaultVal: "Ascending" }
+                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", localizationId: "DevExpress.XtraReports.UI.GroupField.FieldName", editor: Report.editorTemplates.dataBinding },
+                { propertyName: "sortOrder", modelName: "@SortOrder", displayName: "Sort Order", localizationId: "DevExpress.XtraReports.UI.GroupField.SortOrder", defaultVal: "Ascending" }
             ];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -16709,7 +16832,7 @@ var DevExpress;
             })();
             Report.LookUpValue = LookUpValue;
             Report.lookUpValueSerializationInfo = [
-                { propertyName: "description", modelName: "@Description", displayName: "Description", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "description", modelName: "@Description", displayName: "Description", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Description", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { propertyName: "_value", modelName: "@Value", link: true },
             ];
             var ReportParameterHelper = (function (_super) {
@@ -16909,7 +17032,7 @@ var DevExpress;
                     });
                 };
                 Parameter.prototype.getParameterDescriptor = function () {
-                    return { description: this.description.peek(), displayName: "Value", name: this.parameterName.peek(), type: this.type.peek(), value: this.value.peek(), visible: this.visible.peek(), multiValue: this.isMultiValue.peek() };
+                    return { description: this.description.peek(), displayName: "Value", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Value", name: this.parameterName.peek(), type: this.type.peek(), value: this.value.peek(), visible: this.visible.peek(), multiValue: this.isMultiValue.peek() };
                 };
                 Object.defineProperty(Parameter.prototype, "name", {
                     get: function () {
@@ -16956,37 +17079,38 @@ var DevExpress;
                 Parameter.separator = "|";
                 Parameter.defaultGuidValue = "00000000-0000-0000-0000-000000000000";
                 Parameter.typeValues = [
-                    { value: "System.String", displayValue: "String", defaultValue: "", specifics: "String", valueConverter: function (val) { return val.toString(); } },
-                    { value: "System.DateTime", displayValue: "Date", defaultValue: new Date(new Date().setHours(0, 0, 0, 0)), specifics: "Date", valueConverter: function (val) { return DevExpress.JS.Localization.parseDate(val); } },
-                    { value: "System.Int16", displayValue: "Number (16 bit integer)", defaultValue: "0", specifics: "Integer", valueConverter: DevExpress.Data.integerValueConverter },
-                    { value: "System.Int32", displayValue: "Number (32 bit integer)", defaultValue: "0", specifics: "Integer", valueConverter: DevExpress.Data.integerValueConverter },
-                    { value: "System.Int64", displayValue: "Number (64 bit integer)", defaultValue: "0", specifics: "Integer", valueConverter: DevExpress.Data.integerValueConverter },
-                    { value: "System.Single", displayValue: "Number (floating-point)", defaultValue: "0", specifics: "Float", valueConverter: DevExpress.Data.floatValueConverter },
-                    { value: "System.Double", displayValue: "Number (double-precision floating-point)", defaultValue: "0", specifics: "Float", valueConverter: DevExpress.Data.floatValueConverter },
-                    { value: "System.Decimal", displayValue: "Number (decimal)", defaultValue: "0", specifics: "Float", valueConverter: DevExpress.Data.floatValueConverter },
-                    { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) { return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null); } },
-                    { value: "System.Guid", displayValue: "Guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) { return DevExpress.Designer.validateGuid(val) ? val : Parameter.defaultGuidValue; }, specifics: "guid" }
+                    { value: "System.String", displayValue: "String", defaultValue: "", specifics: "String", valueConverter: function (val) { return val.toString(); }, localizationId: "UtilsUIStringId.Parameter_Type_String" },
+                    { value: "System.DateTime", displayValue: "Date", defaultValue: new Date(new Date().setHours(0, 0, 0, 0)), specifics: "Date", valueConverter: function (val) { return DevExpress.JS.Localization.parseDate(val); }, localizationId: "UtilsUIStringId.Parameter_Type_DateTime" },
+                    { value: "System.Int16", displayValue: "Number (16 bit integer)", defaultValue: "0", specifics: "Integer", valueConverter: DevExpress.Data.integerValueConverter, localizationId: "UtilsUIStringId.Parameter_Type_Int16" },
+                    { value: "System.Int32", displayValue: "Number (32 bit integer)", defaultValue: "0", specifics: "Integer", valueConverter: DevExpress.Data.integerValueConverter, localizationId: "UtilsUIStringId.Parameter_Type_Int32" },
+                    { value: "System.Int64", displayValue: "Number (64 bit integer)", defaultValue: "0", specifics: "Integer", valueConverter: DevExpress.Data.integerValueConverter, localizationId: "UtilsUIStringId.Parameter_Type_Int64" },
+                    { value: "System.Single", displayValue: "Number (floating-point)", defaultValue: "0", specifics: "Float", valueConverter: DevExpress.Data.floatValueConverter, localizationId: "UtilsUIStringId.Parameter_Type_Float" },
+                    { value: "System.Double", displayValue: "Number (double-precision floating-point)", defaultValue: "0", specifics: "Float", valueConverter: DevExpress.Data.floatValueConverter, localizationId: "UtilsUIStringId.Parameter_Type_Double" },
+                    { value: "System.Decimal", displayValue: "Number (decimal)", defaultValue: "0", specifics: "Float", valueConverter: DevExpress.Data.floatValueConverter, localizationId: "UtilsUIStringId.Parameter_Type_Decimal" },
+                    { value: "System.Boolean", displayValue: "Boolean", defaultValue: false, specifics: "Bool", valueConverter: function (val) { return String(val).toLowerCase() === "true" ? true : (String(val).toLowerCase() === "false" ? false : null); }, localizationId: "UtilsUIStringId.Parameter_Type_Boolean" },
+                    { value: "System.Guid", displayValue: "Guid", defaultValue: Parameter.defaultGuidValue, valueConverter: function (val) { return DevExpress.Designer.validateGuid(val) ? val : Parameter.defaultGuidValue; }, specifics: "guid", localizationId: "UtilsUIStringId.Parameter_Type_Guid" }
                 ];
                 return Parameter;
             })(Designer.Disposable);
             Report.Parameter = Parameter;
-            var parameterValueSerializationInfo = { propertyName: "value", displayName: "Value", modelName: "@ValueInfo", from: function (val) { return ko.observable(val); }, toJsonObject: Parameter.valueToJsonObject };
-            Report.parameterLookUpSettingsSerializationInfo = { propertyName: "lookUpSettings", displayName: "Look-Up Settings", modelName: "@LookUpSettings", link: true, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var parameterValueSerializationInfo = { propertyName: "value", displayName: "Value", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Value", modelName: "@ValueInfo", from: function (val) { return ko.observable(val); }, toJsonObject: Parameter.valueToJsonObject };
+            Report.parameterLookUpSettingsSerializationInfo = { propertyName: "lookUpSettings", displayName: "Look-Up Settings", localizationId: "DevExpress.XtraReports.Parameters.Parameter.LookUpSettings", modelName: "@LookUpSettings", link: true, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.parameterSerializationInfo = [
-                { propertyName: "parameterName", modelName: "@Name", displayName: "Name", defaultVal: "", validationRules: Designer.nameValidationRules, editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "description", modelName: "@Description", displayName: "Description", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "parameterName", modelName: "@Name", displayName: "Name", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Name", defaultVal: "", validationRules: Designer.nameValidationRules, editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "description", modelName: "@Description", displayName: "Description", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Description", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 Report.visible,
-                { propertyName: "isMultiValue", modelName: "@MultiValue", displayName: "MultiValue", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
-                { propertyName: "type", displayName: "Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: (Parameter.typeValues) },
+                { propertyName: "isMultiValue", modelName: "@MultiValue", displayName: "MultiValue", localizationId: "DevExpress.XtraReports.Parameters.Parameter.MultiValue", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
+                { propertyName: "type", displayName: "Type", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: (Parameter.typeValues) },
                 parameterValueSerializationInfo,
                 { propertyName: "_obsoleteValue", modelName: "@Value", link: true },
                 { propertyName: "_type", modelName: "@Type", link: true },
                 {
-                    propertyName: "lookUpSourceType", displayName: "Look-Up Settings Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                        "None": "No Look-Up",
-                        "StaticListLookUpSettings": "Static List",
-                        "DynamicListLookUpSettings": "Dynamic List"
-                    }
+                    propertyName: "lookUpSourceType", displayName: "Look-Up Settings Type", localizationId: "DevExpress.XtraReports.Parameters.Parameter.LookUpSettings", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    valuesArray: [
+                        { value: "None", displayValue: "No Look-Up", localizationId: "PreviewStringId.ParameterLookUpSettingsNoLookUp" },
+                        { value: "StaticListLookUpSettings", displayValue: "Static List", localizationId: "DevExpress.XtraReports.Parameters.StaticListLookUpSettings" },
+                        { value: "DynamicListLookUpSettings", displayValue: "Dynamic List", localizationId: "DevExpress.XtraReports.Parameters.DynamicListLookUpSettings" }
+                    ]
                 },
                 Report.parameterLookUpSettingsSerializationInfo
             ];
@@ -16998,14 +17122,16 @@ var DevExpress;
                             return _this.add();
                         },
                         imageClassName: "dxrd-image-add",
-                        text: Designer.getLocalization("Add parameter")
+                        text: "Add parameter",
+                        textId: 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddParameter'
                     };
                     this.removeAction = {
                         clickAction: function (item) {
                             _this.remove({ model: item.data });
                         },
                         imageClassName: "dxrd-image-recycle-bin",
-                        text: Designer.getLocalization("Remove parameter")
+                        text: "Remove parameter",
+                        textId: 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveParameter'
                     };
                     this.parameters = report.parameters;
                     this.remove = function (e) {
@@ -17037,7 +17163,7 @@ var DevExpress;
                     if (!request.fullPath) {
                         var parameters = Designer.findFirstItemMatchesCondition(items, function (item) { return item.specifics === "parameters"; });
                         if (parameters)
-                            parameters.displayName = Designer.getLocalization("Parameters");
+                            parameters.displayName = Designer.getLocalization("Parameters", "DevExpress.XtraReports.UI.XtraReport.Parameters");
                         var noneDataSource = !request.fullPath && Designer.findFirstItemMatchesCondition(items, function (item) { return item.specifics === "none"; });
                         if (noneDataSource)
                             noneDataSource.displayName = Designer.localizeNoneString("none");
@@ -17177,7 +17303,7 @@ var DevExpress;
                     this.filterString.itemsProvider = ko.observable(null);
                 }
                 StaticListLookUpSettings.prototype.getInfo = function () {
-                    return _super.prototype.getInfo.call(this).concat({ propertyName: "lookUpValues", displayName: "Values", modelName: "LookUpValues", array: true, editor: Report.editorTemplates.lookUpValues });
+                    return _super.prototype.getInfo.call(this).concat({ propertyName: "lookUpValues", displayName: "Values", localizationId: "DevExpress.XtraReports.Parameters.StaticListLookUpSettings.LookUpValues", modelName: "LookUpValues", array: true, editor: Report.editorTemplates.lookUpValues });
                 };
                 StaticListLookUpSettings.prototype.afterDeserialization = function (model, serializer) {
                     this.lookUpValues = DevExpress.JS.Utils.deserializeArray(model.LookUpValues || [], function (item) { return new Report.LookUpValue(item, serializer); });
@@ -17220,8 +17346,8 @@ var DevExpress;
                 DynamicListLookUpSettings.prototype.getInfo = function () {
                     return _super.prototype.getInfo.call(this).concat([
                         Report.dataAdapter, Report.dataSource, Report.dataMember,
-                        { propertyName: "displayMember", modelName: "@DisplayMember", displayName: "Display Member", defaultVal: "", editor: Designer.Widgets.editorTemplates.field },
-                        { propertyName: "valueMember", modelName: "@ValueMember", displayName: "Value Member", defaultVal: "", editor: Designer.Widgets.editorTemplates.field }
+                        { propertyName: "displayMember", modelName: "@DisplayMember", displayName: "Display Member", localizationId: "DevExpress.XtraReports.Parameters.DynamicListLookUpSettings.DisplayMember", defaultVal: "", editor: Designer.Widgets.editorTemplates.field },
+                        { propertyName: "valueMember", modelName: "@ValueMember", displayName: "Value Member", localizationId: "DevExpress.XtraReports.Parameters.DynamicListLookUpSettings.ValueMember", defaultVal: "", editor: Designer.Widgets.editorTemplates.field }
                     ]);
                 };
                 DynamicListLookUpSettings.prototype.getPath = function (propertyName) {
@@ -17331,11 +17457,11 @@ var DevExpress;
                 _foreColor,
                 _backColor,
                 _borderColor,
-                { propertyName: "backColor", displayName: "Background Color", editor: Designer.Widgets.editorTemplates.customColorEditor },
-                { propertyName: "foreColor", displayName: "Foreground Color", editor: Designer.Widgets.editorTemplates.customColorEditor },
-                { propertyName: "borderColor", displayName: "Border Color", editor: Designer.Widgets.editorTemplates.customColorEditor },
-                { propertyName: "borders", modelName: "@Sides", displayName: "Borders", editor: Designer.Widgets.editorTemplates.borders },
-                { propertyName: "borderWidth", modelName: "@BorderWidthSerializable", displayName: "Border Width", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric }
+                { propertyName: "backColor", displayName: "Background Color", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.BackColor", editor: Designer.Widgets.editorTemplates.customColorEditor },
+                { propertyName: "foreColor", displayName: "Foreground Color", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.ForeColor", editor: Designer.Widgets.editorTemplates.customColorEditor },
+                { propertyName: "borderColor", displayName: "Border Color", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.BorderColor", editor: Designer.Widgets.editorTemplates.customColorEditor },
+                { propertyName: "borders", modelName: "@Sides", displayName: "Borders", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.Borders", editor: Designer.Widgets.editorTemplates.borders },
+                { propertyName: "borderWidth", modelName: "@BorderWidthSerializable", displayName: "Border Width", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.BorderWidth", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric }
             ]).concat([Report.borderDashStyle]);
             Report.styleSerializationInfo.forEach(function (item) { delete item.defaultVal; });
         })(Report = Designer.Report || (Designer.Report = {}));
@@ -17424,6 +17550,7 @@ var DevExpress;
                         }
                     });
                     this.bands = DevExpress.JS.Utils.deserializeArray(report.Bands, function (item) { return _this.createControl(item, serializer); });
+                    Report.BandViewModel.initLevels(this.bands());
                     this.bands().sort(sortBands);
                     this.extensions = DevExpress.JS.Utils.deserializeArray(report.Extensions, function (item) { return new Report.ExtensionModel(item, serializer); });
                     this.crossBandControls = DevExpress.JS.Utils.deserializeArray(report.CrossBandControls, function (item) { return _this.createControl(item, serializer); });
@@ -17764,6 +17891,7 @@ var DevExpress;
                     this.actions = [
                         {
                             text: "Insert Top Margin Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertTopMarginBand',
                             imageClassName: "dxrd-image-actions-top_margin",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("TopMarginBand");
@@ -17772,6 +17900,7 @@ var DevExpress;
                             clickAction: function () { _this._addBand("TopMarginBand"); },
                         }, {
                             text: "Insert Report Header Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertReportHeaderBand',
                             imageClassName: "dxrd-image-actions-report_header",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("ReportHeaderBand");
@@ -17780,6 +17909,7 @@ var DevExpress;
                             clickAction: function () { _this._addBand("ReportHeaderBand"); },
                         }, {
                             text: "Insert Page Header Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageHeaderBand',
                             imageClassName: "dxrd-image-actions-page_header",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("PageHeaderBand");
@@ -17788,12 +17918,14 @@ var DevExpress;
                             clickAction: function () { _this._addBand("PageHeaderBand"); },
                         }, {
                             text: "Insert Group Header Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupHeaderBand',
                             imageClassName: "dxrd-image-actions-group_header",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this._addBand("GroupHeaderBand"); },
                         }, {
                             text: "Insert Detail Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertDetailBand',
                             imageClassName: "dxrd-image-actions-detail",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("DetailBand");
@@ -17802,18 +17934,21 @@ var DevExpress;
                             clickAction: function () { _this._addBand("DetailBand"); },
                         }, {
                             text: "Insert Detail Report Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertDetailReportBand',
                             imageClassName: "dxrd-image-actions-detail_report",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this._addBand("DetailReportBand"); },
                         }, {
                             text: "Insert Group Footer Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupFooterBand',
                             imageClassName: "dxrd-image-actions-group_footer",
                             disabled: ko.observable(false),
                             visible: true,
                             clickAction: function () { _this._addBand("GroupFooterBand"); },
                         }, {
                             text: "Insert Report Footer Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertReportFooterBand',
                             imageClassName: "dxrd-image-actions-report_footer",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("ReportFooterBand");
@@ -17822,6 +17957,7 @@ var DevExpress;
                             clickAction: function () { _this._addBand("ReportFooterBand"); },
                         }, {
                             text: "Insert Page Footer Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageFooterBand',
                             imageClassName: "dxrd-image-actions-page_footer",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("PageFooterBand");
@@ -17830,6 +17966,7 @@ var DevExpress;
                             clickAction: function () { _this._addBand("PageFooterBand"); },
                         }, {
                             text: "Insert Bottom Margin Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertBottomMarginBand',
                             imageClassName: "dxrd-image-actions-bottom_margin",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("BottomMarginBand");
@@ -17838,6 +17975,7 @@ var DevExpress;
                             clickAction: function () { _this._addBand("BottomMarginBand"); },
                         }, {
                             text: "Insert Sub-Band",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertSubBand',
                             imageClassName: "dxrd-image-actions-subband",
                             disabled: ko.pureComputed(function () {
                                 return !_this._canAddBand("SubBand");
@@ -17884,145 +18022,145 @@ var DevExpress;
             })();
             Report.ReportActions = ReportActions;
             Report.paperKind = {
-                propertyName: "paperKind", modelName: "@PaperKind", defaultVal: "Letter", displayName: "Paper Kind",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "A2": "A2",
-                    "A3": "A3",
-                    "A3Extra": "A3Extra",
-                    "A3ExtraTransverse": "A3ExtraTransverse",
-                    "A3Rotated": "A3Rotated",
-                    "A3Transverse": "A3Transverse",
-                    "A4": "A4",
-                    "A4Extra": "A4Extra",
-                    "A4Plus": "A4Plus",
-                    "A4Rotated": "A4Rotated",
-                    "A4Small": "A4Small",
-                    "A4Transverse": "A4Transverse",
-                    "A5": "A5",
-                    "A5Extra": "A5Extra",
-                    "A5Rotated": "A5Rotated",
-                    "A5Transverse": "A5Transverse",
-                    "A6": "A6",
-                    "A6Rotated": "A6Rotated",
-                    "APlus": "APlus",
-                    "B4": "B4",
-                    "B4Envelope": "B4Envelope",
-                    "B4JisRotated": "B4JisRotated",
-                    "B5": "B5",
-                    "B5Envelope": "B5Envelope",
-                    "B5Extra": "B5Extra",
-                    "B5JisRotated": "B5JisRotated",
-                    "B5Transverse": "B5Transverse",
-                    "B6Envelope": "B6Envelope",
-                    "B6Jis": "B6Jis",
-                    "B6JisRotated": "B6JisRotated",
-                    "BPlus": "BPlus",
-                    "C3Envelope": "C3Envelope",
-                    "C4Envelope": "C4Envelope",
-                    "C5Envelope": "C5Envelope",
-                    "C65Envelope": "C65Envelope",
-                    "C6Envelope": "C6Envelope",
-                    "CSheet": "CSheet",
-                    "Custom": "Custom",
-                    "DLEnvelope": "DLEnvelope",
-                    "DSheet": "DSheet",
-                    "ESheet": "ESheet",
-                    "Executive": "Executive",
-                    "Folio": "Folio",
-                    "GermanLegalFanfold": "GermanLegalFanfold",
-                    "GermanStandardFanfold": "GermanStandardFanfold",
-                    "InviteEnvelope": "InviteEnvelope",
-                    "IsoB4": "IsoB4",
-                    "ItalyEnvelope": "ItalyEnvelope",
-                    "JapaneseDoublePostcard": "JapaneseDoublePostcard",
-                    "JapaneseDoublePostcardRotated": "JapaneseDoublePostcardRotated",
-                    "JapanesePostcard": "JapanesePostcard",
-                    "Ledger": "Ledger",
-                    "Legal": "Legal",
-                    "LegalExtra": "LegalExtra",
-                    "Letter": "Letter",
-                    "LetterExtra": "LetterExtra",
-                    "LetterExtraTransverse": "LetterExtraTransverse",
-                    "LetterPlus": "LetterPlus",
-                    "LetterRotated": "LetterRotated",
-                    "LetterSmall": "LetterSmall",
-                    "LetterTransverse": "LetterTransverse",
-                    "MonarchEnvelope": "MonarchEnvelope",
-                    "Note": "Note",
-                    "Number10Envelope": "Number10Envelope",
-                    "Number11Envelope": "Number11Envelope",
-                    "Number12Envelope": "Number12Envelope",
-                    "Number14Envelope": "Number14Envelope",
-                    "Number9Envelope": "Number9Envelope",
-                    "PersonalEnvelope": "PersonalEnvelope",
-                    "Prc16K": "Prc16K",
-                    "Prc16KRotated": "Prc16KRotated",
-                    "Prc32K": "Prc32K",
-                    "Prc32KBig": "Prc32KBig",
-                    "Prc32KBigRotated": "Prc32KBigRotated",
-                    "Prc32KRotated": "Prc32KRotated",
-                    "PrcEnvelopeNumber1": "PrcEnvelopeNumber1",
-                    "PrcEnvelopeNumber10": "PrcEnvelopeNumber10",
-                    "PrcEnvelopeNumber10Rotated": "PrcEnvelopeNumber10Rotated",
-                    "PrcEnvelopeNumber1Rotated": "PrcEnvelopeNumber1Rotated",
-                    "PrcEnvelopeNumber2": "PrcEnvelopeNumber2",
-                    "PrcEnvelopeNumber2Rotated": "PrcEnvelopeNumber2Rotated",
-                    "PrcEnvelopeNumber3": "PrcEnvelopeNumber3",
-                    "PrcEnvelopeNumber3Rotated": "PrcEnvelopeNumber3Rotated",
-                    "PrcEnvelopeNumber4": "PrcEnvelopeNumber4",
-                    "PrcEnvelopeNumber4Rotated": "PrcEnvelopeNumber4Rotated",
-                    "PrcEnvelopeNumber5": "PrcEnvelopeNumber5",
-                    "PrcEnvelopeNumber5Rotated": "PrcEnvelopeNumber5Rotated",
-                    "PrcEnvelopeNumber6": "PrcEnvelopeNumber6",
-                    "PrcEnvelopeNumber6Rotated": "PrcEnvelopeNumber6Rotated",
-                    "PrcEnvelopeNumber7": "PrcEnvelopeNumber7",
-                    "PrcEnvelopeNumber7Rotated": "PrcEnvelopeNumber7Rotated",
-                    "PrcEnvelopeNumber8": "PrcEnvelopeNumber8",
-                    "PrcEnvelopeNumber8Rotated": "PrcEnvelopeNumber8Rotated",
-                    "PrcEnvelopeNumber9": "PrcEnvelopeNumber9",
-                    "PrcEnvelopeNumber9Rotated": "PrcEnvelopeNumber9Rotated",
-                    "Quarto": "Quarto",
-                    "Standard10x11": "Standard10x11",
-                    "Standard10x14": "Standard10x14",
-                    "Standard11x17": "Standard11x17",
-                    "Standard12x11": "Standard12x11",
-                    "Standard15x11": "Standard15x11",
-                    "Standard9x11": "Standard9x11",
-                    "Statement": "Statement",
-                    "Tabloid": "Tabloid",
-                    "TabloidExtra": "TabloidExtra",
-                    "USStandardFanfold": "USStandardFanfold"
-                }
+                propertyName: "paperKind", modelName: "@PaperKind", defaultVal: "Letter", displayName: "Paper Kind", localizationId: "DevExpress.XtraReports.UI.XtraReport.PaperKind",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "A2", displayValue: "A2", localizationId: "System.Drawing.Printing.PaperKind.A2" },
+                    { value: "A3", displayValue: "A3", localizationId: "System.Drawing.Printing.PaperKind.A3" },
+                    { value: "A3Extra", displayValue: "A3Extra", localizationId: "System.Drawing.Printing.PaperKind.A3Extra" },
+                    { value: "A3ExtraTransverse", displayValue: "A3ExtraTransverse", localizationId: "System.Drawing.Printing.PaperKind.A3ExtraTransverse" },
+                    { value: "A3Rotated", displayValue: "A3Rotated", localizationId: "System.Drawing.Printing.PaperKind.A3Rotated" },
+                    { value: "A3Transverse", displayValue: "A3Transverse", localizationId: "System.Drawing.Printing.PaperKind.A3Transverse" },
+                    { value: "A4", displayValue: "A4", localizationId: "System.Drawing.Printing.PaperKind.A4" },
+                    { value: "A4Extra", displayValue: "A4Extra", localizationId: "System.Drawing.Printing.PaperKind.A4Extra" },
+                    { value: "A4Plus", displayValue: "A4Plus", localizationId: "System.Drawing.Printing.PaperKind.A4Plus" },
+                    { value: "A4Rotated", displayValue: "A4Rotated", localizationId: "System.Drawing.Printing.PaperKind.A4Rotated" },
+                    { value: "A4Small", displayValue: "A4Small", localizationId: "System.Drawing.Printing.PaperKind.A4Small" },
+                    { value: "A4Transverse", displayValue: "A4Transverse", localizationId: "System.Drawing.Printing.PaperKind.A4Transverse" },
+                    { value: "A5", displayValue: "A5", localizationId: "System.Drawing.Printing.PaperKind.A5" },
+                    { value: "A5Extra", displayValue: "A5Extra", localizationId: "System.Drawing.Printing.PaperKind.A5Extra" },
+                    { value: "A5Rotated", displayValue: "A5Rotated", localizationId: "System.Drawing.Printing.PaperKind.A5Rotated" },
+                    { value: "A5Transverse", displayValue: "A5Transverse", localizationId: "System.Drawing.Printing.PaperKind.A5Transverse" },
+                    { value: "A6", displayValue: "A6", localizationId: "System.Drawing.Printing.PaperKind.A6" },
+                    { value: "A6Rotated", displayValue: "A6Rotated", localizationId: "System.Drawing.Printing.PaperKind.A6Rotated" },
+                    { value: "APlus", displayValue: "APlus", localizationId: "System.Drawing.Printing.PaperKind.APlus" },
+                    { value: "B4", displayValue: "B4", localizationId: "System.Drawing.Printing.PaperKind.B4" },
+                    { value: "B4Envelope", displayValue: "B4Envelope", localizationId: "System.Drawing.Printing.PaperKind.B4Envelope" },
+                    { value: "B4JisRotated", displayValue: "B4JisRotated", localizationId: "System.Drawing.Printing.PaperKind.B4JisRotated" },
+                    { value: "B5", displayValue: "B5", localizationId: "System.Drawing.Printing.PaperKind.B5" },
+                    { value: "B5Envelope", displayValue: "B5Envelope", localizationId: "System.Drawing.Printing.PaperKind.B5Envelope" },
+                    { value: "B5Extra", displayValue: "B5Extra", localizationId: "System.Drawing.Printing.PaperKind.B5Extra" },
+                    { value: "B5JisRotated", displayValue: "B5JisRotated", localizationId: "System.Drawing.Printing.PaperKind.B5JisRotated" },
+                    { value: "B5Transverse", displayValue: "B5Transverse", localizationId: "System.Drawing.Printing.PaperKind.B5Transverse" },
+                    { value: "B6Envelope", displayValue: "B6Envelope", localizationId: "System.Drawing.Printing.PaperKind.B6Envelope" },
+                    { value: "B6Jis", displayValue: "B6Jis", localizationId: "System.Drawing.Printing.PaperKind.B6Jis" },
+                    { value: "B6JisRotated", displayValue: "B6JisRotated", localizationId: "System.Drawing.Printing.PaperKind.B6JisRotated" },
+                    { value: "BPlus", displayValue: "BPlus", localizationId: "System.Drawing.Printing.PaperKind.BPlus" },
+                    { value: "C3Envelope", displayValue: "C3Envelope", localizationId: "System.Drawing.Printing.PaperKind.C3Envelope" },
+                    { value: "C4Envelope", displayValue: "C4Envelope", localizationId: "System.Drawing.Printing.PaperKind.C4Envelope" },
+                    { value: "C5Envelope", displayValue: "C5Envelope", localizationId: "System.Drawing.Printing.PaperKind.C5Envelope" },
+                    { value: "C65Envelope", displayValue: "C65Envelope", localizationId: "System.Drawing.Printing.PaperKind.C65Envelope" },
+                    { value: "C6Envelope", displayValue: "C6Envelope", localizationId: "System.Drawing.Printing.PaperKind.C6Envelope" },
+                    { value: "CSheet", displayValue: "CSheet", localizationId: "System.Drawing.Printing.PaperKind.CSheet" },
+                    { value: "Custom", displayValue: "Custom", localizationId: "System.Drawing.Printing.PaperKind.Custom" },
+                    { value: "DLEnvelope", displayValue: "DLEnvelope", localizationId: "System.Drawing.Printing.PaperKind.DLEnvelope" },
+                    { value: "DSheet", displayValue: "DSheet", localizationId: "System.Drawing.Printing.PaperKind.DSheet" },
+                    { value: "ESheet", displayValue: "ESheet", localizationId: "System.Drawing.Printing.PaperKind.ESheet" },
+                    { value: "Executive", displayValue: "Executive", localizationId: "System.Drawing.Printing.PaperKind.Executive" },
+                    { value: "Folio", displayValue: "Folio", localizationId: "System.Drawing.Printing.PaperKind.Folio" },
+                    { value: "GermanLegalFanfold", displayValue: "GermanLegalFanfold", localizationId: "System.Drawing.Printing.PaperKind.GermanLegalFanfold" },
+                    { value: "GermanStandardFanfold", displayValue: "GermanStandardFanfold", localizationId: "System.Drawing.Printing.PaperKind.GermanStandardFanfold" },
+                    { value: "InviteEnvelope", displayValue: "InviteEnvelope", localizationId: "System.Drawing.Printing.PaperKind.InviteEnvelope" },
+                    { value: "IsoB4", displayValue: "IsoB4", localizationId: "System.Drawing.Printing.PaperKind.IsoB4" },
+                    { value: "ItalyEnvelope", displayValue: "ItalyEnvelope", localizationId: "System.Drawing.Printing.PaperKind.ItalyEnvelope" },
+                    { value: "JapaneseDoublePostcard", displayValue: "JapaneseDoublePostcard", localizationId: "System.Drawing.Printing.PaperKind.JapaneseDoublePostcard" },
+                    { value: "JapaneseDoublePostcardRotated", displayValue: "JapaneseDoublePostcardRotated", localizationId: "System.Drawing.Printing.PaperKind.JapaneseDoublePostcardRotated" },
+                    { value: "JapanesePostcard", displayValue: "JapanesePostcard", localizationId: "System.Drawing.Printing.PaperKind.JapanesePostcard" },
+                    { value: "Ledger", displayValue: "Ledger", localizationId: "System.Drawing.Printing.PaperKind.Ledger" },
+                    { value: "Legal", displayValue: "Legal", localizationId: "System.Drawing.Printing.PaperKind.Legal" },
+                    { value: "LegalExtra", displayValue: "LegalExtra", localizationId: "System.Drawing.Printing.PaperKind.LegalExtra" },
+                    { value: "Letter", displayValue: "Letter", localizationId: "System.Drawing.Printing.PaperKind.Letter" },
+                    { value: "LetterExtra", displayValue: "LetterExtra", localizationId: "System.Drawing.Printing.PaperKind.LetterExtra" },
+                    { value: "LetterExtraTransverse", displayValue: "LetterExtraTransverse", localizationId: "System.Drawing.Printing.PaperKind.LetterExtraTransverse" },
+                    { value: "LetterPlus", displayValue: "LetterPlus", localizationId: "System.Drawing.Printing.PaperKind.LetterPlus" },
+                    { value: "LetterRotated", displayValue: "LetterRotated", localizationId: "System.Drawing.Printing.PaperKind.LetterRotated" },
+                    { value: "LetterSmall", displayValue: "LetterSmall", localizationId: "System.Drawing.Printing.PaperKind.LetterSmall" },
+                    { value: "LetterTransverse", displayValue: "LetterTransverse", localizationId: "System.Drawing.Printing.PaperKind.LetterTransverse" },
+                    { value: "MonarchEnvelope", displayValue: "MonarchEnvelope", localizationId: "System.Drawing.Printing.PaperKind.MonarchEnvelope" },
+                    { value: "Note", displayValue: "Note", localizationId: "System.Drawing.Printing.PaperKind.Note" },
+                    { value: "Number10Envelope", displayValue: "Number10Envelope", localizationId: "System.Drawing.Printing.PaperKind.Number10Envelope" },
+                    { value: "Number11Envelope", displayValue: "Number11Envelope", localizationId: "System.Drawing.Printing.PaperKind.Number11Envelope" },
+                    { value: "Number12Envelope", displayValue: "Number12Envelope", localizationId: "System.Drawing.Printing.PaperKind.Number12Envelope" },
+                    { value: "Number14Envelope", displayValue: "Number14Envelope", localizationId: "System.Drawing.Printing.PaperKind.Number14Envelope" },
+                    { value: "Number9Envelope", displayValue: "Number9Envelope", localizationId: "System.Drawing.Printing.PaperKind.Number9Envelope" },
+                    { value: "PersonalEnvelope", displayValue: "PersonalEnvelope", localizationId: "System.Drawing.Printing.PaperKind.PersonalEnvelope" },
+                    { value: "Prc16K", displayValue: "Prc16K", localizationId: "System.Drawing.Printing.PaperKind.Prc16K" },
+                    { value: "Prc16KRotated", displayValue: "Prc16KRotated", localizationId: "System.Drawing.Printing.PaperKind.Prc16KRotated" },
+                    { value: "Prc32K", displayValue: "Prc32K", localizationId: "System.Drawing.Printing.PaperKind.Prc32K" },
+                    { value: "Prc32KBig", displayValue: "Prc32KBig", localizationId: "System.Drawing.Printing.PaperKind.Prc32KBig" },
+                    { value: "Prc32KBigRotated", displayValue: "Prc32KBigRotated", localizationId: "System.Drawing.Printing.PaperKind.Prc32KBigRotated" },
+                    { value: "Prc32KRotated", displayValue: "Prc32KRotated", localizationId: "System.Drawing.Printing.PaperKind.Prc32KRotated" },
+                    { value: "PrcEnvelopeNumber1", displayValue: "PrcEnvelopeNumber1", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber1" },
+                    { value: "PrcEnvelopeNumber10", displayValue: "PrcEnvelopeNumber10", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber10" },
+                    { value: "PrcEnvelopeNumber10Rotated", displayValue: "PrcEnvelopeNumber10Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber10Rotated" },
+                    { value: "PrcEnvelopeNumber1Rotated", displayValue: "PrcEnvelopeNumber1Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber1Rotated" },
+                    { value: "PrcEnvelopeNumber2", displayValue: "PrcEnvelopeNumber2", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber2" },
+                    { value: "PrcEnvelopeNumber2Rotated", displayValue: "PrcEnvelopeNumber2Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber2Rotated" },
+                    { value: "PrcEnvelopeNumber3", displayValue: "PrcEnvelopeNumber3", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber3" },
+                    { value: "PrcEnvelopeNumber3Rotated", displayValue: "PrcEnvelopeNumber3Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber3Rotated" },
+                    { value: "PrcEnvelopeNumber4", displayValue: "PrcEnvelopeNumber4", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber4" },
+                    { value: "PrcEnvelopeNumber4Rotated", displayValue: "PrcEnvelopeNumber4Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber4Rotated" },
+                    { value: "PrcEnvelopeNumber5", displayValue: "PrcEnvelopeNumber5", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber5" },
+                    { value: "PrcEnvelopeNumber5Rotated", displayValue: "PrcEnvelopeNumber5Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber5Rotated" },
+                    { value: "PrcEnvelopeNumber6", displayValue: "PrcEnvelopeNumber6", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber6" },
+                    { value: "PrcEnvelopeNumber6Rotated", displayValue: "PrcEnvelopeNumber6Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber6Rotated" },
+                    { value: "PrcEnvelopeNumber7", displayValue: "PrcEnvelopeNumber7", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber7" },
+                    { value: "PrcEnvelopeNumber7Rotated", displayValue: "PrcEnvelopeNumber7Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber7Rotated" },
+                    { value: "PrcEnvelopeNumber8", displayValue: "PrcEnvelopeNumber8", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber8" },
+                    { value: "PrcEnvelopeNumber8Rotated", displayValue: "PrcEnvelopeNumber8Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber8Rotated" },
+                    { value: "PrcEnvelopeNumber9", displayValue: "PrcEnvelopeNumber9", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber9" },
+                    { value: "PrcEnvelopeNumber9Rotated", displayValue: "PrcEnvelopeNumber9Rotated", localizationId: "System.Drawing.Printing.PaperKind.PrcEnvelopeNumber9Rotated" },
+                    { value: "Quarto", displayValue: "Quarto", localizationId: "System.Drawing.Printing.PaperKind.Quarto" },
+                    { value: "Standard10x11", displayValue: "Standard10x11", localizationId: "System.Drawing.Printing.PaperKind.Standard10x11" },
+                    { value: "Standard10x14", displayValue: "Standard10x14", localizationId: "System.Drawing.Printing.PaperKind.Standard10x14" },
+                    { value: "Standard11x17", displayValue: "Standard11x17", localizationId: "System.Drawing.Printing.PaperKind.Standard11x17" },
+                    { value: "Standard12x11", displayValue: "Standard12x11", localizationId: "System.Drawing.Printing.PaperKind.Standard12x11" },
+                    { value: "Standard15x11", displayValue: "Standard15x11", localizationId: "System.Drawing.Printing.PaperKind.Standard15x11" },
+                    { value: "Standard9x11", displayValue: "Standard9x11", localizationId: "System.Drawing.Printing.PaperKind.Standard9x11" },
+                    { value: "Statement", displayValue: "Statement", localizationId: "System.Drawing.Printing.PaperKind.Statement" },
+                    { value: "Tabloid", displayValue: "Tabloid", localizationId: "System.Drawing.Printing.PaperKind.Tabloid" },
+                    { value: "TabloidExtra", displayValue: "TabloidExtra", localizationId: "System.Drawing.Printing.PaperKind.TabloidExtra" },
+                    { value: "USStandardFanfold", displayValue: "USStandardFanfold", localizationId: "System.Drawing.Printing.PaperKind.USStandardFanfold" }
+                ]
             };
-            Report.landscape = { propertyName: "landscape", modelName: "@Landscape", displayName: "Landscape", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.margins = { propertyName: "margins", modelName: "@Margins", from: Designer.Margins.fromString, displayName: "Margins", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.pageColor = { propertyName: "pageColor", modelName: "@PageColor", defaultVal: "White", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Page Color", editor: Designer.Widgets.editorTemplates.customColorEditor };
+            Report.landscape = { propertyName: "landscape", modelName: "@Landscape", displayName: "Landscape", localizationId: "DevExpress.XtraReports.UI.XtraReport.Landscape", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.margins = { propertyName: "margins", modelName: "@Margins", from: Designer.Margins.fromString, displayName: "Margins", localizationId: "DevExpress.XtraReports.UI.XtraReport.Margins", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.pageColor = { propertyName: "pageColor", modelName: "@PageColor", defaultVal: "White", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Page Color", localizationId: "DevExpress.XtraReports.UI.XtraReport.PageColor", editor: Designer.Widgets.editorTemplates.customColorEditor };
             Report.measureUnit = {
                 propertyName: "measureUnit",
-                modelName: "@ReportUnit", defaultVal: "HundredthsOfAnInch", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Measure Units", from: Designer.fromEnum,
-                values: {
-                    "HundredthsOfAnInch": "Hundredths of an Inch",
-                    "TenthsOfAMillimeter": "Tenths of a Millimeter",
-                    "Pixels": "Pixels"
-                }
+                modelName: "@ReportUnit", defaultVal: "HundredthsOfAnInch", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Measure Units", localizationId: "DevExpress.XtraReports.UI.XtraReport.ReportUnit", from: Designer.fromEnum,
+                valuesArray: [
+                    { value: "HundredthsOfAnInch", displayValue: "Hundredths of an Inch", localizationId: "DevExpress.XtraReports.UI.ReportUnit.HundredthsOfAnInch" },
+                    { value: "TenthsOfAMillimeter", displayValue: "Tenths of a Millimeter", localizationId: "DevExpress.XtraReports.UI.ReportUnit.TenthsOfAMillimeter" },
+                    { value: "Pixels", displayValue: "Pixels", localizationId: "DevExpress.XtraReports.UI.ReportUnit.Pixels" }
+                ]
             };
-            Report.snapGridSize = { propertyName: "snapGridSize", modelName: "@SnapGridSize", defaultVal: 12.5, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Snap Grid Size" };
-            Report.showPreviewMarginLines = { propertyName: "showPreviewMarginLines", modelName: "@ShowPreviewMarginLines", displayName: "Show Margin Lines in Preview", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.snapGridSize = { propertyName: "snapGridSize", modelName: "@SnapGridSize", defaultVal: 12.5, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Snap Grid Size", localizationId: "DevExpress.XtraReports.UI.XtraReport.SnapGridSize" };
+            Report.showPreviewMarginLines = { propertyName: "showPreviewMarginLines", modelName: "@ShowPreviewMarginLines", displayName: "Show Margin Lines in Preview", localizationId: "DevExpress.XtraReports.UI.XtraReport.ShowPreviewMarginLines", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.verticalContentSplitting = {
                 propertyName: "verticalContentSplitting",
-                modelName: "@VerticalContentSplitting", displayName: "Vertical Content Splitting", defaultVal: "Exact", from: Designer.fromEnum,
+                modelName: "@VerticalContentSplitting", displayName: "Vertical Content Splitting", localizationId: "DevExpress.XtraReports.UI.XtraReport.VerticalContentSplitting", defaultVal: "Exact", from: Designer.fromEnum,
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "Exact": "Exact",
-                    "Smart": "Smart"
-                }
+                valuesArray: [
+                    { value: "Exact", displayValue: "Exact", localizationId: "DevExpress.XtraPrinting.VerticalContentSplitting.Exact" },
+                    { value: "Smart", displayValue: "Smart", localizationId: "DevExpress.XtraPrinting.VerticalContentSplitting.Smart" }
+                ]
             };
-            Report.reportExportOptionsSerializationInfo = { propertyName: "exportOptions", modelName: "ExportOptions", displayName: "Export Options", from: Report.ExportOptions.from, toJsonObject: Report.ExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.reportExportOptionsSerializationInfo = { propertyName: "exportOptions", modelName: "ExportOptions", displayName: "Export Options", localizationId: "DevExpress.XtraReports.UI.XtraReport.ExportOptions", from: Report.ExportOptions.from, toJsonObject: Report.ExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.watermarkSerializationsInfo = [
                 Report.font, Report.foreColor,
-                { propertyName: "textTransparency", modelName: "@TextTransparency", displayName: "Text Transparency", defaultVal: 50, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "textTransparency", modelName: "@TextTransparency", displayName: "Text Transparency", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.TextTransparency", defaultVal: 50, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
                 {
-                    propertyName: "text", modelName: "@Text", displayName: "Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.comboboxEditable,
+                    propertyName: "text", modelName: "@Text", displayName: "Text", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.comboboxEditable,
                     values: {
                         "ASAP": "ASAP",
                         "CONFIDENTIAL": "CONFIDENTIAL",
@@ -18038,65 +18176,65 @@ var DevExpress;
                     }
                 },
                 {
-                    propertyName: "textDirection", modelName: "@TextDirection", displayName: "Text Direction", defaultVal: "ForwardDiagonal", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "Horizontal": "Horizontal",
-                        "ForwardDiagonal": "ForwardDiagonal",
-                        "BackwardDiagonal": "BackwardDiagonal",
-                        "Vertical": "Vertical"
-                    }
+                    propertyName: "textDirection", modelName: "@TextDirection", displayName: "Text Direction", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.TextDirection", defaultVal: "ForwardDiagonal", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    valuesArray: [
+                        { value: "Horizontal", displayValue: "Horizontal", localizationId: "DevExpress.XtraPrinting.Drawing.DirectionMode.Horizontal" },
+                        { value: "ForwardDiagonal", displayValue: "ForwardDiagonal", localizationId: "DevExpress.XtraPrinting.Drawing.DirectionMode.ForwardDiagonal" },
+                        { value: "BackwardDiagonal", displayValue: "BackwardDiagonal", localizationId: "DevExpress.XtraPrinting.Drawing.DirectionMode.BackwardDiagonal" },
+                        { value: "Vertical", displayValue: "Vertical", localizationId: "DevExpress.XtraPrinting.Drawing.DirectionMode.Vertical" }
+                    ]
                 },
-                { propertyName: "image", modelName: "@Image", displayName: "Image", editor: DevExpress.JS.Widgets.editorTemplates.image },
-                { propertyName: "imageTransparency", modelName: "@ImageTransparency", displayName: "Image Transparency", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-                { propertyName: "imageTiling", modelName: "@ImageTiling", displayName: "Image Tiling", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "image", modelName: "@Image", displayName: "Image", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.Image", editor: DevExpress.JS.Widgets.editorTemplates.image },
+                { propertyName: "imageTransparency", modelName: "@ImageTransparency", displayName: "Image Transparency", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.ImageTransparency", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "imageTiling", modelName: "@ImageTiling", displayName: "Image Tiling", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.ImageTiling", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
-                    propertyName: "imageAlign", modelName: "@ImageAlign", displayName: "Image Alignment", defaultVal: "MiddleCenter", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "TopLeft": "TopLeft",
-                        "TopCenter": "TopCenter",
-                        "TopRight": "TopRight",
-                        "MiddleLeft": "MiddleLeft",
-                        "MiddleCenter": "MiddleCenter",
-                        "MiddleRight": "MiddleRight",
-                        "BottomLeft": "BottomLeft",
-                        "BottomCenter": "BottomCenter",
-                        "BottomRight": "BottomRight"
-                    }
+                    propertyName: "imageAlign", modelName: "@ImageAlign", displayName: "Image Alignment", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.ImageAlign", defaultVal: "MiddleCenter", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    valuesArray: [
+                        { value: "TopLeft", displayValue: "TopLeft", localizationId: "System.Drawing.ContentAlignment.TopLeft" },
+                        { value: "TopCenter", displayValue: "TopCenter", localizationId: "System.Drawing.ContentAlignment.TopCenter" },
+                        { value: "TopRight", displayValue: "TopRight", localizationId: "System.Drawing.ContentAlignment.TopRight" },
+                        { value: "MiddleLeft", displayValue: "MiddleLeft", localizationId: "System.Drawing.ContentAlignment.MiddleLeft" },
+                        { value: "MiddleCenter", displayValue: "MiddleCenter", localizationId: "System.Drawing.ContentAlignment.MiddleCenter" },
+                        { value: "MiddleRight", displayValue: "MiddleRight", localizationId: "System.Drawing.ContentAlignment.MiddleRight" },
+                        { value: "BottomLeft", displayValue: "BottomLeft", localizationId: "System.Drawing.ContentAlignment.BottomLeft" },
+                        { value: "BottomCenter", displayValue: "BottomCenter", localizationId: "System.Drawing.ContentAlignment.BottomCenter" },
+                        { value: "BottomRight", displayValue: "BottomRight", localizationId: "System.Drawing.ContentAlignment.BottomRight" }
+                    ]
                 },
                 {
-                    propertyName: "imageViewMode", modelName: "@ImageViewMode", displayName: "Image View Mode", defaultVal: "Clip", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                        "Clip": "Clip",
-                        "Stretch": "Stretch",
-                        "Zoom": "Zoom"
-                    }
+                    propertyName: "imageViewMode", modelName: "@ImageViewMode", displayName: "Image View Mode", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.ImageViewMode", defaultVal: "Clip", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                        { value: "Clip", displayValue: "Clip", localizationId: "DevExpress.XtraPrinting.Drawing.ImageViewMode.Clip" },
+                        { value: "Stretch", displayValue: "Stretch", localizationId: "DevExpress.XtraPrinting.Drawing.ImageViewMode.Stretch" },
+                        { value: "Zoom", displayValue: "Zoom", localizationId: "DevExpress.XtraPrinting.Drawing.ImageViewMode.Zoom" }
+                    ]
                 },
-                { propertyName: "pageRange", modelName: "@PageRange", displayName: "Page Range", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "showBehind", modelName: "@ShowBehind", defaultVal: true, from: Designer.parseBool, displayName: "Show Behind", editor: DevExpress.JS.Widgets.editorTemplates.bool }
+                { propertyName: "pageRange", modelName: "@PageRange", displayName: "Page Range", localizationId: "DevExpress.XtraPrinting.Drawing.Watermark.PageRange", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "showBehind", modelName: "@ShowBehind", defaultVal: true, from: Designer.parseBool, displayName: "Show Behind", localizationId: "DevExpress.XtraPrinting.Drawing.PageWatermark.ShowBehind", editor: DevExpress.JS.Widgets.editorTemplates.bool }
             ];
-            Report.watermark = { propertyName: "watermark", modelName: "Watermark", displayName: "Watermark", info: Report.watermarkSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.rollPaper = { propertyName: "rollPaper", modelName: "@RollPaper", displayName: "Roll Paper", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Report.requestParameters = { propertyName: "requestParameters", modelName: "@RequestParameters", displayName: "Request Parameters", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Report.formattingRuleSheet = { propertyName: "formattingRuleSheet", modelName: "FormattingRuleSheet", displayName: "Formatting Rule Sheet", array: true };
-            Report.pageWidth = { propertyName: "pageWidth", modelName: "@PageWidth", displayName: "Page Width", defaultVal: "850", from: Designer.floatFromModel, toJsonObject: Designer.saveAsInt, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Report.pageHeight = { propertyName: "pageHeight", modelName: "@PageHeight", displayName: "Page Height", defaultVal: "1100", from: Designer.floatFromModel, toJsonObject: Designer.saveAsInt, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.watermark = { propertyName: "watermark", modelName: "Watermark", displayName: "Watermark", localizationId: "DevExpress.XtraReports.UI.XtraReport.Watermark", info: Report.watermarkSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.rollPaper = { propertyName: "rollPaper", modelName: "@RollPaper", displayName: "Roll Paper", localizationId: "DevExpress.XtraReports.UI.XtraReport.RollPaper", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Report.requestParameters = { propertyName: "requestParameters", modelName: "@RequestParameters", displayName: "Request Parameters", localizationId: "DevExpress.XtraReports.UI.XtraReport.RequestParameters", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Report.formattingRuleSheet = { propertyName: "formattingRuleSheet", modelName: "FormattingRuleSheet", displayName: "Formatting Rule Sheet", localizationId: "DevExpress.XtraReports.UI.XtraReport.FormattingRuleSheet", array: true };
+            Report.pageWidth = { propertyName: "pageWidth", modelName: "@PageWidth", displayName: "Page Width", localizationId: "DevExpress.XtraReports.UI.XtraReport.PageWidth", defaultVal: "850", from: Designer.floatFromModel, toJsonObject: Designer.saveAsInt, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Report.pageHeight = { propertyName: "pageHeight", modelName: "@PageHeight", displayName: "Page Height", localizationId: "DevExpress.XtraReports.UI.XtraReport.PageHeight", defaultVal: "1100", from: Designer.floatFromModel, toJsonObject: Designer.saveAsInt, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Report.scriptLanguage = {
-                propertyName: "scriptLanguage", modelName: "@ScriptLanguage", displayName: "Script Language", defaultVal: "CSharp", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "CSharp": "C#",
-                    "VisualBasic": "Visual Basic",
-                    "JScript": "JScript"
-                }
+                propertyName: "scriptLanguage", modelName: "@ScriptLanguage", displayName: "Script Language", localizationId: "DevExpress.XtraReports.UI.XtraReport.ScriptLanguage", defaultVal: "CSharp", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "CSharp", displayValue: "C#", localizationId: "DevExpress.XtraReports.ScriptLanguage.CSharp" },
+                    { value: "VisualBasic", displayValue: "Visual Basic", localizationId: "DevExpress.XtraReports.ScriptLanguage.VisualBasic" },
+                    { value: "JScript", displayValue: "JScript", localizationId: "DevExpress.XtraReports.ScriptLanguage.JScript" }
+                ]
             };
-            Report.scriptReferencesString = { propertyName: "scriptReferencesString", modelName: "@ScriptReferencesString", defaultVal: "", displayName: "Script References", editor: DevExpress.JS.Widgets.editorTemplates.stringArray };
+            Report.scriptReferencesString = { propertyName: "scriptReferencesString", modelName: "@ScriptReferencesString", defaultVal: "", displayName: "Script References", localizationId: "DevExpress.XtraReports.UI.XtraReport.ScriptReferencesString", editor: DevExpress.JS.Widgets.editorTemplates.stringArray };
             Report.calculatedFields = {
-                propertyName: "calculatedFields", modelName: "CalculatedFields", displayName: "Calculated Fields", array: true,
+                propertyName: "calculatedFields", modelName: "CalculatedFields", displayName: "Calculated Fields", localizationId: "DevExpress.XtraReports.UI.XtraReport.CalculatedFields", array: true,
                 template: "#dxrd-collectionItemWithAccordion",
                 editor: Report.editorTemplates.calculatedFields
             };
-            Report.bookmarkDuplicateSuppress = { propertyName: "bookmarkDuplicateSuppress", modelName: "@BookmarkDuplicateSuppress", displayName: "Bookmark Duplicate Suppress", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            Report.bookmarkDuplicateSuppress = { propertyName: "bookmarkDuplicateSuppress", modelName: "@BookmarkDuplicateSuppress", displayName: "Bookmark Duplicate Suppress", localizationId: "DevExpress.XtraReports.UI.XtraReport.BookmarkDuplicateSuppress", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             Report.horizontalContentSplitting = {
-                propertyName: "horizontalContentSplitting", modelName: "@HorizontalContentSplitting", displayName: "Horizontal Content Splitting", defaultVal: "Exact", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "Exact": "Exact",
-                    "Smart": "Smart"
-                }
+                propertyName: "horizontalContentSplitting", modelName: "@HorizontalContentSplitting", displayName: "Horizontal Content Splitting", localizationId: "DevExpress.XtraReports.UI.XtraReport.HorizontalContentSplitting", defaultVal: "Exact", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "Exact", displayValue: "Exact", localizationId: "DevExpress.XtraPrinting.HorizontalContentSplitting.Exact" },
+                    { value: "Smart", displayValue: "Smart", localizationId: "DevExpress.XtraPrinting.HorizontalContentSplitting.Smart" }
+                ]
             };
             Report.reportSerializationInfo = [
                 $.extend({}, Report.backColor, { defaultVal: "transparent" }),
@@ -18215,6 +18353,7 @@ var DevExpress;
                         for (var key in band.Bands) {
                             bands.push(new BandViewModel(band.Bands[key], this, serializer));
                         }
+                        BandViewModel.initLevels(bands);
                         bands.sort(Report.sortBands);
                     }
                     this.bands = ko.observableArray(bands);
@@ -18279,20 +18418,73 @@ var DevExpress;
                             this["filterString"].helper.parameters = this.root["parameters"];
                         }
                     }
-                    if (this["level"]) {
-                        this["_level"] = ko.observable(this["level"].peek());
-                        this["level"] = ko.pureComputed({
-                            read: function () { return _this["_level"](); },
+                    if (this.level) {
+                        this._level = ko.observable(this.level.peek());
+                        this.level = ko.pureComputed({
+                            read: function () { return _this._level(); },
                             write: function (newVal) {
                                 var parentBands = _this.parentModel() && _this.parentModel().bands;
-                                if (parentBands)
-                                    BandViewModel.reorderBands(parentBands, _this, newVal);
-                                else
-                                    _this["_level"](newVal);
+                                var groupArray = BandViewModel.generateArray(parentBands(), _this.controlType, newVal);
+                                var target = groupArray[newVal];
+                                groupArray.splice(newVal, 0, groupArray.splice(_this._level(), 1)[0]);
+                                _this._level(newVal);
+                                if (!!target) {
+                                    for (var i = newVal + 1; i < groupArray.length; i++) {
+                                        if (!groupArray[i] || groupArray[i]._level() === i)
+                                            break;
+                                        groupArray[i]._level(i);
+                                    }
+                                    for (var i = newVal - 1; i >= 0; i--) {
+                                        if (!groupArray[i] || groupArray[i]._level() === i)
+                                            break;
+                                        groupArray[i]._level(i);
+                                    }
+                                }
+                                BandViewModel.replaceArrays((_this.controlType === "GroupHeaderBand" ? groupArray.reverse() : groupArray).filter(function (x) { return !!x; }), parentBands, _this);
                             }
                         });
                     }
                 }
+                BandViewModel.initLevels = function (bands) {
+                    ["GroupHeaderBand", "GroupFooterBand", "DetailReportBand"].map(function (type) {
+                        return type === "GroupHeaderBand" ?
+                            bands.filter(function (b) { return b.controlType === type; }).sort(Report.sortBands).reverse() :
+                            bands.filter(function (b) { return b.controlType === type; }).sort(Report.sortBands);
+                    }).forEach(function (items) {
+                        for (var i = 0; i < items.length; i++) {
+                            if (items[i]._level() === 0) {
+                                items[i]._level(i);
+                            }
+                        }
+                    });
+                };
+                BandViewModel.generateArray = function (allbands, controlType, newLevel) {
+                    var array = allbands.filter(function (x) { return x.controlType === controlType; });
+                    newLevel = newLevel || array.length - 1;
+                    array = controlType === "GroupHeaderBand" ? array.reverse() : array;
+                    var length = (array.length > 0 && array[array.length - 1].level() > newLevel ? array[array.length - 1].level() : newLevel) + 1;
+                    var j = 0;
+                    var fakeArray = [];
+                    for (var i = 0; i < length; i++) {
+                        if (j < array.length && array[j]._level() === i) {
+                            fakeArray.push(array[j]);
+                            j++;
+                        }
+                        else {
+                            fakeArray.push(undefined);
+                        }
+                    }
+                    return fakeArray;
+                };
+                BandViewModel.replaceArrays = function (newArray, target, band) {
+                    if (newArray.length > 0) {
+                        var currentArray = target().filter(function (b) { return b.controlType === band.controlType; });
+                        var inc = target().indexOf(currentArray[0]);
+                        var from = currentArray.indexOf(band);
+                        var to = newArray.indexOf(band);
+                        target.splice(to + inc, 0, target.splice(inc + from, 1)[0]);
+                    }
+                };
                 BandViewModel.prototype.addChild = function (control) {
                     if (control instanceof BandViewModel) {
                         control.parentModel(this);
@@ -18340,22 +18532,20 @@ var DevExpress;
                         _super.prototype.removeChild.call(this, control);
                     }
                 };
-                BandViewModel._getSameKindBands = function (bands, band) {
-                    var sameKindBands = bands.filter(function (b) { return b.controlType === band.controlType; });
-                    if (band.controlType === "GroupHeaderBand")
-                        sameKindBands = sameKindBands.reverse();
-                    return sameKindBands;
-                };
                 BandViewModel.isReorderingBand = function (control) {
                     return ["GroupHeaderBand", "GroupFooterBand", "DetailReportBand"].indexOf(control.controlType) > -1;
                 };
-                BandViewModel.insertBandInPlaceOf = function (replaced, target, bands) {
-                    var index = BandViewModel._getSameKindBands(bands, replaced).indexOf(target);
-                    replaced["level"](index);
-                };
                 BandViewModel.insertBand = function (bands, newBand) {
                     if (newBand.controlType === "GroupHeaderBand" || newBand.controlType === "GroupFooterBand" || newBand.controlType === "DetailReportBand") {
-                        newBand["level"](bands().filter(function (band) { return band.controlType === newBand.controlType; }).length);
+                        var array = BandViewModel.generateArray(bands(), newBand.controlType);
+                        var level = array.length;
+                        for (var i = 0; i < array.length; i++) {
+                            if (!array[i]) {
+                                level = i;
+                                break;
+                            }
+                        }
+                        newBand._level(level);
                     }
                     BandViewModel.insertBandSorted(bands, newBand);
                 };
@@ -18373,38 +18563,6 @@ var DevExpress;
                         }
                         bands.splice(index, 0, newBand);
                     }
-                };
-                BandViewModel.reorderBands = function (bands, selectedBand, newLevel) {
-                    var oldLevel = selectedBand["_level"]();
-                    if (oldLevel === newLevel)
-                        return;
-                    var bandsValue = bands().slice(0);
-                    var previousBandIndex = bands().indexOf(selectedBand);
-                    if (previousBandIndex === -1) {
-                        bandsValue.push(selectedBand);
-                    }
-                    var selectedIndex = bandsValue.indexOf(selectedBand);
-                    if (newLevel < 0)
-                        newLevel = 0;
-                    else {
-                        var maxLevel = bandsValue.filter(function (band) { return band.controlType === selectedBand.controlType; }).length - 1;
-                        if (newLevel > maxLevel)
-                            newLevel = maxLevel;
-                    }
-                    if (oldLevel === newLevel)
-                        return;
-                    bandsValue.splice(selectedIndex, 1);
-                    var newIndex = bandsValue.indexOf(Designer.findFirstItemMatchesCondition(bandsValue, function (band) { return band.controlType === selectedBand.controlType && band["_level"]() === newLevel; }));
-                    if (newIndex >= selectedIndex)
-                        newIndex++;
-                    if (newIndex === -1) {
-                        newIndex = bandsValue.indexOf(Designer.findFirstItemMatchesCondition(bandsValue, function (band) { return (bandsWeight[band.controlType] > bandsWeight[selectedBand.controlType]) || (bandsWeight[band.controlType] === bandsWeight[selectedBand.controlType]) && (selectedBand.controlType === "GroupHeaderBand"); }));
-                    }
-                    if (previousBandIndex !== -1) {
-                        bands.splice(selectedIndex, 1);
-                    }
-                    bands.splice(newIndex, 0, selectedBand);
-                    BandViewModel._getSameKindBands(bands(), selectedBand).forEach(function (b, i) { return b["_level"](i); });
                 };
                 BandViewModel.getBandWeight = function (band) {
                     if (band.controlType === "GroupHeaderBand") {
@@ -18641,78 +18799,90 @@ var DevExpress;
             })(Designer.SurfaceElementBase);
             Report.BandSurface = BandSurface;
             var multiColumnSerializationsInfo = [
-                { propertyName: "columnCount", modelName: "@ColumnCount", displayName: "Column Count", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-                { propertyName: "columnWidth", modelName: "@ColumnWidth", displayName: "Column Width", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
-                { propertyName: "columnSpacing", modelName: "@ColumnSpacing", displayName: "Column Spacing", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
+                { propertyName: "columnCount", modelName: "@ColumnCount", displayName: "Column Count", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "columnWidth", modelName: "@ColumnWidth", displayName: "Column Width", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnWidth", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
+                { propertyName: "columnSpacing", modelName: "@ColumnSpacing", displayName: "Column Spacing", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnSpacing", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
                 {
-                    propertyName: "layout", modelName: "@Layout", displayName: "Layout", defaultVal: "DownThenAcross", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                        "DownThenAcross": "DownThenAcross",
-                        "AcrossThenDown": "AcrossThenDown"
-                    }
+                    propertyName: "layout", modelName: "@Layout", displayName: "Layout", localizationId: "DevExpress.XtraReports.UI.MultiColumn.Layout", defaultVal: "DownThenAcross", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                        { value: "DownThenAcross", displayValue: "DownThenAcross", localizationId: "DevExpress.XtraPrinting.ColumnLayout.DownThenAcross" },
+                        { value: "AcrossThenDown", displayValue: "AcrossThenDown", localizationId: "DevExpress.XtraPrinting.ColumnLayout.AcrossThenDown" }
+                    ]
                 }, {
-                    propertyName: "mode", modelName: "@Mode", displayName: "Mode", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                        "None": "None",
-                        "UseColumnCount": "UseColumnCount",
-                        "UseColumnWidth": "UseColumnWidth"
-                    }
+                    propertyName: "mode", modelName: "@Mode", displayName: "Mode", localizationId: "DevExpress.XtraReports.UI.MultiColumn.Mode", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.MultiColumnMode.None" },
+                        { value: "UseColumnCount", displayValue: "UseColumnCount", localizationId: "DevExpress.XtraReports.UI.MultiColumnMode.UseColumnCount" },
+                        { value: "UseColumnWidth", displayValue: "UseColumnWidth", localizationId: "DevExpress.XtraReports.UI.MultiColumnMode.UseColumnWidth" }
+                    ]
                 }
             ];
-            Report.multiColumn = { propertyName: "multiColumn", modelName: "MultiColumn", displayName: "Multi-Column Options", info: multiColumnSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.multiColumn = { propertyName: "multiColumn", modelName: "MultiColumn", displayName: "Multi-Column Options", localizationId: "DevExpress.XtraReports.UI.DetailBand.MultiColumn", info: multiColumnSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.expanded = { propertyName: "expanded", modelName: "@Expanded", from: Designer.parseBool, defaultVal: true };
             Report.groupFields = {
                 propertyName: "groupFields",
-                modelName: "GroupFields", displayName: "Group Fields", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.GroupFieldModel.createNew, template: '#dxrd-collection-item-group'
+                modelName: "GroupFields", displayName: "Group Fields", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBand.GroupFields", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection,
+                addHandler: DevExpress.Designer.Report.GroupFieldModel.createNew, template: '#dxrd-collection-item-group',
+                getChildCaption: function (index) {
+                    if (index === 0)
+                        return DevExpress.Designer.getLocalization('Group By', 'DataAccessUIStringId.QueryBuilderColumns_GroupBy');
+                    return DevExpress.Designer.getLocalization('Then By', 'ASPxReportsStringId.ReportDesigner_SortFields_ThenBy');
+                }
             };
-            Report.drillDownDetailReportExpanded = { propertyName: "drillDownDetailReportExpanded", modelName: "@DrillDownExpanded", displayName: "Drill-Down Expanded", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true }, Report.drillDownControl = { propertyName: "drillDownControl", modelName: "@DrillDownControl", displayName: "Drill-Down Control", link: true, defaultVal: null, editor: Report.editorTemplates.drillDownControls };
+            Report.drillDownDetailReportExpanded = { propertyName: "drillDownDetailReportExpanded", modelName: "@DrillDownExpanded", displayName: "Drill-Down Expanded", localizationId: "DevExpress.XtraReports.UI.Band.DrillDownExpanded", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true }, Report.drillDownControl = { propertyName: "drillDownControl", modelName: "@DrillDownControl", displayName: "Drill-Down Control", localizationId: "DevExpress.XtraReports.UI.Band.DrillDownControl", link: true, defaultVal: null, editor: Report.editorTemplates.drillDownControls };
             Report.sortFields = {
                 propertyName: "sortFields",
-                modelName: "SortFields", displayName: "Sort Fields", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.GroupFieldModel.createNew, template: '#dxrd-collection-item-group'
+                modelName: "SortFields", displayName: "Sort Fields", localizationId: "DevExpress.XtraReports.UI.DetailBand.SortFields", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection,
+                addHandler: DevExpress.Designer.Report.GroupFieldModel.createNew, template: '#dxrd-collection-item-group',
+                getChildCaption: function (index) {
+                    if (index === 0)
+                        return DevExpress.Designer.getLocalization('Sort By', 'ASPxReportsStringId.ReportDesigner_SortFields_SortBy');
+                    return DevExpress.Designer.getLocalization('Then By', 'ASPxReportsStringId.ReportDesigner_SortFields_ThenBy');
+                }
             };
             Report.groupUnion = {
                 propertyName: "groupUnion",
-                modelName: "@GroupUnion", displayName: "Group Union", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
-                values: {
-                    "None": "None",
-                    "WholePage": "Whole Page",
-                    "WithFirstDetail": "With First Detail"
-                }
+                modelName: "@GroupUnion", displayName: "Group Union", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBand.GroupUnion", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.GroupUnion.None" },
+                    { value: "WholePage", displayValue: "Whole Page", localizationId: "DevExpress.XtraReports.UI.GroupUnion.WholePage" },
+                    { value: "WithFirstDetail", displayValue: "With First Detail", localizationId: "DevExpress.XtraReports.UI.GroupUnion.WithFirstDetail" }
+                ]
             };
             Report.groupFooterUnion = {
                 propertyName: "groupFooterUnion",
-                modelName: "@GroupUnion", displayName: "Group Union", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
-                values: {
-                    "None": "None",
-                    "WithLastDetail": "With Last Detail"
-                }
+                modelName: "@GroupUnion", displayName: "Group Union", localizationId: "DevExpress.XtraReports.UI.GroupFooterBand.GroupUnion", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.GroupFooterUnion.None" },
+                    { value: "WithLastDetail", displayValue: "With Last Detail", localizationId: "DevExpress.XtraReports.UI.GroupFooterUnion.WithLastDetail" }
+                ]
             };
-            Report.printAtBottom = { propertyName: "printAtBottom", modelName: "@PrintAtBottom", defaultVal: false, from: Designer.parseBool, displayName: "Print at Bottom", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.printAtBottom = { propertyName: "printAtBottom", modelName: "@PrintAtBottom", defaultVal: false, from: Designer.parseBool, displayName: "Print at Bottom", localizationId: "DevExpress.XtraReports.UI.ReportFooterBand.PrintAtBottom", editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.printOn = {
                 propertyName: "printOn",
-                modelName: "@PrintOn", displayName: "Print On", defaultVal: "AllPages",
+                modelName: "@PrintOn", displayName: "Print On", localizationId: "DevExpress.XtraReports.UI.PageBand.PrintOn", defaultVal: "AllPages",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "AllPages": "All Pages",
-                    "NotWithReportHeader": "Not with Report Header",
-                    "NotWithReportFooter": "Not with Report Footer",
-                    "NotWithReportHeaderAndReportFooter": "Not with Report Header and Report Footer"
-                }
+                valuesArray: [
+                    { value: "AllPages", displayValue: "All Pages", localizationId: "DevExpress.XtraReports.UI.PrintOnPages.AllPages" },
+                    { value: "NotWithReportHeader", displayValue: "Not with Report Header", localizationId: "DevExpress.XtraReports.UI.PrintOnPages.NotWithReportHeader" },
+                    { value: "NotWithReportFooter", displayValue: "Not with Report Footer", localizationId: "DevExpress.XtraReports.UI.PrintOnPages.NotWithReportFooter" },
+                    { value: "NotWithReportHeaderAndReportFooter", displayValue: "Not with Report Header and Report Footer", localizationId: "DevExpress.XtraReports.UI.PrintOnPages.NotWithReportHeaderAndReportFooter" }
+                ]
             };
-            Report.level = { propertyName: "level", modelName: "@Level", displayName: "Level", defaultVal: 0, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.repeatEveryPage = { propertyName: "repeatEveryPage", modelName: "@RepeatEveryPage", displayName: "Repeat Every Page", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.level = { propertyName: "level", modelName: "@Level", displayName: "Level", localizationId: "DevExpress.XtraReports.UI.GroupBand.Level", defaultVal: 0, from: Designer.floatFromModel, editor: Report.editorTemplates.numericUndo };
+            Report.repeatEveryPage = { propertyName: "repeatEveryPage", modelName: "@RepeatEveryPage", displayName: "Repeat Every Page", localizationId: "DevExpress.XtraReports.UI.GroupBand.RepeatEveryPage", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.pageBreak = {
                 propertyName: "pageBreak",
-                modelName: "@PageBreak", displayName: "Page Break", defaultVal: "None", from: Designer.fromEnum,
+                modelName: "@PageBreak", displayName: "Page Break", localizationId: "DevExpress.XtraReports.UI.Band.PageBreak", defaultVal: "None", from: Designer.fromEnum,
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "None": "None",
-                    "BeforeBand": "Before the Band",
-                    "BeforeBandExceptFirstEntry": "Before the Band, Except for the First Entry",
-                    "AfterBand": "After the Band",
-                    "AfterBandExceptLastEntry": "After the Band, Except for the Last Entry"
-                }
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.PageBreak.None" },
+                    { value: "BeforeBand", displayValue: "Before the Band", localizationId: "DevExpress.XtraReports.UI.PageBreak.BeforeBand" },
+                    { value: "BeforeBandExceptFirstEntry", displayValue: "Before the Band, Except for the First Entry", localizationId: "DevExpress.XtraReports.UI.PageBreak.BeforeBandExceptFirstEntry" },
+                    { value: "AfterBand", displayValue: "After the Band", localizationId: "DevExpress.XtraReports.UI.PageBreak.AfterBand" },
+                    { value: "AfterBandExceptLastEntry", displayValue: "After the Band, Except for the Last Entry", localizationId: "DevExpress.XtraReports.UI.PageBreak.AfterBandExceptLastEntry" }
+                ]
             };
-            Report.keepTogetherWithDetailReports = { propertyName: "keepTogetherWithDetailReports", modelName: "@KeepTogetherWithDetailReports", defaultVal: false, from: Designer.parseBool, displayName: "Keep Together with Detail Reports", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.height = { propertyName: "height", modelName: "@HeightF", defaultVal: 100, displayName: "Height", from: Designer.floatFromModel };
+            Report.keepTogetherWithDetailReports = { propertyName: "keepTogetherWithDetailReports", modelName: "@KeepTogetherWithDetailReports", defaultVal: false, from: Designer.parseBool, displayName: "Keep Together with Detail Reports", localizationId: "DevExpress.XtraReports.UI.DetailBand.KeepTogetherWithDetailReports", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.height = { propertyName: "height", modelName: "@HeightF", defaultVal: 100, displayName: "Height", localizationId: "DevExpress.XtraReports.UI.Band.Height", from: Designer.floatFromModel };
             Report.commonBandSerializationInfo = [
                 Report.textAlignment, Report.expanded,
                 { propertyName: "controls", modelName: "Controls", array: true },
@@ -18741,26 +18911,22 @@ var DevExpress;
             Report.pageBandSerializationInfo = [Report.printOn, Report.commonBandScripts].concat(Report.bandSerializationInfo);
             var groupBand = [Report.keepTogetherDefaultValueFalse, Report.level, Report.pageBreak, Report.repeatEveryPage].concat(Report.bandSerializationInfo);
             var sortingSummarySerializationsInfo = [
-                { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
+                { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", localizationId: "DevExpress.XtraReports.UI.XRGroupSortingSummary.Enabled", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
                 {
-                    propertyName: "Function", modelName: "@Function", displayName: "Function", defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: $.extend({}, Report.summaryFunctionValues, {
-                        "RunningSum": "Running Summar",
-                        "Percentage": "Percentage",
-                        "RecordNumber": "Record Number"
-                    })
+                    propertyName: "Function", modelName: "@Function", displayName: "Function", localizationId: "DevExpress.XtraReports.UI.XRGroupSortingSummary.Function", defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    valuesArray: Report.summaryFunctionValues
                 },
-                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: "", editor: Designer.Widgets.editorTemplates.field },
-                { propertyName: "ignoreNullValues", modelName: "@IgnoreNullValues", displayName: "Ignore Null Values", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
+                { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", localizationId: "DevExpress.XtraReports.UI.XRGroupSortingSummary.FieldName", defaultVal: "", editor: Designer.Widgets.editorTemplates.field },
+                { propertyName: "ignoreNullValues", modelName: "@IgnoreNullValues", displayName: "Ignore Null Values", localizationId: "DevExpress.XtraReports.UI.XRGroupSortingSummary.IgnoreNullValues", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
                 {
-                    propertyName: "sortOrder", modelName: "@SortOrder", displayName: "SortOrder", defaultVal: "Ascending", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "Ascending": "Ascending",
-                        "Descending": "Descending"
-                    }
+                    propertyName: "sortOrder", modelName: "@SortOrder", displayName: "SortOrder", localizationId: "DevExpress.XtraReports.UI.XRGroupSortingSummary.SortOrder", defaultVal: "Ascending", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    valuesArray: [
+                        { value: "Ascending", displayValue: "Ascending", localizationId: "DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending" },
+                        { value: "Descending", displayValue: "Descending", localizationId: "DevExpress.XtraReports.UI.XRColumnSortOrder.Descending" }
+                    ]
                 },
             ];
-            Report.sortingSummary = { propertyName: "sortingSummary", modelName: "SortingSummary", displayName: "Sorting Summary", info: sortingSummarySerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.sortingSummary = { propertyName: "sortingSummary", modelName: "SortingSummary", displayName: "Sorting Summary", localizationId: "DevExpress.XtraReports.UI.GroupHeaderBand.SortingSummary", info: sortingSummarySerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.groupHeaderBandSerializationInfo = [Report.groupFields, Report.groupUnion, Report.sortingSummary, Report.drillDownDetailReportExpanded,
                 Report.drillDownControl, Report.groupHeaderBandScripts].concat(groupBand);
             Report.groupFooterBandSerializationInfo = [Report.groupFooterUnion, Report.printAtBottom, Report.groupBandScripts].concat(groupBand);
@@ -18836,24 +19002,24 @@ var DevExpress;
             Report.XRCheckboxSurface = XRCheckboxSurface;
             Report.checkState = {
                 propertyName: "checkState",
-                modelName: "@CheckState", displayName: "Check State", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                modelName: "@CheckState", displayName: "Check State", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 defaultVal: "Unchecked",
-                values: {
-                    "Unchecked": "Unchecked",
-                    "Checked": "Checked",
-                    "Indeterminate": "Indeterminate"
-                }
+                valuesArray: [
+                    { value: "Unchecked", displayValue: "Unchecked", localizationId: "System.Windows.Forms.CheckState.Unchecked" },
+                    { value: "Checked", displayValue: "Checked", localizationId: "System.Windows.Forms.CheckState.Checked" },
+                    { value: "Indeterminate", displayValue: "Indeterminate", localizationId: "System.Windows.Forms.CheckState.Indeterminate" }
+                ]
             };
-            Report.checked = { propertyName: "checked", modelName: "@Checked", defaultVal: false, from: Designer.parseBool, displayName: "Checked", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.checked = { propertyName: "checked", modelName: "@Checked", defaultVal: false, from: Designer.parseBool, displayName: "Checked", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.Checked", editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.glyphAlignment = {
                 propertyName: "glyphAlignment",
-                modelName: "@GlyphAlignment", displayName: "Glyph Alignment",
+                modelName: "@GlyphAlignment", displayName: "Glyph Alignment", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.GlyphAlignment",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                defaultVal: "Near", values: {
-                    "Near": "Near",
-                    "Center": "Center",
-                    "Far": "Far"
-                }
+                defaultVal: "Near", valuesArray: [
+                    { value: "Near", displayValue: "Near", localizationId: "DevExpress.Utils.HorzAlignment.Near" },
+                    { value: "Center", displayValue: "Center", localizationId: "DevExpress.Utils.HorzAlignment.Center" },
+                    { value: "Far", displayValue: "Far", localizationId: "DevExpress.Utils.HorzAlignment.Far" }
+                ]
             };
             Report.chekEditOptions = $.extend({}, Report.editOptions, {
                 propertyName: "checkEditOptions",
@@ -19081,18 +19247,21 @@ var DevExpress;
                 function ChartSurface(control, context) {
                     var _this = this;
                     _super.call(this, control, context);
+                    this.designTime = ko.observable(false);
                     this.imageSrc = ko.observable("");
                     this.template = "dxrd-shape";
                     this.contenttemplate = "dxrd-shape-content";
                     this.selectiontemplate = "dxrd-chart-selection";
                     this._disposables.push(ko.computed(function () {
-                        var _self = _this;
-                        if (Designer.Report.HandlerUri) {
-                            Report.ReportRenderingService.getChartImage(_this).done(function (result) {
-                                _self.imageSrc("data:image/x;base64," + result.Image);
-                            }).fail(function (jqXHR) {
-                                Designer.NotifyAboutWarning("Impossible to get chart image.");
-                            });
+                        if (!_this.designTime()) {
+                            var _self = _this;
+                            if (Designer.Report.HandlerUri) {
+                                Report.ReportRenderingService.getChartImage(_this).done(function (result) {
+                                    _self.imageSrc("data:image/x;base64," + result.Image);
+                                }).fail(function (jqXHR) {
+                                    Designer.NotifyAboutWarning("Impossible to get chart image.");
+                                });
+                            }
                         }
                     }));
                 }
@@ -19128,7 +19297,104 @@ var DevExpress;
                 }, toJsonObject: Designer.Chart.chart.toJsonObject
             };
             Report.xrChartSerializationInfo = [Report.chart, Report.stylePriority, Designer.Chart.chartDataSource, Report.imageType, Report.chartScripts,
-                { propertyName: "dataMember", displayName: Designer.getLocalization('DevExpress.XtraReports.UI.XRChart.DataMember', "Data Member"), defaultVal: "", editor: Designer.Widgets.editorTemplates.dataMember }].concat(Report.baseControlProperties, Report.sizeLocation, Report.bordersProperties);
+                { propertyName: "dataMember", displayName: "DevExpress.XtraReports.UI.XRChart.DataMember", localizationId: "Data Member", defaultVal: "", editor: Designer.Widgets.editorTemplates.dataMember }].concat(Report.baseControlProperties, Report.sizeLocation, Report.bordersProperties);
+            Report.createChartDesignerOptions = function (designerModel, dataSourceHelper, model, parameters, chartValueBindingProvider) {
+                var chartDesignerOptionsVisible = ko.observable(false);
+                var chartIsDirty;
+                var currentChart = ko.observable(null);
+                chartDesignerOptionsVisible.subscribe(function (newVal) {
+                    if (newVal) {
+                        currentChart().designTime(true);
+                        designerModel.undoEngine().start();
+                    }
+                    else {
+                        designerModel.undoEngine().end();
+                        var isDirty = chartIsDirty();
+                        chartDesignerOptions.options.data.chart(null);
+                        if (isDirty) {
+                            var undoEngine = designerModel.undoEngine();
+                            undoEngine.undo();
+                            undoEngine.redoEnabled(false);
+                            undoEngine._observers.pop();
+                        }
+                        currentChart().designTime(false);
+                        currentChart(null);
+                    }
+                });
+                var chartDesignerOptions = {
+                    options: null,
+                    visible: chartDesignerOptionsVisible,
+                    buttons: [{
+                            toolbar: 'bottom', location: 'after', widget: 'button', options: {
+                                text: Designer.getLocalization('OK'), onClick: function () {
+                                    chartIsDirty(false);
+                                    chartDesignerOptionsVisible(false);
+                                }
+                            }
+                        },
+                        {
+                            toolbar: 'bottom', location: 'after', widget: 'button', options: {
+                                text: Designer.getLocalization("Cancel"), onClick: function () {
+                                    chartDesignerOptionsVisible(false);
+                                }
+                            }
+                        }],
+                    run: function (chartSurface) {
+                        var xrChart = chartSurface._control;
+                        currentChart(chartSurface);
+                        if (!chartDesignerOptions.options) {
+                            chartDesignerOptions.options = {
+                                callbacks: {
+                                    customizeActions: function (actions) {
+                                        for (var i = 0; i < actions.length; i++) {
+                                            if (actions[i].id === DevExpress.Designer.ActionId.Undo || actions[i].id === DevExpress.Designer.ActionId.Redo) {
+                                                actions[i].hasSeparator = false;
+                                            }
+                                            else {
+                                                actions[i].visible = false;
+                                                actions[i].hasSeparator = false;
+                                            }
+                                        }
+                                    },
+                                    init: function (chartModel) {
+                                        chartIsDirty = ko.computed({
+                                            read: function () {
+                                                return chartModel.undoEngine().isDirty();
+                                            },
+                                            write: function (newVal) {
+                                                chartModel.undoEngine().isDirty(newVal);
+                                            }
+                                        });
+                                        chartModel.displayNameProvider = designerModel.displayNameProvider;
+                                        chartModel.dataSourceHelper = dataSourceHelper;
+                                        chartModel.reportParameters = ko.computed(function () { return parameters().parameters(); });
+                                        chartModel.reportDataSource = ko.computed(function () { return dataSourceHelper().findDataSourceInfo(model().dataSource()); });
+                                        chartModel.reportDataBindingsProvider = chartValueBindingProvider;
+                                        chartDesignerOptionsVisible.subscribe(function (newVal) {
+                                            if (newVal) {
+                                                chartModel.updateSurfaceSize();
+                                            }
+                                        });
+                                    }
+                                },
+                                data: {
+                                    chart: ko.observable(xrChart.chartModel),
+                                    availableChartDataSources: designerModel.chartDataSources,
+                                    width: 500,
+                                    height: 500
+                                },
+                                rtl: designerModel.rtl,
+                                fieldListProvider: designerModel.dataBindingsProvider
+                            };
+                        }
+                        else {
+                            chartDesignerOptions.options.data.chart(xrChart.chartModel);
+                        }
+                        chartDesignerOptions.visible(true);
+                    }
+                };
+                return chartDesignerOptions;
+            };
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -19211,41 +19477,52 @@ var DevExpress;
                 return SortBySummaryInfo;
             })();
             Pivot.SortBySummaryInfo = SortBySummaryInfo;
-            Pivot.summaryTypeValues = {
-                "Count": "Count",
-                "Sum": "Sum",
-                "Min": "Min",
-                "Max": "Max",
-                "Average": "Average",
-                "StdDev": "Standard Deviation",
-                "StdDevp": "Standard Deviation for Entire Population",
-                "Var": "Variation",
-                "Varp": "Variation for Entire Population",
-                "Custom": "Custom"
-            }, Pivot.summaryType = { propertyName: "summaryType", modelName: "@SummaryType", displayName: "Summary Type", defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Pivot.summaryTypeValues }, Pivot.fieldComponentName = { propertyName: "fieldComponentName", modelName: "@FieldComponentName", displayName: "Field", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "": DevExpress.Designer.getLocalization("(" + "none" + ")") } }, Pivot.sortBySummaryConditionInfo = [
+            Pivot.summaryTypeValues = [
+                { value: "Count", displayValue: "Count", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Count" },
+                { value: "Sum", displayValue: "Sum", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Sum" },
+                { value: "Min", displayValue: "Min", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Min" },
+                { value: "Max", displayValue: "Max", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Max" },
+                { value: "Average", displayValue: "Average", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Average" },
+                { value: "StdDev", displayValue: "Standard Deviation", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.StdDev" },
+                { value: "StdDevp", displayValue: "Standard Deviation for Entire Population", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.StdDevp" },
+                { value: "Var", displayValue: "Variation", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Var" },
+                { value: "Varp", displayValue: "Variation for Entire Population", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Varp" },
+                { value: "Custom", displayValue: "Custom", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryType.Custom" }
+            ], Pivot.summaryType = {
+                propertyName: "summaryType", modelName: "@SummaryType", displayName: "Summary Type", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.SummaryType",
+                defaultVal: "Sum", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Pivot.summaryTypeValues
+            }, Pivot.fieldComponentName = {
+                propertyName: "fieldComponentName", modelName: "@FieldComponentName", displayName: "Field", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldSortBySummaryInfo.Field",
+                defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "": DevExpress.Designer.getLocalization("(" + "none" + ")") }
+            }, Pivot.conditions = {
+                propertyName: "conditions", modelName: "Conditions", displayName: "Conditions", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldSortBySummaryInfo.Conditions", array: true,
+                template: "#dxrd-commonCollectionItem",
+                editor: { custom: "dxrd-pivot-sortBySummaryInfo-conditions" }
+            }, Pivot.field = { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldSortBySummaryInfo.FieldName", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.customTotalSummaryType = {
+                propertyName: "customTotalSummaryType", modelName: "@CustomTotalSummaryType", displayName: "Custom Total Summary Type", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldSortBySummaryInfo.CustomTotalSummaryType",
+                defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: $.extend({ "": Designer.getLocalization("(" + "none" + ")") }, Pivot.summaryTypeValues)
+            };
+            Pivot.sortBySummaryInfo = [Pivot.conditions, Pivot.customTotalSummaryType, Pivot.fieldComponentName, Pivot.field, Pivot.summaryType];
+            Pivot.sortBySummaryConditionInfo = [
                 Pivot.fieldComponentName,
                 { modelName: "@Value", propertyName: "value", displayName: "Value", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
-                    modelName: "@Value_type", propertyName: "valueType", displayName: "Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "<Null>", values: {
-                        "System.String": "String",
-                        "System.Byte": "Number (8 bit integer)",
-                        "System.Int16": "Number (16 bit integer)",
-                        "System.Int32": "Number (32 bit integer)",
-                        "System.Int64": "Number (64 bit integer)",
-                        "System.Single": "Number (floating-point)",
-                        "System.Double": "Number (double-precision floating-point)",
-                        "System.Decimal": "Number (decimal)",
-                        "System.Boolean": "Boolean",
-                        "System.Char": "Char",
-                        "System.DateTime": "Date",
-                        "<Null>": "<Null>"
-                    }
+                    modelName: "@Value_type", propertyName: "valueType", displayName: "Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "<Null>", valuesArray: [
+                        { value: "System.String", displayValue: "String", localizationId: "UtilsUIStringId.Parameter_Type_String" },
+                        { value: "System.Byte", displayValue: "Number (8 bit integer)", localizationId: "DataAccessStringId.Type_SByte" },
+                        { value: "System.Int16", displayValue: "Number (16 bit integer)", localizationId: "UtilsUIStringId.Parameter_Type_Int16" },
+                        { value: "System.Int32", displayValue: "Number (32 bit integer)", localizationId: "UtilsUIStringId.Parameter_Type_Int32" },
+                        { value: "System.Int64", displayValue: "Number (64 bit integer)", localizationId: "UtilsUIStringId.Parameter_Type_Int64" },
+                        { value: "System.Single", displayValue: "Number (floating-point)", localizationId: "UtilsUIStringId.Parameter_Type_Float" },
+                        { value: "System.Double", displayValue: "Number (double-precision floating-point)", localizationId: "UtilsUIStringId.Parameter_Type_Double" },
+                        { value: "System.Decimal", displayValue: "Number (decimal)", localizationId: "UtilsUIStringId.Parameter_Type_Decimal" },
+                        { value: "System.Boolean", displayValue: "Boolean", localizationId: "UtilsUIStringId.Parameter_Type_Boolean" },
+                        { value: "System.Char", displayValue: "Char", localizationId: "DataAccessStringId.Type_Char" },
+                        { value: "System.DateTime", displayValue: "Date", localizationId: "UtilsUIStringId.Parameter_Type_DateTime" },
+                        { value: "<Null>", displayValue: "<Null>" }
+                    ]
                 }
-            ], Pivot.conditions = {
-                propertyName: "conditions", modelName: "Conditions", displayName: "Conditions", array: true,
-                template: "#dxrd-commonCollectionItem",
-                editor: { custom: "dxrd-pivot-sortBySummaryInfo-conditions" }
-            }, Pivot.field = { propertyName: "fieldName", modelName: "@FieldName", displayName: "Field Name", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.customTotalSummaryType = { propertyName: "customTotalSummaryType", modelName: "@CustomTotalSummaryType", displayName: "Custom Total Summary Type", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: $.extend({ "": Designer.getLocalization("(" + "none" + ")") }, Pivot.summaryTypeValues) }, Pivot.sortBySummaryInfo = [Pivot.conditions, Pivot.customTotalSummaryType, Pivot.fieldComponentName, Pivot.field, Pivot.summaryType];
+            ];
         })(Pivot = Designer.Pivot || (Designer.Pivot = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -19336,175 +19613,175 @@ var DevExpress;
                 return PivotGridFieldSurface;
             })(Designer.Report.ControlSurfaceBase);
             Pivot.PivotGridFieldSurface = PivotGridFieldSurface;
-            Pivot.caption = { displayName: "Caption", propertyName: "caption", modelName: "@Caption", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.index = { displayName: "Index", propertyName: "index", modelName: "@Index", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.fieldName = { propertyName: "fieldName", modelName: "@FieldName", displayName: "Data Column Name", editor: Designer.Widgets.editorTemplates.field }, Pivot.minWidth = { displayName: "Min Width", propertyName: "minWidth", modelName: "@MinWidth", defaultVal: 20, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.width = { displayName: "Width", propertyName: "width", modelName: "@Width", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.area = {
-                displayName: "Area", propertyName: "area", modelName: "@Area", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "FilterArea",
-                values: {
-                    "RowArea": "Row Area",
-                    "ColumnArea": "Column Area",
-                    "FilterArea": "Filter Area",
-                    "DataArea": "Data Area",
-                }
+            Pivot.caption = { displayName: "Caption", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.Caption", propertyName: "caption", modelName: "@Caption", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.index = { displayName: "Index", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridField.Index", propertyName: "index", modelName: "@Index", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.fieldName = { propertyName: "fieldName", modelName: "@FieldName", displayName: "Data Column Name", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.FieldName", editor: Designer.Widgets.editorTemplates.field }, Pivot.minWidth = { displayName: "Min Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.MinWidth", propertyName: "minWidth", modelName: "@MinWidth", defaultVal: 20, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.width = { displayName: "Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.Width", propertyName: "width", modelName: "@Width", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.area = {
+                displayName: "Area", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.Area", propertyName: "area", modelName: "@Area", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "FilterArea",
+                valuesArray: [
+                    { value: "RowArea", displayValue: "Row Area", localizationId: "DevExpress.XtraPivotGrid.PivotArea.RowArea" },
+                    { value: "ColumnArea", displayValue: "Column Area", localizationId: "DevExpress.XtraPivotGrid.PivotArea.ColumnArea" },
+                    { value: "FilterArea", displayValue: "Filter Area", localizationId: "DevExpress.XtraPivotGrid.PivotArea.FilterArea" },
+                    { value: "DataArea", displayValue: "Data Area", localizationId: "DevExpress.XtraPivotGrid.PivotArea.DataArea" },
+                ]
             }, Pivot.allowedAreas = {
-                propertyName: "allowedAreas", modelName: "@AllowedAreas", displayName: "Allowed Areas", defaultVal: "All", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "All": "All",
-                    "RowArea": "Row Area",
-                    "ColumnArea": "Column Area",
-                    "FilterArea": "Filter Area",
-                    "DataArea": "Data Area"
-                }
-            }, Pivot.areaIndex = { propertyName: "areaIndex", modelName: "@AreaIndex", defaultVal: -1 }, Pivot.areaIndexEditable = { propertyName: "areaIndexEditable", displayName: "Area Index", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+                propertyName: "allowedAreas", modelName: "@AllowedAreas", displayName: "Allowed Areas", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.AllowedAreas", defaultVal: "All", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "All", displayValue: "All", localizationId: "DevExpress.XtraPivotGrid.PivotGridAllowedAreas.All" },
+                    { value: "RowArea", displayValue: "Row Area", localizationId: "DevExpress.XtraPivotGrid.PivotGridAllowedAreas.RowArea" },
+                    { value: "ColumnArea", displayValue: "Column Area", localizationId: "DevExpress.XtraPivotGrid.PivotGridAllowedAreas.ColumnArea" },
+                    { value: "FilterArea", displayValue: "Filter Area", localizationId: "DevExpress.XtraPivotGrid.PivotGridAllowedAreas.FilterArea" },
+                    { value: "DataArea", displayValue: "Data Area", localizationId: "DevExpress.XtraPivotGrid.PivotGridAllowedAreas.DataArea" }
+                ]
+            }, Pivot.areaIndex = { propertyName: "areaIndex", modelName: "@AreaIndex", defaultVal: -1 }, Pivot.areaIndexEditable = { propertyName: "areaIndexEditable", displayName: "Area Index", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.AreaIndex", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Pivot.unboundType = {
-                propertyName: "unboundType", modelName: "@UnboundType", displayName: "Unbound Type", defaultVal: "Bound", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Bound": "Bound",
-                    "Integer": "Integer",
-                    "Decimal": "Decimal",
-                    "DateTime": "DateTime",
-                    "String": "String",
-                    "Boolean": "Boolean",
-                    "Object": "Object"
-                }
-            }, Pivot.unboundFieldName = { propertyName: "unboundFieldName", modelName: "@UnboundFieldName", displayName: "Unbound Field Name", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.unboundExpression = { propertyName: "unboundExpression", modelName: "@UnboundExpression", displayName: "Unbound Expression", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.topValueType = {
-                propertyName: "topValueType", modelName: "@TopValueType", displayName: "Top Value Type", defaultVal: "Absolute", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Absolute": "Absolute",
-                    "Percent": "Percent",
-                    "Sum": "Sum"
-                }
-            }, Pivot.topValueShowOthers = { propertyName: "topValueShowOthers", modelName: "@TopValueShowOthers", displayName: "Top Value Show Others", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.topValueCount = { propertyName: "topValueCount", modelName: "@TopValueCount", displayName: "Top Value Count", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.summaryDisplayType = {
-                propertyName: "summaryDisplayType", modelName: "@SummaryDisplayType", displayName: "Summary Display Type", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Default": "Default",
-                    "AbsoluteVariation": "Absolute Variation",
-                    "PercentVariation": "Percent Variation",
-                    "PercentOfColumn": "Percent Of Column",
-                    "PercentOfRow": "Percent Of Row",
-                    "PercentOfColumnGrandTotal": "Percent Of Column Grand Total",
-                    "PercentOfRowGrandTotal": "Percent Of Row Grand Total",
-                    "PercentOfGrandTotal": "Percent Of Grand Total",
-                    "RankInColumnSmallestToLargest": "Rank In Column Smallest To Largest",
-                    "RankInRowSmallestToLargest": "Rank In Row Smallest To Largest",
-                    "RankInColumnLargestToSmallest": "Rank In Column Largest To Smallest",
-                    "RankInRowLargestToSmallest": "Rank In Row Largest To Smallest",
-                    "Index": "Index"
-                }
+                propertyName: "unboundType", modelName: "@UnboundType", displayName: "Unbound Type", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.UnboundType", defaultVal: "Bound", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Bound", displayValue: "Bound", localizationId: "DevExpress.Data.UnboundColumnType.Bound" },
+                    { value: "Integer", displayValue: "Integer", localizationId: "DevExpress.Data.UnboundColumnType.Integer" },
+                    { value: "Decimal", displayValue: "Decimal", localizationId: "DevExpress.Data.UnboundColumnType.Decimal" },
+                    { value: "DateTime", displayValue: "DateTime", localizationId: "DevExpress.XtraTreeList.Data.UnboundColumnType.DateTime" },
+                    { value: "String", displayValue: "String", localizationId: "DevExpress.Data.UnboundColumnType.String" },
+                    { value: "Boolean", displayValue: "Boolean", localizationId: "DevExpress.Data.UnboundColumnType.Boolean" },
+                    { value: "Object", displayValue: "Object", localizationId: "DevExpress.Data.UnboundColumnType.Object" }
+                ]
+            }, Pivot.unboundFieldName = { propertyName: "unboundFieldName", modelName: "@UnboundFieldName", displayName: "Unbound Field Name", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.UnboundFieldName", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.unboundExpression = { propertyName: "unboundExpression", modelName: "@UnboundExpression", displayName: "Unbound Expression", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.UnboundExpression", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.topValueType = {
+                propertyName: "topValueType", modelName: "@TopValueType", displayName: "Top Value Type", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.TopValueType", defaultVal: "Absolute", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Absolute", displayValue: "Absolute", localizationId: "DevExpress.XtraPivotGrid.PivotTopValueType.Absolute" },
+                    { value: "Percent", displayValue: "Percent", localizationId: "DevExpress.XtraPivotGrid.PivotTopValueType.Percent" },
+                    { value: "Sum", displayValue: "Sum", localizationId: "DevExpress.XtraPivotGrid.PivotTopValueType.Sum" }
+                ]
+            }, Pivot.topValueShowOthers = { propertyName: "topValueShowOthers", modelName: "@TopValueShowOthers", displayName: "Top Value Show Others", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.TopValueShowOthers", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.topValueCount = { propertyName: "topValueCount", modelName: "@TopValueCount", displayName: "Top Value Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.TopValueCount", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.summaryDisplayType = {
+                propertyName: "summaryDisplayType", modelName: "@SummaryDisplayType", displayName: "Summary Display Type", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.SummaryDisplayType", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.Default" },
+                    { value: "AbsoluteVariation", displayValue: "Absolute Variation", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.AbsoluteVariation" },
+                    { value: "PercentVariation", displayValue: "Percent Variation", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.PercentVariation" },
+                    { value: "PercentOfColumn", displayValue: "Percent Of Column", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.PercentOfColumn" },
+                    { value: "PercentOfRow", displayValue: "Percent Of Row", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.PercentOfRow" },
+                    { value: "PercentOfColumnGrandTotal", displayValue: "Percent Of Column Grand Total", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.PercentOfColumnGrandTotal" },
+                    { value: "PercentOfRowGrandTotal", displayValue: "Percent Of Row Grand Total", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.PercentOfRowGrandTotal" },
+                    { value: "PercentOfGrandTotal", displayValue: "Percent Of Grand Total", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.PercentOfGrandTotal" },
+                    { value: "RankInColumnSmallestToLargest", displayValue: "Rank In Column Smallest To Largest", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.RankInColumnSmallestToLargest" },
+                    { value: "RankInRowSmallestToLargest", displayValue: "Rank In Row Smallest To Largest", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.RankInRowSmallestToLargest" },
+                    { value: "RankInColumnLargestToSmallest", displayValue: "Rank In Column Largest To Smallest", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.RankInColumnLargestToSmallest" },
+                    { value: "RankInRowLargestToSmallest", displayValue: "Rank In Row Largest To Smallest", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.RankInRowLargestToSmallest" },
+                    { value: "Index", displayValue: "Index", localizationId: "DevExpress.Data.PivotGrid.PivotSummaryDisplayType.Index" }
+                ]
             }, Pivot.sortOrder = {
-                propertyName: "sortOrder", modelName: "@SortOrder", displayName: "Sort Order", defaultVal: "Ascending", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Ascending": "Ascending", "Descending": "Descending"
-                }
+                propertyName: "sortOrder", modelName: "@SortOrder", displayName: "Sort Order", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.SortOrder", defaultVal: "Ascending", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Ascending", displayValue: "Ascending", localizationId: "DevExpress.XtraPivotGrid.PivotSortOrder.Ascending" }, { value: "Descending", displayValue: "Descending", localizationId: "DevExpress.XtraPivotGrid.PivotSortOrder.Descending" }
+                ]
             }, Pivot.sortMode = {
-                propertyName: "sortMode", modelName: "@SortMode", displayName: "Sort Mode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Default": "Default",
-                    "Value": "Value",
-                    "Display Text": "DisplayText",
-                    "Custom": "Custom",
-                    "Key": "Key",
-                    "ID": "ID",
-                    "None": "None"
-                }
-            }, Pivot.showNewValues = { propertyName: "showNewValues", modelName: "@ShowNewValues", displayName: "Show New Values", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.runningTotal = { propertyName: "runningTotal", modelName: "@RunningTotal", displayName: "Running Total", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.groupIntervalNumericRange = { propertyName: "groupIntervalNumericRange", modelName: "@GroupIntervalNumericRange", displayName: "Group Interval Numeric Range", defaultVal: 10, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.groupInterval = {
-                propertyName: "groupInterval", modelName: "@GroupInterval", displayName: "Group Interval", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Default": "Default",
-                    "Date": "Date",
-                    "Day": "DateDay",
-                    "DateDayOfWeek": "Day Of Week",
-                    "DateDayOfYear": "Day Of Year",
-                    "DateWeekOfMonth": "Week Of Month",
-                    "DateWeekOfYear": "Week Of Year",
-                    "DateMonth": "Month",
-                    "DateQuarter": "Quarter",
-                    "DateYear": "Year",
-                    "YearAge": "Year Age",
-                    "MonthAge": "Month Age",
-                    "WeekAge": "Week Age",
-                    "DayAge": "Day Age",
-                    "Alphabetical": "Alphabetical",
-                    "Numeric": "Numeric",
-                    "Hour": "Hour",
-                    "Custom": "Custom",
-                    "Minute": "Minute",
-                    "Second": "Second",
-                    "DateMonthYear": "Month-Year",
-                    "DateQuarterYear": "Quarter-Year",
-                    "DateHour": "Date-Hour",
-                    "DateHourMinute": "Date-Hour-Minute",
-                    "DateHourMinuteSecond": "Date-Hour-Minute-Second"
-                }
-            }, Pivot.grandTotalText = { propertyName: "grandTotalText", modelName: "@GrandTotalText", displayName: "Grand Total Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.expandedInFieldsGroup = { propertyName: "expandedInFieldsGroup", modelName: "@ExpandedInFieldsGroup", displayName: "Expanded In Fields Group", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.emptyValueText = { propertyName: "emptyValueText", modelName: "@EmptyValueText", displayName: "Empty Value Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.emptyCellText = { propertyName: "emptyCellText", modelName: "@EmptyCellText", displayName: "Empty Cell Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.displayFolder = { propertyName: "displayFolder", modelName: "@DisplayFolder", displayName: "Display Folder", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.columnValueLineCount = { propertyName: "columnValueLineCount", modelName: "@ColumnValueLineCount", displayName: "Column Value Line Count", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.totalsVisibility = {
-                propertyName: "totalsVisibility", modelName: "@TotalsVisibility", displayName: "Totals Visibility", defaultVal: "AutomaticTotals", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "AutomaticTotals": "Automatic Totals",
-                    "CustomTotals": "Custom Totals",
-                    "None": "None"
-                }
-            }, Pivot.useNativeFormat = { propertyName: "useNativeFormat", modelName: "@UseNativeFormat", displayName: "Export As Numbers To Excel", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, Pivot.KPIGraphic = {
-                propertyName: "KPIGraphic", modelName: "@KPIGraphic", displayName: "KPI Graphic", defaultVal: "ServerDefined", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "None": "None",
-                    "ServerDefined": "Server Defined",
-                    "Shapes": "Shapes",
-                    "TrafficLights": "Traffic Lights",
-                    "RoadSigns": "Road Signs",
-                    "Gauge": "Gauge",
-                    "ReversedGauge": "Reversed Gauge",
-                    "Thermometer": "Thermometer",
-                    "ReversedThermometer": "Reversed Thermometer",
-                    "Cylinder": "Cylinder",
-                    "ReversedCylinder": "Reversed Cylinder",
-                    "Faces": "Faces",
-                    "VarianceArrow": "Variance Arrow",
-                    "StandardArrow": "Standard Arrow",
-                    "StatusArrow": "Status Arrow",
-                    "ReversedStatusArrow": "Reversed Status Arrow"
-                }
+                propertyName: "sortMode", modelName: "@SortMode", displayName: "Sort Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.SortMode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.Default" },
+                    { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.Value" },
+                    { value: "DisplayText", displayValue: "DisplayText", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.DisplayText" },
+                    { value: "Custom", displayValue: "Custom", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.Custom" },
+                    { value: "Key", displayValue: "Key", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.Key" },
+                    { value: "ID", displayValue: "ID", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.ID" },
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPivotGrid.PivotSortMode.None" }
+                ]
+            }, Pivot.showNewValues = { propertyName: "showNewValues", modelName: "@ShowNewValues", displayName: "Show New Values", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.ShowNewValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.runningTotal = { propertyName: "runningTotal", modelName: "@RunningTotal", displayName: "Running Total", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.RunningTotal", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridField.RowValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.groupIntervalNumericRange = { propertyName: "groupIntervalNumericRange", modelName: "@GroupIntervalNumericRange", displayName: "Group Interval Numeric Range", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.GroupIntervalNumericRange", defaultVal: 10, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.groupInterval = {
+                propertyName: "groupInterval", modelName: "@GroupInterval", displayName: "Group Interval", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridField.GroupInterval", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Default" },
+                    { value: "Date", displayValue: "Date", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Date" },
+                    { value: "DateDay", displayValue: "DateDay", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateDay" },
+                    { value: "DateDayOfWeek", displayValue: "Day Of Week", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateDayOfWeek" },
+                    { value: "DateDayOfYear", displayValue: "Day Of Year", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateDayOfYear" },
+                    { value: "DateWeekOfMonth", displayValue: "Week Of Month", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateWeekOfMonth" },
+                    { value: "DateWeekOfYear", displayValue: "Week Of Year", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateWeekOfYear" },
+                    { value: "DateMonth", displayValue: "Month", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateMonth" },
+                    { value: "DateQuarter", displayValue: "Quarter", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateQuarter" },
+                    { value: "DateYear", displayValue: "Year", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateYear" },
+                    { value: "YearAge", displayValue: "Year Age", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.YearAge" },
+                    { value: "MonthAge", displayValue: "Month Age", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.MonthAge" },
+                    { value: "WeekAge", displayValue: "Week Age", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.WeekAge" },
+                    { value: "DayAge", displayValue: "Day Age", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DayAge" },
+                    { value: "Alphabetical", displayValue: "Alphabetical", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Alphabetical" },
+                    { value: "Numeric", displayValue: "Numeric", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Numeric" },
+                    { value: "Hour", displayValue: "Hour", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Hour" },
+                    { value: "Custom", displayValue: "Custom", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Custom" },
+                    { value: "Minute", displayValue: "Minute", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Minute" },
+                    { value: "Second", displayValue: "Second", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.Second" },
+                    { value: "DateMonthYear", displayValue: "Month-Year", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateMonthYear" },
+                    { value: "DateQuarterYear", displayValue: "Quarter-Year", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateQuarterYear" },
+                    { value: "DateHour", displayValue: "Date-Hour", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateHour" },
+                    { value: "DateHourMinute", displayValue: "Date-Hour-Minute", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateHourMinute" },
+                    { value: "DateHourMinuteSecond", displayValue: "Date-Hour-Minute-Second", localizationId: "DevExpress.XtraPivotGrid.PivotGroupInterval.DateHourMinuteSecond" }
+                ]
+            }, Pivot.grandTotalText = { propertyName: "grandTotalText", modelName: "@GrandTotalText", displayName: "Grand Total Text", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.GrandTotalText", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.expandedInFieldsGroup = { propertyName: "expandedInFieldsGroup", modelName: "@ExpandedInFieldsGroup", displayName: "Expanded In Fields Group", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.ExpandedInFieldsGroup", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Pivot.emptyValueText = { propertyName: "emptyValueText", modelName: "@EmptyValueText", displayName: "Empty Value Text", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.EmptyValueText", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.emptyCellText = { propertyName: "emptyCellText", modelName: "@EmptyCellText", displayName: "Empty Cell Text", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.EmptyCellText", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.displayFolder = { propertyName: "displayFolder", modelName: "@DisplayFolder", displayName: "Display Folder", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.DisplayFolder", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, Pivot.columnValueLineCount = { propertyName: "columnValueLineCount", modelName: "@ColumnValueLineCount", displayName: "Column Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridField.ColumnValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Pivot.totalsVisibility = {
+                propertyName: "totalsVisibility", modelName: "@TotalsVisibility", displayName: "Totals Visibility", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.TotalsVisibility", defaultVal: "AutomaticTotals", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "AutomaticTotals", displayValue: "Automatic Totals", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsVisibility.AutomaticTotals" },
+                    { value: "CustomTotals", displayValue: "Custom Totals", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsVisibility.CustomTotals" },
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsVisibility.None" }
+                ]
+            }, Pivot.useNativeFormat = { propertyName: "useNativeFormat", modelName: "@UseNativeFormat", displayName: "Export As Numbers To Excel", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.UseNativeFormat", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, Pivot.KPIGraphic = {
+                propertyName: "KPIGraphic", modelName: "@KPIGraphic", displayName: "KPI Graphic", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.KPIGraphic", defaultVal: "ServerDefined", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.None" },
+                    { value: "ServerDefined", displayValue: "Server Defined", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.ServerDefined" },
+                    { value: "Shapes", displayValue: "Shapes", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.Shapes" },
+                    { value: "TrafficLights", displayValue: "Traffic Lights", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.TrafficLights" },
+                    { value: "RoadSigns", displayValue: "Road Signs", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.RoadSigns" },
+                    { value: "Gauge", displayValue: "Gauge", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.Gauge" },
+                    { value: "ReversedGauge", displayValue: "Reversed Gauge", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.ReversedGauge" },
+                    { value: "Thermometer", displayValue: "Thermometer", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.Thermometer" },
+                    { value: "ReversedThermometer", displayValue: "Reversed Thermometer", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.ReversedThermometer" },
+                    { value: "Cylinder", displayValue: "Cylinder", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.Cylinder" },
+                    { value: "ReversedCylinder", displayValue: "Reversed Cylinder", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.ReversedCylinder" },
+                    { value: "Faces", displayValue: "Faces", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.Faces" },
+                    { value: "VarianceArrow", displayValue: "Variance Arrow", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.VarianceArrow" },
+                    { value: "StandardArrow", displayValue: "Standard Arrow", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.StandardArrow" },
+                    { value: "StatusArrow", displayValue: "Status Arrow", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.StatusArrow" },
+                    { value: "ReversedStatusArrow", displayValue: "Reversed Status Arrow", localizationId: "DevExpress.XtraPivotGrid.PivotKPIGraphic.ReversedStatusArrow" }
+                ]
             };
             var formatType = {
-                propertyName: "formatType", modelName: "@FormatType", displayName: "Format Type", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "None": "None",
-                    "Numeric": "Numeric",
-                    "DateTime": "DateTime",
-                    "Custom": "Custom"
-                }
-            }, formatString = { propertyName: "formatString", modelName: "@FormatString", displayName: "Format String", defaultVal: "", editor: Designer.Widgets.editorTemplates.formatEditor };
+                propertyName: "formatType", modelName: "@FormatType", displayName: "Format Type", localizationId: "DevExpress.Utils.FormatInfo.FormatType", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.Utils.FormatType.None" },
+                    { value: "Numeric", displayValue: "Numeric", localizationId: "DevExpress.Utils.FormatType.Numeric" },
+                    { value: "DateTime", displayValue: "DateTime", localizationId: "DevExpress.Utils.FormatType.DateTime" },
+                    { value: "Custom", displayValue: "Custom", localizationId: "DevExpress.Utils.FormatType.Custom" }
+                ]
+            }, formatString = { propertyName: "formatString", modelName: "@FormatString", displayName: "Format String", localizationId: "DevExpress.Utils.FormatInfo.FormatString", defaultVal: "", editor: Designer.Widgets.editorTemplates.formatEditor };
             var formatInfo = [formatType, formatString];
-            Pivot.cellFormat = { propertyName: "cellFormat", modelName: "CellFormat", displayName: "Cell Format", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.totalCellFormat = { propertyName: "totalCellFormat", modelName: "TotalCellFormat", displayName: "Total Cell Format", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.grandTotalCellFormat = { propertyName: "grandTotalCellFormat", modelName: "GrandTotalCellFormat", displayName: "Grand Total Cell Format", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.valueFormat = { propertyName: "valueFormat", modelName: "ValueFormat", displayName: "Value Format", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.totalValueFormat = { propertyName: "totalValueFormat", modelName: "TotalValueFormat", displayName: "Total Value Format", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Pivot.cellFormat = { propertyName: "cellFormat", modelName: "CellFormat", displayName: "Cell Format", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.CellFormat", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.totalCellFormat = { propertyName: "totalCellFormat", modelName: "TotalCellFormat", displayName: "Total Cell Format", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.TotalCellFormat", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.grandTotalCellFormat = { propertyName: "grandTotalCellFormat", modelName: "GrandTotalCellFormat", displayName: "Grand Total Cell Format", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.GrandTotalCellFormat", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.valueFormat = { propertyName: "valueFormat", modelName: "ValueFormat", displayName: "Value Format", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.ValueFormat", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Pivot.totalValueFormat = { propertyName: "totalValueFormat", modelName: "TotalValueFormat", displayName: "Total Value Format", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.TotalValueFormat", info: formatInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var textHorizontalAligment = {
-                propertyName: "textHorizontalAligment", modelName: "@HAlignment", displayName: "Text Horizontal Aligment", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Default": "Default",
-                    "Near": "Near",
-                    "Center": "Center",
-                    "Far": "Far"
-                }
+                propertyName: "textHorizontalAligment", modelName: "@HAlignment", displayName: "Text Horizontal Aligment", localizationId: "DevExpress.PivotGrid.Printing.PrintTextOptions.HAlignment", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.Utils.HorzAlignment.Default" },
+                    { value: "Near", displayValue: "Near", localizationId: "DevExpress.Utils.HorzAlignment.Near" },
+                    { value: "Center", displayValue: "Center", localizationId: "DevExpress.Utils.HorzAlignment.Center" },
+                    { value: "Far", displayValue: "Far", localizationId: "DevExpress.Utils.HorzAlignment.Far" }
+                ]
             }, textVerticalAligment = {
-                propertyName: "textVerticalAligment", modelName: "@VAlignment", displayName: "Text Vertical Aligment", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "Default": "Default",
-                    "Top": "Top",
-                    "Center": "Center",
-                    "Bottom": "Bottom"
-                }
+                propertyName: "textVerticalAligment", modelName: "@VAlignment", displayName: "Text Vertical Aligment", localizationId: "DevExpress.PivotGrid.Printing.PrintTextOptions.VAlignment", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.Utils.VertAlignment.Default" },
+                    { value: "Top", displayValue: "Top", localizationId: "DevExpress.Utils.VertAlignment.Top" },
+                    { value: "Center", displayValue: "Center", localizationId: "DevExpress.Utils.VertAlignment.Center" },
+                    { value: "Bottom", displayValue: "Bottom", localizationId: "DevExpress.Utils.VertAlignment.Bottom" }
+                ]
             }, trimming = {
-                propertyName: "trimming", modelName: "@Trimming", displayName: "Trimming", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "None": "None",
-                    "Character": "Character",
-                    "Word": "Word",
-                    "EllipsisCharacter": "EllipsisCharacter",
-                    "EllipsisWord": "EllipsisWord",
-                    "EllipsisPath": "EllipsisPath"
-                }
+                propertyName: "trimming", modelName: "@Trimming", displayName: "Trimming", localizationId: "DevExpress.PivotGrid.Printing.PrintTextOptions.Trimming", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "System.Drawing.StringTrimming.None" },
+                    { value: "Character", displayValue: "Character", localizationId: "System.Drawing.StringTrimming.Character" },
+                    { value: "Word", displayValue: "Word", localizationId: "System.Drawing.StringTrimming.Word" },
+                    { value: "EllipsisCharacter", displayValue: "EllipsisCharacter", localizationId: "System.Drawing.StringTrimming.EllipsisCharacter" },
+                    { value: "EllipsisWord", displayValue: "EllipsisWord", localizationId: "System.Drawing.StringTrimming.EllipsisWord" },
+                    { value: "EllipsisPath", displayValue: "EllipsisPath", localizationId: "System.Drawing.StringTrimming.EllipsisPath" }
+                ]
             }, appearanceWordWrap = {
-                propertyName: "wordWrap", modelName: "@WordWrap", displayName: "Word Wrap", defaultVal: "NoWrap", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "NoWrap": "No Wrap",
-                    "Wrap": "Wrap"
-                }
+                propertyName: "wordWrap", modelName: "@WordWrap", displayName: "Word Wrap", localizationId: "DevExpress.PivotGrid.Printing.PrintTextOptions.WordWrap", defaultVal: "NoWrap", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "NoWrap", displayValue: "No Wrap", localizationId: "DevExpress.Utils.WordWrap.NoWrap" },
+                    { value: "Wrap", displayValue: "Wrap", localizationId: "DevExpress.Utils.WordWrap.Wrap" }
+                ]
             };
-            var textOptionsInfo = [textHorizontalAligment, textVerticalAligment, trimming, appearanceWordWrap], textOptions = { propertyName: "textOptions", modelName: "TextOptions", displayName: "Text Options", info: textOptionsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var textOptionsInfo = [textHorizontalAligment, textVerticalAligment, trimming, appearanceWordWrap], textOptions = { propertyName: "textOptions", modelName: "TextOptions", displayName: "Text Options", localizationId: "DevExpress.XtraReports.UI.XRAppearanceObject.TextOptions", info: textOptionsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Pivot.appearanceInfo = [Designer.Report.backColor, Designer.Report.borderColor, Designer.Report.foreColor, Designer.Report.font, textOptions];
-            var cellAppearance = { propertyName: "cellAppearance", modelName: "Cell", displayName: "Cell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, totalCellAppearance = { propertyName: "totalCellAppearance", modelName: "TotalCell", displayName: "Total Cell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, customTotalCellAppearance = { propertyName: "customTotalCellAppearance", modelName: "CustomTotalCell", displayName: "Custom Total Cell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, grandTotalCellAppearance = { propertyName: "grandTotalCellAppearance", modelName: "GrandTotalCell", displayName: "Grand Total Cell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldValueAppearance = { propertyName: "fieldValueAppearance", modelName: "FieldValue", displayName: "Field Value", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldValueTotalAppearance = { propertyName: "fieldValueTotalAppearance", modelName: "FieldValueTotal", displayName: "Field Value Total", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldValueGrandTotalAppearance = { propertyName: "fieldValueGrandTotalAppearance", modelName: "FieldValueGrandTotal", displayName: "Field Value Grand Total", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldHeaderAppearance = { propertyName: "fieldHeaderAppearance", modelName: "FieldHeader", displayName: "Field Header", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var cellAppearance = { propertyName: "cellAppearance", modelName: "Cell", displayName: "Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.Cell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, totalCellAppearance = { propertyName: "totalCellAppearance", modelName: "TotalCell", displayName: "Total Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.TotalCell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, customTotalCellAppearance = { propertyName: "customTotalCellAppearance", modelName: "CustomTotalCell", displayName: "Custom Total Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.CustomTotalCell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, grandTotalCellAppearance = { propertyName: "grandTotalCellAppearance", modelName: "GrandTotalCell", displayName: "Grand Total Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.GrandTotalCell", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldValueAppearance = { propertyName: "fieldValueAppearance", modelName: "FieldValue", displayName: "Field Value", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldValue", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldValueTotalAppearance = { propertyName: "fieldValueTotalAppearance", modelName: "FieldValueTotal", displayName: "Field Value Total", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldValueTotal", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldValueGrandTotalAppearance = { propertyName: "fieldValueGrandTotalAppearance", modelName: "FieldValueGrandTotal", displayName: "Field Value Grand Total", localizationId: "DevExpress.XtraPivotGrid.PivotGridAppearancesBase.FieldValueGrandTotal", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, fieldHeaderAppearance = { propertyName: "fieldHeaderAppearance", modelName: "FieldHeader", displayName: "Field Header", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldHeader", info: Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Pivot.appearancesInfo = [cellAppearance, totalCellAppearance, customTotalCellAppearance, grandTotalCellAppearance, fieldHeaderAppearance, fieldValueAppearance, fieldValueGrandTotalAppearance, fieldValueTotalAppearance];
-            var appearances = { propertyName: "appearances", modelName: "Appearance", displayName: "Appearance", info: Pivot.appearancesInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var allowDrag = { propertyName: "allowDrag", modelName: "@AllowDrag", displayName: "Allow Drag", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowDragInCustomizationForm = { propertyName: "@allowDragInCustomizationForm", modelName: "AllowDragInCustomizationForm", displayName: "Allow Drag In Customization Form", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowExpand = { propertyName: "allowExpand", modelName: "@AllowExpand", displayName: "Allow Expand", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowFilter = { propertyName: "allowFilter", modelName: "@AllowFilter", displayName: "Allow Filter", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowFilterBySummary = { propertyName: "allowFilterBySummary", modelName: "@AllowFilterBySummary", displayName: "Allow Filter By Summary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowRunTimeSummaryChange = { propertyName: "allowRunTimeSummaryChange", modelName: "@AllowRunTimeSummaryChange", displayName: "Allow Run Time Summary Change", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, allowSort = { propertyName: "allowSort", modelName: "@AllowSort", displayName: "Allow Sort", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, allowSortBySummary = { propertyName: "allowSortBySummary", modelName: "@AllowSortBySummary", displayName: "Allow Sort By Summary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, groupFilterMode = { propertyName: "groupFilterMode", modelName: "@GroupFilterMode", displayName: "Group Filter Mode", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "List": "List", "Tree": "Tree" } }, hideEmptyVariationItems = { propertyName: "hideEmptyVariationItems", modelName: "@HideEmptyVariationItems", displayName: "Hide Empty Variation Items", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showCustomTotals = { propertyName: "showCustomTotals", modelName: "@ShowCustomTotals", displayName: "Show Custom Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showGrandTotal = { propertyName: "showGrandTotal", modelName: "@ShowGrandTotal", displayName: "Show Grand Total", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showSummaryTypeName = { propertyName: "showSummaryTypeName", modelName: "@ShowSummaryTypeName", displayName: "Show Summary Type Name", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showTotals = { propertyName: "showTotals", modelName: "@ShowTotals", displayName: "Show Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showValues = { propertyName: "showValues", modelName: "@ShowValues", displayName: "Show Values", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            var appearances = { propertyName: "appearances", modelName: "Appearance", displayName: "Appearance", localizationId: "DevExpress.XtraPivotGrid.PivotGridField.Appearance", info: Pivot.appearancesInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var allowDrag = { propertyName: "allowDrag", modelName: "@AllowDrag", displayName: "Allow Drag", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowDrag", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowDragInCustomizationForm = { propertyName: "@allowDragInCustomizationForm", modelName: "AllowDragInCustomizationForm", displayName: "Allow Drag In Customization Form", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowExpand = { propertyName: "allowExpand", modelName: "@AllowExpand", displayName: "Allow Expand", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowExpand", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowFilter = { propertyName: "allowFilter", modelName: "@AllowFilter", displayName: "Allow Filter", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowFilter", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowFilterBySummary = { propertyName: "allowFilterBySummary", modelName: "@AllowFilterBySummary", displayName: "Allow Filter By Summary", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowFilterBySummary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowRunTimeSummaryChange = { propertyName: "allowRunTimeSummaryChange", modelName: "@AllowRunTimeSummaryChange", displayName: "Allow Run Time Summary Change", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowRunTimeSummaryChange", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, allowSort = { propertyName: "allowSort", modelName: "@AllowSort", displayName: "Allow Sort", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowSort", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowSortBySummary = { propertyName: "allowSortBySummary", modelName: "@AllowSortBySummary", displayName: "Allow Sort By Summary", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowSortBySummary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, groupFilterMode = { propertyName: "groupFilterMode", modelName: "@GroupFilterMode", displayName: "Group Filter Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.GroupFilterMode", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "List", displayValue: "List", localizationId: "DevExpress.XtraPivotGrid.PivotGroupFilterMode.List" }, { value: "Tree", displayValue: "Tree", localizationId: "DevExpress.XtraPivotGrid.PivotGroupFilterMode.Tree" }] }, hideEmptyVariationItems = { propertyName: "hideEmptyVariationItems", modelName: "@HideEmptyVariationItems", displayName: "Hide Empty Variation Items", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.HideEmptyVariationItems", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showCustomTotals = { propertyName: "showCustomTotals", modelName: "@ShowCustomTotals", displayName: "Show Custom Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowCustomTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showGrandTotal = { propertyName: "showGrandTotal", modelName: "@ShowGrandTotal", displayName: "Show Grand Total", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowGrandTotal", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showSummaryTypeName = { propertyName: "showSummaryTypeName", modelName: "@ShowSummaryTypeName", displayName: "Show Summary Type Name", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowSummaryTypeName", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showTotals = { propertyName: "showTotals", modelName: "@ShowTotals", displayName: "Show Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showValues = { propertyName: "showValues", modelName: "@ShowValues", displayName: "Show Values", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var optionsInfo = [allowDrag, allowDragInCustomizationForm, allowExpand, allowFilter, allowFilterBySummary, allowRunTimeSummaryChange, allowSort, allowSortBySummary, groupFilterMode,
                 hideEmptyVariationItems, showCustomTotals, showGrandTotal, showSummaryTypeName, showTotals, showValues];
-            Pivot.options = { propertyName: "options", modelName: "Options", displayName: "Options", info: optionsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Pivot.sortBySummary = { propertyName: "sortBySummaryInfo", modelName: "SortBySummaryInfo", displayName: "Sort By Summary Info", from: Pivot.SortBySummaryInfo.from, toJsonObject: Pivot.SortBySummaryInfo.toJSON, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Pivot.options = { propertyName: "options", modelName: "Options", displayName: "Options", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.Options", info: optionsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Pivot.sortBySummary = { propertyName: "sortBySummaryInfo", modelName: "SortBySummaryInfo", displayName: "Sort By Summary Info", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.SortBySummaryInfo", from: Pivot.SortBySummaryInfo.from, toJsonObject: Pivot.SortBySummaryInfo.toJSON, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Pivot.pivotGridFieldSerializationsInfo = [
                 appearances,
                 Pivot.allowedAreas, Pivot.area, Pivot.areaIndex, Pivot.areaIndexEditable,
@@ -19518,7 +19795,7 @@ var DevExpress;
                 Pivot.unboundExpression, Pivot.unboundFieldName, Pivot.unboundType, Pivot.useNativeFormat,
                 Pivot.valueFormat, Pivot.options, Pivot.sortBySummary
             ].concat(Designer.Report.baseControlProperties), Pivot.popularPropertiesPivotGridField = ["area", "areaIndexEditable", "fieldName", "caption", "groupInterval", "summaryType", "summaryDisplayType", "unboundType", "unboundExpression"];
-            Pivot.pivotGridFieldsSerializable = { displayName: "Fields", propertyName: "fields", modelName: "Fields", array: true, editor: Designer.Report.editorTemplates.pivotGridFields, template: "#dxrd-collectionItemWithAccordion", };
+            Pivot.pivotGridFieldsSerializable = { displayName: "Fields", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.Fields", propertyName: "fields", modelName: "Fields", array: true, editor: Designer.Report.editorTemplates.pivotGridFields, template: "#dxrd-collectionItemWithAccordion", };
         })(Pivot = Designer.Pivot || (Designer.Pivot = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -19669,21 +19946,25 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Insert Field in Filter Area",
+                            textId: 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheFilterArea',
                             imageClassName: "dxrd-image-actions-add_field_to_filter_area",
                             clickAction: function (model) { model["addFieldToArea"]("FilterArea"); }
                         },
                         {
                             text: "Insert Field in Data Area",
+                            textId: 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheDataArea',
                             imageClassName: "dxrd-image-actions-add_field_to_data_area",
                             clickAction: function (model) { model["addFieldToArea"]("DataArea"); }
                         },
                         {
                             text: "Insert Field in Column Area",
+                            textId: 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheColumnArea',
                             imageClassName: "dxrd-image-actions-add_field_to_column_area",
                             clickAction: function (model) { model["addFieldToArea"]("ColumnArea"); }
                         },
                         {
                             text: "Insert Field in Row Area",
+                            textId: 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheRowArea',
                             imageClassName: "dxrd-image-actions-add_field_to_row_area",
                             clickAction: function (model) { model["addFieldToArea"]("RowArea"); }
                         }
@@ -19695,64 +19976,70 @@ var DevExpress;
                 return PivotGridActions;
             })(Designer.BaseActionsProvider);
             Report.PivotGridActions = PivotGridActions;
-            var linesAppearance = { propertyName: "linesAppearance", modelName: "Lines", displayName: "Lines", info: Designer.Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.pivotGridAppearances = { propertyName: "appearances", modelName: "Appearance", displayName: "Appearance", info: Designer.Pivot.appearancesInfo.concat(linesAppearance), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var cellStyleName = { propertyName: "cellStyleName", modelName: "@CellStyleName", displayName: "Cell", editor: Report.editorTemplates.style, defaultVal: null }, customTotalCellStyleName = { propertyName: "customTotalCellStyleName", modelName: "@CustomTotalCellStyleName", displayName: "Custom Total Cell", editor: Report.editorTemplates.style, defaultVal: null }, fieldHeaderStyleName = { propertyName: "fieldHeaderStyleName", modelName: "@FieldHeaderStyleName", displayName: "Field Header", editor: Report.editorTemplates.style, defaultVal: null }, fieldValueGrandTotalStyleName = { propertyName: "fieldValueGrandTotalStyleName", modelName: "@FieldValueGrandTotalStyleName", displayName: "Field Value Grand Total", editor: Report.editorTemplates.style, defaultVal: null }, fieldValueStyleName = { propertyName: "fieldValueStyleName", modelName: "@FieldValueStyleName", displayName: "Field Value", editor: Report.editorTemplates.style, defaultVal: null }, fieldValueTotalStyleName = { propertyName: "fieldValueTotalStyleName", modelName: "@FieldValueTotalStyleName", displayName: "Field Value Total", editor: Report.editorTemplates.style, defaultVal: null }, filterSeparatorStyleName = { propertyName: "filterSeparatorStyleName", modelName: "@FilterSeparatorStyleName", displayName: "Filter Separator", editor: Report.editorTemplates.style, defaultVal: null }, grandTotalCellStyleName = { propertyName: "grandTotalCellStyleName", modelName: "@GrandTotalCellStyleName", displayName: "Grand Total Cell", editor: Report.editorTemplates.style, defaultVal: null }, headerGroupLineStyleName = { propertyName: "headerGroupLineStyleName", modelName: "@HeaderGroupLineStyleName", displayName: "Header Group Line", editor: Report.editorTemplates.style, defaultVal: null }, linesStyleName = { propertyName: "linesStyleName", modelName: "@LinesStyleName", displayName: "Lines", editor: Report.editorTemplates.style, defaultVal: null }, totalCellStyleName = { propertyName: "totalCellStyleName", modelName: "@TotalCellStyleName", displayName: "Total Cell", editor: Report.editorTemplates.style, defaultVal: null };
+            var linesAppearance = { propertyName: "linesAppearance", modelName: "Lines", displayName: "Lines", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.Lines", info: Designer.Pivot.appearanceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.pivotGridAppearances = { propertyName: "appearances", modelName: "Appearance", displayName: "Appearance", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.Appearance", info: Designer.Pivot.appearancesInfo.concat(linesAppearance), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var cellStyleName = { propertyName: "cellStyleName", modelName: "@CellStyleName", displayName: "Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.Cell", editor: Report.editorTemplates.style, defaultVal: null }, customTotalCellStyleName = { propertyName: "customTotalCellStyleName", modelName: "@CustomTotalCellStyleName", displayName: "Custom Total Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.CustomTotalCell", editor: Report.editorTemplates.style, defaultVal: null }, fieldHeaderStyleName = { propertyName: "fieldHeaderStyleName", modelName: "@FieldHeaderStyleName", displayName: "Field Header", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldHeader", editor: Report.editorTemplates.style, defaultVal: null }, fieldValueGrandTotalStyleName = { propertyName: "fieldValueGrandTotalStyleName", modelName: "@FieldValueGrandTotalStyleName", displayName: "Field Value Grand Total", localizationId: "DevExpress.XtraPivotGrid.PivotGridAppearancesBase.FieldValueGrandTotal", editor: Report.editorTemplates.style, defaultVal: null }, fieldValueStyleName = { propertyName: "fieldValueStyleName", modelName: "@FieldValueStyleName", displayName: "Field Value", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldValue", editor: Report.editorTemplates.style, defaultVal: null }, fieldValueTotalStyleName = { propertyName: "fieldValueTotalStyleName", modelName: "@FieldValueTotalStyleName", displayName: "Field Value Total", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldValueTotal", editor: Report.editorTemplates.style, defaultVal: null }, filterSeparatorStyleName = { propertyName: "filterSeparatorStyleName", modelName: "@FilterSeparatorStyleName", displayName: "Filter Separator", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FilterSeparator", editor: Report.editorTemplates.style, defaultVal: null }, grandTotalCellStyleName = { propertyName: "grandTotalCellStyleName", modelName: "@GrandTotalCellStyleName", displayName: "Grand Total Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.GrandTotalCell", editor: Report.editorTemplates.style, defaultVal: null }, headerGroupLineStyleName = { propertyName: "headerGroupLineStyleName", modelName: "@HeaderGroupLineStyleName", displayName: "Header Group Line", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.HeaderGroupLine", editor: Report.editorTemplates.style, defaultVal: null }, linesStyleName = { propertyName: "linesStyleName", modelName: "@LinesStyleName", displayName: "Lines", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.Lines", editor: Report.editorTemplates.style, defaultVal: null }, totalCellStyleName = { propertyName: "totalCellStyleName", modelName: "@TotalCellStyleName", displayName: "Total Cell", localizationId: "DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.TotalCell", editor: Report.editorTemplates.style, defaultVal: null };
             Report.pivotGridStyles = [cellStyleName, customTotalCellStyleName, fieldHeaderStyleName, fieldValueGrandTotalStyleName, fieldValueStyleName, fieldValueTotalStyleName, filterSeparatorStyleName,
                 grandTotalCellStyleName, headerGroupLineStyleName, linesStyleName, totalCellStyleName];
             var criteriaString = { propertyName: "_criteriaString", modelName: "@CriteriaString" };
-            var criteriaStringEditable = { propertyName: "criteriaString", displayName: "Criteria", defaultVal: "", editor: Designer.Widgets.editorTemplates.filterEditor };
-            var enabled = { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            var criteriaStringEditable = { propertyName: "criteriaString", displayName: "Criteria", localizationId: "DevExpress.XtraPivotGrid.Prefilter.Criteria", defaultVal: "", editor: Designer.Widgets.editorTemplates.filterEditor };
+            var enabled = { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", localizationId: "DevExpress.XtraPivotGrid.PrefilterBase.Enabled", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var prefilterSerializationsInfo = [criteriaString, criteriaStringEditable, enabled];
-            Report.prefilter = { propertyName: "prefilter", modelName: "Prefilter", displayName: "Prefilter", info: prefilterSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var autoTransposeChart = { propertyName: "autoTransposeChart", modelName: "@AutoTransposeChart", displayName: "Auto Transpose Chart", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, dataProvideMode = {
-                propertyName: "dataProvideMode", modelName: "@DataProvideMode", displayName: "Data Provide Mode", defaultVal: "ProvideLastLevelData", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "ProvideLastLevelData": "Provide Last Level Data",
-                    "UseCustomSettings": "Use Custom Settings"
-                }
+            Report.prefilter = { propertyName: "prefilter", modelName: "Prefilter", displayName: "Prefilter", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.Prefilter", info: prefilterSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var autoTransposeChart = { propertyName: "autoTransposeChart", modelName: "@AutoTransposeChart", displayName: "Auto Transpose Chart", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.AutoTransposeChart", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, dataProvideMode = {
+                propertyName: "dataProvideMode", modelName: "@DataProvideMode", displayName: "Data Provide Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.DataProvideMode", defaultVal: "ProvideLastLevelData", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "ProvideLastLevelData", displayValue: "Provide Last Level Data", localizationId: "DevExpress.XtraPivotGrid.PivotChartDataProvideMode.ProvideLastLevelData" },
+                    { value: "UseCustomSettings", displayValue: "Use Custom Settings", localizationId: "DevExpress.XtraPivotGrid.PivotChartDataProvideMode.UseCustomSettings" }
+                ]
             }, dataProvidePriority = {
-                propertyName: "dataProvidePriority", modelName: "@DataProvidePriority", displayName: "Data Provide Priority", defaultVal: "Rows", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Columns": "Columns",
-                    "Rows": "Rows"
-                }
+                propertyName: "dataProvidePriority", modelName: "@DataProvidePriority", displayName: "Data Provide Priority", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.DataProvidePriority", defaultVal: "Rows", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Columns", displayValue: "Columns", localizationId: "DevExpress.XtraPivotGrid.PivotChartDataProvidePriority.Columns" },
+                    { value: "Rows", displayValue: "Rows", localizationId: "DevExpress.XtraPivotGrid.PivotChartDataProvidePriority.Rows" }
+                ]
             }, fieldValuesProvideMode = {
-                propertyName: "fieldValuesProvideMode", modelName: "@FieldValuesProvideMode", displayName: "Field Values Provide Mode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Default": "Default",
-                    "DisplayText": "Display Text",
-                    "Value": "Value"
-                }
-            }, maxAllowedPointCountInSeries = { propertyName: "maxAllowedPointCountInSeries", modelName: "@MaxAllowedPointCountInSeries", displayName: "Max Allowed Point Count In Series", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, maxAllowedSeriesCount = { propertyName: "maxAllowedSeriesCount", modelName: "@MaxAllowedSeriesCount", displayName: "Max Allowed Series Count", defaultVal: 10, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, provideColumnCustomTotals = { propertyName: "provideColumnCustomTotals", modelName: "@ProvideColumnCustomTotals", displayName: "Provide Column Custom Totals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideColumnGrandTotals = { propertyName: "provideColumnGrandTotals", modelName: "@ProvideColumnGrandTotals", displayName: "Provide Column Grand Totals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideColumnTotals = { propertyName: "provideColumnTotals", modelName: "@ProvideColumnTotals", displayName: "Provide Column Totals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideDataByColumns = { propertyName: "provideDataByColumns", modelName: "@ProvideDataByColumns", displayName: "Provide Data By Columns", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideDataFieldsOnSeries = { propertyName: "provideDataFieldsOnSeries", modelName: "@ProvideDataFieldsOnSeries", displayName: "Provide Data Fields On Series", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideEmptyCells = { propertyName: "provideEmptyCells", modelName: "@ProvideEmptyCells", displayName: "Provide Empty Cells", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideRowCustomTotals = { propertyName: "provideRowCustomTotals", modelName: "@ProvideRowCustomTotals", displayName: "Provide Row Custom Totals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideRowGrandTotals = { propertyName: "provideRowGrandTotals", modelName: "@ProvideRowGrandTotals", displayName: "Provide Row Grand Totals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideRowTotals = { propertyName: "provideRowTotals", modelName: "@ProvideRowTotals", displayName: "Provide Row Totals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsChartDataSourceInfo = [autoTransposeChart, dataProvideMode, dataProvidePriority, fieldValuesProvideMode, maxAllowedPointCountInSeries,
+                propertyName: "fieldValuesProvideMode", modelName: "@FieldValuesProvideMode", displayName: "Field Values Provide Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.FieldValuesProvideMode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.XtraPivotGrid.PivotChartFieldValuesProvideMode.Default" },
+                    { value: "DisplayText", displayValue: "Display Text", localizationId: "DevExpress.XtraPivotGrid.PivotChartFieldValuesProvideMode.DisplayText" },
+                    { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPivotGrid.PivotChartFieldValuesProvideMode.Value" }
+                ]
+            }, maxAllowedPointCountInSeries = { propertyName: "maxAllowedPointCountInSeries", modelName: "@MaxAllowedPointCountInSeries", displayName: "Max Allowed Point Count In Series", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.MaxAllowedPointCountInSeries", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, maxAllowedSeriesCount = { propertyName: "maxAllowedSeriesCount", modelName: "@MaxAllowedSeriesCount", displayName: "Max Allowed Series Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.MaxAllowedSeriesCount", defaultVal: 10, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, provideColumnCustomTotals = { propertyName: "provideColumnCustomTotals", modelName: "@ProvideColumnCustomTotals", displayName: "Provide Column Custom Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideColumnCustomTotals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideColumnGrandTotals = { propertyName: "provideColumnGrandTotals", modelName: "@ProvideColumnGrandTotals", displayName: "Provide Column Grand Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideColumnGrandTotals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideColumnTotals = { propertyName: "provideColumnTotals", modelName: "@ProvideColumnTotals", displayName: "Provide Column Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideColumnTotals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideDataByColumns = { propertyName: "provideDataByColumns", modelName: "@ProvideDataByColumns", displayName: "Provide Data By Columns", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideDataByColumns", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideDataFieldsOnSeries = { propertyName: "provideDataFieldsOnSeries", modelName: "@ProvideDataFieldsOnSeries", displayName: "Provide Data Fields On Series", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideDataFieldsOnSeries", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideEmptyCells = { propertyName: "provideEmptyCells", modelName: "@ProvideEmptyCells", displayName: "Provide Empty Cells", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideEmptyCells", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideRowCustomTotals = { propertyName: "provideRowCustomTotals", modelName: "@ProvideRowCustomTotals", displayName: "Provide Row Custom Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideRowCustomTotals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideRowGrandTotals = { propertyName: "provideRowGrandTotals", modelName: "@ProvideRowGrandTotals", displayName: "Provide Row Grand Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideRowGrandTotals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, provideRowTotals = { propertyName: "provideRowTotals", modelName: "@ProvideRowTotals", displayName: "Provide Row Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsChartDataSource.ProvideRowTotals", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsChartDataSourceInfo = [autoTransposeChart, dataProvideMode, dataProvidePriority, fieldValuesProvideMode, maxAllowedPointCountInSeries,
                 maxAllowedSeriesCount, provideColumnCustomTotals, provideColumnGrandTotals, provideColumnTotals, provideDataByColumns, provideDataFieldsOnSeries, provideEmptyCells,
-                provideRowCustomTotals, provideRowGrandTotals, provideRowTotals], optionsChartDataSource = { propertyName: "optionsChartDataSource", modelName: "OptionsChartDataSource", displayName: "Options Chart Data Source", info: optionsChartDataSourceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var allowCrossGroupVariation = { propertyName: "allowCrossGroupVariation", modelName: "@AllowCrossGroupVariation", displayName: "Allow Cross Group Variation", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, autoExpandGroups = { propertyName: "autoExpandGroups", modelName: "@AutoExpandGroups", displayName: "Aut oExpand Groups", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, caseSensitive = { propertyName: "caseSensitive", modelName: "@CaseSensitive", displayName: "Case Sensitive", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, dataFieldUnboundExpressionMode = {
-                propertyName: "dataFieldUnboundExpressionMode", modelName: "@DataFieldUnboundExpressionMode", displayName: "Data Field Unbound Expression Mode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Default": "Default",
-                    "UseSummaryValues": "Use Summary Values"
-                }
-            }, drillDownMaxRowCount = { propertyName: "DrillDownMaxRowCount", modelName: "@DrillDownMaxRowCount", displayName: "Drill Down Max Row Count", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterByVisibleFieldsOnly = { propertyName: "filterByVisibleFieldsOnly", modelName: "@FilterByVisibleFieldsOnly", displayName: "Filter By Visible Fields Only", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsDataInfo = [allowCrossGroupVariation, autoExpandGroups, caseSensitive, dataFieldUnboundExpressionMode, drillDownMaxRowCount, filterByVisibleFieldsOnly], optionsData = { propertyName: "optionsData", modelName: "OptionsData", displayName: "Data Options", info: optionsDataInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+                provideRowCustomTotals, provideRowGrandTotals, provideRowTotals], optionsChartDataSource = { propertyName: "optionsChartDataSource", modelName: "OptionsChartDataSource", displayName: "Options Chart Data Source", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsChartDataSource", info: optionsChartDataSourceInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var allowCrossGroupVariation = { propertyName: "allowCrossGroupVariation", modelName: "@AllowCrossGroupVariation", displayName: "Allow Cross Group Variation", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.AllowCrossGroupVariation", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, autoExpandGroups = { propertyName: "autoExpandGroups", modelName: "@AutoExpandGroups", displayName: "Aut oExpand Groups", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.AutoExpandGroups", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, caseSensitive = { propertyName: "caseSensitive", modelName: "@CaseSensitive", displayName: "Case Sensitive", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.CaseSensitive", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, dataFieldUnboundExpressionMode = {
+                propertyName: "dataFieldUnboundExpressionMode", modelName: "@DataFieldUnboundExpressionMode", displayName: "Data Field Unbound Expression Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.DataFieldUnboundExpressionMode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.XtraPivotGrid.DataFieldUnboundExpressionMode.Default" },
+                    { value: "UseSummaryValues", displayValue: "Use Summary Values", localizationId: "DevExpress.XtraPivotGrid.DataFieldUnboundExpressionMode.UseSummaryValues" }
+                ]
+            }, drillDownMaxRowCount = { propertyName: "DrillDownMaxRowCount", modelName: "@DrillDownMaxRowCount", displayName: "Drill Down Max Row Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.DrillDownMaxRowCount", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterByVisibleFieldsOnly = { propertyName: "filterByVisibleFieldsOnly", modelName: "@FilterByVisibleFieldsOnly", displayName: "Filter By Visible Fields Only", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.FilterByVisibleFieldsOnly", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, dataProcessingEngine = {
+                propertyName: "dataProcessingEngine", modelName: "@DataProcessingEngine", displayName: "Data Processing Engine", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsData.DataProcessingEngine", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.XtraPivotGrid.PivotDataProcessingEngine.Default" },
+                    { value: "Legacy", displayValue: "Legacy", localizationId: "DevExpress.XtraPivotGrid.PivotDataProcessingEngine.Legacy" },
+                    { value: "LegacyOptimized", displayValue: "Legacy Optimized", localizationId: "DevExpress.XtraPivotGrid.PivotDataProcessingEngine.LegacyOptimized" }
+                ]
+            }, optionsDataInfo = [allowCrossGroupVariation, autoExpandGroups, caseSensitive, dataFieldUnboundExpressionMode, drillDownMaxRowCount, filterByVisibleFieldsOnly, dataProcessingEngine], optionsData = { propertyName: "optionsData", modelName: "OptionsData", displayName: "Data Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsData", info: optionsDataInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var area = {
-                propertyName: "area", modelName: "@Area", displayName: "Area", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "None": "None",
-                    "ColumnArea": "Column Area",
-                    "RowArea": "Row Area"
-                }
-            }, areaIndex = { propertyName: "areaIndex", modelName: "@AreaIndex", displayName: "Area Index", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, columnValueLineCount = { propertyName: "columnValueLineCount", modelName: "@ColumnValueLineCount", displayName: "Column Value Line Count", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, fieldNaming = {
-                propertyName: "fieldNaming", modelName: "@FieldNaming", displayName: "Field Naming", defaultVal: "FieldName", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "FieldName": "Field Name",
-                    "Name": "Name"
-                }
-            }, rowHeaderWidth = { propertyName: "rowHeaderWidth", modelName: "@RowHeaderWidth", displayName: "Row Header Width", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, optionsDataFieldInfo = [area, areaIndex, Designer.Pivot.caption, columnValueLineCount, fieldNaming, rowHeaderWidth, rowValueLineCount], optionsDataField = { propertyName: "optionsDataField", modelName: "OptionsDataField", displayName: "Data Field Options", info: optionsDataFieldInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Designer.Chart.defaultBooleanValues }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
-                printHeadersOnEveryPage, printHorzLines, printRowHeaders, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var columnTotalsLocation = { propertyName: "columnTotalsLocation", modelName: "@ColumnTotalsLocation", displayName: "Column Totals Location", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: { "Near": "Near", "Far": "Far " } }, groupFieldsInCustomizationWindow = { propertyName: "groupFieldsInCustomizationWindow", modelName: "@GroupFieldsInCustomizationWindow", displayName: "Group Fields in the Customization Window", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, rowTotalsLocation = {
-                propertyName: "rowTotalsLocation", modelName: "@RowTotalsLocation", displayName: "Row Totals Location", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "Near": "Near",
-                    "Far": "Far",
-                    "Tree": "Tree"
-                }
-            }, rowTreeOffset = { propertyName: "rowTreeOffset", modelName: "@RowTreeOffset", displayName: "Row Tree Offset", defaultVal: 21, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowTreeWidth = { propertyName: "rowTreeWidth", modelName: "@RowTreeWidth", displayName: "Row Tree Width", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, showColumnGrandTotalHeader = { propertyName: "showColumnGrandTotalHeader", modelName: "@ShowColumnGrandTotalHeader", displayName: "Show Column Grand Total Header", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showColumnGrandTotals = { propertyName: "showColumnGrandTotals", modelName: "@ShowColumnGrandTotals", displayName: "Show Column Grand Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showColumnHeaders = { propertyName: "showColumnHeaders", modelName: "@ShowColumnHeaders", displayName: "Show Column Headers", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showColumnTotals = { propertyName: "showColumnTotals", modelName: "@ShowColumnTotals", displayName: "Show Column Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showCustomTotalsForSingleValues = { propertyName: "showCustomTotalsForSingleValues", modelName: "@ShowCustomTotalsForSingleValues", displayName: "Show Custom Totals For Single Values", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showDataHeaders = { propertyName: "showDataHeaders", modelName: "@ShowDataHeaders", displayName: "Show Data Headers", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showFilterHeaders = { propertyName: "showFilterHeaders", modelName: "@ShowFilterHeaders", displayName: "Show Filter Headers", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showFilterSeparatorBar = { propertyName: "showFilterSeparatorBar", modelName: "@ShowFilterSeparatorBar", displayName: "Show Filter Separator Bar", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showGrandTotalsForSingleValues = { propertyName: "showGrandTotalsForSingleValues", modelName: "@ShowGrandTotalsForSingleValues", displayName: "Show Grand Totals For Single Values", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showHorzLines = { propertyName: "showHorzLines", modelName: "@ShowHorzLines", displayName: "Show Horz Lines", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowGrandTotalHeader = { propertyName: "showRowGrandTotalHeader", modelName: "@ShowRowGrandTotalHeader", displayName: "Show Row Grand Total Header", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowGrandTotals = { propertyName: "showRowGrandTotals", modelName: "@ShowRowGrandTotals", displayName: "Show Row Grand Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowHeaders = { propertyName: "showRowHeaders", modelName: "@ShowRowHeaders", displayName: "Show Row Headers", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowTotals = { propertyName: "showRowTotals", modelName: "@ShowRowTotals", displayName: "Show Row Totals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showTotalsForSingleValues = { propertyName: "showTotalsForSingleValues", modelName: "@ShowTotalsForSingleValues", displayName: "Show Totals For Single Values", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showVertLines = { propertyName: "showVertLines", modelName: "@ShowVertLines", displayName: "Show Vert Lines", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsViewInfo = [columnTotalsLocation, groupFieldsInCustomizationWindow, rowTotalsLocation, rowTreeOffset, rowTreeWidth, showColumnGrandTotalHeader, showColumnGrandTotals, showColumnHeaders, showColumnTotals, showCustomTotalsForSingleValues,
+                propertyName: "area", modelName: "@Area", displayName: "Area", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.Area", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPivotGrid.PivotDataArea.None" },
+                    { value: "ColumnArea", displayValue: "Column Area", localizationId: "DevExpress.XtraPivotGrid.PivotDataArea.ColumnArea" },
+                    { value: "RowArea", displayValue: "Row Area", localizationId: "DevExpress.XtraPivotGrid.PivotDataArea.RowArea" }
+                ]
+            }, areaIndex = { propertyName: "areaIndex", modelName: "@AreaIndex", displayName: "Area Index", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.AreaIndex", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, columnValueLineCount = { propertyName: "columnValueLineCount", modelName: "@ColumnValueLineCount", displayName: "Column Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataFieldEx.ColumnValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, fieldNaming = {
+                propertyName: "fieldNaming", modelName: "@FieldNaming", displayName: "Field Naming", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.FieldNaming", defaultVal: "FieldName", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "FieldName", displayValue: "Field Name", localizationId: "DevExpress.XtraPivotGrid.DataFieldNaming.FieldName" },
+                    { value: "Name", displayValue: "Name", localizationId: "DevExpress.XtraPivotGrid.DataFieldNaming.Name" }
+                ]
+            }, rowHeaderWidth = { propertyName: "rowHeaderWidth", modelName: "@RowHeaderWidth", displayName: "Row Header Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.RowHeaderWidth", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataFieldEx.RowValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, optionsDataFieldInfo = [area, areaIndex, Designer.Pivot.caption, columnValueLineCount, fieldNaming, rowHeaderWidth, rowValueLineCount], optionsDataField = { propertyName: "optionsDataField", modelName: "OptionsDataField", displayName: "Data Field Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsDataField", info: optionsDataFieldInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
+                printHeadersOnEveryPage, printHorzLines, printRowHeaders, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var columnTotalsLocation = { propertyName: "columnTotalsLocation", modelName: "@ColumnTotalsLocation", displayName: "Column Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ColumnTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Near" }, { value: "Far", displayValue: "Far ", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Far" }] }, groupFieldsInCustomizationWindow = { propertyName: "groupFieldsInCustomizationWindow", modelName: "@GroupFieldsInCustomizationWindow", displayName: "Group Fields in the Customization Window", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsView.GroupFieldsInCustomizationWindow", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, rowTotalsLocation = {
+                propertyName: "rowTotalsLocation", modelName: "@RowTotalsLocation", displayName: "Row Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.RowTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotRowTotalsLocation.Near" },
+                    { value: "Far", displayValue: "Far", localizationId: "DevExpress.XtraPivotGrid.PivotRowTotalsLocation.Far" },
+                    { value: "Tree", displayValue: "Tree", localizationId: "DevExpress.XtraPivotGrid.PivotRowTotalsLocation.Tree" }
+                ]
+            }, rowTreeOffset = { propertyName: "rowTreeOffset", modelName: "@RowTreeOffset", displayName: "Row Tree Offset", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsViewBase.RowTreeOffset", defaultVal: 21, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowTreeWidth = { propertyName: "rowTreeWidth", modelName: "@RowTreeWidth", displayName: "Row Tree Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsViewBase.RowTreeWidth", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, showColumnGrandTotalHeader = { propertyName: "showColumnGrandTotalHeader", modelName: "@ShowColumnGrandTotalHeader", displayName: "Show Column Grand Total Header", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowColumnGrandTotalHeader", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showColumnGrandTotals = { propertyName: "showColumnGrandTotals", modelName: "@ShowColumnGrandTotals", displayName: "Show Column Grand Totals", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowColumnGrandTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showColumnHeaders = { propertyName: "showColumnHeaders", modelName: "@ShowColumnHeaders", displayName: "Show Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowColumnHeaders", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showColumnTotals = { propertyName: "showColumnTotals", modelName: "@ShowColumnTotals", displayName: "Show Column Totals", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowColumnTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showCustomTotalsForSingleValues = { propertyName: "showCustomTotalsForSingleValues", modelName: "@ShowCustomTotalsForSingleValues", displayName: "Show Custom Totals For Single Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowCustomTotalsForSingleValues", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showDataHeaders = { propertyName: "showDataHeaders", modelName: "@ShowDataHeaders", displayName: "Show Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowDataHeaders", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showFilterHeaders = { propertyName: "showFilterHeaders", modelName: "@ShowFilterHeaders", displayName: "Show Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowFilterHeaders", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showFilterSeparatorBar = { propertyName: "showFilterSeparatorBar", modelName: "@ShowFilterSeparatorBar", displayName: "Show Filter Separator Bar", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowFilterSeparatorBar", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showGrandTotalsForSingleValues = { propertyName: "showGrandTotalsForSingleValues", modelName: "@ShowGrandTotalsForSingleValues", displayName: "Show Grand Totals For Single Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowGrandTotalsForSingleValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showHorzLines = { propertyName: "showHorzLines", modelName: "@ShowHorzLines", displayName: "Show Horz Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowHorzLines", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowGrandTotalHeader = { propertyName: "showRowGrandTotalHeader", modelName: "@ShowRowGrandTotalHeader", displayName: "Show Row Grand Total Header", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowRowGrandTotalHeader", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowGrandTotals = { propertyName: "showRowGrandTotals", modelName: "@ShowRowGrandTotals", displayName: "Show Row Grand Totals", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowRowGrandTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowHeaders = { propertyName: "showRowHeaders", modelName: "@ShowRowHeaders", displayName: "Show Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowRowHeaders", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showRowTotals = { propertyName: "showRowTotals", modelName: "@ShowRowTotals", displayName: "Show Row Totals", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowRowTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showTotalsForSingleValues = { propertyName: "showTotalsForSingleValues", modelName: "@ShowTotalsForSingleValues", displayName: "Show Totals For Single Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowTotalsForSingleValues", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showVertLines = { propertyName: "showVertLines", modelName: "@ShowVertLines", displayName: "Show Vert Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowVertLines", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsViewInfo = [columnTotalsLocation, groupFieldsInCustomizationWindow, rowTotalsLocation, rowTreeOffset, rowTreeWidth, showColumnGrandTotalHeader, showColumnGrandTotals, showColumnHeaders, showColumnTotals, showCustomTotalsForSingleValues,
                 showDataHeaders, showFilterHeaders, showFilterSeparatorBar, showGrandTotalsForSingleValues, showHorzLines, showRowGrandTotalHeader, showRowGrandTotals, showRowHeaders, showRowTotals,
-                showTotalsForSingleValues, showVertLines], optionsView = { propertyName: "optionsView", modelName: "OptionsView", displayName: "View Options", info: optionsViewInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+                showTotalsForSingleValues, showVertLines], optionsView = { propertyName: "optionsView", modelName: "OptionsView", displayName: "View Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsView", info: optionsViewInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.pivotGridOptions = [optionsChartDataSource, optionsDataField, optionsData, optionsPrint, optionsView];
             Report.pivotGridSerializationsInfo = [
                 Report.pivotGridAppearances,
@@ -19933,17 +20220,17 @@ var DevExpress;
                 return PictureBoxSurface;
             })(Report.ControlSurface);
             Report.PictureBoxSurface = PictureBoxSurface;
-            Report.image = { propertyName: "image", modelName: "@Image", editor: DevExpress.JS.Widgets.editorTemplates.image, displayName: "Image" };
-            Report.imageUrl = { propertyName: "imageUrl", modelName: "@ImageUrl", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "", displayName: "Image Url" };
+            Report.image = { propertyName: "image", modelName: "@Image", editor: DevExpress.JS.Widgets.editorTemplates.image, displayName: "Image", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image" };
+            Report.imageUrl = { propertyName: "imageUrl", modelName: "@ImageUrl", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "", displayName: "Image Url", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl" };
             Report.sizing = {
-                propertyName: "sizing", modelName: "@Sizing", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Sizing", defaultVal: "Normal", from: Designer.fromEnum, values: {
-                    "Normal": "Normal",
-                    "StretchImage": "Stretch Image",
-                    "AutoSize": "Auto-Size",
-                    "CenterImage": "Center Image",
-                    "ZoomImage": "Zoom Image",
-                    "Squeeze": "Squeeze"
-                }
+                propertyName: "sizing", modelName: "@Sizing", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Sizing", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Sizing", defaultVal: "Normal", from: Designer.fromEnum, valuesArray: [
+                    { value: "Normal", displayValue: "Normal", localizationId: "DevExpress.XtraPrinting.ImageSizeMode.Normal" },
+                    { value: "StretchImage", displayValue: "Stretch Image", localizationId: "DevExpress.XtraPrinting.ImageSizeMode.StretchImage" },
+                    { value: "AutoSize", displayValue: "Auto-Size", localizationId: "DevExpress.XtraPrinting.ImageSizeMode.AutoSize" },
+                    { value: "CenterImage", displayValue: "Center Image", localizationId: "DevExpress.XtraPrinting.ImageSizeMode.CenterImage" },
+                    { value: "ZoomImage", displayValue: "Zoom Image", localizationId: "DevExpress.XtraPrinting.ImageSizeMode.ZoomImage" },
+                    { value: "Squeeze", displayValue: "Squeeze", localizationId: "DevExpress.XtraPrinting.ImageSizeMode.Squeeze" }
+                ]
             };
             Report.pictureBoxSerializationsInfo = [
                 Report.image, Report.imageUrl, Report.sizing, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts,
@@ -20446,14 +20733,17 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Insert Row Above",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
                             imageClassName: "dxrd-image-actions-insert_row_above",
                             clickAction: function () { _this.insertRowAbove(); },
                         }, {
                             text: "Insert Row Below",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow',
                             imageClassName: "dxrd-image-actions-insert_row_below",
                             clickAction: function () { _this.insertRowBelow(); },
                         }, {
                             text: "Delete Row",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
                             imageClassName: "dxrd-image-actions-delete_row",
                             clickAction: function () { _this.deleteRow(); },
                         }
@@ -20496,34 +20786,42 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Insert Row Above",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
                             imageClassName: "dxrd-image-actions-insert_row_above",
                             clickAction: function () { _this.insertRowAbove(); },
                         }, {
                             text: "Insert Row Below",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow',
                             imageClassName: "dxrd-image-actions-insert_row_below",
                             clickAction: function () { _this.insertRowBelow(); },
                         }, {
                             text: "Delete Row",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
                             imageClassName: "dxrd-image-actions-delete_row",
                             clickAction: function () { _this.deleteRow(); },
                         }, {
                             text: "Insert Cell",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertCell',
                             imageClassName: "dxrd-image-actions-insert_cell",
                             clickAction: function () { _this.insertCell(); },
                         }, {
                             text: "Delete Cell",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteCell',
                             imageClassName: "dxrd-image-actions-delete_cell",
                             clickAction: function () { _this.deleteCell(); },
                         }, {
                             text: "Insert Column To Left",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToLeft',
                             imageClassName: "dxrd-image-actions-insert_column_to_left",
                             clickAction: function () { _this.insertColumn(false); },
                         }, {
                             text: "Insert Column To Right",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToRight',
                             imageClassName: "dxrd-image-actions-insert_column_to_right",
                             clickAction: function () { _this.insertColumn(true); },
                         }, {
                             text: "Delete Column",
+                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteColumn',
                             imageClassName: "dxrd-image-actions-delete_column",
                             clickAction: function () { _this.deleteColumn(); },
                         }
@@ -20574,7 +20872,7 @@ var DevExpress;
             })(TableRowActions);
             Report.TableCellActions = TableCellActions;
             Report.weight = { propertyName: "weight", modelName: "@Weight", defaultVal: 0, from: Designer.floatFromModel };
-            Report.rowSpan = { propertyName: "rowSpan", modelName: "@RowSpan", displayName: "Row Span", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.rowSpan = { propertyName: "rowSpan", modelName: "@RowSpan", displayName: "Row Span", localizationId: "DevExpress.XtraReports.UI.XRTableCell.RowSpan", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Report.tableSerializationsInfo = [
                 Report.font, Report.foreColor, Report.keepTogetherDefaultValueFalse, Report.anchorVertical, Report.anchorHorizontal, Report.commonScripts,
                 { propertyName: "rows", modelName: "Rows", array: true },
@@ -20583,7 +20881,7 @@ var DevExpress;
             ].concat(Report.sizeLocation, Report.commonControlProperties, Report.bookmarkGroup);
             Report.tableCellSerializationsInfo = [
                 Report.weight, Report.labelScripts, Report.rowSpan, Report.textTrimming,
-                { propertyName: "width", displayName: "Width" },
+                { propertyName: "width", displayName: "Width", localizationId: "DevExpress.XtraReports.UI.XRControl.Width" },
                 { propertyName: "controls", modelName: "Controls", array: true },
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark"]),
                 Report.defaultDataBinding("Text"),
@@ -20591,7 +20889,7 @@ var DevExpress;
             ].concat(Report.labelGroup);
             Report.tableRowSerializationsInfo = [
                 Report.weight, Report.textAlignment, Report.keepTogether, Report.controlScripts,
-                { propertyName: "height", displayName: "Height" },
+                { propertyName: "height", displayName: "Height", localizationId: "DevExpress.XtraReports.UI.XRControl.Height" },
                 { propertyName: "cells", modelName: "Cells", array: true },
             ].concat(Report.commonControlProperties, Report.fontGroup);
             Report.popularPropertiesTable = ["bookmark", "bookmarkParent"];
@@ -20655,13 +20953,13 @@ var DevExpress;
                 modelName: "@LineDirection",
                 defaultVal: "Horizontal",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Line Direction",
-                values: {
-                    "Horizontal": "Horizontal",
-                    "Vertical": "Vertical",
-                    "Slant": "Slant",
-                    "BackSlant": "BackSlant"
-                }
+                displayName: "Line Direction", localizationId: "DevExpress.XtraReports.UI.XRLine.LineDirection",
+                valuesArray: [
+                    { value: "Horizontal", displayValue: "Horizontal", localizationId: "DevExpress.XtraReports.UI.LineDirection.Horizontal" },
+                    { value: "Vertical", displayValue: "Vertical", localizationId: "DevExpress.XtraReports.UI.LineDirection.Vertical" },
+                    { value: "Slant", displayValue: "Slant", localizationId: "DevExpress.XtraReports.UI.LineDirection.Slant" },
+                    { value: "BackSlant", displayValue: "BackSlant", localizationId: "DevExpress.XtraReports.UI.LineDirection.BackSlant" }
+                ]
             };
             Report.lineSerializationsInfo = [
                 Report.foreColor, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal,
@@ -20864,43 +21162,43 @@ var DevExpress;
             })(Report.ControlSurface);
             Report.ShapeControlSurface = ShapeControlSurface;
             Report.shapeType = { propertyName: "shapeType", modelName: "@ShapeName", defaultVal: "Ellipse" };
-            Report.stretch = { propertyName: "stretch", modelName: "@Stretch", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Stretch" };
-            Report.fillColor = { propertyName: "fillColor", modelName: "@FillColor", defaultVal: "transparent", editor: Designer.Widgets.editorTemplates.customColorEditor, from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Fill Color" };
+            Report.stretch = { propertyName: "stretch", modelName: "@Stretch", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Stretch", localizationId: "DevExpress.XtraReports.UI.XRShape.Stretch" };
+            Report.fillColor = { propertyName: "fillColor", modelName: "@FillColor", defaultVal: "transparent", editor: Designer.Widgets.editorTemplates.customColorEditor, from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Fill Color", localizationId: "DevExpress.XtraReports.UI.XRShape.FillColor" };
             Report.Shape = { propertyName: "Shape", modelName: "Shape" };
-            Report.shapeFake = { propertyName: "shapeFake", editor: Report.editorTemplates.shape, displayName: "Shape" };
+            Report.shapeFake = { propertyName: "shapeFake", editor: Report.editorTemplates.shape, displayName: "Shape", localizationId: "DevExpress.XtraReports.UI.XRShape.Shape" };
             Report.shapeElementSerializationsInfo = [Report.shapeType];
-            var fillet = { propertyName: "fillet", modelName: "@Fillet", defaultVal: 0, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Fillet" };
+            var fillet = { propertyName: "fillet", modelName: "@Fillet", defaultVal: 0, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Fillet", localizationId: "DevExpress.XtraPrinting.Shape.FilletShapeBase.Fillet" };
             var shapeRectangleSerializationsInfo = [Report.shapeType, fillet];
             var shapeStarSerializationsInfo = [
                 Report.shapeType,
-                { propertyName: "concavity", modelName: "@Concavity", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Concavity" },
-                { propertyName: "starPointCount", modelName: "@StarPointCount", defaultVal: 3, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Count of Star Points" },
+                { propertyName: "concavity", modelName: "@Concavity", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Concavity", localizationId: "DevExpress.XtraPrinting.Shape.ShapeStar.Concavity" },
+                { propertyName: "starPointCount", modelName: "@StarPointCount", defaultVal: 3, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Count of Star Points", localizationId: "DevExpress.XtraPrinting.Shape.ShapeStar.StarPointCount" },
                 fillet
             ];
             var shapeBraceSerializationsInfo = [
                 Report.shapeType,
-                { propertyName: "fillet", modelName: "@Fillet", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Fillet" },
-                { propertyName: "tailLength", modelName: "@TailLength", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Tail\'s Length" },
-                { propertyName: "tipLength", modelName: "@TipLength", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Tip\'s Length" }
+                { propertyName: "fillet", modelName: "@Fillet", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Fillet", localizationId: "DevExpress.XtraPrinting.Shape.ShapeBrace.Fillet" },
+                { propertyName: "tailLength", modelName: "@TailLength", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Tail\'s Length", localizationId: "DevExpress.XtraPrinting.Shape.ShapeBrace.TailLength" },
+                { propertyName: "tipLength", modelName: "@TipLength", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Tip\'s Length", localizationId: "DevExpress.XtraPrinting.Shape.ShapeBracket.TipLength" }
             ];
             var shapeBracketSerializationsInfo = [
                 Report.shapeType,
-                { propertyName: "tipLength", modelName: "@TipLength", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Tip\'s Length" }
+                { propertyName: "tipLength", modelName: "@TipLength", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Tip\'s Length", localizationId: "DevExpress.XtraPrinting.Shape.ShapeBracket.TipLength" }
             ];
             var shapePolygonSerializationsInfo = [
                 Report.shapeType, fillet,
-                { propertyName: "numberOfSides", modelName: "@NumberOfSides", defaultVal: 3, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Number of Sides" },
+                { propertyName: "numberOfSides", modelName: "@NumberOfSides", defaultVal: 3, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Number of Sides", localizationId: "DevExpress.XtraPrinting.Shape.ShapePolygon.NumberOfSides" },
             ];
             var shapeArrowSerializationsInfo = [
                 Report.shapeType,
-                { propertyName: "arrowHeight", modelName: "@ArrowHeight", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Arrow Height" },
-                { propertyName: "arrowWidth", modelName: "@ArrowWidth", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Arrow Width" },
+                { propertyName: "arrowHeight", modelName: "@ArrowHeight", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Arrow Height", localizationId: "DevExpress.XtraPrinting.Shape.ShapeArrow.ArrowHeight" },
+                { propertyName: "arrowWidth", modelName: "@ArrowWidth", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Arrow Width", localizationId: "DevExpress.XtraPrinting.Shape.ShapeArrow.ArrowWidth" },
                 fillet
             ];
             var shapeCrossSerializationsInfo = [
                 Report.shapeType, fillet,
-                { propertyName: "horizontalLineWidth", modelName: "@HorizontalLineWidth", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Horizontal Line Width" },
-                { propertyName: "verticalLineWidth", modelName: "@VerticalLineWidth", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Vertical Line Width" }
+                { propertyName: "horizontalLineWidth", modelName: "@HorizontalLineWidth", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Horizontal Line Width", localizationId: "DevExpress.XtraPrinting.Shape.ShapeCross.HorizontalLineWidth" },
+                { propertyName: "verticalLineWidth", modelName: "@VerticalLineWidth", defaultVal: 50, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Vertical Line Width", localizationId: "DevExpress.XtraPrinting.Shape.ShapeCross.VerticalLineWidth" }
             ];
             var shapesMap = {
                 "Rectangle": shapeRectangleSerializationsInfo,
@@ -20997,101 +21295,101 @@ var DevExpress;
             })(Report.ControlSurface);
             Report.XRBarcodeSurface = XRBarcodeSurface;
             var defaultCodeSerializationInfo = { propertyName: "name", modelName: "@Name" };
-            var calcCheckSum = { propertyName: "calcCheckSum", modelName: "@CalcCheckSum", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Calculate a Checksum" };
+            var calcCheckSum = { propertyName: "calcCheckSum", modelName: "@CalcCheckSum", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Calculate a Checksum", localizationId: "DevExpress.XtraPrinting.BarCode.BarCodeGeneratorBase.CalcCheckSum" };
             var code93SerializationInfo = [defaultCodeSerializationInfo, calcCheckSum];
-            var wideNarrowRation = { propertyName: "wideNarrowRation", modelName: "@WideNarrowRatio", defaultVal: 2.5, from: Designer.floatFromModel, displayName: "Wide Narrow Ratio", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            var wideNarrowRation = { propertyName: "wideNarrowRation", modelName: "@WideNarrowRatio", defaultVal: 2.5, from: Designer.floatFromModel, displayName: "Wide Narrow Ratio", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarGenerator.WideNarrowRatio", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             var codabarSerializationInfo = [
                 defaultCodeSerializationInfo,
                 wideNarrowRation,
                 {
                     propertyName: "startStopPait",
-                    modelName: "@StartStopPair", defaultVal: "AT", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Start and Stop Symbols",
-                    values: {
-                        "None": "None",
-                        "AT": "AT",
-                        "BN": "BN",
-                        "CStar": "CStar",
-                        "DE": "DE"
-                    }
+                    modelName: "@StartStopPair", defaultVal: "AT", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Start and Stop Symbols", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarGenerator.StartStopPair",
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.None" },
+                        { value: "AT", displayValue: "AT", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.AT" },
+                        { value: "BN", displayValue: "BN", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.BN" },
+                        { value: "CStar", displayValue: "CStar", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.CStar" },
+                        { value: "DE", displayValue: "DE", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.DE" }
+                    ]
                 },
             ];
             var charset = {
                 propertyName: "characterSet",
-                modelName: "@CharacterSet", defaultVal: "CharsetA", displayName: "Character Set", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
-                    "CharsetAuto": "CharsetAuto",
-                    "CharsetA": "CharsetA",
-                    "CharsetB": "CharsetB",
-                    "CharsetC": "CharsetC"
-                }
+                modelName: "@CharacterSet", defaultVal: "CharsetA", displayName: "Character Set", localizationId: "DevExpress.XtraPrinting.BarCode.Code128Generator.CharacterSet", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "CharsetAuto", displayValue: "CharsetAuto", localizationId: "DevExpress.XtraPrinting.BarCode.Code128Charset.CharsetAuto" },
+                    { value: "CharsetA", displayValue: "CharsetA", localizationId: "DevExpress.XtraPrinting.BarCode.Code128Charset.CharsetA" },
+                    { value: "CharsetB", displayValue: "CharsetB", localizationId: "DevExpress.XtraPrinting.BarCode.Code128Charset.CharsetB" },
+                    { value: "CharsetC", displayValue: "CharsetC", localizationId: "DevExpress.XtraPrinting.BarCode.Code128Charset.CharsetC" }
+                ]
             };
-            var addLeadingZero = { propertyName: "addLeadingZero", displayName: "Add Leading Zero", modelName: "@AddLeadingZero", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            var addLeadingZero = { propertyName: "addLeadingZero", displayName: "Add Leading Zero", localizationId: "DevExpress.XtraPrinting.BarCode.Code128Generator.AddLeadingZero", modelName: "@AddLeadingZero", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool };
             var code128SerializationInfo = [defaultCodeSerializationInfo, addLeadingZero, charset];
             var code39SerializationInfo = [wideNarrowRation].concat(code93SerializationInfo);
             var codeMSISerializationInfo = [
                 defaultCodeSerializationInfo,
                 {
                     propertyName: "msiCheckSum",
-                    modelName: "@MSICheckSum", defaultVal: "Modulo10", displayName: "MSI Checksum", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    values: {
-                        "None": "None",
-                        "Modulo10": "Modulo10",
-                        "DoubleModulo10": "DoubleModulo10"
-                    }
+                    modelName: "@MSICheckSum", defaultVal: "Modulo10", displayName: "MSI Checksum", localizationId: "DevExpress.XtraPrinting.BarCode.CodeMSIGenerator.MSICheckSum", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    valuesArray: [
+                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.BarCode.MSICheckSum.None" },
+                        { value: "Modulo10", displayValue: "Modulo10", localizationId: "DevExpress.XtraPrinting.BarCode.MSICheckSum.Modulo10" },
+                        { value: "DoubleModulo10", displayValue: "DoubleModulo10", localizationId: "DevExpress.XtraPrinting.BarCode.MSICheckSum.DoubleModulo10" }
+                    ]
                 }];
-            var fnc1Substitute = { propertyName: "fNC1Substitute", modelName: "@FNC1Substitute", defaultVal: "#", editor: DevExpress.JS.Widgets.editorTemplates.text, displayName: "FNC1 Functional Character" };
+            var fnc1Substitute = { propertyName: "fNC1Substitute", modelName: "@FNC1Substitute", defaultVal: "#", editor: DevExpress.JS.Widgets.editorTemplates.text, displayName: "FNC1 Functional Character", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarGenerator.FNC1Substitute" };
             var dataBarSerializationInfo = [
                 defaultCodeSerializationInfo,
                 fnc1Substitute,
-                { propertyName: "segmentsInRow", modelName: "@SegmentsInRow", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Segments In Row" },
+                { propertyName: "segmentsInRow", modelName: "@SegmentsInRow", defaultVal: 20, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Segments In Row", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarGenerator.SegmentsInRow" },
                 {
                     propertyName: "type",
                     modelName: "@Type", defaultVal: "Omnidirectional", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    displayName: "Type", values: {
-                        "Omnidirectional": "Omnidirectional",
-                        "Truncated": "Truncated",
-                        "Stacked": "Stacked",
-                        "StackedOmnidirectional": "StackedOmnidirectional",
-                        "Limited": "Limited",
-                        "Expanded": "Expanded",
-                        "ExpandedStacked": "ExpandedStacked"
-                    }
+                    displayName: "Type", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarGenerator.Type", valuesArray: [
+                        { value: "Omnidirectional", displayValue: "Omnidirectional", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.Omnidirectional" },
+                        { value: "Truncated", displayValue: "Truncated", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.Truncated" },
+                        { value: "Stacked", displayValue: "Stacked", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.Stacked" },
+                        { value: "StackedOmnidirectional", displayValue: "StackedOmnidirectional", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.StackedOmnidirectional" },
+                        { value: "Limited", displayValue: "Limited", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.Limited" },
+                        { value: "Expanded", displayValue: "Expanded", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.Expanded" },
+                        { value: "ExpandedStacked", displayValue: "ExpandedStacked", localizationId: "DevExpress.XtraPrinting.BarCode.DataBarType.ExpandedStacked" }
+                    ]
                 }];
             var matrixSize = {
                 propertyName: "matrixSize",
                 modelName: "@MatrixSize", defaultVal: "MatrixAuto", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Matrix Size", values: {
-                    "MatrixAuto": "MatrixAuto",
-                    "Matrix10x10": "Matrix10x10",
-                    "Matrix12x12": "Matrix12x12",
-                    "Matrix14x14": "Matrix14x14",
-                    "Matrix16x16": "Matrix16x16",
-                    "Matrix18x18": "Matrix18x18",
-                    "Matrix20x20": "Matrix20x20",
-                    "Matrix22x22": "Matrix22x22",
-                    "Matrix24x24": "Matrix24x24",
-                    "Matrix26x26": "Matrix26x26",
-                    "Matrix32x32": "Matrix32x32",
-                    "Matrix36x36": "Matrix36x36",
-                    "Matrix40x40": "Matrix40x40",
-                    "Matrix44x44": "Matrix44x44",
-                    "Matrix48x48": "Matrix48x48",
-                    "Matrix52x52": "Matrix52x52",
-                    "Matrix64x64": "Matrix64x64",
-                    "Matrix72x72": "Matrix72x72",
-                    "Matrix80x80": "Matrix80x80",
-                    "Matrix88x88": "Matrix88x88",
-                    "Matrix96x96": "Matrix96x96",
-                    "Matrix104x104": "Matrix104x104",
-                    "Matrix120x120": "Matrix120x120",
-                    "Matrix132x132": "Matrix132x132",
-                    "Matrix144x144": "Matrix144x144",
-                    "Matrix8x18": "Matrix8x18",
-                    "Matrix8x32": "Matrix8x32",
-                    "Matrix12x26": "Matrix12x26",
-                    "Matrix12x36": "Matrix12x36",
-                    "Matrix16x36": "Matrix16x36",
-                    "Matrix16x48": "Matrix16x48"
-                }
+                displayName: "Matrix Size", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixGenerator.MatrixSize", valuesArray: [
+                    { value: "MatrixAuto", displayValue: "MatrixAuto", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.MatrixAuto" },
+                    { value: "Matrix10x10", displayValue: "Matrix10x10", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix10x10" },
+                    { value: "Matrix12x12", displayValue: "Matrix12x12", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix12x12" },
+                    { value: "Matrix14x14", displayValue: "Matrix14x14", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix14x14" },
+                    { value: "Matrix16x16", displayValue: "Matrix16x16", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix16x16" },
+                    { value: "Matrix18x18", displayValue: "Matrix18x18", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix18x18" },
+                    { value: "Matrix20x20", displayValue: "Matrix20x20", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix20x20" },
+                    { value: "Matrix22x22", displayValue: "Matrix22x22", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix22x22" },
+                    { value: "Matrix24x24", displayValue: "Matrix24x24", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix24x24" },
+                    { value: "Matrix26x26", displayValue: "Matrix26x26", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix26x26" },
+                    { value: "Matrix32x32", displayValue: "Matrix32x32", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix32x32" },
+                    { value: "Matrix36x36", displayValue: "Matrix36x36", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix36x36" },
+                    { value: "Matrix40x40", displayValue: "Matrix40x40", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix40x40" },
+                    { value: "Matrix44x44", displayValue: "Matrix44x44", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix44x44" },
+                    { value: "Matrix48x48", displayValue: "Matrix48x48", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix48x48" },
+                    { value: "Matrix52x52", displayValue: "Matrix52x52", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix52x52" },
+                    { value: "Matrix64x64", displayValue: "Matrix64x64", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix64x64" },
+                    { value: "Matrix72x72", displayValue: "Matrix72x72", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix72x72" },
+                    { value: "Matrix80x80", displayValue: "Matrix80x80", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix80x80" },
+                    { value: "Matrix88x88", displayValue: "Matrix88x88", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix88x88" },
+                    { value: "Matrix96x96", displayValue: "Matrix96x96", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix96x96" },
+                    { value: "Matrix104x104", displayValue: "Matrix104x104", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix104x104" },
+                    { value: "Matrix120x120", displayValue: "Matrix120x120", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix120x120" },
+                    { value: "Matrix132x132", displayValue: "Matrix132x132", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix132x132" },
+                    { value: "Matrix144x144", displayValue: "Matrix144x144", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix144x144" },
+                    { value: "Matrix8x18", displayValue: "Matrix8x18", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix8x18" },
+                    { value: "Matrix8x32", displayValue: "Matrix8x32", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix8x32" },
+                    { value: "Matrix12x26", displayValue: "Matrix12x26", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix12x26" },
+                    { value: "Matrix12x36", displayValue: "Matrix12x36", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix12x36" },
+                    { value: "Matrix16x36", displayValue: "Matrix16x36", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix16x36" },
+                    { value: "Matrix16x48", displayValue: "Matrix16x48", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixSize.Matrix16x48" }
+                ]
             };
             var dataMatrixSerializationInfo = [
                 defaultCodeSerializationInfo,
@@ -21099,16 +21397,16 @@ var DevExpress;
                 {
                     propertyName: "compactionMode",
                     modelName: "@CompactionMode", defaultVal: "ASCII", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                    displayName: "Compaction Mode", values: {
-                        "ASCII": "ASCII",
-                        "C40": "C40",
-                        "Text": "Text",
-                        "X12": "X12",
-                        "Edifact": "Edifact",
-                        "Binary": "Binary"
-                    }
+                    displayName: "Compaction Mode", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixGenerator.CompactionMode", valuesArray: [
+                        { value: "ASCII", displayValue: "ASCII", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.ASCII" },
+                        { value: "C40", displayValue: "C40", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.C40" },
+                        { value: "Text", displayValue: "Text", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.Text" },
+                        { value: "X12", displayValue: "X12", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.X12" },
+                        { value: "Edifact", displayValue: "Edifact", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.Edifact" },
+                        { value: "Binary", displayValue: "Binary", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.Binary" }
+                    ]
                 }];
-            var humanReadableText = { propertyName: "humanReadableText", modelName: "@HumanReadableText", defaultVal: true, from: Designer.parseBool, displayName: "Human-Readable Text", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            var humanReadableText = { propertyName: "humanReadableText", modelName: "@HumanReadableText", defaultVal: true, from: Designer.parseBool, displayName: "Human-Readable Text", localizationId: "DevExpress.XtraPrinting.BarCode.DataMatrixGS1Generator.HumanReadableText", editor: DevExpress.JS.Widgets.editorTemplates.bool };
             var dataMatrixGS1SerializationInfo = [
                 defaultCodeSerializationInfo,
                 matrixSize,
@@ -21124,124 +21422,124 @@ var DevExpress;
             var Industrial2of5Interleaved2of5ITF14Matrix2of5SerializationInfo = [defaultCodeSerializationInfo, calcCheckSum, wideNarrowRation];
             var PDF417SerializationInfo = [
                 defaultCodeSerializationInfo,
-                { propertyName: "columns", modelName: "@Columns", defaultVal: 1, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Columns" },
+                { propertyName: "columns", modelName: "@Columns", defaultVal: 1, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Columns", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417Generator.Columns" },
                 {
                     propertyName: "compactionMode1",
-                    modelName: "@CompactionMode", defaultVal: "Text", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Compaction Mode",
-                    values: {
-                        "Binary": "Binary",
-                        "Text": "Text"
-                    }
+                    modelName: "@CompactionMode", defaultVal: "Text", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Compaction Mode", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417Generator.CompactionMode",
+                    valuesArray: [
+                        { value: "Binary", displayValue: "Binary", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417CompactionMode.Binary" },
+                        { value: "Text", displayValue: "Text", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417CompactionMode.Text" }
+                    ]
                 },
                 {
                     propertyName: "errorCorrectionLevel",
-                    modelName: "@ErrorCorrectionLevel", defaultVal: "Level2", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Error Correction Level",
-                    values: {
-                        "Level0": "Level0",
-                        "Level1": "Level1",
-                        "Level2": "Level2",
-                        "Level3": "Level3",
-                        "Level4": "Level4",
-                        "Level5": "Level5",
-                        "Level6": "Level6",
-                        "Level7": "Level7",
-                        "Level8": "Level8"
-                    }
+                    modelName: "@ErrorCorrectionLevel", defaultVal: "Level2", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Error Correction Level", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417Generator.ErrorCorrectionLevel",
+                    valuesArray: [
+                        { value: "Level0", displayValue: "Level0", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level0" },
+                        { value: "Level1", displayValue: "Level1", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level1" },
+                        { value: "Level2", displayValue: "Level2", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level2" },
+                        { value: "Level3", displayValue: "Level3", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level3" },
+                        { value: "Level4", displayValue: "Level4", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level4" },
+                        { value: "Level5", displayValue: "Level5", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level5" },
+                        { value: "Level6", displayValue: "Level6", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level6" },
+                        { value: "Level7", displayValue: "Level7", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level7" },
+                        { value: "Level8", displayValue: "Level8", localizationId: "DevExpress.XtraPrinting.BarCode.ErrorCorrectionLevel.Level8" }
+                    ]
                 },
-                { propertyName: "rows", modelName: "@Rows", defaultVal: 0, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Rows" },
-                { propertyName: "yToXRatio", modelName: "@YToXRatio", defaultVal: 3, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Y to X Ratio" },
-                { propertyName: "truncateSymbol", modelName: "@TruncateSymbol", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Truncate Symbol" }
+                { propertyName: "rows", modelName: "@Rows", defaultVal: 0, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Rows", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417Generator.Rows" },
+                { propertyName: "yToXRatio", modelName: "@YToXRatio", defaultVal: 3, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Y to X Ratio", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417Generator.YToXRatio" },
+                { propertyName: "truncateSymbol", modelName: "@TruncateSymbol", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Truncate Symbol", localizationId: "DevExpress.XtraPrinting.BarCode.PDF417Generator.TruncateSymbol" }
             ];
             var QRCodeSerializationInfo = [
                 defaultCodeSerializationInfo,
                 {
                     propertyName: "compactionMode2",
-                    modelName: "@CompactionMode", defaultVal: "AlphaNumeric", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Compaction Mode",
-                    values: {
-                        "Numeric": "Numeric",
-                        "AlphaNumeric": "AlphaNumeric",
-                        "Byte": "Byte"
-                    }
+                    modelName: "@CompactionMode", defaultVal: "AlphaNumeric", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Compaction Mode", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeGenerator.CompactionMode",
+                    valuesArray: [
+                        { value: "Numeric", displayValue: "Numeric", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeCompactionMode.Numeric" },
+                        { value: "AlphaNumeric", displayValue: "AlphaNumeric", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeCompactionMode.AlphaNumeric" },
+                        { value: "Byte", displayValue: "Byte", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeCompactionMode.Byte" }
+                    ]
                 },
                 {
                     propertyName: "errorCorrectionLevel1",
-                    modelName: "@ErrorCorrectionLevel", defaultVal: "L", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Error Correction Level",
-                    values: {
-                        "M": "M",
-                        "L": "L",
-                        "H": "H",
-                        "Q": "Q"
-                    }
+                    modelName: "@ErrorCorrectionLevel", defaultVal: "L", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Error Correction Level", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeGenerator.ErrorCorrectionLevel",
+                    valuesArray: [
+                        { value: "M", displayValue: "M", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.M" },
+                        { value: "L", displayValue: "L", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.L" },
+                        { value: "H", displayValue: "H", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.H" },
+                        { value: "Q", displayValue: "Q", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.Q" }
+                    ]
                 },
                 {
                     propertyName: "version",
-                    modelName: "@Version", defaultVal: "Version1", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Version",
-                    values: {
-                        "AutoVersion": "AutoVersion",
-                        "Version1": "Version1",
-                        "Version2": "Version2",
-                        "Version3": "Version3",
-                        "Version4": "Version4",
-                        "Version5": "Version5",
-                        "Version6": "Version6",
-                        "Version7": "Version7",
-                        "Version8": "Version8",
-                        "Version9": "Version9",
-                        "Version10": "Version10",
-                        "Version11": "Version11",
-                        "Version12": "Version12",
-                        "Version13": "Version13",
-                        "Version14": "Version14",
-                        "Version15": "Version15",
-                        "Version16": "Version16",
-                        "Version17": "Version17",
-                        "Version18": "Version18",
-                        "Version19": "Version19",
-                        "Version20": "Version20",
-                        "Version21": "Version21",
-                        "Version22": "Version22",
-                        "Version23": "Version23",
-                        "Version24": "Version24",
-                        "Version25": "Version25",
-                        "Version26": "Version26",
-                        "Version27": "Version27",
-                        "Version28": "Version28",
-                        "Version29": "Version29",
-                        "Version30": "Version30",
-                        "Version31": "Version31",
-                        "Version32": "Version32",
-                        "Version33": "Version33",
-                        "Version34": "Version34",
-                        "Version35": "Version35",
-                        "Version36": "Version36",
-                        "Version37": "Version37",
-                        "Version38": "Version38",
-                        "Version39": "Version39",
-                        "Version40": "Version40",
-                    }
+                    modelName: "@Version", defaultVal: "Version1", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Version", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeGenerator.Version",
+                    valuesArray: [
+                        { value: "AutoVersion", displayValue: "AutoVersion", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.AutoVersion" },
+                        { value: "Version1", displayValue: "Version1", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version1" },
+                        { value: "Version2", displayValue: "Version2", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version2" },
+                        { value: "Version3", displayValue: "Version3", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version3" },
+                        { value: "Version4", displayValue: "Version4", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version4" },
+                        { value: "Version5", displayValue: "Version5", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version5" },
+                        { value: "Version6", displayValue: "Version6", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version6" },
+                        { value: "Version7", displayValue: "Version7", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version7" },
+                        { value: "Version8", displayValue: "Version8", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version8" },
+                        { value: "Version9", displayValue: "Version9", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version9" },
+                        { value: "Version10", displayValue: "Version10", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version10" },
+                        { value: "Version11", displayValue: "Version11", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version11" },
+                        { value: "Version12", displayValue: "Version12", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version12" },
+                        { value: "Version13", displayValue: "Version13", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version13" },
+                        { value: "Version14", displayValue: "Version14", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version14" },
+                        { value: "Version15", displayValue: "Version15", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version15" },
+                        { value: "Version16", displayValue: "Version16", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version16" },
+                        { value: "Version17", displayValue: "Version17", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version17" },
+                        { value: "Version18", displayValue: "Version18", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version18" },
+                        { value: "Version19", displayValue: "Version19", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version19" },
+                        { value: "Version20", displayValue: "Version20", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version20" },
+                        { value: "Version21", displayValue: "Version21", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version21" },
+                        { value: "Version22", displayValue: "Version22", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version22" },
+                        { value: "Version23", displayValue: "Version23", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version23" },
+                        { value: "Version24", displayValue: "Version24", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version24" },
+                        { value: "Version25", displayValue: "Version25", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version25" },
+                        { value: "Version26", displayValue: "Version26", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version26" },
+                        { value: "Version27", displayValue: "Version27", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version27" },
+                        { value: "Version28", displayValue: "Version28", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version28" },
+                        { value: "Version29", displayValue: "Version29", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version29" },
+                        { value: "Version30", displayValue: "Version30", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version30" },
+                        { value: "Version31", displayValue: "Version31", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version31" },
+                        { value: "Version32", displayValue: "Version32", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version32" },
+                        { value: "Version33", displayValue: "Version33", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version33" },
+                        { value: "Version34", displayValue: "Version34", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version34" },
+                        { value: "Version35", displayValue: "Version35", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version35" },
+                        { value: "Version36", displayValue: "Version36", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version36" },
+                        { value: "Version37", displayValue: "Version37", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version37" },
+                        { value: "Version38", displayValue: "Version38", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version38" },
+                        { value: "Version39", displayValue: "Version39", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version39" },
+                        { value: "Version40", displayValue: "Version40", localizationId: "DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version40" },
+                    ]
                 }
             ];
-            Report.autoModule = { propertyName: "autoModule", modelName: "@AutoModule", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Auto-Module" };
+            Report.autoModule = { propertyName: "autoModule", modelName: "@AutoModule", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Auto-Module", localizationId: "DevExpress.XtraReports.UI.XRBarCode.AutoModule" };
             Report.barCodeOrientation = {
                 propertyName: "barCodeOrientation",
                 modelName: "@BarCodeOrientation", defaultVal: "Normal",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                displayName: "Orientation", values: {
-                    "Normal": "Normal",
-                    "UpsideDown": "UpsideDown",
-                    "RotateLeft": "RotateLeft",
-                    "RotateRight": "RotateRight"
-                }
+                displayName: "Orientation", localizationId: "DevExpress.XtraReports.UI.XRBarCode.BarCodeOrientation", valuesArray: [
+                    { value: "Normal", displayValue: "Normal", localizationId: "DevExpress.XtraPrinting.BarCode.BarCodeOrientation.Normal" },
+                    { value: "UpsideDown", displayValue: "UpsideDown", localizationId: "DevExpress.XtraPrinting.BarCode.BarCodeOrientation.UpsideDown" },
+                    { value: "RotateLeft", displayValue: "RotateLeft", localizationId: "DevExpress.XtraPrinting.BarCode.BarCodeOrientation.RotateLeft" },
+                    { value: "RotateRight", displayValue: "RotateRight", localizationId: "DevExpress.XtraPrinting.BarCode.BarCodeOrientation.RotateRight" }
+                ]
             };
-            Report.moduleInfo = { propertyName: "module", modelName: "@Module", defaultVal: 2, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Module" };
-            Report.showText = { propertyName: "showText", modelName: "@ShowText", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Show Text" };
+            Report.moduleInfo = { propertyName: "module", modelName: "@Module", defaultVal: 2, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Module", localizationId: "DevExpress.XtraReports.UI.XRBarCode.Module" };
+            Report.showText = { propertyName: "showText", modelName: "@ShowText", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Show Text", localizationId: "DevExpress.XtraReports.UI.XRBarCode.ShowText" };
             Report.symbology = { propertyName: "symbology", modelName: "Symbology" };
-            Report.barcodeFake = { propertyName: "barcodeFake", editor: Report.editorTemplates.symbology, displayName: "Symbology" };
+            Report.barcodeFake = { propertyName: "barcodeFake", editor: Report.editorTemplates.symbology, displayName: "Symbology", localizationId: "DevExpress.XtraReports.UI.XRBarCode.Symbology" };
             Report.alignment = {
                 propertyName: "alignment",
-                modelName: "@Alignment", displayName: "Alignment", defaultVal: "TopLeft",
+                modelName: "@Alignment", displayName: "Alignment", localizationId: "DevExpress.XtraReports.UI.XRBarCode.Alignment", defaultVal: "TopLeft",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: Report.textAlignmentValues
+                valuesArray: Report.textAlignmentValues
             };
             var barCodesMap = {
                 "Codabar": codabarSerializationInfo,
@@ -21316,7 +21614,7 @@ var DevExpress;
                 return ZipCodeSurface;
             })(Report.ControlSurface);
             Report.ZipCodeSurface = ZipCodeSurface;
-            Report.segmentWidth = { propertyName: "segmentWidth", modelName: "@SegmentWidth", defaultVal: 4, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Segment Width" };
+            Report.segmentWidth = { propertyName: "segmentWidth", modelName: "@SegmentWidth", defaultVal: 4, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Segment Width", localizationId: "DevExpress.XtraReports.UI.XRZipCode.SegmentWidth" };
             Report.zipCodeSerializationInfo = [
                 Report.foreColor, Report.segmentWidth, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
                 $.extend({}, Report.text, { defaultVal: "0" }),
@@ -21357,38 +21655,38 @@ var DevExpress;
             })(Report.ControlViewModel);
             Report.XRGaugeViewModel = XRGaugeViewModel;
             Report.circularValues = [
-                { displayValue: "Half", value: "Half" },
-                { displayValue: "Full", value: "Full" },
-                { displayValue: "QuarterLeft", value: "QuarterLeft" },
-                { displayValue: "QuarterRight", value: "QuarterRight" },
-                { displayValue: "ThreeFourth", value: "ThreeFourth" }
+                { displayValue: "Half", value: "Half", localizationId: "GaugesPresetsStringId.ShapeHalf" },
+                { displayValue: "Full", value: "Full", localizationId: "GaugesPresetsStringId.ShapeFull" },
+                { displayValue: "QuarterLeft", value: "QuarterLeft", localizationId: "GaugesPresetsStringId.ShapeQuarterLeft" },
+                { displayValue: "QuarterRight", value: "QuarterRight", localizationId: "GaugesPresetsStringId.ShapeQuarterRight" },
+                { displayValue: "ThreeFourth", value: "ThreeFourth", localizationId: "GaugesPresetsStringId.ShapeThreeFourth" }
             ];
             Report.linearValues = [
-                { displayValue: "Horizontal", value: "Horizontal" },
-                { displayValue: "Vertical", value: "Vertical" }
+                { displayValue: "Horizontal", value: "Horizontal", localizationId: "GaugesPresetsStringId.ShapeHorizontal" },
+                { displayValue: "Vertical", value: "Vertical", localizationId: "GaugesPresetsStringId.ShapeVertical" }
             ];
-            Report.actualValue = { propertyName: "actualValue", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Actual Value", modelName: "@ActualValue" };
-            Report.maximum = { propertyName: "maximum", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Maximum", modelName: "@Maximum" };
-            Report.minimum = { propertyName: "minimum", modelName: "@Minimum", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Minimum" };
-            Report.targetValue = { propertyName: "targetValue", modelName: "@TargetValue", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Target Value" };
-            Report.viewStyle = { propertyName: "viewStyle", modelName: "@ViewStyle", displayName: "View Style", editor: Report.editorTemplates.viewStyle };
+            Report.actualValue = { propertyName: "actualValue", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Actual Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.ActualValue", modelName: "@ActualValue" };
+            Report.maximum = { propertyName: "maximum", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Maximum", localizationId: "DevExpress.XtraReports.UI.XRGauge.Maximum", modelName: "@Maximum" };
+            Report.minimum = { propertyName: "minimum", modelName: "@Minimum", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Minimum", localizationId: "DevExpress.XtraReports.UI.XRGauge.Minimum" };
+            Report.targetValue = { propertyName: "targetValue", modelName: "@TargetValue", defaultVal: null, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Target Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.TargetValue" };
+            Report.viewStyle = { propertyName: "viewStyle", modelName: "@ViewStyle", displayName: "View Style", localizationId: "DevExpress.XtraReports.UI.XRGauge.ViewStyle", editor: Report.editorTemplates.viewStyle };
             Report.viewTheme = {
                 propertyName: "viewTheme", modelName: "@ViewTheme",
-                defaultVal: "FlatLight", displayName: "View Theme", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "FlatLight": "FlatLight",
-                    "FlatDark": "FlatDark"
-                }
+                defaultVal: "FlatLight", displayName: "View Theme", localizationId: "DevExpress.XtraReports.UI.XRGauge.ViewTheme", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "FlatLight", displayValue: "FlatLight", localizationId: "GaugesPresetsStringId.ThemeFlatLight" },
+                    { value: "FlatDark", displayValue: "FlatDark", localizationId: "GaugesPresetsStringId.ThemeFlatDark" }
+                ]
             };
             Report.viewType = {
                 propertyName: "viewType", modelName: "@ViewType",
-                defaultVal: "Circular", displayName: "View Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: {
-                    "Circular": "Circular",
-                    "Linear": "Linear"
-                }
+                defaultVal: "Circular", displayName: "View Type", localizationId: "DevExpress.XtraReports.UI.XRGauge.ViewType", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                valuesArray: [
+                    { value: "Circular", displayValue: "Circular", localizationId: "ASPxReportsStringId.ReportDesigner_GaugeViewType_Circular" },
+                    { value: "Linear", displayValue: "Linear", localizationId: "ASPxReportsStringId.ReportDesigner_GaugeViewType_Linear" }
+                ]
             };
-            var defaultDataBinding = function (bindingName) { return { propertyName: "defaultDataBinding" + bindingName, displayName: bindingName, editor: Report.editorTemplates.dataBinding, bindingName: bindingName }; };
+            var defaultDataBinding = function (bindingName) { return { propertyName: "defaultDataBinding" + bindingName, displayName: bindingName, localizationId: "DevExpress.XtraReports.UI.XRGauge." + bindingName, editor: Report.editorTemplates.dataBinding, bindingName: bindingName }; };
             Report.xrGaugeSerializationInfo = [
                 Report.viewStyle, Report.viewTheme, Report.viewType, Report.actualValue, Report.maximum, Report.minimum, Report.targetValue, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts, Report.imageType,
                 Report.dataBindings(["ActualValue", "Bookmark", "Maximum", "Minimum", "NavigateUrl", "Tag", "TargetValue"]),
@@ -21410,35 +21708,35 @@ var DevExpress;
                 function XRPageInfoSurface(control, context) {
                     _super.call(this, control, context);
                     this.displayText = function () {
-                        return control["format"] && control["format"]() || pageInfoValuesMap[control["pageInfo"]()];
+                        return control["format"] && control["format"]() || pageInfoValuesMap.filter(function (item) { return item.value === control["pageInfo"](); });
                     };
                 }
                 return XRPageInfoSurface;
             })(Report.ControlSurface);
             Report.XRPageInfoSurface = XRPageInfoSurface;
-            var pageInfoValuesMap = {
-                "None": "None",
-                "Number": "Page Number",
-                "NumberOfTotal": "'Current of Total' Page Numbers",
-                "RomLowNumber": "Page Number (Roman, Lowercase)",
-                "RomHiNumber": "Page Number (Roman, Uppercase)",
-                "DateTime": "Current Date and Time",
-                "UserName": "User Name",
-                "Total": "Page Count"
-            };
-            Report.format = { propertyName: "format", modelName: "@Format", defaultVal: "", displayName: "Format", editor: Designer.Widgets.editorTemplates.formatEditor };
+            var pageInfoValuesMap = [
+                { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.PageInfo.None" },
+                { value: "Number", displayValue: "Page Number", localizationId: "DevExpress.XtraPrinting.PageInfo.Number" },
+                { value: "NumberOfTotal", displayValue: "'Current of Total' Page Numbers", localizationId: "DevExpress.XtraPrinting.PageInfo.NumberOfTotal" },
+                { value: "RomLowNumber", displayValue: "Page Number (Roman, Lowercase)", localizationId: "DevExpress.XtraPrinting.PageInfo.RomLowNumber" },
+                { value: "RomHiNumber", displayValue: "Page Number (Roman, Uppercase)", localizationId: "DevExpress.XtraPrinting.PageInfo.RomHiNumber" },
+                { value: "DateTime", displayValue: "Current Date and Time", localizationId: "DevExpress.XtraPrinting.PageInfo.DateTime" },
+                { value: "UserName", displayValue: "User Name", localizationId: "DevExpress.XtraPrinting.PageInfo.UserName" },
+                { value: "Total", displayValue: "Page Count", localizationId: "DevExpress.XtraPrinting.PageInfo.Total" }
+            ];
+            Report.format = { propertyName: "format", modelName: "@Format", defaultVal: "", displayName: "Format", localizationId: "DevExpress.XtraReports.UI.XRPageInfo.Format", editor: Designer.Widgets.editorTemplates.formatEditor };
             Report.pageInfo = {
                 propertyName: "pageInfo",
-                modelName: "@PageInfo", defaultVal: "NumberOfTotal", displayName: "Page Information",
+                modelName: "@PageInfo", defaultVal: "NumberOfTotal", displayName: "Page Information", localizationId: "DevExpress.XtraReports.UI.XRPageInfo.PageInfo",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
-                values: pageInfoValuesMap
+                valuesArray: pageInfoValuesMap
             };
             Report.startPageNumber = {
                 propertyName: "startPageNumber",
-                modelName: "@StartPageNumber", displayName: "Start Page Number", defaultVal: 1, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric
+                modelName: "@StartPageNumber", displayName: "Start Page Number", localizationId: "DevExpress.XtraReports.UI.XRPageInfo.StartPageNumber", defaultVal: 1, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric
             };
             Report.runningBand = {
-                propertyName: "runningBand", modelName: "@RunningBand", link: true, displayName: "Running Band", editor: Report.editorTemplates.runningBand
+                propertyName: "runningBand", modelName: "@RunningBand", link: true, displayName: "Running Band", localizationId: "DevExpress.XtraReports.UI.XRPageInfo.RunningBand", editor: Report.editorTemplates.runningBand
             };
             Report.pageInfoSerializationsInfo = [
                 Report.anchorVertical, Report.anchorHorizontal, Report.textAlignment, Report.wordWrap, Report.format, Report.pageInfo, Report.startPageNumber, Report.runningBand, Report.textControlScripts, Report.rtl,
@@ -21803,16 +22101,16 @@ var DevExpress;
                 return CrossBandSurface;
             })(Report.ControlSurfaceBase);
             Report.CrossBandSurface = CrossBandSurface;
-            Report.crossBandLineWidth = { propertyName: "width", modelName: "@WidthF", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.text, displayName: "Width" };
-            Report.startPoint = { propertyName: "startPoint", modelName: "@StartPointFloat", from: Designer.Point.fromString, displayName: "Start Point", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.endPoint = { propertyName: "endPoint", modelName: "@EndPointFloat", from: Designer.Point.fromString, displayName: "End Point", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.startBand = { propertyName: "startBand", modelName: "@StartBand", link: true, displayName: "Start Band", editor: Report.editorTemplates.bands };
-            Report.endBand = { propertyName: "endBand", modelName: "@EndBand", link: true, displayName: "End Band", editor: Report.editorTemplates.bands };
+            Report.crossBandLineWidth = { propertyName: "width", modelName: "@WidthF", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.text, displayName: "Width", localizationId: "DevExpress.XtraReports.UI.XRControl.Width" };
+            Report.startPoint = { propertyName: "startPoint", modelName: "@StartPointFloat", from: Designer.Point.fromString, displayName: "Start Point", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.StartPoint", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.endPoint = { propertyName: "endPoint", modelName: "@EndPointFloat", from: Designer.Point.fromString, displayName: "End Point", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.EndPoint", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.startBand = { propertyName: "startBand", modelName: "@StartBand", link: true, displayName: "Start Band", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.StartBand", editor: Report.editorTemplates.bands };
+            Report.endBand = { propertyName: "endBand", modelName: "@EndBand", link: true, displayName: "End Band", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.EndBand", editor: Report.editorTemplates.bands };
             Report.borderDashStyleCrossband = {
                 propertyName: "borderDashStyleCrossband", modelName: "@BorderDashStyle",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Border Dash Style", values: Report.lineStyleValues
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Border Dash Style", localizationId: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle", valuesArray: Report.borderDashStyleValues
             };
-            Report.width = { propertyName: "width", modelName: "@WidthF", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Width", from: Designer.floatFromModel };
+            Report.width = { propertyName: "width", modelName: "@WidthF", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Width", localizationId: "DevExpress.XtraReports.UI.XRControl.Width", from: Designer.floatFromModel };
             Report.crossBandBoxControlSerializationsInfo = [
                 Report.startPoint, Report.startBand, Report.endPoint, Report.endBand, Report.width,
                 Report.borderColor, Report.borderDashStyleCrossband, Report.canPublish,
@@ -21871,10 +22169,10 @@ var DevExpress;
                     return "";
                 };
                 XRSparklineViewModel.spartlineTypes = [
-                    "Line",
-                    "Bar",
-                    "WinLoss",
-                    "Area"
+                    { value: "Line", displayName: "Line", localizationId: "DevExpress.Sparkline.SparklineViewType.Line" },
+                    { value: "Bar", displayName: "Bar", localizationId: "DevExpress.Sparkline.SparklineViewType.Bar" },
+                    { value: "WinLoss", displayName: "WinLoss", localizationId: "DevExpress.Sparkline.SparklineViewType.WinLoss" },
+                    { value: "Area", displayName: "Area", localizationId: "DevExpress.Sparkline.SparklineViewType.Area" }
                 ];
                 return XRSparklineViewModel;
             })(Report.ControlViewModel);
@@ -21887,12 +22185,12 @@ var DevExpress;
                 return SparkLineSurface;
             })(Report.TodoControlSurface);
             Report.SparkLineSurface = SparkLineSurface;
-            Report.valueMember = { propertyName: "valueMember", modelName: "@ValueMember", displayName: "Value Member", editor: Designer.Widgets.editorTemplates.field };
-            var highlightMinPoint = { modelName: "@HighlightMinPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMinPoint", displayName: "Highlight Min Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightMaxPoint = { modelName: "@HighlightMaxPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMaxPoint", displayName: "Highlight Max Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightStartPoint = { modelName: "@HighlightStartPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightStartPoint", displayName: "Highlight Start Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightEndPoint = { modelName: "@HighlightEndPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightEndPoint", displayName: "Highlight End Point", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightNegativePoints = { modelName: "@HighlightNegativePoints", defaultVal: false, from: Designer.parseBool, propertyName: "highlightNegativePoints", displayName: "Highlight Negative Points", editor: DevExpress.JS.Widgets.editorTemplates.bool }, color = { modelName: "@Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "color", displayName: "Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, maxPointColor = { modelName: "@MaxPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "maxPointColor", displayName: "Max Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, minPointColor = { modelName: "@MinPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "minPointColor", displayName: "Min Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, startPointColor = { modelName: "@StartPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "startPointColor", displayName: "Start Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, negativePointColor = { modelName: "@NegativePointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "negativePointColor", displayName: "Negative Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, endPointColor = { modelName: "@EndPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "endPointColor", displayName: "End Point Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, sparklineViewType = {
+            Report.valueMember = { propertyName: "valueMember", modelName: "@ValueMember", displayName: "Value Member", localizationId: "DevExpress.XtraReports.UI.XRSparkline.ValueMember", editor: Designer.Widgets.editorTemplates.field };
+            var highlightMinPoint = { modelName: "@HighlightMinPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMinPoint", displayName: "Highlight Min Point", localizationId: "DevExpress.Sparkline.SparklineViewBase.HighlightMinPoint", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightMaxPoint = { modelName: "@HighlightMaxPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightMaxPoint", displayName: "Highlight Max Point", localizationId: "DevExpress.Sparkline.SparklineViewBase.HighlightMaxPoint", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightStartPoint = { modelName: "@HighlightStartPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightStartPoint", displayName: "Highlight Start Point", localizationId: "DevExpress.Sparkline.SparklineViewBase.HighlightStartPoint", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightEndPoint = { modelName: "@HighlightEndPoint", defaultVal: false, from: Designer.parseBool, propertyName: "highlightEndPoint", displayName: "Highlight End Point", localizationId: "DevExpress.Sparkline.SparklineViewBase.HighlightEndPoint", editor: DevExpress.JS.Widgets.editorTemplates.bool }, highlightNegativePoints = { modelName: "@HighlightNegativePoints", defaultVal: false, from: Designer.parseBool, propertyName: "highlightNegativePoints", displayName: "Highlight Negative Points", localizationId: "DevExpress.Sparkline.LineSparklineView.HighlightNegativePoints", editor: DevExpress.JS.Widgets.editorTemplates.bool }, color = { modelName: "@Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "color", displayName: "Color", localizationId: "DevExpress.Sparkline.SparklineViewBase.Color", editor: Designer.Widgets.editorTemplates.customColorEditor }, maxPointColor = { modelName: "@MaxPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "maxPointColor", displayName: "Max Point Color", localizationId: "DevExpress.Sparkline.SparklineViewBase.MaxPointColor", editor: Designer.Widgets.editorTemplates.customColorEditor }, minPointColor = { modelName: "@MinPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "minPointColor", displayName: "Min Point Color", localizationId: "DevExpress.Sparkline.SparklineViewBase.MinPointColor", editor: Designer.Widgets.editorTemplates.customColorEditor }, startPointColor = { modelName: "@StartPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "startPointColor", displayName: "Start Point Color", localizationId: "DevExpress.Sparkline.SparklineViewBase.StartPointColor", editor: Designer.Widgets.editorTemplates.customColorEditor }, negativePointColor = { modelName: "@NegativePointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "negativePointColor", displayName: "Negative Point Color", localizationId: "DevExpress.Sparkline.SparklineViewBase.NegativePointColor", editor: Designer.Widgets.editorTemplates.customColorEditor }, endPointColor = { modelName: "@EndPointColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "endPointColor", displayName: "End Point Color", localizationId: "DevExpress.Sparkline.SparklineViewBase.EndPointColor", editor: Designer.Widgets.editorTemplates.customColorEditor }, sparklineViewType = {
                 modelName: "@Type", propertyName: "type"
-            }, enableAntialiasing = { modelName: "@EnableAntialiasing", propertyName: "enableAntialiasing", displayName: "Enable Antialiasing", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true }, maxPointMarkerSize = { modelName: "@MaxPointMarkerSize", defaultVal: 5, propertyName: "maxPointMarkerSize", displayName: "Max Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, minPointMarkerSize = { modelName: "@MinPointMarkerSize", defaultVal: 5, propertyName: "minPointMarkerSize", displayName: "Min Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, startPointMarkerSize = { modelName: "@StartPointMarkerSize", defaultVal: 5, propertyName: "startPointMarkerSize", displayName: "Start Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, negativePointMarkerSize = { modelName: "@NegativePointMarkerSize", defaultVal: 5, propertyName: "negativePointMarkerSize", displayName: "Negative Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, endPointMarkerSize = { modelName: "@EndPointMarkerSize", defaultVal: 5, propertyName: "endPointMarkerSize", displayName: "End Point Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, markerSize = { modelName: "@MarkerSize", propertyName: "markerSize", defaultVal: 5, displayName: "Marker Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, showMarkers = { modelName: "@ShowMarkers", propertyName: "showMarkers", displayName: "Show Markers", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false }, markerColor = { modelName: "@MarkerColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "markerColor", displayName: "Marker Color", editor: Designer.Widgets.editorTemplates.customColorEditor };
-            var barDistance = { modelName: "@BarDistance", propertyName: "barDistance", defaultVal: 2, displayName: "Bar Distance", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            var areaOpacity = { modelName: "@AreaOpacity", propertyName: "areaOpacity", defaultVal: 135, displayName: "Area Opacity", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            }, enableAntialiasing = { modelName: "@EnableAntialiasing", propertyName: "enableAntialiasing", displayName: "Enable Antialiasing", localizationId: "DevExpress.Sparkline.LineSparklineView.EnableAntialiasing", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true }, maxPointMarkerSize = { modelName: "@MaxPointMarkerSize", defaultVal: 5, propertyName: "maxPointMarkerSize", displayName: "Max Point Marker Size", localizationId: "DevExpress.Sparkline.LineSparklineView.MaxPointMarkerSize", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, minPointMarkerSize = { modelName: "@MinPointMarkerSize", defaultVal: 5, propertyName: "minPointMarkerSize", displayName: "Min Point Marker Size", localizationId: "DevExpress.Sparkline.LineSparklineView.MinPointMarkerSize", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, startPointMarkerSize = { modelName: "@StartPointMarkerSize", defaultVal: 5, propertyName: "startPointMarkerSize", displayName: "Start Point Marker Size", localizationId: "DevExpress.Sparkline.LineSparklineView.StartPointMarkerSize", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, negativePointMarkerSize = { modelName: "@NegativePointMarkerSize", defaultVal: 5, propertyName: "negativePointMarkerSize", displayName: "Negative Point Marker Size", localizationId: "DevExpress.Sparkline.LineSparklineView.NegativePointMarkerSize", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, endPointMarkerSize = { modelName: "@EndPointMarkerSize", defaultVal: 5, propertyName: "endPointMarkerSize", displayName: "End Point Marker Size", localizationId: "DevExpress.Sparkline.LineSparklineView.EndPointMarkerSize", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, markerSize = { modelName: "@MarkerSize", propertyName: "markerSize", defaultVal: 5, displayName: "Marker Size", localizationId: "DevExpress.Sparkline.LineSparklineView.MarkerSize", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, showMarkers = { modelName: "@ShowMarkers", propertyName: "showMarkers", displayName: "Show Markers", localizationId: "DevExpress.Sparkline.LineSparklineView.ShowMarkers", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false }, markerColor = { modelName: "@MarkerColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, propertyName: "markerColor", displayName: "Marker Color", localizationId: "DevExpress.Sparkline.LineSparklineView.MarkerColor", editor: Designer.Widgets.editorTemplates.customColorEditor };
+            var barDistance = { modelName: "@BarDistance", propertyName: "barDistance", defaultVal: 2, displayName: "Bar Distance", localizationId: "DevExpress.Sparkline.BarSparklineViewBase.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            var areaOpacity = { modelName: "@AreaOpacity", propertyName: "areaOpacity", defaultVal: 135, displayName: "Area Opacity", localizationId: "DevExpress.Sparkline.AreaSparklineView.AreaOpacity", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             var commonSparklineViewProperties = [highlightStartPoint, highlightEndPoint, highlightMaxPoint, highlightMinPoint, color, maxPointColor, minPointColor, startPointColor, endPointColor, negativePointColor, sparklineViewType];
             var viewLineSerializationsInfo = [].concat(commonSparklineViewProperties, [highlightNegativePoints, enableAntialiasing, negativePointMarkerSize, endPointMarkerSize, startPointMarkerSize, minPointMarkerSize, maxPointMarkerSize, markerSize, showMarkers, Report.lineWidth, markerColor]);
             var viewWinLoseSerializationsInfo = [].concat(commonSparklineViewProperties, [barDistance]);
@@ -21904,9 +22202,10 @@ var DevExpress;
                 "WinLoss": viewWinLoseSerializationsInfo,
                 "Area": viewAreaSerializationsInfo
             };
-            Report.valueRange = { propertyName: "valueRange", modelName: "ValueRange", info: [] };
+            var limit1 = { propertyName: "limit1", modelName: "@Limit1", displayName: "Limit 1", localizationId: "DevExpress.Sparkline.SparklineRange.Limit1", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, limit2 = { propertyName: "limit2", modelName: "@Limit2", displayName: "Limit 2", localizationId: "DevExpress.Sparkline.SparklineRange.Limit2", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, isAuto = { propertyName: "isAuto", modelName: "@IsAuto", displayName: "Is Auto", localizationId: "DevExpress.Sparkline.SparklineRange.IsAuto", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.valueRange = { propertyName: "valueRange", modelName: "ValueRange", displayName: "Value Range", localizationId: "DevExpress.XtraReports.UI.XRSparkline.ValueRange", info: [limit1, limit2, isAuto], editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var sparklineView = { propertyName: "view", modelName: "View" };
-            Report.sparklineFake = { propertyName: "sparklineFake", editor: Report.editorTemplates.sparkline, displayName: "View" };
+            Report.sparklineFake = { propertyName: "sparklineFake", editor: Report.editorTemplates.sparkline, displayName: "View", localizationId: "DevExpress.XtraReports.UI.XRSparkline.View" };
             Report.sparklineSerializationsInfo = [
                 Report.sparklineFake, sparklineView, Report.valueMember, Report.valueRange, Report.imageType, Report.anchorVertical, Report.anchorHorizontal, Report.dataBindings(["Bookmark", "NavigateUrl", "Tag"]),
                 Report.dataAdapter, Report.dataMember, Report.dataSource, Report.controlScripts].concat(Report.commonControlProperties, Report.sizeLocation, Report.navigationGroup);
@@ -21983,6 +22282,7 @@ var DevExpress;
                 function ParameterBinding(model, parent, serializer) {
                     var _this = this;
                     _super.call(this, model, serializer);
+                    this.visible = ko.observable(true);
                     this.subreportControl = ko.observable();
                     var _self = this;
                     this.fakeBinding = this;
@@ -22137,13 +22437,13 @@ var DevExpress;
                 return SubreportSurface;
             })(Report.ControlSurface);
             Report.SubreportSurface = SubreportSurface;
-            Report.reportSourceUrl = { propertyName: "reportSourceUrl", modelName: "@ReportSourceUrl", defaultVal: "", editor: Report.editorTemplates.reportSourceUrl, displayName: "Report Source Url" };
+            Report.reportSourceUrl = { propertyName: "reportSourceUrl", modelName: "@ReportSourceUrl", defaultVal: "", editor: Report.editorTemplates.reportSourceUrl, displayName: "Report Source Url", localizationId: "DevExpress.XtraReports.UI.XRSubreport.ReportSourceUrl" };
             Report.reportSource = { propertyName: "reportSource", modelName: "ReportSource", from: SubreportViewModel.from, toJsonObject: SubreportViewModel.toJson };
             Report.parameterBindingSerializationInfo = Report.dataBindingBaseSerializationInfo.concat([
-                { propertyName: "parameterName", modelName: "@ParameterName", displayName: "Parameter Name", editor: DevExpress.JS.Widgets.editorTemplates.combobox },
-                { propertyName: "fakeBinding", displayName: "Binding", link: true, editor: { header: "dxrd-dataBinding", editorType: Designer.Widgets.FieldListEditor } }
+                { propertyName: "parameterName", modelName: "@ParameterName", displayName: "Parameter Name", localizationId: "DevExpress.XtraReports.UI.ParameterBinding.ParameterName", editor: DevExpress.JS.Widgets.editorTemplates.combobox },
+                { propertyName: "fakeBinding", displayName: "Binding", localizationId: "DevExpress.XtraReports.Design.DataBinding.Binding", link: true, editor: { header: "dxrd-dataBinding", editorType: Designer.Widgets.FieldListEditor } }
             ]);
-            Report.parameterBindings = { propertyName: "parameterBindings", modelName: "ParameterBindings", displayName: "Parameter Bindings", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.ParameterBinding.createNew, template: '#dxrd-commonCollectionItem' };
+            Report.parameterBindings = { propertyName: "parameterBindings", modelName: "ParameterBindings", displayName: "Parameter Bindings", localizationId: "DevExpress.XtraReports.UI.XRSubreport.ParameterBindings", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.ParameterBinding.createNew, template: '#dxrd-commonCollectionItem' };
             var subreportProperties = Report.commonControlProperties.filter(function (item) { return item !== Report.tag && item !== Report.canPublish; });
             Report.subreportSerializationsInfo = [
                 Report.reportSource, Report.reportSourceUrl, Report.subreportScripts, Report.parameterBindings
@@ -22338,9 +22638,9 @@ var DevExpress;
                 return band.controls().some(function (item) { return item.controlType === "XRTableOfContents"; });
             }
             Report.bandControlsSomeXRTableOfContents = bandControlsSomeXRTableOfContents;
-            var font = { propertyName: "font", modelName: "@Font", defaultVal: "Times New Roman, 9.75pt", displayName: "Font", editor: DevExpress.JS.Widgets.editorTemplates.font };
-            var backColor = { propertyName: "backColor", modelName: "@BackColor", defaultVal: "Transparent", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Background Color", editor: Designer.Widgets.editorTemplates.customColorEditor };
-            var foreColor = { propertyName: "foreColor", modelName: "@ForeColor", defaultVal: "Black", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Foreground Color", editor: Designer.Widgets.editorTemplates.customColorEditor };
+            var font = { propertyName: "font", modelName: "@Font", defaultVal: "Times New Roman, 9.75pt", displayName: "Font", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevelBase.Font", editor: DevExpress.JS.Widgets.editorTemplates.font };
+            var backColor = { propertyName: "backColor", modelName: "@BackColor", defaultVal: "Transparent", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Background Color", localizationId: "DevExpress.XtraReports.UI.XRControl.BackColor", editor: Designer.Widgets.editorTemplates.customColorEditor };
+            var foreColor = { propertyName: "foreColor", modelName: "@ForeColor", defaultVal: "Black", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Foreground Color", localizationId: "DevExpress.XtraReports.UI.XRControl.ForeColor", editor: Designer.Widgets.editorTemplates.customColorEditor };
             var size = { propertyName: "size", modelName: "@SizeF", from: Designer.Size.fromString };
             var formattingRuleLinks = {
                 propertyName: "formattingRuleLinks", modelName: "FormattingRuleLinks"
@@ -22351,20 +22651,20 @@ var DevExpress;
                 font,
                 foreColor,
                 Report.padding,
-                { propertyName: "height", modelName: "@Height", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: levelDefaultHeight, displayName: "Height", from: Designer.floatFromModel, editorOptions: { min: 10 } }
+                { propertyName: "height", modelName: "@Height", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: levelDefaultHeight, displayName: "Height", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevelBase.Height", from: Designer.floatFromModel, editorOptions: { min: 10 } }
             ];
             Report.tocLevelSerializationsInfo = [
-                { propertyName: "leaderSymbol", modelName: "@LeaderSymbol", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: ".", displayName: "Leader Symbol", editorOptions: { maxLength: 1 } },
-                { propertyName: "indent", modelName: "@Indent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: null, displayName: "Indent", from: Designer.floatFromModel }
+                { propertyName: "leaderSymbol", modelName: "@LeaderSymbol", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: ".", displayName: "Leader Symbol", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevel.LeaderSymbol", editorOptions: { maxLength: 1 } },
+                { propertyName: "indent", modelName: "@Indent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: null, displayName: "Indent", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevel.Indent", from: Designer.floatFromModel }
             ].concat(baseTocLevelSerializationsInfo);
             Report.tocTitleSerializationsInfo = [Report.text, $.extend({}, Report.textAlignment, { defaultVal: "TopLeft" })].concat(baseTocLevelSerializationsInfo);
-            Report.tocTitle = { propertyName: "levelTitle", modelName: "LevelTitle", displayName: "Level Title", info: Report.tocTitleSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.tocLevelDefault = { propertyName: "levelDefault", modelName: "LevelDefault", displayName: "Level Default", info: Report.tocLevelSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Report.maxNestingLevel = { propertyName: "maxNestingLevel", modelName: "@MaxNestingLevel", defaultVal: 0, displayName: "Max Nesting Level", editor: DevExpress.JS.Widgets.editorTemplates.numeric, editorOptions: { min: 0 } };
+            Report.tocTitle = { propertyName: "levelTitle", modelName: "LevelTitle", displayName: "Level Title", localizationId: "DevExpress.XtraReports.UI.XRTableOfContents.LevelTitle", info: Report.tocTitleSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.tocLevelDefault = { propertyName: "levelDefault", modelName: "LevelDefault", displayName: "Level Default", localizationId: "DevExpress.XtraReports.UI.XRTableOfContents.LevelDefault", info: Report.tocLevelSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Report.maxNestingLevel = { propertyName: "maxNestingLevel", modelName: "@MaxNestingLevel", defaultVal: 0, displayName: "Max Nesting Level", localizationId: "DevExpress.XtraReports.UI.XRTableOfContents.MaxNestingLevel", editor: DevExpress.JS.Widgets.editorTemplates.numeric, editorOptions: { min: 0 } };
             Report.tocLevels = {
                 propertyName: "levels",
                 modelName: "Levels",
-                displayName: "Levels",
+                displayName: "Levels", localizationId: "DevExpress.XtraReports.UI.XRTableOfContents.Levels",
                 array: true,
                 editor: Report.editorTemplates.toclevel,
                 template: "#dxrd-collectionItemWithAccordion",
@@ -22662,31 +22962,23 @@ var DevExpress;
                 return XRCharacterCombSurface;
             })(Report.ControlSurface);
             Report.XRCharacterCombSurface = XRCharacterCombSurface;
-            Report.cellVerticalSpacing = { propertyName: "verticalSpacing", modelName: "@CellVerticalSpacing", defaultVal: 0, displayName: "Cell Vertical Spacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.cellHorizontalSpacing = { propertyName: "horizontalSpacing", modelName: "@CellHorizontalSpacing", defaultVal: 0, displayName: "Cell Horizontal Spacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.cellWidth = { propertyName: "cellWidth", modelName: "@CellWidth", defaultVal: 25, displayName: "Cell Width", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.cellHeight = { propertyName: "cellHeight", modelName: "@CellHeight", defaultVal: 25, displayName: "Cell Height", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.cellVerticalSpacing = { propertyName: "verticalSpacing", modelName: "@CellVerticalSpacing", defaultVal: 0, displayName: "Cell Vertical Spacing", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellVerticalSpacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.cellHorizontalSpacing = { propertyName: "horizontalSpacing", modelName: "@CellHorizontalSpacing", defaultVal: 0, displayName: "Cell Horizontal Spacing", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHorizontalSpacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.cellWidth = { propertyName: "cellWidth", modelName: "@CellWidth", defaultVal: 25, displayName: "Cell Width", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.cellHeight = { propertyName: "cellHeight", modelName: "@CellHeight", defaultVal: 25, displayName: "Cell Height", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHeight", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Report.cellSizeMode = {
-                propertyName: "sizeMode", modelName: "@CellSizeMode", displayName: "Cell Size Mode", defaultVal: "AutoSize", editor: Report.editorTemplates.comboboxUndo,
-                values: {
-                    "Custom": "Custom",
-                    "AutoWidth": "Auto Width",
-                    "AutoHeight": "Auto Height",
-                    "AutoSize": "Auto Size"
-                }
+                propertyName: "sizeMode", modelName: "@CellSizeMode", displayName: "Cell Size Mode", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellSizeMode", defaultVal: "AutoSize", editor: Report.editorTemplates.comboboxUndo,
+                valuesArray: [
+                    { value: "Custom", displayValue: "Custom", localizationId: "DevExpress.XtraPrinting.SizeMode.Custom" },
+                    { value: "AutoWidth", displayValue: "Auto Width", localizationId: "DevExpress.XtraPrinting.SizeMode.AutoWidth" },
+                    { value: "AutoHeight", displayValue: "Auto Height", localizationId: "DevExpress.XtraPrinting.SizeMode.AutoHeight" },
+                    { value: "AutoSize", displayValue: "Auto Size", localizationId: "DevExpress.XtraPrinting.SizeMode.AutoSize" }
+                ]
             };
-            var wordWrap = { propertyName: "wordWrap", modelName: "@WordWrap", defaultVal: true, from: Designer.parseBool, displayName: "Word Wrap", editor: DevExpress.JS.Widgets.editorTemplates.bool };
-            Report.characterCombFont = { propertyName: "font", modelName: "@Font", displayName: "Font", editor: Report.editorTemplates.fontUndo };
-            Report.characterCombBorders = { propertyName: "borders", modelName: "@Borders", displayName: "Borders", defaultVal: "All", editor: Designer.Widgets.editorTemplates.borders };
-            Report.characterCombBorderDashStyle = $.extend({}, Report.borderDashStyle, {
-                values: {
-                    "Solid": "Solid",
-                    "Dash": "Dash",
-                    "Dot": "Dot",
-                    "DashDot": "Dash-Dot",
-                    "DashDotDot": "Dash-Dot-Dot"
-                }
-            });
+            var wordWrap = { propertyName: "wordWrap", modelName: "@WordWrap", defaultVal: true, from: Designer.parseBool, displayName: "Word Wrap", localizationId: "DevExpress.XtraReports.UI.XRControl.WordWrap", editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.characterCombFont = { propertyName: "font", modelName: "@Font", displayName: "Font", localizationId: "DevExpress.XtraReports.UI.XRControl.Font", editor: Report.editorTemplates.fontUndo };
+            Report.characterCombBorders = { propertyName: "borders", modelName: "@Borders", displayName: "Borders", localizationId: "DevExpress.XtraReports.UI.XRControl.Borders", defaultVal: "All", editor: Designer.Widgets.editorTemplates.borders };
+            Report.characterCombBorderDashStyle = $.extend({}, Report.borderDashStyle, { valuesArray: Report.borderDashStyleValues });
             Report.characterCombSerializationsInfo = [
                 Report.styleName, Report.evenStyleName, Report.oddStyleName, Report.stylePriority, Report.canPublish, Report.backColor, Report.autoWidth,
                 Report.formattingRuleLinks, Report.cellSizeMode, wordWrap, Report.cellWidth, Report.cellHeight, Report.cellVerticalSpacing, Report.cellHorizontalSpacing, Report.dataBindings(["Text"]),
@@ -22712,31 +23004,37 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Align to Grid",
+                            textId: 'ReportStringId.Cmd_AlignToGrid',
                             imageClassName: "dxrd-image-actions-align_to_grid",
                             clickAction: function () { alignHandler.alignToGrid(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled; }),
                         }, {
                             text: "Size to Grid",
+                            textId: 'ReportStringId.UD_Capt_MakeSameSizeSizeToGrid',
                             imageClassName: "dxrd-image-actions-size_to_grid",
                             clickAction: function () { alignHandler.sizeToGrid(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled; }),
                         }, {
                             text: "Center Horizontally",
+                            textId: 'ReportStringId.RibbonXRDesign_CenterHorizontally_STipTitle',
                             imageClassName: "dxrd-image-actions-center_horizontally",
                             clickAction: function () { alignHandler.centerHorizontally(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled || selectionProvider.focused() instanceof Report.CrossBandSurface; }),
                         }, {
                             text: "Center Vertically",
+                            textId: 'ReportStringId.RibbonXRDesign_CenterVertically_STipTitle',
                             imageClassName: "dxrd-image-actions-center_vertically",
                             clickAction: function () { alignHandler.centerVertically(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled || selectionProvider.focused() instanceof Report.CrossBandSurface; }),
                         }, {
                             text: "Bring to Front",
+                            textId: 'ReportStringId.Cmd_BringToFront',
                             imageClassName: "dxrd-image-actions-bring_to_front",
                             clickAction: function () { alignHandler.bringToFront(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled || !alignHandler.canChangeZOrder(); }),
                         }, {
                             text: "Send to Back",
+                            textId: 'ReportStringId.Cmd_SendToBack',
                             imageClassName: "dxrd-image-actions-send_to_back",
                             clickAction: function () { alignHandler.sendToBack(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled || !alignHandler.canChangeZOrder(); }),
@@ -22762,70 +23060,87 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Align Lefts",
+                            textId: 'ReportStringId.UD_TTip_AlignLeft',
                             imageClassName: "dxrd-image-actions-align_lefts",
                             clickAction: function () { alignHandler.alignLeft(); },
                         }, {
                             text: "Align Centers",
+                            textId: 'ReportStringId.RibbonXRDesign_AlignVerticalCenters_STipTitle',
                             imageClassName: "dxrd-image-actions-align_centers",
                             clickAction: function () { alignHandler.alignVerticalCenters(); },
                         }, {
                             text: "Align Rights",
+                            textId: 'ReportStringId.RibbonXRDesign_AlignRight_Caption',
                             imageClassName: "dxrd-image-actions-align_rights",
                             clickAction: function () { alignHandler.alignRight(); },
                         }, {
                             text: "Align Tops",
+                            textId: 'ReportStringId.RibbonXRDesign_AlignTop_Caption',
                             imageClassName: "dxrd-image-actions-align_tops",
                             clickAction: function () { alignHandler.alignTop(); },
                         }, {
                             text: "Align Middles",
+                            textId: 'ReportStringId.RibbonXRDesign_AlignHorizontalCenters_Caption',
                             imageClassName: "dxrd-image-actions-align_middles",
                             clickAction: function () { alignHandler.alignHorizontalCenters(); },
                         }, {
                             text: "Align Bottoms",
+                            textId: 'ReportStringId.RibbonXRDesign_AlignBottom_Caption',
                             imageClassName: "dxrd-image-actions-align_bottoms",
                             clickAction: function () { alignHandler.alignBottom(); },
                         }, {
                             text: "Size to Control Width",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlWidth',
                             imageClassName: "dxrd-image-actions-make_same_width",
                             clickAction: function () { alignHandler.sizeToControlWidth(); },
                         }, {
                             text: "Size to Control Height",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlHeight',
                             imageClassName: "dxrd-image-actions-make_same_height",
                             clickAction: function () { alignHandler.sizeToControlHeight(); },
                         }, {
                             text: "Size to Control",
+                            textId: 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControl',
                             imageClassName: "dxrd-image-actions-make_same_sizes",
                             clickAction: function () { alignHandler.sizeToControl(); },
                         }, {
                             text: "Make Horizontal Spacing Equal",
+                            textId: 'ReportStringId.UD_TTip_HorizSpaceMakeEqual',
                             imageClassName: "dxrd-image-actions-make_horizontal_spacing_equal",
                             clickAction: function () { spaceCommandHandler.horizSpaceMakeEqual(); },
                         }, {
                             text: "Increase Horizontal Spacing",
+                            textId: 'ReportStringId.UD_TTip_HorizSpaceIncrease',
                             imageClassName: "dxrd-image-actions-increase_horizontal_spacing",
                             clickAction: function () { spaceCommandHandler.horizSpaceIncrease(); },
                         }, {
                             text: "Decrease Horizontal Spacing",
+                            textId: 'ReportStringId.RibbonXRDesign_HorizSpaceDecrease_Caption',
                             imageClassName: "dxrd-image-actions-decrease_horizontal_spacing",
                             clickAction: function () { spaceCommandHandler.horizSpaceDecrease(); },
                         }, {
                             text: "Remove Horizontal Spacing",
+                            textId: 'ReportStringId.RibbonXRDesign_HorizSpaceConcatenate_Caption',
                             imageClassName: "dxrd-image-actions-remove_horizontal_spacing",
                             clickAction: function () { spaceCommandHandler.horizSpaceConcatenate(); },
                         }, {
                             text: "Make Vertical Spacing Equal",
+                            textId: 'ReportStringId.RibbonXRDesign_VertSpaceMakeEqual_Caption',
                             imageClassName: "dxrd-image-actions-make_vertical_spacing_equal",
                             clickAction: function () { spaceCommandHandler.vertSpaceMakeEqual(); },
                         }, {
                             text: "Increase Vertical Spacing",
+                            textId: 'ReportStringId.RibbonXRDesign_VertSpaceIncrease_STipTitle',
                             imageClassName: "dxrd-image-actions-increase_vertical_spacing",
                             clickAction: function () { spaceCommandHandler.vertSpaceIncrease(); },
                         }, {
                             text: "Decrease Vertical Spacing",
+                            textId: 'ReportStringId.UD_TTip_VertSpaceDecrease',
                             imageClassName: "dxrd-image-actions-decrease_vertical_spacing",
                             clickAction: function () { spaceCommandHandler.vertSpaceDecrease(); },
                         }, {
                             text: "Remove Vertical Spacing",
+                            textId: 'ReportStringId.UD_TTip_VertSpaceConcatenate',
                             imageClassName: "dxrd-image-actions-remove_vertical_spacing",
                             clickAction: function () { spaceCommandHandler.vertSpaceConcatenate(); },
                         }
@@ -23204,7 +23519,6 @@ var DevExpress;
             DevExpress.JS.Utils.getLocalization = DevExpress.Designer.getLocalization;
             Report.controlsFactory = new Designer.ControlsFactory();
             Report.HandlerUri = "DXXRD.axd";
-            Designer.Chart.HandlerUri = Report.HandlerUri;
             Report.ReportDesignerElements = $.extend({
                 NavigationPanel: "dxrd-navigation-panel-template",
                 ReportDialog: "dxrd-report-dialog-template",
@@ -23212,10 +23526,6 @@ var DevExpress;
             }, Designer.DesignerBaseElements);
             Report.reportStorageWebIsRegister = false;
             Report.emptyReportModel = {
-                "?xml": {
-                    "@version": "1.0",
-                    "@encoding": "utf-8"
-                },
                 "XtraReportsLayoutSerializer": {
                     "@SerializerVersion": "17.1.0.0",
                     "@ControlType": "DevExpress.XtraReports.UI.XtraReport",
@@ -23276,7 +23586,7 @@ var DevExpress;
                     Designer.Pivot.unboundExpression, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat,
                     Report.xlsxFormatString,
                     Designer.Pivot.pivotGridFieldsSerializable,
-                    Report.valueMember,
+                    Report.valueMember, Report.valueRange,
                     Report.reportSourceUrl, Report.calculatedFields, Report.parameterBindings,
                     Report.dataBindings([])],
                 "Design": [Report.name, Report.snapGridSize],
@@ -23344,6 +23654,7 @@ var DevExpress;
                             id: Report.ActionId.NewReport,
                             container: "menu",
                             text: "New",
+                            textId: 'ReportStringId.UD_Capt_NewReport',
                             imageClassName: "dxrd-image-newreport",
                             disabled: ko.observable(false),
                             visible: true,
@@ -23407,12 +23718,11 @@ var DevExpress;
                                 reportWizard.start(null, function (reportWizardModel) {
                                     designerModel.isLoading(true);
                                     var deferred = $.Deferred();
-                                    Report.ReportWizardService.generateReportFromWizardModel(reportWizardModel, state())
+                                    Report.ReportWizardService.generateReportFromWizardModel(reportWizardModel, state(), JSON.stringify({ "XtraReportsLayoutSerializer": designerModel.model().serialize() }))
                                         .done(function (result) {
                                         designerModel.navigateByReports.currentTab().undoEngine.start();
                                         designerModel.isDirty(true);
-                                        var newReport = createReportViewModel(JSON.parse(result.reportModel), designerModel.model());
-                                        newReport.dataSourceRefs = result.dataSourceRefs;
+                                        var newReport = createReportViewModel(result, designerModel.model());
                                         designerModel.model(newReport);
                                         designerModel.navigateByReports.currentTab.notifySubscribers();
                                         designerModel.navigateByReports.currentTab().undoEngine.end();
@@ -23429,6 +23739,7 @@ var DevExpress;
                         actions.push({
                             id: Report.ActionId.Preview,
                             text: "Preview",
+                            textId: 'ReportStringId.RepTabCtl_Preview',
                             imageClassName: "dxrd-image-preview",
                             disabled: ko.observable(false),
                             visible: ko.pureComputed(function () { return !reportPreview.previewVisible(); }),
@@ -23444,6 +23755,7 @@ var DevExpress;
                         actions.push({
                             id: Report.ActionId.Scripts,
                             text: "Scripts",
+                            textId: "ReportStringId.RepTabCtl_Scripts",
                             imageClassName: "dxrd-image-scripts",
                             disabled: ko.observable(false),
                             visible: ko.pureComputed(function () { return !scriptsEditor.editorVisible(); }),
@@ -23460,6 +23772,7 @@ var DevExpress;
                             id: Report.ActionId.AddDataSource,
                             container: "menu",
                             text: "Add Data Source...",
+                            textId: 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText',
                             imageClassName: "dxrd-image-add-datasource",
                             disabled: ko.observable(false),
                             visible: true,
@@ -23473,6 +23786,7 @@ var DevExpress;
                             id: Report.ActionId.AddSqlDataSource,
                             container: "menu",
                             text: "Add SQL Data Source...",
+                            textId: "ASPxReportsStringId.ReportDesigner_MenuItem_AddSqlDataSource",
                             imageClassName: "dxrd-image-add-datasource",
                             disabled: ko.observable(false),
                             visible: false,
@@ -23550,6 +23864,7 @@ var DevExpress;
                         id: Report.ActionId.Exit,
                         container: "menu",
                         text: "Exit",
+                        textId: 'ReportStringId.UD_Capt_Exit',
                         imageClassName: "dxrd-image-exit",
                         disabled: ko.observable(false),
                         visible: true,
@@ -23725,8 +24040,7 @@ var DevExpress;
                             .done(function (result) {
                             navigationTab().undoEngine.start();
                             isReportDirty(true);
-                            var newReport = createReportViewModel(JSON.parse(result.reportModel), navigationTab().report());
-                            newReport.dataSourceRefs = result.dataSourceRefs;
+                            var newReport = createReportViewModel(result, navigationTab().report());
                             navigationTab().report(newReport);
                             navigationTab.notifySubscribers();
                             navigationTab().undoEngine.end();
@@ -23739,20 +24053,23 @@ var DevExpress;
                 return new Report.Wizard.ReportWizard(dataSources, reportWizardCallbacks, connectionStrings, data.isReportServer);
             }
             Report.createReportWizard = createReportWizard;
-            function createReportViewModel(reportModel, oldReport) {
+            function createReportViewModel(newReportInfo, oldReport) {
+                var reportModel = JSON.parse(newReportInfo.reportModel);
                 var report = new Report.ReportViewModel(reportModel);
                 if (oldReport) {
-                    oldReport.styles().forEach(function (value) {
-                        var containsStyle = report.styles().some(function (style) { return style.name() === value.name(); });
-                        if (!containsStyle) {
-                            report.styles.push(value);
-                        }
-                    });
-                    oldReport.parameters().forEach(function (value) {
-                        if (!report.parameters().some(function (parameter) { return parameter.name === value.name; }))
-                            report.parameters.push(value);
+                    var nextRef = Math.max.apply(Math, report.objectStorage().map(function (data) { return parseInt(data["_model"]["@Ref"]); })) + 1;
+                    oldReport
+                        .dsHelperProvider()
+                        .usedDataSources()
+                        .filter(function (dsInfo) { return !!dsInfo.data && !newReportInfo.dataSourceRefs.some(function (ref) { return ref.name === dsInfo.name; }); })
+                        .forEach(function (dsInfo) {
+                        dsInfo.data["_model"]["@Ref"] = nextRef.toString();
+                        newReportInfo.dataSourceRefs.push({ name: dsInfo.name, ref: nextRef.toString() });
+                        report.objectStorage.push(dsInfo.data);
+                        nextRef++;
                     });
                 }
+                report.dataSourceRefs = newReportInfo.dataSourceRefs;
                 return report;
             }
             Report.createReportViewModel = createReportViewModel;
@@ -23790,6 +24107,7 @@ var DevExpress;
                 DevExpress["config"]({ rtlEnabled: !!rtl });
                 Report.reportStorageWebIsRegister = data.reportStorageWebIsRegister || Report.reportStorageWebIsRegister;
                 Report.HandlerUri = designerHandlerUri || Report.HandlerUri;
+                Designer.Chart.HandlerUri = Report.HandlerUri;
                 var designerCallbacks = (callbacks && callbacks.designer || {});
                 designerCallbacks.fieldLists = designerCallbacks.fieldLists || Report.ReportDataSourceService.fieldListCallback;
                 if (localization) {
@@ -23840,7 +24158,7 @@ var DevExpress;
                             delete fieldListCache[prop];
                     }
                     var dataSourcesArray = [].concat(usedDataSources);
-                    dataSourcesArray.splice(-1, 0, { ref: "parameters", name: "Parameters", specifics: "parameters", data: parameters().parameters });
+                    dataSourcesArray.splice(-1, 0, { ref: "parameters", name: "Parameters", specifics: "parameters", data: parameters().parameters, dataSerializer: null });
                     fieldListDataSources(dataSourcesArray);
                 };
                 var getChartAvailableSources = function (dsHelper, dataSource) {
@@ -23866,11 +24184,11 @@ var DevExpress;
                     model.parameterHelper.initialize(knownEnums, callbacks.designer);
                     var parametersViewModel = new Report.ParametersViewModel(model);
                     parameters(parametersViewModel);
-                    var dsHelper = model["dataSourceHelper"]();
+                    var dsHelper = model.dataSourceHelper();
                     if (!dsHelper) {
                         var dirty = designerModel.isDirty && designerModel.isDirty();
                         dsHelper = new Report.DataSourceHelper(model.objectStorage, model.dataSourceRefs, data.availableDataSources);
-                        model["dataSourceHelper"](dsHelper);
+                        model.dataSourceHelper(dsHelper);
                         if (!dirty) {
                             designerModel.undoEngine && designerModel.undoEngine().clearHistory();
                         }
@@ -23937,11 +24255,51 @@ var DevExpress;
                 var undoEngine = ko.computed(function () {
                     return navigation.currentTab().undoEngine;
                 });
+                var customMergeForFormatString = function (propertyName, controls, undoEngine) {
+                    var result = null;
+                    if (propertyName === "formatString") {
+                        result = ko.observable(controls.every(function (control) { return controls[0][propertyName].peek() === control[propertyName].peek(); }) ? controls[0][propertyName].peek() : null);
+                        result.subscribe(function (newVal) {
+                            undoEngine && undoEngine().start();
+                            controls.forEach(function (control) {
+                                if (!control.disabled()) {
+                                    control[propertyName](newVal);
+                                }
+                            });
+                            undoEngine && undoEngine().end();
+                        });
+                    }
+                    return result;
+                };
+                var customMerge = function (propertyName, controls, undoEngine) {
+                    var result = null;
+                    if (propertyName === "dataBindings") {
+                        result = ko.observableArray();
+                        var allBindings = [].concat.apply([], controls.map(function (x) { return x[propertyName](); }));
+                        controls[0][propertyName]().map(function (x) { return x.propertyName(); }).forEach(function (name) {
+                            var availableBindings = allBindings.filter(function (binding) {
+                                return binding.propertyName() === name;
+                            });
+                            if (availableBindings.length === controls.length) {
+                                var binding = Designer.CombinedObject._merge(availableBindings, undoEngine, customMergeForFormatString);
+                                binding["isEmpty"] = function () {
+                                    return !(binding["dataMember"]() || binding["dataSource"]() || binding["parameter"]());
+                                };
+                                binding["visible"] = ko.observable(false);
+                                binding["disabled"] = ko.computed(function () {
+                                    return availableBindings.every(function (x) { return x.disabled(); });
+                                });
+                                result.push(binding);
+                            }
+                        });
+                    }
+                    return result;
+                };
                 var selection = new Designer.SurfaceSelection();
                 var controlHelper = new Designer.DesignControlsHelper(model, [{
                         added: function (control) { },
                         deleted: function (control) { control.surface == selection.focused() && selection.focused(Designer.findNextSelection(control.surface)); }
-                    }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]), designerModel = DevExpress.Designer.createDesigner(model, surface, Report.controlsFactory, Report.groups, [], undefined, rtl, selection, controlHelper, undoEngine);
+                    }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]), designerModel = DevExpress.Designer.createDesigner(model, surface, Report.controlsFactory, Report.groups, [], undefined, rtl, selection, controlHelper, undoEngine, customMerge);
                 designerModel.fieldListItemsExtenders = fieldListItemsExtenders;
                 designerModel.rootStyle = "dxrd-designer";
                 designerModel.toolboxDragHandler = new Report.ReportToolboxDragDropHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.snapHelper, designerModel.dragHelperContent, Report.controlsFactory, designerCallbacks.componentAdded);
@@ -24041,11 +24399,11 @@ var DevExpress;
                 designerModel.openReportDialog = openReportDialog;
                 designerModel.styles = ko.pureComputed(function () { return model().styles; });
                 designerModel.formattingRuleSheet = ko.pureComputed(function () { return model().formattingRuleSheet; });
-                designerModel.tabPanel.tabs.push(new Designer.TabInfo("Fields", "dxrd-fieldlistwrapper", fieldListModel, "fieldlist"));
+                designerModel.tabPanel.tabs.push(new Designer.TabInfo("Fields", "dxrd-fieldlistwrapper", fieldListModel, 'ReportStringId.UD_Title_FieldList', "fieldlist"));
                 var reportExplorer = new Report.ReportExplorerModel(model, designerModel.editableObject, function () {
                     designerModel.tabPanel.selectTab({ model: designerModel.tabPanel.tabs[0] });
                 }, new Report.ReportExplorerDragDropHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.dragHelperContent), designerModel.selection);
-                designerModel.tabPanel.tabs.push(new Designer.TabInfo("Report Explorer", "dxrd-reportexplorerwrapper", reportExplorer, "reportexplorer"));
+                designerModel.tabPanel.tabs.push(new Designer.TabInfo("Report Explorer", "dxrd-reportexplorerwrapper", reportExplorer, 'ReportStringId.UD_Title_ReportExplorer', "reportexplorer"));
                 designerModel.designMode = designMode;
                 designerModel.displayNameProvider = displayNameProvider;
                 designerModel.getDisplayNameByPath = function (path, value) { return displayNameProvider().getDisplayNameByPath(path, value); };
@@ -24100,91 +24458,9 @@ var DevExpress;
                 surface.subscribe(function (newValue) {
                     designerModel.selection.focused(newValue);
                 });
-                var chartDesignerOptionsVisible = ko.observable(false);
-                var chartIsDirty;
-                chartDesignerOptionsVisible.subscribe(function (newVal) {
-                    if (newVal) {
-                        designerModel.undoEngine().start();
-                    }
-                    else {
-                        designerModel.undoEngine().end();
-                        if (chartIsDirty()) {
-                            var undoEngine = designerModel.undoEngine();
-                            undoEngine.undo();
-                            undoEngine.redoEnabled(false);
-                            undoEngine._observers.pop();
-                        }
-                    }
-                });
-                var chartDesignerOptions = {
-                    options: null,
-                    visible: chartDesignerOptionsVisible,
-                    buttons: [{
-                            toolbar: 'bottom', location: 'after', widget: 'button', options: {
-                                text: Designer.getLocalization('OK'), onClick: function () {
-                                    chartIsDirty(false);
-                                    chartDesignerOptionsVisible(false);
-                                }
-                            }
-                        },
-                        {
-                            toolbar: 'bottom', location: 'after', widget: 'button', options: {
-                                text: Designer.getLocalization("Cancel"), onClick: function () {
-                                    chartDesignerOptionsVisible(false);
-                                }
-                            }
-                        }]
-                };
-                designerModel.runChartDesigner = function (xrChart) {
-                    if (!chartDesignerOptions.options) {
-                        chartDesignerOptions.options = {
-                            callbacks: {
-                                customizeActions: function (actions) {
-                                    for (var i = 0; i < actions.length; i++) {
-                                        if (actions[i].id === DevExpress.Designer.ActionId.Undo || actions[i].id === DevExpress.Designer.ActionId.Redo) {
-                                            actions[i].hasSeparator = false;
-                                        }
-                                        else {
-                                            actions[i].visible = false;
-                                            actions[i].hasSeparator = false;
-                                        }
-                                    }
-                                },
-                                init: function (chartModel) {
-                                    chartIsDirty = ko.computed({
-                                        read: function () {
-                                            return chartModel.undoEngine().isDirty();
-                                        },
-                                        write: function (newVal) {
-                                            chartModel.undoEngine().isDirty(newVal);
-                                        }
-                                    });
-                                    chartModel.displayNameProvider = designerModel.displayNameProvider;
-                                    chartModel.dataSourceHelper = dataSourceHelper;
-                                    chartModel.reportParameters = ko.computed(function () { return parameters().parameters(); });
-                                    chartModel.reportDataSource = ko.computed(function () { return dataSourceHelper().findDataSourceInfo(model().dataSource()); });
-                                    chartModel.reportDataBindingsProvider = chartValueBindingProvider;
-                                    chartDesignerOptionsVisible.subscribe(function (newVal) {
-                                        if (newVal) {
-                                            chartModel.updateSurfaceSize();
-                                        }
-                                    });
-                                }
-                            },
-                            data: {
-                                chart: ko.observable(xrChart.chartModel),
-                                availableChartDataSources: designerModel.chartDataSources,
-                                width: 500,
-                                height: 500
-                            },
-                            rtl: designerModel.rtl,
-                            fieldListProvider: designerModel.dataBindingsProvider
-                        };
-                    }
-                    else {
-                        chartDesignerOptions.options.data.chart(xrChart.chartModel);
-                    }
-                    chartDesignerOptions.visible(true);
+                var chartDesignerOptions = Report.createChartDesignerOptions(designerModel, dataSourceHelper, model, parameters, chartValueBindingProvider);
+                designerModel.runChartDesigner = function (chart) {
+                    chartDesignerOptions.run(chart);
                 };
                 designerModel.parts.push({ templateName: Report.ReportDesignerElements.NavigationPanel, model: designerModel.navigateByReports }, { templateName: Report.ReportDesignerElements.ReportDialog, model: designerModel.saveReportDialog }, { templateName: Report.ReportDesignerElements.ReportDialog, model: designerModel.saveReportDialogLight }, { templateName: Report.ReportDesignerElements.ReportDialog, model: designerModel.openReportDialog }, { templateName: Report.ReportDesignerElements.ChartDialog, model: chartDesignerOptions });
                 designerCallbacks.customizeParts && designerCallbacks.customizeParts(designerModel.parts);
@@ -25021,6 +25297,7 @@ var DevExpress;
                     var self = this, copyText = ko.observable("");
                     this.toolbarItems.push({
                         text: "Cut",
+                        textId: "ReportStringId.UD_TTip_EditCut",
                         imageClassName: "dxrd-image-cut",
                         disabled: ko.pureComputed(function () { return !self._selectionNotEmpty(); }),
                         visible: true,
@@ -25032,6 +25309,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Copy",
+                        textId: "ReportStringId.Cmd_Copy",
                         imageClassName: "dxrd-image-copy",
                         disabled: ko.pureComputed(function () { return !self._selectionNotEmpty(); }),
                         visible: true,
@@ -25042,6 +25320,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Paste",
+                        textId: "ReportStringId.Cmd_Paste",
                         imageClassName: "dxrd-image-paste",
                         disabled: ko.pureComputed(function () { return !copyText(); }),
                         visible: true,
@@ -25052,6 +25331,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Delete",
+                        textId: "ReportStringId.Cmd_Delete",
                         imageClassName: "dxrd-image-delete",
                         disabled: ko.pureComputed(function () { return !self._selectionNotEmpty(); }),
                         visible: true,
@@ -25061,6 +25341,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Undo",
+                        textId: "ReportStringId.UD_Capt_Undo",
                         imageClassName: "dxrd-image-undo",
                         disabled: ko.pureComputed(function () { return !self._canUndo(); }),
                         visible: true,
@@ -25073,6 +25354,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Redo",
+                        textId: "ReportStringId.UD_Capt_Redo",
                         imageClassName: "dxrd-image-redo",
                         disabled: ko.pureComputed(function () { return !self._canRedo(); }),
                         visible: true,
@@ -25084,6 +25366,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Validate",
+                        textId: "ReportStringId.ScriptEditor_Validate",
                         imageClassName: "dxrd-image-validate",
                         disabled: this.validateDisabled,
                         visible: this.editorVisible,
@@ -25121,6 +25404,7 @@ var DevExpress;
                     });
                     this.toolbarItems.push({
                         text: "Design",
+                        textId: "ReportStringId.RepTabCtl_Designer",
                         imageClassName: "dxrd-image-design",
                         disabled: ko.observable(false),
                         visible: this.editorVisible,
@@ -25331,12 +25615,13 @@ var DevExpress;
             (function (Wizard) {
                 var ReportWizard = (function (_super) {
                     __extends(ReportWizard, _super);
-                    function ReportWizard(dataSources, callbacks, connectionStrings, hideDataMemberSubItems) {
+                    function ReportWizard(dataSources, callbacks, connectionStrings, hideDataMemberSubItems, disableCustomSql) {
                         var _this = this;
                         if (hideDataMemberSubItems === void 0) { hideDataMemberSubItems = false; }
+                        if (disableCustomSql === void 0) { disableCustomSql = true; }
                         _super.call(this);
                         this._labelWizardData = null;
-                        this.title = "Report Wizard";
+                        this.title = Designer.getLocalization("Report Wizard", "ASPxReportsStringId.ReportDesigner_Wizard_Header");
                         this.labelWizardData = function () {
                             if (!_this._labelWizardData) {
                                 var $def = $.Deferred();
@@ -25355,7 +25640,7 @@ var DevExpress;
                             new Report.Wizard.CustomizeLabelPage(this),
                             this._selectDataSourcePage,
                             new Report.Wizard.ReportWizardSelectConnectionString(this, connectionStrings),
-                            new Report.Wizard.ReportWizardAddQueriesPage(this, callbacks, false, false),
+                            new Report.Wizard.ReportWizardAddQueriesPage(this, callbacks, disableCustomSql, false),
                             new Report.Wizard.ReportWizardConfigureParametersPage(this),
                             new Report.Wizard.ReportWizardMasterDetailRelationsPage(this, callbacks.sqlDataSourceResultSchema),
                             new Report.Wizard.SelectDataMemberPage(this, callbacks.fieldListsCallback, callbacks.createSqlDataSourceInfo, hideDataMemberSubItems),
@@ -25388,7 +25673,7 @@ var DevExpress;
                     __extends(DataSourceWizard, _super);
                     function DataSourceWizard(dataSources, fieldListsCallback) {
                         _super.call(this);
-                        this.title = "Data Source Wizard";
+                        this.title = Designer.getLocalization("Report Wizard", "ASPxReportsStringId.ReportDesigner_Wizard_Header");
                         var columnsPage = new Report.Wizard.SelectColumnsPage(this, fieldListsCallback);
                         columnsPage.actionNext.isDisabled = ko.pureComputed(function () {
                             return true;
@@ -25594,8 +25879,7 @@ var DevExpress;
                         this._rootItems = ko.observableArray([]);
                         this._selectedPath = ko.observable(null);
                         this.template = "dxrd-page-dataMember";
-                        this.title = Designer.getLocalization("Choose a Table or View", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Title");
-                        this.description = Designer.getLocalization("The table or view you choose determines wich columns will be available in your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Description");
+                        this.description = Designer.getLocalization("The table or view you choose determines wich columns will be available in your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember");
                         this.actionNext.isDisabled = this.actionFinish.isDisabled = ko.pureComputed(function () {
                             return _this._selectedPath() === null || _this._selectedPath() === undefined;
                         });
@@ -25655,6 +25939,7 @@ var DevExpress;
                                         name: value.displayName,
                                         id: value.name,
                                         specifics: "List",
+                                        dataSerializer: null,
                                         data: {}
                                     };
                                 }));
@@ -25722,7 +26007,6 @@ var DevExpress;
                         var _this = this;
                         _super.call(this, wizard);
                         this.template = "dxrd-page-reportType";
-                        this.title = Designer.getLocalization("Choose a Report Type", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Title");
                         this.description = Designer.getLocalization("Select the report type you wish to create.", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Message");
                         this.selectedItem = ko.observable();
                         this.itemClick = function (item) {
@@ -25772,8 +26056,7 @@ var DevExpress;
                         var _this = this;
                         _super.call(this, wizard);
                         this.template = "dxrd-page-dataSource";
-                        this.title = Designer.getLocalization("Choose a Data Source", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Title");
-                        this.description = Designer.getLocalization("Choose a Data Source to use in your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Description");
+                        this.description = Designer.getLocalization("Choose a Data Source to use in your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource");
                         this.selectedDataSource = ko.observableArray([]);
                         this.dataSourceOperations = [
                             { text: Designer.getLocalization("Yes, let me choose an existing data source from the list", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSourceFromList"), createNewDataSource: false },
@@ -25844,8 +26127,7 @@ var DevExpress;
                         this._selectedPath = null;
                         this._fields = [];
                         this.template = "dxrd-page-columns";
-                        this.title = Designer.getLocalization("Choose Columns to Display in Your Report", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Title");
-                        this.description = Designer.getLocalization("Select the columns you want to display within your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Description");
+                        this.description = Designer.getLocalization("Select the columns you want to display within your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns");
                         this.availableFields = new Wizard.ListViewModel(Designer.getLocalization("Available fields", "ASPxReportsStringId.ReportDesigner_Wizard_AvailableFields"));
                         this.selectedFields = new Wizard.ListViewModel(Designer.getLocalization("Selected fields", "ASPxReportsStringId.ReportDesigner_Wizard_SelectedFields"));
                         this.isSelectEnable = ko.pureComputed(function () {
@@ -25941,8 +26223,7 @@ var DevExpress;
                         var _this = this;
                         _super.call(this, wizard);
                         this.template = "dxrd-page-groups";
-                        this.title = Designer.getLocalization("Create Groups", "ASPxReportsStringId.ReportDesigner_Wizard_CreateGroups_Title");
-                        this.description = Designer.getLocalization("Create multiple groups, each with a single field value, or define several fields in the same group.", "ASPxReportsStringId.ReportDesigner_Wizard_CreateGroups_Description");
+                        this.description = Designer.getLocalization("Create multiple groups, each with a single field value, or define several fields in the same group.", "ASPxReportsStringId.ReportDesigner_Wizard_CreateGroups");
                         this.fields = new Wizard.ListViewModel(Designer.getLocalization("Available fields", "ASPxReportsStringId.ReportDesigner_Wizard_AvailableFields"));
                         this.groups = new Wizard.ListViewModel(Designer.getLocalization("Groups", "ASPxReportsStringId.ReportDesigner_Groups"));
                         this.addNewGroup = function () {
@@ -26071,8 +26352,7 @@ var DevExpress;
                         _super.call(this, wizard);
                         this._columns = [];
                         this.template = "dxrd-page-summaryOptions";
-                        this.title = Designer.getLocalization("Choose summary options", "ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Title");
-                        this.description = Designer.getLocalization("What summary function would you like to calculate?", "ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Description");
+                        this.description = Designer.getLocalization("What summary function would you like to calculate?", "ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions");
                         this.summaryOptions = ko.observableArray([]);
                         this.ignoreNullValues = ko.observable(false);
                         this.toggleIgnoreNullValues = function () {
@@ -26176,8 +26456,7 @@ var DevExpress;
                         ];
                         this._pageOriantation = PageOrientation.Portrait;
                         this.template = "dxrd-page-reportLayoutType";
-                        this.title = Designer.getLocalization("Choose a Report Layout", "ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Title");
-                        this.description = Designer.getLocalization("The report layout specifies the manner in which selected data fields are arranged on individual pages.", "ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Description");
+                        this.description = Designer.getLocalization("The report layout specifies the manner in which selected data fields are arranged on individual pages.", "ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout");
                         this.toggleFitFieldsToPage = function () {
                             _this.fitFieldsToPage(!_this.fitFieldsToPage());
                         };
@@ -26254,8 +26533,7 @@ var DevExpress;
                     function ChooseReportStylePage(wizard) {
                         _super.call(this, wizard);
                         this.template = "dxrd-page-reportStyle";
-                        this.title = Designer.getLocalization("Choose a Report Style", "ASPxReportsStringId.ReportDesigner_Wizard_Report_Style");
-                        this.description = Designer.getLocalization("The report style specifies the appearance of your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Description");
+                        this.description = Designer.getLocalization("The report style specifies the appearance of your report.", "ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle");
                         this.reportStyleItems = [
                             new ReportStyleItem("Bold", "ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Bold", ReportStyle.Bold),
                             new ReportStyleItem("Casual", "ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Casual", ReportStyle.Casual),
@@ -26291,8 +26569,7 @@ var DevExpress;
                     function SetReportTitlePage(wizard) {
                         _super.call(this, wizard);
                         this.template = "dxrd-page-reportTitle";
-                        this.title = Designer.getLocalization("The Report is Complete", "ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Title");
-                        this.description = Designer.getLocalization("We have all the information needed to process the report.", "ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Description");
+                        this.description = Designer.getLocalization("We have all the information needed to process the report.", "ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete");
                         this.reportTitle = ko.observable("");
                         this.actionNext.isDisabled(true);
                     }
@@ -26427,8 +26704,8 @@ var DevExpress;
                         return v.toString(16);
                     });
                 };
-                SqlDataSourceEditor.prototype._applyWizardChanges = function (dataSource, wizardModel, queryName) {
-                    return this._applyDataSourceChange(wizardModel.sqlDataSource, dataSource, queryName);
+                SqlDataSourceEditor.prototype._applyWizardChanges = function (dataSource, wizardModel, queryName, relationsEditing) {
+                    return this._applyDataSourceChange(wizardModel.sqlDataSource, dataSource, queryName, relationsEditing);
                 };
                 SqlDataSourceEditor.prototype._createOrEditSqlDataSource = function (requestJson, dataSource, requestName) {
                     var _this = this;
@@ -26448,9 +26725,9 @@ var DevExpress;
                             Designer.ShowMessage(Designer.getErrorMessage(result));
                     });
                 };
-                SqlDataSourceEditor.prototype._applyDataSourceChange = function (source, dest, queryName) {
+                SqlDataSourceEditor.prototype._applyDataSourceChange = function (source, dest, queryName, relationsEditing) {
                     var _this = this;
-                    return SqlDataSourceEditor.createSqlDataSourceInfo(source, queryName)
+                    return SqlDataSourceEditor.createSqlDataSourceInfo(source, queryName, relationsEditing)
                         .done(function (result) {
                         if (dest) {
                             dest.data["_model"]["@Base64"] = result.base64();
@@ -26489,7 +26766,7 @@ var DevExpress;
                     Report.ReportDataSourceService.sqlDataSourceFromBase64(dataSourceInfo.data._model["@Base64"]).done(function (result) {
                         var sqlDataSource = new DevExpress.Data.SqlDataSource(JSON.parse(result.sqlDataSourceJSON));
                         sqlDataSource.queries.remove(function (x) { return x.name() === queryName; });
-                        _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource }, "");
+                        _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource }, queryName);
                     });
                 };
                 SqlDataSourceEditor.prototype.removeDataSource = function (dataSourceID) {
@@ -26508,7 +26785,7 @@ var DevExpress;
                             return;
                         }
                         _this.relationsEditor(new DevExpress.Data.MasterDetailEditor(sqlDataSource.relations, sqlDataSource.resultSet, function () {
-                            return _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource }, "");
+                            return _this._applyWizardChanges(dataSourceInfo, { sqlDataSource: sqlDataSource }, "", true);
                         }));
                         _this.relationsEditor().popupVisible(true);
                     });
@@ -26518,9 +26795,9 @@ var DevExpress;
                     var queryIndex = dataSourceWizardModel["getQueryIndex"] && dataSourceWizardModel["getQueryIndex"]();
                     return this._applyWizardChanges(dataSource, dataSourceWizardModel, $.isNumeric(queryIndex) ? dataSourceWizardModel.sqlDataSource.queries()[queryIndex].name() : null);
                 };
-                SqlDataSourceEditor.createSqlDataSourceInfo = function (source, queryName) {
+                SqlDataSourceEditor.createSqlDataSourceInfo = function (source, queryName, relationsEditing) {
                     var deferred = $.Deferred();
-                    Designer.QueryBuilder.RequestWrapper.rebuildResultSchema(source, queryName)
+                    Designer.QueryBuilder.RequestWrapper.rebuildResultSchema(source, queryName, relationsEditing)
                         .done(function (result) {
                         var model = JSON.parse(result.resultSchemaJSON);
                         source.resultSet = !!model ? new DevExpress.Data.ResultSet(model) : null;
@@ -26923,9 +27200,9 @@ var DevExpress;
         var Report;
         (function (Report) {
             Report.editOptionsSerializationInfo = [
-                { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect },
-                { propertyName: "id", modelName: "@ID", displayName: "ID", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "readOnly", modelName: "@ReadOnly", displayName: "Read Only", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect }
+                { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", localizationId: "DevExpress.XtraReports.UI.EditOptions.Enabled", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect },
+                { propertyName: "id", modelName: "@ID", displayName: "ID", localizationId: "DevExpress.XtraReports.UI.EditOptions.ID", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "readOnly", modelName: "@ReadOnly", displayName: "Read Only", localizationId: "DevExpress.XtraReports.UI.EditOptions.ReadOnly", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.boolSelect }
             ];
             var EditOptions = (function () {
                 function EditOptions(model, serializer) {
@@ -26951,7 +27228,7 @@ var DevExpress;
                 }
                 CheckEditOptions.prototype.getInfo = function () {
                     return _super.prototype.getInfo.call(this).concat([
-                        { propertyName: "groupId", modelName: "@GroupID", displayName: "Group ID", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+                        { propertyName: "groupId", modelName: "@GroupID", displayName: "Group ID", localizationId: "DevExpress.XtraReports.UI.CheckEditOptions.GroupID", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
                     ]);
                 };
                 return CheckEditOptions;
@@ -26964,7 +27241,7 @@ var DevExpress;
                 }
                 TextEditOptions.prototype.getInfo = function () {
                     return _super.prototype.getInfo.call(this).concat([
-                        { propertyName: "editorName", modelName: "@EditorName", displayName: "Editor Name", defaultVal: "", editor: { header: "dxrd-editOptionsEditorName" } }
+                        { propertyName: "editorName", modelName: "@EditorName", displayName: "Editor Name", localizationId: "DevExpress.XtraReports.UI.TextEditOptions.EditorName", defaultVal: "", editor: { header: "dxrd-editOptionsEditorName" } }
                     ]);
                 };
                 return TextEditOptions;
@@ -27062,6 +27339,7 @@ var DevExpress;
                         tab.displayName.dispose();
                         tab.textSubscription.dispose();
                         tab.undoEngine.removeTargetSubscription();
+                        tab.undoEngine["_callDisposeFunction"](tab.report());
                         var newIndex = this.tabs().indexOf(tab) - 1;
                         this.tabs.remove(tab);
                         this.selectedIndex(newIndex);
@@ -27151,7 +27429,7 @@ var DevExpress;
                     if (Report.reportStorageWebIsRegister) {
                         var subreportControl = subreportSurface.getControlModel();
                         var self = this;
-                        this.addTab(subreportControl.reportSource, subreportControl.reportSourceUrl, "dx-icon-close");
+                        this.addTab(ko.observable(subreportControl.reportSource()), subreportControl.reportSourceUrl, "dx-icon-close");
                     }
                 };
                 NavigateByReports.prototype.addTab = function (report, url, icon) {
@@ -27186,6 +27464,7 @@ var DevExpress;
                 function ReportExplorerDragDropHandler(surface, selection, undoEngine, dragHelperContent) {
                     var _this = this;
                     _super.call(this, surface, selection, undoEngine, null, dragHelperContent);
+                    this.undoEngine = undoEngine;
                     this._isStyle = function (item) { return item.data && item.data.specifics === "stylemodel"; };
                     this._isFormatingRule = function (item) { return item.data && item.data.specifics === "formattingrule"; };
                     this._isReportControl = function (item) { return !_this._isStyle(item) && !_this._isFormatingRule(item); };
@@ -27228,7 +27507,7 @@ var DevExpress;
                 }
                 ReportExplorerDragDropHandler.prototype.startDrag = function (draggable) {
                     if (this._isReportControl(draggable)) {
-                        this.reportControlsDragDropHelper = new ReportControlsDragDropHelper(draggable);
+                        this.reportControlsDragDropHelper = new ReportControlsDragDropHelper(draggable, this.undoEngine());
                     }
                     else {
                         this.reportControlsDragDropHelper = null;
@@ -27265,7 +27544,8 @@ var DevExpress;
             })(Designer.DragDropHandler);
             Report.ReportExplorerDragDropHandler = ReportExplorerDragDropHandler;
             var ReportControlsDragDropHelper = (function () {
-                function ReportControlsDragDropHelper(draggable) {
+                function ReportControlsDragDropHelper(draggable, _undoEngine) {
+                    this._undoEngine = _undoEngine;
                     this._draggable = draggable;
                     this._draggableModel = this._getElementViewModel(draggable);
                     this._draggableParent = this._draggableModel.parentModel();
@@ -27274,11 +27554,11 @@ var DevExpress;
                 ReportControlsDragDropHelper.prototype._getElementViewModel = function (item) {
                     return item && item.data && item.data["data"];
                 };
-                ReportControlsDragDropHelper.prototype._canReorder = function (currentTarget) {
-                    return currentTarget.data.specifics === this._draggable.data.specifics ||
-                        (this._draggableModel.getMetaData().canDrop(this._getElementViewModel(currentTarget).surface, this._draggableModel) &&
-                            !this._getElementViewModel(currentTarget).getMetaData().isContainer &&
-                            !(this._getElementViewModel(currentTarget) instanceof Report.ReportViewModel));
+                ReportControlsDragDropHelper.prototype._canReorder = function (currentTarget, draggableData) {
+                    var currentModel = this._getElementViewModel(currentTarget);
+                    return currentTarget.data.specifics === draggableData.specifics ||
+                        (this._draggableModel.getMetaData().canDrop(currentModel.surface, this._draggableModel) &&
+                            !currentModel.getMetaData().isContainer && !(currentModel instanceof Report.ReportViewModel));
                 };
                 ReportControlsDragDropHelper.prototype._shiftChildrenCount = function (currentTarget) {
                     var _this = this;
@@ -27287,16 +27567,15 @@ var DevExpress;
                 ReportControlsDragDropHelper.prototype._targetIsClosestOfDraggable = function (target, draggable) {
                     return target === draggable || (target.parent && this._targetIsClosestOfDraggable(target.parent, draggable));
                 };
-                ReportControlsDragDropHelper.prototype._canDrop = function (target) {
+                ReportControlsDragDropHelper.prototype._canDrop = function (target, targetModel) {
                     var isReportExplorerTreeListItem = target instanceof DevExpress.JS.Widgets.TreeListItemViewModel && target.data && target.data.data instanceof Designer.ElementViewModel;
                     if (!isReportExplorerTreeListItem) {
                         return false;
                     }
-                    var currentTarget = target, controlModel = this._getElementViewModel(currentTarget);
-                    if (["XRTable", "XRTableCell", "XRTableRow"].indexOf(this._draggableModel.controlType) < 0 && ["XRTable", "XRTableRow"].indexOf(controlModel.controlType) > -1)
+                    if (["XRTable", "XRTableCell", "XRTableRow"].indexOf(this._draggableModel.controlType) < 0 && ["XRTable", "XRTableRow"].indexOf(targetModel.controlType) > -1)
                         return false;
-                    return (this._draggableParent !== controlModel && !this._targetIsClosestOfDraggable(currentTarget, this._draggable)) &&
-                        (this._canReorder(currentTarget) || (controlModel.getMetaData().isContainer && this._draggableModel.getMetaData().canDrop(controlModel.surface, this._draggableModel)));
+                    return (this._draggableParent !== targetModel && !this._targetIsClosestOfDraggable(target, this._draggable)) &&
+                        (this._canReorder(target, this._draggable.data) || (targetModel.getMetaData().isContainer && this._draggableModel.getMetaData().canDrop(targetModel.surface, this._draggableModel)));
                 };
                 ReportControlsDragDropHelper.prototype._removeClass = function (target) {
                     $(target).removeClass("dxrd-treelist-droppable dxrd-drop-approve drop-before drop-after");
@@ -27333,9 +27612,10 @@ var DevExpress;
                     this._targetElement = $targetElement.get(0);
                     if ($targetElement && $targetElement.length) {
                         var classToAdd = "dxrd-treelist-droppable";
-                        if (this._canDrop(this._target)) {
+                        var targetModel = this._getElementViewModel(this._target);
+                        if (this._canDrop(this._target, targetModel)) {
                             classToAdd = classToAdd + " dxrd-drop-approve";
-                            if (this._canReorder(this._target)) {
+                            if (this._canReorder(this._target, this._draggable.data)) {
                                 classToAdd = classToAdd + " " + (this._shiftChildrenCount(this._target) ? "drop-after" : "drop-before");
                             }
                         }
@@ -27346,24 +27626,27 @@ var DevExpress;
                     var _this = this;
                     this._removeClass(this._targetElement);
                     var targetModel = this._getElementViewModel(this._target);
-                    if (!this._target || !targetModel || !this._canDrop(this._target)) {
+                    if (!this._target || !targetModel || !this._canDrop(this._target, targetModel)) {
                         return this._draggableModel.surface;
                     }
-                    var draggablePathName = this._draggable.data.name.split(".")[0], siblings = this._getElementViewModel(this._target.parent) && this._getElementViewModel(this._target.parent)[draggablePathName], clonedSiblings = siblings && siblings().slice(0);
+                    var draggablePathName = this._draggable.data.name.split(".")[0], siblings = targetModel.parentModel()[draggablePathName], clonedSiblings = siblings && siblings().slice(0);
                     if (Report.BandViewModel.isReorderingBand(this._draggableModel)) {
-                        Report.BandViewModel.insertBandInPlaceOf(this._draggableModel, targetModel, clonedSiblings);
+                        this._undoEngine && this._undoEngine.start();
+                        this._draggableModel["level"](targetModel["level"]());
+                        this._undoEngine && this._undoEngine.end();
                     }
                     else {
                         var draggableInfoClone = this._serializer.serialize(this._draggableModel);
                         var weightsCells = null;
-                        if (draggableInfoClone["@ControlType"] === "XRTableCell" && this._getElementViewModel(this._target).parentModel() === this._draggableParent) {
+                        if (draggableInfoClone["@ControlType"] === "XRTableCell" && targetModel.parentModel() === this._draggableParent) {
                             weightsCells = clonedSiblings.filter(function (cell) {
                                 return cell.name.peek() !== _this._draggableModel.name.peek();
                             }).map(function (cell) { return cell.weight.peek(); });
                         }
                         var shiftChildrenCount = this._shiftChildrenCount(this._target);
+                        var draggableData = this._draggable.data;
                         this._draggableParent.removeChild(this._draggableModel);
-                        if (this._canReorder(this._target)) {
+                        if (this._canReorder(this._target, draggableData)) {
                             if (targetModel.parentModel() instanceof Report.TableControlViewModel || targetModel.parentModel() instanceof Report.TableRowViewModel) {
                                 return this._insertTableChilds(targetModel.parentModel(), draggableInfoClone, siblings.indexOf(targetModel) + shiftChildrenCount, weightsCells);
                             }
@@ -27495,12 +27778,13 @@ var DevExpress;
                     };
                     return DevExpress.Designer.Report.HandlerUri + "?actionKey=shapeGlyph&arg=" + encodeURIComponent(JSON.stringify(params));
                 };
-                ReportRenderingService.getRichImage = function (control, propertyName) {
+                ReportRenderingService.getRichImage = function (surface, propertyName) {
                     return Designer.ajax(Report.HandlerUri, 'renderRich', encodeURIComponent(JSON.stringify({
-                        layout: JSON.stringify(new DevExpress.JS.Utils.ModelSerializer().serialize(control)),
-                        text: control.textRtf().replace(/\n/g, "\r\n"),
-                        rtf: control._rtf().replace(/\n/g, "\r\n"),
-                        base64rtf: control._serializableRtfString(),
+                        layout: JSON.stringify(new DevExpress.JS.Utils.ModelSerializer().serialize(surface._control)),
+                        scale: surface._context.zoom(),
+                        text: surface._control["textRtf"]().replace(/\n/g, "\r\n"),
+                        rtf: surface._control["_rtf"]().replace(/\n/g, "\r\n"),
+                        base64rtf: surface._control["_serializableRtfString"](),
                         propertyName: propertyName
                     })));
                 };
@@ -27557,7 +27841,7 @@ var DevExpress;
             var ReportWizardService = (function () {
                 function ReportWizardService() {
                 }
-                ReportWizardService.createWizardRequest = function (reportWizardModel, state) {
+                ReportWizardService.createWizardRequest = function (reportWizardModel, state, oldReportJSON) {
                     var dataSourceJSON = null;
                     if (reportWizardModel.dataSource) {
                         var dataSourceData = new DevExpress.JS.Utils.ModelSerializer().serialize(reportWizardModel.dataSource.data);
@@ -27566,12 +27850,13 @@ var DevExpress;
                     var requestJson = JSON.stringify({
                         reportModel: new Report.RequestReportModel(reportWizardModel),
                         dataSource: dataSourceJSON,
+                        oldReport: oldReportJSON,
                         state: state
                     });
                     return encodeURIComponent(requestJson);
                 };
-                ReportWizardService.generateReportFromWizardModel = function (reportWizardModel, state) {
-                    return Designer.ajax(Report.HandlerUri, 'generateReportFromWizardModel', this.createWizardRequest(reportWizardModel, state));
+                ReportWizardService.generateReportFromWizardModel = function (reportWizardModel, state, oldReportJSON) {
+                    return Designer.ajax(Report.HandlerUri, 'generateReportFromWizardModel', this.createWizardRequest(reportWizardModel, state, oldReportJSON));
                 };
                 ReportWizardService.createDataSource = function (reportWizardModel, state) {
                     return Designer.ajax(Report.HandlerUri, 'createDataSource', this.createWizardRequest(reportWizardModel, state));
@@ -27616,51 +27901,16 @@ var DevExpress;
                 function XRRichViewModel(model, parent, serializer) {
                     var _this = this;
                     _super.call(this, model, parent, serializer);
-                    this._lastRequest = ko.observable(null);
-                    this._innerUpdate = ko.observable(false);
                     this.textRtf = ko.observable("");
                     this._rtf = ko.observable("");
-                    this._imageSrc = ko.observable("");
-                    this._sendCallback();
-                    this._disposables.push(this.textRtf.subscribe(function (newVal) { _this._sendCallback("textRtf"); }));
-                    this._disposables.push(this._rtf.subscribe(function () { _this._sendCallback("rtf"); }));
-                    this._disposables.push(this.font.subscribe(function () { _this._sendCallback("font"); }));
-                    this._disposables.push(this.foreColor.subscribe(function () { _this._sendCallback("foreColor"); }));
-                    this._disposables.push(this.size.height.subscribe(function () { _this._sendCallback("height"); }));
-                    this._disposables.push(this.size.width.subscribe(function () { _this._sendCallback("width"); }));
-                    this._disposables.push(this._serializableRtfString.subscribe(function () { _this._sendCallback("base64rtf"); }));
-                    var nameSubscribe = this.name.subscribe(function (newVal) {
+                    var nameSubscribe = ko.computed(function () {
+                        var newVal = _this.name();
                         if (!_this.textRtf() && newVal) {
                             _this.textRtf(newVal);
-                            nameSubscribe.dispose();
+                            nameSubscribe && nameSubscribe.dispose();
                         }
-                    });
+                    }).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1 } });
                 }
-                XRRichViewModel.prototype._sendCallback = function (propertyName) {
-                    if (propertyName === void 0) { propertyName = null; }
-                    if (!this._innerUpdate()) {
-                        this._lastRequest(propertyName);
-                        var self = this;
-                        Report.ReportRenderingService.getRichImage(this, propertyName).done(function (result) {
-                            if (propertyName === self._lastRequest()) {
-                                self.root && self.root["_update"] && self.root["_update"](true);
-                                if (propertyName !== "height" && propertyName !== "width") {
-                                    self._innerUpdate(true);
-                                    if (propertyName !== "textRtf") {
-                                        self.textRtf(result.Text);
-                                    }
-                                    self._rtf(result.Rtf);
-                                    self._serializableRtfString(result.SerializableRtfString);
-                                    self._innerUpdate(false);
-                                }
-                                self._imageSrc("data:image/x;base64," + result.Img);
-                                self.root && self.root["_update"] && self.root["_update"](false);
-                            }
-                        }).fail(function (jqXHR) {
-                            Designer.NotifyAboutWarning("It is impossible to get richText");
-                        });
-                    }
-                };
                 Object.defineProperty(XRRichViewModel.prototype, "textEditableProperty", {
                     get: function () { return this.textRtf; },
                     enumerable: true,
@@ -27672,11 +27922,48 @@ var DevExpress;
             var XRRichSurface = (function (_super) {
                 __extends(XRRichSurface, _super);
                 function XRRichSurface(control, context) {
+                    var _this = this;
                     _super.call(this, control, context);
-                    this.imageSrc = control._imageSrc;
+                    this._lastRequest = ko.observable(null);
+                    this._innerUpdate = ko.observable(false);
+                    this.imageSrc = ko.observable("");
                     this.template = "dxrd-shape";
                     this.contenttemplate = "dxrd-shape-content";
+                    this._sendCallback();
+                    this._disposables.push(control.textRtf.subscribe(function (newVal) { _this._sendCallback("textRtf"); }));
+                    this._disposables.push(control._rtf.subscribe(function () { _this._sendCallback("rtf"); }));
+                    this._disposables.push(control.font.subscribe(function () { _this._sendCallback("font"); }));
+                    this._disposables.push(control.foreColor.subscribe(function () { _this._sendCallback("foreColor"); }));
+                    this._disposables.push(this["position"]["width"].subscribe(function (newValue) { _this._sendCallback("width"); }));
+                    this._disposables.push(this["position"]["height"].subscribe(function (newValue) { _this._sendCallback("height"); }));
+                    this._disposables.push(control._serializableRtfString.subscribe(function () { _this._sendCallback("base64rtf"); }));
                 }
+                XRRichSurface.prototype._sendCallback = function (propertyName) {
+                    if (propertyName === void 0) { propertyName = null; }
+                    if (!this._innerUpdate()) {
+                        this._lastRequest(propertyName);
+                        var self = this;
+                        var selfControl = this._control;
+                        Report.ReportRenderingService.getRichImage(this, propertyName).done(function (result) {
+                            if (propertyName === self._lastRequest()) {
+                                selfControl.root && selfControl.root["_update"] && selfControl.root["_update"](true);
+                                if (propertyName !== "height" && propertyName !== "width") {
+                                    self._innerUpdate(true);
+                                    if (propertyName !== "textRtf") {
+                                        selfControl.textRtf(result.Text);
+                                    }
+                                    selfControl._rtf(result.Rtf);
+                                    selfControl._serializableRtfString(result.SerializableRtfString);
+                                    self._innerUpdate(false);
+                                }
+                                self.imageSrc("data:image/x;base64," + result.Img);
+                                selfControl.root && selfControl.root["_update"] && selfControl.root["_update"](false);
+                            }
+                        }).fail(function (jqXHR) {
+                            Designer.NotifyAboutWarning("It is impossible to get richText");
+                        });
+                    }
+                };
                 return XRRichSurface;
             })(Report.ControlSurface);
             Report.XRRichSurface = XRRichSurface;
@@ -27775,7 +28062,7 @@ var DevExpress;
                     ];
                 }
                 SaveReportDialogModelBase.prototype.onShow = function (tab) {
-                    this.saveText('"' + tab.displayName() + '" ' + Designer.getLocalization("has been changed. Do you want to save changes?"));
+                    this.saveText(Designer.getLocalization('"{0}" has been changed. Do you want to save changes ?', 'ReportStringId.UD_Msg_MdiReportChanged').replace("{0}", tab.displayName()));
                 };
                 SaveReportDialogModelBase.prototype.getUrl = function () {
                     return this.reportUrl();
@@ -27879,6 +28166,7 @@ var DevExpress;
                         else {
                             self.saveReportDialog.show(self.tab());
                             self.saveReportDialog.closeAfterSave(true);
+                            self.visible(false);
                         }
                     }
                     else {
@@ -27923,16 +28211,18 @@ var DevExpress;
                             self.onSaved({ report: self.tab().report(), url: result });
                             var url = result;
                             self.tab().url(result);
-                            self.tab().undoEngine.clearHistory();
+                            self.tab().isDirty(false);
+                            if (self.closeAfterSave()) {
+                                self.tab().close.resolve();
+                            }
+                            Report.ReportStorageWeb.getUrls().done(function (result) { self.model()["urls"] && self.model()["urls"](result); });
                         });
                     }
                     else {
                         self.tab().report().save();
-                        self.tab().close.resolve();
-                    }
-                    self.tab().isDirty(false);
-                    if (self.closeAfterSave()) {
-                        self.tab().close.resolve();
+                        if (self.closeAfterSave()) {
+                            self.tab().close.resolve();
+                        }
                     }
                 };
                 return SaveReportDialog;
@@ -28181,8 +28471,7 @@ var DevExpress;
                             return _this.selectedPaperSize().width / CustomizeLabelPage.CONVERSION_COEEFICIENT;
                         });
                         this.template = "dxrd-page-customizeLabel";
-                        this.title = "Specify the Label's Parameters";
-                        this.description = "You can adjust the label's parameters here if required.";
+                        this.description = Designer.getLocalization("You can adjust the label's parameters here if required.", "ReportBoxDesignerStringId.Wizard_LabelOptions_Description");
                         this.paperKinds = function () { return (_this.labelData.paperKinds); };
                         this.selectedPaperSize = ko.observable({ "id": 1, "enumId": 9, "name": "A4", "width": 210.0, "height": 297.0, "unit": 6, "isRollPaper": false });
                         this.unit = ko.observable();
@@ -28356,8 +28645,7 @@ var DevExpress;
                     __extends(ReportWizardConfigureParametersPage, _super);
                     function ReportWizardConfigureParametersPage(wizard) {
                         _super.call(this, wizard, parametersViewModelConverter);
-                        this.title = Designer.getLocalization("Configure Query Parameters", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters_Title");
-                        this.description = Designer.getLocalization("Manage parameters that are used in queries and/or stored procedures.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters_Description");
+                        this.description = Designer.getLocalization("Manage parameters that are used in queries and/or stored procedures.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters");
                         this.actionFinish.isDisabled(true);
                     }
                     ReportWizardConfigureParametersPage.prototype.beginAsync = function (data) {
@@ -28398,8 +28686,7 @@ var DevExpress;
                         _super.call(this, wizard);
                         this.wizard = wizard;
                         this.template = "dxrd-page-selectPredefinedLabels";
-                        this.title = "Choose the Label Type";
-                        this.description = "Select one of the predefined labels by specifying the Product and its ID.";
+                        this.description = Designer.getLocalization("Select one of the predefined labels by specifying the Product and its ID.", "ReportBoxDesignerStringId.Wizard_LabelInformation_Description");
                         this.selectedLabelProduct = ko.observable();
                         this.selectedLabelDetails = ko.observable();
                         this.labelDetails = ko.observable();
@@ -28465,8 +28752,7 @@ var DevExpress;
                     __extends(ReportWizardSelectConnectionString, _super);
                     function ReportWizardSelectConnectionString(wizard, connectionStrings) {
                         _super.call(this, wizard, connectionStrings);
-                        this.title = Designer.getLocalization("Choose a Data Connection", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection_Title");
-                        this.description = Designer.getLocalization("Select one of the available data connections.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection_Description");
+                        this.description = Designer.getLocalization("Select one of the available data connections.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection");
                         this.actionPrevious.isVisible(true);
                     }
                     ReportWizardSelectConnectionString.prototype.beginAsync = function (data) {
@@ -28490,7 +28776,6 @@ var DevExpress;
                     __extends(ReportWizardAddQueriesPage, _super);
                     function ReportWizardAddQueriesPage(wizard, callbacks, disableCustomSql, rtl) {
                         _super.call(this, wizard, callbacks, disableCustomSql, rtl);
-                        this.title = Designer.getLocalization("Create a Query or Select a Stored Procedure", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMultiQuery_Title");
                         this.actionNext.isDisabled = this.actionFinish.isDisabled;
                         this.actionFinish.isDisabled = ko.computed(function () { return true; });
                     }
@@ -28515,8 +28800,7 @@ var DevExpress;
                     __extends(ReportWizardMasterDetailRelationsPage, _super);
                     function ReportWizardMasterDetailRelationsPage(wizard, sqlDataSourceResultSchema) {
                         _super.call(this, wizard, sqlDataSourceResultSchema);
-                        this.title = Designer.getLocalization("Configure Master-Detail Relationships", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations_Title");
-                        this.description = Designer.getLocalization("Specify master-detail relationships between required queries.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations_Description");
+                        this.description = Designer.getLocalization("Specify master-detail relationships between required queries.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations");
                         this.actionNext.isVisible(true);
                         this.actionNext.isDisabled(false);
                         this.actionFinish.isDisabled(true);

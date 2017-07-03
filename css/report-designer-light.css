@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v17.1.3 - 2017-05-02
+/*! DevExpress HTML/JS Designer - v17.1.4 - 2017-06-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -3110,6 +3110,12 @@
 .dx-querybuilder .dxqb-designer .dxrd-surface-wrapper {
   left: 1px;
 }
+.dx-querybuilder .dxqb-designer .dxrd-surface-wrapper .dx-scrollable-content {
+  height: 100%;
+}
+.dx-querybuilder .dxqb-designer .dxrd-surface-wrapper .dx-scrollable-content .dx-scrollview-content {
+  height: 100%;
+}
 .dx-querybuilder .dxqb-designer .dxrd-toolbar-wrapper {
   left: 0;
 }
@@ -4744,6 +4750,7 @@
   font-size: 11px;
   bottom: 10px;
   z-index: 10;
+  box-sizing: content-box;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrd-preview-progress .dxrd-preview-progress-text {
   margin-bottom: 7px;
@@ -6712,6 +6719,11 @@
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAdVBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADv8PWxtb+2usNudIHS1dzT1dzr7PL////Q09q0uMHTRPmQAAAAHXRSTlMAAAIBAwwFCxoGBwkNCggEGxkQFREXExgOEg8UFo07ZDcAAAHsSURBVHhe7dvdjtowEIbh4kliSEgMIfwEyN9u2/u/xOVkDyjVTFL4ZNPMe7iyxCNbK31C4kdQaYtb9GfmlRHR7TMYAJnIJa9q9VCSOEMswLg0t7fif2otZrPEEAOgKO3BZY4FuLz/Ca23CQcwiUUD1ivDAmI04CQAFKAABazRgHPggFVggK4V6sacuQekkwCfTdN8NI99/7kbceZpwPB3wPAN4M68P+DXwNeNODMNcELfQOkboAAFKEABlQA43wHaRgC0Y848Afg9CLVjzrzVDaTBAYS100pnpgPQm7AqRAC08AGl7yco0bO8lgDoPRA+AD3L9QkUcBAA1QwAClBAxAGKCrwJZQB4lvu/gUvGA2rvAPAslwGATTgVAM0/IPwnAM9yGYDeAzsBcPAOAM9yGTDzJ1BAhAco4MoDssv/D8hDB4A3oQzAzvLwbwAP2AuAHXiWywDAJpwKABQYgHw+gQwAz3IZgN4D4QPQs/woAK7QG5ABCsjxAOsZoIBt6IC9AsCbUAYgZ3n4N0AhAMCzXAagN+FSAByhq1gGKEABdgaA2DNgIwC2MwA43/8FHMD3FxRk0rIHVxeGAZDLyt1xe99ybBux5b7OHTGLiIxLs9xOLh6ZzQvH/+qWyETP5dgiQ8QBFgvC9vjLa+0LMMDBoObE08kAAAAASUVORK5CYII=");
 }
 .dxrd-wizard .dxrd-wizard-content .dxrd-report-type-page .dxrd-report-type-item .dxrd-report-type-text {
+  white-space: nowrap;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  overflow: hidden;
   text-align: center;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -6914,7 +6926,10 @@
 .dxrd-wizard .dxrd-wizard-content .dxrd-wizard-summary-options-page .dxrd-wizard-summary-columns .dxrd-wizard-summary-column-name {
   height: 30px;
   line-height: 30px;
+  text-overflow: ellipsis;
+  overflow: hidden;
   padding-left: 70px;
+  padding-right: 5px;
 }
 .dxrd-wizard .dxrd-wizard-content .dxrd-wizard-summary-options-page .dxrd-wizard-summary-options {
   padding-top: 15px;
@@ -7209,6 +7224,18 @@
 .dx-popover-wrapper .dx-list .dx-list-item {
   border-top: none;
 }
+.dx-popover-wrapper .dx-list .dx-list-item .dx-text-content {
+  white-space: nowrap;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: center;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 .dx-overlay-wrapper .dxrd-wizard-customizelabel-select-customtemplate .dx-list-item-content {
   padding: 7px 5px;
 }
@@ -7250,7 +7277,7 @@
   border-right: none;
 }
 .dxrd-wizard .dx-rtl .dxrd-wizard-content .dxrd-wizard-summary-options-page .dxrd-wizard-summary-columns .dxrd-wizard-summary-column-name {
-  padding-left: 0px;
+  padding-left: 5px;
   padding-right: 70px;
 }
 .dxrd-wizard .dx-rtl .dxrd-wizard-content .dxrd-wizard-summary-options-page .dxrd-wizard-summary-options-titles {

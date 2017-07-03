@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v17.1.3 - 2017-05-02
+/*! DevExpress HTML/JS Designer - v17.1.4 - 2017-06-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -88,514 +88,6 @@ var DevExpress;
     var Designer;
     (function (Designer) {
         Designer.localization_values = {
-            'Data Preview': 'DataAccessUIStringId.DataPreviewForm_Title',
-            'Select the data provider and specify the connection properties.': 'DataAccessUIStringId.WizardPageConnectionProperties',
-            'Edit...': 'DataAccessUIStringId.EFDataSourceDesignerVerbEdit',
-            'Finish': 'ASPxReportsStringId.ReportDesigner_Wizard_Finish',
-            'Query Editor': 'DataAccessUIStringId.QueryEditorTitle',
-            'Cancel': 'ASPxReportsStringId.SearchDialog_Cancel',
-            'The column name cannot be empty.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns_ColumnNameEmptyError',
-            'Retrieve the actual data': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveData',
-            'Skip hidden columns': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipHiddenColumns',
-            'Excel File': 'DataAccessUIStringId.DSTypeExcel',
-            'Cannot resolve the specified object type. To specify the object’s assembly, return type, data member and/or constructor parameters, use the Data Source editor.': 'DataAccessUIStringId.ODSEditorsCannotResolveDataSource',
-            'Select an assembly containing the class type definition of a data source.': 'DataAccessUIStringId.WizardPageChooseObjectAssembly',
-            'Retrieve the data source schema': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveSchema',
-            'Port:': 'DataAccessUIStringId.ConnectionProperties_Port',
-            'Rebuild Result Schema': 'DataAccessUIStringId.SqlDataSourceDesignerVerbRebuildSchema',
-            'Error message:\r\n{0}\r\n': 'DataAccessUIStringId.LoadingDataCustomError',
-            'The expression contains errors.': 'DataAccessUIStringId.ExpressionEditor_ExpressionContainsErrors',
-            'Is less than': 'DataAccessUIStringId.JoinEditorLessOperator',
-            'The FileName and SourceOptions properties should be assigned.': 'DataAccessUIStringId.UpdateSchemaDataSourceIsNotReady',
-            'Manage Stored Procedures': 'DataAccessUIStringId.EFStoredProcsEditorTitle',
-            'Trim blanks': 'DataAccessUIStringId.WizardPageChooseFileOptions_TrimBlanks',
-            'Worksheet': 'DataAccessUIStringId.ExcelDataSourceWizard_WorksheetItem',
-            'Sorting Type': 'DataAccessUIStringId.QueryBuilderColumns_SortingType',
-            'An error occurred during query validation: {0}\r\nUpdate the connection settings so that they match the database schema or discard this query.': 'DataAccessUIStringId.FilterStringEditorInvalidQuery',
-            'Skip hidden rows': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipHiddenRows',
-            'The {0} data member cannot receive parameters, because this is a method without parameters.': 'DataAccessUIStringId.ODSEditorsNoParametersMessage',
-            'Yes, let me choose from list': 'DataAccessUIStringId.WizardPageChooseEFConnectionString_ChooseConnection',
-            'No, I\'d like to specify the connection parameters myself': 'DataAccessUIStringId.WizardPageChooseConnection_SpecifyCustomConnection',
-            'Do you want to use an existing data connection?': 'DataAccessUIStringId.WizardPageChooseConnection',
-            'Request Database Schema': 'DataAccessUIStringId.UpdateDBSchemaCaption',
-            'records starting with index': 'DataAccessUIStringId.FiltersView_TopAndSkipText',
-            'Newline type:': 'DataAccessUIStringId.WizardPageChooseFileOptions_NewLineType',
-            'Unable to load data into one or several datasources. See information below for details.': 'DataAccessUIStringId.ErrorFormDatasourceInitializationText',
-            'Column': 'DataAccessUIStringId.QueryBuilderColumn',
-            'Loading Data...': 'DataAccessUIStringId.WaitFormWithCancel_Loading',
-            'Edit Relation': 'DataAccessUIStringId.MasterDetailEditorEditRelation',
-            'Create Query Parameter': 'DataAccessUIStringId.QueryFilter_CreateQueryParameter',
-            'Query': 'DataAccessUIStringId.ParametersColumn_QueryName',
-            '<select a parameter>': 'DataAccessUIStringId.QueryFilter_SelectParameter',
-            'Select an object to include in your data source': 'DataAccessUIStringId.WizardFinishPageText',
-            'The current security policy prohibits loading of third-party assemblies.\r\n\r\nClick OK to discard the current data source settings and configure them from scratch.\r\nClick Cancel to keep the current settings without configuring the data source': 'DataAccessUIStringId.EFConnectionEditorMessageCustomAssembliesProhibited',
-            'Show only highlighted members': 'DataAccessUIStringId.WizardPageChooseObjectMember_ShowOnlyHighlighted',
-            'The connection uses server authentication.\r\nDo you want to save the user name and password?': 'DataAccessUIStringId.WizardPageSaveConnection_SaveCredentialsQuestion',
-            'Select a data source constructor.': 'DataAccessUIStringId.WizardPageChooseObjectConstructor',
-            'Select only distinct values': 'DataAccessUIStringId.FiltersView_Distinct',
-            'Column with \'{0}\' name allready exists.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns_ColumnExist',
-            'Password:': 'DataAccessUIStringId.ConnectionProperties_Password',
-            'Delete Relation': 'DataAccessUIStringId.QueryBuilder_DeleteRelation',
-            'Configure Data Member': 'DataAccessUIStringId.ODSDataMemberEditorTitle',
-            'Remove from Query': 'DataAccessUIStringId.QueryBuilder_RemoveFromSelect',
-            'Culture:': 'DataAccessUIStringId.WizardPageChooseFileOptions_Culture',
-            'Windows authentication': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_MSSqlWindows',
-            'Do not select a member, bind to the entire object.': 'DataAccessUIStringId.WizardPageChooseObjectMember_BindToObject',
-            'OK': 'DataAccessUIStringId.Button_OK',
-            'Provider:': 'DataAccessUIStringId.ConnectionProperties_Provider',
-            'Choose a data context.': 'DataAccessUIStringId.WizardPageChooseEFContext',
-            'Add a relation to the detail query': 'DataAccessUIStringId.MasterDetailEditorAddRelationMessage',
-            'Local': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeLocal',
-            'Preview...': 'DataAccessUIStringId.Button_Preview',
-            'Select the data source type.': 'DataAccessUIStringId.WizardPageChooseDSType',
-            'Warning': 'DataAccessUIStringId.MessageBoxWarningTitle',
-            'Specify the method parameters.': 'DataAccessUIStringId.WizardPageObjectMemberParameters',
-            'Cannot use a constructor to create an object of the {0} type that is a static or abstract class, or interface.': 'DataAccessUIStringId.ODSEditorsAbstractTypeMessage',
-            'No connection has been specified.': 'DataAccessUIStringId.MessageMissingConnection',
-            'Validating query...': 'DataAccessUIStringId.QueryEditorWaitFormValidating',
-            'Select a member to bind.': 'DataAccessUIStringId.WizardPageChooseObjectMember_BindToMember',
-            'Skip empty rows': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipEmptyRows',
-            'Select a data source type.': 'DataAccessUIStringId.WizardPageChooseObjectType',
-            'Data loading failed because the exception occurred.': 'DataAccessUIStringId.LoadingDataException',
-            'Output': 'DataAccessUIStringId.QueryBuilderColumns_Output',
-            'Connection string:': 'DataAccessUIStringId.ConnectionProperties_ConnectionString',
-            'Filter Editor': 'DataAccessUIStringId.FiltersView',
-            'Join {0}': 'DataAccessUIStringId.QueryDesignControlJoinCommandPattern',
-            'Preview Results...': 'DataAccessUIStringId.QueryBuilderButtons_PreviewResults',
-            'Connection name: {0}\r\nError message: {1}': 'DataAccessUIStringId.ConnectionErrorFormDetailPattern',
-            'Connection error': 'DataAccessUIStringId.DataConnectionParametersDialog',
-            'Sort Ascending': 'DataAccessUIStringId.QueryBuilder_SortAscending',
-            'Database:': 'DataAccessUIStringId.ConnectionProperties_Database',
-            'Bind To': 'DataAccessUIStringId.QueryFilter_BindTo',
-            'The following errors occurred during query validation:{0}': 'DataAccessUIStringId.MasterDetailEditorMultipleValidationErrorsMessage',
-            'Cannot find the specified query: "{0}". Specify an existing query name before selecting a column.': 'DataAccessUIStringId.MasterDetailEditorInvalidColumnQueryNameMessage',
-            'Add Query Parameter': 'DataAccessUIStringId.QueryFilter_AddQueryParameter',
-            'Group By': 'DataAccessUIStringId.QueryBuilderColumns_GroupBy',
-            'The data source schema has been updated successfully.': 'DataAccessUIStringId.UpdateSchemaComplete',
-            'Invalid property: \'{0}\'.': 'DataAccessUIStringId.ExpressionEditor_InvalidProperty',
-            '<b>A data source with the specified name already exists</b>': 'DataAccessUIStringId.WizardDataSourceNameExistsMessage',
-            'Yes, save the connection as:': 'DataAccessUIStringId.WizardPageSaveConnection_ConfirmSaving',
-            'Create a query or select a stored procedure.\r\nData columns selected from specific tables and/or views will be automatically included into a separate query.': 'DataAccessUIStringId.WizardPageConfigureMultiQuery',
-            '{0} invalid relation(s)': 'DataAccessUIStringId.MasterDetailEditorLabelInvalidRelationsText',
-            '<Select a column>': 'DataAccessUIStringId.JoinEditorEmptyColumnText',
-            'Specify a custom connection string': 'DataAccessUIStringId.WizardPageEFConnectionProperties_CustomConnection',
-            'Allow Edit SQL': 'DataAccessUIStringId.QueryBuilder_AllowEdit',
-            'Error has occurred during loading databases list.': 'DataAccessUIStringId.MessageCannotLoadDatabasesList',
-            'Query Builder': 'DataAccessUIStringId.QueryBuilder',
-            'Add stored procedures to the data source, configure their parameters and preview the result.': 'DataAccessUIStringId.WizardPageConfigureStoredProcedures',
-            'Unable to connect to the database. See details below.': 'DataAccessUIStringId.DataConnectionParametersDialog_Header_UnableConnect',
-            'Alias': 'DataAccessUIStringId.QueryBuilderColumns_Alias',
-            'Join Editor': 'DataAccessUIStringId.JoinEditor',
-            'SQL execution error:\r\n{0}\r\n': 'DataAccessUIStringId.LoadingDataSqlError',
-            'Enter the data source name': 'DataAccessUIStringId.WizardPageChooseDataSourceName',
-            'Use values of the first row as field names': 'DataAccessUIStringId.WizardPageChooseFileOptions_FirstRowAsFieldNames',
-            'Save the connection string.': 'DataAccessUIStringId.WizardPageSaveConnection',
-            'No column has been selected. Please select at least one column to proceed.': 'DataAccessUIStringId.QueryDesignControlNoSelection',
-            'Do you want to select a connection string from the list of available settings?': 'DataAccessUIStringId.WizardPageChooseEFConnectionString',
-            'Table': 'DataAccessUIStringId.ExcelDataSourceWizard_Title',
-            'Client ID:': 'DataAccessUIStringId.ConnectionProperties_ClientID',
-            'The {0} data source type does not provide any members suitable for binding.': 'DataAccessUIStringId.ODSEditorsNoMembersInType',
-            'The specified alias already exists. Do you want to correct the value?': 'DataAccessUIStringId.QueryDesignControlAliasAlreadyExists',
-            'The expression string cannot be empty.': 'DataAccessUIStringId.ExpressionEditor_EmptyExpression',
-            'ObjectDataSource Wizard': 'DataAccessUIStringId.WizardTitleODS',
-            'Name': 'DataAccessUIStringId.ParametersColumn_Name',
-            'Type': 'DataAccessUIStringId.ParametersColumn_Type',
-            'Cannot retrieve the list of available databases. See the details below.': 'DataAccessUIStringId.WizardCannotRetrieveDatabasesMessage',
-            'Select a stored procedure:': 'DataAccessUIStringId.StoredProcControl_Caption',
-            'Data Source Wizard': 'ASPxReportsStringId.ReportDesigner_Wizard_DataSourceHeader',
-            'Server type:': 'DataAccessUIStringId.ConnectionProperties_ServerType',
-            'Server name:': 'DataAccessUIStringId.ConnectionProperties_ServerName',
-            'Show only highlighted assemblies': 'DataAccessUIStringId.WizardPageChooseObjectAssembly_ShowOnlyHighlighted',
-            'Hostname:': 'DataAccessUIStringId.ConnectionProperties_Hostname',
-            'Defined Name': 'DataAccessUIStringId.ExcelDataSourceWizard_DefinedNameItem',
-            'Configure Connection...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbEditConnection',
-            'Remote': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeRemote',
-            'Manage Queries...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbManageQueries',
-            'Key file': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_BigQueryKeyFile',
-            'Columns of {0}': 'DataAccessUIStringId.QueryBuilderColumnsOf',
-            'Show only highlighted types': 'DataAccessUIStringId.WizardPageChooseObjectType_ShowOnlyHighlighted',
-            'Delete': 'DataAccessUIStringId.QueryBuilder_Delete',
-            'Cannot create a relation between two columns that belong to the same table {0}.': 'DataAccessUIStringId.QueryBuilderRelationBetweenTwoColumnsOfTheSameTable',
-            'Select only': 'DataAccessUIStringId.FiltersView_CheckText',
-            'The object data source automatically creates an instance of the specified type by using one of the available constructors. If only one constructor is available, this constructor will be used.': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveDataDescription',
-            'Save the connection string to config file as:': 'DataAccessUIStringId.WizardPageEFConnectionProperties_SaveToConfig',
-            'The current operation cannot be accomplished unless the data source has been specified.': 'DataAccessUIStringId.ODSEditorsNoDataSetMessage',
-            'Error': 'DataAccessUIStringId.MessageBoxErrorTitle',
-            'The new join type will be applied to all existing relations between the following two tables: {0}, {1}. Do you wish to continue?': 'DataAccessUIStringId.QueryBuilderJoinTypeUpdatingConfirmation',
-            'The {0} data member is a property. To be able to receive parameters, a data member must be a method.': 'DataAccessUIStringId.ODSEditorsIsPropertyMessage',
-            'Excel Data Source Editor': 'DataAccessUIStringId.ExcelDataSourceEditorTitle',
-            'Edit Relations for the \'{0}\' Query': 'DataAccessUIStringId.MasterDetailEditorEditQueryRelations',
-            'Cannot find the specified query: "{0}". Specify an existing query name.': 'DataAccessUIStringId.MasterDetailEditorInvalidQueryNameMessage',
-            'Show only highlighted constructors': 'DataAccessUIStringId.WizardPageChooseObjectConstructor_ShowOnlyHighlighted',
-            'Yes, let me choose an existing connection from the list': 'DataAccessUIStringId.WizardPageChooseConnection_ChooseExistingConnection',
-            'Use default connection string': 'DataAccessUIStringId.WizardPageEFConnectionProperties_DefaultConnection',
-            'Connection Editor': 'DataAccessUIStringId.ConnectionEditorTitle',
-            'Specify import settings.': 'DataAccessUIStringId.WizardPageChooseFileOptions',
-            'Server authentication': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_MSSqlServer',
-            'OAuth': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_BigQueryOAuth',
-            'Not enough memory to load data': 'DataAccessUIStringId.LoadingDatasourceOutOfMemoryError',
-            'Error loading file': 'DataAccessUIStringId.PasswordRequest',
-            'A table with the specified name already exists. Please specify a different table name.': 'DataAccessUIStringId.QueryDesignControlTableNameAlreadyExists',
-            'Delete Condition': 'DataAccessUIStringId.QueryBuilder_DeleteCondition',
-            'Do you want to execute the query on the server and obtain the resulting query schema?': 'DataAccessUIStringId.WizardConfirmExecutionMessage',
-            'Value separator:': 'DataAccessUIStringId.WizardPageChooseFileOptions_ValueSeparator',
-            'Entity Framework Data Member Editor': 'DataAccessUIStringId.EFDataMemberEditorTitle',
-            'Run Query Builder...': 'DataAccessUIStringId.Button_QueryBuilder',
-            'Join type:': 'DataAccessUIStringId.JoinEditor_JoinType',
-            'Ascending': 'DataAccessUIStringId.SortingTypeAscending',
-            '<b>The data source name cannot be empty.</b>': 'DataAccessUIStringId.WizardDataSourceEmptyNameMessage',
-            'Configure Constructor Settings': 'DataAccessUIStringId.ODSConstructorEditorTitle',
-            'Configure Parameters': 'DataAccessUIStringId.ODSParametersEditorTitle',
-            'The \'{0}\'.\'{1}\' and \'{3}\'.\'{4}\' columns have different types ({2} and {5}). Do you wish to continue?': 'DataAccessUIStringId.MasterDetailEditorColumnsHasDifferentTypesConfirmation',
-            'Select an Excel workbook or CSV file.': 'DataAccessUIStringId.WizardPageChooseFile',
-            'Remove the relation': 'DataAccessUIStringId.MasterDetailEditorRemoveRelationMessage',
-            'Only the data source schema is retrieved from the specified object, without feeding the actual data.\r\n\r\nTo manually retrieve the actual data, create a data source object’s instance in code and assign it to the ObjectDataSource.DataSource property.': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveSchemaDescription',
-            'Is greater than': 'DataAccessUIStringId.JoinEditorGreaterOperator',
-            'Database': 'DataAccessUIStringId.DSTypeSql',
-            'Close': 'DataAccessUIStringId.Button_Close',
-            'This action will reset the SQL expression, and all your changes will be discarded. Do you want to continue?': 'DataAccessUIStringId.QueryDesignControlExpressionChanged',
-            'Database List Loading Error': 'DataAccessUIStringId.ConnectionProperties_DatabaseListLoadingError',
-            'Connection name: {0}\r\nError message:\r\n{1}\r\n': 'DataAccessUIStringId.LoadingDataSourceOpeningConnectionError',
-            'Select the required worksheet, table or defined name referring to the specified range.': 'DataAccessUIStringId.WizardPageChooseExcelFileDataRange',
-            'Options': 'DataAccessUIStringId.WizardPageChooseFileOptions_Options',
-            'You are about to load a third-party library: \'{0}\'.\r\n\r\nBefore you proceed, please consider resulting security risks and make sure that this library is supplied from a trusted source.': 'DataAccessUIStringId.CustomAssemblyWarning',
-            'Group Filter': 'DataAccessUIStringId.FiltersView_GroupFilter',
-            'At least two queries are required to create a master-detail relation.': 'DataAccessUIStringId.MessageLessThanTwoQueries',
-            'Rename': 'DataAccessUIStringId.QueryBuilder_Rename',
-            'Service account email:': 'DataAccessUIStringId.ConnectionProperties_ServiceAccountEmail',
-            'Confirmation': 'DataAccessUIStringId.MessageBoxConfirmationTitle',
-            'Sort Descending': 'DataAccessUIStringId.QueryBuilder_SortDescending',
-            'To view the errors, click the drop-down button in the editor\'s status bar.': 'DataAccessUIStringId.ExpressionEditor_NavigateToErrors',
-            'Filter': 'DataAccessUIStringId.FiltersView_Filter',
-            'Encoding:': 'DataAccessUIStringId.WizardPageChooseFileOptions_Encoding',
-            'An error occurred during query validation: {0}\r\n\r\nTo discard this query and invoke the wizard, click OK.\r\n\r\nTo keep this query, click Cancel.': 'DataAccessUIStringId.QueryEditorMessageInvalidQuery',
-            '<Select a table>': 'DataAccessUIStringId.JoinEditorEmptyTableText',
-            'Embedded': 'DataAccessUIStringId.ConnectionProperties_ServerTypeEmbedded',
-            'Value': 'DataAccessUIStringId.ParametersColumn_Value',
-            'Expression Editor': 'DataAccessUIStringId.ExpressionEditorViewTitle',
-            'Selected': 'DataAccessUIStringId.ParametersColumn_Selected',
-            'Update schema': 'DataAccessUIStringId.UpdateSchemaCaption',
-            'Select a data connection.': 'DataAccessUIStringId.WizardPageChooseConnectionNoChoice',
-            'Add': 'DataAccessUIStringId.Button_Add',
-            'Configure query parameters and preview the result.': 'DataAccessUIStringId.WizardPageConfigureParameters',
-            'Entity Framework Data Source Editor': 'DataAccessUIStringId.EFDataSourceEditorTitle',
-            'Client Secret:': 'DataAccessUIStringId.ConnectionProperties_ClientSecret',
-            'Data loading has been aborted.': 'DataAccessUIStringId.LoadingDataSourceAborted',
-            'Previous': 'ASPxReportsStringId.ReportDesigner_Wizard_Previous',
-            'Entity Framework': 'DataAccessUIStringId.DSTypeEF',
-            'Key file name:': 'DataAccessUIStringId.ConnectionProperties_KeyFileName',
-            'Server': 'DataAccessUIStringId.ConnectionProperties_ServerTypeServer',
-            'Cannot create an empty data source. Please select an object to include.': 'DataAccessUIStringId.WizardCannotCreateDataSourceMessage',
-            'Bound to {0}': 'DataAccessUIStringId.QueryFilter_BoundTo',
-            'Detect automatically': 'DataAccessUIStringId.WizardPageChooseFileOptions_DetectAutomatically',
-            'DataSet ID:': 'DataAccessUIStringId.ConnectionProperties_DataSetID',
-            'Unsorted': 'DataAccessUIStringId.SortingTypeNone',
-            'Query Parameters': 'DataAccessUIStringId.ParametersGridForm_Title',
-            'Expression': 'DataAccessUIStringId.ParametersColumn_Expression',
-            'Next': 'ASPxReportsStringId.ReportDesigner_Wizard_Next',
-            'Cannot resolve the specified data member. To specify the data member and its parameters, use the Data Member editor.': 'DataAccessUIStringId.ODSEditorsCannotResolveDataMember',
-            'A relation with the specified name already exists.': 'DataAccessUIStringId.MasterDetailEditorInvalidRelationNameMessage',
-            'The query contains parameters and cannot be executed before they are declared. \r\nPlease go to the next wizard page to declare the required query parameters and preview the results.': 'DataAccessUIStringId.QueryBuilderCustomSqlRequiresParameters',
-            'Create a new condition': 'DataAccessUIStringId.MasterDetailEditorAddConditionMessage',
-            'Cannot find the specified column: "{0}". Specify an existing column name.': 'DataAccessUIStringId.MasterDetailEditorInvalidColumnNameMessage',
-            'Sort Order': 'DataAccessUIStringId.QueryBuilderColumns_SortOrder',
-            'Result schema is rebuilt successfully.': 'DataAccessUIStringId.RebuildResultSchemaComplete',
-            'SQL string:': 'DataAccessUIStringId.QueryControl_SqlString',
-            'Specify a connection string.': 'DataAccessUIStringId.WizardPageEFConnectionProperties',
-            'Manage Relations...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbManageRelations',
-            'Join Information': 'DataAccessUIStringId.JoinInformation',
-            'Stored Procedure': 'DataAccessUIStringId.WizardPageConfigureQuery_StoredProcedure',
-            'Database schema is updated successfully.': 'DataAccessUIStringId.UpdateDBSchemaComplete',
-            'No, specify a custom connection string': 'DataAccessUIStringId.WizardPageChooseEFConnectionString_CustomConnection',
-            'Authentication type:': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType',
-            'Filter...': 'DataAccessUIStringId.QueryBuilderButtons_Filter',
-            'Yes, save all required parameters': 'DataAccessUIStringId.WizardPageSaveConnection_SaveCredentials',
-            'Data Preview (First 1000 Rows Displayed)': 'DataAccessUIStringId.QueryDesignControlDataPreviewCaption',
-            'No stored procedures are available in the data context.': 'DataAccessUIStringId.EFEditorsNoStoredProcs',
-            'Text qualifier:': 'DataAccessUIStringId.WizardPageChooseFileOptions_TextQualifier',
-            'Object Binding': 'DataAccessUIStringId.DSTypeObject',
-            'Save password': 'DataAccessUIStringId.PasswordRequest_SavePassword',
-            'User name:': 'DataAccessUIStringId.ConnectionProperties_UserName',
-            'Remove': 'DataAccessUIStringId.Button_Remove',
-            'Cannot specify parameters unless the DataMember property has been assigned a value.': 'DataAccessUIStringId.ODSEditorsNoDataMemberMessage',
-            'Create a query or select a stored procedure.': 'DataAccessUIStringId.WizardPageConfigureQuery',
-            'Is greater than or equal to': 'DataAccessUIStringId.JoinEditorGreaterOrEqualOperator',
-            'A data schema contains a duplicated column \'{0}\'. Modify the query so that all columns have unique names.': 'DataAccessUIStringId.WizardDuplicatingColumnNameMessage',
-            'There are no any stored procedures in current database.': 'DataAccessUIStringId.WizardEmptyStoredProceduresListMessage',
-            'Descending': 'DataAccessUIStringId.SortingTypeDescending',
-            'Version': 'DataAccessUIStringId.ParametersColumn_Version',
-            'Configure Data Source': 'DataAccessUIStringId.ODSDataSourceEditorTitle',
-            'Select a data source member (if required).': 'DataAccessUIStringId.WizardPageChooseObjectMember',
-            'Remove the condition': 'DataAccessUIStringId.MasterDetailEditorRemoveConditionMessage',
-            'Entity Framework Data Connection Editor': 'DataAccessUIStringId.EFConnectionEditorTitle',
-            'Do you want to save the connection string to the application\'s configuration file?': 'DataAccessUIStringId.WizardPageSaveConnection_SaveConnectionString',
-            'The table name cannot be empty.': 'DataAccessUIStringId.QueryDesignControlTableNameEmpty',
-            '{0} is a static member. Using a constructor to create an instance of the {1} class is not appropriate.': 'DataAccessUIStringId.ODSEditorsStaticMemberMessage',
-            'This option is only available when the result set is sorted.': 'DataAccessUIStringId.FiltersView_SkipTooltip',
-            'Do you want to execute the following queries on the server and obtain the resulting schema?': 'DataAccessUIStringId.RebuildResultSchemaConfirmationText',
-            'Specify the constructor parameters.': 'DataAccessUIStringId.WizardPageObjectConstructorParameters',
-            'Manage Queries': 'DataAccessUIStringId.SqlQueryCollectionEditorForm_Title',
-            'Data source name: {0}': 'DataAccessUIStringId.DataSourceName',
-            'Refresh Token:': 'DataAccessUIStringId.ConnectionProperties_RefreshToken',
-            'Is less than or equal to': 'DataAccessUIStringId.JoinEditorLessOrEqualOperator',
-            'Select required columns and specify their settings.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns',
-            'The link between {0}.{1} and {2}.{3} results in a circular relation and cannot be added.': 'DataAccessUIStringId.QueryBuilderCircularRelationWarning',
-            'Internet': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeInternet',
-            'Add to Query': 'DataAccessUIStringId.QueryBuilder_AddToSelect',
-            'Select a data member': 'DataAccessUIStringId.WizardPageChooseEFDataMember',
-            'Project ID:': 'DataAccessUIStringId.ConnectionProperties_ProjectID',
-            'Some fields are empty. Please fill all empty fields or remove the corresponding conditions to proceed.': 'DataAccessUIStringId.JoinEditorFillAllFieldsException',
-            'Equals to': 'DataAccessUIStringId.JoinEditorEqualOperator',
-            'Browse...': 'DataAccessUIStringId.Button_Browse',
-            'No, skip credentials for security reasons': 'DataAccessUIStringId.WizardPageSaveConnection_SkipSaveCredentials',
-            'The following tables will be removed from the query.\r\n\r\n{0}\r\nDo you want to continue?': 'DataAccessUIStringId.QueryDesignControlRemoveTables',
-            'Aggregate': 'DataAccessUIStringId.QueryBuilderColumns_Aggregate',
-            'File name:': 'DataAccessUIStringId.PasswordRequest_FileName',
-            'Cannot connect to the database. See the details below.': 'DataAccessUIStringId.WizardCannotConnectMessage',
-            'Master-Detail Relation Editor': 'DataAccessUIStringId.MasterDetailEditorForm_Title',
-            'Select the data binding mode.': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode',
-            'Does not equal to': 'DataAccessUIStringId.JoinEditorNotEqualOperator',
-            'The data source has been successfully created': 'DataAccessUIStringId.WizardDataSourceCreatedMessage',
-            'Select stored procedures to add': 'DataAccessUIStringId.ChooseEFStoredProceduresDialog',
-            'Returns the index of the current data row in a datasource. Note that this index is zero-based.': 'XtraEditorsExpressionEditor.CurrentRowIndex.Description',
-            'Log10(Value)\r\nReturns the base 10 logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log10.Description',
-            'AddMinutes(DateTime, MinutesCount)\r\nReturns a date-time value that is the specified number of minutes away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMinutes.Description',
-            'Sqr(Value)\r\nReturns the square root of a given number.': 'XtraEditorsExpressionEditor.Sqr.Description',
-            'IsNovember(DateTime)\r\nReturns True if the specified date falls within November.': 'XtraEditorsExpressionEditor.IsNovember.Description',
-            'Greater than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.GreaterOrEqual.Description',
-            'LocalDateTimeNextYear()\r\nReturns a date-time value corresponding to the first day of the following year.': 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description',
-            'Returns the remainder (modulus) obtained by dividing one numeric expression into another.': 'XtraEditorsExpressionEditor.Modulo.Description',
-            'IsApril(DateTime)\r\nReturns True if the specified date falls within April.': 'XtraEditorsExpressionEditor.IsApril.Description',
-            'ToFloat(Value)\r\nConverts Value to an equivalent 32-bit single-precision floating-point number.': 'XtraEditorsExpressionEditor.ToFloat.Description',
-            'IsLastYear(DateTime)\r\nReturns True if the specified date falls within the previous year.': 'XtraEditorsExpressionEditor.IsLastYear.Description',
-            'Sign(Value)\r\nReturns the positive (+1), zero (0), or negative (-1) sign of the given expression.': 'XtraEditorsExpressionEditor.Sign.Description',
-            'GetHour(DateTime)\r\nExtracts an hour from the defined DateTime.': 'XtraEditorsExpressionEditor.GetHour.Description',
-            'Compares each bit of its first operand to the corresponding bit of its second operand. If either bit is 1, the corresponding result bit is set to 1. Otherwise, the corresponding result bit is set to 0.': 'XtraEditorsExpressionEditor.BitwiseOr.Description',
-            'IsJune(DateTime)\r\nReturns True if the specified date falls within June.': 'XtraEditorsExpressionEditor.IsJune.Description',
-            'DateDiffMilliSecond(startDate, endDate)\r\nReturns the number of millisecond boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description',
-            'Math': 'XtraEditorsExpressionEditor.functionsTypes.Properties.MathItems',
-            'expressionEdit': 'XtraEditorsExpressionEditor.>>expressionEdit.Name',
-            'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>expressionEdit.Type',
-            'Date-time': 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems',
-            'Concat(String1, ... , StringN)\r\nReturns a string value containing the concatenation of the current string with any additional strings.': 'XtraEditorsExpressionEditor.Concat.Description',
-            'Cos(Value)\r\nReturns the cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cos.Description',
-            '$this': 'XtraEditorsExpressionEditor.>>layoutItemButton12.Parent',
-            'PadLeft(String, Length, Char)\r\nLeft-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft3Param.Description',
-            'IsFebruary(DateTime)\r\nReturns True if the specified date falls within February.': 'XtraEditorsExpressionEditor.IsFebruary.Description',
-            'Exists()\r\nDetermines whether the object exists in the collection.': 'XtraEditorsExpressionEditor.ExistsAggregate.Description',
-            'LocalDateTimeThisYear()\r\nReturns a date-time value corresponding to the first day of the current year.': 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description',
-            'listOfInputParameters': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Name',
-            'DevExpress.XtraEditors.ListBoxControl, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Type',
-            '0': 'XtraEditorsExpressionEditor.>>functionsTypes.ZOrder',
-            'LocalDateTimeToday()\r\nReturns a date-time value corresponding to Today.': 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description',
-            '6': 'XtraEditorsExpressionEditor.>>layoutItemButton12.ZOrder',
-            'IsSeptember(DateTime)\r\nReturns True if the specified date falls within September.': 'XtraEditorsExpressionEditor.IsSeptember.Description',
-            'IsNextYear(DateTime)\r\nReturns True if the specified date falls within the next year.': 'XtraEditorsExpressionEditor.IsNextYear.Description',
-            'IsJuly(DateTime)\r\nReturns True if the specified date falls within July.': 'XtraEditorsExpressionEditor.IsJuly.Description',
-            '3': 'XtraEditorsExpressionEditor.>>listOfInputTypes.ZOrder',
-            'Divides the first operand by the second.': 'XtraEditorsExpressionEditor.Divide.Description',
-            'Lower(String)\r\nReturns the String in lowercase.': 'XtraEditorsExpressionEditor.Lower.Description',
-            '13': 'XtraEditorsExpressionEditor.>>layoutItemButton8.ZOrder',
-            '8': 'XtraEditorsExpressionEditor.>>layoutItemButton14.ZOrder',
-            'Operators': 'XtraEditorsExpressionEditor.Operators.Text',
-            'Format rule expression editor': 'XtraEditorsExpressionEditor.FormatRule.Caption',
-            'LocalDateTimeTwoWeeksAway()\r\nReturns a date-time value corresponding to the first day of the week that is after next week.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description',
-            'IsMay(DateTime)\r\nReturns True if the specified date falls within May.': 'XtraEditorsExpressionEditor.IsMay.Description',
-            'Upper(String)\r\nReturns String in uppercase.': 'XtraEditorsExpressionEditor.Upper.Description',
-            'LocalDateTimeYesterday()\r\nReturns a date-time value corresponding to Yesterday.': 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description',
-            'Between (,)\r\nSpecifies a range to test. Returns true if a value is greater than or equal to the first operand and less than or equal to the second operand.': 'XtraEditorsExpressionEditor.Between.Description',
-            '16': 'XtraEditorsExpressionEditor.>>labelControl1.ZOrder',
-            '9': 'XtraEditorsExpressionEditor.>>labelControl2.ZOrder',
-            'layoutItemButton9': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Name',
-            'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Type',
-            'Constants': 'XtraEditorsExpressionEditor.Constants.Text',
-            'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'XtraEditorsExpressionEditor.ToInt.Description',
-            '19': 'XtraEditorsExpressionEditor.>>layoutItemButton3.ZOrder',
-            'layoutItemButton8': 'XtraEditorsExpressionEditor.>>layoutItemButton8.Name',
-            'Variables': 'XtraEditorsExpressionEditor.Variables.Text',
-            'UtcNow()\r\nReturns the current system date and time, expressed as Coordinated Universal Time (UTC).': 'XtraEditorsExpressionEditor.UtcNow.Description',
-            'plusItemButton': 'XtraEditorsExpressionEditor.>>plusItemButton.Name',
-            'IsYearToDate(DateTime)\r\nReturns True if the specified date falls within the year-to-date period (starting from the first day of the current year and continuing up to the current date).': 'XtraEditorsExpressionEditor.IsYearToDate.Description',
-            'Count()\r\nReturns the number of objects in a collection.': 'XtraEditorsExpressionEditor.CountAggregate.Description',
-            'layoutItemButton5': 'XtraEditorsExpressionEditor.>>layoutItemButton5.Name',
-            'Len(Value)\r\nReturns an integer containing either the number of characters in a string or the nominal number of bytes required to store a variable.': 'XtraEditorsExpressionEditor.Len.Description',
-            'Trim(String)\r\nRemoves all leading and trailing SPACE characters from String.': 'XtraEditorsExpressionEditor.Trim.Description',
-            'layoutItemButton4': 'XtraEditorsExpressionEditor.>>layoutItemButton4.Name',
-            'BigMul(Value1, Value2)\r\nReturns an Int64 containing the full product of two specified 32-bit numbers.': 'XtraEditorsExpressionEditor.BigMul.Description',
-            'GetMinute(DateTime)\r\nExtracts minutes from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMinute.Description',
-            'Parameters': 'XtraEditorsExpressionEditor.Parameters.Text',
-            'layoutItemButton7': 'XtraEditorsExpressionEditor.>>layoutItemButton7.Name',
-            'PadRight(String, Length)\r\nRight-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadRight.Description',
-            'Floor(Value)\r\nReturns the largest integer less than or equal to the given numeric expression.': 'XtraEditorsExpressionEditor.Floor.Description',
-            'Exp(Value)\r\nReturns the exponential value of the given float expression.': 'XtraEditorsExpressionEditor.Exp.Description',
-            'AddYears(DateTime, YearsCount)\r\nReturns a date-time value that is the specified number of years away from the specieid DateTime.': 'XtraEditorsExpressionEditor.AddYears.Description',
-            'IsNextMonth(DateTime)\r\nReturns True if the specified date falls within the next month.': 'XtraEditorsExpressionEditor.IsNextMonth.Description',
-            'layoutItemButton6': 'XtraEditorsExpressionEditor.>>layoutItemButton6.Name',
-            'ToStr(Value)\r\nReturns a string representation of an object.': 'XtraEditorsExpressionEditor.ToStr.Description',
-            'LocalDateTimeThisMonth()\r\nReturns a date-time value corresponding to the first day of the current month.': 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description',
-            '1': 'XtraEditorsExpressionEditor.>>labelControl4.ZOrder',
-            'Performs a logical conjunction on two expressions.': 'XtraEditorsExpressionEditor.And.Description',
-            '17': 'XtraEditorsExpressionEditor.>>layoutItemButton5.ZOrder',
-            '15': 'XtraEditorsExpressionEditor.>>layoutItemButton6.ZOrder',
-            'Field Information\r\nCaption: {1}\r\nThe type of this field is: {2}': 'XtraEditorsExpressionEditor.GridFields Description Prefix',
-            'DateDiffMinute(startDate, endDate)\r\nReturns the number of minute boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMinute.Description',
-            'layoutItemButton3': 'XtraEditorsExpressionEditor.>>layoutItemButton3.Name',
-            'Logical': 'XtraEditorsExpressionEditor.functionsTypes.Properties.LogicalItems',
-            'DateDiffMonth(startDate, endDate)\r\nReturns the number of month boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMonth.Description',
-            'layoutItemButton2': 'XtraEditorsExpressionEditor.>>layoutItemButton2.Name',
-            '2': 'XtraEditorsExpressionEditor.>>listOfInputParameters.ZOrder',
-            'Today()\r\nReturns the current date. Regardless of the actual time, this function returns midnight of the current date.': 'XtraEditorsExpressionEditor.Today.Description',
-            'Atn2(Value1, Value2)\r\nReturns the angle whose tangent is the quotient of two specified numbers, in radians.': 'XtraEditorsExpressionEditor.Atn2.Description',
-            'Sin(Value)\r\nReturns the sine of the angle, defined in radians.': 'XtraEditorsExpressionEditor.Sin.Description',
-            'AddDays(DateTime, DaysCount)\r\nReturns a date-time value that is the specified number of days away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddDays.Description',
-            'LocalDateTimeLastWeek()\r\nReturns a date-time value corresponding to the first day of the previous week.': 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description',
-            'LocalDateTimeTomorrow()\r\nReturns a date-time value corresponding to Tomorrow.': 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description',
-            'IsNull(Value)\r\nReturns True if the specified Value is NULL.': 'XtraEditorsExpressionEditor.IsNull.Description',
-            'CharIndex(String1, String2)\r\nReturns the starting position of String1 within String2, beginning from the zero character position to the end of a string.': 'XtraEditorsExpressionEditor.CharIndex.Description',
-            'GetDay(DateTime)\r\nExtracts a day from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDay.Description',
-            'String': 'XtraEditorsExpressionEditor.functionsTypes.Properties.StringItems',
-            'IsThisMonth(DateTime)\r\nReturns True if the specified date falls within the current month.': 'XtraEditorsExpressionEditor.IsThisMonth.Description',
-            'IsThisWeek(DateTime)\r\nReturns True if the specified date falls within the current week.': 'XtraEditorsExpressionEditor.IsThisWeek.Description',
-            'Insert(String1, StartPosition, String2)\r\nInserts String2 into String1 at the position specified by StartPositon': 'XtraEditorsExpressionEditor.Insert.Description',
-            'LocalDateTimeThisWeek()\r\nReturns a date-time value corresponding to the first day of the current week.': 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description',
-            'IsLastMonth(DateTime)\r\nReturns True if the specified date falls within the previous month.': 'XtraEditorsExpressionEditor.IsLastMonth.Description',
-            'ToDouble(Value)\r\nConverts Value to an equivalent 64-bit double-precision floating-point number.': 'XtraEditorsExpressionEditor.ToDouble.Description',
-            'Functions': 'XtraEditorsExpressionEditor.Functions.Text',
-            'Now()\r\nReturns the current system date and time.': 'XtraEditorsExpressionEditor.Now.Description',
-            'IsNullOrEmpty(String)\r\nReturns True if the specified String object is NULL or an empty string; otherwise, False is returned.': 'XtraEditorsExpressionEditor.IsNullOrEmpty.Description',
-            'IsDecember(DateTime)\r\nReturns True if the specified date falls within December.': 'XtraEditorsExpressionEditor.IsDecember.Description',
-            'Round(Value)\r\nRounds the given value to the nearest integer.': 'XtraEditorsExpressionEditor.Round.Description',
-            'DateDiffDay(startDate, endDate)\r\nReturns the number of day boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffDay.Description',
-            '11': 'XtraEditorsExpressionEditor.>>layoutItemButton10.ZOrder',
-            '7': 'XtraEditorsExpressionEditor.>>layoutItemButton13.ZOrder',
-            '24': 'XtraEditorsExpressionEditor.>>buttonOK.ZOrder',
-            'Ascii(String)\r\nReturns the ASCII code value of the leftmost character in a character expression.': 'XtraEditorsExpressionEditor.Ascii.Description',
-            'Log(Value, Base)\r\nReturns the logarithm of a specified number in a specified Base.': 'XtraEditorsExpressionEditor.Log2Param.Description',
-            'Performs a logical disjunction on two Boolean expressions.': 'XtraEditorsExpressionEditor.Or.Description',
-            'IsThisYear(DateTime)\r\nReturns True if the specified date falls within the current year.': 'XtraEditorsExpressionEditor.IsThisYear.Description',
-            'Char(Number)\r\nConverts an integerASCIICode to a character.': 'XtraEditorsExpressionEditor.Char.Description',
-            'DateDiffSecond(startDate, endDate)\r\nReturns the number of second boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffSecond.Description',
-            'Returns true if both operands have the same value; otherwise, it returns false.': 'XtraEditorsExpressionEditor.Equal.Description',
-            'Represents the Boolean False value.': 'XtraEditorsExpressionEditor.False.Description',
-            'Atn(Value)\r\nReturns the arctangent of a number (the angle, in radians, whose tangent is the given float expression).': 'XtraEditorsExpressionEditor.Atn.Description',
-            'AddMilliSeconds(DateTime, MilliSecondsCount)\r\nReturns a date-time value that is the specified number of milliseconds away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMilliSeconds.Description',
-            'GetTimeOfDay(DateTime)\r\nExtracts the time of the day from the defined DateTime, in ticks.': 'XtraEditorsExpressionEditor.GetTimeOfDay.Description',
-            'IsSameDay(DateTime, DateTime)\r\nReturns True if the specified date-time values fall within the same day.': 'XtraEditorsExpressionEditor.IsSameDay.Description',
-            'Rnd()\r\nReturns a random number that is less than 1, but greater than or equal to zero.': 'XtraEditorsExpressionEditor.Rnd.Description',
-            'layoutItemButton14': 'XtraEditorsExpressionEditor.>>layoutItemButton14.Name',
-            'Performs a logical exclusion on two Boolean expressions, or a bitwise exclusion on two numeric expressions.': 'XtraEditorsExpressionEditor.BitwiseXor.Description',
-            'Tan(Value)\r\nReturns the tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tan.Description',
-            'layoutItemButton15': 'XtraEditorsExpressionEditor.>>layoutItemButton15.Name',
-            '4': 'XtraEditorsExpressionEditor.>>descriptionControl.ZOrder',
-            'DevExpress.XtraEditors.SimpleButton, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>buttonOK.Type',
-            'buttonOK': 'XtraEditorsExpressionEditor.>>buttonOK.Name',
-            'IsOctober(DateTime)\r\nReturns True if the specified date falls within October.': 'XtraEditorsExpressionEditor.IsOctober.Description',
-            'Less than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.LessOrEqual.Description',
-            'layoutItemButton10': 'XtraEditorsExpressionEditor.>>layoutItemButton10.Name',
-            'The type of this field is: ': 'XtraEditorsExpressionEditor.Fields Description Prefix',
-            'IsJanuary(DateTime)\r\nReturns True if the specified date falls within January.': 'XtraEditorsExpressionEditor.IsJanuary.Description',
-            'DateDiffTick(startDate, endDate)\r\nReturns the number of tick boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffTick.Description',
-            'layoutItemButton11': 'XtraEditorsExpressionEditor.>>layoutItemButton11.Name',
-            'Tanh(Value)\r\nReturns the hyperbolic tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tanh.Description',
-            'listOfInputTypes': 'XtraEditorsExpressionEditor.>>listOfInputTypes.Name',
-            'GetDayOfWeek(DateTime)\r\nExtracts a day of the week from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDayOfWeek.Description',
-            'layoutItemButton12': 'XtraEditorsExpressionEditor.>>layoutItemButton12.Name',
-            'Represents the Boolean True value.': 'XtraEditorsExpressionEditor.True.Description',
-            '18': 'XtraEditorsExpressionEditor.>>layoutItemButton4.ZOrder',
-            'Min(Value)\r\nReturns the minimum expression value in a collection.': 'XtraEditorsExpressionEditor.MinAggregate.Description',
-            '20': 'XtraEditorsExpressionEditor.>>layoutItemButton2.ZOrder',
-            'layoutItemButton13': 'XtraEditorsExpressionEditor.>>layoutItemButton13.Name',
-            'PadRight(String, Length, Char)\r\nRight-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'XtraEditorsExpressionEditor.PadRight3Param.Description',
-            'Expression editor': 'XtraEditorsExpressionEditor.UnboundColumn.Caption',
-            'Avg(Value)\r\nEvaluates the average of the values in the collection.': 'XtraEditorsExpressionEditor.AvgAggregate.Description',
-            'IsMarch(DateTime)\r\nReturns True if the specified date falls within March.': 'XtraEditorsExpressionEditor.IsMarch.Description',
-            'LocalDateTimeYearBeforeToday()\r\nReturns a date-time value corresponding to the day one year ago.': 'XtraEditorsExpressionEditor.LocalDateTimeYearBeforeToday.Description',
-            'Replace(String, SubString2, String3)\r\nReturns a copy of String1, in which SubString2 has been replaced with String3.': 'XtraEditorsExpressionEditor.Replace.Description',
-            'AddHours(DateTime, HoursCount)\r\nReturns a date-time value that is the specified number of hours away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddHours.Description',
-            'Reverse(String)\r\nReverses the order of elements within a string.': 'XtraEditorsExpressionEditor.Reverse.Description',
-            'Remove(String, StartPosition, Length)\r\nDeletes a specified number of characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove3Param.Description',
-            'Remove(String, StartPosition)\r\nDeletes all characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove2Param.Description',
-            'GetDate(DateTime)\r\nExtracts a date from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDate.Description',
-            '22': 'XtraEditorsExpressionEditor.>>plusItemButton.ZOrder',
-            'DevExpress.XtraEditors.LabelControl, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>labelControl4.Type',
-            'labelControl4': 'XtraEditorsExpressionEditor.>>labelControl4.Name',
-            'AddTimeSpan(DateTime, TimeSpan)\r\nReturns a date-time value that is away from the specified DateTime for the given TimeSpan.': 'XtraEditorsExpressionEditor.AddTimeSpan.Description',
-            'labelControl1': 'XtraEditorsExpressionEditor.>>labelControl1.Name',
-            'Performs a bitwise logical AND operation between two integer values.': 'XtraEditorsExpressionEditor.BitwiseAnd.Description',
-            'Represents a null reference, one that does not refer to any object.': 'XtraEditorsExpressionEditor.Null.Description',
-            'LocalDateTimeNextWeek()\r\nReturns a date-time value corresponding to the first day of the following week.': 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description',
-            'ToLong(Value)\r\nConverts Value to an equivalent 64-bit signed integer.': 'XtraEditorsExpressionEditor.ToLong.Description',
-            'labelControl3': 'XtraEditorsExpressionEditor.>>labelControl3.Name',
-            'AddSeconds(DateTime, SecondsCount)\r\nReturns a date-time value that is the specified number of seconds away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddSeconds.Description',
-            'The type of this parameter is: ': 'XtraEditorsExpressionEditor.Parameters Description Prefix',
-            '23': 'XtraEditorsExpressionEditor.>>buttonCancel.ZOrder',
-            'Ceiling(Value)\r\nReturns the smallest integer that is greater than or equal to the given numeric expression.': 'XtraEditorsExpressionEditor.Ceiling.Description',
-            'labelControl2': 'XtraEditorsExpressionEditor.>>labelControl2.Name',
-            'GetSecond(DateTime)\r\nExtracts seconds from the defined DateTime.': 'XtraEditorsExpressionEditor.GetSecond.Description',
-            'CharIndex(String1, String2, StartLocation)\r\nReturns the starting position of String1 within String2, beginning from the StartLocation character position to the end of a string.': 'XtraEditorsExpressionEditor.CharIndex3Param.Description',
-            'Asin(Value)\r\nReturns the arcsine of a number (the angle, in radians, whose sine is the given float expression).': 'XtraEditorsExpressionEditor.Asin.Description',
-            'Round(Value, Precision)\r\nRounds the given value to the nearest integer, or to a specified number of decimal places.': 'XtraEditorsExpressionEditor.Round2Param.Description',
-            'AddTicks(DateTime, TicksCount)\r\nReturns a date-time value that is the specified number of ticks away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddTicks.Description',
-            'IsAugust(DateTime)\r\nReturns True if the specified date falls within August.': 'XtraEditorsExpressionEditor.IsAugust.Description',
-            'Substring(String, StartPosition, Length)\r\nRetrieves a substring from String. The substring starts at StartPosition and has the specified Length.': 'XtraEditorsExpressionEditor.Substring3param.Description',
-            '10': 'XtraEditorsExpressionEditor.>>layoutItemButton11.ZOrder',
-            'CalculatedFieldExpressionEditorForm': 'XtraEditorsExpressionEditor.>>$this.Name',
-            'DevExpress.XtraEditors.XtraForm, DevExpress.Utils.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>$this.Type',
-            'Condition expression editor': 'XtraEditorsExpressionEditor.Condition.Caption',
-            'ToDecimal(Value)\r\nConverts Value to an equivalent decimal number.': 'XtraEditorsExpressionEditor.ToDecimal.Description',
-            '21': 'XtraEditorsExpressionEditor.>>expressionEdit.ZOrder',
-            'Max(Value1, Value2)\r\nReturns the maximum value from the specified values.': 'XtraEditorsExpressionEditor.Max.Description',
-            'LocalDateTimeTwoMonthsAway()\r\nReturns a date-time value corresponding to the first day of the month after next.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoMonthsAway.Description',
-            'Substring(String, StartPosition)\r\nRetrieves a substring from String. The substring starts at StartPosition.': 'XtraEditorsExpressionEditor.Substring2param.Description',
-            'Acos(Value)\r\nReturns the arccosine of a number (the angle, in radians, whose cosine is the given float expression).': 'XtraEditorsExpressionEditor.Acos.Description',
-            'GetDayOfYear(DateTime)\r\nExtracts a day of the year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDayOfYear.Description',
-            'Multiplies the value of two expressions.': 'XtraEditorsExpressionEditor.Multiply.Description',
-            'Returns the total amount of data rows in a datasource.': 'XtraEditorsExpressionEditor.RowCount.Description',
-            'LocalDateTimeNow()\r\nReturns a date-time value corresponding to the current moment in time.': 'XtraEditorsExpressionEditor.LocalDateTimeNow.Description',
-            'LocalDateTimeLastYear()\r\nReturns a date-time value corresponding to the first day of the previous year.': 'XtraEditorsExpressionEditor.LocalDateTimeLastYear.Description',
-            'LocalDateTimeDayAfterTomorrow()\r\nReturns a date-time value corresponding to the day after Tomorrow.': 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description',
-            'Sum(Value)\r\nReturns the sum of all the expression values in the collection.': 'XtraEditorsExpressionEditor.SumAggregate.Description',
-            'Compares a string against a pattern. If the value of the string matches the pattern, result is true. If the string does not match the pattern, result is false. If both string and pattern are empty strings, the result is true.': 'XtraEditorsExpressionEditor.Like.Description',
-            'Power(Value, Power)\r\nReturns a specified number raised to a specified power.': 'XtraEditorsExpressionEditor.Power.Description',
-            'Fields': 'XtraEditorsExpressionEditor.Fields.Text',
-            'Finds the difference between two numbers.': 'XtraEditorsExpressionEditor.Minus.Description',
-            'Log(Value)\r\nReturns the natural logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log.Description',
-            'LocalDateTimeTwoYearsAway()\r\nReturns a date-time value corresponding to the first day of the year after next.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoYearsAway.Description',
-            'Sinh(Value)\r\nReturns the hyperbolic sine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Sinh.Description',
-            'Max(Value)\r\nReturns the maximum expression value in a collection.': 'XtraEditorsExpressionEditor.MaxAggregate.Description',
-            'Greater than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Greater.Description',
-            '(All)': 'XtraEditorsExpressionEditor.functionsTypes.Properties.AllItems',
-            'In (,,,)\r\nTests for the existence of a property in an object.': 'XtraEditorsExpressionEditor.In.Description',
-            'DevExpress.XtraEditors.ComboBoxEdit, DevExpress.XtraEditors.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>functionsTypes.Type',
-            'functionsTypes': 'XtraEditorsExpressionEditor.>>functionsTypes.Name',
-            'Less than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Less.Description',
-            'StartsWith(String, StartString)\r\nReturns True if the beginning of String matches StartString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.StartsWith.Description',
-            '12': 'XtraEditorsExpressionEditor.>>layoutItemButton9.ZOrder',
-            'GetMonth(DateTime)\r\nExtracts a month from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMonth.Description',
-            'EndsWith(String, EndString)\r\nReturns True if the end of String matches EndString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.EndsWith.Description',
-            'Adds the value of one numeric expression to another, or concatenates two strings.': 'XtraEditorsExpressionEditor.Plus.Description',
-            'Single()\r\nReturns a single object from the collection.': 'XtraEditorsExpressionEditor.SingleAggregate.Description',
-            'Contains(String, SubString)\r\nReturns True if SubString occurs within String; otherwise, False is returned.': 'XtraEditorsExpressionEditor.Contains.Description',
-            'DateDiffHour(startDate, endDate)\r\nReturns the number of hour boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffHour.Description',
-            'Returns true if the operands do not have the same value; otherwise, it returns false.': 'XtraEditorsExpressionEditor.NotEqual.Description',
-            'Abs(Value)\r\nReturns the absolute, positive value of the given numeric expression.': 'XtraEditorsExpressionEditor.Abs.Description',
-            'LocalDateTimeNextMonth()\r\nReturns a date-time value corresponding to the first day of next month.': 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description',
-            'AddMonths(DateTime, MonthsCount)\r\nReturns a date-time value that is the specified number of months away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMonths.Description',
-            'Iif(Expression, TruePart, FalsePart)\r\nReturns either TruePart or FalsePart, depending on the evaluation of the Boolean Expression.': 'XtraEditorsExpressionEditor.Iif.Description',
-            'GetMilliSecond(DateTime)\r\nExtracts milliseconds from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMilliSecond.Description',
-            'LocalDateTimeLastMonth()\r\nReturns a date-time value corresponding to the first day of the previous month.': 'XtraEditorsExpressionEditor.LocalDateTimeLastMonth.Description',
-            'buttonCancel': 'XtraEditorsExpressionEditor.>>buttonCancel.Name',
-            'PadLeft(String, Length)\r\nLeft-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft.Description',
-            'descriptionControl': 'XtraEditorsExpressionEditor.>>descriptionControl.Name',
-            'DevExpress.XtraEditors.LabelControl, DevExpress.Utils.v16.2, Version=16.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>descriptionControl.Type',
-            '5': 'XtraEditorsExpressionEditor.>>labelControl3.ZOrder',
-            'Min(Value1, Value2)\r\nReturns the minimum value from the specified values.': 'XtraEditorsExpressionEditor.Min.Description',
-            '14': 'XtraEditorsExpressionEditor.>>layoutItemButton7.ZOrder',
-            'Condition Editor': 'XtraEditorsExpressionEditor.Condition.Text',
-            'Cosh(Value)\r\nReturns the hyperbolic cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cosh.Description',
-            'Performs logical negation on an expression.': 'XtraEditorsExpressionEditor.Not.Description',
-            'GetYear(DateTime)\r\nExtracts a year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetYear.Description',
-            'DateDiffYear(startDate, endDate)\r\nReturns the number of year boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffYear.Description',
             'Page Header': 'DevExpress.XtraReports.UI.PageHeaderBand',
             'Max Nesting Level': 'DevExpress.XtraReports.UI.XRTableOfContents.MaxNestingLevel',
             'Null Value Text': 'DevExpress.XtraReports.UI.XRControl.NullValueText',
@@ -628,6 +120,7 @@ var DevExpress;
             'Data Adapter': 'DevExpress.XtraReports.UI.XRPivotGrid.DataAdapter',
             'Data Source': 'DevExpress.XtraReports.UI.XRSparkline.DataSource',
             'Palette Name': 'DevExpress.XtraReports.UI.XRChart.PaletteName',
+            'Sorting Options': 'DevExpress.XtraReports.UI.SortingOptions',
             'Report Print Options': 'DevExpress.XtraReports.UI.ReportPrintOptions',
             'Filter Separator': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FilterSeparator',
             'Column Width': 'DevExpress.XtraReports.UI.MultiColumn.ColumnWidth',
@@ -635,6 +128,7 @@ var DevExpress;
             'Show Text': 'DevExpress.XtraReports.UI.XRBarCode.ShowText',
             'Line Width': 'DevExpress.XtraReports.UI.XRShape.LineWidth',
             'Line Style': 'DevExpress.XtraReports.UI.XRShape.LineStyle',
+            'Parameters': 'DevExpress.XtraReports.UI.XtraReport.Parameters',
             'Edit Options': 'DevExpress.XtraReports.UI.EditOptions',
             'Location': 'DevExpress.XtraReports.UI.XRControl.Location',
             'Group Union': 'DevExpress.XtraReports.UI.GroupHeaderBand.GroupUnion',
@@ -663,6 +157,7 @@ var DevExpress;
             'Data Member': 'DevExpress.XtraReports.UI.XRSparkline.DataMember',
             'Function': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function',
             'Condition': 'DevExpress.XtraReports.UI.FormattingRule.Condition',
+            'Interactive Sorting': 'DevExpress.XtraReports.UI.XRLabel.InteractiveSorting',
             'Scripts': 'DevExpress.XtraReports.UI.Band.Scripts',
             'OLAP Connection String': 'DevExpress.XtraReports.UI.XRPivotGrid.OLAPConnectionString',
             'Bound Data Changed': 'DevExpress.XtraReports.UI.XRChartScripts.OnBoundDataChanged',
@@ -690,6 +185,7 @@ var DevExpress;
             'Panel': 'DevExpress.XtraReports.UI.XRPanel',
             'Shape': 'DevExpress.XtraReports.UI.XRShape',
             'Using Style': 'DevExpress.XtraReports.UI.XRControlStyle.StyleUsing',
+            'Table': 'DevExpress.XtraReports.UI.XRTable',
             'Start Point': 'DevExpress.XtraReports.UI.XRCrossBandControl.StartPoint',
             'Chart': 'DevExpress.XtraReports.UI.XRChart',
             'Gauge': 'DevExpress.XtraReports.UI.XRGauge',
@@ -720,6 +216,7 @@ var DevExpress;
             'After the Band, Except for the Last Entry': 'DevExpress.XtraReports.UI.PageBreak.AfterBandExceptLastEntry',
             'Indent': 'DevExpress.XtraReports.UI.XRTableOfContentsLevel.Indent',
             'Sorting Summary Reset': 'DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryReset',
+            'Value': 'DevExpress.XtraReports.UI.ProcessDuplicatesTarget.Value',
             'Show Printing Warnings': 'DevExpress.XtraReports.UI.XtraReport.ShowPrintingWarnings',
             'Multi-Column Options': 'DevExpress.XtraReports.UI.MultiColumn',
             'Draw the Watermark': 'DevExpress.XtraReports.UI.XtraReport.DrawWatermark',
@@ -785,6 +282,7 @@ var DevExpress;
             'Anchor Vertically': 'DevExpress.XtraReports.UI.XRControl.AnchorVertical',
             'Report Source Url': 'DevExpress.XtraReports.UI.XRSubreport.ReportSourceUrl',
             'Data Source\'s Schema': 'DevExpress.XtraReports.UI.XtraReport.DataSourceSchema',
+            'Snap Grid Step Count': 'DevExpress.XtraReports.UI.XtraReport.SnapGridStepCount',
             'Zip Code': 'DevExpress.XtraReports.UI.XRZipCode',
             'Angle': 'DevExpress.XtraReports.UI.XRLabel.Angle',
             'Process Duplicates': 'DevExpress.XtraReports.UI.XRLabel.ProcessDuplicates',
@@ -813,6 +311,7 @@ var DevExpress;
             'Summary Row Changed': 'DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryRowChanged',
             'Image URL': 'DevExpress.XtraReports.UI.XRPictureBox.ImageUrl',
             'Size': 'DevExpress.XtraReports.UI.XRControl.Size',
+            'Name': 'DevExpress.XtraReports.UI.XRControl.Name',
             'Control Style': 'DevExpress.XtraReports.UI.XRControlStyle',
             'Foreground Color': 'DevExpress.XtraReports.UI.XRControlStyle.ForeColor',
             'Band Level Changed': 'DevExpress.XtraReports.UI.GroupBandScripts.OnBandLevelChanged',
@@ -857,12 +356,15 @@ var DevExpress;
             'Trimming': 'DevExpress.XtraReports.UI.XRAppearanceObject.Trimming',
             'Ignore Null Values': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.IgnoreNullValues',
             'Script References': 'DevExpress.XtraReports.UI.XtraReport.ScriptReferences',
+            'Ascending': 'DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending',
             'Xlsx Format String': 'DevExpress.XtraReports.UI.XRControl.XlsxFormatString',
             'Sparkline Scripts': 'DevExpress.XtraReports.UI.XRSparklineScripts',
+            'Fields': 'DevExpress.XtraReports.UI.XRPivotGrid.Fields',
             'Binding': 'DevExpress.XtraReports.Design.DataBinding.Binding',
             'First Down, then Across': 'DevExpress.XtraReports.UI.ColumnDirection.DownThenAcross',
             'Print Options': 'DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint',
             'Before Print': 'DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint',
+            'Sort Order': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.SortOrder',
             'Use WMPaint Recursively': 'DevExpress.XtraReports.UI.WinControlDrawMethod.UseWMPaintRecursive',
             'Page Info': 'DevExpress.XtraReports.UI.XRPageInfo',
             'Field Value Display Text': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnFieldValueDisplayText',
@@ -927,6 +429,7 @@ var DevExpress;
             'First Across, then Down': 'DevExpress.XtraReports.UI.ColumnDirection.AcrossThenDown',
             'Pivot Grid': 'DevExpress.XtraReports.UI.XRPivotGrid',
             'Header Group Line': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.HeaderGroupLine',
+            'Descending': 'DevExpress.XtraReports.UI.XRColumnSortOrder.Descending',
             'Table Of Contents Title': 'DevExpress.XtraReports.UI.XRTableOfContentsTitle',
             'Use WMPrint Recursively': 'DevExpress.XtraReports.UI.WinControlDrawMethod.UseWMPrintRecursive',
             'Table Of Contents Level': 'DevExpress.XtraReports.UI.XRTableOfContentsLevel',
@@ -1004,6 +507,7 @@ var DevExpress;
             'Fore Color': 'DevExpress.XtraReports.UI.XRTableOfContentsLevelBase.ForeColor',
             'Field Header': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldHeader',
             'Merge based on Tag': 'DevExpress.XtraReports.UI.ValueSuppressType.MergeByTag',
+            'Expression': 'DevExpress.XtraReports.UI.CalculatedField.Expression',
             'Picture Box': 'DevExpress.XtraReports.UI.XRPictureBox',
             'Automatic Layout': 'DevExpress.XtraReports.UI.XRChart.AutoLayout',
             'Summary Calculated': 'DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryCalculated',
@@ -1048,6 +552,7 @@ var DevExpress;
             'Style': 'DevExpress.XtraReports.UI.ConditionFormatting.Style',
             'Indicators Palette Name': 'DevExpress.XtraReports.UI.XRChart.IndicatorsPaletteName',
             'After Print': 'DevExpress.XtraReports.UI.XRControlEvents.OnAfterPrint',
+            'Target Band': 'DevExpress.XtraReports.UI.SortingOptions.TargetBand',
             'As Bricks': 'DevExpress.XtraReports.UI.WinControlPrintMode.AsBricks',
             'Cell': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.Cell',
             'Grand Total Cell': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.GrandTotalCell',
@@ -1121,6 +626,7 @@ var DevExpress;
             'Always': 'DevExpress.XtraPivotGrid.AllowHideFieldsType.Always',
             'Caption': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Caption',
             'XMLA': 'DevExpress.XtraPivotGrid.OLAPDataProvider.Xmla',
+            'Data Processing Engine': 'DevExpress.XtraPivotGrid.PivotGridOptionsData.DataProcessingEngine',
             'Unbound Field Name': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.UnboundFieldName',
             'All Areas': 'DevExpress.XtraPivotGrid.PivotGridAllowedAreas.All',
             'Faces': 'DevExpress.XtraPivotGrid.PivotKPIGraphic.Faces',
@@ -1271,6 +777,7 @@ var DevExpress;
             'Row Field Value Separator': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator',
             'Apply To Cell': 'DevExpress.XtraPivotGrid.PivotGridStyleFormatCondition.ApplyToCell',
             'Variance Arrow': 'DevExpress.XtraPivotGrid.PivotKPIGraphic.VarianceArrow',
+            'Options': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.Options',
             'Grouping Interval': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.GroupInterval',
             'Data Column Name': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.FieldName',
             'Show Always': 'DevExpress.XtraPivotGrid.PivotShowButtonModeEnum.ShowAlways',
@@ -1311,6 +818,7 @@ var DevExpress;
             'Filter Header Area': 'DevExpress.XtraPivotGrid.PivotGridAppearances.FilterHeaderArea',
             'Allow Hide Fields': 'DevExpress.XtraPivotGrid.PivotGridOptionsCustomization.AllowHideFields',
             'Totals Location': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.TotalsLocation',
+            'Legacy': 'DevExpress.XtraPivotGrid.PivotDataProcessingEngine.Legacy',
             'Print Vertical Lines': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines',
             'Multi Selection': 'DevExpress.XtraPivotGrid.PivotGridCells.MultiSelection',
             'OLAP Use NonEmpty': 'DevExpress.XtraPivotGrid.PivotGridFieldOptions.OLAPUseNonEmpty',
@@ -1332,6 +840,7 @@ var DevExpress;
             'Date': 'DevExpress.XtraPivotGrid.PivotGroupInterval.Date',
             'Hour': 'DevExpress.XtraPivotGrid.PivotGroupInterval.Hour',
             'Date-Hour-Minute-Second': 'DevExpress.XtraPivotGrid.PivotGroupInterval.DateHourMinuteSecond',
+            'Legacy Optimized': 'DevExpress.XtraPivotGrid.PivotDataProcessingEngine.LegacyOptimized',
             'Reversed Status Arrow': 'DevExpress.XtraPivotGrid.PivotKPIGraphic.ReversedStatusArrow',
             'Print Filter Headers': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders',
             'FieldHeader': 'DevExpress.PivotGrid.Printing.PrintAppearance.FieldHeader',
@@ -1355,6 +864,7 @@ var DevExpress;
             'From Center Horizontal': 'DevExpress.XtraCharts.RectangleGradientMode.FromCenterHorizontal',
             'Right Bottom': 'DevExpress.XtraCharts.DockCorner.RightBottom',
             'Reverse': 'DevExpress.XtraCharts.Axis.Reverse',
+            'Close': 'DevExpress.XtraCharts.StockLevel.Close',
             'Line Tension Percent': 'DevExpress.XtraCharts.FullStackedSplineArea3DSeriesView.LineTensionPercent',
             'Equal Bar Width': 'DevExpress.XtraCharts.SideBySideStackedBarSeriesView.EqualBarWidth',
             'Right Outside': 'DevExpress.XtraCharts.LegendAlignmentHorizontal.RightOutside',
@@ -1364,13 +874,16 @@ var DevExpress;
             'Constant Line Collection': 'DevExpress.XtraCharts.ConstantLineCollection',
             'Diamond': 'DevExpress.XtraCharts.MarkerKind.Diamond',
             'Resolve Overlapping Options': 'DevExpress.XtraCharts.AxisLabel.ResolveOverlappingOptions',
+            'Candle Stick Reduction Options': 'DevExpress.XtraCharts.CandleStickReductionOptions',
             'Thousands': 'DevExpress.XtraCharts.NumericGridAlignment.Thousands',
+            'Qualitative Scale Options': 'DevExpress.XtraCharts.AxisXBase.QualitativeScaleOptions',
             'Swift Plot Diagram Secondary Axis X Collection': 'DevExpress.XtraCharts.SwiftPlotDiagramSecondaryAxisXCollection',
             'Label Visibility Mode': 'DevExpress.XtraCharts.Axis2D.LabelVisibilityMode',
             'X-Axis': 'DevExpress.XtraCharts.SwiftPlotDiagram.AxisX',
             'Y-Axis': 'DevExpress.XtraCharts.SwiftPlotDiagram.AxisY',
             'Stacked Area 3D Series Label': 'DevExpress.XtraCharts.StackedArea3DSeriesLabel',
             'Stacked Bar Series Label': 'DevExpress.XtraCharts.StackedBarSeriesLabel',
+            'Marker': 'DevExpress.XtraCharts.LegendMarkerMode.Marker',
             'Left': 'DevExpress.XtraCharts.LegendAlignmentHorizontal.Left',
             'Start To Start': 'DevExpress.XtraCharts.TaskLinkType.StartToStart',
             'Shape Kind': 'DevExpress.XtraCharts.Annotation.ShapeKind',
@@ -1378,7 +891,6 @@ var DevExpress;
             'Retrieve Column Custom Totals': 'DevExpress.XtraCharts.PivotGridDataSourceOptions.RetrieveColumnCustomTotals',
             'Data Filters': 'DevExpress.XtraCharts.SeriesBase.DataFilters',
             'Scrolling Options': 'DevExpress.XtraCharts.Diagram3D.ScrollingOptions',
-            'Custom Panel': 'DevExpress.XtraCharts.SimpleDiagram.CustomPanel',
             'Color': 'DevExpress.XtraCharts.SeriesViewBase.Color',
             'YZX': 'DevExpress.XtraCharts.RotationOrder.YZX',
             'YXZ': 'DevExpress.XtraCharts.RotationOrder.YXZ',
@@ -1408,7 +920,6 @@ var DevExpress;
             'Millisecond': 'DevExpress.XtraCharts.DateTimeMeasureUnit.Millisecond',
             'Signal Smoothing Period': 'DevExpress.XtraCharts.MovingAverageConvergenceDivergence.SignalSmoothingPeriod',
             'No Cap': 'DevExpress.XtraCharts.ErrorBarEndStyle.NoCap',
-            'Marker': 'DevExpress.XtraCharts.Marker',
             'Shadow': 'DevExpress.XtraCharts.XYDiagramSeriesViewBase.Shadow',
             'Hatch Style': 'DevExpress.XtraCharts.HatchFillOptions.HatchStyle',
             'Color Each': 'DevExpress.XtraCharts.SeriesView3DColorEachSupportBase.ColorEach',
@@ -1417,6 +928,7 @@ var DevExpress;
             'Series Selection Mode': 'DevExpress.XtraCharts.Native.Chart.SeriesSelectionMode',
             'Finish To Finish': 'DevExpress.XtraCharts.TaskLinkType.FinishToFinish',
             'Pyramid': 'DevExpress.XtraCharts.Bar3DModel.Pyramid',
+            'End Second': 'DevExpress.XtraCharts.TimeInterval.EndSecond',
             'Solid': 'DevExpress.XtraCharts.FillMode3D.Solid',
             'Spin Grow Up': 'DevExpress.XtraCharts.PieSpinGrowUpAnimation',
             'Top Left to Bottom Right': 'DevExpress.XtraCharts.RectangleGradientMode.TopLeftToBottomRight',
@@ -1433,10 +945,12 @@ var DevExpress;
             'Sine': 'DevExpress.XtraCharts.SineEasingFunction',
             'Rotation Count': 'DevExpress.XtraCharts.PieSpinAnimationBase.RotationCount',
             'Child Color': 'DevExpress.XtraCharts.TaskLinkColorSource.ChildColor',
+            'Time Interval Collection': 'DevExpress.XtraCharts.TimeIntervalCollection',
             'Chart Measure Unit': 'DevExpress.XtraCharts.ChartRangeControlClientSnapMode.ChartMeasureUnit',
             'Dimension': 'DevExpress.XtraCharts.SimpleDiagram3D.Dimension',
             'Range Control Client Numeric Grid Options': 'DevExpress.XtraCharts.ChartRangeControlClientNumericGridOptions',
             'Series Animation': 'DevExpress.XtraCharts.LineSeriesView.SeriesAnimation',
+            'Work Intervals': 'DevExpress.XtraCharts.WorkTimeRule.WorkIntervals',
             'Minor Length': 'DevExpress.XtraCharts.TickmarksBase.MinorLength',
             'Show for Zero Values': 'DevExpress.XtraCharts.BarSeriesLabel.ShowForZeroValues',
             'Minor Color': 'DevExpress.XtraCharts.GridLines.MinorColor',
@@ -1448,13 +962,16 @@ var DevExpress;
             'Tens': 'DevExpress.XtraCharts.NumericMeasureUnit.Tens',
             'Ones': 'DevExpress.XtraCharts.NumericMeasureUnit.Ones',
             'On Load': 'DevExpress.XtraCharts.ChartAnimationMode.OnLoad',
+            'Always Filled': 'DevExpress.XtraCharts.CandleStickFillMode.AlwaysFilled',
             'Bar Distance': 'DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistance',
             'Minor Thickness': 'DevExpress.XtraCharts.TickmarksBase.MinorThickness',
             'Allow Stagger': 'DevExpress.XtraCharts.AxisLabelResolveOverlappingOptions.AllowStagger',
             'From Right Bottom Corner': 'DevExpress.XtraCharts.XYMarkerSlideAnimationDirection.FromRightBottomCorner',
             'Signal Line Color': 'DevExpress.XtraCharts.MovingAverageConvergenceDivergence.SignalLineColor',
             'Text Color': 'DevExpress.XtraCharts.CustomAxisLabel.TextColor',
+            'Aggregate Function': 'DevExpress.XtraCharts.XYDiagram3DSeriesViewBase.AggregateFunction',
             'Max Horizontal Percentage': 'DevExpress.XtraCharts.Legend.MaxHorizontalPercentage',
+            'Work Time Only': 'DevExpress.XtraCharts.DateTimeScaleOptions.WorkTimeOnly',
             'Colorizer': 'DevExpress.XtraCharts.SeriesBase.Colorizer',
             'Signal Line Style': 'DevExpress.XtraCharts.MovingAverageConvergenceDivergence.SignalLineStyle',
             'Center': 'DevExpress.XtraCharts.FunnelSeriesLabelPosition.Center',
@@ -1487,7 +1004,6 @@ var DevExpress;
             'Top Right to Bottom Left': 'DevExpress.XtraCharts.PolygonGradientMode.TopRightToBottomLeft',
             'Tail': 'DevExpress.XtraCharts.AnnotationConnectorStyle.Tail',
             'Use Weight': 'DevExpress.XtraCharts.PaneSizeMode.UseWeight',
-            'Date-Time Options': 'DevExpress.XtraCharts.AxisLabel.DateTimeOptions',
             'Show Others': 'DevExpress.XtraCharts.TopNOptions.ShowOthers',
             'Checkable in Legend': 'DevExpress.XtraCharts.Indicator.CheckableInLegend',
             'Dot': 'DevExpress.XtraCharts.DashStyle.Dot',
@@ -1504,6 +1020,7 @@ var DevExpress;
             'Begin Time': 'DevExpress.XtraCharts.AnimationBase.BeginTime',
             'Power': 'DevExpress.XtraCharts.PowerEasingFunction.Power',
             'Shape Fillet': 'DevExpress.XtraCharts.Annotation.ShapeFillet',
+            'Dependent Axes Y Range': 'DevExpress.XtraCharts.XYDiagram2D.DependentAxesYRange',
             'Tickmarks': 'DevExpress.XtraCharts.RadarAxisY.Tickmarks',
             'Size As Percentage': 'DevExpress.XtraCharts.Pie3DSeriesView.SizeAsPercentage',
             'Currency': 'DevExpress.XtraCharts.NumericFormat.Currency',
@@ -1540,7 +1057,6 @@ var DevExpress;
             'Top Left': 'DevExpress.XtraCharts.ToolTipDockCorner.TopLeft',
             'Moving Average And Envelope': 'DevExpress.XtraCharts.MovingAverageKind.MovingAverageAndEnvelope',
             'Max Line Count': 'DevExpress.XtraCharts.SeriesLabelBase.MaxLineCount',
-            'Grid Offset': 'DevExpress.XtraCharts.ScaleOptionsBase.GridOffset',
             'Thickness': 'DevExpress.XtraCharts.TickmarksBase.Thickness',
             'Minor Count': 'DevExpress.XtraCharts.AxisBase.MinorCount',
             'Fibonacci Indicator Label': 'DevExpress.XtraCharts.FibonacciIndicatorLabel',
@@ -1574,12 +1090,15 @@ var DevExpress;
             'Marker 2': 'DevExpress.XtraCharts.RangeAreaSeriesView.Marker2',
             'Marker 1': 'DevExpress.XtraCharts.RangeAreaSeriesView.Marker1',
             'Show for Each Series': 'DevExpress.XtraCharts.CrosshairLabelMode.ShowForEachSeries',
+            'Stick to End': 'DevExpress.XtraCharts.SwiftPlotDiagramAxisXBase.StickToEnd',
             'End Style': 'DevExpress.XtraCharts.ErrorBars.EndStyle',
+            'Work Time Rules': 'DevExpress.XtraCharts.DateTimeScaleOptions.WorkTimeRules',
             'Zoom Rectangle': 'DevExpress.XtraCharts.ZoomRectangle',
             'Scrolling Options 2D': 'DevExpress.XtraCharts.ScrollingOptions2D',
             'Right': 'DevExpress.XtraCharts.RectangleIndents.Right',
             'Reduction Stock Options': 'DevExpress.XtraCharts.ReductionStockOptions',
             'From Top Center': 'DevExpress.XtraCharts.CircularMarkerAnimationDirection.FromTopCenter',
+            'Financial': 'DevExpress.XtraCharts.SeriesAggregateFunction.Financial',
             'Border Visible': 'DevExpress.XtraCharts.MarkerBase.BorderVisible',
             'Value Duration Format': 'DevExpress.XtraCharts.RangePointOptions.ValueDurationFormat',
             'Tool Tip Point Pattern': 'DevExpress.XtraCharts.SeriesBase.ToolTipPointPattern',
@@ -1602,7 +1121,6 @@ var DevExpress;
             'Left Top': 'DevExpress.XtraCharts.DockCorner.LeftTop',
             'Notched Arrow': 'DevExpress.XtraCharts.AnnotationConnectorStyle.NotchedArrow',
             'Inside Rectangular Border': 'DevExpress.XtraCharts.InsideRectangularBorder',
-            'Approximate Colors': 'DevExpress.XtraCharts.RangeColorizer.ApproximateColors',
             'Max Value Label': 'DevExpress.XtraCharts.RangeBarLabelKind.MaxValueLabel',
             'Full-Stacked Bar Series Label': 'DevExpress.XtraCharts.FullStackedBarSeriesLabel',
             'Dock Corner': 'DevExpress.XtraCharts.FreePosition.DockCorner',
@@ -1617,7 +1135,6 @@ var DevExpress;
             'Edge1': 'DevExpress.XtraCharts.ScaleBreak.Edge1',
             'Auto Format': 'DevExpress.XtraCharts.DateTimeOptions.AutoFormat',
             'Unwind from Center': 'DevExpress.XtraCharts.CircularSeriesUnwindFromCenterAnimation',
-            'Auto Grid': 'DevExpress.XtraCharts.ScaleOptionsBase.AutoGrid',
             'Straight': 'DevExpress.XtraCharts.ScaleBreakStyle.Straight',
             'Crosshair Axis Label Options': 'DevExpress.XtraCharts.Axis2D.CrosshairAxisLabelOptions',
             'Labels Visibility': 'DevExpress.XtraCharts.SeriesBase.LabelsVisibility',
@@ -1640,10 +1157,10 @@ var DevExpress;
             'Automatic: Integral': 'DevExpress.XtraCharts.DateTimeScaleMode.AutomaticIntegral',
             'Free Position': 'DevExpress.XtraCharts.ToolTipFreePosition',
             'Spin Zoom In': 'DevExpress.XtraCharts.CircularSeriesSpinZoomInAnimation',
+            'Filled on Increase': 'DevExpress.XtraCharts.CandleStickFillMode.FilledOnIncrease',
             'Retrieve Row Totals': 'DevExpress.XtraCharts.PivotGridDataSourceOptions.RetrieveRowTotals',
             'Drop In': 'DevExpress.XtraCharts.PieDropInAnimation',
             'Automatic: Average': 'DevExpress.XtraCharts.DateTimeScaleMode.AutomaticAverage',
-            'Numeric Options': 'DevExpress.XtraCharts.AxisLabel.NumericOptions',
             'Use Mouse': 'DevExpress.XtraCharts.ScrollingOptions.UseMouse',
             'High': 'DevExpress.XtraCharts.StockLevel.High',
             'Open': 'DevExpress.XtraCharts.StockLevel.Open',
@@ -1662,6 +1179,7 @@ var DevExpress;
             'Y-Axis Max Zoom Percent': 'DevExpress.XtraCharts.ZoomingOptions2D.AxisYMaxZoomPercent',
             'Dash Dot': 'DevExpress.XtraCharts.DashStyle.DashDot',
             'Value Line Style': 'DevExpress.XtraCharts.CrosshairOptions.ValueLineStyle',
+            'Start Second': 'DevExpress.XtraCharts.TimeInterval.StartSecond',
             'Min Limit': 'DevExpress.XtraCharts.Strip.MinLimit',
             'Group Header Text Options': 'DevExpress.XtraCharts.CrosshairOptions.GroupHeaderTextOptions',
             'Vertical Alignment': 'DevExpress.XtraCharts.Legend.AlignmentVertical',
@@ -1669,6 +1187,7 @@ var DevExpress;
             'Key': 'DevExpress.XtraCharts.SeriesPointFilter.Key',
             'Value Line Color': 'DevExpress.XtraCharts.CrosshairOptions.ValueLineColor',
             'Both': 'DevExpress.XtraCharts.ErrorBarDirection.Both',
+            'Auto Grid': 'DevExpress.XtraCharts.ScaleGridOptionsBase.AutoGrid',
             'Positive Error': 'DevExpress.XtraCharts.FixedValueErrorBars.PositiveError',
             'Secondary Axis Y Collection': 'DevExpress.XtraCharts.SecondaryAxisYCollection',
             'Show Open Close': 'DevExpress.XtraCharts.StockSeriesView.ShowOpenClose',
@@ -1677,9 +1196,9 @@ var DevExpress;
             'Doughnut Series Label': 'DevExpress.XtraCharts.DoughnutSeriesLabel',
             'Right Column': 'DevExpress.XtraCharts.FunnelSeriesLabelPosition.RightColumn',
             'Custom Labels': 'DevExpress.XtraCharts.Axis2D.CustomLabels',
-            'Always Show Zero Level': 'DevExpress.XtraCharts.VisualRange.AlwaysShowZeroLevel',
             'Staggered': 'DevExpress.XtraCharts.AxisLabel.Staggered',
             'Tooltip Options': 'DevExpress.XtraCharts.Native.Chart.ToolTipOptions',
+            'Previous to Current Point': 'DevExpress.XtraCharts.ReductionColorMode.PreviousToCurrentPoint',
             'Scroll Bar Options': 'DevExpress.XtraCharts.XYDiagramPaneBase.ScrollBarOptions',
             'Indicator Collection': 'DevExpress.XtraCharts.IndicatorCollection',
             'Runtime Resizing': 'DevExpress.XtraCharts.Annotation.RuntimeResizing',
@@ -1696,7 +1215,6 @@ var DevExpress;
             'Back Image': 'DevExpress.XtraCharts.XYDiagramPaneBase.BackImage',
             'Total Days': 'DevExpress.XtraCharts.TimeSpanFormat.TotalDays',
             'Use Mouse Advanced': 'DevExpress.XtraCharts.RotationType.UseMouseAdvanced',
-            'Aggregate Function': 'DevExpress.XtraCharts.ScaleOptionsBase.AggregateFunction',
             'Hide Overlapped': 'DevExpress.XtraCharts.AxisLabelResolveOverlappingMode.HideOverlapped',
             'Long Date': 'DevExpress.XtraCharts.DateTimeFormat.LongDate',
             'Long Time': 'DevExpress.XtraCharts.DateTimeFormat.LongTime',
@@ -1705,7 +1223,7 @@ var DevExpress;
             'Threshold Value': 'DevExpress.XtraCharts.TopNMode.ThresholdValue',
             'Marker Color': 'DevExpress.XtraCharts.CustomLegendItem.MarkerColor',
             'Crosshair Label Visibility': 'DevExpress.XtraCharts.SeriesBase.CrosshairLabelVisibility',
-            'Size as Percentage': 'DevExpress.XtraCharts.PieSeriesViewBase.SizeAsPercentage',
+            'Grid Offset': 'DevExpress.XtraCharts.ChartRangeControlClientGridOptions.GridOffset',
             'Pane': 'DevExpress.XtraCharts.SwiftPlotSeriesViewBase.Pane',
             'Start Angle in Degrees': 'DevExpress.XtraCharts.RadarDiagram.StartAngleInDegrees',
             'Marker Image': 'DevExpress.XtraCharts.CustomLegendItem.MarkerImage',
@@ -1767,6 +1285,7 @@ var DevExpress;
             'Snap Alignment': 'DevExpress.XtraCharts.ChartRangeControlClientDateTimeGridOptions.SnapAlignment',
             'Tickmarks Y': 'DevExpress.XtraCharts.TickmarksY',
             'Tickmarks X': 'DevExpress.XtraCharts.TickmarksX',
+            'Always Show Zero Level': 'DevExpress.XtraCharts.WholeRange.AlwaysShowZeroLevel',
             'Area Width': 'DevExpress.XtraCharts.Area3DSeriesView.AreaWidth',
             'Fibonacci Retracement': 'DevExpress.XtraCharts.FibonacciIndicatorKind.FibonacciRetracement',
             'Z Order': 'DevExpress.XtraCharts.Annotation.ZOrder',
@@ -1786,6 +1305,7 @@ var DevExpress;
             'Dash': 'DevExpress.XtraCharts.DashStyle.Dash',
             'Max Allowed Series Count': 'DevExpress.XtraCharts.PivotGridDataSourceOptions.MaxAllowedSeriesCount',
             'Use Mouse Standard': 'DevExpress.XtraCharts.RotationType.UseMouseStandard',
+            'Grid Spacing': 'DevExpress.XtraCharts.ScaleGridOptionsBase.GridSpacing',
             'Double Collection': 'DevExpress.XtraCharts.DoubleCollection',
             'Task Link Options': 'DevExpress.XtraCharts.TaskLinkOptions',
             'Border 1': 'DevExpress.XtraCharts.RangeAreaSeriesView.Border1',
@@ -1820,6 +1340,7 @@ var DevExpress;
             'Rotation': 'DevExpress.XtraCharts.PieSeriesView.Rotation',
             'Zoom': 'DevExpress.XtraCharts.ChartImageSizeMode.Zoom',
             'Tile': 'DevExpress.XtraCharts.ChartImageSizeMode.Tile',
+            'Weekdays': 'DevExpress.XtraCharts.WorkTimeRule.Weekdays',
             'Text Options': 'DevExpress.XtraCharts.TextOptions',
             'Rotated': 'DevExpress.XtraCharts.XYDiagram.Rotated',
             'Dash Dot Dot': 'DevExpress.XtraCharts.DashStyle.DashDotDot',
@@ -1831,12 +1352,12 @@ var DevExpress;
             'Secondary Grid Lines X': 'DevExpress.XtraCharts.SecondaryGridLinesX',
             'Size Mode': 'DevExpress.XtraCharts.Printing.ChartOptionsPrint.SizeMode',
             'From Right': 'DevExpress.XtraCharts.XYMarkerSlideAnimationDirection.FromRight',
+            'Marker and Check Box': 'DevExpress.XtraCharts.LegendMarkerMode.MarkerAndCheckBox',
             'Key Provider': 'DevExpress.XtraCharts.KeyColorColorizer.KeyProvider',
             'Top To Bottom': 'DevExpress.XtraCharts.TextOrientation.TopToBottom',
             'In': 'DevExpress.XtraCharts.EasingMode.In',
             'Two Labels': 'DevExpress.XtraCharts.RangeAreaLabelKind.TwoLabels',
             'Rectangle Indents': 'DevExpress.XtraCharts.RectangleIndents',
-            'Funnel Fill Style': 'DevExpress.XtraCharts.Funnel3DSeriesView.FunnelFillStyle',
             'Mouse Position': 'DevExpress.XtraCharts.ToolTipMousePosition',
             'Value and Weight': 'DevExpress.XtraCharts.BubbleLabelValueToDisplay.ValueAndWeight',
             'Group Header Pattern': 'DevExpress.XtraCharts.CrosshairOptions.GroupHeaderPattern',
@@ -1852,9 +1373,9 @@ var DevExpress;
             'Image Format': 'DevExpress.XtraCharts.Printing.ChartOptionsPrint.ImageFormat',
             'Argument Line Color': 'DevExpress.XtraCharts.CrosshairOptions.ArgumentLineColor',
             'Zooming Options': 'DevExpress.XtraCharts.Diagram3D.ZoomingOptions',
+            'Numeric Options': 'DevExpress.XtraCharts.NumericOptions',
             'Argument Line Style': 'DevExpress.XtraCharts.CrosshairOptions.ArgumentLineStyle',
             'Animation': 'DevExpress.XtraCharts.FunnelSeriesView.Animation',
-            'Date-time Measure Unit': 'DevExpress.XtraCharts.AxisBase.DateTimeMeasureUnit',
             'Billions': 'DevExpress.XtraCharts.NumericGridAlignment.Billions',
             'Negative Error Data Member': 'DevExpress.XtraCharts.DataSourceBasedErrorBars.NegativeErrorDataMember',
             'Minus': 'DevExpress.XtraCharts.ErrorBarDirection.Minus',
@@ -1868,16 +1389,15 @@ var DevExpress;
             'Show Common for All Series': 'DevExpress.XtraCharts.CrosshairLabelMode.ShowCommonForAllSeries',
             'Total Milliseconds': 'DevExpress.XtraCharts.TimeSpanFormat.TotalMilliseconds',
             'Gantt Diagram': 'DevExpress.XtraCharts.GanttDiagram',
+            'Reduction Options': 'DevExpress.XtraCharts.CandleStickSeriesView.ReductionOptions',
             'And': 'DevExpress.XtraCharts.ConjunctionTypes.And',
             'Logarithmic': 'DevExpress.XtraCharts.AxisBase.Logarithmic',
             'Left Column': 'DevExpress.XtraCharts.FunnelSeriesLabelPosition.LeftColumn',
             'Indent from Marker': 'DevExpress.XtraCharts.BubbleSeriesLabel.IndentFromMarker',
             'Owner': 'DevExpress.XtraCharts.SeriesPointCollection.Owner',
-            'Legend Point Options': 'DevExpress.XtraCharts.SeriesBase.LegendPointOptions',
+            'Marker Offset': 'DevExpress.XtraCharts.Legend.MarkerOffset',
             'Date Time': 'DevExpress.XtraCharts.ScaleType.DateTime',
-            'Grid Spacing': 'DevExpress.XtraCharts.ChartRangeControlClientGridOptions.GridSpacing',
             'Bar Depth Auto': 'DevExpress.XtraCharts.Bar3DSeriesView.BarDepthAuto',
-            'Line Visible': 'DevExpress.XtraCharts.SeriesLabelBase.LineVisible',
             'Crosshair Highlight Points': 'DevExpress.XtraCharts.SeriesBase.CrosshairHighlightPoints',
             'Runtime Anchoring': 'DevExpress.XtraCharts.Annotation.RuntimeAnchoring',
             'Y Axis Scroll Bar Visible': 'DevExpress.XtraCharts.ScrollBarOptions.YAxisScrollBarVisible',
@@ -1898,12 +1418,11 @@ var DevExpress;
             'Tool Tip Series Pattern': 'DevExpress.XtraCharts.SeriesBase.ToolTipSeriesPattern',
             'Show Value Line': 'DevExpress.XtraCharts.CrosshairOptions.ShowValueLine',
             'Value As Duration': 'DevExpress.XtraCharts.RangePointOptions.ValueAsDuration',
-            'Use Checkboxes': 'DevExpress.XtraCharts.Legend.UseCheckBoxes',
+            'Use Check Boxes': 'DevExpress.XtraCharts.Legend.UseCheckBoxes',
             'Envelope Percent': 'DevExpress.XtraCharts.MovingAverage.EnvelopePercent',
             'Show Level 0%': 'DevExpress.XtraCharts.FibonacciIndicator.ShowLevel0',
             'Positive Error Data Member': 'DevExpress.XtraCharts.DataSourceBasedErrorBars.PositiveErrorDataMember',
             'Crosshair Label Mode': 'DevExpress.XtraCharts.CrosshairOptions.CrosshairLabelMode',
-            'Begin Text': 'DevExpress.XtraCharts.AxisLabel.BeginText',
             'Maximum Value Label': 'DevExpress.XtraCharts.RangeAreaLabelKind.MaxValueLabel',
             'Series Point Relation Collection': 'DevExpress.XtraCharts.SeriesPointRelationCollection',
             'Use Points': 'DevExpress.XtraCharts.PieExplodeMode.UsePoints',
@@ -1931,6 +1450,7 @@ var DevExpress;
             'Bounce': 'DevExpress.XtraCharts.BounceEasingFunction',
             'Percentage Accuracy': 'DevExpress.XtraCharts.PercentOptions.PercentageAccuracy',
             'Horizontal Scroll Percent': 'DevExpress.XtraCharts.Diagram3D.HorizontalScrollPercent',
+            'Check Box and Marker': 'DevExpress.XtraCharts.LegendMarkerMode.CheckBoxAndMarker',
             'Link Options': 'DevExpress.XtraCharts.GanttSeriesView.LinkOptions',
             'Argument Date-time Options': 'DevExpress.XtraCharts.PointOptions.ArgumentDateTimeOptions',
             'Palette Base Color Number': 'DevExpress.XtraCharts.Native.Chart.PaletteBaseColorNumber',
@@ -1944,7 +1464,6 @@ var DevExpress;
             'Rotation Order': 'DevExpress.XtraCharts.Diagram3D.RotationOrder',
             'Point Series Label': 'DevExpress.XtraCharts.PointSeriesLabel',
             'Relations': 'DevExpress.XtraCharts.SeriesPoint.Relations',
-            'Date-time Grid Alignment': 'DevExpress.XtraCharts.AxisBase.DateTimeGridAlignment',
             'Total Hours': 'DevExpress.XtraCharts.TimeSpanFormat.TotalHours',
             'Out': 'DevExpress.XtraCharts.EasingMode.Out',
             'Box': 'DevExpress.XtraCharts.Bar3DModel.Box',
@@ -1958,11 +1477,11 @@ var DevExpress;
             'Scale Breaks': 'DevExpress.XtraCharts.Axis.ScaleBreaks',
             'Stacked Bar 3D Series Label': 'DevExpress.XtraCharts.StackedBar3DSeriesLabel',
             'Text Direction': 'DevExpress.XtraCharts.RadarAxisXLabel.TextDirection',
+            'Always Empty': 'DevExpress.XtraCharts.CandleStickFillMode.AlwaysEmpty',
             'Threshold Percent': 'DevExpress.XtraCharts.TopNOptions.ThresholdPercent',
             'Snap Offset': 'DevExpress.XtraCharts.ChartRangeControlClientGridOptions.SnapOffset',
             'Automatic Size': 'DevExpress.XtraCharts.BubbleSeriesView.AutoSize',
             'Equally Spaced Items': 'DevExpress.XtraCharts.Legend.EquallySpacedItems',
-            'Reduction Options': 'DevExpress.XtraCharts.FinancialSeriesViewBase.ReductionOptions',
             'Crosshair Label Text Options': 'DevExpress.XtraCharts.CrosshairOptions.CrosshairLabelTextOptions',
             'Show Only in Focused Pane': 'DevExpress.XtraCharts.CrosshairOptions.ShowOnlyInFocusedPane',
             'Elastic': 'DevExpress.XtraCharts.ElasticEasingFunction',
@@ -1980,20 +1499,23 @@ var DevExpress;
             'Tool Tip Enabled': 'DevExpress.XtraCharts.SeriesBase.ToolTipEnabled',
             'Crosshair Options': 'DevExpress.XtraCharts.CrosshairOptions',
             'Qualitative': 'DevExpress.XtraCharts.ScaleType.Qualitative',
+            'Date-Time Options': 'DevExpress.XtraCharts.DateTimeOptions',
             'Linear Unwind': 'DevExpress.XtraCharts.CircularSeriesLinearUnwindAnimation',
             'Show in Legend': 'DevExpress.XtraCharts.ChartPaletteColorizerBase.ShowInLegend',
             'Funnel Series Label': 'DevExpress.XtraCharts.FunnelSeriesLabel',
             'Bar Depth': 'DevExpress.XtraCharts.Bar3DSeriesView.BarDepth',
             'Point Order': 'DevExpress.XtraCharts.SeriesPointAnimationBase.PointOrder',
-            'Synchronize With Whole Range': 'DevExpress.XtraCharts.VisualRange.SynchronizeWithWholeRange',
             'From Bottom Center': 'DevExpress.XtraCharts.CircularMarkerAnimationDirection.FromBottomCenter',
             'Range Control Date-Time Grid Options': 'DevExpress.XtraCharts.ChartRangeControlClientDateTimeOptions.RangeControlDateTimeGridOptions',
             'Point Delay': 'DevExpress.XtraCharts.SeriesPointAnimationBase.PointDelay',
             'Short Period': 'DevExpress.XtraCharts.MovingAverageConvergenceDivergence.ShortPeriod',
             'Unwrap': 'DevExpress.XtraCharts.XYSeriesUnwrapAnimation',
+            'Filled on Reduction': 'DevExpress.XtraCharts.CandleStickFillMode.FilledOnReduction',
             'Stacked Line 3D SeriesLabel': 'DevExpress.XtraCharts.StackedLine3DSeriesLabel',
+            'Color Mode': 'DevExpress.XtraCharts.ReductionStockOptions.ColorMode',
             'Axis Y 3D': 'DevExpress.XtraCharts.AxisY3D',
             'Axis X 3D': 'DevExpress.XtraCharts.AxisX3D',
+            'Work Time Rule Collection': 'DevExpress.XtraCharts.WorkTimeRuleCollection',
             'Show for Nearest Series': 'DevExpress.XtraCharts.CrosshairLabelMode.ShowForNearestSeries',
             'Two Columns': 'DevExpress.XtraCharts.PieSeriesLabelPosition.TwoColumns',
             'Side Margins Value': 'DevExpress.XtraCharts.Range.SideMarginsValue',
@@ -2009,6 +1531,8 @@ var DevExpress;
             'Measure Unit': 'DevExpress.XtraCharts.DateTimeScaleOptions.MeasureUnit',
             'Radar Grid Lines Y': 'DevExpress.XtraCharts.RadarGridLinesY',
             'Radar Grid Lines X': 'DevExpress.XtraCharts.RadarGridLinesX',
+            'Start Hour': 'DevExpress.XtraCharts.TimeInterval.StartHour',
+            'Begin Text': 'DevExpress.XtraCharts.SeriesNameTemplate.BeginText',
             'Exact Workdays': 'DevExpress.XtraCharts.WorkdaysOptions.ExactWorkdays',
             'Vertical Scroll Percent': 'DevExpress.XtraCharts.Diagram3D.VerticalScrollPercent',
             'Dock': 'DevExpress.XtraCharts.DockableTitle.Dock',
@@ -2017,6 +1541,7 @@ var DevExpress;
             'Month and Year': 'DevExpress.XtraCharts.DateTimeFormat.MonthAndYear',
             'XY-Diagram Pane Collection': 'DevExpress.XtraCharts.XYDiagramPaneCollection',
             'Series Name': 'DevExpress.XtraCharts.PointView.SeriesName',
+            'Open to Close Value': 'DevExpress.XtraCharts.ReductionColorMode.OpenToCloseValue',
             'Known Date Collection': 'DevExpress.XtraCharts.KnownDateCollection',
             'Nested Doughnut Series Label': 'DevExpress.XtraCharts.NestedDoughnutSeriesLabel',
             'AnchorPoint': 'DevExpress.XtraCharts.Annotation.AnchorPoint',
@@ -2035,10 +1560,10 @@ var DevExpress;
             'Simple Diagram 3D': 'DevExpress.XtraCharts.SimpleDiagram3D',
             'Color Object Colorizer': 'DevExpress.XtraCharts.ColorObjectColorizer',
             'Skip': 'DevExpress.XtraCharts.ProcessMissingPointsMode.Skip',
+            'Marker Mode': 'DevExpress.XtraCharts.Legend.MarkerMode',
             'Tool Tip Hint Data Member': 'DevExpress.XtraCharts.SeriesBase.ToolTipHintDataMember',
             'Value DateTime Options': 'DevExpress.XtraCharts.PointOptions.ValueDateTimeOptions',
             'Align to Center': 'DevExpress.XtraCharts.FunnelSeriesView.AlignToCenter',
-            'Point Options': 'DevExpress.XtraCharts.SeriesLabelBase.PointOptions',
             'Top Inside': 'DevExpress.XtraCharts.BarSeriesLabelPosition.TopInside',
             'Visual Range': 'DevExpress.XtraCharts.AxisBase.VisualRange',
             'Swift Plot Diagram Secondary Axis Y Collection': 'DevExpress.XtraCharts.SwiftPlotDiagramSecondaryAxisYCollection',
@@ -2052,7 +1577,7 @@ var DevExpress;
             'Chart Print Options': 'DevExpress.XtraCharts.Printing.ChartOptionsPrint',
             'Closed': 'DevExpress.XtraCharts.RadarLineSeriesView.Closed',
             'Back': 'DevExpress.XtraCharts.BackEasingFunction',
-            'Linear': 'DevExpress.XtraCharts.LinearEasingFunction',
+            'Linear': 'ASPxReportsStringId.ReportDesigner_GaugeViewType_Linear',
             'Show Group Headers': 'DevExpress.XtraCharts.CrosshairOptions.ShowGroupHeaders',
             'Crosshair Label Back Color': 'DevExpress.XtraCharts.CrosshairOptions.CrosshairLabelBackColor',
             'Quartic': 'DevExpress.XtraCharts.QuarticEasingFunction',
@@ -2067,7 +1592,6 @@ var DevExpress;
             'Link Type': 'DevExpress.XtraCharts.TaskLink.LinkType',
             'Radar Range Area Series Label': 'DevExpress.XtraCharts.RadarRangeAreaSeriesLabel',
             'Inner Indents': 'DevExpress.XtraCharts.FreePosition.InnerIndents',
-            'Date Time Options': 'DevExpress.XtraCharts.AxisBase.DateTimeOptions',
             'Axis Y Title': 'DevExpress.XtraCharts.AxisTitleY',
             'Axis X Title': 'DevExpress.XtraCharts.AxisTitleX',
             'Tool Tip Hint': 'DevExpress.XtraCharts.SeriesPoint.ToolTipHint',
@@ -2106,7 +1630,6 @@ var DevExpress;
             'Hexagon': 'DevExpress.XtraCharts.MarkerKind.Hexagon',
             'Radar Axis Y': 'DevExpress.XtraCharts.RadarAxisY',
             'RadarAxisX': 'DevExpress.XtraCharts.RadarAxisX',
-            'Value to Display': 'DevExpress.XtraCharts.BubbleSeriesLabel.ValueToDisplay',
             'Marker Image Size Mode': 'DevExpress.XtraCharts.CustomLegendItem.MarkerImageSizeMode',
             'Minor Line Style': 'DevExpress.XtraCharts.GridLines.MinorLineStyle',
             'Point Marker Options': 'DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions',
@@ -2121,6 +1644,7 @@ var DevExpress;
             'Insert Empty Points': 'DevExpress.XtraCharts.ProcessMissingPointsMode.InsertEmptyPoints',
             'Item Visibility Mode': 'DevExpress.XtraCharts.Legend.ItemVisibilityMode',
             'Polar Diagram': 'DevExpress.XtraCharts.PolarDiagram',
+            'End Hour': 'DevExpress.XtraCharts.TimeInterval.EndHour',
             'Use Filters': 'DevExpress.XtraCharts.PieExplodeMode.UseFilters',
             'Circular Unwind': 'DevExpress.XtraCharts.CircularSeriesCircularUnwindAnimation',
             'Arrow Width': 'DevExpress.XtraCharts.TaskLinkOptions.ArrowWidth',
@@ -2156,7 +1680,6 @@ var DevExpress;
             'Value As Percent': 'DevExpress.XtraCharts.PercentOptions.ValueAsPercent',
             'Series Collection': 'DevExpress.XtraCharts.SeriesCollection',
             'Range Control Client Date-Time Grid Options': 'DevExpress.XtraCharts.ChartRangeControlClientDateTimeGridOptions',
-            'Grid Spacing Auto': 'DevExpress.XtraCharts.AxisBase.GridSpacingAuto',
             'Line Join': 'DevExpress.XtraCharts.LineStyle.LineJoin',
             'Point 2': 'DevExpress.XtraCharts.FinancialIndicator.Point2',
             'Point 1': 'DevExpress.XtraCharts.FinancialIndicator.Point1',
@@ -2165,10 +1688,8 @@ var DevExpress;
             'Greater Than Or Equal': 'DevExpress.XtraCharts.DataFilterCondition.GreaterThanOrEqual',
             'Axis X Coordinate': 'DevExpress.XtraCharts.AxisXCoordinate',
             'Visibility In Panes': 'DevExpress.XtraCharts.Axis2D.VisibilityInPanes',
-            'Financial': 'DevExpress.XtraCharts.AggregateFunction.Financial',
             'Rectangle': 'DevExpress.XtraCharts.ShapeKind.Rectangle',
             'Negative Error': 'DevExpress.XtraCharts.FixedValueErrorBars.NegativeError',
-            'Work Days Options': 'DevExpress.XtraCharts.AxisBase.WorkdaysOptions',
             'Ellipse': 'DevExpress.XtraCharts.ShapeKind.Ellipse',
             'Left-to-Right': 'DevExpress.XtraCharts.Direction.LeftToRight',
             'Greater Than': 'DevExpress.XtraCharts.DataFilterCondition.GreaterThan',
@@ -2181,6 +1702,7 @@ var DevExpress;
             'Series Point Animation': 'DevExpress.XtraCharts.PointSeriesViewBase.SeriesPointAnimation',
             'On Data Changed': 'DevExpress.XtraCharts.ChartAnimationMode.OnDataChanged',
             'Exploded Series Point Collection': 'DevExpress.XtraCharts.ExplodedSeriesPointCollection',
+            'Start Minute': 'DevExpress.XtraCharts.TimeInterval.StartMinute',
             'Rounded Rectangle': 'DevExpress.XtraCharts.ShapeKind.RoundedRectangle',
             'Axis Label 3D': 'DevExpress.XtraCharts.AxisLabel3D',
             'Max Vertical Percentage': 'DevExpress.XtraCharts.Legend.MaxVerticalPercentage',
@@ -2193,6 +1715,7 @@ var DevExpress;
             'Cross Axis': 'DevExpress.XtraCharts.TickmarksBase.CrossAxis',
             'Max Value Marker': 'DevExpress.XtraCharts.RangeBarSeriesView.MaxValueMarker',
             'To Center Horizontal': 'DevExpress.XtraCharts.RectangleGradientMode.ToCenterHorizontal',
+            'End Minute': 'DevExpress.XtraCharts.TimeInterval.EndMinute',
             'Radar Tickmarks Y': 'DevExpress.XtraCharts.RadarTickmarksY',
             'Duration': 'DevExpress.XtraCharts.AnimationBase.Duration',
             'Japanese Envelope Chou Number 4': 'System.Drawing.Printing.PaperKind.JapaneseEnvelopeChouNumber4',
@@ -2210,6 +1733,7 @@ var DevExpress;
             'Zoom Image': 'DevExpress.XtraPrinting.ImageSizeMode.ZoomImage',
             'Stop Page Building': 'DevExpress.XtraPrinting.PrintingSystemCommand.StopPageBuilding',
             'JIS B4 Rotated ': 'System.Drawing.Printing.PaperKind.B4JisRotated',
+            'String': 'DevExpress.XtraTreeList.Data.UnboundColumnType.String',
             'Standard 15x11': 'System.Drawing.Printing.PaperKind.Standard15x11',
             'Standard 12x11': 'System.Drawing.Printing.PaperKind.Standard12x11',
             'Standard 10x14': 'System.Drawing.Printing.PaperKind.Standard10x14',
@@ -2279,6 +1803,7 @@ var DevExpress;
             'Smart': 'DevExpress.XtraPrinting.VerticalContentSplitting.Smart',
             'Send File': 'DevExpress.XtraPrinting.PrintingSystemCommand.SendFile',
             'A3 Extra': 'System.Drawing.Printing.PaperKind.A3Extra',
+            'Send as DOCX': 'DevExpress.XtraPrinting.PrintingSystemCommand.SendDocx',
             'Send as XLSX': 'DevExpress.XtraPrinting.PrintingSystemCommand.SendXlsx',
             'Exact': 'DevExpress.XtraPrinting.VerticalContentSplitting.Exact',
             'Dark Vertical': 'System.Drawing.Drawing2D.HatchStyle.DarkVertical',
@@ -2331,6 +1856,7 @@ var DevExpress;
             'A5 Rotated': 'System.Drawing.Printing.PaperKind.A5Rotated',
             'Small Checker Board': 'System.Drawing.Drawing2D.HatchStyle.SmallCheckerBoard',
             'Export as XLSX': 'DevExpress.XtraPrinting.PrintingSystemCommand.ExportXlsx',
+            'Export as DOCX': 'DevExpress.XtraPrinting.PrintingSystemCommand.ExportDocx',
             'Export File': 'DevExpress.XtraPrinting.PrintingSystemCommand.ExportFile',
             'Legal': 'System.Drawing.Printing.PaperKind.Legal',
             'Iso B4': 'System.Drawing.Printing.PaperKind.IsoB4',
@@ -2528,10 +2054,11 @@ var DevExpress;
             'Expanded': 'DevExpress.XtraPrinting.BarCode.DataBarType.Expanded',
             'Rasterization resolution': 'DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizationResolution',
             'Allow URLs with JS Content': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.AllowURLsWithJSContent',
+            'Export Mode': 'DevExpress.XtraPrinting.DocxExportOptions.ExportMode',
             'Address': 'DevExpress.XtraPrinting.Recipient.Address',
             'Rasterize Images': 'DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizeImages',
-            'Export Mode': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.ExportMode',
             'Human-Readable Text': 'DevExpress.XtraPrinting.BarCode.EAN128Generator.HumanReadableText',
+            'Compatible': 'DevExpress.XtraPrinting.XlEncryptionType.Compatible',
             'Category': 'DevExpress.XtraPrinting.XlDocumentOptions.Category',
             'Different Files': 'DevExpress.XtraPrinting.XlsxExportMode.DifferentFiles',
             'Attachments': 'DevExpress.XtraPrinting.PdfExportOptions.Attachments',
@@ -2551,7 +2078,6 @@ var DevExpress;
             'Show Grid Lines': 'DevExpress.XtraPrinting.XlsExportOptions.ShowGridLines',
             'Slant Line': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.SlantLine',
             'XLS Export Options': 'DevExpress.XtraPrinting.XlsExportOptions',
-            'Keep Row Height': 'DevExpress.XtraPrinting.RtfExportOptions.KeepRowHeight',
             'Image Export Options': 'DevExpress.XtraPrinting.ImageExportOptions',
             'Author': 'DevExpress.XtraPrinting.XlDocumentOptions.Author',
             'Save Mode': 'DevExpress.XtraPrinting.PrintPreviewOptions.SaveMode',
@@ -2567,6 +2093,7 @@ var DevExpress;
             'Binary': 'DevExpress.XtraPrinting.BarCode.PDF417CompactionMode.Binary',
             'Multi-Value': 'DevExpress.XtraReports.Parameters.Parameter.MultiValue',
             'Compaction Mode': 'DevExpress.XtraPrinting.BarCode.QRCodeGenerator.CompactionMode',
+            'Version': 'DevExpress.XtraPrinting.XpsDocumentOptions.Version',
             'Security Options': 'DevExpress.XtraPrinting.PdfExportOptions.PasswordSecurityOptions',
             'Using a Save File Dialog': 'DevExpress.XtraPrinting.SaveMode.UsingSaveFileDialog',
             'Version 40 (177x177)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version40',
@@ -2601,6 +2128,7 @@ var DevExpress;
             'Version 39 (173x173)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version39',
             'Version 38 (169x169)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version38',
             'Tail\'s Length': 'DevExpress.XtraPrinting.Shape.ShapeBrace.TailLength',
+            'Type': 'DevExpress.XtraPrinting.XlEncryptionOptions.Type',
             'Subject': 'DevExpress.XtraPrinting.XlDocumentOptions.Subject',
             'Using Printer Settings': 'DevExpress.XtraPrinting.PrinterSettingsUsing',
             'Matrix Size': 'DevExpress.XtraPrinting.BarCode.DataMatrixGenerator.MatrixSize',
@@ -2619,6 +2147,7 @@ var DevExpress;
             'High Resolution': 'DevExpress.XtraPrinting.PrintingPermissions.HighResolution',
             'Retain Background Transparency': 'DevExpress.XtraPrinting.ImageExportOptions.RetainBackgroundTransparency',
             'OpenPassword': 'DevExpress.XtraPrinting.PdfPasswordSecurityOptions.OpenPassword',
+            'Excel Encryption Options': 'DevExpress.XtraPrinting.XlEncryptionOptions',
             'Suppress 65536 Rows Warning': 'DevExpress.XtraPrinting.XlsExportOptions.Suppress65536RowsWarning',
             'Description': 'DevExpress.XtraReports.Parameters.Parameter.Description',
             'Omnidirectional': 'DevExpress.XtraPrinting.BarCode.DataBarType.Omnidirectional',
@@ -2635,6 +2164,8 @@ var DevExpress;
             'Additional Recipients': 'DevExpress.XtraPrinting.EmailOptions.AdditionalRecipients',
             'Backslant Line': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.BackslantLine',
             'MHT Export Options': 'DevExpress.XtraPrinting.MhtExportOptions',
+            '256-bit AES': 'DevExpress.XtraPrinting.PdfEncryptionLevel.AES256',
+            '128-bit AES': 'DevExpress.XtraPrinting.PdfEncryptionLevel.AES128',
             'Add Leading Zero': 'DevExpress.XtraPrinting.BarCode.Code128Generator.AddLeadingZero',
             'Truncated': 'DevExpress.XtraPrinting.BarCode.DataBarType.Truncated',
             'Image Quality': 'DevExpress.XtraPrinting.PdfExportOptions.ImageQuality',
@@ -2651,6 +2182,8 @@ var DevExpress;
             'Version 3 (29x29)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version3',
             'Version 8 (49x49)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version8',
             'Version 9 (53x53)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version9',
+            'Strong': 'DevExpress.XtraPrinting.XlEncryptionType.Strong',
+            'Export Page Breaks': 'DevExpress.XtraPrinting.FormattedTextExportOptions.ExportPageBreaks',
             'Using a Default Path': 'DevExpress.XtraPrinting.SaveMode.UsingDefaultPath',
             'Wide Narrow Ratio': 'DevExpress.XtraPrinting.BarCode.Interleaved2of5Generator.WideNarrowRatio',
             'CSV Export Options': 'DevExpress.XtraPrinting.CsvExportOptions',
@@ -2658,6 +2191,7 @@ var DevExpress;
             'Skip Empty Columns': 'DevExpress.XtraPrinting.CsvExportOptions.SkipEmptyColumns',
             'Dynamic List': 'DevExpress.XtraReports.Parameters.DynamicListLookUpSettings',
             'Prefix': 'DevExpress.XtraPrinting.Recipient.Prefix',
+            '128-bit ARC4': 'DevExpress.XtraPrinting.PdfEncryptionLevel.ARC4',
             'Recipient Name': 'DevExpress.XtraPrinting.EmailOptions.RecipientName',
             'Horizontal Line Width': 'DevExpress.XtraPrinting.Shape.ShapeCross.HorizontalLineWidth',
             'PermissionsOptions': 'DevExpress.XtraPrinting.PdfPasswordSecurityOptions.PermissionsOptions',
@@ -2671,10 +2205,14 @@ var DevExpress;
             'Signature Options': 'DevExpress.XtraPrinting.PdfExportOptions.SignatureOptions',
             'PrintingPermissions': 'DevExpress.XtraPrinting.PdfPermissionsOptions.PrintingPermissions',
             'Workbook Color Palette Compliance': 'DevExpress.XtraPrinting.XlsExportOptions.WorkbookColorPaletteCompliance',
+            'EncryptionLevel': 'DevExpress.XtraPrinting.PdfPasswordSecurityOptions.EncryptionLevel',
             'Not with Report Header and Report Footer': 'DevExpress.XtraReports.UI.PrintOnPages.NotWithReportHeaderAndReportFooter',
             'Text Rendering Mode': 'DevExpress.XtraPrinting.ImageExportOptions.TextRenderingMode',
             'XLSx Export Options': 'DevExpress.XtraPrinting.XlsxExportOptions',
             'Quote Strings with Separators': 'DevExpress.XtraPrinting.TextExportOptionsBase.QuoteStringsWithSeparators',
+            'Empty First Page Header/Footer': 'DevExpress.XtraPrinting.FormattedTextExportOptions.EmptyFirstPageHeaderFooter',
+            'Encryption Options': 'DevExpress.XtraPrinting.XlExportOptionsBase.EncryptionOptions',
+            'Password': 'DevExpress.XtraPrinting.XlEncryptionOptions.Password',
             'Rotate to the Right': 'DevExpress.XtraPrinting.BarCode.BarCodeOrientation.RotateRight',
             'Brace': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.Brace',
             'Octagon': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.Octagon',
@@ -2688,12 +2226,12 @@ var DevExpress;
             'Suppress 256 Columns Warning': 'DevExpress.XtraPrinting.XlsExportOptions.Suppress256ColumnsWarning',
             'Look-Up Values': 'DevExpress.XtraReports.Parameters.StaticListLookUpSettings.LookUpValues',
             'Remove Secondary Symbols': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.RemoveSecondarySymbols',
-            'Empty First Page Header/Footer': 'DevExpress.XtraPrinting.RtfExportOptions.EmptyFirstPageHeaderFooter',
             'ChangingPermissions': 'DevExpress.XtraPrinting.PdfPermissionsOptions.ChangingPermissions',
             'Native Format Options': 'DevExpress.XtraPrinting.NativeFormatOptions',
             'PermissionsPassword': 'DevExpress.XtraPrinting.PdfPasswordSecurityOptions.PermissionsPassword',
             'Show Options Dialog Before Export': 'DevExpress.XtraPrinting.PrintPreviewOptions.ShowOptionsBeforeExport',
             'Back Slant': 'DevExpress.XtraReports.UI.LineDirection.BackSlant',
+            'Table Layout': 'DevExpress.XtraPrinting.DocxExportOptions.TableLayout',
             'Ask a User': 'DevExpress.XtraPrinting.ActionAfterExport.AskUser',
             'Limited': 'DevExpress.XtraPrinting.BarCode.DataBarType.Limited',
             'Stacked': 'DevExpress.XtraPrinting.BarCode.DataBarType.Stacked',
@@ -2743,6 +2281,8 @@ var DevExpress;
             'Truncate Symbol': 'DevExpress.XtraPrinting.BarCode.PDF417Generator.TruncateSymbol',
             'Lowest': 'DevExpress.XtraPrinting.PdfJpegImageQuality.Lowest',
             'Text Export Mode': 'DevExpress.XtraPrinting.TextExportOptionsBase.TextExportMode',
+            'DOCx Export Options': 'DevExpress.XtraPrinting.DocxExportOptions',
+            'Keep Row Height': 'DevExpress.XtraPrinting.FormattedTextExportOptions.KeepRowHeight',
             '5-Point Star': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.FivePointStar',
             'Recipient Address Prefix': 'DevExpress.XtraPrinting.EmailOptions.RecipientAddressPrefix',
             'Default Send Format': 'DevExpress.XtraPrinting.PrintPreviewOptions.DefaultSendFormat',
@@ -2751,7 +2291,6 @@ var DevExpress;
             'DE': 'DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.DE',
             'AT': 'DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.AT',
             'BN': 'DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.BN',
-            'Export Page Breaks': 'DevExpress.XtraPrinting.RtfExportOptions.ExportPageBreaks',
             'Image Transparency': 'DevExpress.XtraPrinting.Drawing.PageWatermark.ImageTransparency',
             'Text Transparency': 'DevExpress.XtraPrinting.Drawing.PageWatermark.TextTransparency',
             'Horizontal Line': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.HorizontalLine',
@@ -2766,7 +2305,6 @@ var DevExpress;
             'Comments': 'DevExpress.XtraPrinting.XlDocumentOptions.Comments',
             'Page Border\'s Width': 'DevExpress.XtraPrinting.ImageExportOptions.PageBorderWidth',
             'Print Preview Options': 'DevExpress.XtraPrinting.PrintPreviewOptions',
-            'Table Layout': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.TableLayout',
             'CC': 'DevExpress.XtraPrinting.RecipientFieldType.CC',
             'TO': 'DevExpress.XtraPrinting.RecipientFieldType.TO',
             'Any Except Extracting Pages': 'DevExpress.XtraPrinting.ChangingPermissions.AnyExceptExtractingPages',
@@ -2821,9 +2359,16 @@ var DevExpress;
             'Max Point Color': 'DevExpress.Sparkline.SparklineViewBase.MaxPointColor',
             'Show Markers': 'DevExpress.Sparkline.LineSparklineView.ShowMarkers',
             'Min Point Color': 'DevExpress.Sparkline.SparklineViewBase.MinPointColor',
+            'Line Sparkline View': 'DevExpress.Sparkline.LineSparklineView',
+            'Bar Sparkline View Base': 'DevExpress.Sparkline.BarSparklineViewBase',
+            'Sparkline View Base': 'DevExpress.Sparkline.SparklineViewBase',
+            'Win-Loss Sparkline View': 'DevExpress.Sparkline.WinLossSparklineView',
+            'Sparkline Range': 'DevExpress.Sparkline.SparklineRange',
             'Max Point Marker Size': 'DevExpress.Sparkline.LineSparklineView.MaxPointMarkerSize',
             'End Point Color': 'DevExpress.Sparkline.SparklineViewBase.EndPointColor',
+            'Area Sparkline View': 'DevExpress.Sparkline.AreaSparklineView',
             'Negative Point Color': 'DevExpress.Sparkline.SparklineViewBase.NegativePointColor',
+            'Bar Sparkline View': 'DevExpress.Sparkline.BarSparklineView',
             'Start Point Color': 'DevExpress.Sparkline.SparklineViewBase.StartPointColor',
             'Is Auto': 'DevExpress.Sparkline.SparklineRange.IsAuto',
             'Limit 1': 'DevExpress.Sparkline.SparklineRange.Limit1',
@@ -2836,7 +2381,7 @@ var DevExpress;
             'Highlight End Point': 'DevExpress.Sparkline.SparklineViewBase.HighlightEndPoint',
             'Start Point Marker Size': 'DevExpress.Sparkline.LineSparklineView.StartPointMarkerSize',
             'Highlight Max Point': 'DevExpress.Sparkline.SparklineViewBase.HighlightMaxPoint',
-            'Circular': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeType.Circular',
+            'Circular': 'ASPxReportsStringId.ReportDesigner_GaugeViewType_Circular',
             'Dashboard Gauge Type': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeType',
             'Half': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeStyle.Half',
             'Full': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeStyle.Full',
@@ -2847,6 +2392,50 @@ var DevExpress;
             'Flat Light': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeTheme.FlatLight',
             'Flat Dark': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeTheme.FlatDark',
             'Quarter Left': 'DevExpress.XtraGauges.Core.Customization.DashboardGaugeStyle.QuarterLeft',
+            'Close Connection': 'DevExpress.DataAccess.Sql.ConnectionOptions.CloseConnection',
+            'Connection Parameters': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionParameters',
+            'Group Filter String': 'DevExpress.DataAccess.Sql.TableQuery.GroupFilterString',
+            'Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.NewlineType',
+            'Skip Hidden Rows': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenRows',
+            'CSV Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.CsvSourceOptions',
+            'Import Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ImportSettings',
+            'Constructor': 'DevExpress.DataAccess.ObjectBinding.ObjectDataSource.Constructor',
+            'Excel Worksheet Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ExcelWorksheetSettings',
+            'Worksheet Name': 'DevExpress.DataAccess.Excel.ExcelWorksheetSettings.WorksheetName',
+            'Connection String Name': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.ConnectionStringName',
+            'Distinct': 'DevExpress.DataAccess.Sql.SelectQuery.Distinct',
+            'ObjectDataSource': 'DevExpress.DataAccess.Sql.ObjectDataSource',
+            'Scope': 'DevExpress.DataAccess.Excel.ExcelDefinedNameSettings.Scope',
+            'Excel Table Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ExcelTableSettings',
+            'Connection': 'DevExpress.DataAccess.EntityFramework.EFDataSource.Connection',
+            'Stored Procedure Name': 'DevExpress.DataAccess.Sql.StoredProcQuery.StoredProcName',
+            'Detect Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectNewlineType',
+            'Command Timeout': 'DevExpress.DataAccess.Sql.ConnectionOptions.DbCommandTimeout',
+            'Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.SourceOptions',
+            'Cell Range': 'DevExpress.DataAccess.Excel.ExcelWorksheetSettings.CellRange',
+            'Value Separator': 'DevExpress.DataAccess.Excel.CsvSourceOptions.ValueSeparator',
+            'File Name': 'DevExpress.DataAccess.Excel.ExcelDataSource.FileName',
+            'Stored Procedures': 'DevExpress.DataAccess.EntityFramework.EFDataSource.StoredProcedures',
+            'Excel Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.ExcelSourceOptions',
+            'Connection Name': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionName',
+            'Detect Encoding': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectEncoding',
+            'Use First Row As Header': 'DevExpress.DataAccess.Excel.ExcelSourceOptionsBase.UseFirstRowAsHeader',
+            'Detect Value Separator': 'DevExpress.DataAccess.Excel.CsvSourceOptions.DetectValueSeparator',
+            'Source': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.Source',
+            'Queries': 'DevExpress.DataAccess.Sql.SqlDataSource.Queries',
+            'ExcelDataSource': 'DevExpress.DataAccess.Excel.ExcelDataSource',
+            'Defined Name': 'DevExpress.DataAccess.Excel.ExcelDefinedNameSettings.DefinedName',
+            'Culture': 'DevExpress.DataAccess.Excel.CsvSourceOptions.Culture',
+            'Skip Hidden Columns': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenColumns',
+            'Connection String': 'DevExpress.DataAccess.EntityFramework.EFConnectionParameters.ConnectionString',
+            'Excel Defined Name Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ExcelDefinedNameSettings',
+            'EFDataSource': 'DevExpress.DataAccess.EntityFramework.EFDataSource',
+            'Trim Blanks': 'DevExpress.DataAccess.Excel.CsvSourceOptions.TrimBlanks',
+            'SqlDataSource': 'DevExpress.DataAccess.Sql.SqlDataSource',
+            'Text Qualifier': 'DevExpress.DataAccess.Excel.CsvSourceOptions.TextQualifier',
+            'Table Name': 'DevExpress.DataAccess.Excel.ExcelTableSettings.TableName',
+            'Connection Options': 'DevExpress.DataAccess.Sql.SqlDataSource.ConnectionOptions',
+            'SQL': 'DevExpress.DataAccess.Sql.CustomSqlQuery.Sql',
             'Align to Grid': 'ReportStringId.RibbonXRDesign_AlignToGrid_STipTitle',
             'Save the current report.': 'ReportStringId.RibbonXRDesign_SaveFile_Description',
             'Make Same Width': 'ReportStringId.RibbonXRDesign_SizeToControlWidth_STipTitle',
@@ -2897,6 +2486,7 @@ var DevExpress;
             'Customize the current XRPivotGrid\'s layout and preview its data.': 'ReportStringId.PivotGridForm_ItemLayout_Description',
             'Size to Grid': 'ReportStringId.UD_Capt_MakeSameSizeSizeToGrid',
             'Right align the selected controls': 'ReportStringId.UD_Hint_AlignRights',
+            'Delete': 'ReportStringId.Cmd_Delete',
             'Open...': 'ReportStringId.UD_Capt_OpenFile',
             'Error when trying to populate the datasource. The following exception was thrown:': 'ReportStringId.Msg_FillDataError',
             'Can\'t load the report. The file is possibly corrupted or report\'s assembly is missing.': 'ReportStringId.Msg_FileCorrupted',
@@ -2911,6 +2501,7 @@ var DevExpress;
             'Data source:': 'ReportStringId.NewParameterEditorForm_DataSource',
             'Standard Controls': 'ReportStringId.UD_XtraReportsToolboxCategoryName',
             'Main Menu': 'ReportStringId.UD_Capt_MainMenuName',
+            'Load Gallery...': 'ReportStringId.Cmd_LoadGallery',
             'Manage fields.': 'ReportStringId.PivotGridForm_ItemFields_Description',
             'Switch between tabbed and window MDI layout modes': 'ReportStringId.UD_Hint_TabbedInterface',
             'Increase Vertical Spacing': 'ReportStringId.RibbonXRDesign_VertSpaceIncrease_STipTitle',
@@ -2956,6 +2547,8 @@ var DevExpress;
             'Clone Formatting Rule': 'ReportStringId.Cmd_CloneFormattingRule',
             'Validate': 'ReportStringId.ScriptEditor_Validate',
             'Data adapter:': 'ReportStringId.NewParameterEditorForm_DataAdapter',
+            'Error': 'ReportStringId.Msg_ErrorTitle',
+            'Column': 'ReportStringId.Cmd_TableDeleteColumn',
             'New': 'ReportStringId.UD_Capt_NewReport',
             'Click "Validate" to check scripts.': 'ReportStringId.ScriptEditor_ClickValidate',
             'Report StyleSheet files (*.repss)|*.repss|All files (*.*)|*.*': 'ReportStringId.SSForm_Msg_FileFilter',
@@ -2975,6 +2568,7 @@ var DevExpress;
             'Assign Even Style To The XRControl': 'ReportStringId.Cmd_AssignEvenStyleToXRControl',
             'Send to Back': 'ReportStringId.UD_Capt_OrderSendToBack',
             'Report Source: {0}\r\n': 'ReportStringId.XRSubreport_ReportSourceInfo',
+            'Add New Folder': 'ReportStringId.Cmd_AddGalleryFolder',
             'Select All': 'ReportStringId.UD_Capt_SelectAll',
             'You selected more than one formatting rule': 'ReportStringId.FRSForm_Msg_MoreThanOneRule',
             'Hide or show the {0} window': 'ReportStringId.UD_Hint_ViewDockPanels',
@@ -2988,12 +2582,14 @@ var DevExpress;
             'There are following errors in script(s):\r\n{0}': 'ReportStringId.Msg_ScriptError',
             'Description:': 'ReportStringId.ExpressionEditor_FieldDescription',
             'Structure': 'ReportStringId.CatStructure',
-            'Export warning: The following controls are overlapped and may be exported to HTML, RTF, XLS, XLSX, CSV and Text incorrectly - {0}.': 'ReportStringId.Msg_WarningControlsAreOverlapped',
+            'Export warning: The following controls are overlapped and may be exported to HTML, RTF, DOCX, XLS, XLSX, CSV and Text incorrectly - {0}.': 'ReportStringId.Msg_WarningControlsAreOverlapped',
             'Middles': 'ReportStringId.UD_Capt_AlignMiddles',
             'Data member:': 'ReportStringId.NewParameterEditorForm_DataMember',
             'Appearances': 'ReportStringId.PivotGridForm_ItemAppearances_Caption',
             'Processing...': 'ReportStringId.RibbonXRDesign_StatusBar_HtmlProcessing',
+            'The current report layout will be lost. Do you wish to continue?': 'ReportStringId.Gallery_Msg_ApplyLayoutToReport',
             'Select Controls With Formatting Rule': 'ReportStringId.Cmd_SelectControlsWithFormattingRule',
+            'Report Gallery': 'ReportStringId.UD_Title_ReportGallery',
             'Group and Sort': 'ReportStringId.UD_Title_GroupAndSort',
             'GroupFooter': 'ReportStringId.Cmd_GroupFooter',
             'New Report': 'ReportStringId.RibbonXRDesign_NewReport_Caption',
@@ -3022,6 +2618,7 @@ var DevExpress;
             'Tops': 'ReportStringId.UD_Capt_AlignTops',
             'Right align the selected controls.': 'ReportStringId.RibbonXRDesign_AlignRight_STipContent',
             'This operation will remove all formatting rules. Do you wish to proceed?': 'ReportStringId.Msg_WarningRemoveFormattingRules',
+            'New Folder': 'ReportStringId.Gallery_NewFolder',
             '(Not set)': 'ReportStringId.UD_PropertyGrid_NotSetText',
             'Elements': 'ReportStringId.CatElements',
             '"{0}" has been changed. Do you want to save changes ?': 'ReportStringId.UD_Msg_MdiReportChanged',
@@ -3032,6 +2629,7 @@ var DevExpress;
             'Are you sure you want to apply these changes?': 'ReportStringId.Msg_ApplyChangesQuestion',
             'Open a report': 'ReportStringId.UD_Hint_OpenFile',
             'Save Report As': 'ReportStringId.RibbonXRDesign_SaveFileAs_STipTitle',
+            'Add to Report Style Sheet': 'ReportStringId.Cmd_AddToReportStyleSheet',
             'Move Down': 'ReportStringId.Cmd_BandMoveDown',
             'The XRTableOfContents control can be placed only into Report Header and Report Footer bands.': 'ReportStringId.Msg_PlacingXrTocIntoIncorrectContainer',
             'All scripts are valid.': 'ReportStringId.ScriptEditor_ScriptsAreValid',
@@ -3062,6 +2660,7 @@ var DevExpress;
             'Align Middles': 'ReportStringId.RibbonXRDesign_AlignHorizontalCenters_Caption',
             'Send To Back': 'ReportStringId.Cmd_SendToBack',
             'Save/Export...': 'ReportStringId.Verb_Export',
+            'Unable to open file as its contents may be unsafe.': 'ReportStringId.Msg_SuspiciousCodeLoadingCanceled',
             'Top\r\nmargin': 'ReportStringId.SR_Top_Margin',
             'Align the bottoms of the selected controls': 'ReportStringId.UD_Hint_AlignBottoms',
             'Properties': 'ReportStringId.Cmd_Properties',
@@ -3101,6 +2700,7 @@ var DevExpress;
             'Align the centers of the selected controls vertically': 'ReportStringId.UD_Hint_AlignCenters',
             'Find the text on this page.': 'ReportStringId.RibbonXRDesign_HtmlFind_STipContent',
             'Number Across': 'ReportStringId.SR_Number_Across',
+            'Opening this file within the Report Designer may be unsafe.\r\nWas this file obtained from a trusted source?': 'ReportStringId.Msg_SuspiciousCodeLoading',
             'Show or hide the Toolbox, Report Explorer, Field List and Property Grid windows.': 'ReportStringId.RibbonXRDesign_Windows_STipContent',
             'Align Text Left': 'ReportStringId.RibbonXRDesign_JustifyLeft_Caption',
             'TopMargin': 'ReportStringId.Cmd_TopMargin',
@@ -3115,18 +2715,21 @@ var DevExpress;
             'Close the report designer.': 'ReportStringId.RibbonXRDesign_Exit_STipContent',
             '\r\n\r\nData Member: {0}': 'ReportStringId.UD_TTip_DataMemberDescription',
             'Align Text Right': 'ReportStringId.RibbonXRDesign_JustifyRight_STipTitle',
+            'Remove': 'ReportStringId.UD_Capt_SpacingRemove',
             'Printing warning: Save the following reports to preview subreports with recent changes applied - {0}.': 'ReportStringId.Msg_WarningUnsavedReports',
             'Decrease the spacing between the selected controls': 'ReportStringId.UD_Hint_SpacingDecrease',
             'BottomMargin': 'ReportStringId.Cmd_BottomMargin',
             'Left align the selected controls': 'ReportStringId.UD_Hint_AlignLefts',
             'Use Ctrl with the left mouse button to rotate the shape': 'ReportStringId.Msg_ShapeRotationToolTip',
             'Add Style': 'ReportStringId.Cmd_AddStyle',
+            'Save Gallery As...': 'ReportStringId.Cmd_SaveGalleryAs',
             'Redo the last operation.': 'ReportStringId.RibbonXRDesign_Redo_STipContent',
             'New via Wizard...': 'ReportStringId.UD_Capt_NewWizardReport',
             'Move back to the previous page.': 'ReportStringId.RibbonXRDesign_HtmlBackward_STipContent',
             'Windows': 'ReportStringId.RibbonXRDesign_Windows_Caption',
             'XtraReports': 'ReportStringId.Msg_Caption',
             'Add a Group': 'ReportStringId.GroupSort_AddGroup',
+            'Rename': 'ReportStringId.Cmd_RenameGalleryItem',
             'Window': 'ReportStringId.UD_Group_Window',
             'Horizontally center the selected controls within a band.': 'ReportStringId.RibbonXRDesign_CenterHorizontally_STipContent',
             'Edit': 'ReportStringId.UD_Group_Edit',
@@ -3164,7 +2767,9 @@ var DevExpress;
             'Delete the control': 'ReportStringId.UD_Hint_Delete',
             'The Font name can\'t be empty.': 'ReportStringId.Msg_WarningFontNameCantBeEmpty',
             'PageFooter': 'ReportStringId.Cmd_PageFooter',
+            'Add To Gallery': 'ReportStringId.Cmd_AddToGallery',
             'File not found.': 'ReportStringId.Msg_FileNotFound',
+            'Warning: The following controls are outside the report printing area and will not be properly printed and/or exported - {0}.': 'ReportStringId.Msg_WarningControlsAreOutOfColumnPrintingArea',
             'The DrillDownControl property of the \'{0}\' band is not valid.': 'ReportStringId.Msg_InvalidDrillDownControl',
             'You selected more than one style': 'ReportStringId.SSForm_Msg_MoreThanOneStyle',
             'Change the font size.': 'ReportStringId.RibbonXRDesign_FontSize_STipContent',
@@ -3175,6 +2780,7 @@ var DevExpress;
             'Add Field to Area': 'ReportStringId.Verb_AddFieldToArea',
             'Tasks': 'ReportStringId.STag_Capt_Tasks',
             'ReportHeader': 'ReportStringId.Cmd_ReportHeader',
+            'Add to Report Components': 'ReportStringId.Cmd_AddToReportComponents',
             'Add Formatting Rule': 'ReportStringId.Cmd_AddFormattingRule',
             'Refresh this page.': 'ReportStringId.RibbonXRDesign_HtmlRefresh_STipContent',
             'Serialization Error': 'ReportStringId.Msg_SerializationErrorTitle',
@@ -3185,6 +2791,7 @@ var DevExpress;
             'Load Report Template...': 'ReportStringId.Verb_LoadReportTemplate',
             'Delete Unused Styles': 'ReportStringId.Cmd_PurgeStyles',
             'Save \'{0}\'': 'ReportStringId.Dlg_SaveFile_Title',
+            'Cannot obtain data columns. Make sure that the report data source and data member are valid.': 'ReportStringId.Msg_CannotObtainDataColumns',
             'Layout Toolbar': 'ReportStringId.UD_Capt_LayoutToolbarName',
             'Move forward to the next page.': 'ReportStringId.RibbonXRDesign_HtmlForward_STipContent',
             'XRPivotGrid Fields': 'ReportStringId.PivotGridFrame_Fields_ColumnsText',
@@ -3194,6 +2801,7 @@ var DevExpress;
             'to Grid': 'ReportStringId.UD_Capt_AlignToGrid',
             'View Code': 'ReportStringId.Cmd_ViewCode',
             'Edit and Reorder Bands...': 'ReportStringId.Verb_EditBands',
+            'Report Data': 'ReportStringId.CatReportData',
             'one band per report': 'ReportStringId.BandDsg_QuantityPerReport',
             'Importing a report layout. Please, wait...': 'ReportStringId.Msg_ReportImporting',
             'You must select fields for the report before you continue': 'ReportStringId.Wizard_PageChooseFields_Msg',
@@ -3243,6 +2851,7 @@ var DevExpress;
             'This operation will remove all parameters. Do you wish to proceed?': 'ReportStringId.Msg_WarningRemoveParameters',
             'Tile Horizontal': 'ReportStringId.UD_Capt_MdiTileHorizontal',
             'Make the font bold': 'ReportStringId.UD_Hint_FontBold',
+            'Apply Layout to Report': 'ReportStringId.Cmd_ApplyLayoutToReport',
             'Tab Buttons': 'ReportStringId.UD_Group_TabButtonsList',
             'Make the selected controls have the same size.': 'ReportStringId.RibbonXRDesign_SizeToControl_STipContent',
             'No formatting rules are selected': 'ReportStringId.FRSForm_Msg_NoRuleSelected',
@@ -3312,6 +2921,7 @@ var DevExpress;
             'Show Details command cannot be executed when Top N is applied to one of the row/column fields.': 'PivotGridStringId.OLAPDrillDownTopNException',
             'Invert Filter': 'PivotGridStringId.FilterInvert',
             'Q{0}': 'PivotGridStringId.DateTimeQuarterFormat',
+            'Cancel': 'ASPxReportsStringId.SearchDialog_Cancel',
             'Hidden': 'PivotGridStringId.SummaryFilterLegendHidden',
             'Going Down': 'PivotGridStringId.TrendGoingDown',
             'PivotGrid Field List': 'PivotGridStringId.CustomizationFormCaption',
@@ -3319,6 +2929,7 @@ var DevExpress;
             'Show values from': 'PivotGridStringId.SummaryFilterRangeFrom',
             '(Any)': 'PivotGridStringId.PopupMenuFormatRulesAnyField',
             '(Blank)': 'PivotGridStringId.FilterBlank',
+            'The following fields have circular dependency: {0}': 'PivotGridStringId.ExpressionValidationCircularDependency',
             '[Data Area Headers]': 'PivotGridStringId.Alt_DataAreaHeaders',
             '[Resize]': 'PivotGridStringId.Alt_FilterWindowSizeGrip',
             'KPIs': 'PivotGridStringId.OLAPKPIsCaption',
@@ -3329,6 +2940,8 @@ var DevExpress;
             'Horizontal Lines': 'PivotGridStringId.PrintDesignerHorizontalLines',
             'Clear Sorting': 'PivotGridStringId.PopupMenuClearSorting',
             'Show Field List': 'PivotGridStringId.PopupMenuShowFieldList',
+            'OK': 'PivotGridStringId.FilterOk',
+            'A summary expression is expected.': 'PivotGridStringId.ExpressionValidationSummaryExpressionExpected',
             '[Layout Button]': 'PivotGridStringId.Alt_LayoutButton',
             '[Row Area Headers]': 'PivotGridStringId.Alt_RowAreaHeaders',
             '[Stacked Default Layout]': 'PivotGridStringId.Alt_StackedDefaultLayout',
@@ -3346,6 +2959,7 @@ var DevExpress;
             'This command cannot be used on multiple selections.': 'PivotGridStringId.CannotCopyMultipleSelections',
             'Clear Rules from This Intersection': 'PivotGridStringId.PopupMenuFormatRulesClearIntersectionRules',
             'Sort "{0}" by This Row': 'PivotGridStringId.PopupMenuSortFieldByRow',
+            'Criteria cannot contain aggregates.': 'PivotGridStringId.ExpressionValidationNotSummaryExpressionExpected',
             'Going Up': 'PivotGridStringId.TrendGoingUp',
             'Defer Layout Update': 'PivotGridStringId.CustomizationFormDeferLayoutUpdate',
             'Choose fields to add to report:': 'PivotGridStringId.CustomizationFormAvailableFields',
@@ -3384,6 +2998,7 @@ var DevExpress;
             '{0} Sum': 'PivotGridStringId.TotalFormatSum',
             '{0} Max': 'PivotGridStringId.TotalFormatMax',
             '{0} Min': 'PivotGridStringId.TotalFormatMin',
+            'The {0} not found.': 'PivotGridStringId.ExpressionValidationInvalidProperty',
             'The palette is default and then can\'t be modified.': 'ChartStringId.MsgModifyDefaultPaletteError',
             'Export the current document in one of the available formats, and save it to the file on a disk.': 'ChartStringId.CmdExportPlaceHolderDescription',
             'Spline': 'ChartStringId.SvnSpline',
@@ -3517,6 +3132,7 @@ var DevExpress;
             'Right-top': 'ChartStringId.WizDockCornerRightTop',
             'DashedUpwardDiagonal': 'ChartStringId.WizHatchDashedUpwardDiagonal',
             'The logarithmic base should be greater than 1.': 'ChartStringId.MsgInvalidLogarithmicBase',
+            'This chart type is incompatible with the DateTime and Qualitative arguments.': 'ChartStringId.CmdIncompatibleScaleTypeNote',
             'The fixed series distance should be greater than or equal to 0.': 'ChartStringId.MsgIncorrectSeriesDistanceFixed',
             'JustifyAroundPoint': 'ChartStringId.WizResolveOverlappingModeJustifyAroundPoint',
             'Chaikin\'s Volatility': 'ChartStringId.IndChaikinsVolatility',
@@ -3635,6 +3251,7 @@ var DevExpress;
             'The thickness of the minor tickmark should be greater than 0.': 'ChartStringId.MsgIncorrectTickmarkMinorThickness',
             'Load\r\nTemplate': 'ChartStringId.CmdLoadTemplateMenuCaption',
             'Black and White': 'ChartStringId.PltBlackAndWhite',
+            'Add': 'ChartStringId.MenuItemAdd',
             'LargeCheckerBoard': 'ChartStringId.WizHatchLargeCheckerBoard',
             'Stacked Column': 'ChartStringId.CmdCreateStackedBarChartMenuCaption',
             'It\'s impossible to swap autocreated and fixed series.': 'ChartStringId.MsgCantSwapSeries',
@@ -4047,6 +3664,7 @@ var DevExpress;
             '2-D Column': 'ChartStringId.CmdColumn2DGroupPlaceHolderMenuCaption',
             'The MeasureUnit property can\'t be modified in both the automatic and continuous date-time scale modes.': 'ChartStringId.MsgIncorrectDateTimeMeasureUnitPropertyUsing',
             'Error Bars': 'ChartStringId.IndErrorBars',
+            'Index was out of range. Must be non-negative and less than the size of the collection.': 'ChartStringId.MsgOutOfRangeIndexInSeriesPointCollection',
             'Exploded': 'ChartStringId.ExplodedPointsDialogExplodedColumn',
             'The precision should be greater than or equal to 0.': 'ChartStringId.MsgIncorrectNumericPrecision',
             'Pane ': 'ChartStringId.XYDiagramPanePrefix',
@@ -4177,6 +3795,7 @@ var DevExpress;
             'The GridAlignment property can\'t be modified in the automatic numeric scale mode.': 'ChartStringId.MsgIncorrectNumericGridAlignmentPropertyUsing',
             'DataFilters changed': 'ChartStringId.TrnDataFiltersChanged',
             'Detrended Price Oscillator': 'ChartStringId.IndDetrendedPriceOscillator',
+            'The legend marker offset should be greater than or equal to 0 and less than 1000.': 'ChartStringId.MsgIncorrectLegendMarkerOffset',
             'Use Shift with the left mouse button\r\nto zoom in the chart.\r\nUse Alt with the left mouse button \r\nto zoom out the chart.': 'ChartStringId.Msg3DZoomToolTip',
             'Violet II': 'ChartStringId.PltVioletII',
             'the value scale type': 'ChartStringId.MsgIncompatibleByValueScaleType',
@@ -4236,13 +3855,20 @@ var DevExpress;
             'Path can\'t be created.': 'GaugesCoreStringId.MsgPathCreationError',
             'It\'s impossible to create an instance of a class {0} because specified text is incorrect: ': 'GaugesCoreStringId.MsgTextParsingError',
             'The gauge control can\'t be restored correctly, because the specified layout file contians the following invalid elements: {0}.': 'GaugesCoreStringId.MsgGaugeRestoreError',
+            'Bottom Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_BottomMargin',
             'We have all the information needed to process the report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Description',
-            'What summary function would you like to calculate?': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Description',
+            'What summary functions would you like to calculate?': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Description',
+            'Columns selected from specific tables and/or views will be automatically included into a separate query.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMultiQuery',
             'To be able to run the Document Viewer, the client web browser must support HTML5.': 'ASPxReportsStringId.WebDocumentViewer_PlatformNotSupported_Error',
             'Enter the text to find in the document.': 'ASPxReportsStringId.SearchDialog_EnterText',
             'The specified Report Service has not been found.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceConnection_Error',
             'Report Wizard': 'ASPxReportsStringId.ReportDesigner_Wizard_Header',
+            'Height:': 'ASPxReportsStringId.ReportDesigner_Wizard_Height',
+            'Horizontal Pitch:': 'ASPxReportsStringId.ReportDesigner_Wizard_HorizontalPitch',
+            'Next': 'ASPxReportsStringId.ReportDesigner_Wizard_Next',
+            'Inch': 'ASPxReportsStringId.ReportDesigner_Wizard_Inch',
             'Ignore null values': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_IgnoreNullValues',
+            'Choose a data connection.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection',
             'To log in to the Report Server, handle the RequestCredentials event.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorCredentialHandled_Error',
             'Collapsed': 'ASPxReportsStringId.ReportDesigner_Accordion_Collapsed',
             'Align Left 1': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AlignLeft1',
@@ -4252,13 +3878,20 @@ var DevExpress;
             'Last Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_LastPage',
             'Insert Group Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupHeaderBand',
             'The value cannot be empty.': 'ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError',
+            'Label Height:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelHeight',
+            'Label Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_LabelReport',
+            'Join Type': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_JoinType',
+            'Finish': 'ASPxReportsStringId.ReportDesigner_Wizard_Finish',
             'To be able to run the Report Designer, the client web browser must support HTML5.': 'ASPxReportsStringId.ReportDesigner_PlatformNotSupported_Error',
             'Size to Control Height': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlHeight',
             'Display the specified page.': 'ASPxReportsStringId.DocumentViewer_RibbonCurrentPageToolTip',
+            'Sort Type': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SortType',
             'of': 'ASPxReportsStringId.ToolBarItemText_OfLabel',
             'Delete Row': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
             'Remove calculated field': 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveCalculatedField',
             'Insert Page Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageHeaderBand',
+            'Left Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_LeftMargin',
+            'Selection Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectionProperties',
             'Choose a Report Layout': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Title',
             'Choose a Table or View': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Title',
             'Guid should contain 32 digits delimited with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).': 'ASPxReportsStringId.ParametersPanel_GuidValidationError',
@@ -4266,7 +3899,10 @@ var DevExpress;
             'Insert Field in the Column Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheColumnArea',
             'Loading...': 'ASPxReportsStringId.WebDocumentViewer_Loading',
             'Formal': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Formal',
+            'Write Custom SQL': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_WriteCustomSQL',
             'Specify the print settings and print the document.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PrintReport',
+            'Available tables and views': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_AvailableTables',
+            'Select All (*)': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectAll',
             'Outline 2': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Outline2',
             'Outline 1': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Outline1',
             'Failed to log in with the specified user credentials.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorLogin_Error',
@@ -4281,25 +3917,37 @@ var DevExpress;
             'Save To File': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_SaveToFile',
             'Error obtaining a build status': 'ASPxReportsStringId.WebDocumentViewer_GetBuildStatusError',
             'An error occurred during search': 'ASPxReportsStringId.WebDocumentViewer_SearchError',
+            'Paper Size:': 'ASPxReportsStringId.ReportDesigner_Wizard_PaperSize',
+            'Paper Type:': 'ASPxReportsStringId.ReportDesigner_Wizard_PaperType',
+            'Label Width:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth',
+            'To create an item click the Add button.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParametersEmpty',
             'Insert Group Footer Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupFooterBand',
             'Match whole word only': 'ASPxReportsStringId.SearchDialog_WholeWord',
             'Insert Sub-Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertSubBand',
+            'Query Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_QueryProperties',
             'Select the columns you want to display within your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Description',
+            'Width:': 'ASPxReportsStringId.ReportDesigner_Wizard_Width',
             'Down': 'ASPxReportsStringId.SearchDialog_Down',
             'Match case': 'ASPxReportsStringId.SearchDialog_Case',
             '(Select All)': 'ASPxReportsStringId.WebDocumentViewer_SelectAll',
+            'Select distinct': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectDistinct',
+            'Custom SQL Editor': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_CustomSqlEditor',
+            'Add SQL Data Source...': 'ASPxReportsStringId.ReportDesigner_MenuItem_AddSqlDataSource',
             'The DocumentViewerRemoteSourceSettings.CustomTokenStorage property is not assigned.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceSettings_CustomTokenStorage_Error',
             'Print the report': 'ASPxReportsStringId.ToolBarItemText_PrintReport',
             'Parameters Panel': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_ParametersPanel',
             'Portrait': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Portrait',
             'There are no parameters available yet.': 'ASPxReportsStringId.ReportDesigner_FieldList_Parameters',
+            'Create New Query...': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_CreateNewQuery',
             'Page Count:': 'ASPxReportsStringId.DocumentViewer_RibbonPageCountText',
             'Size to Control': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControl',
             'Current Page': 'ASPxReportsStringId.DocumentViewer_RibbonCurrentPageText',
             'Insert Field in the Data Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheDataArea',
             'Create a New Style': 'ASPxReportsStringId.ReportDesigner_StylesEditor_CreateNew',
+            'Select the report type you wish to create.': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Message',
             'Choose a Report Style': 'ASPxReportsStringId.ReportDesigner_Wizard_Report_Style',
             'Insert Field in the Filter Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheFilterArea',
+            'Data-bound Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_DataBoundReport',
             'Insert Page Footer Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageFooterBand',
             'Display the last document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_LastPage',
             'Finished searching the document.': 'ASPxReportsStringId.SearchDialog_Finished',
@@ -4307,9 +3955,12 @@ var DevExpress;
             'Findnbsp;what': 'ASPxReportsStringId.SearchDialog_FindWhat',
             'Export a report and save it to the disk': 'ASPxReportsStringId.ToolBarItemText_SaveToDisk',
             'Export a report and show it in a new window': 'ASPxReportsStringId.ToolBarItemText_SaveToWindow',
+            'Millimeter': 'ASPxReportsStringId.ReportDesigner_Wizard_Millimeter',
             'Add parameter': 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddParameter',
             'Delete Column': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteColumn',
+            'Top Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_TopMargin',
             'Insert Top Margin Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertTopMarginBand',
+            'Empty Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_EmptyReport',
             'Find Text': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_FindText',
             'The report preview initialization has failed': 'ASPxReportsStringId.WebDocumentViewer_InitializationError',
             'Next Page': 'ASPxReportsStringId.ToolBarItemText_NextPage',
@@ -4318,23 +3969,32 @@ var DevExpress;
             'Display the search window': 'ASPxReportsStringId.ToolBarItemText_Search',
             'The document is not found. Please try opening the document once again.': 'ASPxReportsStringId.WebDocumentViewer_DocumentNotFound_Error',
             'Preview Parameters': 'ASPxReportsStringId.ReportDesigner_Preview_ParametersTitle',
+            'Relation Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_RelationProperties',
+            'Label Product:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelProduct',
             'Display the first document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_FirstPage',
+            'Vertical Pitch:': 'ASPxReportsStringId.ReportDesigner_Wizard_VerticalPitch',
             'Stepped': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Stepped',
             'The report is not found. Please try opening the report once again.': 'ASPxReportsStringId.WebDocumentViewer_ReportNotFound_Error',
             'Delete Cell': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteCell',
             'Choose a Data Source to use in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Description',
             'Specify the report\'s title': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_SpecifyTitle',
+            'Remove query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_RemoveQuery',
             'It is only possible to assign either the Local Report or Remote Source of ASPxDocumentViewer at a time.': 'ASPxReportsStringId.DocumentViewer_LocalAndRemoteSource_Error',
             'Save the document to a file in a specified format.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_SaveToFile',
             'Previous Page': 'ASPxReportsStringId.ToolBarItemText_PreviousPage',
             'Display the next document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_NextPage',
+            'Then By': 'ASPxReportsStringId.ReportDesigner_SortFields_ThenBy',
             'Find text in the document.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_FindText',
             'Print Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintPage',
+            'Add query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_AddQuery',
             'Save To Window': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_SaveToWindow',
             'Adjust the field width so all fields fit onto a page': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AdjustFieldWidth',
             'The RequestCredentials event has not been subscribed to.': 'ASPxReportsStringId.DocumentViewer_RemoteRequestCredentials_Error',
             'To view the remote report, specify the ServerUri or EndpointConfigurationName property of the ASPxDocumentViewer.SettingsRemoteSource.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceSettings_Error',
+            'Table Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_TableProperties',
             'Insert Detail Report Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertDetailReportBand',
+            'Operator': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_Operator',
+            'Sort By': 'ASPxReportsStringId.ReportDesigner_SortFields_SortBy',
             'To display a report, only one of the following actions can be performed at a time:\r\n- assigning the ASPxWebDocumentViewer.ReportSourceId property;\r\n- calling the ASPxWebDocumentViewer.OpenReport method;\r\n- calling the ASPxWebDocumentViewer.OpenReportXmlLayout method.': 'ASPxReportsStringId.WebDocumentViewer_OpenReport_Error',
             'Specify the print settings and print the current page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PrintPage',
             'Groups': 'ASPxReportsStringId.ReportDesigner_Groups',
@@ -4344,7 +4004,7 @@ var DevExpress;
             'The report layout specifies the manner in which selected data fields are arranged on individual pages.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Description',
             'Run Wizard': 'ASPxReportsStringId.ReportDesigner_MenuButtons_RunWizard',
             'Compact': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Compact',
-            'The table or view you choose determines wich columns will be available in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Description',
+            'The table or view you choose determines which columns will be available in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Description',
             'Insert Bottom Margin Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertBottomMarginBand',
             'To view a remote report, enable the PageByPage property of the SettingsReportViewer.': 'ASPxReportsStringId.DocumentViewer_RemotePageByPage_Error',
             'Access and modify the report parameter values.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_ParametersPanel',
@@ -4354,7 +4014,9 @@ var DevExpress;
             'Choose Columns to Display in Your Report': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Title',
             'Insert Field in the Row Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheRowArea',
             'The user credentials cannot be empty.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorCredential_Error',
+            'Configure master-detail relationships.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations',
             'This command cannot be executed because a document has not yet been generated.': 'ASPxReportsStringId.DocumentViewer_NoRemoteDocumentInformation_Error',
+            'Actions': 'ASPxReportsStringId.ReportDesigner_Actions',
             'Print the current page': 'ASPxReportsStringId.ToolBarItemText_PrintPage',
             'Export To': 'ASPxReportsStringId.WebDocumentViewer_ExportToText',
             'Display the previous document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PreviousPage',
@@ -4367,18 +4029,29 @@ var DevExpress;
             'Insert Column To the Right': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToRight',
             'Corporate': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Corporate',
             'Size to Control Width': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlWidth',
+            'Choose a Report Type': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Title',
             'Access is denied. You are not granted permission to perform this operation.': 'ASPxReportsStringId.WebDocumentViewer_AccessDenied_Error',
+            'DOCX': 'ASPxReportsStringId.ExportName_docx',
             'XLSX': 'ASPxReportsStringId.ExportName_xlsx',
+            'Product Number:': 'ASPxReportsStringId.ReportDesigner_Wizard_ProductNumber',
+            'Edit query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_EditQuery',
             'Toggle Multipage Mode': 'ASPxReportsStringId.WebDocumentViewer_ToggleMultipageMode',
+            'Right Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_RightMargin',
             'Submit': 'ASPxReportsStringId.ParametersPanel_Submit',
+            'No data to display': 'ASPxReportsStringId.ReportDesigner_DataPreview_Empty',
+            'Data Preview (First 100 Rows Displayed)': 'ASPxReportsStringId.ReportDesigner_DataPreview_Title',
+            'Configure query parameters.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters',
+            'Previous': 'ASPxReportsStringId.ReportDesigner_Wizard_Previous',
             'Selected fields': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectedFields',
             'Save the document in a specified format and display the result in a new window.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_SaveToWindow',
             'Insert Row Below': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow',
             'Insert Row Above': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
             'Available fields': 'ASPxReportsStringId.ReportDesigner_Wizard_AvailableFields',
             'Add Filter Fields Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddFilterFields',
+            'SQL Data Source Wizard': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_Title',
             'Cannot obtain additional document data for the current document': 'ASPxReportsStringId.WebDocumentViewer_GetDocumentDataError',
             'Add calculated field': 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddCalculatedField',
+            'Data Source Wizard': 'ASPxReportsStringId.ReportDesigner_Wizard_DataSourceHeader',
             'Add Row Fields Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddRowFields',
             '0 pages': 'ASPxReportsStringId.WebDocumentViewer_0Pages',
             'Tabular': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Tabular',
@@ -4388,10 +4061,1368 @@ var DevExpress;
             'Insert Report Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertReportHeaderBand',
             'The Report is Complete': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Title',
             'The value is not valid.': 'ASPxReportsStringId.ParametersPanel_GenericRegexValidationError',
+            'Page Size:': 'ASPxReportsStringId.ReportDesigner_Wizard_PageSize',
             'Choose summary options': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Title',
             'Print Report': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintReport',
+            'Column Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_ColumnProperties',
             'Add Column Fields Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddColumnFields',
-            'Choose a Data Source': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Title'
+            'Choose a Data Source': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataSource_Title',
+            'The selected assembly does not contain Entity Framework data contexts.': 'DataAccessStringId.WizardNoEFDataContextsMessage',
+            'The default constructor of an ITypedList implementation has thrown an exception.': 'DataAccessStringId.ODSWizardErrorExceptionInCtor',
+            'Views': 'DataAccessStringId.ConfigureMultiQueryPage_ViewCategory',
+            'A data connection with the specified name already exists. Please specify a different connection name.': 'DataAccessStringId.WizardDataConnectionNameExistsMessage',
+            'A table cannot be null.': 'DataAccessStringId.TableNullValidationException',
+            'Grouping requires at least one aggregated column.': 'DataAccessStringId.GroupByWithoutAggregateValidationException',
+            'CSV Files': 'DataAccessStringId.FileNameFilter_CSV',
+            'Constants': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Constants',
+            'Loading data source': 'DataAccessStringId.LoadingDataSourcePanelText',
+            'Functions': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions',
+            'Please wait': 'DataAccessStringId.ConnectingToDatabaseCaption',
+            'Table Selection': 'DataAccessStringId.QueryPropertyGridTableSelectionCategoryName',
+            'Cannot set relation between columns \'{0}\'.\'{1}\' of type {2} and \'{3}\'.\'{4}\' of type {5}.': 'DataAccessStringId.RelationException',
+            'Operators': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Operators',
+            'Column{0}': 'DataAccessStringId.EmptyColumnAliasPattern',
+            'Space': 'DataAccessStringId.ExcelWizard_ValueSeparator_Space',
+            'The collection already contains the \'{0}\' item': 'DataAccessStringId.MessageDuplicateItem',
+            'Comma': 'DataAccessStringId.ExcelWizard_ValueSeparator_Comma',
+            'One or more queries have failed to execute.': 'DataAccessStringId.QueriesFailedToExecute_ExceptionMessage',
+            '{0} of {1}...': 'DataAccessStringId.LoadingDataSourcePanelCounter',
+            ' (from the Server Explorer)': 'DataAccessStringId.ConnectionStringPostfixServerExplorer',
+            'Type: {0}': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_ColumnDescriptionFormat',
+            'column': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Columns_Tooltip',
+            'The column name is not specified.': 'DataAccessStringId.UnnamedColumnValidationException',
+            'There are no tables containing column [{0}], which is used in the custom expression.': 'DataAccessStringId.CustomExpressionWithColumnOfMissingTableValidationException',
+            'Invalid column: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_InvalidColumn',
+            'Connection name: {0}\r\n Error message:\r\n{1}\r\n': 'DataAccessStringId.DatabaseConnectionExceptionMessage',
+            'The following column is used as a sorting criterion more than once: "{0}"."{1}".': 'DataAccessStringId.SortingBySameColumnTwiceValidationException',
+            'Left outer join': 'DataAccessStringId.RelationEditorRelationTypeLeftOuterJoin',
+            'Semicolon': 'DataAccessStringId.ExcelWizard_ValueSeparator_Semicolon',
+            'The following database provider is not supported: {0}.': 'DataAccessStringId.ProviderNotSupportedException',
+            'Parameter name mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcParamNameValidationException',
+            'The specified alias already exists.': 'DataAccessStringId.QueryBuilderAliasAlreadyExists',
+            'Item name \'{0}\' contains wrong characters': 'DataAccessStringId.MessageWrongCharacterItemName',
+            'Cannot group by an aggregate column: "{0}"."{1}".': 'DataAccessStringId.GroupByAggregateColumnValidationException',
+            'Char': 'DataAccessStringId.Type_Char',
+            'Non-negative number (8 bit integer)': 'DataAccessStringId.Type_Byte',
+            'Non-negative number (32 bit integer)': 'DataAccessStringId.Type_UInt',
+            'The reference table has not been selected: "{0}".': 'DataAccessStringId.RelationTableNotSelectedValidationException',
+            'The SQL string is null or empty.': 'DataAccessStringId.SqlStringEmptyValidationException',
+            'function': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions_Tooltip',
+            'Non-negative number (16 bit integer)': 'DataAccessStringId.Type_UShort',
+            'A relation cannot be null.': 'DataAccessStringId.RelationNullValidationException',
+            'A column with the following name already exists: "{0}"."{1}".': 'DataAccessStringId.DuplicatingColumnNamesValidationException',
+            'Logical': 'DataAccessStringId.ExpressionEditor_FunctionCategory_Logical',
+            'The column name [{0}], which is used in the filter string, is ambiguous. Columns with this name exist in the following tables: {1}.': 'DataAccessStringId.FilterByAmbiguousColumnValidationException',
+            'Cannot find the following connection in the config file: {0}.': 'DataAccessStringId.ConnectionNotFoundInConfig_ExceptionMessage',
+            'Invalid port number. A port number should be between 0 and 65535 inclusive.': 'DataAccessStringId.InvalidPortErrorMessage',
+            'Invalid expression.': 'DataAccessStringId.ExpressionEditor_InvalidExpression',
+            'Rebuilding the Result Schema...': 'DataAccessStringId.RebuildResultSchemaWaitFormText',
+            'Common': 'DataAccessStringId.QueryPropertyGridCommonCategoryName',
+            'Not all parts of the expression are specified.': 'DataAccessStringId.QueryBuilderJoinEditorMissingData',
+            'Connection parameters were discarded because the {0} provider is not supported. \r\nSelect one of the available data providers and specify connection parameters or close the wizard \r\nusing the Close button to undo this change.': 'DataAccessStringId.ConnectionPropertiesPage_ProviderNotSupported',
+            'The protected file cannot be opened.': 'DataAccessStringId.ExcelEncryptedFileException_EncryptionTypeNotSupported',
+            'The collection of tables cannot be empty.': 'DataAccessStringId.NoTablesValidationException',
+            'Group filtering cannot be applied to data that is not grouped. Please apply data grouping first.': 'DataAccessStringId.GroupFilterStringEditorNoGroups',
+            'The SKIP setting is set while records are not sorted. Please apply sorting to be able to skip the first N records or reset the SKIP setting in the Filter Editor dialog.': 'DataAccessStringId.SkipWithoutSortingValidationException',
+            'The connection has been cancelled.': 'DataAccessStringId.ConnectionAborted_ExceptionMessage',
+            'Custom connection string': 'DataAccessStringId.WizardCustomConnectionString',
+            'Column [{0}].[{1}] is used in the custom expression, but is missing in DBSchema.': 'DataAccessStringId.CustomExpressionWithMissingInSchemaColumnValidationException',
+            'Stored Procedure': 'DataAccessStringId.QueryPropertyGridStoredProcCategoryName',
+            'Some of the query features are not supported for XML files.': 'DataAccessStringId.XmlProviderNotSupportedLabel',
+            'The column name [{0}], which is used in the custom expression, is ambiguous. Columns with this name exist in the following tables: {1}.': 'DataAccessStringId.CustomExpressionWithAmbiguousColumnValidationException',
+            'The name of a stored procedure cannot be null.': 'DataAccessStringId.StoredProcNameNullValidationException',
+            'An expression cannot be null, either column or custom expression expected.': 'DataAccessStringId.ExpressionNullValidationException',
+            'Column [{0}].[{1}] is used in the filter string, but is missing in DBSchema.': 'DataAccessStringId.FilterByMissingInSchemaColumnValidationException',
+            'Inner join': 'DataAccessStringId.RelationEditorRelationTypeInnerJoin',
+            'Schema loading...': 'DataAccessStringId.ExcelDataSource_SchemaLoadingText',
+            'The specified relation is incomplete: "{0}".': 'DataAccessStringId.IncompleteRelationValidationException',
+            'Number (8 bit integer)': 'DataAccessStringId.Type_SByte',
+            'The password is not correct. Please try again.': 'DataAccessStringId.ExcelEncryptedFileException_WrongPassword',
+            'Non-negative number (64 bit integer)': 'DataAccessStringId.Type_ULong',
+            'Master-detail relation': 'DataAccessStringId.RelationEditorRelationTypeMasterDetail',
+            'Column not found: \'{0}\'.\'{1}\'.': 'DataAccessStringId.ResultRelation_ColumnNotFoundError',
+            'A query with the specified name already exists: {0}.': 'DataAccessStringId.MessageDuplicateQueryName',
+            ' (in the config file)': 'DataAccessStringId.ConnectionStringPostfixAppConfig',
+            'The query name cannot be empty.': 'DataAccessStringId.MessageEmptyQueryName',
+            'A grouping criteria cannot be null.': 'DataAccessStringId.GroupNullValidationException',
+            'Unable to load the {0} assembly for the {1} context. Please choose an existing external assembly and/or existing context.': 'DataAccessStringId.MessageCannotLoadCustomAssembly',
+            'Unknown': 'DataAccessStringId.UnknownType',
+            'Manual editing of custom SQL is not allowed. The current query is represented by a custom SQL query string, \r\nwhich will be lost if you proceed with editing the query using the Query Builder dialog. \r\n\r\nDo you want to discard the custom SQL and proceed with the Query Builder?': 'DataAccessStringId.ConfigureQueryPage_CustomSqlWillBeLost',
+            'The specified relation does not contain key columns: "{0}".': 'DataAccessStringId.NoRelationColumnsValidationException',
+            'The following aggregate function is not supported: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_NotSupportedAggregateFunction',
+            'A database does not contain tables or views and does not support SQL editing. To be able to run the Query Builder, make sure that your database contains at least one table or supports SQL editing.': 'DataAccessStringId.QueryBuilderNoTablesAndViews',
+            'Group filtering criteria are defined while data is not grouped. Please apply data grouping or remove group filtering criteria on the Group Filter tab of the Filter Editor dialog.': 'DataAccessStringId.HavingWithoutGroupByValidationException',
+            'default': 'DataAccessStringId.ParameterlessConstructor',
+            'A sorting criteria cannot be null.': 'DataAccessStringId.SortingNullValidationException',
+            'The schema does not contain the specified table: "{0}".': 'DataAccessStringId.TableNotInSchemaValidationException',
+            'There are no tables containing column [{0}], which is used in the filter string.': 'DataAccessStringId.FilterByColumnOfMissingTableValidationException',
+            'Cannot parse the following expression string: "{0}".': 'DataAccessStringId.InvalidExpressionStringValidationException',
+            'Certain columns on the select list are invalid because they are not contained in either an aggregate function or in the Group By clause. Apply aggregation/grouping either to all columns or to none of them.': 'DataAccessStringId.PartialAggregationValidationException',
+            'none': 'DataAccessStringId.ParameterListEmpty',
+            'Cannot sort by an aggregate column: {0}({1}), because the query is not aggregated.': 'DataAccessStringId.SortByAggregateColumnValidationException',
+            '(All Tables)': 'DataAccessStringId.QueryBuilder_AllTables',
+            'Invalid function: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_InvalidCustomFunction',
+            '{0} on {1}': 'DataAccessStringId.QueryDesignerJoinExpressionPattern',
+            'Top and Skip properties should be non-negative integer.': 'DataAccessStringId.NegativeTopSkipValidationException',
+            '{0}\r\nFile not found.\r\nCheck the file name and try again.': 'DataAccessStringId.ExcelDataSource_FileNotFoundMessage',
+            'Parameter count mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcParamCountValidationException',
+            'null': 'DataAccessStringId.ParameterListNull',
+            'The following query features are not supported for XML files:\r\n\t• custom expression in columns;\r\n\t• asterisk;\r\n\t• records count;\r\n\t• distinct.\r\nTo proceed, remove these features from the query or switch to the use of another data provider.': 'DataAccessStringId.XmlProviderNotSupportedFeatureException',
+            'Excel Workbooks': 'DataAccessStringId.FileNameFilter_Excel',
+            'Cannot get item properties from IListSource without default constructor.': 'DataAccessStringId.ODSWizardErrorNoDefaultCtor',
+            'Only non-negative numeric values are allowed.': 'DataAccessStringId.PositiveIntegerError',
+            'Aggregate': 'DataAccessStringId.ExpressionEditor_FunctionCategory_Aggregate',
+            'A custom SQL query should contain only SELECT statements.': 'DataAccessStringId.CustomSqlQueryValidationException',
+            'Gathering types information...': 'DataAccessStringId.GatheringTypesPanelText',
+            'The table name is not specified.': 'DataAccessStringId.UnnamedTableValidationException',
+            'The name cannot be null, empty or contain only whitespaces.': 'DataAccessStringId.WizardEmptyConnectionNameMessage',
+            'The schema does not contain the following column: "{0}"."{1}".': 'DataAccessStringId.ColumnNotInSchemaValidationException',
+            'Parameter type mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcParamTypeValidationException',
+            'One or more queries have failed to validate.': 'DataAccessStringId.QueriesFailedToValidate_ExceptionMessage',
+            'Incorrect file format': 'DataAccessStringId.ExcelInvalidFileException_WrongFormat',
+            'Loading Data...': 'DataAccessStringId.LoadingDataPanelText',
+            'Can join {0}': 'DataAccessStringId.QueryBuilderCanJoin',
+            'Query \'{0}\' does not exist.': 'DataAccessStringId.MessageNonexistentQuery',
+            'Custom SQL': 'DataAccessStringId.QueryPropertyGridCustomSqlCategoryName',
+            'No column has been selected. Please select at least one column to proceed.': 'DataAccessStringId.QueryBuilderNothingSelected',
+            'Parameter name \'{0}\' contains wrong characters': 'DataAccessStringId.MessageWrongCharacterParameterName',
+            'This collection already contains an item with the \'{0}\' name': 'DataAccessStringId.MessageDuplicateItemName',
+            'Failed to connect to the database. To learn more, see the exception details. \r\n\r\nException details:\r\n {0}': 'DataAccessStringId.DatabaseConnectionExceptionStringId',
+            'Cannot add a null value to the collection': 'DataAccessStringId.MessageNullItem',
+            'One or more relations are invalid. \r\nTo learn about the error details, click Manage Relations.': 'DataAccessStringId.ConfigureMultiQueryPage_ValidateRelationError',
+            'Column \'{0}\'.\'{1}\' does not exist.': 'DataAccessStringId.MessageNonexistentColumn',
+            'Joined on {0}': 'DataAccessStringId.QueryBuilderJoinedOn',
+            'A parameter cannot be null.': 'DataAccessStringId.StoredProcParamNullValidationException',
+            'A table with the following name already exists: "{0}".': 'DataAccessStringId.DuplicatingTableNamesValidationException',
+            'Query {0} failed to execute.': 'DataAccessStringId.SqlQueryExecutionException',
+            'Connecting to the database...': 'DataAccessStringId.ConnectingToDatabaseMessage',
+            'parameter': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Parameters_Tooltip',
+            'A password is required to open this workbook.': 'DataAccessStringId.ExcelEncryptedFileException_PasswordRequired',
+            '* (All Columns)': 'DataAccessStringId.QueryBuilder_AllColumns',
+            'The expression string cannot be empty.': 'DataAccessStringId.ExpressionEditor_EmptyExpression',
+            'constant': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Constants_Tooltip',
+            'None of the tables contain any columns.': 'DataAccessStringId.NoColumnsValidationException',
+            'Cannot load this assembly for security reasons.': 'DataAccessStringId.WizardAssemblyLoadingDisallowed',
+            'No connection has been specified.': 'DataAccessStringId.ConnectionNotSpecified_ExceptionMessage',
+            'The following tables have no relations: "{0}".': 'DataAccessStringId.TablesNotRelatedValidationException',
+            'XML Files': 'DataAccessStringId.XmlFileStrategy_FileNameFilter',
+            'Error trying to execute an SQL query{0}{1}.{2}Error: {3}': 'DataAccessStringId.SqlExecutionException',
+            'The schema does not contain the following relation column: "{0}"."{1}".': 'DataAccessStringId.RelationColumnNotInSchemaValidationException',
+            'A data member \'{0}\' does not exist.': 'DataAccessStringId.ODSErrorMissingMember',
+            'Item name cannot be null or an empty string': 'DataAccessStringId.MessageInvalidItemName',
+            'Loading the data sources referenced in this file may harm your computer. Was this file obtained from a trusted source?\r\n\r\nClick \'Yes\' to load the data source content as is.\r\nClick \'No\' to load only trusted data source content.': 'DataAccessStringId.ObjectDataSourceLoadingWarningMessage',
+            ', ': 'DataAccessStringId.QueryDesignerJoinExpressionElementSeparator',
+            '[{0}] {1} join [{2}] on {3}': 'DataAccessStringId.QueryDesignerJoinTooltipPattern',
+            'The relation column cannot be null.': 'DataAccessStringId.RelationColumnNullValidationException',
+            'No table has been selected. Please select at least one table to proceed.': 'DataAccessStringId.QueryBuilderNoTablesSelected',
+            'Cannot find the specified stored procedure: "{0}".': 'DataAccessStringId.StoredProcNotInSchemaValidationException',
+            'Math': 'DataAccessStringId.ExpressionEditor_FunctionCategory_Math',
+            'The file is corrupt.': 'DataAccessStringId.ExcelInvalidFileException_CorruptedFile',
+            'All Supported Formats': 'DataAccessStringId.FileNameFilter_AllFormats',
+            ' with parameters:{0}{1}': 'DataAccessStringId.SqlExecutionException_WithParameters',
+            'operator': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Operators_Tooltip',
+            'Circular relations have been detected.': 'DataAccessStringId.CircularRelationsValidationException',
+            'BIFF5 (Excel 5.0/95) XLS file format is not supported.': 'DataAccessStringId.ExcelInvalidFileException_BIFF5Format',
+            'An expression string cannot be null': 'DataAccessStringId.ExpressionStringNullValidationException',
+            'Please click the \'Filter...\' button to correct the filter string.': 'DataAccessStringId.QueryBuilderInvalidFilter',
+            'Invalid sorting column "{0}"."{1}". Results of a TableQuery containing aggregate functions can only be sorted by columns used as grouping criteria.': 'DataAccessStringId.AggregateQueryInvalidSortingValidationException',
+            'The type is static and it does not have any members returning IEnumerable.': 'DataAccessStringId.ODSWizardErrorStaticValue',
+            'The following table is not in tables list, but its column is used: "{0}".': 'DataAccessStringId.TableNotSelectedValidationException',
+            'The GetItemProperties method of an ITypedList has thrown an exception.': 'DataAccessStringId.ODSWizardErrorExceptionInGetItemProperties',
+            'Tab': 'DataAccessStringId.ExcelWizard_ValueSeparator_Tab',
+            'A column cannot be null.': 'DataAccessStringId.ColumnNullValidationException',
+            'Invalid parameter: \'{0}\'.': 'DataAccessStringId.ExpressionEditor_InvalidParameter',
+            'An aggregate column should have an alias.': 'DataAccessStringId.AggregationWithoutAliasValidationException',
+            'The connection string contains no XpoProvider key or the specified key is invalid. \r\n\r\nException details:\r\n {0}': 'DataAccessStringId.NoXpoProviderStringId',
+            'The SKIP setting is set while records are not sorted. Please apply sorting to be able to skip the first N records.': 'DataAccessStringId.SkipWithoutSortingPropertyGridError',
+            'Data Preview': 'DataAccessUIStringId.DataPreviewForm_Title',
+            'Select the data provider and specify the connection properties.': 'DataAccessUIStringId.WizardPageConnectionProperties',
+            'Edit...': 'DataAccessUIStringId.EFDataSourceDesignerVerbEdit',
+            'Query Editor': 'DataAccessUIStringId.QueryEditorTitle',
+            'The column name cannot be empty.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns_ColumnNameEmptyError',
+            'Retrieve the actual data': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveData',
+            'Skip hidden columns': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipHiddenColumns',
+            'Excel File': 'DataAccessUIStringId.DSTypeExcel',
+            'Cannot resolve the specified object type. To specify the object’s assembly, return type, data member and/or constructor parameters, use the Data Source editor.': 'DataAccessUIStringId.ODSEditorsCannotResolveDataSource',
+            'Select an assembly containing the class type definition of a data source.': 'DataAccessUIStringId.WizardPageChooseObjectAssembly',
+            'Retrieve the data source schema': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveSchema',
+            'Port:': 'DataAccessUIStringId.ConnectionProperties_Port',
+            'Rebuild Result Schema': 'DataAccessUIStringId.SqlDataSourceDesignerVerbRebuildSchema',
+            'Error message:\r\n{0}\r\n': 'DataAccessUIStringId.LoadingDataCustomError',
+            'The expression contains errors.': 'DataAccessUIStringId.ExpressionEditor_ExpressionContainsErrors',
+            'Is less than': 'DataAccessUIStringId.JoinEditorLessOperator',
+            'The FileName and SourceOptions properties should be assigned.': 'DataAccessUIStringId.UpdateSchemaDataSourceIsNotReady',
+            'Manage Stored Procedures': 'DataAccessUIStringId.EFStoredProcsEditorTitle',
+            'Trim blanks': 'DataAccessUIStringId.WizardPageChooseFileOptions_TrimBlanks',
+            'Worksheet': 'DataAccessUIStringId.ExcelDataSourceWizard_WorksheetItem',
+            'Sorting Type': 'DataAccessUIStringId.QueryBuilderColumns_SortingType',
+            'An error occurred during query validation: {0}\r\nUpdate the connection settings so that they match the database schema or discard this query.': 'DataAccessUIStringId.FilterStringEditorInvalidQuery',
+            'Skip hidden rows': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipHiddenRows',
+            'The {0} data member cannot receive parameters, because this is a method without parameters.': 'DataAccessUIStringId.ODSEditorsNoParametersMessage',
+            'Yes, let me choose from list': 'DataAccessUIStringId.WizardPageChooseEFConnectionString_ChooseConnection',
+            'No, I\'d like to specify the connection parameters myself': 'DataAccessUIStringId.WizardPageChooseConnection_SpecifyCustomConnection',
+            'Do you want to use an existing data connection?': 'DataAccessUIStringId.WizardPageChooseConnection',
+            'Request Database Schema': 'DataAccessUIStringId.UpdateDBSchemaCaption',
+            'records starting with index': 'DataAccessUIStringId.FiltersView_TopAndSkipText',
+            'Newline type:': 'DataAccessUIStringId.WizardPageChooseFileOptions_NewLineType',
+            'Unable to load data into one or several datasources. See information below for details.': 'DataAccessUIStringId.ErrorFormDatasourceInitializationText',
+            'Edit Relation': 'DataAccessUIStringId.MasterDetailEditorEditRelation',
+            'Create Query Parameter': 'DataAccessUIStringId.QueryFilter_CreateQueryParameter',
+            'Query': 'DataAccessUIStringId.ParametersColumn_QueryName',
+            '<select a parameter>': 'DataAccessUIStringId.QueryFilter_SelectParameter',
+            'Select an object to include in your data source': 'DataAccessUIStringId.WizardFinishPageText',
+            'The current security policy prohibits loading of third-party assemblies.\r\n\r\nClick OK to discard the current data source settings and configure them from scratch.\r\nClick Cancel to keep the current settings without configuring the data source': 'DataAccessUIStringId.EFConnectionEditorMessageCustomAssembliesProhibited',
+            'Show only highlighted members': 'DataAccessUIStringId.WizardPageChooseObjectMember_ShowOnlyHighlighted',
+            'The connection uses server authentication.\r\nDo you want to save the user name and password?': 'DataAccessUIStringId.WizardPageSaveConnection_SaveCredentialsQuestion',
+            'Select a data source constructor.': 'DataAccessUIStringId.WizardPageChooseObjectConstructor',
+            'Select only distinct values': 'DataAccessUIStringId.FiltersView_Distinct',
+            'Column with \'{0}\' name allready exists.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns_ColumnExist',
+            'Password:': 'DataAccessUIStringId.ConnectionProperties_Password',
+            'Delete Relation': 'DataAccessUIStringId.QueryBuilder_DeleteRelation',
+            'Configure Data Member': 'DataAccessUIStringId.ODSDataMemberEditorTitle',
+            'Remove from Query': 'DataAccessUIStringId.QueryBuilder_RemoveFromSelect',
+            'Culture:': 'DataAccessUIStringId.WizardPageChooseFileOptions_Culture',
+            'Windows authentication': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_MSSqlWindows',
+            'Do not select a member, bind to the entire object.': 'DataAccessUIStringId.WizardPageChooseObjectMember_BindToObject',
+            'Provider:': 'DataAccessUIStringId.ConnectionProperties_Provider',
+            'Choose a data context.': 'DataAccessUIStringId.WizardPageChooseEFContext',
+            'Add a relation to the detail query': 'DataAccessUIStringId.MasterDetailEditorAddRelationMessage',
+            'Local': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeLocal',
+            'Preview...': 'DataAccessUIStringId.Button_Preview',
+            'Select the data source type.': 'DataAccessUIStringId.WizardPageChooseDSType',
+            'Warning': 'DataAccessUIStringId.MessageBoxWarningTitle',
+            'Specify the method parameters.': 'DataAccessUIStringId.WizardPageObjectMemberParameters',
+            'Cannot use a constructor to create an object of the {0} type that is a static or abstract class, or interface.': 'DataAccessUIStringId.ODSEditorsAbstractTypeMessage',
+            'Validating query...': 'DataAccessUIStringId.QueryEditorWaitFormValidating',
+            'Select a member to bind.': 'DataAccessUIStringId.WizardPageChooseObjectMember_BindToMember',
+            'Skip empty rows': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipEmptyRows',
+            'Select a data source type.': 'DataAccessUIStringId.WizardPageChooseObjectType',
+            'Data loading failed because the exception occurred.': 'DataAccessUIStringId.LoadingDataException',
+            'Output': 'DataAccessUIStringId.QueryBuilderColumns_Output',
+            'Connection string:': 'DataAccessUIStringId.ConnectionProperties_ConnectionString',
+            'Filter Editor': 'DataAccessUIStringId.FiltersView',
+            'Join {0}': 'DataAccessUIStringId.QueryDesignControlJoinCommandPattern',
+            'Preview Results...': 'DataAccessUIStringId.QueryBuilderButtons_PreviewResults',
+            'Connection name: {0}\r\nError message: {1}': 'DataAccessUIStringId.ConnectionErrorFormDetailPattern',
+            'Connection error': 'DataAccessUIStringId.DataConnectionParametersDialog',
+            'Sort Ascending': 'DataAccessUIStringId.QueryBuilder_SortAscending',
+            'Database:': 'DataAccessUIStringId.ConnectionProperties_Database',
+            'Bind To': 'DataAccessUIStringId.QueryFilter_BindTo',
+            'The following errors occurred during query validation:{0}': 'DataAccessUIStringId.MasterDetailEditorMultipleValidationErrorsMessage',
+            'Cannot find the specified query: "{0}". Specify an existing query name before selecting a column.': 'DataAccessUIStringId.MasterDetailEditorInvalidColumnQueryNameMessage',
+            'Add Query Parameter': 'DataAccessUIStringId.QueryFilter_AddQueryParameter',
+            'Group By': 'DataAccessUIStringId.QueryBuilderColumns_GroupBy',
+            'The data source schema has been updated successfully.': 'DataAccessUIStringId.UpdateSchemaComplete',
+            'Invalid property: \'{0}\'.': 'DataAccessUIStringId.ExpressionEditor_InvalidProperty',
+            '<b>A data source with the specified name already exists</b>': 'DataAccessUIStringId.WizardDataSourceNameExistsMessage',
+            'Yes, save the connection as:': 'DataAccessUIStringId.WizardPageSaveConnection_ConfirmSaving',
+            'Create a query or select a stored procedure.\r\nData columns selected from specific tables and/or views will be automatically included into a separate query.': 'DataAccessUIStringId.WizardPageConfigureMultiQuery',
+            '{0} invalid relation(s)': 'DataAccessUIStringId.MasterDetailEditorLabelInvalidRelationsText',
+            '<Select a column>': 'DataAccessUIStringId.JoinEditorEmptyColumnText',
+            'Specify a custom connection string': 'DataAccessUIStringId.WizardPageEFConnectionProperties_CustomConnection',
+            'Allow Edit SQL': 'DataAccessUIStringId.QueryBuilder_AllowEdit',
+            'Error has occurred during loading databases list.': 'DataAccessUIStringId.MessageCannotLoadDatabasesList',
+            'Query Builder': 'DataAccessUIStringId.QueryBuilder',
+            'Add stored procedures to the data source, configure their parameters and preview the result.': 'DataAccessUIStringId.WizardPageConfigureStoredProcedures',
+            'Cannot connect to the database using the specified connection parameters.\r\nSpecify the correct connection parameters and click OK.\r\nThese parameters will not be saved after closing this dialog window.': 'DataAccessUIStringId.DataConnectionParametersDialog_Header_UnableConnect',
+            'Alias': 'DataAccessUIStringId.QueryBuilderColumns_Alias',
+            'Join Editor': 'DataAccessUIStringId.JoinEditor',
+            'SQL execution error:\r\n{0}\r\n': 'DataAccessUIStringId.LoadingDataSqlError',
+            'Enter the data source name': 'DataAccessUIStringId.WizardPageChooseDataSourceName',
+            'Use values of the first row as field names': 'DataAccessUIStringId.WizardPageChooseFileOptions_FirstRowAsFieldNames',
+            'Save the connection string.': 'DataAccessUIStringId.WizardPageSaveConnection',
+            'Do you want to select a connection string from the list of available settings?': 'DataAccessUIStringId.WizardPageChooseEFConnectionString',
+            'Client ID:': 'DataAccessUIStringId.ConnectionProperties_ClientID',
+            'The {0} data source type does not provide any members suitable for binding.': 'DataAccessUIStringId.ODSEditorsNoMembersInType',
+            'The specified alias already exists. Do you want to correct the value?': 'DataAccessUIStringId.QueryDesignControlAliasAlreadyExists',
+            'ObjectDataSource Wizard': 'DataAccessUIStringId.WizardTitleODS',
+            'Cannot retrieve the list of available databases. See the details below.': 'DataAccessUIStringId.WizardCannotRetrieveDatabasesMessage',
+            'Select a stored procedure:': 'DataAccessUIStringId.StoredProcControl_Caption',
+            'Server type:': 'DataAccessUIStringId.ConnectionProperties_ServerType',
+            'Server name:': 'DataAccessUIStringId.ConnectionProperties_ServerName',
+            'Show only highlighted assemblies': 'DataAccessUIStringId.WizardPageChooseObjectAssembly_ShowOnlyHighlighted',
+            'Hostname:': 'DataAccessUIStringId.ConnectionProperties_Hostname',
+            'Configure Connection...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbEditConnection',
+            'Remote': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeRemote',
+            'Manage Queries...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbManageQueries',
+            'Key file': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_BigQueryKeyFile',
+            'Columns of {0}': 'DataAccessUIStringId.QueryBuilderColumnsOf',
+            'Show only highlighted types': 'DataAccessUIStringId.WizardPageChooseObjectType_ShowOnlyHighlighted',
+            'Cannot create a relation between two columns that belong to the same table {0}.': 'DataAccessUIStringId.QueryBuilderRelationBetweenTwoColumnsOfTheSameTable',
+            'Select only': 'DataAccessUIStringId.FiltersView_CheckText',
+            'The object data source automatically creates an instance of the specified type by using one of the available constructors. If only one constructor is available, this constructor will be used.': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveDataDescription',
+            'Save the connection string to config file as:': 'DataAccessUIStringId.WizardPageEFConnectionProperties_SaveToConfig',
+            'The current operation cannot be accomplished unless the data source has been specified.': 'DataAccessUIStringId.ODSEditorsNoDataSetMessage',
+            'The new join type will be applied to all existing relations between the following two tables: {0}, {1}. Do you wish to continue?': 'DataAccessUIStringId.QueryBuilderJoinTypeUpdatingConfirmation',
+            'The {0} data member is a property. To be able to receive parameters, a data member must be a method.': 'DataAccessUIStringId.ODSEditorsIsPropertyMessage',
+            'Excel Data Source Editor': 'DataAccessUIStringId.ExcelDataSourceEditorTitle',
+            'Edit Relations for the \'{0}\' Query': 'DataAccessUIStringId.MasterDetailEditorEditQueryRelations',
+            'Cannot find the specified query: "{0}". Specify an existing query name.': 'DataAccessUIStringId.MasterDetailEditorInvalidQueryNameMessage',
+            'Show only highlighted constructors': 'DataAccessUIStringId.WizardPageChooseObjectConstructor_ShowOnlyHighlighted',
+            'Yes, let me choose an existing connection from the list': 'DataAccessUIStringId.WizardPageChooseConnection_ChooseExistingConnection',
+            'Use default connection string': 'DataAccessUIStringId.WizardPageEFConnectionProperties_DefaultConnection',
+            'Connection Editor': 'DataAccessUIStringId.ConnectionEditorTitle',
+            'Specify import settings.': 'DataAccessUIStringId.WizardPageChooseFileOptions',
+            'Server authentication': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_MSSqlServer',
+            'OAuth': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_BigQueryOAuth',
+            'Not enough memory to load data': 'DataAccessUIStringId.LoadingDatasourceOutOfMemoryError',
+            'Error loading file': 'DataAccessUIStringId.PasswordRequest',
+            'A table with the specified name already exists. Please specify a different table name.': 'DataAccessUIStringId.QueryDesignControlTableNameAlreadyExists',
+            'Delete Condition': 'DataAccessUIStringId.QueryBuilder_DeleteCondition',
+            'Do you want to execute the query on the server and obtain the resulting query schema?': 'DataAccessUIStringId.WizardConfirmExecutionMessage',
+            'Value separator:': 'DataAccessUIStringId.WizardPageChooseFileOptions_ValueSeparator',
+            'Entity Framework Data Member Editor': 'DataAccessUIStringId.EFDataMemberEditorTitle',
+            'Run Query Builder...': 'DataAccessUIStringId.Button_QueryBuilder',
+            'Join type:': 'DataAccessUIStringId.JoinEditor_JoinType',
+            '<b>The data source name cannot be empty.</b>': 'DataAccessUIStringId.WizardDataSourceEmptyNameMessage',
+            'Configure Constructor Settings': 'DataAccessUIStringId.ODSConstructorEditorTitle',
+            'Configure Parameters': 'DataAccessUIStringId.ODSParametersEditorTitle',
+            'The \'{0}\'.\'{1}\' and \'{3}\'.\'{4}\' columns have different types ({2} and {5}). Do you wish to continue?': 'DataAccessUIStringId.MasterDetailEditorColumnsHasDifferentTypesConfirmation',
+            'Select an Excel workbook or CSV file.': 'DataAccessUIStringId.WizardPageChooseFile',
+            'Remove the relation': 'DataAccessUIStringId.MasterDetailEditorRemoveRelationMessage',
+            'Only the data source schema is retrieved from the specified object, without feeding the actual data.\r\n\r\nTo manually retrieve the actual data, create a data source object’s instance in code and assign it to the ObjectDataSource.DataSource property.': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode_RetrieveSchemaDescription',
+            'Is greater than': 'DataAccessUIStringId.JoinEditorGreaterOperator',
+            'Database': 'DataAccessUIStringId.DSTypeSql',
+            'This action will reset the SQL expression, and all your changes will be discarded. Do you want to continue?': 'DataAccessUIStringId.QueryDesignControlExpressionChanged',
+            'Database List Loading Error': 'DataAccessUIStringId.ConnectionProperties_DatabaseListLoadingError',
+            'Connection name: {0}\r\nError message:\r\n{1}\r\n': 'DataAccessUIStringId.LoadingDataSourceOpeningConnectionError',
+            'Select the required worksheet, table or defined name referring to the specified range.': 'DataAccessUIStringId.WizardPageChooseExcelFileDataRange',
+            'You are about to load a third-party library: \'{0}\'.\r\n\r\nBefore you proceed, please consider resulting security risks and make sure that this library is supplied from a trusted source.': 'DataAccessUIStringId.CustomAssemblyWarning',
+            'Group Filter': 'DataAccessUIStringId.FiltersView_GroupFilter',
+            'At least two queries are required to create a master-detail relation.': 'DataAccessUIStringId.MessageLessThanTwoQueries',
+            'Service account email:': 'DataAccessUIStringId.ConnectionProperties_ServiceAccountEmail',
+            'Confirmation': 'DataAccessUIStringId.MessageBoxConfirmationTitle',
+            'Sort Descending': 'DataAccessUIStringId.QueryBuilder_SortDescending',
+            'To view the errors, click the drop-down button in the editor\'s status bar.': 'DataAccessUIStringId.ExpressionEditor_NavigateToErrors',
+            'Filter': 'DataAccessUIStringId.FiltersView_Filter',
+            'Encoding:': 'DataAccessUIStringId.WizardPageChooseFileOptions_Encoding',
+            'An error occurred during query validation: {0}\r\n\r\nTo discard this query and invoke the wizard, click OK.\r\n\r\nTo keep this query, click Cancel.': 'DataAccessUIStringId.QueryEditorMessageInvalidQuery',
+            '<Select a table>': 'DataAccessUIStringId.JoinEditorEmptyTableText',
+            'Embedded': 'DataAccessUIStringId.ConnectionProperties_ServerTypeEmbedded',
+            'Expression Editor': 'DataAccessUIStringId.ExpressionEditorViewTitle',
+            'Selected': 'DataAccessUIStringId.ParametersColumn_Selected',
+            'Update schema': 'DataAccessUIStringId.UpdateSchemaCaption',
+            'Select a data connection.': 'DataAccessUIStringId.WizardPageChooseConnectionNoChoice',
+            'Configure query parameters and preview the result.': 'DataAccessUIStringId.WizardPageConfigureParameters',
+            'Entity Framework Data Source Editor': 'DataAccessUIStringId.EFDataSourceEditorTitle',
+            'Client Secret:': 'DataAccessUIStringId.ConnectionProperties_ClientSecret',
+            'Data loading has been aborted.': 'DataAccessUIStringId.LoadingDataSourceAborted',
+            'Entity Framework': 'DataAccessUIStringId.DSTypeEF',
+            'Key file name:': 'DataAccessUIStringId.ConnectionProperties_KeyFileName',
+            'Server': 'DataAccessUIStringId.ConnectionProperties_ServerTypeServer',
+            'Cannot create an empty data source. Please select an object to include.': 'DataAccessUIStringId.WizardCannotCreateDataSourceMessage',
+            'Bound to {0}': 'DataAccessUIStringId.QueryFilter_BoundTo',
+            'Detect automatically': 'DataAccessUIStringId.WizardPageChooseFileOptions_DetectAutomatically',
+            'DataSet ID:': 'DataAccessUIStringId.ConnectionProperties_DataSetID',
+            'Unsorted': 'DataAccessUIStringId.SortingTypeNone',
+            'Query Parameters': 'DataAccessUIStringId.ParametersGridForm_Title',
+            'Cannot resolve the specified data member. To specify the data member and its parameters, use the Data Member editor.': 'DataAccessUIStringId.ODSEditorsCannotResolveDataMember',
+            'A relation with the specified name already exists.': 'DataAccessUIStringId.MasterDetailEditorInvalidRelationNameMessage',
+            'The query contains parameters and cannot be executed before they are declared. \r\nPlease go to the next wizard page to declare the required query parameters and preview the results.': 'DataAccessUIStringId.QueryBuilderCustomSqlRequiresParameters',
+            'Create a new condition': 'DataAccessUIStringId.MasterDetailEditorAddConditionMessage',
+            'Cannot find the specified column: "{0}". Specify an existing column name.': 'DataAccessUIStringId.MasterDetailEditorInvalidColumnNameMessage',
+            'Result schema is rebuilt successfully.': 'DataAccessUIStringId.RebuildResultSchemaComplete',
+            'SQL string:': 'DataAccessUIStringId.QueryControl_SqlString',
+            'Specify a connection string.': 'DataAccessUIStringId.WizardPageEFConnectionProperties',
+            'Manage Relations...': 'DataAccessUIStringId.SqlDataSourceDesignerVerbManageRelations',
+            'Join Information': 'DataAccessUIStringId.JoinInformation',
+            'Database schema is updated successfully.': 'DataAccessUIStringId.UpdateDBSchemaComplete',
+            'No, specify a custom connection string': 'DataAccessUIStringId.WizardPageChooseEFConnectionString_CustomConnection',
+            'Authentication type:': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType',
+            'Filter...': 'DataAccessUIStringId.QueryBuilderButtons_Filter',
+            'Yes, save all required parameters': 'DataAccessUIStringId.WizardPageSaveConnection_SaveCredentials',
+            'Data Preview (First 1000 Rows Displayed)': 'DataAccessUIStringId.QueryDesignControlDataPreviewCaption',
+            'No stored procedures are available in the data context.': 'DataAccessUIStringId.EFEditorsNoStoredProcs',
+            'Text qualifier:': 'DataAccessUIStringId.WizardPageChooseFileOptions_TextQualifier',
+            'Object Binding': 'DataAccessUIStringId.DSTypeObject',
+            'Save password': 'DataAccessUIStringId.PasswordRequest_SavePassword',
+            'User name:': 'DataAccessUIStringId.ConnectionProperties_UserName',
+            'Cannot specify parameters unless the DataMember property has been assigned a value.': 'DataAccessUIStringId.ODSEditorsNoDataMemberMessage',
+            'Create a query or select a stored procedure.': 'DataAccessUIStringId.WizardPageConfigureQuery',
+            'Is greater than or equal to': 'DataAccessUIStringId.JoinEditorGreaterOrEqualOperator',
+            'A data schema contains a duplicated column \'{0}\'. Modify the query so that all columns have unique names.': 'DataAccessUIStringId.WizardDuplicatingColumnNameMessage',
+            'There are no any stored procedures in current database.': 'DataAccessUIStringId.WizardEmptyStoredProceduresListMessage',
+            'Configure Data Source': 'DataAccessUIStringId.ODSDataSourceEditorTitle',
+            'Select a data source member (if required).': 'DataAccessUIStringId.WizardPageChooseObjectMember',
+            'Remove the condition': 'DataAccessUIStringId.MasterDetailEditorRemoveConditionMessage',
+            'Entity Framework Data Connection Editor': 'DataAccessUIStringId.EFConnectionEditorTitle',
+            'Do you want to save the connection string to the application\'s configuration file?': 'DataAccessUIStringId.WizardPageSaveConnection_SaveConnectionString',
+            'The table name cannot be empty.': 'DataAccessUIStringId.QueryDesignControlTableNameEmpty',
+            '{0} is a static member. Using a constructor to create an instance of the {1} class is not appropriate.': 'DataAccessUIStringId.ODSEditorsStaticMemberMessage',
+            'This option is only available when the result set is sorted.': 'DataAccessUIStringId.FiltersView_SkipTooltip',
+            'Do you want to execute the following queries on the server and obtain the resulting schema?': 'DataAccessUIStringId.RebuildResultSchemaConfirmationText',
+            'Specify the constructor parameters.': 'DataAccessUIStringId.WizardPageObjectConstructorParameters',
+            'Manage Queries': 'DataAccessUIStringId.SqlQueryCollectionEditorForm_Title',
+            'Data source name: {0}': 'DataAccessUIStringId.DataSourceName',
+            'Cannot find any database servers.': 'DataAccessUIStringId.MessageCannotLoadServersList',
+            'Refresh Token:': 'DataAccessUIStringId.ConnectionProperties_RefreshToken',
+            'Is less than or equal to': 'DataAccessUIStringId.JoinEditorLessOrEqualOperator',
+            'Select required columns and specify their settings.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns',
+            'The link between {0}.{1} and {2}.{3} results in a circular relation and cannot be added.': 'DataAccessUIStringId.QueryBuilderCircularRelationWarning',
+            'Internet': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeInternet',
+            'Add to Query': 'DataAccessUIStringId.QueryBuilder_AddToSelect',
+            'Select a data member': 'DataAccessUIStringId.WizardPageChooseEFDataMember',
+            'Project ID:': 'DataAccessUIStringId.ConnectionProperties_ProjectID',
+            'Some fields are empty. Please fill all empty fields or remove the corresponding conditions to proceed.': 'DataAccessUIStringId.JoinEditorFillAllFieldsException',
+            'Equals to': 'DataAccessUIStringId.JoinEditorEqualOperator',
+            'Browse...': 'DataAccessUIStringId.Button_Browse',
+            'No, skip credentials for security reasons': 'DataAccessUIStringId.WizardPageSaveConnection_SkipSaveCredentials',
+            'The following tables will be removed from the query.\r\n\r\n{0}\r\nDo you want to continue?': 'DataAccessUIStringId.QueryDesignControlRemoveTables',
+            'File name:': 'DataAccessUIStringId.PasswordRequest_FileName',
+            'Cannot connect to the database. See the details below.': 'DataAccessUIStringId.WizardCannotConnectMessage',
+            'Master-Detail Relation Editor': 'DataAccessUIStringId.MasterDetailEditorForm_Title',
+            'Select the data binding mode.': 'DataAccessUIStringId.WizardPageChooseObjectBindingMode',
+            'Does not equal to': 'DataAccessUIStringId.JoinEditorNotEqualOperator',
+            'The data source has been successfully created': 'DataAccessUIStringId.WizardDataSourceCreatedMessage',
+            'Select stored procedures to add': 'DataAccessUIStringId.ChooseEFStoredProceduresDialog',
+            'Unexpected behavior: none of the style is selected.': 'ReportBoxDesignerStringId.Wizard_ReportStyle_UnexpectedBehavior',
+            'You can adjust the label\'s parameters here if required.': 'ReportBoxDesignerStringId.Wizard_LabelOptions_Description',
+            'Select the report data member and data fields that will supply data to your report.': 'ReportBoxDesignerStringId.Wizard_SelectReportData_Description',
+            'Choose summary functions to calculate in reports.': 'ReportBoxDesignerStringId.Wizard_MasterDetailChooseSummaryOptions_Description',
+            'Select one of the predefined labels by specifying the Product and its ID': 'ReportBoxDesignerStringId.Wizard_LabelInformation_Description',
+            'Select one or more data members to assign to the report and its detail reports.\r\nChoose fields to display in these reports.': 'ReportBoxDesignerStringId.Wizard_MasterDetailSelectReportData_Description',
+            'Group data in the selected reports. You can specify one or more fields for each group.': 'ReportBoxDesignerStringId.Wizard_MasterDetailAddGroupingLevel_Description',
+            'Returns the index of the current data row in a datasource. Note that this index is zero-based.': 'XtraEditorsExpressionEditor.CurrentRowIndex.Description',
+            'Log10(Value)\r\nReturns the base 10 logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log10.Description',
+            'AddMinutes(DateTime, MinutesCount)\r\nReturns a date-time value that is the specified number of minutes away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMinutes.Description',
+            'Sqr(Value)\r\nReturns the square root of a given number.': 'XtraEditorsExpressionEditor.Sqr.Description',
+            'IsNovember(DateTime)\r\nReturns True if the specified date falls within November.': 'XtraEditorsExpressionEditor.IsNovember.Description',
+            'Greater than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.GreaterOrEqual.Description',
+            'LocalDateTimeNextYear()\r\nReturns a date-time value corresponding to the first day of the following year.': 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description',
+            'Returns the remainder (modulus) obtained by dividing one numeric expression into another.': 'XtraEditorsExpressionEditor.Modulo.Description',
+            'IsApril(DateTime)\r\nReturns True if the specified date falls within April.': 'XtraEditorsExpressionEditor.IsApril.Description',
+            'ToFloat(Value)\r\nConverts Value to an equivalent 32-bit single-precision floating-point number.': 'XtraEditorsExpressionEditor.ToFloat.Description',
+            'IsLastYear(DateTime)\r\nReturns True if the specified date falls within the previous year.': 'XtraEditorsExpressionEditor.IsLastYear.Description',
+            'Sign(Value)\r\nReturns the positive (+1), zero (0), or negative (-1) sign of the given expression.': 'XtraEditorsExpressionEditor.Sign.Description',
+            'GetHour(DateTime)\r\nExtracts an hour from the defined DateTime.': 'XtraEditorsExpressionEditor.GetHour.Description',
+            'Compares each bit of its first operand to the corresponding bit of its second operand. If either bit is 1, the corresponding result bit is set to 1. Otherwise, the corresponding result bit is set to 0.': 'XtraEditorsExpressionEditor.BitwiseOr.Description',
+            'IsJune(DateTime)\r\nReturns True if the specified date falls within June.': 'XtraEditorsExpressionEditor.IsJune.Description',
+            'DateDiffMilliSecond(startDate, endDate)\r\nReturns the number of millisecond boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description',
+            'expressionEdit': 'XtraEditorsExpressionEditor.>>expressionEdit.Name',
+            'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>expressionEdit.Type',
+            'Date-time': 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems',
+            'Concat(String1, ... , StringN)\r\nReturns a string value containing the concatenation of the current string with any additional strings.': 'XtraEditorsExpressionEditor.Concat.Description',
+            'Cos(Value)\r\nReturns the cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cos.Description',
+            '$this': 'XtraEditorsExpressionEditor.>>layoutItemButton12.Parent',
+            'PadLeft(String, Length, Char)\r\nLeft-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft3Param.Description',
+            'IsFebruary(DateTime)\r\nReturns True if the specified date falls within February.': 'XtraEditorsExpressionEditor.IsFebruary.Description',
+            'Exists()\r\nDetermines whether the object exists in the collection.': 'XtraEditorsExpressionEditor.ExistsAggregate.Description',
+            'LocalDateTimeThisYear()\r\nReturns a date-time value corresponding to the first day of the current year.': 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description',
+            'listOfInputParameters': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Name',
+            'DevExpress.XtraEditors.ListBoxControl, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Type',
+            '0': 'XtraEditorsExpressionEditor.>>functionsTypes.ZOrder',
+            'LocalDateTimeToday()\r\nReturns a date-time value corresponding to Today.': 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description',
+            '6': 'XtraEditorsExpressionEditor.>>layoutItemButton12.ZOrder',
+            'IsSeptember(DateTime)\r\nReturns True if the specified date falls within September.': 'XtraEditorsExpressionEditor.IsSeptember.Description',
+            'IsNextYear(DateTime)\r\nReturns True if the specified date falls within the next year.': 'XtraEditorsExpressionEditor.IsNextYear.Description',
+            'IsJuly(DateTime)\r\nReturns True if the specified date falls within July.': 'XtraEditorsExpressionEditor.IsJuly.Description',
+            '3': 'XtraEditorsExpressionEditor.>>listOfInputTypes.ZOrder',
+            'Divides the first operand by the second.': 'XtraEditorsExpressionEditor.Divide.Description',
+            'Lower(String)\r\nReturns the String in lowercase.': 'XtraEditorsExpressionEditor.Lower.Description',
+            '13': 'XtraEditorsExpressionEditor.>>layoutItemButton8.ZOrder',
+            '8': 'XtraEditorsExpressionEditor.>>layoutItemButton14.ZOrder',
+            'Format rule expression editor': 'XtraEditorsExpressionEditor.FormatRule.Caption',
+            'LocalDateTimeTwoWeeksAway()\r\nReturns a date-time value corresponding to the first day of the week that is after next week.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description',
+            'IsMay(DateTime)\r\nReturns True if the specified date falls within May.': 'XtraEditorsExpressionEditor.IsMay.Description',
+            'Upper(String)\r\nReturns String in uppercase.': 'XtraEditorsExpressionEditor.Upper.Description',
+            'LocalDateTimeYesterday()\r\nReturns a date-time value corresponding to Yesterday.': 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description',
+            'Between (,)\r\nSpecifies a range to test. Returns true if a value is greater than or equal to the first operand and less than or equal to the second operand.': 'XtraEditorsExpressionEditor.Between.Description',
+            '16': 'XtraEditorsExpressionEditor.>>labelControl1.ZOrder',
+            '9': 'XtraEditorsExpressionEditor.>>labelControl2.ZOrder',
+            'layoutItemButton9': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Name',
+            'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Type',
+            'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'XtraEditorsExpressionEditor.ToInt.Description',
+            '19': 'XtraEditorsExpressionEditor.>>layoutItemButton3.ZOrder',
+            'layoutItemButton8': 'XtraEditorsExpressionEditor.>>layoutItemButton8.Name',
+            'Variables': 'XtraEditorsExpressionEditor.Variables.Text',
+            'UtcNow()\r\nReturns the current system date and time, expressed as Coordinated Universal Time (UTC).': 'XtraEditorsExpressionEditor.UtcNow.Description',
+            'plusItemButton': 'XtraEditorsExpressionEditor.>>plusItemButton.Name',
+            'IsYearToDate(DateTime)\r\nReturns True if the specified date falls within the year-to-date period (starting from the first day of the current year and continuing up to the current date).': 'XtraEditorsExpressionEditor.IsYearToDate.Description',
+            'Count()\r\nReturns the number of objects in a collection.': 'XtraEditorsExpressionEditor.CountAggregate.Description',
+            'layoutItemButton5': 'XtraEditorsExpressionEditor.>>layoutItemButton5.Name',
+            'Len(Value)\r\nReturns an integer containing either the number of characters in a string or the nominal number of bytes required to store a variable.': 'XtraEditorsExpressionEditor.Len.Description',
+            'Trim(String)\r\nRemoves all leading and trailing SPACE characters from String.': 'XtraEditorsExpressionEditor.Trim.Description',
+            'layoutItemButton4': 'XtraEditorsExpressionEditor.>>layoutItemButton4.Name',
+            'BigMul(Value1, Value2)\r\nReturns an Int64 containing the full product of two specified 32-bit numbers.': 'XtraEditorsExpressionEditor.BigMul.Description',
+            'GetMinute(DateTime)\r\nExtracts minutes from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMinute.Description',
+            'layoutItemButton7': 'XtraEditorsExpressionEditor.>>layoutItemButton7.Name',
+            'PadRight(String, Length)\r\nRight-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadRight.Description',
+            'Floor(Value)\r\nReturns the largest integer less than or equal to the given numeric expression.': 'XtraEditorsExpressionEditor.Floor.Description',
+            'Exp(Value)\r\nReturns the exponential value of the given float expression.': 'XtraEditorsExpressionEditor.Exp.Description',
+            'AddYears(DateTime, YearsCount)\r\nReturns a date-time value that is the specified number of years away from the specieid DateTime.': 'XtraEditorsExpressionEditor.AddYears.Description',
+            'IsNextMonth(DateTime)\r\nReturns True if the specified date falls within the next month.': 'XtraEditorsExpressionEditor.IsNextMonth.Description',
+            'layoutItemButton6': 'XtraEditorsExpressionEditor.>>layoutItemButton6.Name',
+            'ToStr(Value)\r\nReturns a string representation of an object.': 'XtraEditorsExpressionEditor.ToStr.Description',
+            'LocalDateTimeThisMonth()\r\nReturns a date-time value corresponding to the first day of the current month.': 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description',
+            '1': 'XtraEditorsExpressionEditor.>>labelControl4.ZOrder',
+            'Performs a logical conjunction on two expressions.': 'XtraEditorsExpressionEditor.And.Description',
+            '17': 'XtraEditorsExpressionEditor.>>layoutItemButton5.ZOrder',
+            '15': 'XtraEditorsExpressionEditor.>>layoutItemButton6.ZOrder',
+            'Field Information\r\nCaption: {1}\r\nThe type of this field is: {2}': 'XtraEditorsExpressionEditor.GridFields Description Prefix',
+            'DateDiffMinute(startDate, endDate)\r\nReturns the number of minute boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMinute.Description',
+            'layoutItemButton3': 'XtraEditorsExpressionEditor.>>layoutItemButton3.Name',
+            'DateDiffMonth(startDate, endDate)\r\nReturns the number of month boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMonth.Description',
+            'layoutItemButton2': 'XtraEditorsExpressionEditor.>>layoutItemButton2.Name',
+            '2': 'XtraEditorsExpressionEditor.>>listOfInputParameters.ZOrder',
+            'Today()\r\nReturns the current date. Regardless of the actual time, this function returns midnight of the current date.': 'XtraEditorsExpressionEditor.Today.Description',
+            'Atn2(Value1, Value2)\r\nReturns the angle whose tangent is the quotient of two specified numbers, in radians.': 'XtraEditorsExpressionEditor.Atn2.Description',
+            'Sin(Value)\r\nReturns the sine of the angle, defined in radians.': 'XtraEditorsExpressionEditor.Sin.Description',
+            'AddDays(DateTime, DaysCount)\r\nReturns a date-time value that is the specified number of days away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddDays.Description',
+            'LocalDateTimeLastWeek()\r\nReturns a date-time value corresponding to the first day of the previous week.': 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description',
+            'LocalDateTimeTomorrow()\r\nReturns a date-time value corresponding to Tomorrow.': 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description',
+            'IsNull(Value)\r\nReturns True if the specified Value is NULL.': 'XtraEditorsExpressionEditor.IsNull.Description',
+            'CharIndex(String1, String2)\r\nReturns the starting position of String1 within String2, beginning from the zero character position to the end of a string.': 'XtraEditorsExpressionEditor.CharIndex.Description',
+            'GetDay(DateTime)\r\nExtracts a day from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDay.Description',
+            'IsThisMonth(DateTime)\r\nReturns True if the specified date falls within the current month.': 'XtraEditorsExpressionEditor.IsThisMonth.Description',
+            'IsThisWeek(DateTime)\r\nReturns True if the specified date falls within the current week.': 'XtraEditorsExpressionEditor.IsThisWeek.Description',
+            'Insert(String1, StartPosition, String2)\r\nInserts String2 into String1 at the position specified by StartPositon': 'XtraEditorsExpressionEditor.Insert.Description',
+            'LocalDateTimeThisWeek()\r\nReturns a date-time value corresponding to the first day of the current week.': 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description',
+            'IsLastMonth(DateTime)\r\nReturns True if the specified date falls within the previous month.': 'XtraEditorsExpressionEditor.IsLastMonth.Description',
+            'ToDouble(Value)\r\nConverts Value to an equivalent 64-bit double-precision floating-point number.': 'XtraEditorsExpressionEditor.ToDouble.Description',
+            'Now()\r\nReturns the current system date and time.': 'XtraEditorsExpressionEditor.Now.Description',
+            'IsNullOrEmpty(String)\r\nReturns True if the specified String object is NULL or an empty string; otherwise, False is returned.': 'XtraEditorsExpressionEditor.IsNullOrEmpty.Description',
+            'IsDecember(DateTime)\r\nReturns True if the specified date falls within December.': 'XtraEditorsExpressionEditor.IsDecember.Description',
+            'Round(Value)\r\nRounds the given value to the nearest integer.': 'XtraEditorsExpressionEditor.Round.Description',
+            'DateDiffDay(startDate, endDate)\r\nReturns the number of day boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffDay.Description',
+            '11': 'XtraEditorsExpressionEditor.>>layoutItemButton10.ZOrder',
+            '7': 'XtraEditorsExpressionEditor.>>layoutItemButton13.ZOrder',
+            '24': 'XtraEditorsExpressionEditor.>>buttonOK.ZOrder',
+            'Ascii(String)\r\nReturns the ASCII code value of the leftmost character in a character expression.': 'XtraEditorsExpressionEditor.Ascii.Description',
+            'Log(Value, Base)\r\nReturns the logarithm of a specified number in a specified Base.': 'XtraEditorsExpressionEditor.Log2Param.Description',
+            'Performs a logical disjunction on two Boolean expressions.': 'XtraEditorsExpressionEditor.Or.Description',
+            'IsThisYear(DateTime)\r\nReturns True if the specified date falls within the current year.': 'XtraEditorsExpressionEditor.IsThisYear.Description',
+            'Char(Number)\r\nConverts an integerASCIICode to a character.': 'XtraEditorsExpressionEditor.Char.Description',
+            'DateDiffSecond(startDate, endDate)\r\nReturns the number of second boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffSecond.Description',
+            'Returns true if both operands have the same value; otherwise, it returns false.': 'XtraEditorsExpressionEditor.Equal.Description',
+            'Represents the Boolean False value.': 'XtraEditorsExpressionEditor.False.Description',
+            'Atn(Value)\r\nReturns the arctangent of a number (the angle, in radians, whose tangent is the given float expression).': 'XtraEditorsExpressionEditor.Atn.Description',
+            'AddMilliSeconds(DateTime, MilliSecondsCount)\r\nReturns a date-time value that is the specified number of milliseconds away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMilliSeconds.Description',
+            'GetTimeOfDay(DateTime)\r\nExtracts the time of the day from the defined DateTime, in ticks.': 'XtraEditorsExpressionEditor.GetTimeOfDay.Description',
+            'IsSameDay(DateTime, DateTime)\r\nReturns True if the specified date-time values fall within the same day.': 'XtraEditorsExpressionEditor.IsSameDay.Description',
+            'Rnd()\r\nReturns a random number that is less than 1, but greater than or equal to zero.': 'XtraEditorsExpressionEditor.Rnd.Description',
+            'layoutItemButton14': 'XtraEditorsExpressionEditor.>>layoutItemButton14.Name',
+            'Performs a logical exclusion on two Boolean expressions, or a bitwise exclusion on two numeric expressions.': 'XtraEditorsExpressionEditor.BitwiseXor.Description',
+            'Tan(Value)\r\nReturns the tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tan.Description',
+            'layoutItemButton15': 'XtraEditorsExpressionEditor.>>layoutItemButton15.Name',
+            '4': 'XtraEditorsExpressionEditor.>>descriptionControl.ZOrder',
+            'DevExpress.XtraEditors.SimpleButton, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>buttonOK.Type',
+            'buttonOK': 'XtraEditorsExpressionEditor.>>buttonOK.Name',
+            'IsOctober(DateTime)\r\nReturns True if the specified date falls within October.': 'XtraEditorsExpressionEditor.IsOctober.Description',
+            'Less than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.LessOrEqual.Description',
+            'layoutItemButton10': 'XtraEditorsExpressionEditor.>>layoutItemButton10.Name',
+            'The type of this field is: ': 'XtraEditorsExpressionEditor.Fields Description Prefix',
+            'IsJanuary(DateTime)\r\nReturns True if the specified date falls within January.': 'XtraEditorsExpressionEditor.IsJanuary.Description',
+            'DateDiffTick(startDate, endDate)\r\nReturns the number of tick boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffTick.Description',
+            'layoutItemButton11': 'XtraEditorsExpressionEditor.>>layoutItemButton11.Name',
+            'Tanh(Value)\r\nReturns the hyperbolic tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tanh.Description',
+            'listOfInputTypes': 'XtraEditorsExpressionEditor.>>listOfInputTypes.Name',
+            'GetDayOfWeek(DateTime)\r\nExtracts a day of the week from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDayOfWeek.Description',
+            'layoutItemButton12': 'XtraEditorsExpressionEditor.>>layoutItemButton12.Name',
+            'Represents the Boolean True value.': 'XtraEditorsExpressionEditor.True.Description',
+            '18': 'XtraEditorsExpressionEditor.>>layoutItemButton4.ZOrder',
+            'Min(Value)\r\nReturns the minimum expression value in a collection.': 'XtraEditorsExpressionEditor.MinAggregate.Description',
+            '20': 'XtraEditorsExpressionEditor.>>layoutItemButton2.ZOrder',
+            'layoutItemButton13': 'XtraEditorsExpressionEditor.>>layoutItemButton13.Name',
+            'PadRight(String, Length, Char)\r\nRight-aligns characters in the defined string, padding its left side with the specified Char up to a specified total length.': 'XtraEditorsExpressionEditor.PadRight3Param.Description',
+            'Expression editor': 'XtraEditorsExpressionEditor.UnboundColumn.Caption',
+            'Avg(Value)\r\nEvaluates the average of the values in the collection.': 'XtraEditorsExpressionEditor.AvgAggregate.Description',
+            'IsMarch(DateTime)\r\nReturns True if the specified date falls within March.': 'XtraEditorsExpressionEditor.IsMarch.Description',
+            'LocalDateTimeYearBeforeToday()\r\nReturns a date-time value corresponding to the day one year ago.': 'XtraEditorsExpressionEditor.LocalDateTimeYearBeforeToday.Description',
+            'Replace(String, SubString2, String3)\r\nReturns a copy of String1, in which SubString2 has been replaced with String3.': 'XtraEditorsExpressionEditor.Replace.Description',
+            'AddHours(DateTime, HoursCount)\r\nReturns a date-time value that is the specified number of hours away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddHours.Description',
+            'Reverse(String)\r\nReverses the order of elements within a string.': 'XtraEditorsExpressionEditor.Reverse.Description',
+            'Remove(String, StartPosition, Length)\r\nDeletes a specified number of characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove3Param.Description',
+            'Remove(String, StartPosition)\r\nDeletes all characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove2Param.Description',
+            'GetDate(DateTime)\r\nExtracts a date from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDate.Description',
+            '22': 'XtraEditorsExpressionEditor.>>plusItemButton.ZOrder',
+            'DevExpress.XtraEditors.LabelControl, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>labelControl4.Type',
+            'labelControl4': 'XtraEditorsExpressionEditor.>>labelControl4.Name',
+            'AddTimeSpan(DateTime, TimeSpan)\r\nReturns a date-time value that is away from the specified DateTime for the given TimeSpan.': 'XtraEditorsExpressionEditor.AddTimeSpan.Description',
+            'labelControl1': 'XtraEditorsExpressionEditor.>>labelControl1.Name',
+            'Performs a bitwise logical AND operation between two integer values.': 'XtraEditorsExpressionEditor.BitwiseAnd.Description',
+            'Represents a null reference, one that does not refer to any object.': 'XtraEditorsExpressionEditor.Null.Description',
+            'LocalDateTimeNextWeek()\r\nReturns a date-time value corresponding to the first day of the following week.': 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description',
+            'ToLong(Value)\r\nConverts Value to an equivalent 64-bit signed integer.': 'XtraEditorsExpressionEditor.ToLong.Description',
+            'labelControl3': 'XtraEditorsExpressionEditor.>>labelControl3.Name',
+            'AddSeconds(DateTime, SecondsCount)\r\nReturns a date-time value that is the specified number of seconds away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddSeconds.Description',
+            'The type of this parameter is: ': 'XtraEditorsExpressionEditor.Parameters Description Prefix',
+            '23': 'XtraEditorsExpressionEditor.>>buttonCancel.ZOrder',
+            'Ceiling(Value)\r\nReturns the smallest integer that is greater than or equal to the given numeric expression.': 'XtraEditorsExpressionEditor.Ceiling.Description',
+            'labelControl2': 'XtraEditorsExpressionEditor.>>labelControl2.Name',
+            'GetSecond(DateTime)\r\nExtracts seconds from the defined DateTime.': 'XtraEditorsExpressionEditor.GetSecond.Description',
+            'CharIndex(String1, String2, StartLocation)\r\nReturns the starting position of String1 within String2, beginning from the StartLocation character position to the end of a string.': 'XtraEditorsExpressionEditor.CharIndex3Param.Description',
+            'Asin(Value)\r\nReturns the arcsine of a number (the angle, in radians, whose sine is the given float expression).': 'XtraEditorsExpressionEditor.Asin.Description',
+            'Round(Value, Precision)\r\nRounds the given value to the nearest integer, or to a specified number of decimal places.': 'XtraEditorsExpressionEditor.Round2Param.Description',
+            'AddTicks(DateTime, TicksCount)\r\nReturns a date-time value that is the specified number of ticks away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddTicks.Description',
+            'IsAugust(DateTime)\r\nReturns True if the specified date falls within August.': 'XtraEditorsExpressionEditor.IsAugust.Description',
+            'Substring(String, StartPosition, Length)\r\nRetrieves a substring from String. The substring starts at StartPosition and has the specified Length.': 'XtraEditorsExpressionEditor.Substring3param.Description',
+            '10': 'XtraEditorsExpressionEditor.>>layoutItemButton11.ZOrder',
+            'CalculatedFieldExpressionEditorForm': 'XtraEditorsExpressionEditor.>>$this.Name',
+            'DevExpress.XtraEditors.XtraForm, DevExpress.Utils.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>$this.Type',
+            'Condition expression editor': 'XtraEditorsExpressionEditor.Condition.Caption',
+            'ToDecimal(Value)\r\nConverts Value to an equivalent decimal number.': 'XtraEditorsExpressionEditor.ToDecimal.Description',
+            '21': 'XtraEditorsExpressionEditor.>>expressionEdit.ZOrder',
+            'Max(Value1, Value2)\r\nReturns the maximum value from the specified values.': 'XtraEditorsExpressionEditor.Max.Description',
+            'LocalDateTimeTwoMonthsAway()\r\nReturns a date-time value corresponding to the first day of the month after next.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoMonthsAway.Description',
+            'Substring(String, StartPosition)\r\nRetrieves a substring from String. The substring starts at StartPosition.': 'XtraEditorsExpressionEditor.Substring2param.Description',
+            'Acos(Value)\r\nReturns the arccosine of a number (the angle, in radians, whose cosine is the given float expression).': 'XtraEditorsExpressionEditor.Acos.Description',
+            'GetDayOfYear(DateTime)\r\nExtracts a day of the year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDayOfYear.Description',
+            'Multiplies the value of two expressions.': 'XtraEditorsExpressionEditor.Multiply.Description',
+            'Returns the total amount of data rows in a datasource.': 'XtraEditorsExpressionEditor.RowCount.Description',
+            'LocalDateTimeNow()\r\nReturns a date-time value corresponding to the current moment in time.': 'XtraEditorsExpressionEditor.LocalDateTimeNow.Description',
+            'LocalDateTimeLastYear()\r\nReturns a date-time value corresponding to the first day of the previous year.': 'XtraEditorsExpressionEditor.LocalDateTimeLastYear.Description',
+            'LocalDateTimeDayAfterTomorrow()\r\nReturns a date-time value corresponding to the day after Tomorrow.': 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description',
+            'Sum(Value)\r\nReturns the sum of all the expression values in the collection.': 'XtraEditorsExpressionEditor.SumAggregate.Description',
+            'Compares a string against a pattern. If the value of the string matches the pattern, result is true. If the string does not match the pattern, result is false. If both string and pattern are empty strings, the result is true.': 'XtraEditorsExpressionEditor.Like.Description',
+            'Power(Value, Power)\r\nReturns a specified number raised to a specified power.': 'XtraEditorsExpressionEditor.Power.Description',
+            'Finds the difference between two numbers.': 'XtraEditorsExpressionEditor.Minus.Description',
+            'Log(Value)\r\nReturns the natural logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log.Description',
+            'LocalDateTimeTwoYearsAway()\r\nReturns a date-time value corresponding to the first day of the year after next.': 'XtraEditorsExpressionEditor.LocalDateTimeTwoYearsAway.Description',
+            'Sinh(Value)\r\nReturns the hyperbolic sine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Sinh.Description',
+            'Max(Value)\r\nReturns the maximum expression value in a collection.': 'XtraEditorsExpressionEditor.MaxAggregate.Description',
+            'Greater than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Greater.Description',
+            '(All)': 'XtraEditorsExpressionEditor.functionsTypes.Properties.AllItems',
+            'In (,,,)\r\nTests for the existence of a property in an object.': 'XtraEditorsExpressionEditor.In.Description',
+            'DevExpress.XtraEditors.ComboBoxEdit, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>functionsTypes.Type',
+            'functionsTypes': 'XtraEditorsExpressionEditor.>>functionsTypes.Name',
+            'Less than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Less.Description',
+            'StartsWith(String, StartString)\r\nReturns True if the beginning of String matches StartString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.StartsWith.Description',
+            '12': 'XtraEditorsExpressionEditor.>>layoutItemButton9.ZOrder',
+            'GetMonth(DateTime)\r\nExtracts a month from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMonth.Description',
+            'EndsWith(String, EndString)\r\nReturns True if the end of String matches EndString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.EndsWith.Description',
+            'Adds the value of one numeric expression to another, or concatenates two strings.': 'XtraEditorsExpressionEditor.Plus.Description',
+            'Single()\r\nReturns a single object from the collection.': 'XtraEditorsExpressionEditor.SingleAggregate.Description',
+            'Contains(String, SubString)\r\nReturns True if SubString occurs within String; otherwise, False is returned.': 'XtraEditorsExpressionEditor.Contains.Description',
+            'DateDiffHour(startDate, endDate)\r\nReturns the number of hour boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffHour.Description',
+            'Returns true if the operands do not have the same value; otherwise, it returns false.': 'XtraEditorsExpressionEditor.NotEqual.Description',
+            'Abs(Value)\r\nReturns the absolute, positive value of the given numeric expression.': 'XtraEditorsExpressionEditor.Abs.Description',
+            'LocalDateTimeNextMonth()\r\nReturns a date-time value corresponding to the first day of next month.': 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description',
+            'AddMonths(DateTime, MonthsCount)\r\nReturns a date-time value that is the specified number of months away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMonths.Description',
+            'Iif(Expression, TruePart, FalsePart)\r\nReturns either TruePart or FalsePart, depending on the evaluation of the Boolean Expression.': 'XtraEditorsExpressionEditor.Iif.Description',
+            'GetMilliSecond(DateTime)\r\nExtracts milliseconds from the defined DateTime.': 'XtraEditorsExpressionEditor.GetMilliSecond.Description',
+            'LocalDateTimeLastMonth()\r\nReturns a date-time value corresponding to the first day of the previous month.': 'XtraEditorsExpressionEditor.LocalDateTimeLastMonth.Description',
+            'buttonCancel': 'XtraEditorsExpressionEditor.>>buttonCancel.Name',
+            'PadLeft(String, Length)\r\nLeft-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft.Description',
+            'descriptionControl': 'XtraEditorsExpressionEditor.>>descriptionControl.Name',
+            'DevExpress.XtraEditors.LabelControl, DevExpress.Utils.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>descriptionControl.Type',
+            '5': 'XtraEditorsExpressionEditor.>>labelControl3.ZOrder',
+            'Min(Value1, Value2)\r\nReturns the minimum value from the specified values.': 'XtraEditorsExpressionEditor.Min.Description',
+            '14': 'XtraEditorsExpressionEditor.>>layoutItemButton7.ZOrder',
+            'Condition Editor': 'XtraEditorsExpressionEditor.Condition.Text',
+            'Cosh(Value)\r\nReturns the hyperbolic cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cosh.Description',
+            'Performs logical negation on an expression.': 'XtraEditorsExpressionEditor.Not.Description',
+            'GetYear(DateTime)\r\nExtracts a year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetYear.Description',
+            'DateDiffYear(startDate, endDate)\r\nReturns the number of year boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffYear.Description',
+            'Export mode:': 'PreviewStringId.ExportOption_DocxExportMode',
+            'Select Picture': 'PreviewStringId.WMForm_PictureDlg_Title',
+            'Export the document to Image and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendGraphic_STipContent',
+            'Valid From: {0:d} to {1:d}': 'PreviewStringId.ExportOption_PdfSignature_ValidRange',
+            'Do you want to open this file?': 'PreviewStringId.Msg_OpenFileQuestion',
+            'CSV File': 'PreviewStringId.RibbonPreview_ExportCsv_Caption',
+            'Fit to': 'PreviewStringId.ScalePopup_FitTo',
+            'Export the document to MHT and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportMht_STipContent',
+            'Document': 'PreviewStringId.RibbonPreview_PageGroup_Document',
+            'Export watermarks': 'PreviewStringId.ExportOption_DocxExportWatermarks',
+            'Embed images in HTML': 'PreviewStringId.ExportOption_HtmlEmbedImagesInHTML',
+            '[Date Printed]': 'PreviewStringId.PageInfo_PageDate',
+            '[Time Printed]': 'PreviewStringId.PageInfo_PageTime',
+            'The separator cannot be an empty string.': 'PreviewStringId.Msg_SeparatorCannotBeEmptyString',
+            'URGENT': 'PreviewStringId.WMForm_Watermark_Urgent',
+            'XPS': 'PreviewStringId.RibbonPreview_SendXps_Description',
+            'Different files': 'PreviewStringId.ExportOption_XlsExportMode_DifferentFiles',
+            'Integer Positive': 'PreviewStringId.EditingFieldEditors_IntegerPositive',
+            'The output file is too big to create a JPEG file. Please choose another image format or another export mode.': 'PreviewStringId.Msg_BigFileToCreateJPEG',
+            'Subject:': 'PreviewStringId.ExportOption_PdfDocumentSubject',
+            'SAMPLE': 'PreviewStringId.WMForm_Watermark_Sample',
+            'PDF File': 'PreviewStringId.RibbonPreview_SendPdf_Caption',
+            'This font is not yet supported': 'PreviewStringId.Msg_NotSupportedFont',
+            'The document does not contain any pages.': 'PreviewStringId.Msg_EmptyDocument',
+            'Page {0} of {1}': 'PreviewStringId.SB_PageOfPages',
+            'Control\'s boundaries are too small for the barcode': 'PreviewStringId.Msg_CantFitBarcodeToControlBounds',
+            'Send via E-Mail...': 'PreviewStringId.TB_TTip_Send',
+            'Save the document': 'PreviewStringId.TB_TTip_Save',
+            'Open a document': 'PreviewStringId.TB_TTip_Open',
+            'Export the document to RTF and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendRtf_STipContent',
+            'Don\'t embed these fonts:': 'PreviewStringId.ExportOption_PdfNeverEmbeddedFonts',
+            'Stop': 'PreviewStringId.SB_TTip_Stop',
+            'Page range:': 'PreviewStringId.ExportOption_DocxPageRange',
+            'Export the current document in one of the available formats, and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendFile_STipContent',
+            'The output file already exists. Click OK to overwrite.': 'PreviewStringId.Msg_FileAlreadyExists',
+            '[Page #]': 'PreviewStringId.PageInfo_PageNumber',
+            'Super fast': 'PreviewStringId.ExportOption_XpsCompression_SuperFast',
+            'Native Format': 'PreviewStringId.SaveDlg_FilterNativeFormat',
+            'The printer is not available.': 'PreviewStringId.PrinterStatus_NotAvailable',
+            'DOCX File': 'PreviewStringId.MenuItem_DocxDocument',
+            'No printers installed.': 'PreviewStringId.Msg_NeedPrinter',
+            'The manual feed is enabled.': 'PreviewStringId.PrinterStatus_ManualFeed',
+            'Single file page-by-page': 'PreviewStringId.ExportOption_ImageExportMode_SingleFilePageByPage',
+            'Printing...': 'PreviewStringId.PrinterStatus_Printing',
+            'The current printer doesn\'t support the selected paper size.\r\nProceed with printing anyway?': 'PreviewStringId.Msg_WrongPageSettings',
+            'Zoom Factor: ': 'PreviewStringId.SB_ZoomFactor',
+            'Character set:': 'PreviewStringId.ExportOption_HtmlCharacterSet',
+            'The path is too long.\r\nTry a shorter name.': 'PreviewStringId.Msg_PathTooLong',
+            'Page number in document. Click to open the Go To Page dialog.': 'PreviewStringId.SB_PageOfPagesHint',
+            'Show the mouse pointer.': 'PreviewStringId.RibbonPreview_Pointer_STipContent',
+            'TOP SECRET': 'PreviewStringId.WMForm_Watermark_TopSecret',
+            'Exporting the document...': 'PreviewStringId.Msg_ExportingDocument',
+            'File "{0}" is set to read-only, try again with a different file name.': 'PreviewStringId.Msg_FileReadOnly',
+            'Quote strings with separators': 'PreviewStringId.ExportOption_TextQuoteStringsWithSeparators',
+            'Only Lowercase Letters': 'PreviewStringId.EditingFieldEditors_OnlyLowercaseLetters',
+            'Save As': 'PreviewStringId.SaveDlg_Title',
+            'Insert ghosted text or image behind the content of a page.\r\n\r\nThis is often used to indicate that a document is to be treated specially.': 'PreviewStringId.RibbonPreview_Watermark_STipContent',
+            'Choose the paper size of the document.': 'PreviewStringId.RibbonPreview_PaperSize_STipContent',
+            'Raw data mode': 'PreviewStringId.ExportOption_XlsRawDataMode',
+            'Inserting, deleting and rotating pages': 'PreviewStringId.ExportOption_PdfChangingPermissions_InsertingDeletingRotating',
+            'Single file': 'PreviewStringId.ExportOption_ImageExportMode_SingleFile',
+            'DO NOT COPY': 'PreviewStringId.WMForm_Watermark_DoNotCopy',
+            'Show print dialog on open': 'PreviewStringId.ExportOption_PdfShowPrintDialogOnOpen',
+            'Table layout': 'PreviewStringId.ExportOption_HtmlTableLayout',
+            'Page Setup...': 'PreviewStringId.MenuItem_PageSetup',
+            'The server is offline.': 'PreviewStringId.PrinterStatus_ServerOffline',
+            'TAB': 'PreviewStringId.ExportOption_TextSeparator_TabAlias',
+            'Export the document to XLS and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendXls_STipContent',
+            'The created XLS file is too big for the XLS format, because it contains more than 65,536 rows.\r\nPlease try to use the XLSX format, instead.': 'PreviewStringId.Msg_XlsMoreThanMaxRows',
+            'Print task deletion is pending.': 'PreviewStringId.PrinterStatus_PendingDeletion',
+            'XPS File': 'PreviewStringId.RibbonPreview_SendXps_Caption',
+            '[Page # of Pages #]': 'PreviewStringId.PageInfo_PageNumberOfTotal',
+            'Send As': 'PreviewStringId.MenuItem_Send',
+            '[User Name]': 'PreviewStringId.PageInfo_PageUserName',
+            'Navigate to the last page of the document.': 'PreviewStringId.RibbonPreview_ShowLastPage_STipContent',
+            'Export the document to MHT and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendMht_STipContent',
+            'Quick Print': 'PreviewStringId.RibbonPreview_PrintDirect_Caption',
+            'Microsoft Word 2007 Document': 'PreviewStringId.RibbonPreview_SendDocx_Description',
+            'Text Width': 'PreviewStringId.MenuItem_ZoomTextWidth',
+            'Color...': 'PreviewStringId.MenuItem_BackgrColor',
+            'pages wide': 'PreviewStringId.ScalePopup_PagesWide',
+            'Export the document to DOCX and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendDocx_STipContent',
+            'Commenting, filling in form fields, and signing existing signature fields': 'PreviewStringId.ExportOption_PdfChangingPermissions_CommentingFillingSigning',
+            'Close Print Preview': 'PreviewStringId.RibbonPreview_ClosePreview_STipTitle',
+            'Export to DOCX': 'PreviewStringId.RibbonPreview_ExportDocx_STipTitle',
+            'Images quality:': 'PreviewStringId.ExportOption_PdfImageQuality',
+            'Page border width:': 'PreviewStringId.ExportOption_ImagePageBorderWidth',
+            'Cannot perform the specified task. The following library is missing: "{0}"': 'PreviewStringId.Msg_CannotFindFile',
+            'E-Mail As': 'PreviewStringId.RibbonPreview_SendFile_Caption',
+            'Page border color:': 'PreviewStringId.ExportOption_ImagePageBorderColor',
+            'Export the document to HTML and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportHtm_STipContent',
+            'Application:': 'PreviewStringId.ExportOption_PdfDocumentApplication',
+            'Open the Document Map, which allows you to navigate through a structural view of the document.': 'PreviewStringId.RibbonPreview_DocumentMap_STipContent',
+            'MHT File': 'PreviewStringId.RibbonPreview_SendMht_Caption',
+            'mm': 'PreviewStringId.Margin_Millimeter',
+            'Digital Signature:': 'PreviewStringId.ExportOption_PdfSignatureOptions',
+            'Select a folder to save the exported document to:': 'PreviewStringId.FolderBrowseDlg_ExportDirectory',
+            'Title:': 'PreviewStringId.ExportOption_PdfDocumentTitle',
+            '% of normal size': 'PreviewStringId.ScalePopup_NormalSize',
+            'Category:': 'PreviewStringId.ExportOption_XpsDocumentCategory',
+            'HTML File': 'PreviewStringId.MenuItem_HtmDocument',
+            'Version:': 'PreviewStringId.ExportOption_XpsDocumentVersion',
+            'Letters': 'PreviewStringId.EditingFieldEditorCategories_Letters',
+            'HTML Document': 'PreviewStringId.SaveDlg_FilterHtm',
+            'MHT Document': 'PreviewStringId.SaveDlg_FilterMht',
+            'CSV Document': 'PreviewStringId.SaveDlg_FilterCsv',
+            'BMP Bitmap Format': 'PreviewStringId.SaveDlg_FilterBmp',
+            'XPS Document': 'PreviewStringId.SaveDlg_FilterXps',
+            'XLS Document': 'PreviewStringId.SaveDlg_FilterXls',
+            'GIF Graphics Interchange Format': 'PreviewStringId.SaveDlg_FilterGif',
+            'EMF Enhanced Windows Metafile': 'PreviewStringId.SaveDlg_FilterEmf',
+            'PNG Portable Network Graphics Format': 'PreviewStringId.SaveDlg_FilterPng',
+            'PDF Document': 'PreviewStringId.SaveDlg_FilterPdf',
+            'Text Document': 'PreviewStringId.SaveDlg_FilterTxt',
+            'Rich Text Document': 'PreviewStringId.SaveDlg_FilterRtf',
+            'WMF Windows Metafile': 'PreviewStringId.SaveDlg_FilterWmf',
+            'XLSX File': 'PreviewStringId.RibbonPreview_SendXlsx_Caption',
+            'Image File': 'PreviewStringId.RibbonPreview_ExportGraphic_Caption',
+            'E-Mail As...': 'PreviewStringId.RibbonPreview_SendFile_STipTitle',
+            'The power save mode is on.': 'PreviewStringId.PrinterStatus_PowerSave',
+            'Permissions': 'PreviewStringId.ExportOption_PdfPasswordSecurityOptions_Permissions',
+            'The created XLSX file is too big for the XLSX format, because it contains more than 1,048,576 rows.\r\nPlease try to reduce the amount of rows in your report and export the report to XLSX again.': 'PreviewStringId.Msg_XlsxMoreThanMaxRows',
+            'Show the Page Setup dialog.': 'PreviewStringId.RibbonPreview_PageGroup_PageSetup_STipContent',
+            'Wide': 'PreviewStringId.RibbonPreview_GalleryItem_PageMarginsWide_Description',
+            'E-Mail As RTF': 'PreviewStringId.RibbonPreview_SendRtf_STipTitle',
+            'Please confirm the Document Open Password. Be sure to make a note of the password. It will be required to open the document.': 'PreviewStringId.ExportOption_ConfirmOpenPasswordForm_Note',
+            'Document Open Password:': 'PreviewStringId.ExportOption_ConfirmOpenPasswordForm_Name',
+            'Send the document directly to the default printer without making changes.': 'PreviewStringId.RibbonPreview_PrintDirect_STipContent',
+            'Password Security:': 'PreviewStringId.ExportOption_PdfPasswordSecurityOptions',
+            'E-Mail As DOCX': 'PreviewStringId.RibbonPreview_SendDocx_STipTitle',
+            'Switch the pages between portrait and landscape layouts.': 'PreviewStringId.RibbonPreview_PageOrientation_STipContent',
+            'Export the document to RTF and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportRtf_STipContent',
+            'The printer\'s input/output is active.': 'PreviewStringId.PrinterStatus_IOActive',
+            'Filling in form fields and signing existing signature fields': 'PreviewStringId.ExportOption_PdfChangingPermissions_FillingSigning',
+            'Text File': 'PreviewStringId.RibbonPreview_ExportTxt_Caption',
+            'E-Mail As MHT': 'PreviewStringId.RibbonPreview_SendMht_STipTitle',
+            'An error occurred during printing a document.': 'PreviewStringId.Msg_WrongPrinting',
+            'Header and Footer': 'PreviewStringId.RibbonPreview_EditPageHF_STipTitle',
+            'Microsoft Excel 2000-2003 Workbook': 'PreviewStringId.RibbonPreview_SendXls_Description',
+            'Export the document to XLSX and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendXlsx_STipContent',
+            'Header And Footer': 'PreviewStringId.TB_TTip_EditPageHF',
+            'E-Mail As CSV': 'PreviewStringId.RibbonPreview_SendCsv_STipTitle',
+            'The specified parameters do not exist: {0}.': 'PreviewStringId.Msg_NoParameters',
+            'Open a document.': 'PreviewStringId.RibbonPreview_Open_STipContent',
+            'Navigate to the first page of the document.': 'PreviewStringId.RibbonPreview_ShowFirstPage_STipContent',
+            'Export the document to Text and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportTxt_STipContent',
+            'COPY': 'PreviewStringId.WMForm_Watermark_Copy',
+            'ASAP': 'PreviewStringId.WMForm_Watermark_Asap',
+            'Next Page (PageDown)': 'PreviewStringId.RibbonPreview_ShowNextPage_STipTitle',
+            'Sheet name:': 'PreviewStringId.ExportOption_XlsSheetName',
+            'Creator:': 'PreviewStringId.ExportOption_XpsDocumentCreator',
+            'Fixed-Point': 'PreviewStringId.EditingFieldEditors_FixedPoint',
+            'The specified file doesn\'t have a PRNX extension. Proceed anyway?': 'PreviewStringId.Msg_FileDoesNotHavePrnxExtension',
+            'Editing Fields': 'PreviewStringId.RibbonPreview_HighlightEditingFields_Caption',
+            'The printer is out of memory.': 'PreviewStringId.PrinterStatus_OutOfMemory',
+            'No Look-Up': 'PreviewStringId.ParameterLookUpSettingsNoLookUp',
+            'Last  Page ': 'PreviewStringId.RibbonPreview_ShowLastPage_Caption',
+            'Fast': 'PreviewStringId.ExportOption_XpsCompression_Fast',
+            'Open (Ctrl + O)': 'PreviewStringId.RibbonPreview_Open_STipTitle',
+            'E-Mail As XLS': 'PreviewStringId.RibbonPreview_SendXls_STipTitle',
+            'Navigate to the next page of the document.': 'PreviewStringId.RibbonPreview_ShowNextPage_STipContent',
+            '(Text)': 'PreviewStringId.WatermarkTypeText',
+            'Page Background': 'PreviewStringId.RibbonPreview_PageGroup_Background',
+            'Moderate': 'PreviewStringId.RibbonPreview_GalleryItem_PageMarginsModerate_Description',
+            'Keywords:': 'PreviewStringId.ExportOption_XpsDocumentKeywords',
+            'There are invalid characters in the text': 'PreviewStringId.Msg_InvalidBarcodeText',
+            'Binary data can\'t be longer than 1033 bytes.': 'PreviewStringId.Msg_InvalidBarcodeData',
+            'The number must be between {0} and {1}.': 'PreviewStringId.Msg_IncorrectZoomFactor',
+            'BMP, GIF, JPEG, PNG, TIFF, EMF, WMF': 'PreviewStringId.RibbonPreview_SendGraphic_Description',
+            'Reason': 'PreviewStringId.ExportOption_PdfSignatureOptions_Reason',
+            'Top:\t\t{0}\t\tBottom:\t\t{1}\r\nLeft:\t\t {2}\t\tRight:\t\t   {3}': 'PreviewStringId.RibbonPreview_GalleryItem_PageMargins_Description',
+            'JPEG File Interchange Format': 'PreviewStringId.SaveDlg_FilterJpeg',
+            'DOCX Document': 'PreviewStringId.SaveDlg_FilterDocx',
+            'XLSX Document': 'PreviewStringId.SaveDlg_FilterXlsx',
+            'TIFF Tag Image File Format': 'PreviewStringId.SaveDlg_FilterTiff',
+            'E-Mail As PDF': 'PreviewStringId.RibbonPreview_SendPdf_STipTitle',
+            'XLS File': 'PreviewStringId.RibbonPreview_SendXls_Caption',
+            'Narrow': 'PreviewStringId.RibbonPreview_GalleryItem_PageMarginsNarrow_Caption',
+            'Any except extracting pages': 'PreviewStringId.ExportOption_PdfChangingPermissions_AnyExceptExtractingPages',
+            'Last Page (Ctrl+End)': 'PreviewStringId.RibbonPreview_ShowLastPage_STipTitle',
+            'A page punt has occurred.': 'PreviewStringId.PrinterStatus_PagePunt',
+            'The printer door is open.': 'PreviewStringId.PrinterStatus_DoorOpen',
+            '(Picture)': 'PreviewStringId.WatermarkTypePicture',
+            'PDF/A Compatibility:': 'PreviewStringId.ExportOption_PdfACompatibility',
+            'Compression:': 'PreviewStringId.ExportOption_XpsCompression',
+            'Statusbar': 'PreviewStringId.MenuItem_ViewStatusbar',
+            'The printer is busy.': 'PreviewStringId.PrinterStatus_Busy',
+            'Waiting...': 'PreviewStringId.PrinterStatus_Waiting',
+            'The output file is too big. Please try to reduce the image resolution,\r\nor choose another export mode.': 'PreviewStringId.Msg_BigBitmapToCreate',
+            'Permissions Password:': 'PreviewStringId.ExportOption_ConfirmPermissionsPasswordForm_Name',
+            'Please confirm the Permissions Password. Be sure to make a note of the password. You will need it to change these settings in the future.': 'PreviewStringId.ExportOption_ConfirmPermissionsPasswordForm_Note',
+            'Show the Find dialog to find text in the document.': 'PreviewStringId.RibbonPreview_Find_STipContent',
+            'Export the document to XLS and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportXls_STipContent',
+            'Two Pages': 'PreviewStringId.MenuItem_ZoomTwoPages',
+            'Only Uppercase Letters': 'PreviewStringId.EditingFieldEditors_OnlyUppercaseLetters',
+            'Show grid lines': 'PreviewStringId.ExportOption_XlsShowGridLines',
+            'Header/Footer': 'PreviewStringId.RibbonPreview_EditPageHF_Caption',
+            'A user intervention has occurred.': 'PreviewStringId.PrinterStatus_UserIntervention',
+            'E-Mail As XLSX': 'PreviewStringId.RibbonPreview_SendXlsx_STipTitle',
+            'Export the document to PDF and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportPdf_STipContent',
+            'ORIGINAL': 'PreviewStringId.WMForm_Watermark_Original',
+            'Highlight all editing fields to quickly discover which of the document elements are editable.': 'PreviewStringId.RibbonPreview_HighlightEditingFields_STipContent',
+            'Edit the header and footer of the document.': 'PreviewStringId.RibbonPreview_EditPageHF_STipContent',
+            'One or more margins are set outside the printable area of the page. Continue?': 'PreviewStringId.Msg_PageMarginsWarning',
+            'Low Resolution (150 dpi)': 'PreviewStringId.ExportOption_PdfPrintingPermissions_LowResolution',
+            'Only Letters': 'PreviewStringId.EditingFieldEditors_OnlyLetters',
+            'Only Latin Letters': 'PreviewStringId.EditingFieldEditors_OnlyLatinLetters',
+            'Not compressed': 'PreviewStringId.ExportOption_XpsCompression_NotCompressed',
+            'The output file is too big. Try to reduce the number of its pages, or split it into several documents.': 'PreviewStringId.Msg_BigFileToCreate',
+            'From': 'PreviewStringId.EMail_From',
+            'Confirm Permissions Password': 'PreviewStringId.ExportOption_ConfirmPermissionsPasswordForm_Caption',
+            'Fixed-Point Positive': 'PreviewStringId.EditingFieldEditors_FixedPointPositive',
+            'Creating the document...': 'PreviewStringId.Msg_CreatingDocument',
+            'Export the document to Text and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendTxt_STipContent',
+            'Export to Text': 'PreviewStringId.RibbonPreview_ExportTxt_STipTitle',
+            'Export the document to Image and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportGraphic_STipContent',
+            'Invalid text format': 'PreviewStringId.Msg_InvalidBarcodeTextFormat',
+            'Contact Info': 'PreviewStringId.ExportOption_PdfSignatureOptions_ContactInfo',
+            'The paper has jammed.': 'PreviewStringId.PrinterStatus_PaperJam',
+            'The printer is out of paper.': 'PreviewStringId.PrinterStatus_PaperOut',
+            'Page Size': 'PreviewStringId.RibbonPreview_PaperSize_STipTitle',
+            'Confirm Document Open Password': 'PreviewStringId.ExportOption_ConfirmOpenPasswordForm_Caption',
+            'DOCX Export Options': 'PreviewStringId.ExportOptionsForm_CaptionDocx',
+            'XLSX Export Options': 'PreviewStringId.ExportOptionsForm_CaptionXlsx',
+            'Export Document...': 'PreviewStringId.TB_TTip_Export',
+            'Export hyperlinks': 'PreviewStringId.ExportOption_XlsExportHyperlinks',
+            'Open the Thumbnails, which allows you to navigate through the document.': 'PreviewStringId.RibbonPreview_Thumbnails_STipContent',
+            'Initializing the Preview...': 'PreviewStringId.PrinterStatus_Initializing',
+            'RTF File': 'PreviewStringId.RibbonPreview_ExportRtf_Caption',
+            'Pages': 'PreviewStringId.MPForm_Lbl_Pages',
+            'Date-Time': 'PreviewStringId.EditingFieldEditorCategories_DateTime',
+            'The server is unknown.': 'PreviewStringId.PrinterStatus_ServerUnknown',
+            'View Many Pages': 'PreviewStringId.RibbonPreview_MultiplePages_STipTitle',
+            '{0} x {1}': 'PreviewStringId.RibbonPreview_GalleryItem_PaperSize_Description',
+            'Navigate to the previous page of the document.': 'PreviewStringId.RibbonPreview_ShowPrevPage_STipContent',
+            'Export the document to PDF and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendPdf_STipContent',
+            'The net printer is unavailable.': 'PreviewStringId.Msg_UnavailableNetPrinter',
+            'A document can\'t be exported to a stream in the DifferentFiles mode. Use the SingleFile or SingleFilePageByPage mode instead.': 'PreviewStringId.Msg_NoDifferentFilesInStream',
+            'The created XLS file is too big for the XLS format, because it contains more than 256 columns.\r\nPlease try to use the XLSX format, instead.': 'PreviewStringId.Msg_XlsMoreThanMaxColumns',
+            'Comma-Separated Values Text': 'PreviewStringId.RibbonPreview_ExportCsv_Description',
+            'Save the document.': 'PreviewStringId.RibbonPreview_Save_STipContent',
+            'Change the zoom level of the document preview.': 'PreviewStringId.RibbonPreview_Zoom_STipContent',
+            'Open the Print Options dialog, in which you can change printing options.': 'PreviewStringId.RibbonPreview_Customize_STipContent',
+            'First Page (Ctrl+Home)': 'PreviewStringId.RibbonPreview_ShowFirstPage_STipTitle',
+            'Export the document to XLSX and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportXlsx_STipContent',
+            'Please Wait': 'PreviewStringId.WaitForm_Caption',
+            'The toner is low.': 'PreviewStringId.PrinterStatus_TonerLow',
+            'Print...': 'PreviewStringId.MenuItem_PrintSelection',
+            'The printer is paused.': 'PreviewStringId.PrinterStatus_Paused',
+            'Image format:': 'PreviewStringId.ExportOption_ImageFormat',
+            'Right Margin': 'PreviewStringId.Margin_RightMargin',
+            'CONFIDENTIAL': 'PreviewStringId.WMForm_Watermark_Confidential',
+            'The specified file doesn\'t contain valid XML data in the PRNX format. Loading is stopped.': 'PreviewStringId.Msg_FileDoesNotContainValidXml',
+            'Mouse Pointer': 'PreviewStringId.RibbonPreview_Pointer_STipTitle',
+            'The process cannot access the file "{0}" because it is being used by another process.': 'PreviewStringId.Msg_CannotAccessFile',
+            'Confirmation password does not match. Please start over and enter the password again.': 'PreviewStringId.ExportOption_ConfirmationDoesNotMatchForm_Msg',
+            'The printer is offline.': 'PreviewStringId.PrinterStatus_Offline',
+            'Invalid property name': 'PreviewStringId.Msg_InvPropName',
+            'Cannot find the specified path.': 'PreviewStringId.Msg_InvalidatePath',
+            'Invoke the Hand tool to manually scroll through pages.': 'PreviewStringId.RibbonPreview_HandTool_STipContent',
+            'Left Margin': 'PreviewStringId.Margin_LeftMargin',
+            'Adjust to': 'PreviewStringId.ScalePopup_AdjustTo',
+            'Export to CSV': 'PreviewStringId.RibbonPreview_ExportCsv_STipTitle',
+            '[Pages #]': 'PreviewStringId.PageInfo_PageTotal',
+            'The printer is warming up.': 'PreviewStringId.PrinterStatus_WarmingUp',
+            'Close Print Preview of the document.': 'PreviewStringId.RibbonPreview_ClosePreview_STipContent',
+            'Zoom out to see more of the page at a reduced size.': 'PreviewStringId.RibbonPreview_ZoomOut_STipContent',
+            'Invoke the Magnifier tool.\r\n\r\nClicking once on a document zooms it so that a single page becomes entirely visible, while clicking another time zooms it to 100% of the normal size.': 'PreviewStringId.RibbonPreview_Magnifier_STipContent',
+            'Bookmarks': 'PreviewStringId.RibbonPreview_DocumentMap_Caption',
+            'Help': 'PreviewStringId.Button_Help',
+            'Microsoft Excel 2007 Workbook': 'PreviewStringId.RibbonPreview_SendXlsx_Description',
+            'Issuer: ': 'PreviewStringId.ExportOption_PdfSignature_Issuer',
+            'Zoom in to get a close-up view of the document.': 'PreviewStringId.RibbonPreview_ZoomIn_STipContent',
+            'The printer driver needs to be updated.': 'PreviewStringId.PrinterStatus_DriverUpdateNeeded',
+            'A paper-related problem has occurred.': 'PreviewStringId.PrinterStatus_PaperProblem',
+            'Apply': 'PreviewStringId.Button_Apply',
+            'Choose the page layout to arrange the document pages in preview.': 'PreviewStringId.RibbonPreview_MultiplePages_STipContent',
+            'This is not a valid measurement.': 'PreviewStringId.Msg_InvalidMeasurement',
+            'Middle': 'PreviewStringId.WMForm_VertAlign_Middle',
+            'Watermark...': 'PreviewStringId.MenuItem_Watermark',
+            'Many Pages': 'PreviewStringId.RibbonPreview_MultiplePages_Caption',
+            'XPS Export Options': 'PreviewStringId.ExportOptionsForm_CaptionXps',
+            'E-Mail As Image': 'PreviewStringId.RibbonPreview_SendGraphic_STipTitle',
+            'Resolution (dpi):': 'PreviewStringId.ExportOption_ImageResolution',
+            'Save (Ctrl + S)': 'PreviewStringId.RibbonPreview_Save_STipTitle',
+            'Next  Page ': 'PreviewStringId.RibbonPreview_ShowNextPage_Caption',
+            'There is no page numbered {0} in this document.': 'PreviewStringId.Msg_GoToNonExistentPage',
+            'Facing': 'PreviewStringId.MenuItem_ViewFacing',
+            'DRAFT': 'PreviewStringId.WMForm_Watermark_Draft',
+            'Text separator:': 'PreviewStringId.ExportOption_TextSeparator',
+            'The output bin is full.': 'PreviewStringId.PrinterStatus_OutputBinFull',
+            'E-Mail As Text': 'PreviewStringId.RibbonPreview_SendTxt_STipTitle',
+            'Export the document to CSV and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendCsv_STipContent',
+            'Select the margin sizes for the entire document.\r\n\r\nTo apply specific margin sizes to the document, click Custom Margins.': 'PreviewStringId.RibbonPreview_PageMargins_STipContent',
+            'Preview Document Files (*{0})|*{0}|All Files (*.*)|*.*': 'PreviewStringId.OpenFileDialog_Filter',
+            'Export the document to DOCX and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportDocx_STipContent',
+            'This is not a valid page range': 'PreviewStringId.Msg_IncorrectPageRange',
+            'The specified file cannot be loaded, because it either does not contain valid XML data or exceeds the allowed size.': 'PreviewStringId.Msg_CannotLoadDocument',
+            'The printer name is invalid. Please check the printer settings.': 'PreviewStringId.Msg_WrongPrinter',
+            'Open the Parameters pane, which allows you to enter values for report parameters.': 'PreviewStringId.RibbonPreview_Parameters_STipContent',
+            'Certificate': 'PreviewStringId.ExportOption_PdfSignatureOptions_Certificate',
+            'PERSONAL': 'PreviewStringId.WMForm_Watermark_Personal',
+            'Warning!': 'PreviewStringId.Msg_CustomDrawWarning',
+            'The created XLSX file is too big for the XLSX format, because it contains more than 16,384 columns.\r\nPlease try to reduce the amount of columns in your report and export the report to XLSX again.': 'PreviewStringId.Msg_XlsxMoreThanMaxColumns',
+            'Stretch or shrink the printed output to a percentage of its actual size.': 'PreviewStringId.RibbonPreview_Scale_STipContent',
+            'Export To...': 'PreviewStringId.RibbonPreview_ExportFile_STipTitle',
+            'Remove carriage returns': 'PreviewStringId.ExportOption_HtmlRemoveSecondarySymbols',
+            'The printer has no toner.': 'PreviewStringId.PrinterStatus_NoToner',
+            'EVALUATION': 'PreviewStringId.WMForm_Watermark_Evaluation',
+            'Print (Ctrl+P)': 'PreviewStringId.RibbonPreview_Print_STipTitle',
+            'Text export mode:': 'PreviewStringId.ExportOption_TextExportMode',
+            'Document Open Password': 'PreviewStringId.ExportOption_PdfPasswordSecurityOptions_DocumentOpenPassword',
+            'The printer is ready.': 'PreviewStringId.PrinterStatus_Ready',
+            '{0} of {1}': 'PreviewStringId.SB_PageInfo',
+            'Export the document to CSV and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportCsv_STipContent',
+            'Previous Page (PageUp)': 'PreviewStringId.RibbonPreview_ShowPrevPage_STipTitle',
+            'Choose a color for the background of the document pages.': 'PreviewStringId.RibbonPreview_FillBackground_STipContent',
+            'Custom Margins...': 'PreviewStringId.RibbonPreview_PageSetup_Caption',
+            'The font size cannot be set to zero or a negative number': 'PreviewStringId.Msg_FontInvalidNumber',
+            'Author:': 'PreviewStringId.ExportOption_PdfDocumentAuthor',
+            'Show data labels rotated at 225 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_225DegreesDescription',
+            'Add Annotation': 'ChartDesignerStringIDs.Default_Elements_AddAnnotation',
+            'Show the title on the right of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_RightDescription',
+            'The entered value has an incorrect type. Must be DateTime': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithDateTimeStripMaxLimitMessage',
+            'Show only the label for the second value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DValue2LabelPositionDescription',
+            'Fade In': 'ChartDesignerStringIDs.Bar2DFadeInAnimation',
+            'Scatter Radar Line 2D': 'ChartDesignerStringIDs.RadarLineScatterSeries2D',
+            'Add Pane At Right': 'ChartDesignerStringIDs.Default_Elements_AddPaneHorizontal',
+            'Incorrect Value Format': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithNumericalStripMinLimitCaption',
+            'Additional Panes': 'ChartDesignerStringIDs.TreeAdditionalPanelCollection',
+            '0 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_0DegreesCaption',
+            'Show data labels outside bars.': 'ChartDesignerStringIDs.SeriesOptions_Labels_OutsideDescription',
+            'Diagram Options': 'ChartDesignerStringIDs.Default_Main_Diagram3DOptionsGroup',
+            'Open Value:': 'ChartDesignerStringIDs.SeriesOptions_OpenValueDataMember',
+            'There is no data to visualize. To see the chart, switch to the Chart ribbon tab and choose a desired series type from the Add New Series gallery.': 'ChartDesignerStringIDs.EmptyDiagramHint',
+            'Show axis labels rotated at -90 degrees.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_RotatedMinus90Description',
+            'Change Series View': 'ChartDesignerStringIDs.SeriesOptions_ChangeSeriesView',
+            'Add String': 'ChartDesignerStringIDs.ColorizerKeyString',
+            'The labels are organized into a straight column on the right of the funnel series points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelRightColumnPointDescription',
+            '-90 Degrees': 'ChartDesignerStringIDs.AxisOptions_YLabelOrientation_RotatedMinus90Caption',
+            'Show axis labels.': 'ChartDesignerStringIDs.AxisOptions_CircularYLabelOrientation_NormalDescription',
+            '315 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_315DegreesCaption',
+            'Do you want to save the settings?': 'ChartDesignerStringIDs.SaveAndExitWindowText',
+            'Axis Options': 'ChartDesignerStringIDs.AxisCategoryTitle',
+            'Add a constant line to the primary X-axis.': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineXDescription',
+            'Thickness:': 'ChartDesignerStringIDs.Indicator_Thickness',
+            'Slide From Top': 'ChartDesignerStringIDs.Stock2DSlideFromTopAnimation',
+            'Area Series': 'ChartDesignerStringIDs.ChartViewGallery_Area',
+            'Polar Range Area 2D': 'ChartDesignerStringIDs.PolarRangeAreaSeries2D',
+            'Order legend items from left to right.': 'ChartDesignerStringIDs.LegendOptions_Orientation_HorizontalDescription',
+            'Envelope Percent:': 'ChartDesignerStringIDs.Indicator_MovingAverageEnvelopePercent',
+            'Scatter Line 2D': 'ChartDesignerStringIDs.LineScatterSeries2D',
+            'Chart Data Source': 'ChartDesignerStringIDs.SeriesOptions_ChartDataSource',
+            'Show On Left': 'ChartDesignerStringIDs.AxisOptions_AxisKind_LeftCaption',
+            'Axes Elements': 'ChartDesignerStringIDs.Default_Elements_AxesElementsGroupTitle',
+            'Show the axis on the left of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_LeftDescription',
+            'Argument Axis:': 'ChartDesignerStringIDs.SeriesOptions_ArgumentAxis',
+            'Stacked Bar 2D': 'ChartDesignerStringIDs.BarStackedSeries2D',
+            'Argument:': 'ChartDesignerStringIDs.Indicator_Argument1',
+            'Right Below': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_FarBelowHorizontal',
+            'Show axis labels rotated at -45 degrees.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_RotatedMinus45Description',
+            'Full-Stacked Line 2D': 'ChartDesignerStringIDs.LineFullStackedSeries2D',
+            'Change Chart Type': 'ChartDesignerStringIDs.Default_Main_ChangeChartTypeGroupTitle',
+            'Name:': 'ChartDesignerStringIDs.Font_Family',
+            'Max:': 'ChartDesignerStringIDs.AxisOptions_WholeRangeMaxValue',
+            'Advanced': 'ChartDesignerStringIDs.Indicator_AdvancedGroupCaption',
+            'Only the Envelope is shown.': 'ChartDesignerStringIDs.Indicators_MovingAverageKind_EnvelopeDescription',
+            'Add a new pane below the current pane and stack them vertically.': 'ChartDesignerStringIDs.Default_Elements_AddPaneVerticalDescription',
+            'Panes Orientation': 'ChartDesignerStringIDs.Default_Main_PaneOrientationButtonCaption',
+            'Show axis labels rotated at 90 degrees.': 'ChartDesignerStringIDs.AxisOptions_YLabelOrientation_Rotated90Description',
+            'New Date Time Options': 'ChartDesignerStringIDs.NewDateTimeOptions',
+            'Simple': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_SimpleIndicatorsGalleryGroup',
+            'Constant Line': 'ChartDesignerStringIDs.DefaultConstantLineTitle',
+            'Show axis labels rotated at 45 degrees.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_Rotated45Description',
+            'Show data labels rotated at 180 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_180DegreesDescription',
+            'New Line Style': 'ChartDesignerStringIDs.NewLineStyle',
+            '45 Degrees': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_Rotated45Caption',
+            'New Regression Line': 'ChartDesignerStringIDs.NewRegressionLine',
+            'Legend Options': 'ChartDesignerStringIDs.LegendOptionsRibbonCategoryTitle',
+            'Stretch From Far': 'ChartDesignerStringIDs.Line2DStretchFromFarAnimation',
+            'Turn off axis labels.': 'ChartDesignerStringIDs.AxisOptions_AxisLabelNoneDescription',
+            'Value Level:': 'ChartDesignerStringIDs.Indicator_ValueLevel',
+            'Points Count:': 'ChartDesignerStringIDs.Indicator_MovingAveragePointsCount',
+            'Spline Area Full Stacked 2D': 'ChartDesignerStringIDs.SplineAreaFullStackedSeries2D',
+            'Do not display the axis.': 'ChartDesignerStringIDs.AxisOptions_AxisKindNoneDescription',
+            'Spline Area 2D': 'ChartDesignerStringIDs.SplineAreaSeries2D',
+            'New Navigation Options': 'ChartDesignerStringIDs.NewNavigationOptions',
+            'Bubble 2D': 'ChartDesignerStringIDs.BubbleSeries2D',
+            'Bubble 3D': 'ChartDesignerStringIDs.BubbleSeries3D',
+            'Show the title in the center of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_CenterDescription',
+            'Text:': 'ChartDesignerStringIDs.ConstantLine_TitleText',
+            'Value:': 'ChartDesignerStringIDs.SeriesOptions_ValueDataMember',
+            'Show data labels in the center of funnel points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelCenterPointDescription',
+            '3D Simple Diagram': 'ChartDesignerStringIDs.TreeDiagramSimpleDiagram3D',
+            'Slide From Right': 'ChartDesignerStringIDs.Stock2DSlideFromRightAnimation',
+            'Pattern Editor': 'ChartDesignerStringIDs.PatternEditor_WindowTitle',
+            '270 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_270DegreesCaption',
+            'Oscillator Indicators': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_OscillatorsGalleryGroup',
+            'Perspective Angle:': 'ChartDesignerStringIDs.Default_Main_Diagram3DPerspectiveAngle',
+            'Show one label in the center of the range bar with both minimum and maximum values.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarOneLabelPositionDescription',
+            'Show the title on the top of an axis.': 'ChartDesignerStringIDs.AxisOptions_YTitlePosition_TopDescription',
+            'DataSource Based Error Bars': 'ChartDesignerStringIDs.DataSourceBasedErrorBars',
+            'New Time Interval': 'ChartDesignerStringIDs.NewTimeInterval',
+            'Slide From Right Center': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromRightCenter',
+            'Candle Stick 2D': 'ChartDesignerStringIDs.CandleStickSeries2D',
+            'Spline 2D': 'ChartDesignerStringIDs.SplineSeries2D',
+            'Right Above': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_FarAboveHorizontal',
+            'High Value:': 'ChartDesignerStringIDs.SeriesOptions_HighValueDataMember',
+            'Trend Indicators': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_TrendIndicatorsGalleryGroup',
+            'Only the Moving Average is shown.': 'ChartDesignerStringIDs.Indicators_MovingAverageKind_MovingAverageDescription',
+            'Fibonacci': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_FibonacciIndicatorsGalleryGroup',
+            'Full-Stacked Step Area 2D': 'ChartDesignerStringIDs.AreaStepFullStackedSeries2D',
+            'Show the axis at the bottom of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_BottomDescription',
+            'Text On Axis:': 'ChartDesignerStringIDs.Strip_AxisLabelText',
+            'Slide From Left Top Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromLeftTopCorner',
+            'New Tool Tip Mouse Position': 'ChartDesignerStringIDs.NewToolTipMousePosition',
+            'Template': 'ChartDesignerStringIDs.SeriesTemplate',
+            '90 Degrees': 'ChartDesignerStringIDs.AxisOptions_YLabelOrientation_Rotated90Caption',
+            'Zoom  Scroll': 'ChartDesignerStringIDs.Default_Main_NavigationHeader',
+            'Save and Exit': 'ChartDesignerStringIDs.SaveAndExitButtonCaption',
+            'Value2': 'ChartDesignerStringIDs.ValueLevel_Value2',
+            'Show Labels': 'ChartDesignerStringIDs.AxisOptions_CircularYLabelOrientation_NormalCaption',
+            'Format:': 'ChartDesignerStringIDs.AxisOptions_DateTimeFormat',
+            'New Reduction Stock Options': 'ChartDesignerStringIDs.NewReductionStockOptions',
+            'New Tool Tip Options': 'ChartDesignerStringIDs.NewToolTipOptions',
+            'Show the title below the line on the left.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_NearBelowHorizontal',
+            'New Indicator Label': 'ChartDesignerStringIDs.NewIndicatorLabel',
+            'Nested Donut 2D': 'ChartDesignerStringIDs.NestedDonutSeries2D',
+            'Show Axis': 'ChartDesignerStringIDs.AxisOptions_AxisKind_CircularAxisYVisibleCaption',
+            'Show data labels rotated at 45 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_45DegreesDescription',
+            'Close Value:': 'ChartDesignerStringIDs.SeriesOptions_CloseValueDataMember',
+            'Moving Average nd Envelope': 'ChartDesignerStringIDs.Indicators_MovingAverageKind_MovingAverageAndEnvelope',
+            'Show only the label for the minimum value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DMinValueLabelPositionDescription',
+            'New Numeric Options': 'ChartDesignerStringIDs.NewNumericOptions',
+            'Show data labels rotated at 135 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_135DegreesDescription',
+            'Kind: ': 'ChartDesignerStringIDs.Indicator_MovingAverageKind',
+            'Show the title on the left of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_LeftDescription',
+            'Strip Options': 'ChartDesignerStringIDs.Strip_CategoryCaption',
+            'Max Limit:': 'ChartDesignerStringIDs.Strip_MaxLimit',
+            'Add Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddSecondaryAxisY',
+            'Add Axis X': 'ChartDesignerStringIDs.Default_Elements_AddSecondaryAxisX',
+            'Legend #': 'ChartDesignerStringIDs.TreeLegend',
+            '180 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_180DegreesCaption',
+            'Show data labels on the right of funnel points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelRightPointDescription',
+            'Constant Line Options': 'ChartDesignerStringIDs.ConstantLineCategoryTitle',
+            'Financial Series': 'ChartDesignerStringIDs.ChartViewGallery_Financial',
+            'Left Below': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_NearBelowHorizontal',
+            'Point Distance:': 'ChartDesignerStringIDs.SeriesOptions_FunnelPointDistance',
+            'Grid Alignment:': 'ChartDesignerStringIDs.AxisOptions_DateTimeGridAlignment',
+            'Reverse Items': 'ChartDesignerStringIDs.LegendOptions_ReverseItems',
+            'Slide From Left': 'ChartDesignerStringIDs.Bar2DSlideFromLeftAnimation',
+            'New Fibonacci Retracement': 'ChartDesignerStringIDs.NewFibonacciRetracement',
+            'Show data labels outside pie slices.': 'ChartDesignerStringIDs.SeriesOptions_Labels_OutsideSlicesDescription',
+            'New Workdays Options': 'ChartDesignerStringIDs.NewWorkdaysOptions',
+            'Secondary Axis X #': 'ChartDesignerStringIDs.SecondaryAxisXPrefix',
+            'Dollar': 'ChartDesignerStringIDs.Marker2DModelDollar',
+            'Height / Width:': 'ChartDesignerStringIDs.SeriesOptions_FunnelRatio',
+            'Show the axis on the right of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_RightDescription',
+            'New Simple Moving Average': 'ChartDesignerStringIDs.NewSimpleMovingAverage',
+            'Add a constant line to the primary Y-axis.': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineYDescription',
+            'Add Legend': 'ChartDesignerStringIDs.Default_Elements_AddLegend',
+            'Show the axis on the top of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_TopDescription',
+            'Shape Style': 'ChartDesignerStringIDs.Default_Main_CircularDiagramShapeStyle',
+            'Slide From Bottom': 'ChartDesignerStringIDs.Bar2DSlideFromBottomAnimation',
+            'Center ': 'ChartDesignerStringIDs.SeriesOptions_RangeBarOneLabelPositionCaption',
+            'Radar Series': 'ChartDesignerStringIDs.ChartViewGallery_Radar',
+            'Text in Legend:': 'ChartDesignerStringIDs.Indicator_LegendText',
+            'Show the title below the line on the right.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_FarBelowVertical',
+            'Turn off the axis title.': 'ChartDesignerStringIDs.AxisOptions_TitlePosition_NoneDescription',
+            'Polar Series': 'ChartDesignerStringIDs.ChartViewGallery_Polar',
+            'Pane  Axis': 'ChartDesignerStringIDs.Indicator_SeparatePaneGroupCaption',
+            'Color:': 'ChartDesignerStringIDs.SeriesOptions_ColorDataMember',
+            'Funnel Series': 'ChartDesignerStringIDs.ChartViewGallery_Funnel',
+            'Radar Area 2D': 'ChartDesignerStringIDs.RadarAreaSeries2D',
+            'Title Visibility': 'ChartDesignerStringIDs.AxisOptions_TitleVisibility',
+            'Series Data Source': 'ChartDesignerStringIDs.SeriesOptions_SeriesDataSource',
+            'Dimension:': 'ChartDesignerStringIDs.Default_Main_SimpleDiagramLayoutDimensionWithColon',
+            'Pie/Doughnut': 'ChartDesignerStringIDs.SeriesOptions_PieDoughnutOptionsGroup',
+            'Stock 2D': 'ChartDesignerStringIDs.StockSeries2D',
+            'The entered value has an incorrect type. Must be Numerical': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithNumericalStripMaxLimitMessage',
+            'New Work Time Rule': 'ChartDesignerStringIDs.NewWorkTimeRule',
+            'Funnel 2D': 'ChartDesignerStringIDs.FunnelSeries2D',
+            'Slide To Center': 'ChartDesignerStringIDs.CircularMarkerSlideToCenterAnimation',
+            'Show the Axis Y.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_CircularAxisYVisibleDescription',
+            'Stacked Series 2D': 'ChartDesignerStringIDs.AreaStackedSeries2D',
+            'Stacked Area 3D': 'ChartDesignerStringIDs.AreaStackedSeries3D',
+            'Full-Stacked Series 2D': 'ChartDesignerStringIDs.AreaFullStackedSeries2D',
+            'Full-Stacked Area 3D': 'ChartDesignerStringIDs.AreaFullStackedSeries3D',
+            'Add Indicator': 'ChartDesignerStringIDs.SeriesOptions_AddIndicatorsGroupTitle',
+            'Connector:': 'ChartDesignerStringIDs.SeriesOptions_ConnectorThickness',
+            'Annotation Options': 'ChartDesignerStringIDs.ChartAnnotationOptionsRibbonCategoryTitle',
+            'Side-By-Side Range Bar 2D': 'ChartDesignerStringIDs.RangeBarSideBySideSeries2D',
+            'Add a strip to the primary X-axis.': 'ChartDesignerStringIDs.Default_Elements_AddStripXDescription',
+            'DateTime Options': 'ChartDesignerStringIDs.AxisOptions_DateTimeOptionsGroup',
+            'Show data labels rotated at 270 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_270DegreesDescription',
+            'Range Series': 'ChartDesignerStringIDs.ChartViewGallery_RangeSeries',
+            'New Weighted Moving Average': 'ChartDesignerStringIDs.NewWeightedMovingAverage',
+            'Side-by-Side Bar 2D': 'ChartDesignerStringIDs.BarSideBySideSeries2D',
+            'Side-by-Side Bar 3D': 'ChartDesignerStringIDs.BarSideBySideSeries3D',
+            'Low Value:': 'ChartDesignerStringIDs.SeriesOptions_LowValueDataMember',
+            '-45 Degrees': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_RotatedMinus45Caption',
+            'Slide From Top Center': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromTopCenter',
+            'Show data labels on the left of funnel points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelLeftPointDescription',
+            'No Data Source': 'ChartDesignerStringIDs.SeriesOptions_DataSourceNone',
+            'Overlapped Range Bar 2D': 'ChartDesignerStringIDs.RangeBarOverlappedSeries2D',
+            'Polar Area 2D': 'ChartDesignerStringIDs.PolarAreaSeries2D',
+            '225 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_225DegreesCaption',
+            'Series Options': 'ChartDesignerStringIDs.SeriesOptionsRibbonCategoryTitle',
+            'Clear Series Data': 'ChartDesignerStringIDs.ClearSeriesDataButtonCaption',
+            'Show data labels in the center of point markers.': 'ChartDesignerStringIDs.SeriesOptions_Labels_Marker3DCenterDescription',
+            'New Resolve Overlapping Options': 'ChartDesignerStringIDs.NewResolveOverlappingOptions',
+            'KeyColorColorizer': 'ChartDesignerStringIDs.KeyColorColorizer',
+            'Fan Zoom In': 'ChartDesignerStringIDs.Pie2DFanZoomInAnimation',
+            'New Crosshair Options': 'ChartDesignerStringIDs.NewCrosshairOptions',
+            'RangeColorizer': 'ChartDesignerStringIDs.RangeColorizer',
+            'Point and Bubble Series': 'ChartDesignerStringIDs.ChartViewGallery_PointBubble',
+            'Triple Exponential Moving Average (TriX)': 'ChartDesignerStringIDs.TripleExponentialMovingAverageTrix',
+            'Spline Area Stacked 2D': 'ChartDesignerStringIDs.SplineAreaStackedSeries2D',
+            'Visible Range': 'ChartDesignerStringIDs.AxisOptions_VisibleRangeHeader',
+            'Chart Area Elements': 'ChartDesignerStringIDs.Default_Elements_ChartAreaElementsGroupTitle',
+            'Step Line 2D': 'ChartDesignerStringIDs.LineStepSeries2D',
+            'Turn off the title.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_None',
+            'Weight:': 'ChartDesignerStringIDs.SeriesOptions_WeightDataMember',
+            'Add Pane Below': 'ChartDesignerStringIDs.Default_Elements_AddPaneVertical',
+            'Stretch From Near': 'ChartDesignerStringIDs.Area2DStretchFromNearAnimation',
+            'Price Indicators': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_PriceIndicatorsGalleryGroup',
+            'Bar Series': 'ChartDesignerStringIDs.ChartViewGallery_BarSeries',
+            'Axis Title': 'ChartDesignerStringIDs.AxisOptions_TitleGroup',
+            'Show At Bottom': 'ChartDesignerStringIDs.AxisOptions_AxisKind_BottomCaption',
+            'Series:': 'ChartDesignerStringIDs.SeriesOptions_SeriesDataMember',
+            'Radar Line 2D': 'ChartDesignerStringIDs.RadarLineSeries2D',
+            'SeriesPoint Anchor Point': 'ChartDesignerStringIDs.AnnotationSeriesPointAnchorPoint',
+            'New Fibonacci Arcs': 'ChartDesignerStringIDs.NewFibonacciArcs',
+            'New Fibonacci Fans': 'ChartDesignerStringIDs.NewFibonacciFans',
+            'Slide From Left Center': 'ChartDesignerStringIDs.CircularMarkerSlideFromLeftCenterAnimation',
+            '135 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_135DegreesCaption',
+            'The labels are organized into a straight column on the left of the funnel series points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelLeftColumnPointDescription',
+            'Drop From Far': 'ChartDesignerStringIDs.Area2DDropFromFarAnimation',
+            'Show only the label for the maximum value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DMaxValueLabelPositionDescription',
+            'Show data labels in the center of bars.': 'ChartDesignerStringIDs.SeriesOptions_Labels_StackedBarCenteredInBarDescription',
+            'Point 3D': 'ChartDesignerStringIDs.PointSeries3D',
+            'Point 2D': 'ChartDesignerStringIDs.PointSeries2D',
+            'Unwrap Horizontally': 'ChartDesignerStringIDs.Line2DUnwrapHorizontallyAnimation',
+            'New Pane': 'ChartDesignerStringIDs.NewPane',
+            'New Axis': 'ChartDesignerStringIDs.NewAxis',
+            'Show the title above the line on the right.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_FarAboveVertical',
+            'ColorObjectColorizer': 'ChartDesignerStringIDs.ColorObjectColorizer',
+            'New Legend': 'ChartDesignerStringIDs.NewLegend',
+            ' Polar Line 2D': 'ChartDesignerStringIDs.PolarLineSeries2D',
+            'Title Options': 'ChartDesignerStringIDs.ChartTitleOptionsRibbonCategoryTitle',
+            'Height / Width Auto': 'ChartDesignerStringIDs.SeriesOptions_FunnelRatioAuto',
+            'Turn on data labels.': 'ChartDesignerStringIDs.SeriesOptions_Labels_Area3DEnabledDescription',
+            'Add Constant Line To Axis X': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineX',
+            'Add Constant Line To Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineY',
+            'Step Area 2D': 'ChartDesignerStringIDs.AreaStepSeries2D',
+            'Measure Unit:': 'ChartDesignerStringIDs.AxisOptions_DateTimeMeasureUnit',
+            'Complex Content': 'ChartDesignerStringIDs.ComplexAnnotationContent',
+            'New Exponential Moving Average': 'ChartDesignerStringIDs.NewExponentialMovingAverage',
+            'Add Strip To Axis X': 'ChartDesignerStringIDs.Default_Elements_AddStripX',
+            'Add Strip To Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddStripY',
+            'New Tool Tip Free Position': 'ChartDesignerStringIDs.NewToolTipFreePosition',
+            'Turn off data labels.': 'ChartDesignerStringIDs.SeriesOptions_Labels_NoneDescription',
+            'Min Limit:': 'ChartDesignerStringIDs.Strip_MinLimit',
+            'Show both labels with minimum and maximum values of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DTwoLabelsPositionDescription',
+            'Show data labels in two columns.': 'ChartDesignerStringIDs.SeriesOptions_Labels_TwoColumnsDescription',
+            'Bar 3D (Manhattan Bar)': 'ChartDesignerStringIDs.BarSeries3D',
+            'Pie Series': 'ChartDesignerStringIDs.ChartViewGallery_Pie',
+            'Show On Right': 'ChartDesignerStringIDs.AxisOptions_AxisKind_RightCaption',
+            'Left Above': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_NearAboveHorizontal',
+            'Show axis labels in staggered order.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_StaggeredDescription',
+            'Data Members': 'ChartDesignerStringIDs.SeriesOptions_DataMembersPageGroup',
+            'Stretch Out': 'ChartDesignerStringIDs.Area2DStretchOutAnimation',
+            'Show data labels inside pie slices.': 'ChartDesignerStringIDs.SeriesOptions_Labels_InsideSlicesDescription',
+            'New Axis Range': 'ChartDesignerStringIDs.NewAxisRange',
+            'New Crosshair Axis Label Options': 'ChartDesignerStringIDs.NewCrosshairAxisLabelOptions',
+            'Show both labels with minimum and maximum values.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarTwoLabelsLabelPositionDescription',
+            'Slide From Right Top Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromRightTopCorner',
+            'New Tool Tip Controller': 'ChartDesignerStringIDs.NewChartToolTipController',
+            'New Axis Label': 'ChartDesignerStringIDs.NewAxisLabel',
+            'New Triangular Moving Average': 'ChartDesignerStringIDs.NewTriangularMovingAverage',
+            'Min:': 'ChartDesignerStringIDs.AxisOptions_WholeRangeMinValue',
+            'Stacked Line 2D': 'ChartDesignerStringIDs.LineStackedSeries2D',
+            'Area 2D': 'ChartDesignerStringIDs.AreaSeries2D',
+            'Both ': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DTwoLabelsPositionCaption',
+            'Zoom Percent:': 'ChartDesignerStringIDs.Default_Main_Diagram3DZoomPercent',
+            'Slide From Bottom Center': 'ChartDesignerStringIDs.CircularMarkerSlideFromBottomCenterAnimation',
+            'Radar Point 2D': 'ChartDesignerStringIDs.RadarPointSeries2D',
+            'Ring': 'ChartDesignerStringIDs.Marker2DModelRing',
+            'Pie 2D': 'ChartDesignerStringIDs.PieSeries2D',
+            'Minor': 'ChartDesignerStringIDs.AxisOptions_MinorVisible',
+            'End Style:': 'ChartDesignerStringIDs.Indicator_ErrorBarsEndStyle',
+            'Add Constant Line': 'ChartDesignerStringIDs.Default_Elements_AddConstantLine',
+            'Strip': 'ChartDesignerStringIDs.TreeStripModel',
+            'Add Integer': 'ChartDesignerStringIDs.ColorizerKeyInt',
+            'Order legend items from top to bottom.': 'ChartDesignerStringIDs.LegendOptions_Orientation_VerticalDescription',
+            'Nested Donut': 'ChartDesignerStringIDs.SeriesOptions_NestedDonut2DOptionsGroup',
+            'Show one label in the center of the range area with both minimum and maximum values.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DOneLabelPositionDescription',
+            'Show the title above the line on the left.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_NearAboveVertical',
+            'Pane #': 'ChartDesignerStringIDs.PanePrefix',
+            'New Tool Tip Relative Position': 'ChartDesignerStringIDs.NewToolTipRelativePosition',
+            'Polar Point 2D': 'ChartDesignerStringIDs.PolarPointSeries2D',
+            'Show data labels in the center of bubbles.': 'ChartDesignerStringIDs.SeriesOptions_Labels_Bubble2DCenterDescription',
+            'Slide From Center': 'ChartDesignerStringIDs.CircularMarkerSlideFromCenterAnimation',
+            'Text In Legend:': 'ChartDesignerStringIDs.ConstantLine_LegendText',
+            'New Title': 'ChartDesignerStringIDs.NewTitle',
+            'Series Data': 'ChartDesignerStringIDs.SeriesDataPanelTitle',
+            'Secondary Axis Y #': 'ChartDesignerStringIDs.SecondaryAxisYPrefix',
+            'Add a strip to the primary Y-axis.': 'ChartDesignerStringIDs.Default_Elements_AddStripYDescription',
+            'Range Area 2D': 'ChartDesignerStringIDs.RangeAreaSeries2D',
+            'Drop From Near': 'ChartDesignerStringIDs.Area2DDropFromNearAnimation',
+            'Add a new pane to the right of the current pane and stack them horizontally.': 'ChartDesignerStringIDs.Default_Elements_AddPaneHorizontalDescription',
+            'Pane:': 'ChartDesignerStringIDs.SeriesOptions_SeriesPane',
+            'Both the Moving Average and Envelope are shown.': 'ChartDesignerStringIDs.Indicators_MovingAverageKind_MovingAverageAndEnvelopeDescription',
+            'Show only the label for the maximum range bar value.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarMaxValueLabelPositionDescription',
+            'Scatter Polar Line 2D': 'ChartDesignerStringIDs.PolarLineScatterSeries2D',
+            'Side-by-Side Stacked Bar 2D': 'ChartDesignerStringIDs.BarSideBySideStackedSeries2D',
+            'New Series Border': 'ChartDesignerStringIDs.NewSeriesBorder',
+            'Indicator Options': 'ChartDesignerStringIDs.IndicatorCategoryTitle',
+            'Hole percent:': 'ChartDesignerStringIDs.SeriesOptions_HoleRadiusPercent',
+            'New Custom Legend Item': 'ChartDesignerStringIDs.NewCustomLegendItem',
+            'Value 2:': 'ChartDesignerStringIDs.SeriesOptions_Value2DataMember',
+            'Show On Top': 'ChartDesignerStringIDs.AxisOptions_AxisKind_TopCaption',
+            'Side-By-Side Full Stacked Bar 2D': 'ChartDesignerStringIDs.BarSideBySideFullStackedSeries2D',
+            'New Scroll Bar Options': 'ChartDesignerStringIDs.NewScrollBarOptions',
+            'Add Double': 'ChartDesignerStringIDs.ColorizerKeyDouble',
+            'Placeholders': 'ChartDesignerStringIDs.PatternEditor_PlaceholdersLabelText',
+            'Show the title at the bottom of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_BottomDescription',
+            'Show only the label for the first value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DValue1LabelPositionDescription',
+            'Line 2D': 'ChartDesignerStringIDs.LineSeries2D',
+            'Radar Range Area 2D': 'ChartDesignerStringIDs.RadarRangeAreaSeries2D',
+            'New Trend Line': 'ChartDesignerStringIDs.NewTrendLine',
+            'Show data labels rotated at 90 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_90DegreesDescription',
+            'Chart Designer': 'ChartDesignerStringIDs.ChartDesignerWindowTitle',
+            'Special': 'ChartDesignerStringIDs.PatternEditor_FormatComboBox_Special',
+            'Direction:': 'ChartDesignerStringIDs.Indicator_ErrorBarsDirection',
+            'Brush': 'ChartDesignerStringIDs.DataEditor_BrushColumnHeader',
+            'Slide From Right Bottom Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromRightBottomCorner',
+            'Show data labels without rotation.': 'ChartDesignerStringIDs.SeriesOptions_Labels_0DegreesDescription',
+            'Indicator': 'ChartDesignerStringIDs.Indicator_IndicatorPageTitle',
+            'Stacked Step Area 2D': 'ChartDesignerStringIDs.AreaStepStackedSeries2D',
+            'Add Chart Title': 'ChartDesignerStringIDs.Default_Elements_AddChartTitle',
+            'Value level': 'ChartDesignerStringIDs.Indicator_ValueLevelForRegressionLine',
+            'Line Series': 'ChartDesignerStringIDs.ChartViewGallery_LineSeries',
+            'Show data labels on the top of point markers.': 'ChartDesignerStringIDs.SeriesOptions_Labels_3DTopDescription',
+            'New Series Label': 'ChartDesignerStringIDs.NewSeriesLabel',
+            'New SeriesPoint': 'ChartDesignerStringIDs.NewSeriesPoint',
+            'Chart Structure': 'ChartDesignerStringIDs.ChartStructureDockPanelTitle',
+            'Slide From Left Bottom Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromLeftBottomCorner',
+            'Add New Series': 'ChartDesignerStringIDs.Default_Main_AddSeriesManuallyGroupTitle',
+            'Major': 'ChartDesignerStringIDs.AxisOptions_MajorVisible',
+            'Value Axis:': 'ChartDesignerStringIDs.SeriesOptions_ValueAxis',
+            'Size:': 'ChartDesignerStringIDs.Font_Size',
+            'Full-Stacked Bar 2D': 'ChartDesignerStringIDs.BarFullStackedSeries2D',
+            'Cartesian Diagram': 'ChartDesignerStringIDs.TreeDiagramXYDiagram2D',
+            '3D Cartesian Diagram': 'ChartDesignerStringIDs.TreeDiagramXYDiagram3D',
+            'New Crosshair Mouse Position': 'ChartDesignerStringIDs.NewCrosshairMousePosition',
+            'Show data labels rotated at 315 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_315DegreesDescription',
+            'New Crosshair Free Position': 'ChartDesignerStringIDs.NewCrosshairFreePosition',
+            'Indent:': 'ChartDesignerStringIDs.SeriesOptions_Indent',
+            'Show only the label for the minimum range bar value.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarMinValueLabelPositionDescription',
+            'Unwrap Vertically': 'ChartDesignerStringIDs.Line2DUnwrapVerticallyAnimation',
+            'Title Collection': 'ChartDesignerStringIDs.TreeTitleCollection',
+            'Africa Sunset': 'GaugesPresetsStringId.ThemeAfricaSunset',
+            'Classic': 'GaugesPresetsStringId.ThemeClassic',
+            'Silver Blur': 'GaugesPresetsStringId.ThemeSilverBlur',
+            'Future': 'GaugesPresetsStringId.ThemeFuture',
+            'Cosmic': 'GaugesPresetsStringId.ThemeCosmic',
+            'Clever': 'GaugesPresetsStringId.ThemeClever',
+            'Shining Dark': 'GaugesPresetsStringId.ThemeShiningDark',
+            'QuarterLeft': 'GaugesPresetsStringId.ShapeQuarterLeft',
+            'Theme': 'GaugesPresetsStringId.StyleChooserFilterTheme',
+            'Eco': 'GaugesPresetsStringId.ThemeEco',
+            'White': 'GaugesPresetsStringId.ThemeWhite',
+            'Retro': 'GaugesPresetsStringId.ThemeRetro',
+            'Disco': 'GaugesPresetsStringId.ThemeDisco',
+            'Ignis': 'GaugesPresetsStringId.ThemeIgnis',
+            'Ice-Cold Zone': 'GaugesPresetsStringId.ThemeIceColdZone',
+            'Dark Night': 'GaugesPresetsStringId.ThemeDarkNight',
+            'iStyle': 'GaugesPresetsStringId.ThemeiStyle',
+            'Deep Fire': 'GaugesPresetsStringId.ThemeDeepFire',
+            'Gothic Mat': 'GaugesPresetsStringId.ThemeGothicMat',
+            'QuarterRight': 'GaugesPresetsStringId.ShapeQuarterRight',
+            'Clean White': 'GaugesPresetsStringId.ThemeCleanWhite',
+            'Magic Light': 'GaugesPresetsStringId.ThemeMagicLight',
+            'Military': 'GaugesPresetsStringId.ThemeMilitary',
+            'Pure Dark': 'GaugesPresetsStringId.ThemePureDark',
+            'ThreeFourth': 'GaugesPresetsStringId.ShapeThreeFourth',
+            'Haze': 'GaugesPresetsStringId.ThemeHaze',
+            'Sport Car': 'GaugesPresetsStringId.ThemeSportCar',
+            'Mechanical': 'GaugesPresetsStringId.ThemeMechanical',
+            'Yellow Submarine': 'GaugesPresetsStringId.ThemeYellowSubmarine',
+            'Progressive': 'GaugesPresetsStringId.ThemeProgressive',
+            'Number (32 bit integer)': 'UtilsUIStringId.Parameter_Type_Int32',
+            'Number (64 bit integer)': 'UtilsUIStringId.Parameter_Type_Int64',
+            'Number (16 bit integer)': 'UtilsUIStringId.Parameter_Type_Int16',
+            'Number (floating-point)': 'UtilsUIStringId.Parameter_Type_Float',
+            'Input format string contains illegal symbol(s).': 'UtilsUIStringId.Msg_ContainsIllegalSymbols',
+            'Error: Illegal symbol(s)': 'UtilsUIStringId.FSForm_Msg_BadSymbol',
+            'Remove All Calculated Fields': 'UtilsUIStringId.Cmd_ClearCalculatedFields',
+            'Add or remove {0} objects': 'UtilsUIStringId.CollectionEditor_Cancel',
+            'Edit Calculated Fields...': 'UtilsUIStringId.Cmd_EditCalculatedFields',
+            'Remove All Parameters': 'UtilsUIStringId.Cmd_ClearParameters',
+            'Number (decimal)': 'UtilsUIStringId.Parameter_Type_Decimal',
+            'Categorized': 'UtilsUIStringId.PropGrid_TTip_Categorized',
+            'Edit Parameters...': 'UtilsUIStringId.Cmd_EditParameters',
+            'Add Calculated Field': 'UtilsUIStringId.Cmd_AddCalculatedField',
+            'Number (double-precision floating-point)': 'UtilsUIStringId.Parameter_Type_Double',
+            'Add Parameter': 'UtilsUIStringId.Cmd_AddParameter',
+            'The format string is not contained in any of the standard categories.': 'UtilsUIStringId.Msg_FormatStringNotFound',
+            'Edit Expression...': 'UtilsUIStringId.Cmd_EditExpression'
         };
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -4465,7 +5496,7 @@ var DevExpress;
                             return options.isVisibleButton ? options.isVisibleButton(_this.selectedIndex(), name) : true;
                     };
                     this.padding = options.level !== void 0 ? options.level * Widgets.propertiesGridEditorsPaddingLeft : 0;
-                    this.displayName = options.displayName;
+                    this.displayName = (options.info && options.info()) ? DevExpress.Designer.getLocalization(options.info().displayName, options.info().localizationId) : options.displayName;
                     this.options = options;
                     if (!options.displayName) {
                         this.collapsed(false);
@@ -4809,13 +5840,53 @@ var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
+        var CodeResolver = (function () {
+            function CodeResolver() {
+                this._queue = [];
+                this._done = [];
+            }
+            CodeResolver.prototype.done = function (callback) {
+                this._done.push(callback);
+            };
+            CodeResolver.prototype.execute = function (func, time) {
+                if (time === void 0) { time = 0; }
+                var deferred = $.Deferred();
+                if (time) {
+                    var self = this;
+                    this._queue.push(function () {
+                        setTimeout(function () {
+                            deferred.resolve(func());
+                            self._queue.splice(0, 1);
+                            if (self._queue.length !== 0) {
+                                self._queue[0]();
+                            }
+                            else {
+                                for (var i = 0; i < self._done.length; i++) {
+                                    self._done[i]();
+                                }
+                            }
+                        }, time);
+                    });
+                    if (this._queue.length === 1) {
+                        this._queue[0]();
+                    }
+                }
+                else {
+                    deferred.resolve(func());
+                }
+                return deferred.promise();
+            };
+            return CodeResolver;
+        })();
+        JS.CodeResolver = CodeResolver;
+        var globalResolver = new CodeResolver();
         ko.virtualElements.allowedBindings["lazy"] = true;
         ko.bindingHandlers['lazy'] = {
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                 var parsedBindings = valueAccessor();
                 $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
                     var innerBinding = ko.bindingHandlers[innerBindingKey];
-                    setTimeout(function () {
+                    globalResolver.execute(function () {
                         var isInitialized = false;
                         ko.computed({
                             read: function () {
@@ -4899,8 +5970,8 @@ var DevExpress;
                     if (!value)
                         return value;
                     if (!prevDisplayExpr)
-                        return JS.Utils.getLocalization(value);
-                    return JS.Utils.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr]);
+                        return DevExpress.Designer.getLocalization(value, value.localizationId);
+                    return DevExpress.Designer.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr], value.localizationId);
                 };
                 var extendedOptions = viewModel.getOptions ? viewModel.getOptions(options) : options;
                 ko.bindingHandlers["dxSelectBox"].init(element, function () { return extendedOptions; }, allBindings, viewModel, bindingContext);
@@ -4993,21 +6064,25 @@ var DevExpress;
                     && editor1.editorType === editor2.editorType;
             }
             var ObjectProperties = (function () {
-                function ObjectProperties(target, editorsInfo, level, parentDisabled) {
+                function ObjectProperties(target, editorsInfo, level, parentDisabled, recreateEditors) {
                     var _this = this;
                     if (level === void 0) { level = 0; }
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
+                    if (recreateEditors === void 0) { recreateEditors = false; }
+                    this._targetSubscription = null;
+                    this._infoSubscription = null;
+                    this._getInfoComputed = null;
                     this.level = 0;
                     this.rtl = DevExpress['config']()['rtlEnabled'];
                     this._editors = ko.observableArray([]);
                     this.level = level;
                     this._parentDisabled = parentDisabled;
-                    ko.computed(function () {
-                        var viewModel = target();
-                        var serializationInfo = editorsInfo && editorsInfo.editors || viewModel && viewModel["getInfo"] && viewModel["getInfo"]();
-                        _this._createEditors(viewModel, serializationInfo);
-                        _this.update(viewModel);
+                    this._targetSubscription = target.subscribe(function (newVal) {
+                        _this._infoSubscription && _this._infoSubscription.dispose();
+                        _this._getInfoComputed && _this._getInfoComputed.dispose();
+                        _this._update(newVal, editorsInfo, recreateEditors);
                     });
+                    this._update(target(), editorsInfo, recreateEditors);
                 }
                 ObjectProperties.prototype.update = function (viewModel) {
                     if (viewModel) {
@@ -5015,6 +6090,25 @@ var DevExpress;
                             editor.update(viewModel);
                         });
                     }
+                };
+                ObjectProperties.prototype._cleanEditorsSubscriptions = function () {
+                    this._editors().forEach(function (editor) {
+                        for (var name in editor) {
+                            if (ko.isComputed(editor[name])) {
+                                editor[name].dispose();
+                            }
+                        }
+                    });
+                };
+                ObjectProperties.prototype.cleanSubscriptions = function () {
+                    this._infoSubscription && this._infoSubscription.dispose();
+                    this._getInfoComputed && this._getInfoComputed.dispose();
+                    this._targetSubscription && this._targetSubscription.dispose();
+                    this._cleanEditorsSubscriptions();
+                };
+                ObjectProperties.prototype.cleanEditors = function () {
+                    this._cleanEditorsSubscriptions();
+                    this._editors([]);
                 };
                 ObjectProperties.prototype.createEditor = function (modelPropertyInfo) {
                     var editorType = modelPropertyInfo.editor && modelPropertyInfo.editor.editorType || Editor;
@@ -5036,6 +6130,27 @@ var DevExpress;
                     this._editors.sort(function (a, b) {
                         return propertyNames.indexOf(a.name) - propertyNames.indexOf(b.name);
                     });
+                };
+                ObjectProperties.prototype._update = function (target, editorsInfo, recreateEditors) {
+                    var _this = this;
+                    if (recreateEditors)
+                        this._editors([]);
+                    var infoSubscription = null;
+                    if (editorsInfo && editorsInfo && editorsInfo.editors) {
+                        this._createEditors(target, editorsInfo && editorsInfo.editors);
+                        this.update(target);
+                    }
+                    else {
+                        this._getInfoComputed = ko.computed(function () { return target && target["getInfo"] && target["getInfo"](); });
+                        this._infoSubscription = this._getInfoComputed.subscribe(function (newInfo) {
+                            if (recreateEditors)
+                                _this._editors([]);
+                            _this._createEditors(target, newInfo);
+                            _this.update(target);
+                        });
+                        this._createEditors(target, this._getInfoComputed());
+                        this.update(target);
+                    }
                 };
                 ObjectProperties.prototype.getEditors = function () {
                     return this._editors();
@@ -5071,7 +6186,7 @@ var DevExpress;
                         defaultValue = ko.observableArray();
                     }
                     this.values = ko.computed(function () {
-                        var _values = _this.info().valueStore;
+                        var _values = _this.info().valueStore || _this.info().valuesArray;
                         if (_values) {
                             return _values;
                         }
@@ -5079,12 +6194,6 @@ var DevExpress;
                         if (_values) {
                             return $.map(_values, function (displayValue, value) {
                                 return { value: value, displayValue: displayValue };
-                            });
-                        }
-                        _values = _this.info().valuesArray;
-                        if (_values) {
-                            return $.map(_values, function (value) {
-                                return { value: value.value, displayValue: value.displayValue };
                             });
                         }
                     });
@@ -5147,6 +6256,9 @@ var DevExpress;
                                 return;
                             }
                             var modelValue = model[name];
+                            if (!DevExpress["validationEngine"].validate(val, _this.validationRules, _this.localizingDisplayName()).isValid) {
+                                return;
+                            }
                             if (ko.isObservable(modelValue)) {
                                 modelValue(val);
                             }
@@ -5160,6 +6272,8 @@ var DevExpress;
                 };
                 Editor.prototype.findInfo = function (viewModel) {
                     var _this = this;
+                    if (!viewModel)
+                        return null;
                     var modelInfo = viewModel["getInfo"] && viewModel["getInfo"]();
                     if (modelInfo) {
                         return modelInfo.filter(function (property) { return property.propertyName === _this.name; })[0];
@@ -5174,9 +6288,15 @@ var DevExpress;
                     return !propertyInfo;
                 };
                 Editor.prototype.update = function (viewModel) {
-                    var propertyInfo = this.findInfo(viewModel);
-                    this.isVisibleByContent(viewModel[this.name] !== undefined && this.updateInfo(propertyInfo));
-                    this._model(this.isVisibleByContent() ? viewModel : null);
+                    if (!!viewModel) {
+                        var propertyInfo = this.findInfo(viewModel);
+                        this.isVisibleByContent(viewModel[this.name] !== undefined && this.updateInfo(propertyInfo));
+                        this._model(this.isVisibleByContent() ? viewModel : null);
+                    }
+                    else {
+                        this.isVisibleByContent(false);
+                        this._model(null);
+                    }
                 };
                 Editor.prototype.localizingDisplayName = function () {
                     return DevExpress.Designer.getLocalization(this.displayName(), this["localizationId"]);
@@ -5247,16 +6367,29 @@ var DevExpress;
             };
             Widgets.fontInfo = [
                 {
-                    propertyName: "family", displayName: "Font Name",
+                    propertyName: "family", displayName: "Font Name", localizationId: "ReportStringId.UD_TTip_FormatFontName",
                     editor: Widgets.editorTemplates.combobox, values: Widgets.availableFonts
                 },
-                { propertyName: "size", displayName: "Size", editor: Widgets.editorTemplates.numeric },
+                { propertyName: "size", displayName: "Size", localizationId: "System.Drawing.Font.Size", editor: Widgets.editorTemplates.numeric },
                 {
-                    propertyName: "unit", displayName: "Unit", editor: Widgets.editorTemplates.combobox,
+                    propertyName: "unit", displayName: "Unit", localizationId: "System.Drawing.Font.Unit", editor: Widgets.editorTemplates.combobox,
                     values: Widgets.availableUnits
                 },
                 { propertyName: "modificators", editor: Widgets.editorTemplates.modificators },
             ];
+            ko.bindingHandlers['dxPropertyGrid'] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    $(element).children().remove();
+                    var templateHtml = $('#dx-propertieseditor').text(), $element = $(element).append(templateHtml);
+                    var value = valueAccessor();
+                    var model = new DevExpress.JS.Widgets.ObjectProperties(value.target, value.editorsInfo, value.level, value.parentDisabled, value.recreateEditors);
+                    ko.applyBindings(bindingContext.createChildContext(model), $element.children()[0]);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        model.cleanSubscriptions();
+                    });
+                    return { controlsDescendantBindings: true };
+                }
+            };
         })(Widgets = JS.Widgets || (JS.Widgets = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -5745,7 +6878,7 @@ var DevExpress;
                                     }
                                     if (!ko.isComputed(target[realPropertyName])) {
                                         if (!ko.isObservable(target[realPropertyName])) {
-                                            this._createDisposeFunction(target[realPropertyName], info[i].info);
+                                            subscribtions.push.apply([], this._createDisposeFunction(target[realPropertyName], info[i].info));
                                         }
                                         else {
                                             subscribtions.push(this.subscribeProperty(target[realPropertyName], !info[i].link));
@@ -5844,7 +6977,16 @@ var DevExpress;
                     return subscriptions;
                 };
                 UndoEngine.prototype._callDisposeFunction = function (val) {
-                    val && val[this._disposeUndoEngineSubscriptionsName] && val[this._disposeUndoEngineSubscriptionsName].func();
+                    if (val) {
+                        if (Array.isArray(val)) {
+                            for (var i = 0; i < val.length; i++) {
+                                val[i][this._disposeUndoEngineSubscriptionsName] && val[i][this._disposeUndoEngineSubscriptionsName].func();
+                            }
+                        }
+                        else {
+                            val[this._disposeUndoEngineSubscriptionsName] && val[this._disposeUndoEngineSubscriptionsName].func();
+                        }
+                    }
                 };
                 UndoEngine.prototype._cleanSubscribtions = function (subscribtionArray) {
                     if (subscribtionArray) {
@@ -7134,24 +8276,21 @@ var DevExpress;
             })();
             Widgets.PathRequest = PathRequest;
             var TreeListItemViewModel = (function () {
-                function TreeListItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
+                function TreeListItemViewModel(options, path, onItemsVisibilityChanged, rtl) {
                     var _this = this;
                     if (path === void 0) { path = []; }
-                    if (hasItems === void 0) { hasItems = true; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
                     this._rtl = false;
+                    this._data = ko.observable(null);
                     this.level = -1;
-                    this.hasItems = true;
                     this.items = ko.observableArray();
                     this.collapsed = ko.observable(true);
-                    this.data = null;
                     this.isSelected = ko.observable(false);
                     this.isHovered = ko.observable(false);
                     this.isMultiSelected = ko.observable(false);
                     this._path = path;
                     this._rtl = rtl;
-                    this.hasItems = hasItems;
                     this._treeListController = options.treeListController;
                     this._templateName = options.templateName;
                     this._onItemsVisibilityChanged = onItemsVisibilityChanged;
@@ -7187,10 +8326,19 @@ var DevExpress;
                     };
                     this.nodeImageClass = this._getNodeImageClassName();
                 }
-                TreeListItemViewModel.prototype._getImageClassName = function (field, showIcon) {
+                TreeListItemViewModel.prototype._equal = function (obj1, obj2) {
+                    var ignore = ["innerActions", "noDragable", "dragData"];
+                    if (obj2 === obj1)
+                        return true;
+                    return Object.keys(obj2).filter(function (key) { return ignore.indexOf(key) === -1; }).every(function (key) {
+                        return obj2[key] === obj1[key];
+                    });
+                };
+                TreeListItemViewModel.prototype._getImageClassName = function (showIcon) {
+                    var _this = this;
                     return ko.computed(function () {
                         return "dx-image-fieldlist-"
-                            + (ko.unwrap(field.icon || field.specifics) || "default").toLowerCase()
+                            + (ko.unwrap((_this.data && _this.data.icon) || (_this.data && _this.data.specifics)) || "default").toLowerCase()
                             + (!showIcon ? " dx-treelist-image-empty" : "");
                     });
                 };
@@ -7221,17 +8369,55 @@ var DevExpress;
                             return;
                         value.done(function (data) {
                             var _data = data;
-                            _this.items.peek().forEach(function (item) { return item.dispose(); });
+                            var items = _this.items.peek();
+                            var isMutated = false;
+                            [].concat.apply([], items).forEach(function (i) {
+                                if (_data.filter(function (d) { return d.name === i.data.name; }).length === 0) {
+                                    i.dispose();
+                                    items.splice(items.indexOf(i), 1);
+                                    isMutated = true;
+                                }
+                            });
+                            var resorted = false;
                             var showIconsForChildItems = !_this._treeListController.showIconsForChildItems || _this._treeListController.showIconsForChildItems(_this);
-                            _this.items($.map(_data, function (item) {
-                                var newItem = new TreeListItemViewModel(options, _this.pathParts, options.treeListController.hasItems(item), _this._onItemsVisibilityChanged, _this._rtl);
-                                newItem.data = item;
-                                newItem.level = _this.level + 1;
-                                newItem.parent = _this;
-                                newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
-                                newItem.imageClassName = _this._getImageClassName(item, showIconsForChildItems);
-                                return newItem;
-                            }));
+                            _data.forEach(function (d, index) {
+                                var currentItem = items.filter(function (i) { return d.name === i.data.name; })[0];
+                                if (!currentItem) {
+                                    isMutated = true;
+                                    var newItem = new TreeListItemViewModel(options, _this.pathParts, _this._onItemsVisibilityChanged, _this._rtl);
+                                    newItem.data = d;
+                                    newItem.level = _this.level + 1;
+                                    newItem.parent = _this;
+                                    newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
+                                    newItem.imageClassName = newItem._getImageClassName(showIconsForChildItems);
+                                    items.splice(index, 0, newItem);
+                                }
+                                else {
+                                    if (!_this._equal(d, currentItem.data))
+                                        currentItem.data = d;
+                                    if (!resorted)
+                                        resorted = items.indexOf(currentItem) !== index;
+                                }
+                            });
+                            if (resorted) {
+                                var index = items.reduce(function (acc, x, index) {
+                                    var max = Math.abs(index - _data.indexOf(x.data));
+                                    if (!acc || acc.max < max) {
+                                        return { max: max, index: index };
+                                    }
+                                    return acc;
+                                }, null).index;
+                                var curItem = items[index];
+                                items.splice(index, 1);
+                                items.splice(_data.indexOf(curItem.data), 0, curItem);
+                                isMutated = true;
+                            }
+                            isMutated && _this.items.valueHasMutated();
+                            _this.items().forEach(function (item) {
+                                if (!item.collapsed() && item.hasItems) {
+                                    item._loadItems(options);
+                                }
+                            });
                             _this.nodeImageClass(_this.items.peek().filter(function (x) { return x.visible; }).length > 0 ? "dx-collapsing-image dx-image-expanded" : "dx-image-leaf-node");
                             deferred.resolve(_this.items.peek());
                             var selectedPath = options.selectedPath.peek();
@@ -7287,6 +8473,26 @@ var DevExpress;
                     padding["padding-" + position] = value;
                     return padding;
                 };
+                Object.defineProperty(TreeListItemViewModel.prototype, "hasItems", {
+                    get: function () {
+                        if (!this.data) {
+                            return true;
+                        }
+                        return this._treeListController.hasItems(this.data);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "data", {
+                    get: function () {
+                        return this._data();
+                    },
+                    set: function (newVal) {
+                        this._data(newVal);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 Object.defineProperty(TreeListItemViewModel.prototype, "name", {
                     get: function () {
                         return ko.unwrap(this.data && this.data.name);
@@ -7384,13 +8590,12 @@ var DevExpress;
             Widgets.TreeListItemViewModel = TreeListItemViewModel;
             var TreeListRootItemViewModel = (function (_super) {
                 __extends(TreeListRootItemViewModel, _super);
-                function TreeListRootItemViewModel(options, path, hasItems, onItemsVisibilityChanged, rtl) {
+                function TreeListRootItemViewModel(options, path, onItemsVisibilityChanged, rtl) {
                     var _this = this;
                     if (path === void 0) { path = []; }
-                    if (hasItems === void 0) { hasItems = true; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this, options, path, hasItems, onItemsVisibilityChanged, rtl);
+                    _super.call(this, options, path, onItemsVisibilityChanged, rtl);
                     var selectedPathSubscriptions = options.selectedPath.subscribe(function (newPath) {
                         _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
                     });
@@ -7454,9 +8659,9 @@ var DevExpress;
                             }
                             return result;
                         });
-                        treeListViewModel = new TreeListRootItemViewModel(options, pathArray, true, updateScrollBar, options.rtl);
+                        treeListViewModel = new TreeListRootItemViewModel(options, pathArray, updateScrollBar, options.rtl);
                         var templateHtml = $('#dx-treelist').text() || options.templateHtml, $element = $(element).html(templateHtml);
-                        var childContext = bindingContext.createChildContext(treeListViewModel.items);
+                        var childContext = bindingContext.createChildContext(treeListViewModel);
                         ko.applyBindings(childContext, $element.children()[0]);
                     };
                     updateTreeList($.extend({}, options));
@@ -7656,17 +8861,27 @@ var DevExpress;
             Widgets.FilterEditorHelper = FilterEditorHelper;
             Widgets.DefaultFilterEditorHelper = FilterEditorHelper;
             var FilterStringOptions = (function () {
-                function FilterStringOptions(filterString, dataMember, disabled) {
+                function FilterStringOptions(filterString, dataMember, disabled, title) {
                     var _this = this;
                     this.popupContainer = ".dx-viewport";
                     this.itemsProvider = null;
                     this.resetValue = function () {
                         _this.value("");
                     };
+                    this.title = ko.pureComputed({
+                        read: function () {
+                            var title = _this._title();
+                            return DevExpress.Designer.getLocalization(title.text, title.localizationId);
+                        },
+                        write: function (value) {
+                            _this._title({ text: value });
+                        }
+                    });
                     this.value = filterString;
                     this.path = dataMember || ko.observable("");
                     this.disabled = disabled || ko.observable(false);
                     this.helper = new Widgets.DefaultFilterEditorHelper();
+                    this._title = ko.observable(title || { text: "Filter Editor" });
                 }
                 return FilterStringOptions;
             })();
@@ -7988,11 +9203,20 @@ var DevExpress;
                     });
                 }
                 CriteriaOperatorSurface.prototype._createLeftPartProperty = function (value) {
+                    var _this = this;
                     if (value instanceof JS.Data.OperandProperty) {
                         var surface = this.createChildSurface(value);
                     }
                     else {
                         var surface = this.createChildSurface(value);
+                        var specifics = Object.keys(this.helper.filterEditorOperators).reduce(function (key, value) {
+                            if (value !== "_common" && key === "integer"
+                                && _this.helper.filterEditorOperators[value].filter(function (item) { return _this.operatorType() === item.value && _this.reverse === item.reverse && _this.model.enumType === item.type; }).length > 0) {
+                                key = value;
+                            }
+                            return key;
+                        }, "integer");
+                        surface.specifics = surface.specifics || ko.observable(specifics);
                     }
                     surface["canChange"] = false;
                     surface.canRemove = false;
@@ -8946,7 +10170,7 @@ var DevExpress;
                     this.toolBox = [
                         this._generateList(DevExpress.Designer.getLocalization("FUNCTIONS", 'XtraEditorsExpressionEditor.Functions.Text'), functionGroups.map(function (funtionGroup) {
                             var result = {
-                                display: funtionGroup.display,
+                                display: DevExpress.Designer.getLocalization(funtionGroup.display),
                                 collapsed: ko.observable(true),
                                 items: []
                             };
@@ -9467,9 +10691,9 @@ var DevExpress;
                     var visible = valueAccessor().on || valueAccessor();
                     var subscription = visible.subscribe(function (newVal) {
                         if (newVal) {
-                            if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
+                            setTimeout(function () {
                                 $(element).find(":input").focus();
-                            }
+                            }, 1);
                         }
                     });
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
@@ -9793,12 +11017,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,19],$V8=[1,30],$V9=[1,32],$Va=[1,25],$Vb=[1,24],$Vc=[1,34],$Vd=[1,31],$Ve=[1,33],$Vf=[1,13],$Vg=[1,5],$Vh=[1,14],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,39],$Vq=[1,50],$Vr=[1,52],$Vs=[1,53],$Vt=[1,56],$Vu=[1,55],$Vv=[1,51],$Vw=[1,54],$Vx=[1,36],$Vy=[1,37],$Vz=[1,40],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$V71=[5,11,41,42,50,56],$V81=[16,50],$V91=[15,16,17,22,25,26,27,28,50],$Va1=[16,17,20],$Vb1=[5,11,17,19,20,23,26,40,41,42,43,44,45,46,50,56,63,64,66,67,68,69],$Vc1=[5,11,40,41,42,45,46,50,56,66,67],$Vd1=[5,11,19,20,40,41,42,45,46,50,56,66,67,68,69],$Ve1=[11,56],$Vf1=[5,11,16,17,19,20,23,26,27,40,41,42,43,44,45,46,50,56,60,61,62,63,64,66,67,68,69];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,14],$V8=[1,19],$V9=[1,30],$Va=[1,32],$Vb=[1,25],$Vc=[1,24],$Vd=[1,34],$Ve=[1,31],$Vf=[1,33],$Vg=[1,13],$Vh=[1,5],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,40],$Vq=[1,39],$Vr=[1,50],$Vs=[1,52],$Vt=[1,53],$Vu=[1,56],$Vv=[1,55],$Vw=[1,51],$Vx=[1,54],$Vy=[1,36],$Vz=[1,37],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,27,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,27,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,28,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,27,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,31,43,44,45,46,47,48,49,53,63,64,66,67,68,69],$V71=[5,11,31,44,45,53],$V81=[16,53],$V91=[15,16,17,22,25,26,27,28,29,30,53],$Va1=[16,17,20],$Vb1=[5,11,17,19,20,23,27,31,43,44,45,46,47,48,49,53,63,64,66,67,68,69],$Vc1=[5,11,31,43,44,45,48,49,53,66,67],$Vd1=[5,11,19,20,31,43,44,45,48,49,53,66,67,68,69],$Ve1=[11,31],$Vf1=[5,11,16,17,19,20,23,26,27,28,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"-":26,"[":27,"=":28,"param":29,"?":30,"property":31,"columnOrAggregate":32,"AGG_COUNT":33,"AGG_AVG":34,"AGG_MAX":35,"AGG_MIN":36,"AGG_SINGLE":37,"AGG_EXISTS":38,"AGG_SUM":39,"OP_LIKE":40,"AND":41,"OR":42,"OP_BETWEEN":43,"OP_IN":44,"NOT":45,"IS":46,"NULL":47,"propertyWithAggregate":48,"compositeProperty":49,"]":50,"field":51,"aggregate":52,"aggregateSuffix":53,"topLevelAggregate":54,"(":55,")":56,"MinStart":57,"MaxStart":58,"CONST":59,"*":60,"/":61,"%":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"-",27:"[",28:"=",30:"?",33:"AGG_COUNT",34:"AGG_AVG",35:"AGG_MAX",36:"AGG_MIN",37:"AGG_SINGLE",38:"AGG_EXISTS",39:"AGG_SUM",40:"OP_LIKE",41:"AND",42:"OR",43:"OP_BETWEEN",44:"OP_IN",45:"NOT",46:"IS",47:"NULL",50:"]",55:"(",56:")",59:"CONST",60:"*",61:"/",62:"%",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[29,2],[29,1],[31,1],[31,3],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[32,1],[48,1],[48,3],[49,3],[49,4],[49,5],[49,6],[51,1],[51,2],[52,4],[52,3],[52,6],[52,5],[52,4],[52,3],[52,1],[54,1],[53,1],[53,1],[53,3],[53,3],[53,4],[53,4],[53,3],[53,4],[53,2],[53,2],[57,3],[58,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"%":26,"-":27,"[":28,"=":29,"(":30,")":31,"param":32,"?":33,"property":34,"columnOrAggregate":35,"AGG_COUNT":36,"AGG_AVG":37,"AGG_MAX":38,"AGG_MIN":39,"AGG_SINGLE":40,"AGG_EXISTS":41,"AGG_SUM":42,"OP_LIKE":43,"AND":44,"OR":45,"OP_BETWEEN":46,"OP_IN":47,"NOT":48,"IS":49,"NULL":50,"propertyWithAggregate":51,"compositeProperty":52,"]":53,"field":54,"aggregate":55,"aggregateSuffix":56,"topLevelAggregate":57,"MinStart":58,"MaxStart":59,"CONST":60,"*":61,"/":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"%",27:"-",28:"[",29:"=",30:"(",31:")",33:"?",36:"AGG_COUNT",37:"AGG_AVG",38:"AGG_MAX",39:"AGG_MIN",40:"AGG_SINGLE",41:"AGG_EXISTS",42:"AGG_SUM",43:"OP_LIKE",44:"AND",45:"OR",46:"OP_BETWEEN",47:"OP_IN",48:"NOT",49:"IS",50:"NULL",53:"]",60:"CONST",61:"*",62:"/",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
+productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,4],[24,4],[24,4],[24,4],[32,2],[32,1],[34,1],[34,3],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[51,1],[51,3],[52,3],[52,4],[52,5],[52,6],[54,1],[54,2],[55,4],[55,3],[55,6],[55,5],[55,4],[55,3],[55,1],[57,1],[56,1],[56,1],[56,3],[56,3],[56,4],[56,4],[56,3],[56,4],[56,2],[56,2],[58,3],[59,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -9819,10 +11043,10 @@ break;
 case 5: case 6:
  this.$ = $$[$0-2]; this.$.push($$[$0]); 
 break;
-case 7: case 10: case 17: case 39: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 88: case 89: case 90: case 91:
+case 7: case 10: case 17: case 48: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 58: case 59: case 60: case 61: case 62: case 63: case 64: case 65: case 66: case 97: case 98: case 99: case 100:
  this.$ = $$[$0]; 
 break;
-case 8: case 81: case 82: case 114: case 124:
+case 8: case 90: case 91: case 123: case 133:
  this.$ = $$[$0-1]; 
 break;
 case 9:
@@ -9849,40 +11073,43 @@ break;
 case 19:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0] }); 
 break;
-case 22: case 23:
+case 22: case 23: case 24:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-1].propertyName + ' ' + $$[$0] }); 
 break;
-case 24:
+case 25:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "^" }); 
 break;
-case 25: case 26: case 27:
+case 26: case 27: case 28: case 29:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '-' + $$[$0] }); 
 break;
-case 28: case 29: case 30:
+case 30: case 31: case 32: case 33:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '[' + $$[$0] }); 
 break;
-case 31: case 32: case 33:
+case 34: case 35: case 36: case 37:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '+' + $$[$0] }); 
 break;
-case 34: case 35: case 36:
+case 38: case 39: case 40: case 41:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '=' + $$[$0] }); 
 break;
-case 37:
+case 42: case 43: case 44: case 45:
+  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1] + ')' }); 
+break;
+case 46:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
 break;
-case 38:
+case 47:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
 break;
-case 40:
+case 49:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
 break;
-case 41:
+case 50:
  this.$ = $$[$0].propertyName; 
 break;
-case 58:
+case 67:
  this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
 break;
-case 59:
+case 68:
 
   var lst = [];
   lst.push($$[$0-1]);
@@ -9893,7 +11120,7 @@ case 59:
   };
  
 break;
-case 60:
+case 69:
 
 	var lst = [];
   lst.push($$[$0-2] + '.');
@@ -9904,59 +11131,59 @@ case 60:
   };
  
 break;
-case 61:
+case 70:
 
   var propertyNameObject = $$[$0-4];
   propertyNameObject.names.push($$[$0-1]);
   this.$ = propertyNameObject;
  
 break;
-case 62:
+case 71:
 
   var propertyNameObject = $$[$0-5];
   propertyNameObject.names.push($$[$0-2] + '.');
   this.$ = propertyNameObject;
  
 break;
-case 63:
+case 72:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0].names.join('.'), startColumn: $$[$0].column, startLine: $$[$0].line }); 
 break;
-case 64:
+case 73:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { }); 
 break;
-case 65:
+case 74:
 
 		var agg = $$[$0];
 		var collectionProperty = DevExpress.JS.Data.criteriaCreator.process("property", { });
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(collectionProperty, null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 66:
+case 75:
 
 		var agg = $$[$0];
 		var prop = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].names.join('.'), startColumn: $$[$0-2].column, startLine: $$[$0-2].line });
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(prop, null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 67:
+case 76:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 68:
+case 77:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 69:
+case 78:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 70:
+case 79:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 73: case 75:
+case 82: case 84:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -9966,7 +11193,7 @@ case 73: case 75:
 		});
 	
 break;
-case 74: case 76:
+case 83: case 85:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -9976,7 +11203,7 @@ case 74: case 76:
 		});
 	
 break;
-case 77:
+case 86:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -9986,7 +11213,7 @@ case 77:
 		});
 	
 break;
-case 78:
+case 87:
 
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -9996,7 +11223,7 @@ case 78:
 		});
 	
 break;
-case 79:
+case 88:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -10006,7 +11233,7 @@ case 79:
 		});
 	
 break;
-case 80:
+case 89:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -10016,7 +11243,7 @@ case 80:
 		});
 	
 break;
-case 83:
+case 92:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -10026,7 +11253,7 @@ case 83:
 		});
 	
 break;
-case 84:
+case 93:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -10036,69 +11263,69 @@ case 84:
 		});
 	
 break;
-case 85: case 86:
+case 94: case 95:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: $$[$0] }); 
 break;
-case 87:
+case 96:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: null }); 
 break;
-case 92:
+case 101:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Multiply }); 
 break;
-case 93:
+case 102:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Divide }); 
 break;
-case 94:
+case 103:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Plus }); 
 break;
-case 95:
+case 104:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Minus }); 
 break;
-case 96:
+case 105:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Modulo }); 
 break;
-case 97:
+case 106:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseOr }); 
 break;
-case 98:
+case 107:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd }); 
 break;
-case 99:
+case 108:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseXor }); 
 break;
-case 100:
+case 109:
 
 								this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Minus, operator: $$[$0] });
 							
 break;
-case 101:
+case 110:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Plus, operator: $$[$0] }); 
 break;
-case 102:
+case 111:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, operator: $$[$0] }); 
 break;
-case 103:
+case 112:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Equal }); 
 break;
-case 104:
+case 113:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.NotEqual }); 
 break;
-case 105:
+case 114:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Greater }); 
 break;
-case 106:
+case 115:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Less }); 
 break;
-case 107:
+case 116:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual }); 
 break;
-case 108:
+case 117:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.LessOrEqual }); 
 break;
-case 109:
+case 118:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }); 
 break;
-case 110:
+case 119:
 
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
 			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, 
@@ -10106,19 +11333,19 @@ case 110:
 		});
 	
 break;
-case 111:
+case 120:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, operator: $$[$0] }); 
 break;
-case 112:
+case 121:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 113:
+case 122:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 115:
+case 124:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-2] }); 
 break;
-case 116:
+case 125:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
 			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not,
@@ -10126,35 +11353,35 @@ case 116:
 		}); 
 	
 break;
-case 117:
+case 126:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("in", { criteriaOperator: $$[$0-2], operands: $$[$0] }); 
 break;
-case 118:
+case 127:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("between", { property: $$[$0-6], begin: $$[$0-3], end: $$[$0-1] }); 
 break;
-case 119: case 120:
+case 128: case 129:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
 break;
-case 121:
+case 130:
  this.$ = null; 
 break;
-case 122:
+case 131:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Min, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
 break;
-case 123:
+case 132:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Max, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
 break;
-case 125:
+case 134:
  this.$ = []; 
 break;
-case 126:
+case 135:
 
 							var lst = [];
 							lst.push($$[$0]);
 							this.$ = lst;
 						
 break;
-case 127:
+case 136:
 
 							var lst = $$[$0-2];
 							lst.push($$[$0]);
@@ -10163,7 +11390,7 @@ case 127:
 break;
 }
 },
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87]),o($VG,[2,88]),o($VG,[2,89],{27:[1,57]}),o($VG,[2,90],{16:[1,58]}),o($VG,[2,91]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,64],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{55:$VH,70:65},o($VI,$VJ,{70:67,55:$VH}),{11:[1,68],56:$VK},{11:[1,70],56:$VL},o($VG,[2,38],{15:[1,72]}),o($VM,[2,63],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:75,50:[1,74]},o($V31,[2,39],{15:$V41,22:$V51}),o($VG,[2,71]),{55:[1,98]},{55:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,72]),{14:100,15:[1,101]},o($VG,[2,73],{55:[1,102]}),o($VG,[2,74],{55:[1,103]}),{55:[1,104]},{55:[1,105]},{55:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{40:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{45:[1,126],47:[1,125]},{55:$VH,70:127},{55:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,50:[1,130],51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,100]),o($VG,[2,101]),o($V61,[2,102],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o($V71,[2,111],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,133],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,121]),o($VG,[2,119]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,135],57:17,58:18,59:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,120]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,81]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,82]),o($VG,[2,37]),{27:[1,140],33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:139,57:141,58:142},o($VM,[2,64],{16:[1,143]}),{16:[1,145],50:[1,144]},o($V81,[2,57]),o($V81,[2,41],{15:[1,146],17:[1,151],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,152]}),o($V81,[2,42]),o($V81,[2,43]),o($V81,[2,44]),o($V81,[2,45]),o($V81,[2,46]),o($V81,[2,47]),o($V81,[2,48]),o($V81,[2,49]),o($V81,[2,50]),o($V81,[2,51]),o($V81,[2,52]),o($V81,[2,53]),o($V81,[2,54]),o($V81,[2,55]),o($V81,[2,56]),o($V91,[2,19]),o($V91,[2,20]),o($V91,[2,24]),o($VI,[2,15]),o($VI,[2,16]),{4:153,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:154,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{16:[1,156],17:[1,157],20:[1,155]},o($Va1,[2,10]),{56:[1,158]},{56:[1,159]},{4:160,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:161,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,56:[1,162],57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,92]),o($VG,[2,93]),o($Vb1,[2,94],{60:$Vx,61:$Vy,62:$Vz}),o($Vb1,[2,95],{60:$Vx,61:$Vy,62:$Vz}),o($VG,[2,96]),o([5,11,19,20,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,97],{17:$Vl,23:$Vo,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,98],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz}),o([5,11,19,20,23,40,41,42,43,44,45,46,50,56,63,66,67,68,69],[2,99],{17:$Vl,26:$Vp,60:$Vx,61:$Vy,62:$Vz,64:$VB}),o($Vc1,[2,103],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vc1,[2,104],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,105],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,106],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,107],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,108],{17:$Vl,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vc1,[2,109],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($V71,[2,112],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,42,50,56],[2,113],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,115]),{47:[1,165]},o($VG,[2,117]),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,50:[1,167],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,70],{16:[1,168]}),o($V31,[2,40],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,114]),{11:[1,170],56:[1,169]},o($VG,[2,125]),o($Ve1,[2,126],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,171],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,172],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,66]),{15:$VN,23:$VO,24:77,25:$VP,32:76,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,48:173},{56:$VK},{56:$VL},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:174,57:141,58:142},o($Vf1,[2,59]),{15:$VN,23:$VO,24:77,25:$VP,32:176,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,50:[1,175]},o($V91,[2,21]),o($V91,[2,22]),o($V91,[2,23]),{15:[1,177],22:[1,179],25:[1,178]},{15:[1,180],22:[1,182],25:[1,181]},{15:[1,183],22:[1,185],25:[1,184]},{15:[1,186],22:[1,188],25:[1,187]},o($Ve1,[2,83],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Ve1,[2,84],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,189]},{15:[1,190]},{15:[1,191]},o($VG,[2,75]),o($VG,[2,76]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,192],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,193],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,79]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,194],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vc1,[2,110],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,43:$Vt,44:$Vu,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,116]),{11:[1,195],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,69],{16:[1,196]}),{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:197,57:141,58:142},o($VG,[2,124]),{4:198,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},o($VG,[2,122]),o($VG,[2,123]),{16:[1,200],50:[1,199]},o($VG,[2,65]),o($Vf1,[2,60]),o($V81,[2,58]),o($V91,[2,25]),o($V91,[2,26]),o($V91,[2,27]),o($V91,[2,28]),o($V91,[2,29]),o($V91,[2,30]),o($V91,[2,31]),o($V91,[2,32]),o($V91,[2,33]),o($V91,[2,34]),o($V91,[2,35]),o($V91,[2,36]),o($VI,[2,13]),o($Va1,[2,11]),o($Va1,[2,12]),o($VG,[2,77]),o($VG,[2,78]),o($VG,[2,80]),{4:201,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,29:6,30:$V7,31:8,33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,45:$Vf,47:$Vg,49:20,51:7,52:9,53:28,54:23,55:$Vh,57:17,58:18,59:$Vi,65:$Vj,71:$Vk},{33:$V8,34:$V9,35:$Va,36:$Vb,37:$Vc,38:$Vd,39:$Ve,53:202,57:141,58:142},o($VG,[2,68]),o($Ve1,[2,127],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,61]),{15:$VN,23:$VO,24:77,25:$VP,32:176,33:$VQ,34:$VR,35:$VS,36:$VT,37:$VU,38:$VV,39:$VW,40:$VX,41:$VY,42:$VZ,43:$V_,44:$V$,45:$V01,46:$V11,47:$V21,50:[1,203]},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,40:$Vq,41:$Vr,42:$Vs,43:$Vt,44:$Vu,45:$Vv,46:$Vw,56:[1,204],60:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,67]),o($Vf1,[2,62]),o($VG,[2,118])],
+table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,94]),o($VG,[2,95]),o($VG,[2,96]),o($VG,[2,97]),o($VG,[2,98],{28:[1,57]}),o($VG,[2,99],{16:[1,58]}),o($VG,[2,100]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,31:[1,64],32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{30:$VH,70:65},o($VI,$VJ,{70:67,30:$VH}),{11:[1,68],31:$VK},{11:[1,70],31:$VL},o($VG,[2,47],{15:[1,72]}),o($VM,[2,72],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,35:76,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,51:75,53:[1,74]},o($V31,[2,48],{15:$V41,22:$V51}),o($VG,[2,80]),{30:[1,98]},{30:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,81]),{14:100,15:[1,101]},o($VG,[2,82],{30:[1,102]}),o($VG,[2,83],{30:[1,103]}),{30:[1,104]},{30:[1,105]},{30:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{43:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{48:[1,126],50:[1,125]},{30:$VH,70:127},{30:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,53:[1,130],54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,109]),o($VG,[2,110]),o($V61,[2,111],{17:$Vl,26:$Vp,27:$Vq,61:$Vy,62:$Vz}),o($V71,[2,120],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,133],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,130]),o($VG,[2,128]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,31:[1,135],32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,129]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,90]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,91]),o($VG,[2,46]),{28:[1,140],36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:139,58:141,59:142},o($VM,[2,73],{16:[1,143]}),{16:[1,145],53:[1,144]},o($V81,[2,66]),o($V81,[2,50],{15:[1,147],17:[1,152],22:[1,148],25:[1,146],26:[1,149],27:[1,150],28:[1,151],29:[1,153],30:[1,154]}),o($V81,[2,51]),o($V81,[2,52]),o($V81,[2,53]),o($V81,[2,54]),o($V81,[2,55]),o($V81,[2,56]),o($V81,[2,57]),o($V81,[2,58]),o($V81,[2,59]),o($V81,[2,60]),o($V81,[2,61]),o($V81,[2,62]),o($V81,[2,63]),o($V81,[2,64]),o($V81,[2,65]),o($V91,[2,19]),o($V91,[2,20]),o($V91,[2,25]),o($VI,[2,15]),o($VI,[2,16]),{4:155,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:156,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{16:[1,158],17:[1,159],20:[1,157]},o($Va1,[2,10]),{31:[1,160]},{31:[1,161]},{4:162,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:165,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,31:[1,164],32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,101]),o($VG,[2,102]),o($Vb1,[2,103],{26:$Vp,61:$Vy,62:$Vz}),o($Vb1,[2,104],{26:$Vp,61:$Vy,62:$Vz}),o($VG,[2,105]),o([5,11,19,20,31,43,44,45,46,47,48,49,53,63,66,67,68,69],[2,106],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,107],{17:$Vl,26:$Vp,27:$Vq,61:$Vy,62:$Vz}),o([5,11,19,20,23,31,43,44,45,46,47,48,49,53,63,66,67,68,69],[2,108],{17:$Vl,26:$Vp,27:$Vq,61:$Vy,62:$Vz,64:$VB}),o($Vc1,[2,112],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vc1,[2,113],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,114],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,115],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,116],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,117],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vc1,[2,118],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($V71,[2,121],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,31,45,53],[2,122],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,124]),{50:[1,167]},o($VG,[2,126]),{4:168,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,53:[1,169],61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,79],{16:[1,170]}),o($V31,[2,49],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,123]),{11:[1,172],31:[1,171]},o($VG,[2,134]),o($Ve1,[2,135],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,173],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,174],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,75]),{15:$VN,23:$VO,24:77,25:$VP,35:76,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,51:175},{31:$VK},{31:$VL},{36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:176,58:141,59:142},o($Vf1,[2,68]),{15:$VN,23:$VO,24:77,25:$VP,35:178,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,53:[1,177]},o($V91,[2,21]),o($V91,[2,22]),o($V91,[2,23]),o($V91,[2,24]),{15:[1,179],22:[1,181],25:[1,180],26:[1,182]},{15:[1,183],22:[1,185],25:[1,184],26:[1,186]},{15:[1,187],22:[1,189],25:[1,188],26:[1,190]},{15:[1,191],22:[1,193],25:[1,192],26:[1,194]},{15:[1,195],22:[1,197],25:[1,196],26:[1,198]},o($Ve1,[2,92],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Ve1,[2,93],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,199]},{15:[1,200]},{15:[1,201]},o($VG,[2,84]),o($VG,[2,85]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,202],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,203],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,88]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,204],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vc1,[2,119],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,125]),{11:[1,205],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,78],{16:[1,206]}),{36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:207,58:141,59:142},o($VG,[2,133]),{4:208,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,131]),o($VG,[2,132]),{16:[1,210],53:[1,209]},o($VG,[2,74]),o($Vf1,[2,69]),o($V81,[2,67]),o($V91,[2,26]),o($V91,[2,27]),o($V91,[2,28]),o($V91,[2,29]),o($V91,[2,30]),o($V91,[2,31]),o($V91,[2,32]),o($V91,[2,33]),o($V91,[2,34]),o($V91,[2,35]),o($V91,[2,36]),o($V91,[2,37]),o($V91,[2,38]),o($V91,[2,39]),o($V91,[2,40]),o($V91,[2,41]),{31:[1,211]},{31:[1,212]},{31:[1,213]},{31:[1,214]},o($VI,[2,13]),o($Va1,[2,11]),o($Va1,[2,12]),o($VG,[2,86]),o($VG,[2,87]),o($VG,[2,89]),{4:215,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:216,58:141,59:142},o($VG,[2,77]),o($Ve1,[2,136],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,70]),{15:$VN,23:$VO,24:77,25:$VP,35:178,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,53:[1,217]},o($V91,[2,42]),o($V91,[2,43]),o($V91,[2,44]),o($V91,[2,45]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,218],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,76]),o($Vf1,[2,71]),o($VG,[2,127])],
 defaultActions: {35:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
@@ -10645,21 +11872,21 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:/* skip whitespace */
 break;
-case 1:return 43
+case 1:return 46
 break;
-case 2:return 44
+case 2:return 47
 break;
-case 3:return 45
+case 3:return 48
 break;
-case 4:return 46
+case 4:return 49
 break;
-case 5:return 47
+case 5:return 50
 break;
-case 6:return 60
+case 6:return 61
 break;
-case 7:return 61
+case 7:return 62
 break;
-case 8:return 26
+case 8:return 27
 break;
 case 9:return 17
 break;
@@ -10669,15 +11896,15 @@ case 11:return 67
 break;
 case 12:return '!'
 break;
-case 13:return 62
+case 13:return 26
 break;
-case 14:return 55
+case 14:return 30
 break;
-case 15:return 56
+case 15:return 31
 break;
-case 16:return 27
+case 16:return 28
 break;
-case 17:return 50
+case 17:return 53
 break;
 case 18:return 67
 break;
@@ -10689,33 +11916,33 @@ case 21:return 20
 break;
 case 22:return 19
 break;
-case 23:return 42
+case 23:return 45
 break;
-case 24:return 41
+case 24:return 44
 break;
-case 25:return 34
+case 25:return 37
 break;
-case 26:return 35
+case 26:return 38
 break;
-case 27:return 36
+case 27:return 39
 break;
-case 28:return 37
+case 28:return 40
 break;
-case 29:return 33
+case 29:return 36
 break;
-case 30:return 38
+case 30:return 41
 break;
-case 31:return 39
+case 31:return 42
 break;
 case 32:return 66
 break;
 case 33:return 66
 break;
-case 34:return 40
+case 34:return 43
 break;
-case 35:return 41
+case 35:return 44
 break;
-case 36:return 42
+case 36:return 45
 break;
 case 37:return 5
 break;
@@ -10725,17 +11952,17 @@ case 39:return 16
 break;
 case 40:return 11
 break;
-case 41:return 30
+case 41:return 33
 break;
-case 42:return 59
+case 42:return 60
 break;
-case 43:return 59
+case 43:return 60
 break;
 case 44:return 15	
 break;
-case 45:return 59	
+case 45:return 60	
 break;
-case 46:return 59
+case 46:return 60
 break;
 case 47:return 25   
 break;
@@ -11373,10 +12600,12 @@ var DevExpress;
         })();
         Designer.HoverInfo = HoverInfo;
         function createObservableReverseArrayMapCollection(elementModels, target, createItem) {
+            var array = target();
             elementModels.peek().forEach(function (item) {
                 var surface = createItem(item);
-                target.splice(0, 0, surface);
+                array.splice(0, 0, surface);
             });
+            target.valueHasMutated();
             elementModels.subscribe(function (args) {
                 var unwrapedTarget = target();
                 var targetLength = unwrapedTarget.length;
@@ -11395,10 +12624,12 @@ var DevExpress;
         }
         Designer.createObservableReverseArrayMapCollection = createObservableReverseArrayMapCollection;
         function createObservableArrayMapCollection(elementModels, target, createItem) {
+            var array = target();
             elementModels.peek().forEach(function (item) {
                 var surface = createItem(item);
-                target.push(surface);
+                array.push(surface);
             });
+            target.valueHasMutated();
             elementModels.subscribe(function (args) {
                 var startIndex = target().length, deleteCount = 0, valuesToAdd = [];
                 args.forEach(function (changeSet) {
@@ -11794,6 +13025,7 @@ var DevExpress;
                     this.editorValue = ko.observable(selectAllItem);
                     this.updateValue = function () {
                         value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
+                        valueHasMutated();
                     };
                     this.onOptionChanged = function (e) {
                         if (e.name !== "opened" || e.value)
@@ -11914,12 +13146,12 @@ var DevExpress;
     var Designer;
     (function (Designer) {
         Designer.sizeFake = [
-            { propertyName: "height", displayName: "Height", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-            { propertyName: "width", displayName: "Width", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
+            { propertyName: "height", displayName: "Height", localizationId: "System.Drawing.SizeF.Height", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+            { propertyName: "width", displayName: "Width", localizationId: "System.Drawing.SizeF.Width", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
         ];
         Designer.locationFake = [
-            { propertyName: "x", displayName: "X", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-            { propertyName: "y", displayName: "Y", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
+            { propertyName: "x", displayName: "X", localizationId: "DevExpress.XtraCharts.ChartAnchorPoint.X", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+            { propertyName: "y", displayName: "Y", localizationId: "DevExpress.XtraCharts.ChartAnchorPoint.Y", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
         ];
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -12072,9 +13304,11 @@ var DevExpress;
         function minHeightWithoutScroll(element) {
             return Math.min(element.scrollHeight, element.offsetHeight, element.clientHeight) + element.offsetTop;
         }
+        Designer.minHeightWithoutScroll = minHeightWithoutScroll;
         function chooseBetterPositionOf(html, designer) {
-            return minHeightWithoutScroll(html) <= minHeightWithoutScroll(designer) ? window : designer;
+            return minHeightWithoutScroll(html) < minHeightWithoutScroll(designer) ? window : designer;
         }
+        Designer.chooseBetterPositionOf = chooseBetterPositionOf;
         function ShowMessage(msg, type, displayTime, debugInfo) {
             if (type === void 0) { type = "error"; }
             DevExpress.ui.notify({
@@ -12083,6 +13317,7 @@ var DevExpress;
                 position: { of: chooseBetterPositionOf(document.documentElement, $(".dx-designer")[0]), my: "bottom", at: "bottom", offset: "0 -10" },
                 targetContainer: $(".dx-designer")[0],
                 closeOnOutsideClick: true,
+                closeOnSwipe: false,
                 displayTime: displayTime || (type === "error" ? 60000 : 3000)
             });
         }
@@ -12274,7 +13509,8 @@ var DevExpress;
         };
         function fromEnum(value) {
             var shotEnumValueKey = getShortTypeName(value);
-            return ko.observable((this.values && this.values[shotEnumValueKey] !== undefined) ? shotEnumValueKey : value);
+            var valuesArrayItem = this.valuesArray && this.valuesArray.filter(function (item) { return item.value == shotEnumValueKey; })[0];
+            return ko.observable((valuesArrayItem || this.values && this.values[shotEnumValueKey] !== undefined) ? shotEnumValueKey : value);
         }
         Designer.fromEnum = fromEnum;
         function getTypeNameFromFullName(controlType) {
@@ -13341,13 +14577,13 @@ var DevExpress;
         Designer.TabPanel = TabPanel;
         var TabInfo = (function (_super) {
             __extends(TabInfo, _super);
-            function TabInfo(text, template, model, imageBaseName, computedVisible) {
+            function TabInfo(text, template, model, localizationId, imageBaseName, computedVisible) {
                 var _this = this;
                 _super.call(this);
                 this.active = ko.observable(false);
                 this.visible = ko.observable();
                 imageBaseName = imageBaseName || text.toLowerCase();
-                this.text = text;
+                this.text = Designer.getLocalization(text, localizationId);
                 this.imageClassName = ko.pureComputed(function () {
                     return "dxrd-image-" + imageBaseName + (_this.active() ? "-active" : "-inactive");
                 });
@@ -13559,7 +14795,7 @@ var DevExpress;
             };
         }
         Designer.createActionWrappingFunction = createActionWrappingFunction;
-        function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper, undoEngine) {
+        function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper, undoEngine, customMerge) {
             if (groups === void 0) { groups = {}; }
             if (editors === void 0) { editors = []; }
             var undoEngine = undoEngine || ko.observable(new DevExpress.JS.Utils.UndoEngine(model)), actionUndoEngineWrappingFunction = createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
@@ -13569,7 +14805,7 @@ var DevExpress;
             }), selection = selection || new Designer.SurfaceSelection(), contextActionProviders = [], snapHelper = new Designer.SnapLinesHelper(surface), controlsHelper = designControlsHelper || new DesignControlsHelper(model, [{
                     added: function (control) { },
                     deleted: function (control) { control.surface == selection.focused() && selection.focused(findNextSelection(control.surface)); }
-                }]), dragHelperContent = new Designer.DragHelperContent(selection), toolboxItems = Designer.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new InlineTextEdit(selection), editableObject = Designer.CombinedObject.getEditableObject(selection, undoEngine).extend({ throttle: 1 }), popularProperties = new DevExpress.JS.Widgets.ObjectProperties(ko.pureComputed(function () {
+                }]), dragHelperContent = new Designer.DragHelperContent(selection), toolboxItems = Designer.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new InlineTextEdit(selection), editableObject = Designer.CombinedObject.getEditableObject(selection, undoEngine, customMerge).extend({ throttle: 1 }), popularProperties = new DevExpress.JS.Widgets.ObjectProperties(ko.pureComputed(function () {
                 var popularPropertiesObject = { getInfo: function () { return []; } }, editable = editableObject();
                 if (editable) {
                     var controlInfo = controlsFactory.controlsMap[editable.controlType], propertiesInfo = createPopularProperties(controlInfo && controlInfo.info || [], controlInfo && controlInfo.popularProperties || []);
@@ -13594,7 +14830,7 @@ var DevExpress;
                     };
                 }
                 return popularPropertiesObject;
-            }), undefined, undefined, undefined), tabPanel = new TabPanel([new TabInfo("Properties", "dxrd-propertiestab", new Designer.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors }, null), undefined)], undefined, rtl);
+            }), undefined, undefined, undefined), tabPanel = new TabPanel([new TabInfo("Properties", "dxrd-propertiestab", new Designer.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors }, null), 'ReportStringId.Cmd_Properties', "properties")], undefined, rtl);
             var designerModel = {
                 parts: parts,
                 model: model,
@@ -14198,97 +15434,90 @@ var DevExpress;
         var CombinedObject = (function () {
             function CombinedObject() {
             }
-            CombinedObject.combineInfo = function (infos) {
-                var info = [];
-                for (var i = 0; i < infos[0].length; i++) {
-                    if (infos.filter(function (info) { return info.filter(function (x) { return x.propertyName === infos[0][i].propertyName; }).length > 0; }).length === infos.length) {
-                        info.push(infos[0][i]);
+            CombinedObject.getInfo = function (controls) {
+                var infos = controls.map(function (item) { return item["getInfo"](); });
+                return function () {
+                    var info = [];
+                    for (var i = 0; i < infos[0].length; i++) {
+                        if (infos.filter(function (info) { return info.filter(function (x) { return x.propertyName === infos[0][i].propertyName; }).length > 0; }).length === infos.length) {
+                            info.push(infos[0][i]);
+                        }
                     }
-                }
-                return info;
+                    return info;
+                };
             };
-            CombinedObject.collectProperties = function (controls, allProperties) {
-                for (var propertyName in controls[0]) {
-                    if (CombinedObject.skipPropertyNames.indexOf(propertyName) !== -1) {
-                        continue;
+            CombinedObject.isPropertyDisabled = function (controls) {
+                return function (name) {
+                    for (var i = 0; i < controls.length; i++) {
+                        if (controls[i]["isPropertyDisabled"](name)) {
+                            return true;
+                        }
                     }
-                    if (controls.filter(function (item) { return item[propertyName]; }).length === controls.length) {
-                        var property = controls[0][propertyName];
+                    return false;
+                };
+            };
+            CombinedObject.isPropertyVisible = function (controls) {
+                return function (name) {
+                    for (var i = 0; i < controls.length; i++) {
+                        if (!controls[i]["isPropertyVisible"](name)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+            };
+            CombinedObject.mergeProperty = function (controls, propertyName, undoEngine, customMerge) {
+                var property = controls[0][propertyName];
+                var result = null;
+                if (controls.filter(function (x) { return !!x[propertyName]; }).length === controls.length) {
+                    result = customMerge && customMerge(propertyName, controls, undoEngine);
+                    if (!result) {
                         if (ko.isObservable(property) && !property["push"]) {
-                            allProperties[propertyName] = { properties: [].concat(controls.map(function (item) { return item[propertyName]; })) };
+                            result = ko.observable(controls.every(function (control) { return controls[0][propertyName].peek() === control[propertyName].peek(); }) ? controls[0][propertyName].peek() : null);
+                            result.subscribe(function (newVal) {
+                                undoEngine && undoEngine().start();
+                                controls.forEach(function (control) { control[propertyName](newVal); });
+                                undoEngine && undoEngine().end();
+                            });
                         }
-                        else if ($.isPlainObject(property) && !allProperties[propertyName]) {
-                            allProperties[propertyName] = { object: {} };
-                            CombinedObject.collectProperties(controls.map(function (item) { return item[propertyName]; }), allProperties[propertyName].object);
-                        }
-                        else if (propertyName === "getInfo") {
-                            allProperties[propertyName] = function () {
-                                return CombinedObject.combineInfo(controls.map(function (item) { return item["getInfo"](); }));
-                            };
-                        }
-                        else if (propertyName === "isPropertyDisabled") {
-                            allProperties[propertyName] = function (name) {
-                                for (var i = 0; i < controls.length; i++) {
-                                    if (controls[i]["isPropertyDisabled"](name)) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            };
-                        }
-                        else if (propertyName === "isPropertyVisible") {
-                            allProperties[propertyName] = function (name) {
-                                for (var i = 0; i < controls.length; i++) {
-                                    if (!controls[i]["isPropertyVisible"](name)) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            };
+                        else if (typeof property === "object" && !$.isArray(property)) {
+                            result = this._merge(controls.map(function (x) { return x[propertyName]; }), undoEngine, customMerge);
                         }
                     }
                 }
-            };
-            CombinedObject.createSubscribe = function (object, undoEngine, propertyName, properties) {
-                object[propertyName].subscribe(function (val) {
-                    undoEngine && undoEngine().start();
-                    properties.properties.forEach(function (property) {
-                        property(val);
-                    });
-                    undoEngine && undoEngine().end();
-                });
-            };
-            CombinedObject.generateMergedObject = function (object, allProperties, controlsCount, undoEngine) {
-                var isAdded = false;
-                for (var propertyName in allProperties) {
-                    if (propertyName === "getInfo" || propertyName === "isPropertyVisible" || propertyName === "isPropertyDisabled") {
-                        object[propertyName] = allProperties[propertyName];
-                    }
-                    else if (allProperties[propertyName].object) {
-                        var subObject = {};
-                        if (CombinedObject.generateMergedObject(subObject, allProperties[propertyName].object, controlsCount, undoEngine)) {
-                            isAdded = true;
-                            object[propertyName] = subObject;
-                        }
-                    }
-                    else if (allProperties[propertyName].properties && allProperties[propertyName].properties.length === controlsCount) {
-                        isAdded = true;
-                        var firstValue = allProperties[propertyName].properties[0].peek();
-                        object[propertyName] = ko.observable(allProperties[propertyName].properties.every(function (property) { return firstValue === property.peek(); }) ? firstValue : null);
-                        CombinedObject.createSubscribe(object, undoEngine, propertyName, allProperties[propertyName]);
-                    }
-                }
-                ;
-                return isAdded;
-            };
-            CombinedObject.mergeControls = function (controls, undoEngine) {
-                var allProperties = {}, result = {};
-                CombinedObject.collectProperties(controls, allProperties);
-                CombinedObject.generateMergedObject(result, allProperties, controls.length, undoEngine);
-                $.extend(result, { controlType: "multiselect", displayName: ko.observable("") });
                 return result;
             };
-            CombinedObject.getEditableObject = function (selectionProvider, undoEngine) {
+            CombinedObject._createProperty = function (result, propertyName, propertyValue) {
+                if (propertyValue) {
+                    if (typeof propertyValue === "object" && $.isEmptyObject(propertyValue))
+                        return;
+                    result[propertyName] = propertyValue;
+                }
+            };
+            CombinedObject._merge = function (controls, undoEngine, customMerge) {
+                var _this = this;
+                var result = {};
+                ["getInfo", "isPropertyDisabled", "isPropertyVisible"].forEach(function (propertyName) {
+                    if (controls[0][propertyName])
+                        _this._createProperty(result, propertyName, _this[propertyName](controls));
+                });
+                if (result && result["getInfo"]) {
+                    result["getInfo"]().map(function (x) { return x.propertyName; }).forEach(function (propertyName) {
+                        _this._createProperty(result, propertyName, _this.mergeProperty(controls, propertyName, undoEngine, customMerge));
+                    });
+                }
+                else {
+                    for (var propertyName in controls[0]) {
+                        this._createProperty(result, propertyName, this.mergeProperty(controls, propertyName, undoEngine, customMerge));
+                    }
+                }
+                return result;
+            };
+            CombinedObject.mergeControls = function (controls, undoEngine, customMerge) {
+                return $.extend(this._merge(controls, undoEngine, customMerge), { controlType: "multiselect", displayName: ko.observable("") });
+            };
+            CombinedObject.getEditableObject = function (selectionProvider, undoEngine, customMerge) {
+                var _this = this;
                 var editableObject = ko.observable(null);
                 selectionProvider.focused.subscribe(function (newVal) {
                     newVal && editableObject(newVal.getControlModel());
@@ -14296,7 +15525,7 @@ var DevExpress;
                 return ko.pureComputed({
                     read: function () {
                         if (selectionProvider.selectedItems.length > 1) {
-                            return CombinedObject.mergeControls(selectionProvider.selectedItems.map(function (item) { return item.getControlModel(); }), undoEngine);
+                            return _this.mergeControls(selectionProvider.selectedItems.map(function (item) { return item.getControlModel(); }), undoEngine, customMerge);
                         }
                         else {
                             return editableObject();
@@ -14387,6 +15616,7 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Cut,
                         text: "Cut",
+                        textId: "ReportStringId.UD_TTip_EditCut",
                         imageClassName: "dxrd-image-cut",
                         disabled: ko.pureComputed(function () {
                             return !copyPasteHandler.canCopy() || selectionControlsLocked();
@@ -14402,6 +15632,7 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Copy,
                         text: "Copy",
+                        textId: "ReportStringId.Cmd_Copy",
                         imageClassName: "dxrd-image-copy",
                         disabled: ko.pureComputed(function () {
                             return !copyPasteHandler.canCopy() || selectionControlsLocked();
@@ -14415,6 +15646,7 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Paste,
                         text: "Paste",
+                        textId: "ReportStringId.Cmd_Paste",
                         imageClassName: "dxrd-image-paste",
                         disabled: ko.pureComputed(function () {
                             return !copyPasteHandler.canPaste() || selectionControlsLocked();
@@ -14430,6 +15662,7 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Delete,
                         text: "Delete",
+                        textId: "ReportStringId.Cmd_Delete",
                         imageClassName: "dxrd-image-delete",
                         disabled: ko.pureComputed(function () {
                             if (selection.focused()) {
@@ -14451,6 +15684,7 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.Undo,
                     text: "Undo",
+                    textId: "ReportStringId.UD_Capt_Undo",
                     imageClassName: "dxrd-image-undo",
                     disabled: ko.pureComputed(function () { return !undoEngine().undoEnabled() || (selection && selectionControlsLocked()); }),
                     visible: true,
@@ -14463,6 +15697,7 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.Redo,
                     text: "Redo",
+                    textId: "ReportStringId.UD_Capt_Redo",
                     imageClassName: "dxrd-image-redo",
                     disabled: ko.pureComputed(function () { return !undoEngine().redoEnabled() || (selection && selectionControlsLocked()); }),
                     visible: true,
@@ -14474,6 +15709,7 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.ZoomOut,
                     text: "Zoom Out",
+                    textId: "ReportStringId.UD_Capt_ZoomOut",
                     imageClassName: "dxrd-image-zoomout",
                     disabled: ko.observable(false),
                     visible: true,
@@ -14504,6 +15740,7 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.ZoomIn,
                     text: "Zoom In",
+                    textId: "ReportStringId.UD_Capt_ZoomIn",
                     imageClassName: "dxrd-image-zoomin",
                     disabled: ko.observable(false),
                     visible: true,
@@ -14863,6 +16100,7 @@ var DevExpress;
                 this._parentViewport = "";
                 this.option("path") && this._path(this.option("path"));
                 this.option("value") && this._value(this.option("value"));
+                this.option("valueChangeEvent", "change");
                 this._parentViewport = this["_$element"].parents(".dx-viewport");
             }
             dxFieldListPicker.prototype._showDropDown = function () {
