@@ -1,11 +1,11 @@
 {
   "name": "xtrareportsjs",
-  "version": "16.2.7",
+  "version": "16.2.8",
   "description": "DevExpress Reporting",
   "moduleType": [
     "globals"
   ],
-  "main": ["js/dx-designer.min.js", "js/report-designer.min.js", "js/web-document-viewer.min.js", "css/web-document-viewer-dark.css", "css/web-document-viewer-light.css", "css/report-designer-dark.css", "css/report-designer-light.css", "html/report-designer.html", "html/web-document-viewer.html"],
+  "main": ["js/dx-designer.js", "js/dx-designer.min.js", "js/report-designer.js", "js/report-designer.min.js", "js/web-document-viewer.js", "js/web-document-viewer.min.js", "css/web-document-viewer-dark.css", "css/web-document-viewer-light.css", "css/report-designer-dark.css", "css/report-designer-light.css", "html/report-designer.html", "html/web-document-viewer.html"],
   "authors": [
     { "name": "Developer Express Inc.", "email": "support@devexpress.com", "homepage": "http://www.devexpress.com" }
   ],
@@ -21,7 +21,7 @@
     "jquery-ui": "^1.11.4",
     "knockout": "latest",
     "globalize": "^1.1",
-    "devextreme": "16.2.7"
+    "devextreme": "16.2.8"
   },
   "ignore": [
     "node_modules",

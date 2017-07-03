@@ -1,4 +1,4 @@
-<!-- /*! DevExpress HTML/JS Designer - v16.2.7 - 2017-05-17
+<!-- /*! DevExpress HTML/JS Designer - v16.2.8 - 2017-06-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
  -->
@@ -503,7 +503,9 @@
 <script id="dx-filtereditor-parameter" type="text/html">
     <div class="criteria-operator-text" data-bind="css: css">
         <div data-bind="service: { name: 'createChangeParameter' }"></div>
+        <!-- ko if: $data.canChange -->
         <div data-bind="service: { name: 'createChangeValueType' }"></div>
+        <!-- /ko -->
     </div>
 </script>
 

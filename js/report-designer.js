@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.7 - 2017-05-17
+/*! DevExpress HTML/JS Designer - v16.2.8 - 2017-06-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -1113,7 +1113,7 @@ var DevExpress;
                 numeric: { header: "dx-numeric", custom: "dxqb-property-editor" }
             };
             QueryBuilder.name = { propertyName: "name", modelName: "@Name", displayName: "Name", disabled: true, editor: QueryBuilder.editorTemplates.text };
-            QueryBuilder.alias = { propertyName: "alias", modelName: "@Alias", displayName: "Alias", localizationId: "DataAccessUIStringId.QueryBuilderColumns_Alias", defaultVal: null, editor: QueryBuilder.editorTemplates.text };
+            QueryBuilder.alias = { propertyName: "alias", modelName: "@Alias", displayName: "Alias", localizationId: "DataAccessUIStringId.QueryBuilderColumns_Alias", defaultVal: "", editor: QueryBuilder.editorTemplates.text };
             QueryBuilder.text = { propertyName: "text", modelName: "@Text", displayName: "Text", editor: QueryBuilder.editorTemplates.text };
             QueryBuilder.selected = { propertyName: "selected", displayName: "Output", editor: QueryBuilder.editorTemplates.bool, localizationId: "DataAccessUIStringId.QueryBuilderColumns_Output" };
             QueryBuilder.size = { propertyName: "size", modelName: "@Size", defaultVal: "100,125", from: Designer.Size.fromString };
@@ -7673,7 +7673,7 @@ var DevExpress;
                     ];
                 };
                 ExportOptionsPreview.prototype.hasSensitiveData = function () {
-                    return this.xls.hasSensitiveData() || this.xlsx.hasSensitiveData() || this.pdf.hasSensitiveData();
+                    return (this.xls && this.xls.hasSensitiveData()) || (this.xlsx && this.xlsx.hasSensitiveData()) || (this.pdf && this.pdf.hasSensitiveData());
                 };
                 ExportOptionsPreview.prototype.getInfo = function () {
                     return this._generateInfo();
@@ -20923,7 +20923,8 @@ var DevExpress;
                 "WinLoss": viewWinLoseSerializationsInfo,
                 "Area": viewAreaSerializationsInfo
             };
-            Report.valueRange = { propertyName: "valueRange", modelName: "ValueRange", info: [] };
+            var limit1 = { propertyName: "limit1", modelName: "@Limit1", displayName: Designer.getLocalization('Limit 1', 'DevExpress.Sparkline.SparklineRange.Limit1'), defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, limit2 = { propertyName: "limit2", modelName: "@Limit2", displayName: Designer.getLocalization('Limit 2', 'DevExpress.Sparkline.SparklineRange.Limit2'), defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, isAuto = { propertyName: "isAuto", modelName: "@IsAuto", displayName: Designer.getLocalization('Is Auto', 'DevExpress.Sparkline.SparklineRange.IsAuto'), defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool };
+            Report.valueRange = { propertyName: "valueRange", modelName: "ValueRange", displayName: Designer.getLocalization('Value Range', 'DevExpress.XtraReports.UI.XRSparkline.ValueRange'), info: [limit1, limit2, isAuto], editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var sparklineView = { propertyName: "view", modelName: "View" };
             Report.sparklineFake = { propertyName: "sparklineFake", editor: Report.editorTemplates.sparkline, displayName: "View" };
             Report.sparklineSerializationsInfo = [
@@ -22528,7 +22529,7 @@ var DevExpress;
                     Report.chekEditOptions,
                     Designer.Pivot.sortBySummary
                 ],
-                "Data": [Report.actualValue, Designer.Chart.seriesDataMember, Report.checkState, Report.checked, Report.chartDataSource, Report.dataSource, Report.dataMember, Report.dataAdapter, Designer.Pivot.expandedInFieldsGroup, Designer.Chart.pivotGridDataSourceOptions, Designer.Pivot.fieldName, Report.filterStringEditable, Report.image, Report.imageUrl, Report.maximum, Report.minimum, Report.nullValueText, Report.prefilter, Designer.Pivot.runningTotal, Report.sortFields, Report.summary, Designer.Pivot.showNewValues, Designer.Pivot.sortMode, Designer.Pivot.sortOrder, Designer.Pivot.summaryDisplayType, Designer.Pivot.summaryType, Report.targetValue, Report.tag, Report.text, Report.textArea, Report.rtf, Report.textRtf, Report.serializableRtfString, Designer.Pivot.topValueCount, Designer.Pivot.topValueShowOthers, Designer.Pivot.topValueType, Designer.Pivot.unboundExpression, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat, Report.xlsxFormatString, Designer.Pivot.pivotGridFieldsSerializable, Report.valueMember, Report.reportSourceUrl, Report.calculatedFields, Report.parameterBindings, Report.dataBindings([])],
+                "Data": [Report.actualValue, Designer.Chart.seriesDataMember, Report.checkState, Report.checked, Report.chartDataSource, Report.dataSource, Report.dataMember, Report.dataAdapter, Designer.Pivot.expandedInFieldsGroup, Designer.Chart.pivotGridDataSourceOptions, Designer.Pivot.fieldName, Report.filterStringEditable, Report.image, Report.imageUrl, Report.maximum, Report.minimum, Report.nullValueText, Report.prefilter, Designer.Pivot.runningTotal, Report.sortFields, Report.summary, Designer.Pivot.showNewValues, Designer.Pivot.sortMode, Designer.Pivot.sortOrder, Designer.Pivot.summaryDisplayType, Designer.Pivot.summaryType, Report.targetValue, Report.tag, Report.text, Report.textArea, Report.rtf, Report.textRtf, Report.serializableRtfString, Designer.Pivot.topValueCount, Designer.Pivot.topValueShowOthers, Designer.Pivot.topValueType, Designer.Pivot.unboundExpression, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat, Report.xlsxFormatString, Designer.Pivot.pivotGridFieldsSerializable, Report.valueMember, Report.valueRange, Report.reportSourceUrl, Report.calculatedFields, Report.parameterBindings, Report.dataBindings([])],
                 "Design": [Report.name, Report.snapGridSize],
                 "Layout": [Report.cellHeight, Report.cellHorizontalSpacing, Report.cellSizeMode, Report.cellVerticalSpacing, Report.cellWidth, Report.startBand, Report.startPoint, Report.endBand, Report.endPoint, Report.height, Report.location, Report.size, Designer.Pivot.minWidth, Report.width],
                 "Navigation": [Report.bookmark, Report.bookmarkParent, Report.bookmarkDuplicateSuppress, Report.target, Report.navigateUrl],
@@ -26785,6 +26786,7 @@ var DevExpress;
                         tab.displayName.dispose();
                         tab.textSubscription.dispose();
                         tab.undoEngine.removeTargetSubscription();
+                        tab.undoEngine["_callDisposeFunction"](tab.report());
                         var newIndex = this.tabs().indexOf(tab) - 1;
                         this.tabs.remove(tab);
                         this.selectedIndex(newIndex);
@@ -26882,7 +26884,7 @@ var DevExpress;
                     if (Report.reportStorageWebIsRegister) {
                         var subreportControl = subreportSurface.getControlModel();
                         var self = this;
-                        this.addTab(subreportControl.reportSource, subreportControl.reportSourceUrl, "dx-icon-close");
+                        this.addTab(ko.observable(subreportControl.reportSource()), subreportControl.reportSourceUrl, "dx-icon-close");
                     }
                 };
                 NavigateByReports.prototype.addTab = function (report, url, icon) {
@@ -27339,6 +27341,7 @@ var DevExpress;
                             Report.ReportStorageWeb.setData(self.tab().report().serialize(), this.reportUrl()).done(function (jsonResult) {
                                 self.tab().undoEngine.clearHistory();
                                 self.tab().close.resolve();
+                                self.visible(false);
                             }).fail((function (error) {
                                 self.tab().report().save();
                             }));
@@ -27346,6 +27349,7 @@ var DevExpress;
                         else {
                             saveReportDialog.open(self.tab());
                             saveReportDialog.closeAfterSave(true);
+                            self.visible(false);
                         }
                     }
                     else {

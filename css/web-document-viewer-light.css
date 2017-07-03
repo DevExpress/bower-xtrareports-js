@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.7 - 2017-05-17
+/*! DevExpress HTML/JS Designer - v16.2.8 - 2017-06-27
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -3107,6 +3107,7 @@
   font-size: 11px;
   bottom: 10px;
   z-index: 10;
+  box-sizing: content-box;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrd-preview-progress .dxrd-preview-progress-text {
   margin-bottom: 7px;
