@@ -1,6 +1,10 @@
-/*! DevExpress HTML/JS Designer - v17.1.4 - 2017-06-27
-* http://www.devexpress.com
-* Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
+/**
+* DevExpress HTML/JS Reporting (dx-designer.js)
+* Version: 17.1.5
+* Build date: 2017-07-31
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
+*/
 
 var DevExpress;
 (function (DevExpress) {
@@ -25,7 +29,9 @@ var DevExpress;
                     return date;
                 }
                 return null;
-            }
+            },
+            selectPlaceholder: function () { return DevExpress.Designer.getLocalization("Select...", "ASPxReportsStringId.ReportDesigner_PropertyGrid_Editor_EmptyText"); },
+            noDataText: function () { return DevExpress.Designer.getLocalization("No data to display", "ASPxReportsStringId.ReportDesigner_DataPreview_Empty"); }
         };
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -37,10 +43,14 @@ var DevExpress;
             return (DevExpress.JS.Localization.localize(Designer.localization_values[text]) || DevExpress.JS.Localization.localize(text)) || text;
         }
         var custom_localization_values = {};
+        function isCustomizedWithUpdateLocalizationMethod(text) {
+            return !!custom_localization_values[text];
+        }
+        Designer.isCustomizedWithUpdateLocalizationMethod = isCustomizedWithUpdateLocalizationMethod;
         function getLocalization(text, id) {
             if (id === void 0) { id = null; }
             var result;
-            if (id && !custom_localization_values[text]) {
+            if (id && !isCustomizedWithUpdateLocalizationMethod(text)) {
                 result = DevExpress.JS.Localization.localize(id);
             }
             return result || _getLocalization(text);
@@ -5738,14 +5748,14 @@ var DevExpress;
                 "Webdings": "Webdings",
                 "Wingdings": "Wingdings"
             };
-            Widgets.availableUnits = {
-                "pt": "Point",
-                "world": "World",
-                "px": "Pixel",
-                "in": "Inch",
-                "doc": "Document",
-                "mm": "Millimetr"
-            };
+            Widgets.availableUnits = [
+                { value: "pt", displayValue: "Point", localizationId: "DevExpress.ReportDesigner_FontOptions_Unit_Point" },
+                { value: "world", displayValue: "World", localizationId: "ASPxReportsStringId.ReportDesigner_FontOptions_Unit_World" },
+                { value: "px", displayValue: "Pixel", localizationId: "ASPxReportsStringId.ReportDesigner_FontOptions_Unit_Pixel" },
+                { value: "in", displayValue: "Inch", localizationId: "ASPxReportsStringId.ReportDesigner_Wizard_Inch" },
+                { value: "doc", displayValue: "Document", localizationId: "PreviewStringId.ReportDesigner_FontOptions_Unit_Document" },
+                { value: "mm", displayValue: "Millimetr", localizationId: "ASPxReportsStringId.ReportDesigner_Wizard_Millimeter" }
+            ];
             var FontModel = (function () {
                 function FontModel(value) {
                     var _this = this;
@@ -5778,10 +5788,10 @@ var DevExpress;
                         var components = value.split(',');
                         this.family(components[0]);
                         var self = this;
-                        Object.keys(Widgets.availableUnits).forEach(function (element) {
-                            if (components[1].indexOf(element) != -1) {
-                                self.size(parseFloat(components[1].split(element)[0]));
-                                self.unit(element);
+                        Widgets.availableUnits.forEach(function (element) {
+                            if (components[1].indexOf(element.value) != -1) {
+                                self.size(parseFloat(components[1].split(element.value)[0]));
+                                self.unit(element.value);
                             }
                         });
                         this.modificators.bold(value.indexOf("Bold") !== -1);
@@ -5883,10 +5893,15 @@ var DevExpress;
         ko.virtualElements.allowedBindings["lazy"] = true;
         ko.bindingHandlers['lazy'] = {
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var resolver = globalResolver;
                 var parsedBindings = valueAccessor();
+                if (parsedBindings.innerBindings) {
+                    resolver = parsedBindings.resolver;
+                    parsedBindings = parsedBindings.innerBindings;
+                }
                 $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
                     var innerBinding = ko.bindingHandlers[innerBindingKey];
-                    globalResolver.execute(function () {
+                    resolver.execute(function () {
                         var isInitialized = false;
                         ko.computed({
                             read: function () {
@@ -5966,6 +5981,8 @@ var DevExpress;
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                 var options = valueAccessor();
                 var prevDisplayExpr = options.displayExpr;
+                options["placeholder"] = options["placeholder"] || JS.Localization.selectPlaceholder();
+                options["noDataText"] = options["noDataText"] || JS.Localization.noDataText();
                 options.displayExpr = function (value) {
                     if (!value)
                         return value;
@@ -6016,7 +6033,7 @@ var DevExpress;
                 function EditorAddOn(editor, popupService) {
                     var _this = this;
                     this.showPopup = function (args) {
-                        _this._popupService.title(_this._editor.displayName());
+                        _this._popupService.title(_this._editor.localizingDisplayName());
                         _this._updateActions(_this._editor._model());
                         _this._popupService.target(args.element);
                         _this._popupService.visible(true);
@@ -6373,7 +6390,7 @@ var DevExpress;
                 { propertyName: "size", displayName: "Size", localizationId: "System.Drawing.Font.Size", editor: Widgets.editorTemplates.numeric },
                 {
                     propertyName: "unit", displayName: "Unit", localizationId: "System.Drawing.Font.Unit", editor: Widgets.editorTemplates.combobox,
-                    values: Widgets.availableUnits
+                    valuesArray: Widgets.availableUnits
                 },
                 { propertyName: "modificators", editor: Widgets.editorTemplates.modificators },
             ];
@@ -8694,6 +8711,9 @@ var DevExpress;
     (function (JS) {
         var Widgets;
         (function (Widgets) {
+            function initDisplayText(object) {
+                object.displayText = DevExpress.Designer.getLocalization(object.name, object.localizationId);
+            }
             var FilterEditorHelper = (function () {
                 function FilterEditorHelper(serializer) {
                     this.rtl = false;
@@ -8703,16 +8723,15 @@ var DevExpress;
                     this.canChoiceParameters = true;
                     this.canChoiceProperty = true;
                     this.filterEditorOperators = {
-                        _common: [{
-                                name: "Equals", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType
-                            },
-                            { name: "Does not equal", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType },
-                            { name: "Is greater than", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType },
-                            { name: "Is greater than or equal to", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType },
-                            { name: "Is less than", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType },
-                            { name: "Is less than or equal to", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType },
-                            { name: "Is between", value: "Between", type: JS.Data.BetweenOperator },
-                            { name: "Is not between", value: "Between", type: JS.Data.BetweenOperator, reverse: true }],
+                        _common: [
+                            { name: "Equals", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
+                            { name: "Does not equal", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
+                            { name: "Is greater than", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
+                            { name: "Is greater than or equal to", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
+                            { name: "Is less than", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
+                            { name: "Is less than or equal to", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLessOrEqual" },
+                            { name: "Is between", value: "Between", type: JS.Data.BetweenOperator, localizationId: "StringId.FilterClauseBetween" },
+                            { name: "Is not between", value: "Between", type: JS.Data.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }],
                         string: [],
                         guid: [],
                         integer: [],
@@ -8768,60 +8787,67 @@ var DevExpress;
                     };
                     this.serializer = serializer || new FilterEditorSerializer();
                     this.filterEditorOperators.string = [].concat(this.filterEditorOperators._common, [
-                        { name: "Contains", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType },
-                        { name: "Does not contain", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, reverse: true },
-                        { name: "Begins with", value: JS.Data.FunctionOperatorType.StartsWith, type: JS.Data.FunctionOperatorType },
-                        { name: "Ends with", value: JS.Data.FunctionOperatorType.EndsWith, type: JS.Data.FunctionOperatorType },
-                        { name: "Is like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType },
-                        { name: "Is not like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, reverse: true },
-                        { name: "Is any of", value: "In", type: JS.Data.InOperator },
-                        { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
-                        { name: "Is blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType },
-                        { name: "Is not blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, reverse: true }
+                        { name: "Contains", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseContains" },
+                        { name: "Does not contain", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, reverse: true, localizationId: "StringId.FilterClauseDoesNotContain" },
+                        { name: "Begins with", value: JS.Data.FunctionOperatorType.StartsWith, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseBeginsWith" },
+                        { name: "Ends with", value: JS.Data.FunctionOperatorType.EndsWith, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseEndsWith" },
+                        { name: "Is like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLike" },
+                        { name: "Is not like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseNotLike" },
+                        { name: "Is any of", value: "In", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
+                        { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true, localizationId: "StringId.FilterClauseNoneOf" },
+                        { name: "Is blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseIsNullOrEmpty" },
+                        { name: "Is not blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNullOrEmpty" }
                     ]);
                     this.filterEditorOperators.guid = this.filterEditorOperators.string;
                     this.filterEditorOperators.integer = [].concat(this.filterEditorOperators._common, [
-                        { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType },
-                        { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true },
-                        { name: "Is any of", value: "In", type: JS.Data.InOperator },
-                        { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
+                        { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, localizationId: "StringId.FilterClauseIsNull" },
+                        { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNull" },
+                        { name: "Is any of", value: "In", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
+                        { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true, localizationId: "StringId.FilterClauseNoneOf" },
                     ]);
                     this.filterEditorOperators.float = this.filterEditorOperators.integer;
                     this.filterEditorOperators.date = [].concat(this.filterEditorOperators._common, [
-                        { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType },
-                        { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true },
-                        { name: "Is any of", value: "In", type: JS.Data.InOperator },
-                        { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true },
-                        { name: "Is beyond this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalBeyondThisYear, type: JS.Data.FunctionOperatorType },
-                        { name: "Is later this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisYear, type: JS.Data.FunctionOperatorType },
-                        { name: "Is later this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisMonth, type: JS.Data.FunctionOperatorType },
-                        { name: "Is next week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalNextWeek, type: JS.Data.FunctionOperatorType },
-                        { name: "Is later this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisWeek, type: JS.Data.FunctionOperatorType },
-                        { name: "Is tomorrow", value: JS.Data.FunctionOperatorType.IsOutlookIntervalTomorrow, type: JS.Data.FunctionOperatorType },
-                        { name: "Is today", value: JS.Data.FunctionOperatorType.IsOutlookIntervalToday, type: JS.Data.FunctionOperatorType },
-                        { name: "Is yesterday", value: JS.Data.FunctionOperatorType.IsOutlookIntervalYesterday, type: JS.Data.FunctionOperatorType },
-                        { name: "Is earlier this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisWeek, type: JS.Data.FunctionOperatorType },
-                        { name: "Is last week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLastWeek, type: JS.Data.FunctionOperatorType },
-                        { name: "Is earlier this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisMonth, type: JS.Data.FunctionOperatorType },
-                        { name: "Is earlier this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisYear, type: JS.Data.FunctionOperatorType },
-                        { name: "Is prior this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalPriorThisYear, type: JS.Data.FunctionOperatorType },
+                        { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, localizationId: "StringId.FilterClauseIsNull" },
+                        { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNull" },
+                        { name: "Is any of", value: "In", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
+                        { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true, localizationId: "StringId.FilterClauseNoneOf" },
+                        { name: "Is beyond this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalBeyondThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalBeyondThisYear" },
+                        { name: "Is later this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisYear" },
+                        { name: "Is later this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisMonth, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisMonth" },
+                        { name: "Is next week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalNextWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalNextWeek" },
+                        { name: "Is later this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisWeek" },
+                        { name: "Is tomorrow", value: JS.Data.FunctionOperatorType.IsOutlookIntervalTomorrow, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalTomorrow" },
+                        { name: "Is today", value: JS.Data.FunctionOperatorType.IsOutlookIntervalToday, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalToday" },
+                        { name: "Is yesterday", value: JS.Data.FunctionOperatorType.IsOutlookIntervalYesterday, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalYesterday" },
+                        { name: "Is earlier this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisWeek" },
+                        { name: "Is last week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLastWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLastWeek" },
+                        { name: "Is earlier this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisMonth, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisMonth" },
+                        { name: "Is earlier this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisYear" },
+                        { name: "Is prior this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalPriorThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalPriorThisYear" },
                     ]);
                     this.filterEditorOperators.list = [
-                        { name: "Exists", value: JS.Data.Aggregate.Exists, type: JS.Data.Aggregate },
-                        { name: "Count", value: JS.Data.Aggregate.Count, type: JS.Data.Aggregate },
-                        { name: "Max", value: JS.Data.Aggregate.Max, type: JS.Data.Aggregate },
-                        { name: "Min", value: JS.Data.Aggregate.Min, type: JS.Data.Aggregate },
-                        { name: "Sum", value: JS.Data.Aggregate.Sum, type: JS.Data.Aggregate },
-                        { name: "Avg", value: JS.Data.Aggregate.Avg, type: JS.Data.Aggregate }
+                        { name: "Exists", value: JS.Data.Aggregate.Exists, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateExists" },
+                        { name: "Count", value: JS.Data.Aggregate.Count, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateCount" },
+                        { name: "Max", value: JS.Data.Aggregate.Max, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateMax" },
+                        { name: "Min", value: JS.Data.Aggregate.Min, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateMin" },
+                        { name: "Sum", value: JS.Data.Aggregate.Sum, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateSum" },
+                        { name: "Avg", value: JS.Data.Aggregate.Avg, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateAvg" }
                     ];
                     this.filterEditorOperators.group = [
-                        { name: "And", value: JS.Data.GroupOperatorType.And, type: JS.Data.GroupOperatorType },
-                        { name: "Or", value: JS.Data.GroupOperatorType.Or, type: JS.Data.GroupOperatorType },
-                        { name: "Not And", value: JS.Data.GroupOperatorType.And, reverse: true, type: JS.Data.GroupOperatorType },
-                        { name: "Not Or", value: JS.Data.GroupOperatorType.Or, reverse: true, type: JS.Data.GroupOperatorType },
+                        { name: "And", value: JS.Data.GroupOperatorType.And, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupAnd" },
+                        { name: "Or", value: JS.Data.GroupOperatorType.Or, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupOr" },
+                        { name: "Not And", value: JS.Data.GroupOperatorType.And, reverse: true, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupNotAnd" },
+                        { name: "Not Or", value: JS.Data.GroupOperatorType.Or, reverse: true, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupNotOr" },
                     ];
+                    this._initDisplayText();
                 }
-                FilterEditorHelper.prototype.registrateOperator = function (specific, targetEnum, value, name, reverse) {
+                FilterEditorHelper.prototype._initDisplayText = function () {
+                    var _this = this;
+                    Object.keys(this.filterEditorOperators).forEach(function (specific) {
+                        _this.filterEditorOperators[specific].forEach(initDisplayText);
+                    });
+                };
+                FilterEditorHelper.prototype.registrateOperator = function (specific, targetEnum, value, name, reverse, localizationId) {
                     if (reverse === void 0) { reverse = false; }
                     if (this.filterEditorOperators[specific]) {
                         if (!targetEnum[value]) {
@@ -8837,7 +8863,8 @@ var DevExpress;
                             targetEnum[maxNumber] = value;
                             targetEnum[value] = maxNumber;
                         }
-                        this.filterEditorOperators[specific].push({ name: name, value: targetEnum[value], type: targetEnum, reverse: reverse });
+                        var newOperator = { name: name, value: targetEnum[value], type: targetEnum, reverse: reverse, displayText: DevExpress.Designer.getLocalization(name, localizationId) };
+                        this.filterEditorOperators[specific].push(newOperator);
                     }
                 };
                 FilterEditorHelper.prototype.generateTreelistOptions = function (fieldListProvider, path) {
@@ -8881,7 +8908,7 @@ var DevExpress;
                     this.path = dataMember || ko.observable("");
                     this.disabled = disabled || ko.observable(false);
                     this.helper = new Widgets.DefaultFilterEditorHelper();
-                    this._title = ko.observable(title || { text: "Filter Editor" });
+                    this._title = ko.observable(title || { text: DevExpress.Designer.getLocalization("Filter Editor", "DataAccessUIStringId.FiltersView") });
                 }
                 return FilterStringOptions;
             })();
@@ -8919,7 +8946,10 @@ var DevExpress;
                         this._popupService.data({
                             data: ko.unwrap(viewModel[this.propertyName]),
                             template: this.popupContentTemplate,
-                            click: function (data) { viewModel[_this._action](data); _this._popupService.visible(false); },
+                            click: function (data) {
+                                viewModel[_this._action](data);
+                                _this._popupService.visible(false);
+                            },
                         });
                     }
                 };
@@ -9248,7 +9278,7 @@ var DevExpress;
                     get: function () {
                         var _this = this;
                         var item = this.items.filter(function (item) { return _this.operatorType() === item.value && _this.reverse === item.reverse && _this.model.enumType === item.type; })[0];
-                        return item && item.name || this.operatorType && this.operatorType() || "";
+                        return item && item.name && (item.displayText || DevExpress.Designer.getLocalization(item.name, item.localizationId)) || this.operatorType && this.operatorType() || "";
                     },
                     enumerable: true,
                     configurable: true
@@ -9373,13 +9403,14 @@ var DevExpress;
                 Object.defineProperty(OperandSurfaceBase.prototype, "changeTypeItems", {
                     get: function () {
                         var _this = this;
-                        var items = [{ name: "Value", instance: JS.Data.OperandValue }];
+                        var items = [{ name: "Value", instance: JS.Data.OperandValue, localizationId: "ASPxReportsStringId.FilterEditor_Operand_Type_Value" }];
                         if (this.helper.canChoiceProperty) {
-                            items.push({ name: "Property", instance: JS.Data.OperandProperty });
+                            items.push({ name: "Property", instance: JS.Data.OperandProperty, localizationId: "ASPxReportsStringId.FilterEditor_Operand_Type_Property" });
                         }
                         if (this.helper.canChoiceParameters && (this.helper.parameters() && this.helper.parameters().filter(function (item) { return item.specifics && item.specifics.toLowerCase() === _this.parent.specifics(); }).length > 0 || this.helper.canCreateParameters)) {
-                            items.push({ name: "Parameter", instance: JS.Data.OperandParameter });
+                            items.push({ name: "Parameter", instance: JS.Data.OperandParameter, localizationId: "ASPxReportsStringId.FilterEditor_Operand_Type_Parameter" });
                         }
+                        items.forEach(initDisplayText);
                         return items;
                     },
                     enumerable: true,
@@ -9431,7 +9462,7 @@ var DevExpress;
                         var _this = this;
                         var item = this.items.filter(function (item) { return _this.operatorType() === item.value && _this.reverse === item.reverse && _this.model.enumType === item.type; })[0];
                         if (item && item.name) {
-                            return item.name;
+                            return item.displayText || DevExpress.Designer.getLocalization(item.name, item.localizationId);
                         }
                         else {
                             if (!isNaN(parseInt(this.operatorType()))) {
@@ -9584,7 +9615,7 @@ var DevExpress;
                             if (_this.reverse) {
                                 value = "-" + value;
                             }
-                            return value !== null && value !== undefined && value !== "" ? value : OperandValueSurface.defaultDisplay;
+                            return value !== null && value !== undefined && value !== "" ? value : DevExpress.Designer.getLocalization(OperandValueSurface.defaultDisplay, "StringId.FilterEmptyEnter");
                         },
                         write: function (newVal) {
                             if (newVal > 0 && !_this.reverse || newVal < 0 && _this.reverse) {
@@ -9637,9 +9668,10 @@ var DevExpress;
                     this.operands = ko.observableArray([]);
                     this.createItems = null;
                     this.createItems = [
-                        { name: JS.Utils.getLocalization("Add group"), value: true },
-                        { name: JS.Utils.getLocalization("Add condition"), value: false }
+                        { name: "Add group", value: true, localizationId: "StringId.FilterMenuGroupAdd" },
+                        { name: "Add condition", value: false, localizationId: "StringId.FilterMenuConditionAdd" }
                     ];
+                    this.createItems.forEach(initDisplayText);
                     this.operands((operator.operands || []).map(function (operand) {
                         return _this.createChildSurface(operand);
                     }));
@@ -10312,7 +10344,7 @@ var DevExpress;
                     var fieldsTreeListOptions = options.path && ko.pureComputed(function () {
                         return options.path() && _this._createToolsOptions("field", options.path(), _this._fieldsPutSelectionHandler, options.fieldName);
                     });
-                    this.tools = new Tools(this._updateTextAreaValue, this._createToolsOptions("parameter", "parameters", this._parametersPutSelectionHandler), fieldsTreeListOptions, options.functions);
+                    this.tools = new Tools(this._updateTextAreaValue, this._createToolsOptions("Parameter", "Parameters", this._parametersPutSelectionHandler), fieldsTreeListOptions, options.functions);
                     this._createMainPopupButtons();
                 }
                 ExpressionEditor.prototype._createMainPopupButtons = function () {
@@ -10491,8 +10523,8 @@ var DevExpress;
                 FormatStringEditor.prototype._createMainPopupButtons = function () {
                     var self = this;
                     this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: 'OK', onClick: function () { self.okAction(); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: 'Cancel', onClick: function () { self.popupVisible(false); } } }
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('OK', DevExpress.Designer.StringId.DataAccessBtnOK), onClick: function () { self.okAction(); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Cancel', DevExpress.Designer.StringId.DataAccessBtnCancel), onClick: function () { self.popupVisible(false); } } }
                     ];
                 };
                 FormatStringEditor.prototype._convertArray = function (array, canRemove) {
@@ -13025,7 +13057,6 @@ var DevExpress;
                     this.editorValue = ko.observable(selectAllItem);
                     this.updateValue = function () {
                         value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
-                        valueHasMutated();
                     };
                     this.onOptionChanged = function (e) {
                         if (e.name !== "opened" || e.value)
@@ -13360,11 +13391,11 @@ var DevExpress;
                 }
                 var dss = dataSources.peek();
                 for (var i = 0; i < dss.length; i++) {
-                    if (dss[i].id === request.id) {
+                    if (dss[i].id === request.id && !!request.id) {
                         request.ref = undefined;
                         return;
                     }
-                    if (dss[i].ref === request.ref) {
+                    if (dss[i].ref === request.ref && !!request.ref) {
                         request.id = undefined;
                         return;
                     }
