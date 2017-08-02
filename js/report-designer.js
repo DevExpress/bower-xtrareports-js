@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.12 - 2017-05-17
+/*! DevExpress HTML/JS Designer - v16.1.13 - 2017-07-28
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -7437,7 +7437,7 @@ var DevExpress;
                     return this._generateInfo();
                 };
                 ExportOptionsPreview.prototype.hasSensitiveData = function () {
-                    return this.pdf.hasSensitiveData();
+                    return this.pdf && this.pdf.hasSensitiveData();
                 };
                 return ExportOptionsPreview;
             })(ExportOptions);

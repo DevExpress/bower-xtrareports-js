@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.1.12 - 2017-05-17
+/*! DevExpress HTML/JS Designer - v16.1.13 - 2017-07-31
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -10302,14 +10302,23 @@ var DevExpress;
             return jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.error ? jqXHR.responseJSON.error : '';
         }
         Designer.getErrorMessage = getErrorMessage;
+        function minHeightWithoutScroll(element) {
+            return Math.min(element.scrollHeight, element.offsetHeight, element.clientHeight) + element.offsetTop;
+        }
+        Designer.minHeightWithoutScroll = minHeightWithoutScroll;
+        function chooseBetterPositionOf(html, designer) {
+            return minHeightWithoutScroll(html) < minHeightWithoutScroll(designer) ? window : designer;
+        }
+        Designer.chooseBetterPositionOf = chooseBetterPositionOf;
         function ShowMessage(msg, type, displayTime, debugInfo) {
             if (type === void 0) { type = "error"; }
             DevExpress.ui.notify({
                 message: msg,
                 type: type,
-                position: { of: $(".dx-designer")[0], my: "bottom", at: "bottom", offset: "0 -10" },
+                position: { of: chooseBetterPositionOf(document.documentElement, $(".dx-designer")[0]), my: "bottom", at: "bottom", offset: "0 -10" },
                 targetContainer: $(".dx-designer")[0],
                 closeOnOutsideClick: true,
+                closeOnSwipe: false,
                 displayTime: displayTime || (type === "error" ? 60000 : 3000)
             });
         }
