@@ -1,8 +1,8 @@
 <!--
 /**
-* DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.1.5
-* Build date: 2017-07-31
+* DevExpress HTML/JS Analytics Core (dx-designer.html)
+* Version: 17.1.6
+* Build date: 2017-09-04
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -34,7 +34,7 @@
                         <!-- ko if: displayName -->
                         <div class="dx-collectioneditor-header-text" data-bind="styleunit: { 'paddingLeft': padding }">
                             <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                            <div class="dx-group-header-font" data-bind="text: DevExpress.JS.Utils.getLocalization(displayName), attr: { title: DevExpress.JS.Utils.getLocalization(displayName) }"></div>
+                            <div class="dx-group-header-font" data-bind="text: displayName, attr: { title: displayName }"></div>
                         </div>
                         <!-- /ko -->
                     </div>
@@ -82,10 +82,10 @@
                     <div class="dx-field-label dx-accordion-header" data-bind="styleunit: padding, css: { 'dx-accordion-empty': templateName === 'dx-emptyHeader' }">
                         <!-- ko if: isComplexEditor -->
                         <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
-                        <div class="dx-group-header-font" data-bind="text: localizingDisplayName(), attr: { 'title': localizingDisplayName() }"></div>
+                        <div class="dx-group-header-font" data-bind="text: displayName, attr: { 'title': displayName }"></div>
                         <!-- /ko -->
                         <!-- ko if: !isComplexEditor -->
-                        <div class="propertygrid-editor-displayName" data-bind="text: localizingDisplayName(), attr: { 'title': localizingDisplayName() }, style: { fontWeight: isPropertyModified() ? 'Bold' : ''}"></div>
+                        <div class="propertygrid-editor-displayName" data-bind="text: displayName, attr: { 'title': displayName }, style: { fontWeight: isPropertyModified() ? 'Bold' : ''}"></div>
                         <!-- /ko -->
                     </div>
                     <div class="dx-field-value">
@@ -221,7 +221,7 @@
 </script>
 <script type="text/html" id="dx-expressioneditor-main">
     <div class="dx-expression-tree">
-        <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyPress: function() { isValid(true); } }"></div>
+        <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyUp: function() { isValid(true); } }"></div>
         <div class="dx-expressioneditor-tools">
             <!-- ko with: tools-->
             <div class="dx-expressioneditor-tools-popular">
@@ -260,7 +260,10 @@
                 </div>
                 <!-- /ko-->
             </div>
-            <div class="dx-expressioneditor-description" data-bind="text: description, attr: { title: description }"></div>
+            <div class="dx-expressioneditor-description">
+                <div class="dx-expressioneditor-description-header" data-bind="text: descriptionHeader, attr: { title: descriptionHeader }"></div>
+                <div class="dx-expressioneditor-description-body" data-bind="text: descriptionBody, attr: { title: descriptionBody }"></div>
+            </div>
             <!-- /ko -->
         </div>
     </div>
@@ -325,7 +328,9 @@
         </div>
         <div class="dx-treelist-caption">
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">
-                <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>
+                <div class="dx-treelist-text-wrapper">
+                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1269,6 +1274,16 @@
 <script type="text/html" id="dxrd-colorpicker">
     <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled }"></div>
 </script>
+<!--
+/**
+* DevExpress HTML/JS Reporting (web-document-viewer.html)
+* Version: 17.1.6
+* Build date: 2017-09-04
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
+*/
+-->
+
 <script type="text/html" id="dxrp-editing-field-container">
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
         <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>

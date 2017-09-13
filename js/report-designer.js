@@ -1,7 +1,7 @@
 /**
-* DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 17.1.5
-* Build date: 2017-07-31
+* DevExpress HTML/JS Query Builder (dx-querybuilder.js)
+* Version: 17.1.6
+* Build date: 2017-09-04
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2934,6 +2934,58 @@ var DevExpress;
         (function (Report) {
             var Wizard;
             (function (Wizard) {
+                var CommonParametersPage = (function (_super) {
+                    __extends(CommonParametersPage, _super);
+                    function CommonParametersPage() {
+                        _super.apply(this, arguments);
+                    }
+                    CommonParametersPage.prototype.getParameters = function () {
+                        return [];
+                    };
+                    CommonParametersPage.prototype.validateParameters = function () {
+                        var _this = this;
+                        var oldFinish = this.actionFinish.isDisabled();
+                        var oldNext = this.actionNext.isDisabled();
+                        this._validation = ko.computed(function () {
+                            if (!_this.actionFinish.isDisabled.peek() || !_this.actionNext.isDisabled.peek()) {
+                                oldFinish = _this.actionFinish.isDisabled.peek();
+                                oldNext = _this.actionNext.isDisabled.peek();
+                            }
+                            var parameters = _this.getParameters();
+                            if (parameters.length === 0 || parameters.every(function (param) {
+                                return param.isValid();
+                            })) {
+                                _this.actionFinish.isDisabled(oldFinish);
+                                _this.actionNext.isDisabled(oldNext);
+                            }
+                            else {
+                                _this.actionFinish.isDisabled(true);
+                                _this.actionNext.isDisabled(true);
+                            }
+                        });
+                    };
+                    CommonParametersPage.prototype.reset = function () {
+                        this._validation && this._validation.dispose();
+                        _super.prototype.reset.call(this);
+                    };
+                    CommonParametersPage.prototype.commit = function (data) {
+                        this._validation && this._validation.dispose();
+                    };
+                    return CommonParametersPage;
+                })(Wizard.WizardPage);
+                Wizard.CommonParametersPage = CommonParametersPage;
+            })(Wizard = Report.Wizard || (Report.Wizard = {}));
+        })(Report = Designer.Report || (Designer.Report = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Report;
+        (function (Report) {
+            var Wizard;
+            (function (Wizard) {
                 var SqlDataSourceWizard = (function (_super) {
                     __extends(SqlDataSourceWizard, _super);
                     function SqlDataSourceWizard(connectionStrings, callbacks, disableCustomSql, rtl) {
@@ -3372,17 +3424,22 @@ var DevExpress;
                             collapsed: false
                         };
                     }
+                    ConfigureParametersPage.prototype.getParameters = function () {
+                        return this.parametersEditorOptions.values()();
+                    };
                     ConfigureParametersPage.prototype._begin = function (data) {
                         var _this = this;
                         this.parametersEditorOptions.hideButtons(data.sqlQuery.type() === DevExpress.Data.SqlQueryType.storedProcQuery);
                         this.parametersEditorOptions.values(ko.observableArray(data.sqlQuery.parameters().map(function (item) { return _this.parametersConverter.createParameterViewModel(item); })));
+                        this.validateParameters();
                     };
                     ConfigureParametersPage.prototype.commit = function (data) {
                         var _this = this;
+                        _super.prototype.commit.call(this, data);
                         data.sqlQuery.parameters(this.parametersEditorOptions.values()().map(function (item) { return _this.parametersConverter.getParameterFromViewModel(item); }));
                     };
                     return ConfigureParametersPage;
-                })(Wizard.WizardPage);
+                })(Wizard.CommonParametersPage);
                 Wizard.ConfigureParametersPage = ConfigureParametersPage;
             })(Wizard = Report.Wizard || (Report.Wizard = {}));
         })(Report = Designer.Report || (Designer.Report = {}));
@@ -3463,6 +3520,7 @@ var DevExpress;
 /// <reference path="sources/dragdrop.ts" />
 /// <reference path="sources/initializer.ts" />
 /// <reference path="sources/wizard/wizardCore.ts" />
+/// <reference path="sources/wizard/commonParametersPage.ts" />
 /// <reference path="sources/wizard/sqlDataSourceWizard/wizardModel.ts" />
 /// <reference path="sources/wizard/sqlDataSourceWizard/selectConnectionString.ts" />
 /// <reference path="sources/wizard/sqlDataSourceWizard/createQueryPage.ts" />
@@ -3559,6 +3617,7 @@ var DevExpress;
                 _super.call(this);
                 this._serializationsInfo = _serializationsInfo;
                 this._valueInfo = ko.observable(Data.parameterValueSerializationsInfo);
+                this.isValid = ko.observable(true);
                 serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
                 serializer.deserialize(this, $.extend(model, { "@ItemType": "Parameter" }));
                 this.name = ko.pureComputed({
@@ -3594,12 +3653,21 @@ var DevExpress;
                 return value !== void 0 && value !== null && !isNaN(typeof value === "string" ? "" : value);
             };
             DataSourceParameter.prototype._updateValueInfo = function (newType) {
+                var _this = this;
                 var typeValue = this._getTypeValue(newType);
                 var newValue = this._tryConvertValue(this._value(), typeValue);
                 var expressionOptions = this._expressionValue.peek();
                 this._expressionValue(null);
                 this._value(null);
-                this._valueInfo($.extend({}, Data.parameterValueSerializationsInfo, { editor: DevExpress.Designer.getEditorType(typeValue.name), disabled: typeValue.disableEditor === true }));
+                this._valueInfo($.extend({}, Data.parameterValueSerializationsInfo, {
+                    editor: DevExpress.Designer.getEditorType(typeValue.name),
+                    disabled: typeValue.disableEditor === true,
+                    editorOptions: {
+                        onFocusOut: function (params) {
+                            _this.isValid(params.component.option("isValid"));
+                        }
+                    }
+                }));
                 this._expressionValue(expressionOptions);
                 this._value(newValue);
             };
@@ -4128,17 +4196,17 @@ var DevExpress;
                     this.fieldsOptions = parent.leftPart.fieldsOptions;
                     this.parameterName = ko.pureComputed({
                         read: function () {
-                            return _this._parameterName() || OperandParameterQBSurface.defaultDisplay;
+                            return _this._parameterName() || OperandParameterQBSurface.defaultDisplay();
                         },
                         write: function (newVal) {
-                            if (newVal !== OperandParameterQBSurface.defaultDisplay) {
+                            if (newVal !== OperandParameterQBSurface.defaultDisplay()) {
                                 _this.model.parameterName = ko.unwrap(newVal);
                                 _this._parameterName(_this.model.parameterName);
                             }
                         }
                     });
                 }
-                OperandParameterQBSurface.defaultDisplay = "Create new parameter";
+                OperandParameterQBSurface.defaultDisplay = function () { return Designer.getLocalization("Create new parameter", "ASPxReportsStringId.FilterEditor_Operand_CreateNewParameter"); };
                 return OperandParameterQBSurface;
             })(DevExpress.JS.Widgets.OperandParameterSurface);
             QueryBuilder.OperandParameterQBSurface = OperandParameterQBSurface;
@@ -4164,7 +4232,7 @@ var DevExpress;
                         return result.promise();
                     };
                     this.createParameter = function (name, dataType) {
-                        if (name !== "" && name !== OperandParameterQBSurface.defaultDisplay && query().parameters().filter(function (parameter) { return parameter.name() === name; }).length === 0) {
+                        if (name !== "" && name !== OperandParameterQBSurface.defaultDisplay() && query().parameters().filter(function (parameter) { return parameter.name() === name; }).length === 0) {
                             var parameter = new DevExpress.Data.DataSourceParameter({ "@Name": name, "@Type": dataType });
                             query().parameters.push(parameter);
                         }
@@ -5345,10 +5413,19 @@ var DevExpress;
                                 selectedPath: this._selectedPath,
                                 treeListController: new ParametersTreeListController(this._rootItems, this._createNewParameter),
                             });
+                            this.validateParameters();
                         }
+                    };
+                    MultiQueryConfigureParametersPage.prototype.getParameters = function () {
+                        return [].concat.apply([], (this._rootItems || []).map(function (x) {
+                            return x.parameters().map(function (param) {
+                                return param.dataSorceParameter();
+                            });
+                        }));
                     };
                     MultiQueryConfigureParametersPage.prototype.commit = function (data) {
                         var _this = this;
+                        _super.prototype.commit.call(this, data);
                         this._rootItems.forEach(function (item) {
                             item.query().parameters(item.parameters().map(function (parameterViewModel) {
                                 return _this.parametersConverter.getParameterFromViewModel(parameterViewModel.dataSorceParameter());
@@ -5356,7 +5433,7 @@ var DevExpress;
                         });
                     };
                     return MultiQueryConfigureParametersPage;
-                })(Wizard.WizardPage);
+                })(Wizard.CommonParametersPage);
                 Wizard.MultiQueryConfigureParametersPage = MultiQueryConfigureParametersPage;
                 var ParametersTreeListItem = (function () {
                     function ParametersTreeListItem(parameter, parent) {
@@ -5702,6 +5779,14 @@ var DevExpress;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-query-builder-core.js.map
+/**
+* DevExpress HTML/JS Reporting (report-designer.js)
+* Version: 17.1.6
+* Build date: 2017-09-04
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
+*/
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5896,6 +5981,72 @@ var DevExpress;
                 return ChartStructureTreeListController;
             })(DevExpress.Designer.ObjectStructureTreeListController);
             Chart.ChartStructureTreeListController = ChartStructureTreeListController;
+            var ChartDependencyEditor = (function (_super) {
+                __extends(ChartDependencyEditor, _super);
+                function ChartDependencyEditor(info, level, parentDisabled) {
+                    _super.call(this, info, level, parentDisabled);
+                }
+                ChartDependencyEditor.prototype.getDependencyOptions = function (templateOptions, propertyName, depPropertyName) {
+                    var _this = this;
+                    if (!this.bindableOptions) {
+                        var debObj = {};
+                        this.depProperty = ko.computed(function () { return _this._model() && _this._model()[depPropertyName](); });
+                        debObj[propertyName] = this.depProperty;
+                        this.bindableOptions = $.extend({}, this.getOptions(templateOptions), debObj);
+                    }
+                    return this.bindableOptions;
+                };
+                return ChartDependencyEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Chart.ChartDependencyEditor = ChartDependencyEditor;
+            var UndoColorPickerEditor = (function (_super) {
+                __extends(UndoColorPickerEditor, _super);
+                function UndoColorPickerEditor(info, level, parentDisabled) {
+                    _super.call(this, info, level, parentDisabled);
+                }
+                UndoColorPickerEditor.prototype.generateValue = function (undoEngine) {
+                    var _this = this;
+                    if (!this.generatedValue) {
+                        this.generatedValue = ko.computed({
+                            read: function () { return _this.displayValue(); },
+                            write: function (newVal) {
+                                undoEngine().start();
+                                _this.displayValue(newVal);
+                                undoEngine().end();
+                            }
+                        });
+                    }
+                    return this.generatedValue;
+                };
+                return UndoColorPickerEditor;
+            })(Designer.Widgets.ColorPickerEditor);
+            Chart.UndoColorPickerEditor = UndoColorPickerEditor;
+            var ViewEditor = (function (_super) {
+                __extends(ViewEditor, _super);
+                function ViewEditor(info, level, parentDisabled) {
+                    var _this = this;
+                    _super.call(this, info, level, parentDisabled);
+                    this.contentValue = ko.computed(function () {
+                        return _this.value() && _this.value().model() || {};
+                    });
+                }
+                ViewEditor.prototype.generateHeaderValue = function (undoEngine) {
+                    var _this = this;
+                    if (!this.headerValue) {
+                        this.headerValue = ko.computed({
+                            read: function () { return _this.value() && _this.value().type(); },
+                            write: function (newVal) {
+                                undoEngine().start();
+                                _this.value().type(newVal);
+                                undoEngine().end();
+                            }
+                        });
+                    }
+                    return this.headerValue;
+                };
+                return ViewEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Chart.ViewEditor = ViewEditor;
         })(Chart = Designer.Chart || (Designer.Chart = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -5910,7 +6061,7 @@ var DevExpress;
                 dataSource: { header: "dxrd-datasource" },
                 chartDataSource: { header: "dxcd-datasource" },
                 collection: { header: "dxcd-collection-lookup-header", content: "dxcd-collection-item", editorType: Chart.CollectionLookupEditorModel },
-                views: { header: "dxcd-viewSelect" },
+                views: { header: "dxcd-viewHeader", content: "dxcd-viewContent", editorType: Chart.ViewEditor },
                 fieldChart: { header: "dxcd-field", editorType: Designer.Widgets.FieldListEditor },
                 dataMemberChart: { header: "dxcd-field", editorType: Designer.Widgets.DataMemberEditor },
                 valueDataMember: { header: "dxcd-field", editorType: Chart.ChartDataMemberEditor },
@@ -5919,7 +6070,11 @@ var DevExpress;
                 axisY: { header: "dxcd-axisY-editor" },
                 legends: { header: "dxcd-legends-editor" },
                 summaryFunction: { header: "dx-emptyHeader", content: "dxcd-summaryFunction-content", editorType: Chart.SummaryFunctionEditor },
-                points: { custom: "dxcd-pointscollection" }
+                points: { custom: "dxcd-pointscollection" },
+                maxSize: { header: "dxcd-maxSize", editorType: Chart.ChartDependencyEditor },
+                minSize: { header: "dxcd-minSize", editorType: Chart.ChartDependencyEditor },
+                group: { header: "dxcd-group" },
+                undoCustomColorEditor: { header: "dxcd-color-undo", editorType: Chart.UndoColorPickerEditor }
             };
             Chart.defaultBooleanValues = {
                 "True": "True",
@@ -6294,89 +6449,44 @@ var DevExpress;
         (function (Chart) {
             var FillStyle = (function (_super) {
                 __extends(FillStyle, _super);
-                function FillStyle(model, parent, info, serializer) {
+                function FillStyle(model, info, gradientTypeName, serializer) {
                     var _this = this;
+                    this.getInfo = function () { return info; };
                     _super.call(this, model, serializer, info);
-                    this.parent = parent;
+                    this.gradientTypeName = gradientTypeName;
                     this.updateOptions(this.fillMode(), serializer, model["Options"]);
                     this._disposables.push(this.fillMode.subscribe(function (newValue) {
                         _this.updateOptions(newValue, serializer, {});
                     }));
                 }
+                FillStyle.from = function (info, gradientTypeName) {
+                    return function (model, serializer) {
+                        return new FillStyle(model || {}, info, gradientTypeName, serializer);
+                    };
+                };
+                FillStyle.toJson = function (model, serializer, refs) {
+                    return serializer.serialize(model, undefined, refs);
+                };
+                FillStyle.prototype._optionsTypeMap = function (unitType) {
+                    switch (unitType) {
+                        case "Gradient": return this.gradientTypeName;
+                        case "Hatch": return "HatchFillOptions";
+                        default: return undefined;
+                    }
+                };
                 FillStyle.prototype.isPropertyVisible = function (propertyName) {
                     return propertyName !== "options" || (propertyName === "options" && this[propertyName]());
                 };
                 FillStyle.prototype.updateOptions = function (fillMode, serializer, optionsObject) {
-                    var newObject = $.extend({ "@TypeNameSerializable": optionsTypeMap[fillMode] }, optionsObject);
-                    var optionsInfo = Chart.barSeriesViewGroup.indexOf(this.parent.typeName()) !== -1 ? Chart.barStyle2DMap[fillMode] : Chart.barStyle3DMap[fillMode];
+                    var newObject = $.extend({ "@TypeNameSerializable": this._optionsTypeMap(fillMode) }, optionsObject);
+                    var optionsInfo = Chart.fillModeMapper[fillMode];
                     this.options(new Designer.SerializableModel(newObject, serializer, optionsInfo));
                 };
                 return FillStyle;
             })(Designer.SerializableModel);
             Chart.FillStyle = FillStyle;
             Chart.typeNameSerializable = {
-                propertyName: "typeName", modelName: "@TypeNameSerializable", displayName: "Type", defaultVal: "", editor: Chart.editorTemplates.views, values: {
-                    "SideBySideBarSeriesView": "Bar",
-                    "StackedBarSeriesView": "Bar Stacked",
-                    "FullStackedBarSeriesView": "Bar Stacked 100%",
-                    "SideBySideStackedBarSeriesView": "Side By Side Bar Stacked",
-                    "SideBySideFullStackedBarSeriesView": "Side By Side Bar Stacked 100%",
-                    "SideBySideBar3DSeriesView": "Bar 3D",
-                    "StackedBar3DSeriesView": "Bar 3D Stacked",
-                    "FullStackedBar3DSeriesView": "Bar 3D Stacked 100%",
-                    "SideBySideStackedBar3DSeriesView": "Side By Side Bar 3D Stacked ",
-                    "SideBySideFullStackedBar3DSeriesView": "Side By Side Bar 3D Stacked 100%",
-                    "ManhattanBarSeriesView": "Manhattan Bar",
-                    "PointSeriesView": "Point",
-                    "BubbleSeriesView": "Bubble",
-                    "LineSeriesView": "Line",
-                    "StackedLineSeriesView": "Line Stacked",
-                    "FullStackedLineSeriesView": "Line Stacked 100%",
-                    "StepLineSeriesView": "Step Line",
-                    "SplineSeriesView": "Spline",
-                    "ScatterLineSeriesView": "Scatter Line",
-                    "SwiftPlotSeriesView": "Swift Plot",
-                    "Line3DSeriesView": "Line 3D",
-                    "StackedLine3DSeriesView": "Line 3D Stacked",
-                    "FullStackedLine3DSeriesView": "Line 3D Stacked 100%",
-                    "StepLine3DSeriesView": "Step Line 3D",
-                    "Spline3DSeriesView": "Spline 3D",
-                    "PieSeriesView": "Pie",
-                    "DoughnutSeriesView": "Doughnut",
-                    "NestedDoughnutSeriesView": "Nested Doughnut",
-                    "Pie3DSeriesView": "Pie 3D",
-                    "Doughnut3DSeriesView": "Doughnut 3D",
-                    "FunnelSeriesView": "Funnel",
-                    "Funnel3DSeriesView": "Funnel 3D",
-                    "AreaSeriesView": "Area",
-                    "StackedAreaSeriesView": "Area Stacked",
-                    "FullStackedAreaSeriesView": "Area Stacked 100%",
-                    "StepAreaSeriesView": "Step Area",
-                    "SplineAreaSeriesView": "Spline Area",
-                    "StackedSplineAreaSeriesView": "Spline Area Stacked",
-                    "FullStackedSplineAreaSeriesView": "Spline Area Stacked 100%",
-                    "Area3DSeriesView": "Area 3D",
-                    "StackedArea3DSeriesView": "Area 3D Stacked",
-                    "FullStackedArea3DSeriesView": "Area 3D Stacked 100%",
-                    "StepArea3DSeriesView": "Step 3D Area",
-                    "SplineArea3DSeriesView": "Spline 3D Area",
-                    "StackedSplineArea3DSeriesView": "Spline Area 3D Stacked",
-                    "FullStackedSplineArea3DSeriesView": "Spline Area 3D Stacked 100%",
-                    "OverlappedRangeBarSeriesView": "Range Bar",
-                    "SideBySideRangeBarSeriesView": "Side By Side Range Bar",
-                    "RangeAreaSeriesView": "Range Area",
-                    "RangeArea3DSeriesView": "Range Area 3D",
-                    "RadarPointSeriesView": "Radar Point",
-                    "RadarLineSeriesView": "Radar Line",
-                    "RadarAreaSeriesView": "Radar Area",
-                    "PolarPointSeriesView": "Polar Point",
-                    "PolarLineSeriesView": "Polar Line",
-                    "PolarAreaSeriesView": "Polar Area",
-                    "StockSeriesView": "Stock Series",
-                    "CandleStickSeriesView": "Candle Stick",
-                    "OverlappedGanttSeriesView": "Gantt",
-                    "SideBySideGanttSeriesView": "Side By Side Gantt"
-                }
+                propertyName: "typeName", modelName: "@TypeNameSerializable", from: function (value) { return value; }
             };
             Chart.barSeriesViewGroup = ["SideBySideBarSeriesView", "StackedBarSeriesView", "FullStackedBarSeriesView", "SideBySideStackedBarSeriesView", "SideBySideFullStackedBarSeriesView", "OverlappedRangeBarSeriesView", "SideBySideRangeBarSeriesView", "OverlappedGanttSeriesView", "SideBySideGanttSeriesView"];
             Chart.bar3DSeriesViewGroup = ["SideBySideBar3DSeriesView", "StackedBar3DSeriesView", "FullStackedBar3DSeriesView", "SideBySideStackedBar3DSeriesView", "SideBySideFullStackedBar3DSeriesView", "ManhattanBarSeriesView"];
@@ -6392,7 +6502,7 @@ var DevExpress;
                     "Hatch": "Hatch"
                 }
             };
-            var rectangleGradientMode = {
+            var gradientModeBase = {
                 propertyName: "gradientMode", modelName: "@GradientMode", displayName: "Gradient Mode", defaultVal: "TopToBottom", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
                     "TopToBottom": "Top To Bottom",
                     "BottomToTop": "Bottom To Top",
@@ -6407,7 +6517,7 @@ var DevExpress;
                     "FromCenterVertical": "From Center Vertical",
                     "ToCenterVertical": "To Center Vertical"
                 }
-            }, rectangleGradientFillOptionsInfo = [rectangleGradientMode, color2, Chart.tag, { propertyName: "typeNameSerializable", modelName: "@TypeNameSerializable" }];
+            }, GradientFillOptionsInfoBase = [gradientModeBase, color2, Chart.tag, { propertyName: "typeNameSerializable", modelName: "@TypeNameSerializable" }];
             var hatchStyle = {
                 propertyName: "hatchStyle", modelName: "@HatchStyle", displayName: "Hatch Style", defaultVal: "BackwardDiagonal", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
                     "Horizontal": "Horizontal",
@@ -6487,20 +6597,11 @@ var DevExpress;
                 }
             };
             Chart.viewSerializationsInfo = [Chart.typeNameSerializable, Chart.color, Chart.colorEach, Chart.border, aggregateFunction, Chart.tag];
-            Chart.barStyle2DMap = {
+            Chart.fillModeMapper = {
                 "Empty": [],
                 "Solid": [Chart.tag],
-                "Gradient": rectangleGradientFillOptionsInfo,
+                "Gradient": GradientFillOptionsInfoBase,
                 "Hatch": hatchFillOptionsInfo
-            };
-            Chart.barStyle3DMap = {
-                "Empty": [],
-                "Solid": [Chart.tag],
-                "Gradient": rectangleGradientFillOptionsInfo
-            };
-            var optionsTypeMap = {
-                "Gradient": "RectangleGradientFillOptions",
-                "Hatch": "HatchFillOptions"
             };
         })(Chart = Designer.Chart || (Designer.Chart = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -6734,10 +6835,10 @@ var DevExpress;
                     if (model) {
                         var typeName = "";
                         if (this.dataContainer.seriesDataMember() || this.dataContainer.series().length === 0) {
-                            typeName = this.dataContainer.seriesTemplate.view.typeName();
+                            typeName = this.dataContainer.seriesTemplate.viewType();
                         }
                         else {
-                            typeName = this.dataContainer.series()[0].view.typeName();
+                            typeName = this.dataContainer.series()[0].viewType();
                         }
                         if (oldType.peek() !== Chart.diagramMapper[typeName].type) {
                             oldType(Chart.diagramMapper[typeName].type);
@@ -6800,7 +6901,7 @@ var DevExpress;
                     var _this = this;
                     _super.call(this, model, serializer, Chart.dataContainerSerializationsInfo);
                     this.series = Chart.deserializeModelArray(model && model.SeriesSerializable, function (item, parent) { return new SeriesViewModel(item, parent, serializer); }, SeriesViewModel.prefix);
-                    var typeArray = Chart.typeNameSerializable.values;
+                    var typeArray = Chart.viewBindableSerializationInfo.values;
                     var actions = [];
                     for (var name in typeArray) {
                         actions.push({
@@ -6962,7 +7063,18 @@ var DevExpress;
                     if (this.valueDataMembers) {
                         ko.unwrap(this.valueDataMembers).dispose();
                     }
-                    this.valueDataMembers = ko.observable(new (viewTypesDataMembers[this.view.typeName()] || CommonValueDataMembers)(this.valueDataMembers.toString(), this.valueScaleType));
+                    this.viewType = ko.observable(this.view().typeName);
+                    this.viewType.subscribe(function (newType) {
+                        var newSerializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                        _this.view(SeriesViewViewModel.from({ "@TypeNameSerializable": newType }, newSerializer)());
+                    });
+                    this._disposables.push(this.view.subscribe(function (newView) {
+                        if (_this.viewType() !== newView.typeName) {
+                            _this.viewType(newView.typeName);
+                        }
+                        _this.updateByView(newView);
+                    }));
+                    this.valueDataMembers = ko.observable(new (viewTypesDataMembers[this.view().typeName] || CommonValueDataMembers)(this.valueDataMembers.toString(), this.valueScaleType));
                     this.dataFilters = DevExpress.JS.Utils.deserializeArray(model.DataFilters, function (item) { return new Chart.DefaultDataFilterModel(item, serializer); });
                     this._disposables.push(ko.computed(function () {
                         _this.dataFilters().forEach(function (dataFilter) {
@@ -6973,21 +7085,17 @@ var DevExpress;
                             }
                         });
                     }));
-                    this._disposables.push(ko.computed(function () {
-                        if (_this.label && _this.label.typeNameSerializable) {
-                            _this.label.typeNameSerializable(mapTypes[_this.view.typeName()]);
-                        }
-                    }));
                     this._disposables.push(this.argumentScaleType.subscribe(function (newVal) {
                         if (newVal !== "Auto" && newVal !== "Qualitative")
                             _this.argumentDataMember("");
                     }));
-                    this._disposables.push(ko.computed(function () {
-                        _this.valueDataMembers.peek().dispose();
-                        _this.valueDataMembers(new (viewTypesDataMembers[_this.view.typeName()] || CommonValueDataMembers)(_this.valueDataMembers.peek().toString(), _this.valueScaleType));
-                    }));
+                    this.updateByView(this.view());
                     this.summaryFunction["getPath"] = function (propertyName) {
                         return _this["getPath"] && _this["getPath"]("summaryFunction") || "";
+                    };
+                    this.viewBindable = {
+                        model: this.view,
+                        type: this.viewType
                     };
                 }
                 SeriesTemplateViewModel.from = function (model, serializer) {
@@ -6995,6 +7103,13 @@ var DevExpress;
                 };
                 SeriesTemplateViewModel.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, Chart.seriesTemplateSerializationsInfo, refs);
+                };
+                SeriesTemplateViewModel.prototype.updateByView = function (view) {
+                    if (this.label && this.label.typeNameSerializable) {
+                        this.label.typeNameSerializable(mapTypes[view.typeName]);
+                    }
+                    this.valueDataMembers.peek().dispose();
+                    this.valueDataMembers(new (viewTypesDataMembers[view.typeName] || CommonValueDataMembers)(this.valueDataMembers.peek().toString(), this.valueScaleType));
                 };
                 return SeriesTemplateViewModel;
             })(Designer.SerializableModel);
@@ -7012,7 +7127,6 @@ var DevExpress;
                     this.points = ko.observableArray([]);
                     this._disposables.push(this.points.subscribe(function (newValue) { newValue["owner"] = _this; }));
                     this.points(DevExpress.JS.Utils.deserializeArray(model.Points || [], function (item) { return new SeriesPointModel(item, _this, serializer); })());
-                    this._disposables.push(this.view.typeName.subscribe(function () { _this.points([]); }));
                 }
                 SeriesViewModel.from = function (model, serializer) {
                     return new SeriesViewModel(model || {}, null, serializer);
@@ -7023,6 +7137,10 @@ var DevExpress;
                 SeriesViewModel.getClassName = function (typeName) {
                     return typeName.toLowerCase().split("seriesview")[0];
                 };
+                SeriesViewModel.prototype.updateByView = function (view) {
+                    _super.prototype.updateByView.call(this, view);
+                    this.points && this.points([]);
+                };
                 SeriesViewModel.prefix = "Series";
                 return SeriesViewModel;
             })(SeriesTemplateViewModel);
@@ -7031,52 +7149,61 @@ var DevExpress;
                 __extends(SeriesViewViewModel, _super);
                 function SeriesViewViewModel(model, serializer) {
                     var _this = this;
-                    this._info = ko.observable(Chart.viewSerializationsInfo);
-                    this.getInfo = function () { return _this._info(); };
+                    model["@TypeNameSerializable"] = model["@TypeNameSerializable"] || "SideBySideBarSeriesView";
+                    this.getInfo = function () { return _this._getInfo(model["@TypeNameSerializable"]); };
                     _super.call(this, model, serializer);
-                    if (this.typeName && this.typeName() === "")
-                        this.typeName("SideBySideBarSeriesView");
-                    this._updateModel(this.typeName(), serializer, model);
-                    this.typeName.subscribe(function (newValue) {
-                        _this._updateModel(newValue, serializer, {});
-                    });
+                    this._createMarkerDependences();
+                    this._createLinkOptionsDependences();
+                    this["isPropertyDisabled"] = function (propertyName) {
+                        return _this._createPropertyDisabledDependence(propertyName, "heightToWidthRatio", _this["heightToWidthRatioAuto"], [true]) ||
+                            _this._createPropertyDisabledDependence(propertyName, "minSize", _this["autoSize"], [true]) ||
+                            _this._createPropertyDisabledDependence(propertyName, "maxSize", _this["autoSize"], [true]) ||
+                            _this._createPropertyDisabledDependence(propertyName, "barDepth", _this["barDepthAuto"], [true]) ||
+                            _this._createPropertyDisabledDependence(propertyName, "showFacet", _this["model"], ["Cone", "Pyramid"]);
+                    };
                 }
                 SeriesViewViewModel.from = function (model, serializer) {
-                    return new SeriesViewViewModel(model || {}, serializer);
+                    return ko.observable(new SeriesViewViewModel(model || {}, serializer));
+                };
+                SeriesViewViewModel.prototype.dispose = function () {
+                    this._disposables.forEach(function (x) { return x.dispose(); });
                 };
                 SeriesViewViewModel.toJson = function (value, serializer, refs) {
+                    value = ko.unwrap(value);
                     return serializer.serialize(value, value.getInfo(), refs);
                 };
-                SeriesViewViewModel.prototype._updateModel = function (typeName, serializer, model) {
+                SeriesViewViewModel.prototype._getInfo = function (typeName) {
+                    return [Chart.typeNameSerializable].concat(Chart.viewMapper[typeName]);
+                };
+                SeriesViewViewModel.prototype._createPropertyDisabledDependence = function (propertyName, depLeftPropertyName, depRightProperty, depValues, reverse) {
+                    if (reverse === void 0) { reverse = false; }
+                    if (propertyName !== depLeftPropertyName || !depRightProperty)
+                        return false;
+                    var isDisabled = false;
+                    for (var i = 0; i < depValues.length; i++) {
+                        if (depRightProperty() === depValues[i]) {
+                            isDisabled = true;
+                            break;
+                        }
+                    }
+                    return reverse ? !isDisabled : isDisabled;
+                };
+                SeriesViewViewModel.prototype._createMarkerDependences = function () {
                     var _this = this;
-                    var diagram = Chart.diagramMapper[typeName];
-                    var info = $.extend(true, [], Chart.viewSerializationsInfo);
-                    var XYDiagramAdditionalInfo = [Chart.paneName, Chart.axisXName, Chart.axisYName];
-                    if (diagram.type === "XYDiagram" || diagram.type === "SwiftPlotDiagram" || diagram.type === "gantObject") {
-                        XYDiagramAdditionalInfo.forEach(function (item) {
-                            _this[item.propertyName] = ko.observable(model[item.modelName] || item.defaultVal);
-                        });
-                        info = info.concat(XYDiagramAdditionalInfo);
-                    }
-                    else {
-                        XYDiagramAdditionalInfo.forEach(function (item) {
-                            delete _this[item.propertyName];
-                        });
-                    }
-                    if (Chart.barSeriesViewGroup.indexOf(typeName) !== -1) {
-                        this.fillStyle = ko.observable(new Chart.FillStyle(model["FillStyle"] || {}, this, [Chart.fillMode, Chart.fillStyleOptionsSerialize], serializer));
-                        this.barWidth = ko.observable(model[Chart.barWidth.modelName] || Chart.barWidth.defaultVal);
-                        this._info(info.concat([Chart.barWidth, Chart.fillStyle]));
-                    }
-                    else if (Chart.bar3DSeriesViewGroup.indexOf(typeName) !== -1) {
-                        this.fillStyle = ko.observable(new Chart.FillStyle(model["FillStyle"] || {}, this, [Chart.fillMode3D, Chart.fillStyleOptionsSerialize], serializer));
-                        this.barWidth = ko.observable(model[Chart.barWidth.modelName] || Chart.barWidth.defaultVal);
-                        this._info(info.concat([Chart.barWidth, Chart.fillStyle]));
-                    }
-                    else {
-                        delete this.fillStyle;
-                        delete this.barWidth;
-                        this._info(info);
+                    ["minValueMarker", "maxValueMarker", "marker1", "marker2", "markerOptions", "lineMarkerOptions", "bubbleMarkerOptions", "pointMarkerOptions"].forEach(function (propertyName) {
+                        if (_this[propertyName]) {
+                            _this[propertyName].isPropertyDisabled = function (innerName) {
+                                return _this._createPropertyDisabledDependence(innerName, "starPointCount", _this[propertyName].kind, ["Star"], true);
+                            };
+                        }
+                    });
+                };
+                SeriesViewViewModel.prototype._createLinkOptionsDependences = function () {
+                    var _this = this;
+                    if (!!this["linkOptions"]) {
+                        this._disposables.push(this["linkOptions"].color.subscribe(function (newVal) {
+                            _this["linkOptions"].colorSource("OwnColor");
+                        }));
                     }
                 };
                 return SeriesViewViewModel;
@@ -7124,7 +7251,7 @@ var DevExpress;
                     return new DiagramViewModel(model || {}, serializer);
                 };
                 DiagramViewModel.toJson = function (value, serializer, refs) {
-                    return serializer.serialize(value, refs);
+                    return serializer.serialize(value, null, refs);
                 };
                 return DiagramViewModel;
             })(Designer.SerializableModel);
@@ -7317,7 +7444,7 @@ var DevExpress;
                     "DateTime": "DateTime"
                 }
             }, Chart.labelsVisibility = { propertyName: "labelsVisibility", modelName: "@LabelsVisibility", displayName: "Labels Visibility", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: Chart.defaultBooleanValues }, Chart.argumentDataMember = { propertyName: "argumentDataMember", modelName: "@ArgumentDataMember", displayName: "Argument Data Member", defaultVal: "", editor: Chart.editorTemplates.valueDataMember }, Chart.valueDataMembersSerializable = { propertyName: "valueDataMembers", modelName: "@ValueDataMembersSerializable", displayName: "Value Data Members", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: CommonValueDataMembers.from, toJsonObject: CommonValueDataMembers.toJson };
-            var transparency = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, size = { propertyName: "size", modelName: "@Size", displayName: "Size", defaultVal: 2, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Chart.transparency = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Chart.size = { propertyName: "size", modelName: "@Size", displayName: "Size", defaultVal: 2, editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             var enabled = { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mode = {
                 propertyName: "mode", modelName: "@Mode", displayName: "Mode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Count", values: {
                     "Count": "Count",
@@ -7436,8 +7563,71 @@ var DevExpress;
             };
             Chart.view = {
                 propertyName: "view", modelName: "View", displayName: "View", defaultVal: {},
-                from: SeriesViewViewModel.from, toJsonObject: SeriesViewViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor
-            }, Chart.seriesTemplateSerializationsInfo = [Chart.view, Chart.argumentDataMember, Chart.valueDataMembersSerializable, colorDataMember, Chart.argumentScaleType, Chart.seriesPointsSorting, Chart.seriesPointsSortingKey, Chart.valueScaleType, Chart.checkableInLegend, Chart.checkedInLegend, Chart.showInLegend, Chart.legendName, Chart.legendText, Chart.legendTextPattern, Chart.labelsVisibility, dataFiltersConjunctionMode, Chart.summaryFunctionSerializationInfo, dataFilters, Chart.seriesLabel, topNOptions, Chart.visible], Chart.seriesTemplate = { propertyName: "seriesTemplate", modelName: "SeriesTemplate", displayName: Designer.getLocalization("Series Template", 'DevExpress.XtraReports.UI.XRChart.SeriesTemplate'), info: Chart.seriesTemplateSerializationsInfo, from: SeriesTemplateViewModel.from, toJsonObject: SeriesTemplateViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.seriesSerializationsInfo = [Chart.name, Chart.points].concat(Chart.seriesTemplateSerializationsInfo), Chart.seriesSerializable = { propertyName: "series", modelName: "SeriesSerializable", displayName: "Series", array: true, editor: Chart.editorTemplates.collection }, Chart.seriesDataMember = { propertyName: "seriesDataMember", modelName: "@SeriesDataMember", displayName: "Series Data Member", editor: ko.bindingHandlers["displayNameExtender"] ? Designer.Widgets.editorTemplates.field : Chart.editorTemplates.fieldChart }, Chart.dataContainerSerializationsInfo = [Chart.seriesDataMember, Chart.seriesSerializable, Chart.seriesTemplate, Chart.dataMember, Chart.pivotGridDataSourceOptions], Chart.dataContainer = { propertyName: "dataContainer", modelName: "DataContainer", displayName: "Data Container", info: Chart.dataContainerSerializationsInfo, from: DataContainerViewModel.from, toJsonObject: DataContainerViewModel.toJson, editor: Designer.Widgets.editorTemplates.objecteditorCustom };
+                from: SeriesViewViewModel.from, toJsonObject: SeriesViewViewModel.toJson
+            }, Chart.viewBindableSerializationInfo = {
+                propertyName: "viewBindable", displayName: "View", editor: Chart.editorTemplates.views, values: {
+                    "SideBySideBarSeriesView": "Bar",
+                    "StackedBarSeriesView": "Bar Stacked",
+                    "FullStackedBarSeriesView": "Bar Stacked 100%",
+                    "SideBySideStackedBarSeriesView": "Side By Side Bar Stacked",
+                    "SideBySideFullStackedBarSeriesView": "Side By Side Bar Stacked 100%",
+                    "SideBySideBar3DSeriesView": "Bar 3D",
+                    "StackedBar3DSeriesView": "Bar 3D Stacked",
+                    "FullStackedBar3DSeriesView": "Bar 3D Stacked 100%",
+                    "SideBySideStackedBar3DSeriesView": "Side By Side Bar 3D Stacked ",
+                    "SideBySideFullStackedBar3DSeriesView": "Side By Side Bar 3D Stacked 100%",
+                    "ManhattanBarSeriesView": "Manhattan Bar",
+                    "PointSeriesView": "Point",
+                    "BubbleSeriesView": "Bubble",
+                    "LineSeriesView": "Line",
+                    "StackedLineSeriesView": "Line Stacked",
+                    "FullStackedLineSeriesView": "Line Stacked 100%",
+                    "StepLineSeriesView": "Step Line",
+                    "SplineSeriesView": "Spline",
+                    "ScatterLineSeriesView": "Scatter Line",
+                    "SwiftPlotSeriesView": "Swift Plot",
+                    "Line3DSeriesView": "Line 3D",
+                    "StackedLine3DSeriesView": "Line 3D Stacked",
+                    "FullStackedLine3DSeriesView": "Line 3D Stacked 100%",
+                    "StepLine3DSeriesView": "Step Line 3D",
+                    "Spline3DSeriesView": "Spline 3D",
+                    "PieSeriesView": "Pie",
+                    "DoughnutSeriesView": "Doughnut",
+                    "NestedDoughnutSeriesView": "Nested Doughnut",
+                    "Pie3DSeriesView": "Pie 3D",
+                    "Doughnut3DSeriesView": "Doughnut 3D",
+                    "FunnelSeriesView": "Funnel",
+                    "Funnel3DSeriesView": "Funnel 3D",
+                    "AreaSeriesView": "Area",
+                    "StackedAreaSeriesView": "Area Stacked",
+                    "FullStackedAreaSeriesView": "Area Stacked 100%",
+                    "StepAreaSeriesView": "Step Area",
+                    "SplineAreaSeriesView": "Spline Area",
+                    "StackedSplineAreaSeriesView": "Spline Area Stacked",
+                    "FullStackedSplineAreaSeriesView": "Spline Area Stacked 100%",
+                    "Area3DSeriesView": "Area 3D",
+                    "StackedArea3DSeriesView": "Area 3D Stacked",
+                    "FullStackedArea3DSeriesView": "Area 3D Stacked 100%",
+                    "StepArea3DSeriesView": "Step 3D Area",
+                    "SplineArea3DSeriesView": "Spline 3D Area",
+                    "StackedSplineArea3DSeriesView": "Spline Area 3D Stacked",
+                    "FullStackedSplineArea3DSeriesView": "Spline Area 3D Stacked 100%",
+                    "OverlappedRangeBarSeriesView": "Range Bar",
+                    "SideBySideRangeBarSeriesView": "Side By Side Range Bar",
+                    "RangeAreaSeriesView": "Range Area",
+                    "RangeArea3DSeriesView": "Range Area 3D",
+                    "RadarPointSeriesView": "Radar Point",
+                    "RadarLineSeriesView": "Radar Line",
+                    "RadarAreaSeriesView": "Radar Area",
+                    "PolarPointSeriesView": "Polar Point",
+                    "PolarLineSeriesView": "Polar Line",
+                    "PolarAreaSeriesView": "Polar Area",
+                    "StockSeriesView": "Stock Series",
+                    "CandleStickSeriesView": "Candle Stick",
+                    "OverlappedGanttSeriesView": "Gantt",
+                    "SideBySideGanttSeriesView": "Side By Side Gantt"
+                }
+            }, Chart.seriesTemplateSerializationsInfo = [Chart.viewBindableSerializationInfo, Chart.view, Chart.argumentDataMember, Chart.valueDataMembersSerializable, colorDataMember, Chart.argumentScaleType, Chart.seriesPointsSorting, Chart.seriesPointsSortingKey, Chart.valueScaleType, Chart.checkableInLegend, Chart.checkedInLegend, Chart.showInLegend, Chart.legendName, Chart.legendText, Chart.legendTextPattern, Chart.labelsVisibility, dataFiltersConjunctionMode, Chart.summaryFunctionSerializationInfo, dataFilters, Chart.seriesLabel, topNOptions, Chart.visible], Chart.seriesTemplate = { propertyName: "seriesTemplate", modelName: "SeriesTemplate", displayName: Designer.getLocalization("Series Template", 'DevExpress.XtraReports.UI.XRChart.SeriesTemplate'), info: Chart.seriesTemplateSerializationsInfo, from: SeriesTemplateViewModel.from, toJsonObject: SeriesTemplateViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.seriesSerializationsInfo = [Chart.name, Chart.points].concat(Chart.seriesTemplateSerializationsInfo), Chart.seriesSerializable = { propertyName: "series", modelName: "SeriesSerializable", displayName: "Series", array: true, editor: Chart.editorTemplates.collection }, Chart.seriesDataMember = { propertyName: "seriesDataMember", modelName: "@SeriesDataMember", displayName: "Series Data Member", editor: ko.bindingHandlers["displayNameExtender"] ? Designer.Widgets.editorTemplates.field : Chart.editorTemplates.fieldChart }, Chart.dataContainerSerializationsInfo = [Chart.seriesDataMember, Chart.seriesSerializable, Chart.seriesTemplate, Chart.dataMember, Chart.pivotGridDataSourceOptions], Chart.dataContainer = { propertyName: "dataContainer", modelName: "DataContainer", displayName: "Data Container", info: Chart.dataContainerSerializationsInfo, from: DataContainerViewModel.from, toJsonObject: DataContainerViewModel.toJson, editor: Designer.Widgets.editorTemplates.objecteditorCustom };
             Chart.titleSerializationsInfo = [Chart.chartTitleText, Chart.textColor, Chart.dock, Chart.titleAlignment, Chart.visibility, Chart.font18], Chart.titles = { propertyName: "titles", modelName: "Titles", displayName: Designer.getLocalization("Titles", 'DevExpress.XtraReports.UI.XRChart.Titles'), array: true, editor: Chart.editorTemplates.collection };
             var markerMode = {
                 propertyName: "markerMode", modelName: "@MarkerMode", displayName: Designer.getLocalization('Marker Mode', 'DevExpress.XtraCharts.Legend.MarkerMode'), defaultVal: "Marker", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
@@ -7591,9 +7781,6 @@ var DevExpress;
                         if (args[0].status === "added") {
                             _this._initSeries(args[0].value);
                         }
-                        else if (args[0].status === "deleted") {
-                            args[0].value._disposables.forEach(function (val) { return val.dispose(); });
-                        }
                     }, null, "arrayChange"));
                     this.chart.dataContainer.seriesTemplate["getPath"] = function (propertyName) {
                         return _this.getPath("seriesDataMember");
@@ -7662,7 +7849,7 @@ var DevExpress;
                     this._disposables.push(ko.computed(function () {
                         var series = control.chart.dataContainer.series();
                         series.forEach(function (val) {
-                            val.view.typeName();
+                            val.viewType();
                         });
                         var _self = _this;
                         if (Designer.Chart.HandlerUri) {
@@ -7813,7 +8000,7 @@ var DevExpress;
                 return function () {
                     var rightAreaWidth = $element.find(".dxrd-right-panel")[0].offsetWidth;
                     var leftAreaWidth = $element.find(".dx-chart-left-panel")[0].offsetWidth;
-                    var otherWidth = rightAreaWidth + leftAreaWidth, surfaceWidth = $element.find(".dxrd-designer")[0].offsetWidth - (otherWidth + 5);
+                    var otherWidth = rightAreaWidth + leftAreaWidth, surfaceWidth = $element.find(".dxcd-designer")[0].offsetWidth - (otherWidth + 5);
                     $element.find(".dxrd-surface-wrapper").eq(0).css({
                         "right": !rtl ? rightAreaWidth : leftAreaWidth,
                         "left": rtl ? rightAreaWidth : leftAreaWidth,
@@ -7914,7 +8101,9 @@ var DevExpress;
                     ["axisX", "axisY"].forEach(function (propertyName) {
                         if (diagram[propertyName]) {
                             axisCollectionNames.forEach(function (innerPropertyName) {
-                                diagramSubscriptions.push(subscribeTreelistArray(chartStructureProvider, diagram[propertyName][innerPropertyName], function () { return ["Chart", "diagram", propertyName, innerPropertyName]; }));
+                                if (diagram[propertyName][innerPropertyName]) {
+                                    diagramSubscriptions.push(subscribeTreelistArray(chartStructureProvider, diagram[propertyName][innerPropertyName], function () { return ["Chart", "diagram", propertyName, innerPropertyName]; }));
+                                }
                             });
                         }
                     });
@@ -7955,13 +8144,17 @@ var DevExpress;
                 var chartStructure = ko.observable(null);
                 var chartSelectedItem = ko.observable(null);
                 var subscriptions = [];
+                var groups = ko.observableArray();
                 var chartSourceSubscription = null;
+                var undoModel = ko.observable({});
                 var initChartControlModel = function (newModel) {
                     surface() && surface()._disposables.forEach(function (item) { item.dispose(); });
                     subscriptions.forEach(function (item) { return item.dispose(); });
                     subscriptions = [];
                     if (newModel) {
+                        groups(newModel.chart.dataContainer.series().map(function (x) { return x.view()["group"] || x["stackedGroup"]; }).filter(function (x) { return !!x; }).map(function (x) { return x(); }));
                         chartControlModel(newModel);
+                        undoModel(newModel);
                         surface() && surface()._disposables.forEach(function (item) { item.dispose(); });
                         surface(new Chart.ChartControlSurface(newModel, ko.observable(1), size));
                         if (!!options.fieldListProvider) {
@@ -7994,15 +8187,23 @@ var DevExpress;
                     });
                     initChartControlModel(newModel);
                 };
+                var undoEngine = new DevExpress.JS.Utils.UndoEngine(undoModel, ["viewType"], "getInfo");
+                undoEngine["_disposeUndoEngineSubscriptionsName"] += "chartdesigner";
                 var designerModel = {
                     model: chartControlModel,
                     chartStructure: chartStructure,
                     surface: surface,
-                    undoEngine: ko.observable(new DevExpress.JS.Utils.UndoEngine(chartControlModel)),
+                    undoEngine: ko.observable(undoEngine),
                     tabPanel: new Designer.TabPanel([new Designer.TabInfo("Properties", "dxrd-propertygridtab", new DevExpress.JS.Widgets.ObjectProperties(chartSelectedItem))], undefined, options.rtl),
                     surfaceSize: ko.observable(0),
                     isLoading: ko.observable(true),
-                    rtl: options.rtl
+                    rtl: options.rtl,
+                    groups: groups,
+                    applyGroup: function (groupName) {
+                        if (groups().indexOf(groupName) === -1 && !!groupName) {
+                            groups.push(groupName);
+                        }
+                    }
                 };
                 if (options.data.chartSource) {
                     chartSourceSubscription = options.data.chartSource.subscribe(function (newValue) {
@@ -8039,7 +8240,7 @@ var DevExpress;
                     var displayedChartSources = options.data.dataSource && options.data.dataSource() ? [{ displayName: options.data.dataSource().name, value: options.data.dataSource() }] : [];
                     designerModel.chartDataSources = ko.observableArray(displayedChartSources);
                 }
-                designerModel.rootStyle = "dxrd-designer dxcd-designer";
+                designerModel.rootStyle = "dxcd-designer";
                 designerModel.parts = [
                     { templateName: "dx-chart-middlePart", model: designerModel },
                     { templateName: "dxcd-toolbar", model: designerModel },
@@ -8086,6 +8287,537 @@ var DevExpress;
                     });
                     return { controlsDescendantBindings: true };
                 }
+            };
+        })(Chart = Designer.Chart || (Designer.Chart = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Chart;
+        (function (Chart) {
+            var arrowWidthValidationRules = [{
+                    type: "custom",
+                    validationCallback: function (options) {
+                        return options.value % 2 !== 0;
+                    },
+                    message: DevExpress.Designer.getLocalization("The arrow width should be always odd and greater than 0", "ChartStringId.MsgIncorrectArrowWidth")
+                }];
+            var invertedStep = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.FullStackedStepAreaSeriesView.InvertedStep", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var fillMode = {
+                propertyName: "fillMode", modelName: "@FillMode", displayName: "Fill Mode", localizationId: "DevExpress.XtraCharts.FillStyle2D.FillMode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Empty": "Empty",
+                    "Solid": "Solid",
+                    "Gradient": "Gradient",
+                    "Hatch": "Hatch",
+                }, defaultVal: "Empty"
+            };
+            var fillStyleInfo = [fillMode, Chart.fillStyleOptionsSerialize, Chart.tag,];
+            var fillStyle = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.AreaSeriesViewBase.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "PolygonGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var transparency = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.AreaSeriesViewBase.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var enableAntialiasing = {
+                propertyName: "enableAntialiasing", modelName: "@EnableAntialiasing", displayName: "Enable Antialiasing", localizationId: "DevExpress.XtraCharts.LineSeriesView.EnableAntialiasing", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var size = { propertyName: "size", modelName: "@Size", displayName: "Size", localizationId: "DevExpress.XtraCharts.Shadow.Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2, editorOptions: { min: 1 } };
+            var color = { propertyName: "color", modelName: "@Color", displayName: "Color", localizationId: "DevExpress.XtraCharts.Shadow.Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "79,0,0,0" };
+            var visible = { propertyName: "visible", modelName: "@Visible", displayName: "Visible", localizationId: "DevExpress.XtraCharts.Shadow.Visible", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var shadowInfo = [size, color, visible, Chart.tag,];
+            var shadow = { propertyName: "shadow", modelName: "Shadow", displayName: "Shadow", localizationId: "DevExpress.XtraCharts.XYDiagramSeriesViewBase.Shadow", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: shadowInfo, };
+            var aggregateFunction = {
+                propertyName: "aggregateFunction", modelName: "@AggregateFunction", displayName: "Aggregate Function", localizationId: "DevExpress.XtraCharts.XYDiagram2DSeriesViewBase.AggregateFunction", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "None": "None",
+                    "Average": "Average",
+                    "Minimum": "Minimum",
+                    "Maximum": "Maximum",
+                    "Sum": "Sum",
+                    "Count": "Count",
+                    "Financial": "Financial",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var color1 = { propertyName: "color", modelName: "@Color", displayName: "Color", localizationId: "DevExpress.XtraCharts.SeriesViewBase.Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "transparent" };
+            var fullStackedStepAreaSeriesViewinfo = [invertedStep, fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var color2 = { propertyName: "color", modelName: "@Color", displayName: "Color", localizationId: "DevExpress.XtraCharts.Marker.Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "transparent" };
+            var size1 = { propertyName: "size", modelName: "@Size", displayName: "Size", localizationId: "DevExpress.XtraCharts.SimpleMarker.Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 10, editorOptions: { min: 1 } };
+            var kind = {
+                propertyName: "kind", modelName: "@Kind", displayName: "Kind", localizationId: "DevExpress.XtraCharts.MarkerBase.Kind", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Square": "Square",
+                    "Diamond": "Diamond",
+                    "Triangle": "Triangle",
+                    "InvertedTriangle": "InvertedTriangle",
+                    "Circle": "Circle",
+                    "Plus": "Plus",
+                    "Cross": "Cross",
+                    "Star": "Star",
+                    "Pentagon": "Pentagon",
+                    "Hexagon": "Hexagon",
+                }, defaultVal: "Circle"
+            };
+            var starPointCount = { propertyName: "starPointCount", modelName: "@StarPointCount", displayName: "Star Point Count", localizationId: "DevExpress.XtraCharts.MarkerBase.StarPointCount", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, editorOptions: { min: 3, max: 100 } };
+            var fillStyle1 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.MarkerBase.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "PolygonGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var borderVisible = { propertyName: "borderVisible", modelName: "@BorderVisible", displayName: "Border Visible", localizationId: "DevExpress.XtraCharts.MarkerBase.BorderVisible", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var borderColor = { propertyName: "borderColor", modelName: "@BorderColor", displayName: "Border Color", localizationId: "DevExpress.XtraCharts.MarkerBase.BorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "transparent" };
+            var marker1Info = [color2, size1, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var marker1 = { propertyName: "marker1", modelName: "Marker1", displayName: "Marker 1", localizationId: "DevExpress.XtraCharts.RadarRangeAreaSeriesView.Marker1", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: marker1Info, };
+            var marker2Info = [color2, size1, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var marker2 = { propertyName: "marker2", modelName: "Marker2", displayName: "Marker 2", localizationId: "DevExpress.XtraCharts.RadarRangeAreaSeriesView.Marker2", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: marker2Info, };
+            var color3 = { propertyName: "color", modelName: "@Color", displayName: "Color", localizationId: "DevExpress.XtraCharts.BorderBase.Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "transparent" };
+            var thickness = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.BorderBase.Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 1 } };
+            var visibility = {
+                propertyName: "visibility", modelName: "@Visibility", displayName: "Visibility", localizationId: "DevExpress.XtraCharts.BorderBase.Visibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var border1Info = [color3, thickness, visibility, Chart.tag,];
+            var border1 = { propertyName: "border1", modelName: "Border1", displayName: "Border 1", localizationId: "DevExpress.XtraCharts.RadarRangeAreaSeriesView.Border1", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: border1Info, };
+            var border2Info = [color3, thickness, visibility, Chart.tag,];
+            var border2 = { propertyName: "border2", modelName: "Border2", displayName: "Border 2", localizationId: "DevExpress.XtraCharts.RadarRangeAreaSeriesView.Border2", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: border2Info, };
+            var marker1Visibility = {
+                propertyName: "marker1Visibility", modelName: "@Marker1Visibility", displayName: "Marker 1 Visibility", localizationId: "DevExpress.XtraCharts.RadarRangeAreaSeriesView.Marker1Visibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var marker2Visibility = {
+                propertyName: "marker2Visibility", modelName: "@Marker2Visibility", displayName: "Marker 2 Visibility", localizationId: "DevExpress.XtraCharts.RadarRangeAreaSeriesView.Marker2Visibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var fillStyle2 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.RadarAreaSeriesView.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "PolygonGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var transparency1 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.RadarAreaSeriesView.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 135 };
+            var aggregateFunction1 = {
+                propertyName: "aggregateFunction", modelName: "@AggregateFunction", displayName: "Aggregate Function", localizationId: "DevExpress.XtraCharts.RadarSeriesViewBase.AggregateFunction", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "None": "None",
+                    "Average": "Average",
+                    "Minimum": "Minimum",
+                    "Maximum": "Maximum",
+                    "Sum": "Sum",
+                    "Count": "Count",
+                    "Financial": "Financial",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var shadow1 = { propertyName: "shadow", modelName: "Shadow", displayName: "Shadow", localizationId: "DevExpress.XtraCharts.RadarSeriesViewBase.Shadow", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: shadowInfo, };
+            var colorEach = { propertyName: "colorEach", modelName: "@ColorEach", displayName: "Color Each", localizationId: "DevExpress.XtraCharts.RadarSeriesViewBase.ColorEach", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var polarRangeAreaSeriesViewinfo = [marker1, marker2, border1, border2, marker1Visibility, marker2Visibility, fillStyle2, transparency1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var radarRangeAreaSeriesViewinfo = [marker1, marker2, border1, border2, marker1Visibility, marker2Visibility, fillStyle2, transparency1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var areaWidth = { propertyName: "areaWidth", modelName: "@AreaWidth", displayName: "Area Width", localizationId: "DevExpress.XtraCharts.Area3DSeriesView.AreaWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 1 } };
+            var aggregateFunction2 = {
+                propertyName: "aggregateFunction", modelName: "@AggregateFunction", displayName: "Aggregate Function", localizationId: "DevExpress.XtraCharts.XYDiagram3DSeriesViewBase.AggregateFunction", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "None": "None",
+                    "Average": "Average",
+                    "Minimum": "Minimum",
+                    "Maximum": "Maximum",
+                    "Sum": "Sum",
+                    "Count": "Count",
+                    "Financial": "Financial",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var transparency2 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.XYDiagram3DSeriesViewBase.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var rangeArea3DSeriesViewinfo = [areaWidth, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var marker11 = { propertyName: "marker1", modelName: "Marker1", displayName: "Marker 1", localizationId: "DevExpress.XtraCharts.RangeAreaSeriesView.Marker1", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: marker1Info, };
+            var marker21 = { propertyName: "marker2", modelName: "Marker2", displayName: "Marker 2", localizationId: "DevExpress.XtraCharts.RangeAreaSeriesView.Marker2", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: marker2Info, };
+            var border11 = { propertyName: "border1", modelName: "Border1", displayName: "Border 1", localizationId: "DevExpress.XtraCharts.RangeAreaSeriesView.Border1", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: border1Info, };
+            var border21 = { propertyName: "border2", modelName: "Border2", displayName: "Border 2", localizationId: "DevExpress.XtraCharts.RangeAreaSeriesView.Border2", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: border2Info, };
+            var marker1Visibility1 = {
+                propertyName: "marker1Visibility", modelName: "@Marker1Visibility", displayName: "Marker 1 Visibility", localizationId: "DevExpress.XtraCharts.RangeAreaSeriesView.Marker1Visibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var marker2Visibility1 = {
+                propertyName: "marker2Visibility", modelName: "@Marker2Visibility", displayName: "Marker 2 Visibility", localizationId: "DevExpress.XtraCharts.RangeAreaSeriesView.Marker2Visibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var transparency3 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.AreaSeriesViewBase.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 135 };
+            var colorEach1 = { propertyName: "colorEach", modelName: "@ColorEach", displayName: "Color Each", localizationId: "DevExpress.XtraCharts.SeriesViewColorEachSupportBase.ColorEach", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var rangeAreaSeriesViewinfo = [marker11, marker21, border11, border21, marker1Visibility1, marker2Visibility1, fillStyle, transparency3, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var invertedStep1 = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.StackedStepAreaSeriesView.InvertedStep", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var borderInfo = [color3, thickness, visibility, Chart.tag,];
+            var border = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.AreaSeriesViewBase.Border", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: borderInfo, };
+            var stackedStepAreaSeriesViewinfo = [invertedStep1, border, fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var invertedStep2 = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.StepArea3DSeriesView.InvertedStep", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var transparency4 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.XYDiagram3DSeriesViewBase.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 135 };
+            var stepArea3DSeriesViewinfo = [invertedStep2, areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var invertedStep3 = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.StepAreaSeriesView.InvertedStep", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var markerOptionsInfo = [color2, size1, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var markerOptions = { propertyName: "markerOptions", modelName: "MarkerOptions", displayName: "Marker Options", localizationId: "DevExpress.XtraCharts.AreaSeriesViewBase.MarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: markerOptionsInfo, };
+            var markerVisibility = {
+                propertyName: "markerVisibility", modelName: "@MarkerVisibility", displayName: "Marker Visibility", localizationId: "DevExpress.XtraCharts.LineSeriesView.MarkerVisibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var stepAreaSeriesViewinfo = [invertedStep3, border, fillStyle, markerOptions, transparency3, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var stackedGroup = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
+            var barDistance = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var barWidth = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
+            var barDepth = { propertyName: "barDepth", modelName: "@BarDepth", displayName: "Bar Depth", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarDepth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
+            var barDepthAuto = { propertyName: "barDepthAuto", modelName: "@BarDepthAuto", displayName: "Bar Depth Auto", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarDepthAuto", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var fillMode1 = {
+                propertyName: "fillMode", modelName: "@FillMode", displayName: "Fill Mode", localizationId: "DevExpress.XtraCharts.FillStyle3D.FillMode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Empty": "Empty",
+                    "Solid": "Solid",
+                    "Gradient": "Gradient",
+                }, defaultVal: "Empty"
+            };
+            var fillStyleInfo1 = [fillMode1, Chart.fillStyleOptionsSerialize, Chart.tag,];
+            var fillStyle3 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo1, "RectangleGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var model = {
+                propertyName: "model", modelName: "@Model", displayName: "Model", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.Model", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Box": "Box",
+                    "Cylinder": "Cylinder",
+                    "Cone": "Cone",
+                    "Pyramid": "Pyramid",
+                }, defaultVal: "Box"
+            };
+            var showFacet = { propertyName: "showFacet", modelName: "@ShowFacet", displayName: "Show Facet", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.ShowFacet", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var colorEach2 = { propertyName: "colorEach", modelName: "@ColorEach", displayName: "Color Each", localizationId: "DevExpress.XtraCharts.SeriesView3DColorEachSupportBase.ColorEach", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var sideBySideFullStackedBar3DSeriesViewinfo = [stackedGroup, barDistance, barDistanceFixed, equalBarWidth, barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var stackedGroup1 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
+            var barDistance1 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed1 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth1 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var barWidth1 = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.BarSeriesView.BarWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 1 } };
+            var border3 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.BarSeriesView.Border", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: borderInfo, };
+            var fillStyle4 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.BarSeriesView.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "RectangleGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var transparency5 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.BarSeriesView.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var sideBySideFullStackedBarSeriesViewinfo = [stackedGroup1, barDistance1, barDistanceFixed1, equalBarWidth1, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var stackedGroup2 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
+            var barDistance2 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed2 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth2 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var sideBySideStackedBar3DSeriesViewinfo = [stackedGroup2, barDistance2, barDistanceFixed2, equalBarWidth2, barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var stackedGroup3 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
+            var barDistance3 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed3 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth3 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var sideBySideStackedBarSeriesViewinfo = [stackedGroup3, barDistance3, barDistanceFixed3, equalBarWidth3, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var lineThickness = { propertyName: "lineThickness", modelName: "@LineThickness", displayName: "Line Thickness", localizationId: "DevExpress.XtraCharts.Line3DSeriesView.LineThickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, editorOptions: { min: 1 } };
+            var lineWidth = { propertyName: "lineWidth", modelName: "@LineWidth", displayName: "Line Width", localizationId: "DevExpress.XtraCharts.Line3DSeriesView.LineWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 1 } };
+            var fullStackedLine3DSeriesViewinfo = [lineThickness, lineWidth, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var thickness1 = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.LineStyle.Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2, editorOptions: { min: 1 } };
+            var dashStyle = {
+                propertyName: "dashStyle", modelName: "@DashStyle", displayName: "Dash Style", localizationId: "DevExpress.XtraCharts.LineStyle.DashStyle", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Solid": "Solid",
+                    "Dash": "Dash",
+                    "Dot": "Dot",
+                    "DashDot": "DashDot",
+                    "DashDotDot": "DashDotDot",
+                }, defaultVal: "Solid"
+            };
+            var lineJoin = {
+                propertyName: "lineJoin", modelName: "@LineJoin", displayName: "Line Join", localizationId: "DevExpress.XtraCharts.LineStyle.LineJoin", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Miter": "Miter",
+                    "Bevel": "Bevel",
+                    "Round": "Round",
+                    "MiterClipped": "MiterClipped",
+                }, defaultVal: "Miter"
+            };
+            var lineStyleInfo = [thickness1, dashStyle, lineJoin, Chart.tag,];
+            var lineStyle = { propertyName: "lineStyle", modelName: "LineStyle", displayName: "Line Style", localizationId: "DevExpress.XtraCharts.LineSeriesView.LineStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineStyleInfo, };
+            var lineMarkerOptionsInfo = [color2, size1, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var lineMarkerOptions = { propertyName: "lineMarkerOptions", modelName: "LineMarkerOptions", displayName: "Line Marker Options", localizationId: "DevExpress.XtraCharts.LineSeriesView.LineMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineMarkerOptionsInfo, };
+            var fullStackedLineSeriesViewinfo = [lineStyle, lineMarkerOptions, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var lineStyle1 = { propertyName: "lineStyle", modelName: "LineStyle", displayName: "Line Style", localizationId: "DevExpress.XtraCharts.RadarLineSeriesView.LineStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineStyleInfo, };
+            var closed = { propertyName: "closed", modelName: "@Closed", displayName: "Closed", localizationId: "DevExpress.XtraCharts.RadarLineSeriesView.Closed", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var lineMarkerOptions1 = { propertyName: "lineMarkerOptions", modelName: "LineMarkerOptions", displayName: "Line Marker Options", localizationId: "DevExpress.XtraCharts.RadarLineSeriesView.LineMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineMarkerOptionsInfo, };
+            var markerVisibility1 = {
+                propertyName: "markerVisibility", modelName: "@MarkerVisibility", displayName: "Marker Visibility", localizationId: "DevExpress.XtraCharts.RadarLineSeriesView.MarkerVisibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var scatterPolarLineSeriesViewinfo = [lineStyle1, closed, lineMarkerOptions1, markerVisibility1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var scatterRadarLineSeriesViewinfo = [lineStyle1, closed, lineMarkerOptions1, markerVisibility1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var stackedLine3DSeriesViewinfo = [lineThickness, lineWidth, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var stackedLineSeriesViewinfo = [lineStyle, lineMarkerOptions, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var weight = { propertyName: "weight", modelName: "@Weight", displayName: "Weight", localizationId: "DevExpress.XtraCharts.NestedDoughnutSeriesView.Weight", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 1 } };
+            var innerIndent = { propertyName: "innerIndent", modelName: "@InnerIndent", displayName: "Inner Indent", localizationId: "DevExpress.XtraCharts.NestedDoughnutSeriesView.InnerIndent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, editorOptions: { min: 0 } };
+            var group = { propertyName: "group", modelName: "@GroupSerializable", displayName: "Group", localizationId: "DevExpress.XtraCharts.NestedDoughnutSeriesView.Group", editor: Chart.editorTemplates.group, defaultVal: null };
+            var holeRadiusPercent = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.DoughnutSeriesView.HoleRadiusPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 40, editorOptions: { min: 0, max: 100 } };
+            var minAllowedSizePercentage = { propertyName: "minAllowedSizePercentage", modelName: "@MinAllowedSizePercentage", displayName: "Min Allowed Size Percentage", localizationId: "DevExpress.XtraCharts.PieSeriesView.MinAllowedSizePercentage", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 50, editorOptions: { min: 0, max: 100 } };
+            var rotation = { propertyName: "rotation", modelName: "@Rotation", displayName: "Rotation", localizationId: "DevExpress.XtraCharts.PieSeriesView.Rotation", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var heightToWidthRatio = { propertyName: "heightToWidthRatio", modelName: "@HeightToWidthRatio", displayName: "Height to Width Ratio", localizationId: "DevExpress.XtraCharts.PieSeriesView.HeightToWidthRatio", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 0 } };
+            var border4 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.PieSeriesView.Border", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: borderInfo, };
+            var fillStyle5 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.PieSeriesView.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "PolygonGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var runtimeExploding = { propertyName: "runtimeExploding", modelName: "@RuntimeExploding", displayName: "Runtime Exploding", localizationId: "DevExpress.XtraCharts.PieSeriesView.RuntimeExploding", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var explodedDistancePercentage = { propertyName: "explodedDistancePercentage", modelName: "@ExplodedDistancePercentage", displayName: "Exploded Distance Percentage", localizationId: "DevExpress.XtraCharts.PieSeriesViewBase.ExplodedDistancePercentage", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 10, editorOptions: { min: 1 } };
+            var explodeMode = {
+                propertyName: "explodeMode", modelName: "@ExplodeMode", displayName: "Explode Mode", localizationId: "DevExpress.XtraCharts.PieSeriesViewBase.ExplodeMode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "None": "None",
+                    "All": "All",
+                    "MinValue": "MinValue",
+                    "MaxValue": "MaxValue",
+                    "UsePoints": "UsePoints",
+                    "UseFilters": "UseFilters",
+                    "Others": "Others",
+                }, defaultVal: "None"
+            };
+            var sweepDirection = {
+                propertyName: "sweepDirection", modelName: "@SweepDirection", displayName: "Sweep Direction", localizationId: "DevExpress.XtraCharts.PieSeriesViewBase.SweepDirection", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Counterclockwise": "Counterclockwise",
+                    "Clockwise": "Clockwise",
+                }, defaultVal: "Counterclockwise"
+            };
+            var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var thickness2 = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.LineStyle.Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 1 } };
+            var lineStyleInfo1 = [thickness2, dashStyle, lineJoin, Chart.tag,];
+            var lineStyle2 = { propertyName: "lineStyle", modelName: "LineStyle", displayName: "Line Style", localizationId: "DevExpress.XtraCharts.SwiftPlotSeriesView.LineStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineStyleInfo1, };
+            var antialiasing = { propertyName: "antialiasing", modelName: "@Antialiasing", displayName: "Antialiasing", localizationId: "DevExpress.XtraCharts.SwiftPlotSeriesView.Antialiasing", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var swiftPlotSeriesViewinfo = [lineStyle2, antialiasing, Chart.axisXName, Chart.axisYName, Chart.paneName, aggregateFunction, color1, Chart.tag,];
+            var holeRadiusPercent1 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.Funnel3DSeriesView.HoleRadiusPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 90, editorOptions: { min: 0, max: 100 } };
+            var heightToWidthRatio1 = { propertyName: "heightToWidthRatio", modelName: "@HeightToWidthRatio", displayName: "Height to Width Ratio", localizationId: "DevExpress.XtraCharts.FunnelSeriesViewBase.HeightToWidthRatio", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var pointDistance = { propertyName: "pointDistance", modelName: "@PointDistance", displayName: "Point Distance", localizationId: "DevExpress.XtraCharts.FunnelSeriesViewBase.PointDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0, editorOptions: { min: 0 } };
+            var funnel3DSeriesViewinfo = [holeRadiusPercent1, heightToWidthRatio1, pointDistance, Chart.tag,];
+            var border5 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.Border", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: borderInfo, };
+            var fillStyle6 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "PolygonGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
+            var alignToCenter = { propertyName: "alignToCenter", modelName: "@AlignToCenter", displayName: "Align to Center", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.AlignToCenter", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var heightToWidthRatioAuto = { propertyName: "heightToWidthRatioAuto", modelName: "@HeightToWidthRatioAuto", displayName: "Height to Width Ratio Auto", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.HeightToWidthRatioAuto", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var funnelSeriesViewinfo = [border5, fillStyle6, alignToCenter, heightToWidthRatioAuto, heightToWidthRatio1, pointDistance, Chart.tag,];
+            var scatterLineSeriesViewinfo = [lineStyle, lineMarkerOptions, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var bubbleMarkerOptionsInfo = [kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var bubbleMarkerOptions = { propertyName: "bubbleMarkerOptions", modelName: "BubbleMarkerOptions", displayName: "Bubble Marker Options", localizationId: "DevExpress.XtraCharts.BubbleSeriesView.BubbleMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: bubbleMarkerOptionsInfo, };
+            var autoSize = { propertyName: "autoSize", modelName: "@AutoSize", displayName: "Automatic Size", localizationId: "DevExpress.XtraCharts.BubbleSeriesView.AutoSize", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var maxSize = { propertyName: "maxSize", modelName: "@MaxSize", displayName: "Max Size", localizationId: "DevExpress.XtraCharts.BubbleSeriesView.MaxSize", editor: Chart.editorTemplates.maxSize, defaultVal: 0.9 };
+            var minSize = { propertyName: "minSize", modelName: "@MinSize", displayName: "Min Size", localizationId: "DevExpress.XtraCharts.BubbleSeriesView.MinSize", editor: Chart.editorTemplates.minSize, defaultVal: 0.3, editorOptions: { min: 0 } };
+            var transparency6 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.BubbleSeriesView.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var bubbleSeriesViewinfo = [bubbleMarkerOptions, autoSize, maxSize, minSize, transparency6, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var lineTensionPercent = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.Spline3DSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var spline3DSeriesViewinfo = [lineTensionPercent, lineThickness, lineWidth, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var lineTensionPercent1 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.SplineArea3DSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var splineArea3DSeriesViewinfo = [lineTensionPercent1, areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var lineTensionPercent2 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.FullStackedSplineArea3DSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var fullStackedSplineArea3DSeriesViewinfo = [lineTensionPercent2, areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var lineTensionPercent3 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.SplineAreaSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var splineAreaSeriesViewinfo = [lineTensionPercent3, border, fillStyle, markerOptions, transparency3, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var lineTensionPercent4 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.FullStackedSplineAreaSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var fullStackedSplineAreaSeriesViewinfo = [lineTensionPercent4, fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var lineTensionPercent5 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.StackedSplineArea3DSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var stackedSplineArea3DSeriesViewinfo = [lineTensionPercent5, areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var lineTensionPercent6 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.SplineSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var splineSeriesViewinfo = [lineTensionPercent6, lineStyle, lineMarkerOptions, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var lineTensionPercent7 = { propertyName: "lineTensionPercent", modelName: "@LineTensionPercent", displayName: "Line Tension Percent", localizationId: "DevExpress.XtraCharts.StackedSplineAreaSeriesView.LineTensionPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 80, editorOptions: { min: 0, max: 100 } };
+            var stackedSplineAreaSeriesViewinfo = [lineTensionPercent7, border, fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var area3DSeriesViewinfo = [areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var fullStackedArea3DSeriesViewinfo = [areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var border6 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.RadarAreaSeriesView.Border", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: borderInfo, };
+            var markerOptions1 = { propertyName: "markerOptions", modelName: "MarkerOptions", displayName: "Marker Options", localizationId: "DevExpress.XtraCharts.RadarAreaSeriesView.MarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: markerOptionsInfo, };
+            var polarAreaSeriesViewinfo = [border6, fillStyle2, markerOptions1, transparency1, markerVisibility1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var radarAreaSeriesViewinfo = [border6, fillStyle2, markerOptions1, transparency1, markerVisibility1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var stackedArea3DSeriesViewinfo = [areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
+            var fullStackedBar3DSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var barDistance4 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed4 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth4 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var sideBySideBar3DSeriesViewinfo = [barDistance4, barDistanceFixed4, equalBarWidth4, barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var stackedBar3DSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var polarLineSeriesViewinfo = [lineStyle1, closed, lineMarkerOptions1, markerVisibility1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var radarLineSeriesViewinfo = [lineStyle1, closed, lineMarkerOptions1, markerVisibility1, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var holeRadiusPercent2 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.Doughnut3DSeriesView.HoleRadiusPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 60, editorOptions: { min: 0, max: 100 } };
+            var depth = { propertyName: "depth", modelName: "@Depth", displayName: "Depth", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.Depth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 15, editorOptions: { min: 1, max: 100 } };
+            var sizeAsPercentage = { propertyName: "sizeAsPercentage", modelName: "@SizeAsPercentage", displayName: "Size As Percentage", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.SizeAsPercentage", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 100, editorOptions: { min: 0, max: 100 } };
+            var pieFillStyleInfo = [fillMode1, Chart.fillStyleOptionsSerialize, Chart.tag,];
+            var pieFillStyle = { propertyName: "pieFillStyle", modelName: "PieFillStyle", displayName: "Pie Fill Style", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.PieFillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pieFillStyleInfo, };
+            var doughnut3DSeriesViewinfo = [holeRadiusPercent2, depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var holeRadiusPercent3 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.DoughnutSeriesView.HoleRadiusPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 60, editorOptions: { min: 0, max: 100 } };
+            var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var size2 = { propertyName: "size", modelName: "@Size", displayName: "Size", localizationId: "DevExpress.XtraCharts.SimpleMarker.Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 8, editorOptions: { min: 1 } };
+            var pointMarkerOptionsInfo = [size2, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var pointMarkerOptions = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.RadarPointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
+            var polarPointSeriesViewinfo = [pointMarkerOptions, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var arrowWidth = { propertyName: "arrowWidth", modelName: "@ArrowWidth", displayName: "Arrow Width", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.ArrowWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 7, editorOptions: { min: 1 }, validationRules: arrowWidthValidationRules };
+            var arrowHeight = { propertyName: "arrowHeight", modelName: "@ArrowHeight", displayName: "Arrow Height", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.ArrowHeight", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, editorOptions: { min: 1 } };
+            var minIndent = { propertyName: "minIndent", modelName: "@MinIndent", displayName: "Min Indent", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.MinIndent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2, editorOptions: { min: 0 } };
+            var thickness3 = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 3, editorOptions: { min: 1 } };
+            var visible1 = { propertyName: "visible", modelName: "@Visible", displayName: "Visible", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.Visible", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var colorSource = {
+                propertyName: "colorSource", modelName: "@ColorSource", displayName: "Color Source", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.ColorSource", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "ParentColor": "ParentColor",
+                    "ParentBorderColor": "ParentBorderColor",
+                    "ChildColor": "ChildColor",
+                    "ChildBorderColor": "ChildBorderColor",
+                    "OwnColor": "OwnColor",
+                }, defaultVal: "ParentColor"
+            };
+            var color4 = { propertyName: "color", modelName: "@Color", displayName: "Color", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Chart.editorTemplates.undoCustomColorEditor, defaultVal: "transparent" };
+            var inFront = { propertyName: "inFront", modelName: "@InFront", displayName: "In Front", localizationId: "DevExpress.XtraCharts.TaskLinkOptions.InFront", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var linkOptionsInfo = [arrowWidth, arrowHeight, minIndent, thickness3, visible1, colorSource, color4, inFront, Chart.tag,];
+            var linkOptions = { propertyName: "linkOptions", modelName: "LinkOptions", displayName: "Link Options", localizationId: "DevExpress.XtraCharts.GanttSeriesView.LinkOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: linkOptionsInfo, };
+            var minValueMarkerInfo = [color2, size1, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var minValueMarker = { propertyName: "minValueMarker", modelName: "MinValueMarker", displayName: "Min Value Marker", localizationId: "DevExpress.XtraCharts.RangeBarSeriesView.MinValueMarker", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: minValueMarkerInfo, };
+            var maxValueMarkerInfo = [color2, size1, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
+            var maxValueMarker = { propertyName: "maxValueMarker", modelName: "MaxValueMarker", displayName: "Max Value Marker", localizationId: "DevExpress.XtraCharts.RangeBarSeriesView.MaxValueMarker", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: maxValueMarkerInfo, };
+            var minValueMarkerVisibility = {
+                propertyName: "minValueMarkerVisibility", modelName: "@MinValueMarkerVisibility", displayName: "Min Value Marker Visibility", localizationId: "DevExpress.XtraCharts.RangeBarSeriesView.MinValueMarkerVisibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var maxValueMarkerVisibility = {
+                propertyName: "maxValueMarkerVisibility", modelName: "@MaxValueMarkerVisibility", displayName: "Max Value Marker Visibility", localizationId: "DevExpress.XtraCharts.RangeBarSeriesView.MaxValueMarkerVisibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "True": "True",
+                    "False": "False",
+                    "Default": "Default",
+                }, defaultVal: "Default"
+            };
+            var overlappedGanttSeriesViewinfo = [linkOptions, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var radarPointSeriesViewinfo = [pointMarkerOptions, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
+            var barDistance5 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed5 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth5 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var sideBySideGanttSeriesViewinfo = [barDistance5, barDistanceFixed5, equalBarWidth5, linkOptions, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var areaSeriesViewinfo = [border, fillStyle, markerOptions, transparency3, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var fillMode2 = {
+                propertyName: "fillMode", modelName: "@FillMode", displayName: "Fill Mode", localizationId: "DevExpress.XtraCharts.CandleStickReductionOptions.FillMode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "FilledOnReduction": "FilledOnReduction",
+                    "FilledOnIncrease": "FilledOnIncrease",
+                    "AlwaysEmpty": "AlwaysEmpty",
+                    "AlwaysFilled": "AlwaysFilled",
+                }, defaultVal: "FilledOnReduction"
+            };
+            var color5 = { propertyName: "color", modelName: "@Color", displayName: "Color", localizationId: "DevExpress.XtraCharts.ReductionStockOptions.Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "255,255,0,0" };
+            var level = {
+                propertyName: "level", modelName: "@Level", displayName: "Level", localizationId: "DevExpress.XtraCharts.ReductionStockOptions.Level", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Low": "Low",
+                    "High": "High",
+                    "Open": "Open",
+                    "Close": "Close",
+                }, defaultVal: "Close"
+            };
+            var visible2 = { propertyName: "visible", modelName: "@Visible", displayName: "Visible", localizationId: "DevExpress.XtraCharts.ReductionStockOptions.Visible", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var colorMode = {
+                propertyName: "colorMode", modelName: "@ColorMode", displayName: "Color Mode", localizationId: "DevExpress.XtraCharts.ReductionStockOptions.ColorMode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "PreviousToCurrentPoint": "PreviousToCurrentPoint",
+                    "OpenToCloseValue": "OpenToCloseValue",
+                }, defaultVal: "PreviousToCurrentPoint"
+            };
+            var reductionOptionsInfo = [fillMode2, color5, level, visible2, colorMode, Chart.tag,];
+            var reductionOptions = { propertyName: "reductionOptions", modelName: "ReductionOptions", displayName: "Reduction Options", localizationId: "DevExpress.XtraCharts.CandleStickSeriesView.ReductionOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: reductionOptionsInfo, };
+            var levelLineLength = { propertyName: "levelLineLength", modelName: "@LevelLineLength", displayName: "Level Line Length", localizationId: "DevExpress.XtraCharts.FinancialSeriesViewBase.LevelLineLength", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.25, editorOptions: { min: 1 } };
+            var lineThickness1 = { propertyName: "lineThickness", modelName: "@LineThickness", displayName: "Line Thickness", localizationId: "DevExpress.XtraCharts.FinancialSeriesViewBase.LineThickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2, editorOptions: { min: 1 } };
+            var reductionOptionsInfo1 = [color5, level, visible2, colorMode, Chart.tag,];
+            var reductionOptions1 = { propertyName: "reductionOptions", modelName: "ReductionOptions", displayName: "Reduction Options", localizationId: "DevExpress.XtraCharts.FinancialSeriesViewBase.ReductionOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: reductionOptionsInfo1, };
+            var candleStickSeriesViewinfo = [reductionOptions, levelLineLength, lineThickness1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var fullStackedAreaSeriesViewinfo = [fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var fullStackedBarSeriesViewinfo = [barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var line3DSeriesViewinfo = [lineThickness, lineWidth, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var lineSeriesViewinfo = [lineStyle, lineMarkerOptions, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var manhattanBarSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
+            var overlappedRangeBarSeriesViewinfo = [minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var pie3DSeriesViewinfo = [depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var pointMarkerOptions1 = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
+            var pointSeriesViewinfo = [pointMarkerOptions1, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var barDistance6 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed6 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth6 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var sideBySideBarSeriesViewinfo = [barDistance6, barDistanceFixed6, equalBarWidth6, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var barDistance7 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
+            var barDistanceFixed7 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var equalBarWidth7 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
+            var sideBySideRangeBarSeriesViewinfo = [barDistance7, barDistanceFixed7, equalBarWidth7, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var stackedAreaSeriesViewinfo = [border, fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var stackedBarSeriesViewinfo = [barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var invertedStep4 = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.StepLineSeriesView.InvertedStep", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var stepLineSeriesViewinfo = [invertedStep4, lineStyle, lineMarkerOptions, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var showOpenClose = {
+                propertyName: "showOpenClose", modelName: "@ShowOpenClose", displayName: "Show Open Close", localizationId: "DevExpress.XtraCharts.StockSeriesView.ShowOpenClose", editor: DevExpress.JS.Widgets.editorTemplates.combobox, values: {
+                    "Both": "Both",
+                    "Open": "Open",
+                    "Close": "Close",
+                }, defaultVal: "Both"
+            };
+            var stockSeriesViewinfo = [showOpenClose, levelLineLength, lineThickness1, reductionOptions1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
+            var invertedStep5 = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.StepLine3DSeriesView.InvertedStep", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false };
+            var stepLine3DSeriesViewinfo = [invertedStep5, lineThickness, lineWidth, aggregateFunction2, transparency2, color1, Chart.tag,];
+            Chart.viewMapper = {
+                FullStackedStepAreaSeriesView: fullStackedStepAreaSeriesViewinfo,
+                PolarRangeAreaSeriesView: polarRangeAreaSeriesViewinfo,
+                RadarRangeAreaSeriesView: radarRangeAreaSeriesViewinfo,
+                RangeArea3DSeriesView: rangeArea3DSeriesViewinfo,
+                RangeAreaSeriesView: rangeAreaSeriesViewinfo,
+                StackedStepAreaSeriesView: stackedStepAreaSeriesViewinfo,
+                StepArea3DSeriesView: stepArea3DSeriesViewinfo,
+                StepAreaSeriesView: stepAreaSeriesViewinfo,
+                SideBySideFullStackedBar3DSeriesView: sideBySideFullStackedBar3DSeriesViewinfo,
+                SideBySideFullStackedBarSeriesView: sideBySideFullStackedBarSeriesViewinfo,
+                SideBySideStackedBar3DSeriesView: sideBySideStackedBar3DSeriesViewinfo,
+                SideBySideStackedBarSeriesView: sideBySideStackedBarSeriesViewinfo,
+                FullStackedLine3DSeriesView: fullStackedLine3DSeriesViewinfo,
+                FullStackedLineSeriesView: fullStackedLineSeriesViewinfo,
+                ScatterPolarLineSeriesView: scatterPolarLineSeriesViewinfo,
+                ScatterRadarLineSeriesView: scatterRadarLineSeriesViewinfo,
+                StackedLine3DSeriesView: stackedLine3DSeriesViewinfo,
+                StackedLineSeriesView: stackedLineSeriesViewinfo,
+                NestedDoughnutSeriesView: nestedDoughnutSeriesViewinfo,
+                SwiftPlotSeriesView: swiftPlotSeriesViewinfo,
+                Funnel3DSeriesView: funnel3DSeriesViewinfo,
+                FunnelSeriesView: funnelSeriesViewinfo,
+                ScatterLineSeriesView: scatterLineSeriesViewinfo,
+                BubbleSeriesView: bubbleSeriesViewinfo,
+                Spline3DSeriesView: spline3DSeriesViewinfo,
+                SplineArea3DSeriesView: splineArea3DSeriesViewinfo,
+                FullStackedSplineArea3DSeriesView: fullStackedSplineArea3DSeriesViewinfo,
+                SplineAreaSeriesView: splineAreaSeriesViewinfo,
+                FullStackedSplineAreaSeriesView: fullStackedSplineAreaSeriesViewinfo,
+                StackedSplineArea3DSeriesView: stackedSplineArea3DSeriesViewinfo,
+                SplineSeriesView: splineSeriesViewinfo,
+                StackedSplineAreaSeriesView: stackedSplineAreaSeriesViewinfo,
+                Area3DSeriesView: area3DSeriesViewinfo,
+                FullStackedArea3DSeriesView: fullStackedArea3DSeriesViewinfo,
+                PolarAreaSeriesView: polarAreaSeriesViewinfo,
+                RadarAreaSeriesView: radarAreaSeriesViewinfo,
+                StackedArea3DSeriesView: stackedArea3DSeriesViewinfo,
+                FullStackedBar3DSeriesView: fullStackedBar3DSeriesViewinfo,
+                SideBySideBar3DSeriesView: sideBySideBar3DSeriesViewinfo,
+                StackedBar3DSeriesView: stackedBar3DSeriesViewinfo,
+                PolarLineSeriesView: polarLineSeriesViewinfo,
+                RadarLineSeriesView: radarLineSeriesViewinfo,
+                Doughnut3DSeriesView: doughnut3DSeriesViewinfo,
+                DoughnutSeriesView: doughnutSeriesViewinfo,
+                PolarPointSeriesView: polarPointSeriesViewinfo,
+                OverlappedGanttSeriesView: overlappedGanttSeriesViewinfo,
+                RadarPointSeriesView: radarPointSeriesViewinfo,
+                SideBySideGanttSeriesView: sideBySideGanttSeriesViewinfo,
+                AreaSeriesView: areaSeriesViewinfo,
+                CandleStickSeriesView: candleStickSeriesViewinfo,
+                FullStackedAreaSeriesView: fullStackedAreaSeriesViewinfo,
+                FullStackedBarSeriesView: fullStackedBarSeriesViewinfo,
+                Line3DSeriesView: line3DSeriesViewinfo,
+                LineSeriesView: lineSeriesViewinfo,
+                ManhattanBarSeriesView: manhattanBarSeriesViewinfo,
+                OverlappedRangeBarSeriesView: overlappedRangeBarSeriesViewinfo,
+                Pie3DSeriesView: pie3DSeriesViewinfo,
+                PieSeriesView: pieSeriesViewinfo,
+                PointSeriesView: pointSeriesViewinfo,
+                SideBySideBarSeriesView: sideBySideBarSeriesViewinfo,
+                SideBySideRangeBarSeriesView: sideBySideRangeBarSeriesViewinfo,
+                StackedAreaSeriesView: stackedAreaSeriesViewinfo,
+                StackedBarSeriesView: stackedBarSeriesViewinfo,
+                StepLineSeriesView: stepLineSeriesViewinfo,
+                StockSeriesView: stockSeriesViewinfo,
+                StepLine3DSeriesView: stepLine3DSeriesViewinfo,
             };
         })(Chart = Designer.Chart || (Designer.Chart = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -11223,6 +11955,24 @@ var DevExpress;
                     $(element).children().remove();
                     ko.applyBindings(designerModel, element);
                 }
+                return designerModel;
+            }
+            Preview.createDesktopPreview = createDesktopPreview;
+            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent) {
+                if (previewVisible === void 0) { previewVisible = true; }
+                if (applyBindings === void 0) { applyBindings = true; }
+                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
+                DevExpress.JS.Localization.addCultureInfo({
+                    messages: localization
+                });
+                DevExpress["config"]({ rtlEnabled: !!rtl });
+                var designerModel;
+                if (isMobile) {
+                    designerModel = Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
+                }
+                else {
+                    designerModel = createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
+                }
                 designerModel.GetParametersModel = function () {
                     return designerModel.parametersModel;
                 };
@@ -11237,41 +11987,25 @@ var DevExpress;
                     if (!preview.exportDisabled()) {
                         preview.exportDocumentTo(format || 'pdf', inlineResult);
                     }
-                },
-                    designerModel.GetCurrentPageIndex = function () {
-                        return designerModel.reportPreview.pageIndex();
-                    },
-                    designerModel.GoToPage = function (pageIndex) {
-                        designerModel.reportPreview.goToPage(pageIndex);
-                    },
-                    designerModel.Close = function () {
-                        designerModel.reportPreview.deactivate();
-                    },
-                    designerModel.ResetParameters = function () {
-                        var parametersModel = designerModel.parametersModel;
-                        parametersModel && designerModel.parametersModel.restore();
-                    },
-                    designerModel.StartBuild = function () {
-                        var parametersModel = designerModel.parametersModel;
-                        parametersModel && designerModel.parametersModel.submit();
-                    };
+                };
+                designerModel.GetCurrentPageIndex = function () {
+                    return designerModel.reportPreview.pageIndex();
+                };
+                designerModel.GoToPage = function (pageIndex) {
+                    designerModel.reportPreview.goToPage(pageIndex);
+                };
+                designerModel.Close = function () {
+                    designerModel.reportPreview.deactivate();
+                };
+                designerModel.ResetParameters = function () {
+                    var parametersModel = designerModel.parametersModel;
+                    parametersModel && designerModel.parametersModel.restore();
+                };
+                designerModel.StartBuild = function () {
+                    var parametersModel = designerModel.parametersModel;
+                    parametersModel && designerModel.parametersModel.submit();
+                };
                 return designerModel;
-            }
-            Preview.createDesktopPreview = createDesktopPreview;
-            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent) {
-                if (previewVisible === void 0) { previewVisible = true; }
-                if (applyBindings === void 0) { applyBindings = true; }
-                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                DevExpress.JS.Localization.addCultureInfo({
-                    messages: localization
-                });
-                DevExpress["config"]({ rtlEnabled: !!rtl });
-                if (isMobile) {
-                    return Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
-                }
-                else {
-                    return createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
-                }
             }
             Preview.createPreview = createPreview;
             function createAndInitPreviewModel(viewerModel, element, callbacks, applyBindings) {
@@ -15488,7 +16222,19 @@ var DevExpress;
                     if (!self.nameValidationAdded) {
                         self.validationRules.push({
                             type: "custom",
-                            validationCallback: function (options) { return allControls.filter(function (x) { return ko.unwrap(x.name) === options.value && x !== self._model(); }).length === 0; },
+                            validationCallback: function (options) {
+                                return allControls().filter(function (x) {
+                                    if (ko.unwrap(x.name) !== options.value)
+                                        return false;
+                                    var model = self._model();
+                                    if (x === model)
+                                        return false;
+                                    var same = model["isSame"];
+                                    if (same && $.isFunction(same) && same(x))
+                                        return false;
+                                    return true;
+                                }).length === 0;
+                            },
                             message: DevExpress.Designer.getLocalization("Invalid name", "ASPxReportsStringId.ReportDesigner_NameValidationError")
                         });
                         self.nameValidationAdded = true;
@@ -16194,7 +16940,7 @@ var DevExpress;
                         var styleName = _this._getStylePriorityPropertyName(propertyName);
                         _this.stylePriority[styleName](!_this.stylePriority[styleName]());
                     };
-                    this.actions.push({ action: this.toggleUseStyle, title: "Style Priority", visible: function (name) { return _this.isStyleProperty(name); } });
+                    this.actions.push({ action: this.toggleUseStyle, title: Designer.getLocalization("Style Priority", "DevExpress.XtraReports.UI.XRControl.StylePriority"), visible: function (name) { return _this.isStyleProperty(name); } });
                     this.dsHelperProvider = function () {
                         return self.root["dataSourceHelper"] && self.root["dataSourceHelper"]();
                     };
@@ -19698,6 +20444,9 @@ var DevExpress;
                         }
                     }));
                 }
+                ChartSurface.prototype.runDesignerButtonText = function () {
+                    return Designer.getLocalization('Run Designer', 'ReportStringId.Verb_RunDesigner');
+                };
                 return ChartSurface;
             })(Report.ControlSurface);
             Report.ChartSurface = ChartSurface;
@@ -20462,8 +21211,8 @@ var DevExpress;
                     { value: "Name", displayValue: "Name", localizationId: "DevExpress.XtraPivotGrid.DataFieldNaming.Name" }
                 ]
             }, rowHeaderWidth = { propertyName: "rowHeaderWidth", modelName: "@RowHeaderWidth", displayName: "Row Header Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.RowHeaderWidth", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataFieldEx.RowValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, optionsDataFieldInfo = [area, areaIndex, Designer.Pivot.caption, columnValueLineCount, fieldNaming, rowHeaderWidth, rowValueLineCount], optionsDataField = { propertyName: "optionsDataField", modelName: "OptionsDataField", displayName: "Data Field Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsDataField", info: optionsDataFieldInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
-                printHeadersOnEveryPage, printHorzLines, printRowHeaders, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnFieldValues = { propertyName: "printColumnFieldValues", modelName: "@PrintColumnFieldValues", displayName: "Print Column FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowFieldValues = { propertyName: "printRowFieldValues", modelName: "@PrintRowFieldValues", displayName: "Print Row FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
+                printHeadersOnEveryPage, printHorzLines, printRowFieldValues, printRowHeaders, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var columnTotalsLocation = { propertyName: "columnTotalsLocation", modelName: "@ColumnTotalsLocation", displayName: "Column Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ColumnTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Near" }, { value: "Far", displayValue: "Far ", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Far" }] }, groupFieldsInCustomizationWindow = { propertyName: "groupFieldsInCustomizationWindow", modelName: "@GroupFieldsInCustomizationWindow", displayName: "Group Fields in the Customization Window", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsView.GroupFieldsInCustomizationWindow", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, rowTotalsLocation = {
                 propertyName: "rowTotalsLocation", modelName: "@RowTotalsLocation", displayName: "Row Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.RowTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
                     { value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotRowTotalsLocation.Near" },
@@ -22822,7 +23571,7 @@ var DevExpress;
                             _this.reportSource(new SubreportViewModel(SubreportViewModel.defaultReport, serializer));
                         }
                     }));
-                    this.actions.push({ action: function () { _this.root["getSubreportUrls"](); }, title: "Update", visible: function (name) { return name === "reportSourceUrl"; } });
+                    this.actions.push({ action: function () { _this.root["getSubreportUrls"](); }, title: Designer.getLocalization("Update"), visible: function (name) { return name === "reportSourceUrl"; } });
                 }
                 XRSubreportViewModel.prototype._getSubreportLayout = function (url) {
                     var self = this;
@@ -22830,7 +23579,6 @@ var DevExpress;
                         if (result) {
                             var model = new Report.ReportViewModel(JSON.parse(result.reportLayout));
                             model.dataSourceRefs = result.dataSourceRefInfo;
-                            model["dataSourceHelper"](new Report.DataSourceHelper(model.objectStorage, model.dataSourceRefs, result.dataSources));
                             self.reportSource(model);
                         }
                     });
@@ -25597,13 +26345,11 @@ var DevExpress;
                 __extends(JSReportDesignerBinding, _super);
                 function JSReportDesignerBinding(_options) {
                     _super.call(this, _options);
-                    if (!_options.undoEngine) {
-                        _options.designerModel = ko.isWriteableObservable(_options.designerModel) ? _options.designerModel : ko.observable(null);
-                        this._sender = new JSReportDesigner(_options.designerModel);
-                        this._initializationData = ko.isObservable(_options.initializationData)
-                            ? _options.initializationData
-                            : ko.observable(_options.initializationData);
-                    }
+                    _options.designerModel = ko.isWriteableObservable(_options.designerModel) ? _options.designerModel : ko.observable(null);
+                    this._sender = new JSReportDesigner(_options.designerModel);
+                    this._initializationData = ko.isObservable(_options.initializationData)
+                        ? _options.initializationData
+                        : ko.observable(_options.initializationData);
                 }
                 JSReportDesignerBinding.prototype._applyBindings = function (model, $element) {
                     this._sender.designerModel = model;
@@ -29263,6 +30009,7 @@ var DevExpress;
                         this.name = parameter.name;
                         this.value = parameter.value;
                         this.type = parameter.type;
+                        this.isValid = parameter["isValid"];
                     }
                     Object.defineProperty(DataSourceParameterWrapper.prototype, "specifics", {
                         get: function () {

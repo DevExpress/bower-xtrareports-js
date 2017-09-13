@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.1.5
-* Build date: 2017-07-31
+* Version: 17.1.6
+* Build date: 2017-09-04
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3144,6 +3144,24 @@ var DevExpress;
                     $(element).children().remove();
                     ko.applyBindings(designerModel, element);
                 }
+                return designerModel;
+            }
+            Preview.createDesktopPreview = createDesktopPreview;
+            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent) {
+                if (previewVisible === void 0) { previewVisible = true; }
+                if (applyBindings === void 0) { applyBindings = true; }
+                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
+                DevExpress.JS.Localization.addCultureInfo({
+                    messages: localization
+                });
+                DevExpress["config"]({ rtlEnabled: !!rtl });
+                var designerModel;
+                if (isMobile) {
+                    designerModel = Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
+                }
+                else {
+                    designerModel = createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
+                }
                 designerModel.GetParametersModel = function () {
                     return designerModel.parametersModel;
                 };
@@ -3158,41 +3176,25 @@ var DevExpress;
                     if (!preview.exportDisabled()) {
                         preview.exportDocumentTo(format || 'pdf', inlineResult);
                     }
-                },
-                    designerModel.GetCurrentPageIndex = function () {
-                        return designerModel.reportPreview.pageIndex();
-                    },
-                    designerModel.GoToPage = function (pageIndex) {
-                        designerModel.reportPreview.goToPage(pageIndex);
-                    },
-                    designerModel.Close = function () {
-                        designerModel.reportPreview.deactivate();
-                    },
-                    designerModel.ResetParameters = function () {
-                        var parametersModel = designerModel.parametersModel;
-                        parametersModel && designerModel.parametersModel.restore();
-                    },
-                    designerModel.StartBuild = function () {
-                        var parametersModel = designerModel.parametersModel;
-                        parametersModel && designerModel.parametersModel.submit();
-                    };
+                };
+                designerModel.GetCurrentPageIndex = function () {
+                    return designerModel.reportPreview.pageIndex();
+                };
+                designerModel.GoToPage = function (pageIndex) {
+                    designerModel.reportPreview.goToPage(pageIndex);
+                };
+                designerModel.Close = function () {
+                    designerModel.reportPreview.deactivate();
+                };
+                designerModel.ResetParameters = function () {
+                    var parametersModel = designerModel.parametersModel;
+                    parametersModel && designerModel.parametersModel.restore();
+                };
+                designerModel.StartBuild = function () {
+                    var parametersModel = designerModel.parametersModel;
+                    parametersModel && designerModel.parametersModel.submit();
+                };
                 return designerModel;
-            }
-            Preview.createDesktopPreview = createDesktopPreview;
-            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent) {
-                if (previewVisible === void 0) { previewVisible = true; }
-                if (applyBindings === void 0) { applyBindings = true; }
-                if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                DevExpress.JS.Localization.addCultureInfo({
-                    messages: localization
-                });
-                DevExpress["config"]({ rtlEnabled: !!rtl });
-                if (isMobile) {
-                    return Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
-                }
-                else {
-                    return createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
-                }
             }
             Preview.createPreview = createPreview;
             function createAndInitPreviewModel(viewerModel, element, callbacks, applyBindings) {
