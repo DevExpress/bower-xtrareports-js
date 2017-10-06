@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (report-designer.de.js)
-* Version: 17.1.6
-* Build date: 2017-09-04
+* Version: 17.1.7
+* Build date: 2017-10-02
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
