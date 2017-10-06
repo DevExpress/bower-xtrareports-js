@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.9 - 2017-08-15
+/*! DevExpress HTML/JS Designer - v16.2.10 - 2017-10-02
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -12190,7 +12190,7 @@ var DevExpress;
                     return _this.createFont(control["font"] && control["font"]() || "");
                 };
                 this.paddingsCss = function () {
-                    var controlPaddings = ko.unwrap(control["padding"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
+                    var controlPaddings = ko.unwrap(control["paddingObj"] || control["padding"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
                     var paddings = {};
                     paddings["paddingLeft"] = _this._getPixelValueFromUnit(controlPaddings.left(), control) + "px";
                     paddings["paddingTop"] = _this._getPixelValueFromUnit(controlPaddings.top(), control) + "px";
@@ -14575,10 +14575,11 @@ var DevExpress;
             var PaddingModel = (function (_super) {
                 __extends(PaddingModel, _super);
                 function PaddingModel(left, right, top, bottom, dpi) {
-                    if (left === void 0) { left = ko.observable(0); }
-                    if (right === void 0) { right = ko.observable(0); }
-                    if (top === void 0) { top = ko.observable(0); }
-                    if (bottom === void 0) { bottom = ko.observable(0); }
+                    var _this = this;
+                    if (left === void 0) { left = ko.observable(null); }
+                    if (right === void 0) { right = ko.observable(null); }
+                    if (top === void 0) { top = ko.observable(null); }
+                    if (bottom === void 0) { bottom = ko.observable(null); }
                     if (dpi === void 0) { dpi = ko.observable(100); }
                     _super.call(this);
                     this.left = left;
@@ -14586,41 +14587,51 @@ var DevExpress;
                     this.top = top;
                     this.bottom = bottom;
                     this.dpi = dpi;
+                    ["left", "right", "top", "bottom"].forEach(function (propertyName) {
+                        _this['_' + propertyName] = ko.observable(_this[propertyName]());
+                        _this[propertyName] = ko.computed({
+                            read: function () {
+                                return _this['_' + propertyName]() || 0;
+                            },
+                            write: function (newVal) {
+                                _this['_' + propertyName](newVal);
+                            }
+                        });
+                    });
                 }
                 PaddingModel.prototype.getInfo = function () {
                     return Widgets.paddingSerializationsInfo;
                 };
+                PaddingModel.prototype.resetValue = function () {
+                    var _this = this;
+                    ["left", "right", "top", "bottom"].forEach(function (name) { return _this['_' + name](null); });
+                };
                 PaddingModel.prototype.isEmpty = function () {
-                    return this._toString(true).indexOf("0, 0, 0, 0") === 0;
+                    var _this = this;
+                    return ["left", "right", "top", "bottom"].map(function (x) { return ko.unwrap(_this['_' + x]); }).every(function (x) { return x === null; });
                 };
                 PaddingModel.prototype.applyFromString = function (value) {
-                    var components = (value || "").split(',');
-                    this.left(parseInt(components[0]) || 0);
-                    this.right(parseInt(components[1]) || 0);
-                    this.top(parseInt(components[2]) || 0);
-                    this.bottom(parseInt(components[3]) || 0);
+                    if (value) {
+                        var components = (value || "").split(',');
+                        this.left(parseInt(components[0]) || 0);
+                        this.right(parseInt(components[1]) || 0);
+                        this.top(parseInt(components[2]) || 0);
+                        this.bottom(parseInt(components[3]) || 0);
+                    }
                     return this;
                 };
                 PaddingModel.from = function (val) {
                     return new PaddingModel().applyFromString(val);
                 };
                 PaddingModel.prototype.toString = function () {
-                    var value = this._toString();
-                    if (value.indexOf("0,0,0,0") === 0) {
-                        return {};
-                    }
-                    else {
-                        return value;
-                    }
-                };
-                PaddingModel.prototype._getProperty = function (name, inner) {
-                    if (inner === void 0) { inner = false; }
-                    return parseInt(ko.unwrap(inner ? (this["_" + name] || this[name]) : this[name]));
+                    if (this.isEmpty())
+                        return;
+                    return this._toString();
                 };
                 PaddingModel.prototype._toString = function (inner) {
                     var _this = this;
                     if (inner === void 0) { inner = false; }
-                    return ["left", "right", "top", "bottom"].map(function (x) { return _this._getProperty(x, inner); }).concat(this.dpi()).join(', ');
+                    return ["left", "right", "top", "bottom"].map(function (x) { return parseInt(ko.unwrap(_this[x])); }).concat(this.dpi()).join(', ');
                 };
                 PaddingModel.defaultVal = "0, 0, 0, 0, 100";
                 PaddingModel.unitProperties = ["left", "right", "top", "bottom"];
