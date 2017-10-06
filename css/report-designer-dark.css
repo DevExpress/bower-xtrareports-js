@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.8 - 2017-06-27
+/*! DevExpress HTML/JS Designer - v16.2.9 - 2017-08-15
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
