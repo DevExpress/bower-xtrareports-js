@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 17.1.6
-* Build date: 2017-09-04
+* Version: 17.1.7
+* Build date: 2017-10-02
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5781,8 +5781,8 @@ var DevExpress;
 //# sourceMappingURL=dx-query-builder-core.js.map
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 17.1.6
-* Build date: 2017-09-04
+* Version: 17.1.7
+* Build date: 2017-10-02
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -6131,7 +6131,7 @@ var DevExpress;
                 }
                 AxisXYViewModel.from = function (info) {
                     return function (model, serializer) {
-                        return new AxisXYViewModel(model || {}, serializer);
+                        return new AxisXYViewModel(model || {}, serializer, info);
                     };
                 };
                 AxisXYViewModel.toJson = function (value, serializer, refs) {
@@ -6208,7 +6208,7 @@ var DevExpress;
                     "Count": "Count",
                     "Financial": "Financial"
                 }
-            }, gridSpacing = { propertyName: "gridSpacing", modelName: "@GridSpacing", displayName: "Grid Spacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, autoGrid = { propertyName: "autoGrid", modelName: "@AutoGrid", displayName: "Auto Grid", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool }, gridOffset = { propertyName: "gridOffset", modelName: "@GridOffset", displayName: "Grid Offset", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            }, gridSpacing = { propertyName: "gridSpacing", modelName: "@GridSpacing", displayName: Designer.getLocalization("Grid Spacing", "DevExpress.XtraCharts.ScaleGridOptionsBase.GridSpacing"), defaultVal: 1.0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, autoGrid = { propertyName: "autoGrid", modelName: "@AutoGrid", displayName: Designer.getLocalization("Auto Grid", "DevExpress.XtraCharts.ScaleGridOptionsBase.AutoGrid"), editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true, from: Designer.parseBool }, gridOffset = { propertyName: "gridOffset", modelName: "@GridOffset", displayName: Designer.getLocalization("Grid Offset", "DevExpress.XtraCharts.ScaleGridOptionsBase.GridOffset"), editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Chart.scaleOptionsBaseSerializationsInfo = [autoGrid, aggregateFunction, gridOffset, gridSpacing, scaleMode];
             var numericMeasureUnit = {
                 propertyName: "measureUnit", modelName: "@MeasureUnit", displayName: "Measure Unit",
@@ -6264,6 +6264,7 @@ var DevExpress;
                 }
             }, workdaysOnly = { propertyName: "workdaysOnly", modelName: "@WorkdaysOnly", displayName: "Workdays Only", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool };
             Chart.dateTimeScaleOptionsSerializationsInfo = [dateGridAlignment, dateMeasureUnit, workdaysOnly].concat(Chart.scaleOptionsBaseSerializationsInfo), Chart.dateTimeScaleOptions = { propertyName: "dateTimeScaleOptions", modelName: "DateTimeScaleOptions", displayName: "Date-Time Scale Options", info: Chart.dateTimeScaleOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Chart.qualitativeScaleOptionsSerializationInfo = [autoGrid, gridOffset, gridSpacing], Chart.qualitativeScaleOptions = { propertyName: "qualitativeScaleOptions", modelName: "QualitativeScaleOptions", displayName: Designer.getLocalization("Qualitative Scale Options", "DevExpress.XtraCharts.AxisX3D.QualitativeScaleOptions"), info: Chart.qualitativeScaleOptionsSerializationInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var visibleInPanesSerializable = { propertyName: "visibleInPanesSerializable", modelName: "@VisibleInPanesSerializable", displayName: "Visible In Panes Serializable", editor: DevExpress.JS.Widgets.editorTemplates.text }, minorVisible = { propertyName: "minorVisible", modelName: "@MinorVisible", displayName: "Minor Visible", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, minorColor = { propertyName: "minorColor", modelName: "@MinorColor", displayName: "Minor Color", from: Designer.colorFromString, toJsonObject: Designer.colorToString, editor: Designer.Widgets.editorTemplates.customColorEditor };
             var gridLinesAxisBaseSerializationsInfo = [Chart.visible, minorVisible, Chart.color, minorColor, Chart.lineStyle, Chart.minorLineStyle];
             Chart.gridLinesAxisX = { propertyName: "gridLinesAxisX", modelName: "GridLines", displayName: "Grid Lines", info: gridLinesAxisBaseSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.gridLinesAxisY = { propertyName: "gridLinesAxisY", modelName: "GridLines", displayName: "Grid Lines", info: gridLinesAxisBaseSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
@@ -6355,10 +6356,10 @@ var DevExpress;
                 }
             };
             Chart.radarAxisXLabelSerializationsInfo = axisLabelBaseSerializationsInfo.concat(Chart.radarAxisXLabelTextDirection), Chart.radarAxisXLabel = { propertyName: "radarAxisXLabel", modelName: "Label", displayName: "Label", info: Chart.radarAxisXLabelSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.radarAxisYLabel = { propertyName: "radarAxisYLabel", modelName: "Label", displayName: "Label", info: axisLabelBaseSerializationsInfo.concat([Chart.visible]), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var radarAxisSerializationsInfo = [Chart.interlaced, Chart.interlacedColor, Chart.interlacedFillStyle, Chart.visualRange, Chart.minorCount], radarAxisXSerializationsInfo = [Chart.radarAxisXNumericScaleOptions, Chart.radarWholeRange, Chart.gridLinesAxisX, Chart.radarAxisXLabel].concat(radarAxisSerializationsInfo), radarAxisYSerializationsInfo = [Chart.color, Chart.thickness, Chart.visible, Chart.radarAxisYNumericScaleOptions, Chart.topLevel, Chart.wholeRange, Chart.gridLinesAxisY, Chart.radarAxisYLabel, Chart.tickmarks].concat(radarAxisSerializationsInfo);
+            var radarAxisSerializationsInfo = [Chart.interlaced, Chart.interlacedColor, Chart.interlacedFillStyle, Chart.visualRange, Chart.minorCount], radarAxisXSerializationsInfo = [Chart.radarAxisXNumericScaleOptions, Chart.radarWholeRange, Chart.gridLinesAxisX, Chart.radarAxisXLabel, Chart.qualitativeScaleOptions].concat(radarAxisSerializationsInfo), radarAxisYSerializationsInfo = [Chart.color, Chart.thickness, Chart.visible, Chart.radarAxisYNumericScaleOptions, Chart.topLevel, Chart.wholeRange, Chart.gridLinesAxisY, Chart.radarAxisYLabel, Chart.tickmarks].concat(radarAxisSerializationsInfo);
             Chart.radarAxisX = { propertyName: "axisX", modelName: "AxisX", displayName: "Axis X", info: radarAxisXSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.radarAxisY = { propertyName: "axisY", modelName: "AxisY", displayName: "Axis Y", info: radarAxisYSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Chart.axisX3D = { propertyName: "axisX", modelName: "AxisX", displayName: "Axis X", info: [Chart.gridLinesAxisX, Chart.interlaced].concat(Chart.axis3DSerializationsInfo), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.axisY3D = { propertyName: "axisY", modelName: "AxisY", displayName: "Axis Y", info: [Chart.gridLinesAxisY, Chart.axisY3DInterlaced].concat(Chart.axis3DSerializationsInfo), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            Chart.axisX = { propertyName: "axisX", modelName: "AxisX", displayName: Designer.getLocalization("Primary Axis X", 'DevExpress.XtraCharts.AxisX'), defaultVal: {}, from: AxisXYViewModel.from([Chart.gridLinesAxisX].concat(Chart.axisXYSerializationsInfo)), toJsonObject: AxisXYViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.axisY = { propertyName: "axisY", modelName: "AxisY", displayName: Designer.getLocalization("Primary Axis Y", 'DevExpress.XtraCharts.AxisY'), defaultVal: {}, from: AxisXYViewModel.from([Chart.gridLinesAxisY].concat(Chart.axisXYSerializationsInfo)), toJsonObject: AxisXYViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Chart.axisX3D = { propertyName: "axisX", modelName: "AxisX", displayName: "Axis X", info: [Chart.gridLinesAxisX, Chart.interlaced, Chart.qualitativeScaleOptions].concat(Chart.axis3DSerializationsInfo), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.axisY3D = { propertyName: "axisY", modelName: "AxisY", displayName: "Axis Y", info: [Chart.gridLinesAxisY, Chart.axisY3DInterlaced].concat(Chart.axis3DSerializationsInfo), editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            Chart.axisX = { propertyName: "axisX", modelName: "AxisX", displayName: Designer.getLocalization("Primary Axis X", 'DevExpress.XtraCharts.AxisX'), defaultVal: {}, from: AxisXYViewModel.from([Chart.gridLinesAxisX, Chart.qualitativeScaleOptions].concat(Chart.axisXYSerializationsInfo)), toJsonObject: AxisXYViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Chart.axisY = { propertyName: "axisY", modelName: "AxisY", displayName: Designer.getLocalization("Primary Axis Y", 'DevExpress.XtraCharts.AxisY'), defaultVal: {}, from: AxisXYViewModel.from([Chart.gridLinesAxisY].concat(Chart.axisXYSerializationsInfo)), toJsonObject: AxisXYViewModel.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
         })(Chart = Designer.Chart || (Designer.Chart = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -9576,6 +9577,7 @@ var DevExpress;
                 keepRowHeight,
                 Report.exportPageBreaks,
                 { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+                { propertyName: "allowFloatingPictures", modelName: "@AllowFloatingPictures", displayName: "Allow Floating Pictures", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
             ];
             var DocxExportOptions = (function () {
                 function DocxExportOptions(model, serializer) {
@@ -10445,12 +10447,16 @@ var DevExpress;
                 __extends(dxSearchEditor, _super);
                 function dxSearchEditor(element, options) {
                     var _this = this;
-                    options["onEnterKey"] = function (e) {
-                        if (DevExpress.browser && DevExpress.browser.msie && e && e.component) {
-                            e.component.blur();
-                            e.component.focus();
+                    options["onKeyDown"] = function (e) {
+                        if (e.jQueryEvent.keyCode === 13) {
+                            e.jQueryEvent.stopPropagation();
+                            e.jQueryEvent.preventDefault();
+                            if (DevExpress.browser && DevExpress.browser.msie && e && e.component) {
+                                e.component.blur();
+                                e.component.focus();
+                            }
+                            _this.findNext(e && e.jQueryEvent && e.jQueryEvent.shiftKey);
                         }
-                        _this.findNext(e && e.jQueryEvent && e.jQueryEvent.shiftKey);
                     };
                     options["onFocusOut"] = function (e) {
                         _this._searchModel.searchText(_this.option("text"));
@@ -14496,6 +14502,31 @@ var DevExpress;
                     });
                 }
             };
+            ko.virtualElements.allowedBindings["lazy-viewer"] = true;
+            ko.bindingHandlers['lazy-viewer'] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var parsedBindings = valueAccessor();
+                    $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
+                        var innerBinding = ko.bindingHandlers[innerBindingKey];
+                        setTimeout(function () {
+                            var isInitialized = false;
+                            ko.computed({
+                                read: function () {
+                                    if (!isInitialized && innerBinding.init) {
+                                        innerBinding.init(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                        isInitialized = true;
+                                    }
+                                    if (innerBinding.update) {
+                                        innerBinding.update(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                    }
+                                },
+                                disposeWhenNodeIsRemoved: element
+                            });
+                        }, 1);
+                    });
+                    return { controlsDescendantBindings: true };
+                }
+            };
             ko.bindingHandlers["brick-selection"] = {
                 update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var values = valueAccessor(), unwrappedValues = ko.unwrap(values);
@@ -16441,7 +16472,9 @@ var DevExpress;
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Border Dash Style", localizationId: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle",
                 valuesArray: [].concat(Report.borderDashStyleValues, [{ value: "Double", displayValue: "Double", localizationId: "DevExpress.XtraPrinting.BorderDashStyle.Double" }])
             }, Report.previewBorderDashStyle);
-            Report.padding = $.extend({ displayName: "Padding", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }, Report.previewPadding);
+            Report.paddingString = { propertyName: "padding", modelName: "@Padding" };
+            Report.padding = { displayName: "Padding", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, propertyName: "paddingObj" };
+            Report.paddingGroup = [Report.paddingString, Report.padding];
             Report.textAlignment = $.extend({
                 displayName: "Text Alignment",
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
@@ -16676,8 +16709,8 @@ var DevExpress;
             Report.dpi = { propertyName: "dpi", modelName: "@Dpi", defaultVal: 100, from: Designer.floatFromModel };
             var borderWidthSerializable = { propertyName: "borderWidthSerializable", modelName: "@BorderWidthSerializable", displayName: "Border Width", localizationId: "DevExpress.XtraReports.UI.Formatting.BorderWidthSerializable", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, sides = $.extend({ displayName: "Borders", editor: Designer.Widgets.editorTemplates.borders }, Report.previewSides);
             Report.formattingSerializationsInfo = [Report.backColor, sides, Report.borderColor, Report.borderDashStyle, borderWidthSerializable,
-                Report.foreColor, Report.font, Report.padding, Report.textAlignment, Report.defaultBooleanVisible
-            ];
+                Report.foreColor, Report.font, Report.textAlignment, Report.defaultBooleanVisible
+            ].concat(Report.paddingGroup);
             Report.conditionObj = { propertyName: "conditionObj", displayName: "Condition", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Condition", editor: Designer.Widgets.editorTemplates.expressionEditor }, Report.formatting = { propertyName: "formatting", modelName: "Formatting", displayName: "Formatting", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Formatting", info: Report.formattingSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             Report.formattingRuleSerializationsInfo = [
                 { propertyName: "name", modelName: "@Name", displayName: "Name", localizationId: "DevExpress.XtraReports.UI.FormattingRule.Name", editor: DevExpress.JS.Widgets.editorTemplates.text, validationRules: Designer.nameValidationRules },
@@ -16705,7 +16738,7 @@ var DevExpress;
             Report.sizeLocation = [Report.size, Report.location];
             Report.bordersProperties = [Report.borders, Report.borderWidth, Report.borderDashStyle, Report.borderColor];
             Report.baseControlProperties = [Report.name, Report.visible, Report.dpi, Report.lockedInUserDesigner, Report.tag];
-            Report.commonBandProperties = [Report.backColor, Report.padding, Report.formattingRuleLinks].concat(Report.baseControlProperties, Report.bordersProperties);
+            Report.commonBandProperties = [Report.backColor, Report.formattingRuleLinks].concat(Report.baseControlProperties, Report.bordersProperties, Report.paddingGroup);
             Report.commonControlProperties = [Report.styleName, Report.evenStyleName, Report.oddStyleName, Report.stylePriority, Report.canPublish].concat(Report.commonBandProperties);
             Report.fontGroup = [Report.font, Report.foreColor];
             Report.bookmarkGroup = [Report.bookmark, Report.bookmarkParent];
@@ -16877,34 +16910,23 @@ var DevExpress;
         var Report;
         (function (Report) {
             Report.stylesProperties = ["foreColor", "borderColor", "borderWidth", "backColor", "borders", "borderDashStyle", "padding", "textAlignment", "font"];
-            function _getTargetByPath(target, path) {
-                for (var i = 0; i < path.length - 1; i++) {
-                    target = target[path[i]];
-                }
-                return target;
-            }
             var ReportElementViewModel = (function (_super) {
                 __extends(ReportElementViewModel, _super);
                 function ReportElementViewModel(model, parent, serializer) {
                     var _this = this;
                     _super.call(this, model, parent, serializer);
                     this.initialize();
-                    var self = this;
                     this.formattingRuleLinks = DevExpress.JS.Utils.deserializeArray(model.FormattingRuleLinks, function (item) { return new Report.FormattingRuleLink(item, serializer); });
-                    var _generateProperty = function (path, stylePriorityName) {
-                        var name = path[path.length - 1];
-                        var target = _getTargetByPath(_this, path);
-                        target["_" + name] = ko.observable(target[name]());
-                        target[name] = ko.computed({
-                            read: function () {
-                                return _this._getStyleProperty(path, stylePriorityName, _this.root);
-                            },
+                    var _generateProperty = function (propertyName, stylePriorityName) {
+                        _this["_" + propertyName] = ko.observable(_this[propertyName]());
+                        _this[propertyName] = ko.computed({
+                            read: function () { return _this._getStyleProperty(propertyName, stylePriorityName, _this.root); },
                             write: function (val) {
-                                if (_this._getStyleProperty(path, stylePriorityName, _this.root) !== val) {
+                                if (_this._getStyleProperty(propertyName, stylePriorityName, _this.root) !== val) {
                                     if (_this.stylePriority && _this.stylePriority[stylePriorityName]) {
                                         _this.stylePriority[stylePriorityName](false);
                                     }
-                                    target["_" + name](val);
+                                    _this["_" + propertyName](val);
                                 }
                             }
                         });
@@ -16913,48 +16935,33 @@ var DevExpress;
                     if (defaultBinding) {
                         this[defaultBinding.propertyName] = this.dataBindings()["findBinding"](defaultBinding["bindingName"]);
                     }
-                    this.getStyleProperty = function (path, stylePriorityName) {
-                        return _this._getStyleProperty(path, stylePriorityName, _this.root);
-                    };
-                    if (this.padding) {
-                        this.padding.dpi = ko.computed(function () {
-                            return _this.dpi && _this.dpi();
-                        });
-                    }
+                    this.getStyleProperty = function (propertyName, stylePriorityName) { return _this._getStyleProperty(propertyName, stylePriorityName, _this.root); };
                     for (var i = 0; i < Report.stylesProperties.length; i++) {
                         if (this[Report.stylesProperties[i]]) {
                             var stylePriorityName = this._getStylePriorityPropertyName(Report.stylesProperties[i]);
-                            if (ko.unwrap(this[Report.stylesProperties[i]]) instanceof Object) {
-                                var info = this[Report.stylesProperties[i]].getInfo();
-                                for (var j = 0; j < info.length; j++) {
-                                    _generateProperty([Report.stylesProperties[i], info[j].propertyName], stylePriorityName);
-                                }
-                            }
-                            else {
-                                _generateProperty([Report.stylesProperties[i]], stylePriorityName);
-                            }
+                            _generateProperty(Report.stylesProperties[i], stylePriorityName);
                         }
                     }
                     ;
+                    if (this.padding) {
+                        this._createPaddingDependencies();
+                    }
                     this.toggleUseStyle = function (propertyName) {
                         var styleName = _this._getStylePriorityPropertyName(propertyName);
                         _this.stylePriority[styleName](!_this.stylePriority[styleName]());
                     };
                     this.actions.push({ action: this.toggleUseStyle, title: Designer.getLocalization("Style Priority", "DevExpress.XtraReports.UI.XRControl.StylePriority"), visible: function (name) { return _this.isStyleProperty(name); } });
-                    this.dsHelperProvider = function () {
-                        return self.root["dataSourceHelper"] && self.root["dataSourceHelper"]();
-                    };
+                    this.dsHelperProvider = function () { return _this.root["dataSourceHelper"] && _this.root["dataSourceHelper"](); };
                     this.lockedInUserDesigner = ko.computed({
                         read: function () {
                             var parent = _this.parentModel(), parentLocked = (parent && parent["lockedInUserDesigner"]) ? parent["lockedInUserDesigner"]() : false;
                             return _this._lockedInUserDesigner() || parentLocked;
                         },
-                        write: function (newValue) {
-                            _this._lockedInUserDesigner(newValue);
-                        }
+                        write: function (newValue) { return _this._lockedInUserDesigner(newValue); }
                     });
                 }
                 ReportElementViewModel.prototype._getStylePriorityPropertyName = function (propertyName) {
+                    propertyName = propertyName === "paddingObj" ? "padding" : propertyName;
                     return "use" + propertyName.charAt(0).toUpperCase() + propertyName.substr(1);
                 };
                 ReportElementViewModel.prototype._getStyle = function (root) {
@@ -16965,30 +16972,23 @@ var DevExpress;
                     var property = target && (target["_" + propertyName] || target[propertyName]);
                     return ko.unwrap(property) && target.isPropertyModified(propertyName);
                 };
-                ReportElementViewModel.prototype._getStyleProperty = function (path, stylePriorityName, root) {
-                    var name = path[path.length - 1];
-                    var target = _getTargetByPath(this, path);
-                    if (this.stylePriority && this.stylePriority[stylePriorityName] && this.stylePriority[stylePriorityName]()) {
+                ReportElementViewModel.prototype._getStyleProperty = function (propertyName, stylePriorityName, root) {
+                    if (this.stylePriority && this.stylePriority[stylePriorityName] && this.stylePriority[stylePriorityName]() || !this._checkModify(this, propertyName)) {
                         var style = this._getStyle(root);
-                        if (this._checkModify(style, path[0])) {
-                            return _getTargetByPath(style, path)[name]();
+                        if (this._checkModify(style, propertyName)) {
+                            return style[propertyName]();
                         }
                     }
-                    if (this._checkModify(this, path[0])) {
-                        return target["_" + name]();
+                    if (this._checkModify(this, propertyName)) {
+                        return this["_" + propertyName]();
                     }
-                    var defaultValue = this.getPropertyDefaultValue(path[0]);
+                    var defaultValue = this.getPropertyDefaultValue(propertyName);
                     if (defaultValue && !(defaultValue instanceof Object)) {
                         return defaultValue;
                     }
                     var parent = this.parentModel();
                     if (parent) {
-                        return parent.getStyleProperty(path, stylePriorityName);
-                    }
-                    else {
-                        if (defaultValue instanceof Object) {
-                            return ko.unwrap(defaultValue[name]);
-                        }
+                        return parent.getStyleProperty(propertyName, stylePriorityName);
                     }
                 };
                 ReportElementViewModel.prototype._zOrderChange = function (bringToFront) {
@@ -16998,6 +16998,38 @@ var DevExpress;
                         controlContainer.splice(itemIndex, 1);
                         controlContainer.splice((bringToFront ? 0 : controlContainer().length), 0, this);
                     }
+                };
+                ReportElementViewModel.prototype._createPaddingDependencies = function () {
+                    var _this = this;
+                    this.paddingObj = new Designer.Widgets.PaddingModel();
+                    this.paddingObj.applyFromString(this["padding"]());
+                    this.paddingObj.dpi = ko.computed(function () { return _this.dpi && _this.dpi(); });
+                    var isUpdate = false;
+                    var lock = function (action) {
+                        if (!isUpdate) {
+                            isUpdate = true;
+                            action();
+                            isUpdate = false;
+                        }
+                    };
+                    this.padding.subscribe(function (newVal) { return lock(function () { return _this.paddingObj.applyFromString(newVal); }); });
+                    ["left", "right", "top", "bottom"].forEach(function (name) {
+                        _this.paddingObj[name].subscribe(function (newVal) {
+                            if (_this.root["isModelReady"] && _this.root["isModelReady"]() || !_this.root["isModelReady"])
+                                lock(function () { return _this.padding(_this.paddingObj.toString()); });
+                        });
+                    });
+                    this.paddingObj.dpi.subscribe(function (newVal) { return lock(function () {
+                        if (_this["_padding"]())
+                            _this["_padding"](_this.paddingObj.toString());
+                    }); });
+                    this.paddingObj["resetValue"] = function () {
+                        lock(function () {
+                            ["left", "right", "top", "bottom"].forEach(function (name) { return _this.paddingObj[name](null); });
+                            _this.padding(_this.paddingObj.toString());
+                            _this.paddingObj.applyFromString(_this.padding());
+                        });
+                    };
                 };
                 ReportElementViewModel.prototype.getControlFactory = function () {
                     return DevExpress.Designer.Report.controlsFactory;
@@ -17027,6 +17059,7 @@ var DevExpress;
                 };
                 ReportElementViewModel.prototype.isStyleProperty = function (propertyName) {
                     var _this = this;
+                    propertyName = propertyName === "paddingObj" ? "padding" : propertyName;
                     return this.stylePriority && Report.stylePrioritySerializationInfo.some(function (info) { return info.propertyName == _this._getStylePriorityPropertyName(propertyName); });
                 };
                 ReportElementViewModel.prototype.isResettableProperty = function (propertyName) {
@@ -18606,6 +18639,24 @@ var DevExpress;
                             write: function (val) { _this["_" + propertyName](val); }
                         });
                     });
+                    this.paddingObj = new Designer.Widgets.PaddingModel();
+                    this.paddingObj.applyFromString(this["padding"]());
+                    var isUpdate = false;
+                    var lock = function (action) {
+                        if (!isUpdate) {
+                            isUpdate = true;
+                            action();
+                            isUpdate = false;
+                        }
+                    };
+                    this.padding.subscribe(function (newVal) {
+                        lock(function () { return _this.paddingObj.applyFromString(newVal); });
+                    });
+                    ["left", "right", "top", "bottom"].forEach(function (name) {
+                        _this.paddingObj[name].subscribe(function (newVal) {
+                            lock(function () { return _this.padding(_this.paddingObj.toString()); });
+                        });
+                    });
                 }
                 StyleModel.prototype.getInfo = function () {
                     return Report.styleSerializationInfo;
@@ -18632,7 +18683,7 @@ var DevExpress;
             var _foreColor = { propertyName: "_foreColor", modelName: "@ForeColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
             var _borderColor = { propertyName: "_borderColor", modelName: "@BorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
             Report.styleSerializationInfo = $.extend(true, [], [
-                Report.name, Report.font, Report.textAlignment, Report.padding,
+                Report.name, Report.font, Report.textAlignment,
                 _foreColor,
                 _backColor,
                 _borderColor,
@@ -18641,7 +18692,7 @@ var DevExpress;
                 { propertyName: "borderColor", displayName: "Border Color", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.BorderColor", editor: Designer.Widgets.editorTemplates.customColorEditor },
                 { propertyName: "borders", modelName: "@Sides", displayName: "Borders", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.Borders", editor: Designer.Widgets.editorTemplates.borders },
                 { propertyName: "borderWidth", modelName: "@BorderWidthSerializable", displayName: "Border Width", localizationId: "DevExpress.XtraReports.UI.XRControlStyle.BorderWidth", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric }
-            ]).concat([Report.borderDashStyle]);
+            ]).concat([Report.borderDashStyle], Report.paddingGroup);
             Report.styleSerializationInfo.forEach(function (item) { delete item.defaultVal; });
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -19426,7 +19477,6 @@ var DevExpress;
                 $.extend({}, Report.borders, { defaultVal: "None" }),
                 { propertyName: "size", visible: false },
                 Report.landscape,
-                Report.padding,
                 Report.paperKind,
                 Report.pageColor,
                 Report.bookmark,
@@ -19451,7 +19501,7 @@ var DevExpress;
                 { propertyName: "version", modelName: "@Version" },
                 Report.reportExportOptionsSerializationInfo, Report.reportScripts, Report.scriptLanguage, Report.scriptReferencesString,
                 Report.rtlReport, Report.rtlLayout, Report.bookmarkDuplicateSuppress, Report.horizontalContentSplitting
-            ].concat(Report.baseControlProperties, Report.datasourcePrintOptionsGroup);
+            ].concat(Report.baseControlProperties, Report.datasourcePrintOptionsGroup, Report.paddingGroup);
             Report.popularPropertiesReport = ["dataSource", "dataMember", "filterString", "measureUnit"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -20157,7 +20207,7 @@ var DevExpress;
                         return "dxrd-checkbox-checkstate-" + control["checkState"]().toLowerCase();
                     });
                     this.leftPadding = function () {
-                        var padding = ko.unwrap(control["padding"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
+                        var padding = ko.unwrap(control["paddingObj"]) || Designer.Widgets.PaddingModel.from(Designer.Widgets.PaddingModel.defaultVal);
                         return Designer.unitsToPixel(padding.left(), context.measureUnit());
                     };
                     this.textWidth = ko.pureComputed(function () {
@@ -21301,7 +21351,7 @@ var DevExpress;
                     };
                     this._disposables.push(ko.computed(function () {
                         if (_this.isAutoSize && _this.image.peek()) {
-                            var borders = new Designer.Widgets.BordersModel({ value: _this["borders"] }), borderWidth = _this["borderWidth"]() || 0, top, bottom, left, right, paddings = (_this["padding"]);
+                            var borders = new Designer.Widgets.BordersModel({ value: _this["borders"] }), borderWidth = _this["borderWidth"]() || 0, top, bottom, left, right, paddings = (_this["paddingObj"]);
                             top = borders.top() ? borderWidth : 0;
                             bottom = borders.bottom() ? borderWidth : 0;
                             left = borders.left() ? borderWidth : 0;
@@ -22059,7 +22109,8 @@ var DevExpress;
                 Report.font, Report.foreColor, Report.keepTogetherDefaultValueFalse, Report.anchorVertical, Report.anchorHorizontal, Report.commonScripts,
                 { propertyName: "rows", modelName: "Rows", array: true },
                 Report.dataBindings(["Bookmark", "Tag"]),
-                Report.rtl
+                Report.rtl,
+                Report.textAlignment
             ].concat(Report.sizeLocation, Report.commonControlProperties, Report.bookmarkGroup);
             Report.tableCellSerializationsInfo = [
                 Report.weight, Report.labelScripts, Report.rowSpan, Report.textTrimming,
@@ -22890,7 +22941,13 @@ var DevExpress;
                 function XRPageInfoSurface(control, context) {
                     _super.call(this, control, context);
                     this.displayText = function () {
-                        return control["format"] && control["format"]() || pageInfoValuesMap.filter(function (item) { return item.value === control["pageInfo"](); });
+                        var format = control["format"] && control["format"]();
+                        if (format)
+                            return format;
+                        var value = control["pageInfo"](), info = pageInfoValuesMap.filter(function (item) { return item.value === value; })[0];
+                        if (info)
+                            return info.displayValue;
+                        return value;
                     };
                 }
                 return XRPageInfoSurface;
@@ -23648,6 +23705,10 @@ var DevExpress;
                     this.borderWidth = parent.borderWidth;
                     this.borderColor = parent.borderColor;
                     this.borders = parent.borders;
+                    this.dpi = parent.dpi;
+                    if (this.padding) {
+                        this._createPaddingDependencies();
+                    }
                     this.borderDashStyle = parent.borderDashStyle;
                     this.borderDefault = parent.borderDefault;
                     this._levelIndex = ko.pureComputed(function () { return parent.allLevels().indexOf(_this); });
@@ -23685,6 +23746,38 @@ var DevExpress;
                 }
                 TableOfContentsLevel.createNew = function (parent) {
                     return new TableOfContentsLevel({ "@Height": Report.reculculateUnit(levelDefaultHeight, parent.dpi()) }, parent);
+                };
+                TableOfContentsLevel.prototype._createPaddingDependencies = function () {
+                    var _this = this;
+                    this.paddingObj = new Designer.Widgets.PaddingModel();
+                    this.paddingObj.applyFromString(this["padding"]());
+                    this.paddingObj.dpi = ko.computed(function () { return _this.dpi && _this.dpi(); });
+                    var isUpdate = false;
+                    var lock = function (action) {
+                        if (!isUpdate) {
+                            isUpdate = true;
+                            action();
+                            isUpdate = false;
+                        }
+                    };
+                    this.padding.subscribe(function (newVal) { return lock(function () { return _this.paddingObj.applyFromString(newVal); }); });
+                    ["left", "right", "top", "bottom"].forEach(function (name) {
+                        _this.paddingObj[name].subscribe(function (newVal) {
+                            if (_this.root["isModelReady"] && _this.root["isModelReady"]() || !_this.root["isModelReady"])
+                                lock(function () { return _this.padding(_this.paddingObj.toString()); });
+                        });
+                    });
+                    this.paddingObj.dpi.subscribe(function (newVal) { return lock(function () {
+                        if (_this.padding())
+                            _this.padding(_this.paddingObj.toString());
+                    }); });
+                    this.paddingObj["resetValue"] = function () {
+                        lock(function () {
+                            ["left", "right", "top", "bottom"].forEach(function (name) { return _this.paddingObj[name](null); });
+                            _this.padding(_this.paddingObj.toString());
+                            _this.paddingObj.applyFromString(_this.padding());
+                        });
+                    };
                 };
                 TableOfContentsLevel.prototype.getInfo = function () {
                     return this.isTitle ? Report.tocTitleSerializationsInfo : Report.tocLevelSerializationsInfo;
@@ -23831,9 +23924,8 @@ var DevExpress;
                 backColor,
                 font,
                 foreColor,
-                Report.padding,
                 { propertyName: "height", modelName: "@Height", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: levelDefaultHeight, displayName: "Height", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevelBase.Height", from: Designer.floatFromModel, editorOptions: { min: 10 } }
-            ];
+            ].concat(Report.paddingGroup);
             Report.tocLevelSerializationsInfo = [
                 { propertyName: "leaderSymbol", modelName: "@LeaderSymbol", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: ".", displayName: "Leader Symbol", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevel.LeaderSymbol", editorOptions: { maxLength: 1 } },
                 { propertyName: "indent", modelName: "@Indent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: null, displayName: "Indent", localizationId: "DevExpress.XtraReports.UI.XRTableOfContentsLevel.Indent", from: Designer.floatFromModel }

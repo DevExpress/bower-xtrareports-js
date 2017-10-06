@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.1.6
-* Build date: 2017-09-04
+* Version: 17.1.7
+* Build date: 2017-10-02
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1277,8 +1277,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.1.6
-* Build date: 2017-09-04
+* Version: 17.1.7
+* Build date: 2017-10-02
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1666,7 +1666,7 @@
         </div>
         <!--/ko-->
         <!-- ko foreach: ($data.bricks || []) -->
-        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->
+        <!-- ko lazy-viewer: { template: { name: "dxrd-page-brick" } } -->
         <!--/ko-->
         <!--/ko-->
     </div>
@@ -1714,7 +1714,7 @@
         <div class="dxrd-preview-surface" data-bind="styleunit: { 'width': previewSize() }, visible: showMultipagePreview()">
             <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">
                 <!-- ko foreach: pages -->
-                <!-- ko lazy: { if: pageLoading() || (!pageLoading() && imageSrc()) } -->
+                <!-- ko lazy-viewer: { if: pageLoading() || (!pageLoading() && imageSrc()) } -->
                 <div class="dxrd-report-preview dxrd-report-preview-multipage" data-bind="styleunit: { 'width': width(), 'height': height() }, toView: { active: active }, css : { 'dxrd-report-preview-active': active }">
                     <!-- ko template: 'dxrd-preview-page'-->
                     <!-- /ko -->

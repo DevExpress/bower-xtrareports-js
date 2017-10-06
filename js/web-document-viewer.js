@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.1.6
-* Build date: 2017-09-04
+* Version: 17.1.7
+* Build date: 2017-10-02
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -765,6 +765,7 @@ var DevExpress;
                 keepRowHeight,
                 Report.exportPageBreaks,
                 { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+                { propertyName: "allowFloatingPictures", modelName: "@AllowFloatingPictures", displayName: "Allow Floating Pictures", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
             ];
             var DocxExportOptions = (function () {
                 function DocxExportOptions(model, serializer) {
@@ -1634,12 +1635,16 @@ var DevExpress;
                 __extends(dxSearchEditor, _super);
                 function dxSearchEditor(element, options) {
                     var _this = this;
-                    options["onEnterKey"] = function (e) {
-                        if (DevExpress.browser && DevExpress.browser.msie && e && e.component) {
-                            e.component.blur();
-                            e.component.focus();
+                    options["onKeyDown"] = function (e) {
+                        if (e.jQueryEvent.keyCode === 13) {
+                            e.jQueryEvent.stopPropagation();
+                            e.jQueryEvent.preventDefault();
+                            if (DevExpress.browser && DevExpress.browser.msie && e && e.component) {
+                                e.component.blur();
+                                e.component.focus();
+                            }
+                            _this.findNext(e && e.jQueryEvent && e.jQueryEvent.shiftKey);
                         }
-                        _this.findNext(e && e.jQueryEvent && e.jQueryEvent.shiftKey);
                     };
                     options["onFocusOut"] = function (e) {
                         _this._searchModel.searchText(_this.option("text"));
@@ -5683,6 +5688,31 @@ var DevExpress;
                         $element.off("scroll", throttledLoad);
                         subscribtion.dispose();
                     });
+                }
+            };
+            ko.virtualElements.allowedBindings["lazy-viewer"] = true;
+            ko.bindingHandlers['lazy-viewer'] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var parsedBindings = valueAccessor();
+                    $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
+                        var innerBinding = ko.bindingHandlers[innerBindingKey];
+                        setTimeout(function () {
+                            var isInitialized = false;
+                            ko.computed({
+                                read: function () {
+                                    if (!isInitialized && innerBinding.init) {
+                                        innerBinding.init(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                        isInitialized = true;
+                                    }
+                                    if (innerBinding.update) {
+                                        innerBinding.update(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                    }
+                                },
+                                disposeWhenNodeIsRemoved: element
+                            });
+                        }, 1);
+                    });
+                    return { controlsDescendantBindings: true };
                 }
             };
             ko.bindingHandlers["brick-selection"] = {
