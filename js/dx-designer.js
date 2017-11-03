@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.2.2
+* Build date: 2017-10-27
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -10,29 +10,40 @@ var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
-        JS.Localization = {
-            messages: {},
-            addCultureInfo: function (json) {
-                $.extend(JS.Localization.messages, json.messages);
-            },
-            localize: function (val) {
-                return JS.Localization.messages[val];
-            },
-            parseDate: function (val) {
+        var Localization;
+        (function (Localization) {
+            Localization.Globalize = DevExpress.JS.Localization.Globalize || window["Globalize"];
+            Localization.messages = {};
+            function addCultureInfo(json) {
+                $.extend(Localization.messages, json.messages);
+            }
+            Localization.addCultureInfo = addCultureInfo;
+            function localize(val) {
+                return Localization.messages[val];
+            }
+            Localization.localize = localize;
+            function parseDate(val) {
                 if (val) {
                     if (val instanceof Date)
                         return val;
-                    var enGlobalize = new window["Globalize"]("en");
+                    var enGlobalize = new Localization.Globalize("en");
                     var date = enGlobalize["parseDate"](val, { raw: "MM/dd/yyyy HH:mm:ss" });
                     if (!date)
                         date = enGlobalize["parseDate"](val, { raw: "yyyy-MM-dd" });
                     return date;
                 }
                 return null;
-            },
-            selectPlaceholder: function () { return DevExpress.Designer.getLocalization("Select...", "ASPxReportsStringId.ReportDesigner_PropertyGrid_Editor_EmptyText"); },
-            noDataText: function () { return DevExpress.Designer.getLocalization("No data to display", "ASPxReportsStringId.ReportDesigner_DataPreview_Empty"); }
-        };
+            }
+            Localization.parseDate = parseDate;
+            function selectPlaceholder() {
+                return DevExpress.Designer.getLocalization("Select...", "ASPxReportsStringId.ReportDesigner_PropertyGrid_Editor_EmptyText");
+            }
+            Localization.selectPlaceholder = selectPlaceholder;
+            function noDataText() {
+                return DevExpress.Designer.getLocalization("No data to display", "ASPxReportsStringId.ReportDesigner_DataPreview_Empty");
+            }
+            Localization.noDataText = noDataText;
+        })(Localization = JS.Localization || (JS.Localization = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
@@ -56,6 +67,12 @@ var DevExpress;
             return result || _getLocalization(text);
         }
         Designer.getLocalization = getLocalization;
+        function getSpecificLocalizationWithAddition(text, defaultText, addition, id) {
+            if (addition === void 0) { addition = ""; }
+            if (id === void 0) { id = null; }
+            return isCustomizedWithUpdateLocalizationMethod(text) ? getLocalization(text) : (getLocalization(defaultText, id) + addition);
+        }
+        Designer.getSpecificLocalizationWithAddition = getSpecificLocalizationWithAddition;
         function updateLocalization(object) {
             $.extend(custom_localization_values, object);
             var messages = {};
@@ -209,6 +226,8 @@ var DevExpress;
             'Double-Click in Preview': 'DevExpress.XtraReports.UI.XRControlEvents.OnPreviewDoubleClick',
             'Field Name': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.FieldName',
             'Request Parameters': 'DevExpress.XtraReports.UI.XtraReport.RequestParameters',
+            'MultiThread': 'DevExpress.XtraReports.UI.DocumentExportMode.MultiThread',
+            'Regular': 'DevExpress.XtraReports.UI.DocumentExportMode.Regular',
             'Count (Distinct)': 'DevExpress.XtraReports.UI.SortingSummaryFunction.DCount',
             'Field Value Grand Total Style': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridStyles.FieldValueGrandTotalStyle',
             'Table Row': 'DevExpress.XtraReports.UI.XRTableRow',
@@ -281,6 +300,7 @@ var DevExpress;
             'Page Color': 'DevExpress.XtraReports.UI.XtraReport.PageColor',
             'With First Detail': 'DevExpress.XtraReports.UI.GroupUnion.WithFirstDetail',
             'Navigation URL': 'DevExpress.XtraReports.UI.XRControl.NavigateUrl',
+            'Streaming': 'DevExpress.XtraReports.UI.DocumentExportMode.Streaming',
             'Report Header': 'DevExpress.XtraReports.UI.ReportHeaderBand',
             'Custom Field Value Cells': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomFieldValueCells',
             'Styles': 'DevExpress.XtraReports.UI.XRPivotGrid.Styles',
@@ -523,6 +543,7 @@ var DevExpress;
             'Summary Calculated': 'DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryCalculated',
             'Actual Width': 'DevExpress.XtraReports.UI.XRPivotGrid.ActualWidth',
             'Navigation Target': 'DevExpress.XtraReports.UI.XRControl.Target',
+            'Auto': 'DevExpress.XtraReports.UI.DocumentExportMode.Auto',
             'Summary Calculated Field': 'DevExpress.XtraReports.UI.SummaryCalculatedField',
             'Field Value': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldValue',
             'Parent Bookmark': 'DevExpress.XtraReports.UI.XRControl.BookmarkParent',
@@ -735,7 +756,6 @@ var DevExpress;
             'Shapes': 'DevExpress.XtraPivotGrid.PivotKPIGraphic.Shapes',
             'Rank In Row Smallest To Largest': 'DevExpress.Data.PivotGrid.PivotSummaryDisplayType.RankInRowSmallestToLargest',
             'Row Header Area': 'DevExpress.XtraPivotGrid.PivotGridAppearances.RowHeaderArea',
-            'Auto': 'DevExpress.XtraPivotGrid.PivotOLAPFilterUsingWhereClause.Auto',
             'Cylinder': 'DevExpress.XtraPivotGrid.PivotKPIGraphic.Cylinder',
             'Filter By UniqueName': 'DevExpress.XtraPivotGrid.PivotGridOptionsOLAP.FilterByUniqueName',
             'Sort Mode': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.SortMode',
@@ -1358,6 +1378,7 @@ var DevExpress;
             'Pie Fill Style': 'DevExpress.XtraCharts.Pie3DSeriesView.PieFillStyle',
             'Saturday': 'DevExpress.XtraCharts.Weekday.Saturday',
             'Color 2': 'DevExpress.XtraCharts.FillOptionsColor2Base.Color2',
+            'Animation': 'DevExpress.XtraCharts.Indicator.Animation',
             'Secondary Grid Lines Y': 'DevExpress.XtraCharts.SecondaryGridLinesY',
             'Secondary Grid Lines X': 'DevExpress.XtraCharts.SecondaryGridLinesX',
             'Size Mode': 'DevExpress.XtraCharts.Printing.ChartOptionsPrint.SizeMode',
@@ -1385,7 +1406,6 @@ var DevExpress;
             'Zooming Options': 'DevExpress.XtraCharts.Diagram3D.ZoomingOptions',
             'Numeric Options': 'DevExpress.XtraCharts.NumericOptions',
             'Argument Line Style': 'DevExpress.XtraCharts.CrosshairOptions.ArgumentLineStyle',
-            'Animation': 'DevExpress.XtraCharts.FunnelSeriesView.Animation',
             'Billions': 'DevExpress.XtraCharts.NumericGridAlignment.Billions',
             'Negative Error Data Member': 'DevExpress.XtraCharts.DataSourceBasedErrorBars.NegativeErrorDataMember',
             'Minus': 'DevExpress.XtraCharts.ErrorBarDirection.Minus',
@@ -1492,6 +1512,7 @@ var DevExpress;
             'Snap Offset': 'DevExpress.XtraCharts.ChartRangeControlClientGridOptions.SnapOffset',
             'Automatic Size': 'DevExpress.XtraCharts.BubbleSeriesView.AutoSize',
             'Equally Spaced Items': 'DevExpress.XtraCharts.Legend.EquallySpacedItems',
+            'Unwrap': 'DevExpress.XtraCharts.IndicatorUnwrapAnimation',
             'Crosshair Label Text Options': 'DevExpress.XtraCharts.CrosshairOptions.CrosshairLabelTextOptions',
             'Show Only in Focused Pane': 'DevExpress.XtraCharts.CrosshairOptions.ShowOnlyInFocusedPane',
             'Elastic': 'DevExpress.XtraCharts.ElasticEasingFunction',
@@ -1519,7 +1540,6 @@ var DevExpress;
             'Range Control Date-Time Grid Options': 'DevExpress.XtraCharts.ChartRangeControlClientDateTimeOptions.RangeControlDateTimeGridOptions',
             'Point Delay': 'DevExpress.XtraCharts.SeriesPointAnimationBase.PointDelay',
             'Short Period': 'DevExpress.XtraCharts.MovingAverageConvergenceDivergence.ShortPeriod',
-            'Unwrap': 'DevExpress.XtraCharts.XYSeriesUnwrapAnimation',
             'Filled on Reduction': 'DevExpress.XtraCharts.CandleStickFillMode.FilledOnReduction',
             'Stacked Line 3D SeriesLabel': 'DevExpress.XtraCharts.StackedLine3DSeriesLabel',
             'Color Mode': 'DevExpress.XtraCharts.ReductionStockOptions.ColorMode',
@@ -1542,6 +1562,7 @@ var DevExpress;
             'Radar Grid Lines Y': 'DevExpress.XtraCharts.RadarGridLinesY',
             'Radar Grid Lines X': 'DevExpress.XtraCharts.RadarGridLinesX',
             'Start Hour': 'DevExpress.XtraCharts.TimeInterval.StartHour',
+            'Unwind': 'DevExpress.XtraCharts.IndicatorUnwindAnimation',
             'Begin Text': 'DevExpress.XtraCharts.SeriesNameTemplate.BeginText',
             'Exact Workdays': 'DevExpress.XtraCharts.WorkdaysOptions.ExactWorkdays',
             'Vertical Scroll Percent': 'DevExpress.XtraCharts.Diagram3D.VerticalScrollPercent',
@@ -1668,7 +1689,6 @@ var DevExpress;
             'Equal': 'DevExpress.XtraCharts.DataFilterCondition.Equal',
             'Use Angles': 'DevExpress.XtraCharts.RotationType.UseAngles',
             'Easing Mode': 'DevExpress.XtraCharts.EasingFunctionBase.EasingMode',
-            'Unwind': 'DevExpress.XtraCharts.XYSeriesUnwindAnimation',
             'Use Size In Pixels': 'DevExpress.XtraCharts.PaneSizeMode.UseSizeInPixels',
             'Polar Axis X': 'DevExpress.XtraCharts.PolarAxisX',
             'Nearest Argument': 'DevExpress.XtraCharts.CrosshairSnapMode.NearestArgument',
@@ -4509,7 +4529,7 @@ var DevExpress;
             'IsJune(DateTime)\r\nReturns True if the specified date falls within June.': 'XtraEditorsExpressionEditor.IsJune.Description',
             'DateDiffMilliSecond(startDate, endDate)\r\nReturns the number of millisecond boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description',
             'expressionEdit': 'XtraEditorsExpressionEditor.>>expressionEdit.Name',
-            'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>expressionEdit.Type',
+            'DevExpress.XtraEditors.MemoEdit, DevExpress.XtraEditors.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>expressionEdit.Type',
             'Date-time': 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems',
             'Concat(String1, ... , StringN)\r\nReturns a string value containing the concatenation of the current string with any additional strings.': 'XtraEditorsExpressionEditor.Concat.Description',
             'Cos(Value)\r\nReturns the cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cos.Description',
@@ -4519,7 +4539,7 @@ var DevExpress;
             'Exists()\r\nDetermines whether the object exists in the collection.': 'XtraEditorsExpressionEditor.ExistsAggregate.Description',
             'LocalDateTimeThisYear()\r\nReturns a date-time value corresponding to the first day of the current year.': 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description',
             'listOfInputParameters': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Name',
-            'DevExpress.XtraEditors.ListBoxControl, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Type',
+            'DevExpress.XtraEditors.ListBoxControl, DevExpress.XtraEditors.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>listOfInputParameters.Type',
             '0': 'XtraEditorsExpressionEditor.>>functionsTypes.ZOrder',
             'LocalDateTimeToday()\r\nReturns a date-time value corresponding to Today.': 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description',
             '6': 'XtraEditorsExpressionEditor.>>layoutItemButton12.ZOrder',
@@ -4540,7 +4560,7 @@ var DevExpress;
             '16': 'XtraEditorsExpressionEditor.>>labelControl1.ZOrder',
             '9': 'XtraEditorsExpressionEditor.>>labelControl2.ZOrder',
             'layoutItemButton9': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Name',
-            'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Type',
+            'DevExpress.XtraReports.Native.LayoutItemButton, DevExpress.XtraReports.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>layoutItemButton9.Type',
             'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'XtraEditorsExpressionEditor.ToInt.Description',
             '19': 'XtraEditorsExpressionEditor.>>layoutItemButton3.ZOrder',
             'layoutItemButton8': 'XtraEditorsExpressionEditor.>>layoutItemButton8.Name',
@@ -4615,7 +4635,7 @@ var DevExpress;
             'Tan(Value)\r\nReturns the tangent of the angle defined in radians.': 'XtraEditorsExpressionEditor.Tan.Description',
             'layoutItemButton15': 'XtraEditorsExpressionEditor.>>layoutItemButton15.Name',
             '4': 'XtraEditorsExpressionEditor.>>descriptionControl.ZOrder',
-            'DevExpress.XtraEditors.SimpleButton, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>buttonOK.Type',
+            'DevExpress.XtraEditors.SimpleButton, DevExpress.XtraEditors.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>buttonOK.Type',
             'buttonOK': 'XtraEditorsExpressionEditor.>>buttonOK.Name',
             'IsOctober(DateTime)\r\nReturns True if the specified date falls within October.': 'XtraEditorsExpressionEditor.IsOctober.Description',
             'Less than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.LessOrEqual.Description',
@@ -4645,7 +4665,7 @@ var DevExpress;
             'Remove(String, StartPosition)\r\nDeletes all characters from this instance, beginning at a specified position.': 'XtraEditorsExpressionEditor.Remove2Param.Description',
             'GetDate(DateTime)\r\nExtracts a date from the defined DateTime.': 'XtraEditorsExpressionEditor.GetDate.Description',
             '22': 'XtraEditorsExpressionEditor.>>plusItemButton.ZOrder',
-            'DevExpress.XtraEditors.LabelControl, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>labelControl4.Type',
+            'DevExpress.XtraEditors.LabelControl, DevExpress.XtraEditors.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>labelControl4.Type',
             'labelControl4': 'XtraEditorsExpressionEditor.>>labelControl4.Name',
             'AddTimeSpan(DateTime, TimeSpan)\r\nReturns a date-time value that is away from the specified DateTime for the given TimeSpan.': 'XtraEditorsExpressionEditor.AddTimeSpan.Description',
             'labelControl1': 'XtraEditorsExpressionEditor.>>labelControl1.Name',
@@ -4668,7 +4688,7 @@ var DevExpress;
             'Substring(String, StartPosition, Length)\r\nRetrieves a substring from String. The substring starts at StartPosition and has the specified Length.': 'XtraEditorsExpressionEditor.Substring3param.Description',
             '10': 'XtraEditorsExpressionEditor.>>layoutItemButton11.ZOrder',
             'CalculatedFieldExpressionEditorForm': 'XtraEditorsExpressionEditor.>>$this.Name',
-            'DevExpress.XtraEditors.XtraForm, DevExpress.Utils.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>$this.Type',
+            'DevExpress.XtraEditors.XtraForm, DevExpress.Utils.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>$this.Type',
             'Condition expression editor': 'XtraEditorsExpressionEditor.Condition.Caption',
             'ToDecimal(Value)\r\nConverts Value to an equivalent decimal number.': 'XtraEditorsExpressionEditor.ToDecimal.Description',
             '21': 'XtraEditorsExpressionEditor.>>expressionEdit.ZOrder',
@@ -4693,7 +4713,7 @@ var DevExpress;
             'Greater than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Greater.Description',
             '(All)': 'XtraEditorsExpressionEditor.functionsTypes.Properties.AllItems',
             'In (,,,)\r\nTests for the existence of a property in an object.': 'XtraEditorsExpressionEditor.In.Description',
-            'DevExpress.XtraEditors.ComboBoxEdit, DevExpress.XtraEditors.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>functionsTypes.Type',
+            'DevExpress.XtraEditors.ComboBoxEdit, DevExpress.XtraEditors.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>functionsTypes.Type',
             'functionsTypes': 'XtraEditorsExpressionEditor.>>functionsTypes.Name',
             'Less than operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.Less.Description',
             'StartsWith(String, StartString)\r\nReturns True if the beginning of String matches StartString; otherwise, False is returned.': 'XtraEditorsExpressionEditor.StartsWith.Description',
@@ -4714,7 +4734,7 @@ var DevExpress;
             'buttonCancel': 'XtraEditorsExpressionEditor.>>buttonCancel.Name',
             'PadLeft(String, Length)\r\nLeft-aligns characters in the defined string, padding its left side with white space characters up to a specified total length.': 'XtraEditorsExpressionEditor.PadLeft.Description',
             'descriptionControl': 'XtraEditorsExpressionEditor.>>descriptionControl.Name',
-            'DevExpress.XtraEditors.LabelControl, DevExpress.Utils.v17.1, Version=17.1.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>descriptionControl.Type',
+            'DevExpress.XtraEditors.LabelControl, DevExpress.Utils.v17.2, Version=17.2.0.0, Culture=neutral': 'XtraEditorsExpressionEditor.>>descriptionControl.Type',
             '5': 'XtraEditorsExpressionEditor.>>labelControl3.ZOrder',
             'Min(Value1, Value2)\r\nReturns the minimum value from the specified values.': 'XtraEditorsExpressionEditor.Min.Description',
             '14': 'XtraEditorsExpressionEditor.>>layoutItemButton7.ZOrder',
@@ -5469,6 +5489,12 @@ var DevExpress;
                 function CollectionEditorViewModel(options, disabled) {
                     var _this = this;
                     if (disabled === void 0) { disabled = ko.observable(false); }
+                    this.buttonMap = {
+                        "delete": { text: 'Delete', localizationId: 'ReportStringId.Cmd_Delete' },
+                        "add": { text: 'Add', localizationId: 'ChartStringId.MenuItemAdd' },
+                        "down": { text: 'Move Down', localizationId: 'ReportStringId.Cmd_BandMoveDown' },
+                        "up": { text: 'Move Up', localizationId: 'ReportStringId.Cmd_BandMoveUp' }
+                    };
                     this.selectedIndex = ko.observable(null);
                     this.alwaysShow = ko.observable(false);
                     this.collapsed = ko.observable(options.collapsed !== false);
@@ -5550,6 +5576,15 @@ var DevExpress;
                         array.splice(new_index, 0, array.splice(old_index, 1)[0]);
                         this.selectedIndex(new_index);
                     }
+                };
+                CollectionEditorViewModel.prototype.getDisplayTextButton = function (key) {
+                    return DevExpress.Designer.getLocalization(this.buttonMap[key].text, this.buttonMap[key].localizationId);
+                };
+                CollectionEditorViewModel.prototype.getDisplayTextEmptyArray = function () {
+                    return DevExpress.Designer.getLocalization('To create an item click the Add button.', 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParametersEmpty');
+                };
+                CollectionEditorViewModel.prototype.createCollectionItemWrapper = function (grandfather, index) {
+                    return new DevExpress.JS.Widgets.CollectionItemWrapper(grandfather, this.values, index, this.displayPropertyName);
                 };
                 return CollectionEditorViewModel;
             })();
@@ -5646,7 +5681,7 @@ var DevExpress;
             var dxFileImagePicker = (function (_super) {
                 __extends(dxFileImagePicker, _super);
                 function dxFileImagePicker(element, options) {
-                    options.placeholder = options.placeholder || DevExpress.JS.Utils.getLocalization("(none)");
+                    options.placeholder = options.placeholder || DevExpress.Designer.getLocalization("(none)", "ChartStringId.WizNoBackImage");
                     _super.call(this, element, options);
                 }
                 dxFileImagePicker.prototype._handleFiles = function (filesHolder) {
@@ -5832,6 +5867,34 @@ var DevExpress;
                 return DevExpress.JS.Localization && DevExpress.JS.Localization.localize(value) || value;
             }
             Utils.getLocalization = getLocalization;
+            function findMatchesInString(textToTest, searchPattern) {
+                var searchExpr = escapeToRegExp(searchPattern);
+                return !!textToTest && textToTest.match(new RegExp(searchExpr, "gi"));
+            }
+            Utils.findMatchesInString = findMatchesInString;
+            function escapeToRegExp(string) {
+                return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            }
+            Utils.escapeToRegExp = escapeToRegExp;
+            function formatUnicorn(text) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                var str = text.toString();
+                if (args.length) {
+                    var t = typeof args[0];
+                    var key;
+                    var argsFinal = ("string" === t || "number" === t) ?
+                        Array.prototype.slice.call(args)
+                        : args[0];
+                    for (key in argsFinal) {
+                        str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), argsFinal[key]);
+                    }
+                }
+                return str;
+            }
+            Utils.formatUnicorn = formatUnicorn;
             var PopupService = (function () {
                 function PopupService() {
                     this.data = ko.observable();
@@ -5930,21 +5993,13 @@ var DevExpress;
                     .find(".dx-accordion-header,.dx-accordion-button").first()
                     .off("dxclick")
                     .on("dxclick", function () {
-                    var newCollapsed = options.alwaysShow && options.alwaysShow() ? false : !options.collapsed();
-                    if (newCollapsed) {
-                        options.collapsed(true);
-                        $accordionContent.slideUp(options.timeout, function () {
-                            scrollUpdateCallback();
-                        });
-                    }
-                    else {
-                        options.collapsed(false);
-                        $accordionContent.slideDown(options.timeout, function () {
-                            scrollUpdateCallback();
-                        });
-                    }
+                    options.collapsed(options.alwaysShow && options.alwaysShow() ? false : !options.collapsed());
                 });
                 options.collapsed() ? $accordionContent.hide() : $accordionContent.show();
+                var subscription = options.collapsed.subscribe(function (newVal) {
+                    $accordionContent.slideToggle(options.timeout, function () { return scrollUpdateCallback(); });
+                });
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () { return subscription.dispose(); });
             }
         };
         ko.bindingHandlers["dxdAccordionExt"] = {
@@ -6074,6 +6129,14 @@ var DevExpress;
             })();
             Widgets.EditorAddOn = EditorAddOn;
             Widgets.propertiesGridEditorsPaddingLeft = 19;
+            function validateGuid(guid) {
+                return guid && (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(guid)
+                    || /^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$/.test(guid)
+                    || /^\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$/.test(guid)
+                    || /^[0-9a-fA-F]{32}$/.test(guid));
+            }
+            Widgets.validateGuid = validateGuid;
+            Widgets.guidValidationRules = [{ type: "custom", validationCallback: function (options) { return validateGuid(options.value); }, message: DevExpress.Designer.getLocalization('Guid is required and should have a valid format.', 'ASPxReportsStringId.ReportDesigner_GuidIsRequired_Error') }];
             function compareEditorInfo(editor1, editor2) {
                 return !!editor1 && !!editor2 &&
                     editor1.header === editor2.header
@@ -6081,7 +6144,7 @@ var DevExpress;
                     && editor1.editorType === editor2.editorType;
             }
             var ObjectProperties = (function () {
-                function ObjectProperties(target, editorsInfo, level, parentDisabled, recreateEditors) {
+                function ObjectProperties(target, editorsInfo, level, parentDisabled, recreateEditors, textToSearch) {
                     var _this = this;
                     if (level === void 0) { level = 0; }
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
@@ -6094,6 +6157,10 @@ var DevExpress;
                     this._editors = ko.observableArray([]);
                     this.level = level;
                     this._parentDisabled = parentDisabled;
+                    this._textToSearch = textToSearch;
+                    this.visible = ko.computed(function () {
+                        return _this._editors().some(function (editor) { return editor.visible(); });
+                    });
                     this._targetSubscription = target.subscribe(function (newVal) {
                         _this._infoSubscription && _this._infoSubscription.dispose();
                         _this._getInfoComputed && _this._getInfoComputed.dispose();
@@ -6127,20 +6194,23 @@ var DevExpress;
                     this._cleanEditorsSubscriptions();
                     this._editors([]);
                 };
+                ObjectProperties.prototype.findEditorByInfo = function (serializationInfo) {
+                    return this._editors().filter(function (editor) { return editor.name === serializationInfo.propertyName && compareEditorInfo(editor.info().editor, serializationInfo.editor); })[0];
+                };
                 ObjectProperties.prototype.createEditor = function (modelPropertyInfo) {
                     var editorType = modelPropertyInfo.editor && modelPropertyInfo.editor.editorType || Editor;
-                    return new editorType(modelPropertyInfo, this.level, this._parentDisabled);
+                    return new editorType(modelPropertyInfo, this.level, this._parentDisabled, this._textToSearch);
                 };
                 ObjectProperties.prototype.createEditors = function (serializationInfo) {
                     var _this = this;
                     var self = this;
                     return (serializationInfo || [])
-                        .filter(function (info) { return !!info.editor && self._editors().filter(function (editor) { return editor.name === info.propertyName && compareEditorInfo(editor.info().editor, info.editor); }).length === 0; })
+                        .filter(function (info) { return !!info.editor && !_this.findEditorByInfo(info); })
                         .map(function (info) { return _this.createEditor(info); });
                 };
-                ObjectProperties.prototype._createEditors = function (target, serializationInfo) {
+                ObjectProperties.prototype._createEditors = function (serializationInfo) {
                     var _this = this;
-                    if (!serializationInfo)
+                    if (!serializationInfo || serializationInfo.length === 0)
                         return false;
                     this.createEditors(serializationInfo).forEach(function (editor) { return _this._editors.push(editor); });
                     var propertyNames = serializationInfo.map(function (info) { return info.propertyName; });
@@ -6153,21 +6223,18 @@ var DevExpress;
                     if (recreateEditors)
                         this._editors([]);
                     var infoSubscription = null;
-                    if (editorsInfo && editorsInfo && editorsInfo.editors) {
-                        this._createEditors(target, editorsInfo && editorsInfo.editors);
-                        this.update(target);
-                    }
-                    else {
-                        this._getInfoComputed = ko.computed(function () { return target && target["getInfo"] && target["getInfo"](); });
-                        this._infoSubscription = this._getInfoComputed.subscribe(function (newInfo) {
-                            if (recreateEditors)
-                                _this._editors([]);
-                            _this._createEditors(target, newInfo);
-                            _this.update(target);
-                        });
-                        this._createEditors(target, this._getInfoComputed());
-                        this.update(target);
-                    }
+                    this._getInfoComputed = ko.computed(function () {
+                        return (editorsInfo && editorsInfo.editors && ko.unwrap(editorsInfo.editors))
+                            || (target && target["getInfo"] && target["getInfo"]());
+                    });
+                    this._infoSubscription = this._getInfoComputed.subscribe(function (newInfo) {
+                        if (recreateEditors)
+                            _this._editors([]);
+                        _this._createEditors(newInfo);
+                        _this.update(target);
+                    });
+                    this._createEditors(this._getInfoComputed());
+                    this.update(target);
                 };
                 ObjectProperties.prototype.getEditors = function () {
                     return this._editors();
@@ -6176,11 +6243,14 @@ var DevExpress;
             })();
             Widgets.ObjectProperties = ObjectProperties;
             var Editor = (function () {
-                function Editor(modelPropertyInfo, level, parentDisabled) {
+                function Editor(modelPropertyInfo, level, parentDisabled, textToSearch) {
                     var _this = this;
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
+                    if (textToSearch === void 0) { textToSearch = undefined; }
                     this._model = ko.observable();
                     this.isVisibleByContent = ko.observable(true);
+                    this.isSearchedProperty = ko.observable(true);
+                    this.isParentSearched = ko.observable(false);
                     this.rtl = DevExpress["config"]()["rtlEnabled"];
                     this.isEditorSelected = ko.observable(false);
                     this.isPropertyModified = ko.computed(function () {
@@ -6192,6 +6262,12 @@ var DevExpress;
                         var info = _this.info();
                         return info && DevExpress.Designer.getLocalization(info.displayName, info["localizationId"]);
                     });
+                    if (textToSearch) {
+                        this.textToSearch = textToSearch;
+                        this.isSearchedProperty = ko.computed(function () {
+                            return _this.isParentSearched() || !!DevExpress.JS.Utils.findMatchesInString(_this.displayName(), textToSearch());
+                        });
+                    }
                     this.padding = this._setPadding(this.rtl ? "right" : "left", level * Widgets.propertiesGridEditorsPaddingLeft);
                     var defaultValue = ko.observable(null), propertyName = modelPropertyInfo.propertyName;
                     this.editorOptions = modelPropertyInfo.editorOptions;
@@ -6239,7 +6315,7 @@ var DevExpress;
                         return result;
                     });
                     this.visible = ko.computed(function () {
-                        var model = _this._model(), result = (model && model.isPropertyVisible) ? model.isPropertyVisible(_this.name) : _this.isVisibleByContent();
+                        var model = _this._model(), result = _this.isSearchedProperty() && ((model && model.isPropertyVisible) ? model.isPropertyVisible(_this.name) : _this.isVisibleByContent());
                         if (result) {
                             result = calculateAccessibleByPropertyInfo(model, _this.info().visible, true);
                         }
@@ -6321,9 +6397,12 @@ var DevExpress;
                     var extendedOptions = this.info.peek().editor.extendedOptions;
                     return $.extend({}, templateOptions, this.editorOptions, extendedOptions);
                 };
+                Editor.prototype.getValidationRules = function () {
+                    return !!this.info && !!this.info() && this.info().validationRules || [];
+                };
                 Object.defineProperty(Editor.prototype, "validationRules", {
                     get: function () {
-                        return !!this.info && !!this.info() && this.info().validationRules || [];
+                        return this.getValidationRules();
                     },
                     enumerable: true,
                     configurable: true
@@ -6336,33 +6415,66 @@ var DevExpress;
                 return Editor;
             })();
             Widgets.Editor = Editor;
+            var GuidEditor = (function (_super) {
+                __extends(GuidEditor, _super);
+                function GuidEditor() {
+                    _super.apply(this, arguments);
+                }
+                GuidEditor.prototype.getValidationRules = function () {
+                    return (_super.prototype.getValidationRules.call(this) || []).concat(Widgets.guidValidationRules);
+                };
+                return GuidEditor;
+            })(Editor);
+            Widgets.GuidEditor = GuidEditor;
             var PropertyGridEditor = (function (_super) {
                 __extends(PropertyGridEditor, _super);
-                function PropertyGridEditor(info, level, parentDisabled) {
+                function PropertyGridEditor(info, level, parentDisabled, textToSearch) {
                     var _this = this;
-                    _super.call(this, info, level, parentDisabled);
+                    _super.call(this, info, level, parentDisabled, textToSearch);
                     this.editorCreated = ko.observable(false);
-                    this.collapsed.subscribe(function () {
-                        if (!_this.editorCreated()) {
-                            _this.viewmodel = new ObjectProperties(_this.value, { editors: info.info }, level + 1, _this.disabled);
+                    this.viewmodel = this.createObjectProperties();
+                    var subscription = this.collapsed.subscribe(function (newVal) {
+                        if (!newVal) {
+                            subscription.dispose();
                             _this.editorCreated(true);
                         }
                     });
-                    this.viewmodel = {};
+                    if (textToSearch) {
+                        this.visibleByName = ko.computed(function () {
+                            var visible = !!DevExpress.JS.Utils.findMatchesInString(_this.displayName(), textToSearch());
+                            if (!$.isEmptyObject(_this.viewmodel)) {
+                                _this.viewmodel._editors().forEach(function (editor) { return editor.isParentSearched(visible); });
+                            }
+                            return visible;
+                        });
+                        this.isSearchedProperty["dispose"] && this.isSearchedProperty["dispose"]();
+                        this.isSearchedProperty = ko.computed(function () {
+                            if (_this.visibleByName())
+                                return true;
+                            var visibleByEditors = _this.viewmodel.visible();
+                            visibleByEditors && _this.collapsed(false);
+                            return visibleByEditors;
+                        });
+                    }
                 }
+                PropertyGridEditor.prototype.createObjectProperties = function () {
+                    var _this = this;
+                    return new ObjectProperties(this.value, { editors: ko.computed(function () { return _this.info().info; }) }, this.level + 1, this.disabled, undefined, this.textToSearch);
+                };
                 return PropertyGridEditor;
             })(Editor);
             Widgets.PropertyGridEditor = PropertyGridEditor;
             var FontEditor = (function (_super) {
                 __extends(FontEditor, _super);
-                function FontEditor(info, level, parentDisabled) {
-                    _super.call(this, info, level, parentDisabled);
-                    var model = new Widgets.FontModel(this.value);
-                    var grid = new ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, level + 1, this.disabled);
-                    this.viewmodel = grid;
+                function FontEditor(info, level, parentDisabled, textToSearch) {
+                    _super.call(this, info, level, parentDisabled, textToSearch);
                 }
+                FontEditor.prototype.createObjectProperties = function () {
+                    var model = new Widgets.FontModel(this.value);
+                    return new ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, this.level + 1, this.disabled, undefined, this.textToSearch);
+                };
                 return FontEditor;
-            })(Editor);
+            })(PropertyGridEditor);
             Widgets.FontEditor = FontEditor;
             Widgets.editorTemplates = {
                 color: { header: "dx-color" },
@@ -6398,7 +6510,7 @@ var DevExpress;
                     $(element).children().remove();
                     var templateHtml = $('#dx-propertieseditor').text(), $element = $(element).append(templateHtml);
                     var value = valueAccessor();
-                    var model = new DevExpress.JS.Widgets.ObjectProperties(value.target, value.editorsInfo, value.level, value.parentDisabled, value.recreateEditors);
+                    var model = new DevExpress.JS.Widgets.ObjectProperties(value.target, value.editorsInfo, value.level, value.parentDisabled, value.recreateEditors, value.textToSearch);
                     ko.applyBindings(bindingContext.createChildContext(model), $element.children()[0]);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                         model.cleanSubscriptions();
@@ -7206,6 +7318,11 @@ var DevExpress;
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-ko-undoengine.js.map
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -7218,27 +7335,95 @@ var DevExpress;
                     this.isDisposing = false;
                 }
                 Disposable.prototype.dispose = function () {
-                    this.isDisposing = true;
-                    ko.utils.arrayForEach(this._disposables, this.disposeOne);
-                    this._disposables = [];
-                };
-                Disposable.prototype.disposeOne = function (propOrValue, value) {
-                    var disposable = value || propOrValue;
-                    if (disposable && !disposable.isDisposing && typeof disposable.dispose === "function") {
-                        disposable.dispose();
+                    if (!this.isDisposing) {
+                        this.isDisposing = true;
+                        this._disposables.forEach(function (x) { return x && x.dispose(); });
+                        this._disposables = [];
                     }
                 };
                 return Disposable;
             })();
             Utils.Disposable = Disposable;
+            var HighlightEngine = (function (_super) {
+                __extends(HighlightEngine, _super);
+                function HighlightEngine(options) {
+                    var _this = this;
+                    _super.call(this);
+                    this._$spanProtect = $("<span>");
+                    this._$spanSearch = $("<span>").addClass('dx-datagrid-search-text');
+                    this.content = ko.observable("");
+                    if (ko.isSubscribable(options.text)) {
+                        this._disposables.push(options.text.subscribe(function (newText) {
+                            _this.content(_this._getHighlightContent(newText, ko.unwrap(options.textToSearch)));
+                        }));
+                    }
+                    this._disposables.push(options.textToSearch.subscribe(function (newFind) {
+                        _this.content(_this._getHighlightContent(ko.unwrap(options.text), newFind));
+                    }));
+                    this.content(this._getHighlightContent(ko.unwrap(options.text), ko.unwrap(options.textToSearch)));
+                }
+                HighlightEngine.prototype._getHighlightContent = function (text, textToSearch) {
+                    var _this = this;
+                    var searchPattern = textToSearch;
+                    var result = text;
+                    if (searchPattern) {
+                        var match = DevExpress.JS.Utils.findMatchesInString(result, searchPattern);
+                        if (match) {
+                            var newResult = "", curIndex = 0, subString = result;
+                            match.forEach(function (item, index) {
+                                var itemIndex = subString.indexOf(item);
+                                var textBeforeMath = result.substr(curIndex, itemIndex);
+                                subString = subString.substr(itemIndex + item.length);
+                                if (textBeforeMath) {
+                                    _this._$spanProtect.text(textBeforeMath);
+                                    newResult += _this._$spanProtect[0].outerHTML;
+                                }
+                                _this._$spanSearch.text(item);
+                                newResult += _this._$spanSearch[0].outerHTML;
+                                curIndex = result.length - subString.length;
+                                if (index === match.length - 1) {
+                                    if (subString) {
+                                        _this._$spanProtect.text(subString);
+                                        newResult += _this._$spanProtect[0].outerHTML;
+                                    }
+                                }
+                            });
+                            return newResult;
+                        }
+                    }
+                    this._$spanProtect.text(result);
+                    result = this._$spanProtect[0].outerHTML;
+                    return result;
+                };
+                return HighlightEngine;
+            })(Disposable);
+            Utils.HighlightEngine = HighlightEngine;
+            ko.bindingHandlers["searchHighlighting"] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var highlight = new HighlightEngine(valueAccessor());
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        highlight.dispose();
+                    });
+                    setTimeout(function () {
+                        var isInitialized = false;
+                        ko.computed({
+                            read: function () {
+                                if (!isInitialized && ko.bindingHandlers["html"].init) {
+                                    ko.bindingHandlers["html"].init(element, function () { return highlight.content; }, allBindings, viewModel, bindingContext);
+                                    isInitialized = true;
+                                }
+                                if (ko.bindingHandlers["html"].update) {
+                                    ko.bindingHandlers["html"].update(element, function () { return highlight.content; }, allBindings, viewModel, bindingContext);
+                                }
+                            },
+                            disposeWhenNodeIsRemoved: element
+                        });
+                    }, 1);
+                }
+            };
         })(Utils = JS.Utils || (JS.Utils = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -7392,7 +7577,7 @@ var DevExpress;
                 };
                 CriteriaOperator.parse = function (stringCriteria) {
                     if (stringCriteria && stringCriteria !== "") {
-                        return window["criteriaparser"].parse(stringCriteria);
+                        return DevExpress.JS.Data["criteriaparser"].parse(stringCriteria);
                     }
                     return null;
                 };
@@ -8273,6 +8458,281 @@ var DevExpress;
     (function (JS) {
         var Widgets;
         (function (Widgets) {
+            var CodeCompletor = (function () {
+                function CodeCompletor(editor, bindingContext, fieldListProvider, path, functions, rootItems) {
+                    var _this = this;
+                    this._contextPath = null;
+                    this._isInContext = function () { return _this._contextPath !== null; };
+                    this._getPath = function () { return _this._contextPath ? _this._path() + "." + _this._contextPath : _this._path(); };
+                    this.identifierRegexps = [/\./, /\[/];
+                    this._fieldListProvider = fieldListProvider;
+                    this._path = path;
+                    this._editor = editor;
+                    this._functions = functions || Widgets.functionDisplay;
+                    this._rootItems = rootItems || [{ name: "Parameters", needPrefix: true }];
+                }
+                CodeCompletor.prototype._previousSymbol = function () {
+                    var cursorPosition = this._editor.getCursorPosition();
+                    return this._editor.session.getLine(cursorPosition.row)[cursorPosition.column - 1];
+                };
+                CodeCompletor.prototype.beforeInsertMatch = function (editor, token, parentPrefix) {
+                    var cursorPosition = editor.getCursorPosition();
+                    token = token || editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
+                    if (token && (token.type === "support.variable" || token.type === "support.function")) {
+                        editor.session.remove({
+                            start: { column: token.start || 0, row: cursorPosition.row },
+                            end: { column: Math.max(token.start + token.value.length, cursorPosition.column), row: cursorPosition.row }
+                        });
+                    }
+                };
+                CodeCompletor.prototype.insertMatch = function (editor, parentPrefix, fieldName) {
+                    editor.insert("[" + (parentPrefix || "") + fieldName + "]");
+                };
+                CodeCompletor.prototype.generateFieldDisplayName = function (parentPrefix, displayName) {
+                    return "[" + displayName + "]";
+                };
+                CodeCompletor.prototype._convertDataMemberInfoToCompletions = function (fields, token, parentPrefix) {
+                    var _this = this;
+                    if (parentPrefix === void 0) { parentPrefix = ""; }
+                    return (fields || []).map(function (field) {
+                        var displayName = _this.generateFieldDisplayName(parentPrefix, field.displayName);
+                        return {
+                            caption: field.name,
+                            snippet: displayName,
+                            meta: JS.Utils.isList(field) && "list" || "field",
+                            score: JS.Utils.isList(field) && 200 || 100,
+                            completer: {
+                                insertMatch: function (editor, data) {
+                                    _this.beforeInsertMatch(editor, token, parentPrefix);
+                                    _this.insertMatch(editor, parentPrefix, field.name);
+                                }
+                            }
+                        };
+                    });
+                };
+                CodeCompletor.prototype._getFields = function (token, completions) {
+                    var _this = this;
+                    if (token === void 0) { token = null; }
+                    if (completions === void 0) { completions = []; }
+                    var $deferred = $.Deferred();
+                    if (token && (token.type === "support.variable" || token.type === "support.function") && token.value.indexOf(".") > -1) {
+                        var dotIndex = token.value.lastIndexOf(".", this._editor.getCursorPosition().column - token.start);
+                        var startIndex = token.type === "support.variable" ? 1 : 0;
+                        var parentPrefix = token.value.substring(startIndex, dotIndex);
+                        if (parentPrefix[0] === "[" && parentPrefix[parentPrefix.length - 1] === "]") {
+                            parentPrefix = parentPrefix.substring(1, parentPrefix.length - 1);
+                        }
+                        var rootItem = this._rootItems.filter(function (item) { return parentPrefix.indexOf(item.name) === 0; })[0];
+                        var path = (rootItem ? "" : (this._getPath() + ".")) + parentPrefix;
+                        if (rootItem && rootItem.rootPath) {
+                            path = [rootItem.rootPath, parentPrefix].join('.');
+                        }
+                        this._fieldListProvider.getItems(new Widgets.PathRequest(path))
+                            .done(function (fields) {
+                            completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, parentPrefix + "."));
+                        })
+                            .always(function () { $deferred.resolve(completions); });
+                    }
+                    else {
+                        var $fields = this._fieldListProvider.getItems(new Widgets.PathRequest(this._getPath()))
+                            .done(function (fields) {
+                            completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token));
+                        });
+                        if (!this._isInContext()) {
+                            var $deferreds = [$fields];
+                            this._rootItems.forEach(function (item) {
+                                $deferreds.push(_this._fieldListProvider.getItems(new Widgets.PathRequest(item.rootPath || item.name))
+                                    .done(function (fields) {
+                                    completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, item.needPrefix ? item.name + "." : ""));
+                                }));
+                            });
+                            $.when($deferreds).always(function () { $deferred.resolve(completions); });
+                        }
+                        else {
+                            $.when($fields).always(function () { $deferred.resolve(completions); });
+                        }
+                    }
+                    return $deferred.promise();
+                };
+                CodeCompletor.prototype.getFunctionsCompletions = function () {
+                    var functions = [];
+                    ko.unwrap(this._functions).forEach(function (fnDisplay) {
+                        Object.keys(fnDisplay.items).forEach(function (fnKey) {
+                            if (fnDisplay.items[fnKey]) {
+                                functions.push(createFunctionCompletion(fnDisplay.items[fnKey][0], fnKey));
+                            }
+                        });
+                    });
+                    return functions;
+                };
+                CodeCompletor.prototype.getAggregateCompletions = function () {
+                    var functions = [];
+                    var aggregates = ko.unwrap(this._functions).filter(function (fnDisplay) { return fnDisplay.category === "Aggregate"; })[0];
+                    Object.keys(aggregates.items).forEach(function (fnKey) {
+                        if (aggregates.items[fnKey]) {
+                            functions.push(createFunctionCompletion(aggregates.items[fnKey][0], fnKey, fnKey + "()"));
+                        }
+                    });
+                    return functions;
+                };
+                CodeCompletor.prototype.getOperatorCompletions = function (prefix) {
+                    return Widgets.operatorNames.map(function (operator) {
+                        return { caption: operator.text, snippet: prefix + operator.text, meta: "operator" };
+                    });
+                };
+                CodeCompletor.prototype._addFunctions = function (completions) {
+                    completions.push.apply(completions, this.getFunctionsCompletions());
+                };
+                CodeCompletor.prototype._addAggregates = function (completions) {
+                    completions.push.apply(completions, this.getAggregateCompletions());
+                };
+                CodeCompletor.prototype._addOperators = function (completions, text) {
+                    var prefix = /\s/.test(text[text.length - 1]) ? "" : " ";
+                    completions.push.apply(completions, this.getOperatorCompletions(prefix));
+                };
+                CodeCompletor.prototype._getOperands = function (token) {
+                    if (token === void 0) { token = null; }
+                    var result = [];
+                    this._addFunctions(result);
+                    return this._getFields(token, result);
+                };
+                CodeCompletor.prototype._getOperandsOrOperators = function (text, completions) {
+                    var exceptionInfo;
+                    try {
+                        JS.Data.CriteriaOperator.parse(text);
+                    }
+                    catch (exception) {
+                        exceptionInfo = exception.hash;
+                    }
+                    var trimmedText = text.trim();
+                    var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
+                    if (!exceptionInfo && trimmedText || (lastNonSpaceSymbol === "]" || lastNonSpaceSymbol === ")")) {
+                        this._addOperators(completions, text);
+                    }
+                    else {
+                        return this._getOperands();
+                    }
+                };
+                CodeCompletor.prototype._getCompletions = function (editor, session, pos, prefix) {
+                    var $deferred;
+                    var completions = [];
+                    var currentToken = session.getTokenAt(pos.row, pos.column);
+                    var text = editor.session.getLine(pos.row).substring(0, pos.column);
+                    var tokens = session.getTokens(pos.row);
+                    this._contextPath = null;
+                    var currentTokenIndex = currentToken ? currentToken.index : -1;
+                    for (var i = currentTokenIndex; i > -1; i--) {
+                        var t = tokens[i];
+                        if (t.type === "support.context.start") {
+                            var cursorPositionInToken = pos.column - (t.start || 0);
+                            if (t.value.length <= cursorPositionInToken) {
+                                text = text.substring(t.start + t.value.length);
+                                if (!text.trim()) {
+                                    currentToken = null;
+                                }
+                            }
+                            else {
+                                currentToken = {
+                                    type: "support.variable",
+                                    value: t.value.substring(0, t.value.length - 1),
+                                    start: currentToken.start
+                                };
+                            }
+                            this._contextPath = trimBrackets(t.value.match(/^\[(?:[^\]\)])*\]/)[0]);
+                            break;
+                        }
+                        else if (t.type === "support.context.end") {
+                            break;
+                        }
+                    }
+                    if (!currentToken) {
+                        $deferred = this._getOperands();
+                    }
+                    else if (currentToken.type === "string.quoted.single") {
+                    }
+                    else if (currentToken.type === "support.variable") {
+                        $deferred = this._getFields(currentToken);
+                    }
+                    else if (currentToken.type === "support.function") {
+                        $deferred = this.defaultProcess(currentToken, text.substring(0, currentToken.start), completions);
+                    }
+                    else if (currentToken.type === "support.other.aggregate") {
+                        var previousToken = tokens[currentToken.index - 1];
+                        if (previousToken && ["support.function", "support.variable"].indexOf(previousToken.type) > -1) {
+                            this._addAggregates(completions);
+                            if (trimBrackets(previousToken.value).trim()) {
+                                $deferred = this._getFields({
+                                    start: (currentToken.start - (previousToken.value || "").length) || 0,
+                                    value: previousToken.value + currentToken.value,
+                                    type: "support.function"
+                                }, completions);
+                            }
+                        }
+                    }
+                    else {
+                        $deferred = this.defaultProcess(currentToken, text, completions);
+                    }
+                    return $deferred ? $deferred.promise() : $.Deferred().resolve(completions).promise();
+                };
+                CodeCompletor.prototype.defaultProcess = function (token, text, completions) {
+                    return this._getOperandsOrOperators(text, completions);
+                };
+                CodeCompletor.prototype.getCompletions = function (aceEditor, session, pos, prefix, callback) {
+                    this._getCompletions(aceEditor, session, pos, prefix).done(function (completions) {
+                        callback(null, completions);
+                    });
+                };
+                return CodeCompletor;
+            })();
+            Widgets.CodeCompletor = CodeCompletor;
+            function createFunctionCompletion(fnInfo, name, insertValue) {
+                if (insertValue === void 0) { insertValue = null; }
+                var insertValue = insertValue || fnInfo.text;
+                return {
+                    caption: name,
+                    snippet: insertValue,
+                    meta: "function",
+                    score: 10,
+                    completer: {
+                        insertMatch: function (editor, data) {
+                            var completions = editor.completer.completions;
+                            if (completions.filterText) {
+                                var ranges = editor.selection.getAllRanges();
+                                for (var i = 0, range; range = ranges[i]; i++) {
+                                    range.start.column -= completions.filterText.length;
+                                    editor.session.remove(range);
+                                }
+                            }
+                            if (insertValue.substr(0, 3) === "[].") {
+                                var ranges = editor.selection.getAllRanges();
+                                for (var i = 0, range; range = ranges[i]; i++) {
+                                    range.start.column -= 2;
+                                    if (editor.session.getTextRange(range) === "].")
+                                        insertValue = insertValue.substr(3);
+                                }
+                            }
+                            editor.insert(insertValue);
+                            if (fnInfo.paramCount > 0) {
+                                var cursorPosition = editor.getCursorPosition();
+                                editor.gotoLine(cursorPosition.row + 1, cursorPosition.column - (insertValue.length - 1 - insertValue.lastIndexOf("(")));
+                            }
+                        }
+                    }
+                };
+            }
+            Widgets.createFunctionCompletion = createFunctionCompletion;
+            function trimBrackets(value) {
+                return value.substring(value[0] === "[" ? 1 : 0, value[value.length - 1] === "]" ? value.length - 1 : value.length);
+            }
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
             var PathRequest = (function () {
                 function PathRequest(fullPath, pathParts) {
                     if (pathParts === void 0) { pathParts = []; }
@@ -8555,6 +9015,9 @@ var DevExpress;
                 TreeListItemViewModel.prototype.actionsTemplate = function () {
                     return this.data && ko.unwrap(this.data["actionsTemplate"]) || "dx-treelist-item-actions-with-edit";
                 };
+                TreeListItemViewModel.prototype.treeListEditAction = function () {
+                    return Widgets.treeListEditAction;
+                };
                 Object.defineProperty(TreeListItemViewModel.prototype, "hasContent", {
                     get: function () {
                         return this.data && this.data["contenttemplate"];
@@ -8578,6 +9041,13 @@ var DevExpress;
                             return this._treeListController.isDraggable(this);
                         }
                         return false;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TreeListItemViewModel.prototype, "treeListController", {
+                    get: function () {
+                        return this._treeListController;
                     },
                     enumerable: true,
                     configurable: true
@@ -8679,6 +9149,9 @@ var DevExpress;
                             return result;
                         });
                         treeListViewModel = new TreeListRootItemViewModel(options, pathArray, updateScrollBar, options.rtl);
+                        if (options.expandRootItems) {
+                            treeListViewModel.items().forEach(function (item) { return item.toggleCollapsed(); });
+                        }
                         var templateHtml = $('#dx-treelist').text() || options.templateHtml, $element = $(element).html(templateHtml);
                         var childContext = bindingContext.createChildContext(treeListViewModel);
                         ko.applyBindings(childContext, $element.children()[0]);
@@ -8701,8 +9174,9 @@ var DevExpress;
             Widgets.treeListEditAction = {
                 templateName: "dx-treelist-edit-action",
                 imageClassName: "",
-                text: "",
-                clickAction: $.noop
+                text: "Edit",
+                clickAction: $.noop,
+                displayText: function () { return DevExpress.Designer.getLocalization("Edit", "ReportStringId.UD_Group_Edit"); }
             };
         })(Widgets = JS.Widgets || (JS.Widgets = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
@@ -8726,14 +9200,14 @@ var DevExpress;
                     this.canChoiceProperty = true;
                     this.filterEditorOperators = {
                         _common: [
-                            { name: "Equals", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
-                            { name: "Does not equal", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
-                            { name: "Is greater than", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
-                            { name: "Is greater than or equal to", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
-                            { name: "Is less than", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
-                            { name: "Is less than or equal to", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLessOrEqual" },
-                            { name: "Is between", value: "Between", type: JS.Data.BetweenOperator, localizationId: "StringId.FilterClauseBetween" },
-                            { name: "Is not between", value: "Between", type: JS.Data.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }],
+                            { name: "Equals", insertVal: "==", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
+                            { name: "Does not equal", insertVal: "!=", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
+                            { name: "Is greater than", insertVal: ">", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
+                            { name: "Is greater than or equal to", insertVal: ">=", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
+                            { name: "Is less than", insertVal: "<", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
+                            { name: "Is less than or equal to", insertVal: "<=", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLessOrEqual" },
+                            { name: "Is between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: JS.Data.BetweenOperator, localizationId: "StringId.FilterClauseBetween" },
+                            { name: "Is not between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: JS.Data.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }],
                         string: [],
                         guid: [],
                         integer: [],
@@ -8742,6 +9216,7 @@ var DevExpress;
                         list: [],
                         group: [],
                     };
+                    this.onChange = function () { };
                     this.handlers = {
                         create: function (criteria, popupService) {
                             return {
@@ -8789,55 +9264,55 @@ var DevExpress;
                     };
                     this.serializer = serializer || new FilterEditorSerializer();
                     this.filterEditorOperators.string = [].concat(this.filterEditorOperators._common, [
-                        { name: "Contains", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseContains" },
+                        { name: "Contains", insertVal: "Contains(, )", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseContains" },
                         { name: "Does not contain", value: JS.Data.FunctionOperatorType.Contains, type: JS.Data.FunctionOperatorType, reverse: true, localizationId: "StringId.FilterClauseDoesNotContain" },
-                        { name: "Begins with", value: JS.Data.FunctionOperatorType.StartsWith, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseBeginsWith" },
-                        { name: "Ends with", value: JS.Data.FunctionOperatorType.EndsWith, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseEndsWith" },
-                        { name: "Is like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLike" },
-                        { name: "Is not like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseNotLike" },
-                        { name: "Is any of", value: "In", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
+                        { name: "Begins with", insertVal: "StartsWith(, )", value: JS.Data.FunctionOperatorType.StartsWith, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseBeginsWith" },
+                        { name: "Ends with", insertVal: "StartsWith(, )", value: JS.Data.FunctionOperatorType.EndsWith, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseEndsWith" },
+                        { name: "Is like", insertVal: "Like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLike" },
+                        { name: "Is not like", insertVal: "Not Like", value: JS.Data.BinaryOperatorType.Like, type: JS.Data.BinaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseNotLike" },
+                        { name: "Is any of", value: "In", insertVal: "In()", paramCount: 1, type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
                         { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true, localizationId: "StringId.FilterClauseNoneOf" },
-                        { name: "Is blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseIsNullOrEmpty" },
-                        { name: "Is not blank", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNullOrEmpty" }
+                        { name: "Is blank", insertVal: "IsNullOrEmpty()", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterClauseIsNullOrEmpty" },
+                        { name: "Is not blank", insertVal: "Not IsNullOrEmpty()", value: JS.Data.FunctionOperatorType.IsNullOrEmpty, type: JS.Data.FunctionOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNullOrEmpty" }
                     ]);
                     this.filterEditorOperators.guid = this.filterEditorOperators.string;
                     this.filterEditorOperators.integer = [].concat(this.filterEditorOperators._common, [
-                        { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, localizationId: "StringId.FilterClauseIsNull" },
-                        { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNull" },
-                        { name: "Is any of", value: "In", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
+                        { name: "Is null", insertVal: "Is Null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, localizationId: "StringId.FilterClauseIsNull" },
+                        { name: "Is not null", insertVal: "Is Not Null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNull" },
+                        { name: "Is any of", value: "In", insertVal: "In()", paramCount: 1, type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
                         { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true, localizationId: "StringId.FilterClauseNoneOf" },
                     ]);
                     this.filterEditorOperators.float = this.filterEditorOperators.integer;
                     this.filterEditorOperators.date = [].concat(this.filterEditorOperators._common, [
-                        { name: "Is null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, localizationId: "StringId.FilterClauseIsNull" },
-                        { name: "Is not null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNull" },
-                        { name: "Is any of", value: "In", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
+                        { name: "Is null", insertVal: "Is Null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, localizationId: "StringId.FilterClauseIsNull" },
+                        { name: "Is not null", insertVal: "Is Not Null", value: JS.Data.UnaryOperatorType.IsNull, type: JS.Data.UnaryOperatorType, reverse: true, localizationId: "StringId.FilterClauseIsNotNull" },
+                        { name: "Is any of", value: "In", insertVal: "In()", type: JS.Data.InOperator, localizationId: "StringId.FilterClauseAnyOf" },
                         { name: "Is none of", value: "In", type: JS.Data.InOperator, reverse: true, localizationId: "StringId.FilterClauseNoneOf" },
-                        { name: "Is beyond this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalBeyondThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalBeyondThisYear" },
-                        { name: "Is later this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisYear" },
-                        { name: "Is later this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisMonth, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisMonth" },
-                        { name: "Is next week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalNextWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalNextWeek" },
-                        { name: "Is later this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisWeek" },
-                        { name: "Is tomorrow", value: JS.Data.FunctionOperatorType.IsOutlookIntervalTomorrow, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalTomorrow" },
-                        { name: "Is today", value: JS.Data.FunctionOperatorType.IsOutlookIntervalToday, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalToday" },
-                        { name: "Is yesterday", value: JS.Data.FunctionOperatorType.IsOutlookIntervalYesterday, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalYesterday" },
-                        { name: "Is earlier this week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisWeek" },
-                        { name: "Is last week", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLastWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLastWeek" },
-                        { name: "Is earlier this month", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisMonth, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisMonth" },
-                        { name: "Is earlier this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisYear" },
-                        { name: "Is prior this year", value: JS.Data.FunctionOperatorType.IsOutlookIntervalPriorThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalPriorThisYear" },
+                        { name: "Is beyond this year", insertVal: "IsOutlookIntervalBeyondThisYear()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalBeyondThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalBeyondThisYear" },
+                        { name: "Is later this year", insertVal: "IsOutlookIntervalLaterThisYear()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisYear" },
+                        { name: "Is later this month", insertVal: "IsOutlookIntervalLaterThisMonth()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisMonth, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisMonth" },
+                        { name: "Is next week", insertVal: "IsOutlookIntervalNextWeek()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalNextWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalNextWeek" },
+                        { name: "Is later this week", insertVal: "IsOutlookIntervalLaterThisWeek()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLaterThisWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisWeek" },
+                        { name: "Is tomorrow", insertVal: "IsOutlookIntervalTomorrow()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalTomorrow, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalTomorrow" },
+                        { name: "Is today", insertVal: "IsOutlookIntervalToday()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalToday, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalToday" },
+                        { name: "Is yesterday", insertVal: "IsOutlookIntervalYesterday()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalYesterday, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalYesterday" },
+                        { name: "Is earlier this week", insertVal: "IsOutlookIntervalEarlierThisWeek()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisWeek" },
+                        { name: "Is last week", insertVal: "IsOutlookIntervalLastWeek()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalLastWeek, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLastWeek" },
+                        { name: "Is earlier this month", insertVal: "IsOutlookIntervalEarlierThisMonth()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisMonth, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisMonth" },
+                        { name: "Is earlier this year", insertVal: "IsOutlookIntervalEarlierThisYear()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalEarlierThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisYear" },
+                        { name: "Is prior this year", insertVal: "IsOutlookIntervalPriorThisYear()", value: JS.Data.FunctionOperatorType.IsOutlookIntervalPriorThisYear, type: JS.Data.FunctionOperatorType, localizationId: "StringId.FilterCriteriaToStringFunctionIsOutlookIntervalPriorThisYear" },
                     ]);
                     this.filterEditorOperators.list = [
-                        { name: "Exists", value: JS.Data.Aggregate.Exists, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateExists" },
-                        { name: "Count", value: JS.Data.Aggregate.Count, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateCount" },
-                        { name: "Max", value: JS.Data.Aggregate.Max, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateMax" },
-                        { name: "Min", value: JS.Data.Aggregate.Min, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateMin" },
-                        { name: "Sum", value: JS.Data.Aggregate.Sum, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateSum" },
-                        { name: "Avg", value: JS.Data.Aggregate.Avg, type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateAvg" }
+                        { name: "Exists", value: JS.Data.Aggregate.Exists, insertVal: "Exists()", type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateExists" },
+                        { name: "Count", value: JS.Data.Aggregate.Count, insertVal: "Count()", type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateCount" },
+                        { name: "Max", value: JS.Data.Aggregate.Max, insertVal: "Max()", type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateMax" },
+                        { name: "Min", value: JS.Data.Aggregate.Min, insertVal: "Min()", type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateMin" },
+                        { name: "Sum", value: JS.Data.Aggregate.Sum, insertVal: "Sum()", type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateSum" },
+                        { name: "Avg", value: JS.Data.Aggregate.Avg, insertVal: "Avg()", type: JS.Data.Aggregate, localizationId: "StringId.FilterAggregateAvg" }
                     ];
                     this.filterEditorOperators.group = [
-                        { name: "And", value: JS.Data.GroupOperatorType.And, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupAnd" },
-                        { name: "Or", value: JS.Data.GroupOperatorType.Or, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupOr" },
+                        { name: "And", insertVal: "And", value: JS.Data.GroupOperatorType.And, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupAnd" },
+                        { name: "Or", insertVal: "Or", value: JS.Data.GroupOperatorType.Or, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupOr" },
                         { name: "Not And", value: JS.Data.GroupOperatorType.And, reverse: true, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupNotAnd" },
                         { name: "Not Or", value: JS.Data.GroupOperatorType.Or, reverse: true, type: JS.Data.GroupOperatorType, localizationId: "StringId.FilterGroupNotOr" },
                     ];
@@ -8873,17 +9348,19 @@ var DevExpress;
                     var _this = this;
                     var treeListOptions = ko.observable(null);
                     var selected = ko.observable(null);
-                    ko.computed(function () {
-                        treeListOptions({
-                            itemsProvider: ko.unwrap(fieldListProvider),
-                            selectedPath: ko.observable(""),
-                            selected: selected,
-                            path: ko.unwrap(path),
-                            treeListController: new FilterEditorTreeListController(selected),
-                            rtl: _this.rtl
-                        });
-                    });
-                    return treeListOptions;
+                    return {
+                        subscription: ko.computed(function () {
+                            treeListOptions({
+                                itemsProvider: ko.unwrap(fieldListProvider),
+                                selectedPath: ko.observable(""),
+                                selected: selected,
+                                path: ko.unwrap(path),
+                                treeListController: new FilterEditorTreeListController(selected),
+                                rtl: _this.rtl
+                            });
+                        }),
+                        options: treeListOptions
+                    };
                 };
                 return FilterEditorHelper;
             })();
@@ -9119,11 +9596,57 @@ var DevExpress;
                 return FilterEditorTreeListController;
             })(Widgets.TreeListController);
             Widgets.FilterEditorTreeListController = FilterEditorTreeListController;
-            var FilterEditor = (function () {
+            var FilterEditor = (function (_super) {
+                __extends(FilterEditor, _super);
                 function FilterEditor(options, fieldListProvider, rtl) {
                     var _this = this;
                     if (rtl === void 0) { rtl = false; }
-                    this.isValid = ko.observable(true);
+                    _super.call(this);
+                    this._advancedMode = ko.observable(false);
+                    this.textFocused = ko.observable(false);
+                    this.aceAvailable = Widgets.aceAvailable;
+                    this.languageHelper = {
+                        getLanguageMode: function () { return "ace/mode/criteria"; },
+                        createCompleters: function (editor, bindingContext, viewModel) { return [new Widgets.FilterEditorCodeCompletor(editor, bindingContext, viewModel.fieldListProvider(), viewModel.options().path)]; }
+                    };
+                    this.aceOptions = {
+                        showLineNumbers: false,
+                        showPrintMargin: false,
+                        enableBasicAutocompletion: true,
+                        enableLiveAutocompletion: true,
+                        showGutter: false
+                    };
+                    this.additionalOptions = {
+                        onChange: function (value) { return _this.onValueChange(value); },
+                        validationTimeout: 200,
+                        onFocus: function (_) { return _this.onFocus(); },
+                        onBlur: function (_) { return _this.onBlur(); }
+                    };
+                    this.editorContainer = ko.observable();
+                    this.textVisible = ko.observable(false);
+                    this.timeout = null;
+                    this.advancedMode = ko.computed({
+                        read: function () {
+                            return _this._advancedMode();
+                        },
+                        write: function (newVal) {
+                            _this.timeout && clearTimeout(_this.timeout);
+                            if (newVal) {
+                                _this.textVisible(true);
+                                _this.timeout = setTimeout(function () {
+                                    _this._advancedMode(true);
+                                    _this.focusText();
+                                }, 1);
+                            }
+                            else {
+                                _this._advancedMode(false);
+                                _this.timeout = setTimeout(function () {
+                                    _this.textVisible(false);
+                                }, 200);
+                            }
+                        },
+                    });
+                    this.invalidMessage = function () { return DevExpress.Designer.getLocalization("Cannot create a tree for this expression", "ASPxReportsStringId.FilterEditor_TreeCreationError"); };
                     this.operandSurface = ko.observable(null);
                     this.operand = null;
                     this.popupVisible = ko.observable(false);
@@ -9132,54 +9655,101 @@ var DevExpress;
                     this.rtl = rtl;
                     options() && options().helper && (options().helper.rtl = rtl);
                     this.options = options;
+                    this.value = ko.observable("");
                     this.save = function () {
-                        _this.options().value(options().helper.serializer.serialize(_this.operandSurface().model, false));
+                        if (_this.operandSurface() && _this.isSurfaceValid()) {
+                            _this.options().value(options().helper.serializer.serialize(_this.operand, false));
+                        }
+                        else {
+                            _this.options().value(_this.value());
+                        }
                         _this.popupVisible(false);
                     };
                     this.fieldListProvider = fieldListProvider;
+                    this.modelValueIsValid = ko.computed(function () {
+                        return options() && _this._validateValue(options().value());
+                    });
                     this.isValid = ko.computed(function () {
+                        return _this._validateValue(_this.value());
+                    });
+                    this.isSurfaceValid = ko.computed(function () {
                         try {
-                            _this.operand = _this.options().helper.serializer.deserialize(_this.options().value());
-                            return true;
+                            return _this.options() && _this.isValid() && CriteriaSurfaceValidator.validateModel(_this.options().helper.serializer.deserialize(_this.value()));
                         }
                         catch (e) {
                             return false;
                         }
                     });
-                    this.popupVisible.subscribe(function (newVal) {
-                        _this.operand = _this.options().helper.serializer.deserialize(_this.options().value());
+                    this._disposables.push(this.modelValueIsValid);
+                    this._disposables.push(this.isValid);
+                    this._disposables.push(this.isSurfaceValid);
+                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
                         if (newVal) {
-                            var type = null;
-                            if (_this.operand instanceof JS.Data.UnaryOperator) {
-                                type = _this.options().helper.mapper.Unary;
+                            _this.value(_this.options().value());
+                            if (_this.isSurfaceValid()) {
+                                _this.operand = _this._generateOperand(_this.value());
+                                _this.operandSurface(_this._generateSurface(_this.operand));
                             }
                             else {
-                                type = _this.options().helper.mapper.Group;
+                                _this.textVisible(true);
+                                _this._advancedMode(true);
+                                _this.editorContainer() && _this.focusText();
                             }
-                            var surface = new type(_this.operand, _this, _this.fieldListProvider, _this.path);
-                            surface.canRemove = false;
-                            if (surface instanceof UnaryOperandSurface) {
-                                surface.operand().canRemove = false;
-                            }
-                            _this.operandSurface(surface);
+                            options().helper.onChange = function () {
+                                _this.value(options().helper.serializer.serialize(_this.operand, false));
+                            };
                         }
                         else {
+                            _this.value(null);
+                            _this.operandSurface() && _this.operandSurface().dispose();
                             _this.operandSurface(null);
+                            _this.operand = null;
                         }
-                    });
+                    }));
                     this.createAddButton = function (criteria) { return options().helper.handlers.create(criteria, _this.popupService); };
                     this.createChangeType = function (criteria) { return options().helper.handlers.change(criteria, _this.popupService); };
                     this.createChangeProperty = function (criteria) { return options().helper.handlers.changeProperty(criteria, _this.popupService); };
                     this.createChangeParameter = function (criteria) { return options().helper.handlers.changeParameter(criteria, _this.popupService); };
                     this.createChangeValueType = function (criteria) { return options().helper.handlers.changeValueType(criteria, _this.popupService); };
-                    this._createMainPopupButtons();
+                    var saveDisabled = ko.computed(function () { return !_this.isValid(); });
+                    this._disposables.push(saveDisabled);
+                    this._disposables.push(this.advancedMode);
+                    this._createMainPopupButtons(saveDisabled);
                 }
-                FilterEditor.prototype._createMainPopupButtons = function () {
+                FilterEditor.prototype._createMainPopupButtons = function (saveDisabled) {
                     var self = this;
                     this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Save", "StringId.OK"), onClick: function () { self.save(); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Cancel", "StringId.Cancel"), onClick: function () { self.popupVisible(false); } } }
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Save", "StringId.OK"), disabled: saveDisabled, onClick: function () { self.save(); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Cancel", "StringId.Cancel"), onClick: function () { self.popupVisible(false); } } },
+                        { toolbar: 'bottom', location: 'before', widget: 'dxCheckBox', options: { value: self.advancedMode, text: DevExpress.Designer.getLocalization("Advanced Mode", "TODO") } }
                     ];
+                };
+                FilterEditor.prototype._generateOperand = function (value) {
+                    return this.options().helper.serializer.deserialize(value);
+                };
+                FilterEditor.prototype._generateSurface = function (operand) {
+                    var type = null;
+                    if (operand instanceof JS.Data.UnaryOperator) {
+                        type = this.options().helper.mapper.Unary;
+                    }
+                    else {
+                        type = this.options().helper.mapper.Group;
+                    }
+                    var surface = new type(operand, this, this.fieldListProvider, this.path);
+                    surface.canRemove = false;
+                    if (surface instanceof UnaryOperandSurface) {
+                        surface.operand().canRemove = false;
+                    }
+                    return surface;
+                };
+                FilterEditor.prototype._validateValue = function (value) {
+                    try {
+                        this.options().helper.serializer.deserialize(value);
+                        return true;
+                    }
+                    catch (e) {
+                        return false;
+                    }
                 };
                 FilterEditor.prototype.change = function (type, surface) {
                     this.operand = JS.Data.CriteriaOperator.create(type);
@@ -9212,12 +9782,120 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                FilterEditor.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.operandSurface() && this.operandSurface().dispose();
+                };
+                FilterEditor.prototype.onInput = function (s, e) {
+                    var self = this;
+                    this.timeout && clearTimeout(this.timeout);
+                    this.timeout = setTimeout(function () {
+                        self.onValueChange(s.component.option("text"));
+                    }, 200);
+                };
+                FilterEditor.prototype.onFocus = function () {
+                    this.textFocused(true);
+                };
+                FilterEditor.prototype.onBlur = function () {
+                    this.textFocused(false);
+                };
+                FilterEditor.prototype.cacheElement = function ($element) {
+                    this.editorContainer($element.dxTextArea("instance"));
+                };
+                FilterEditor.prototype.onValueChange = function (value) {
+                    if (this.value() === value)
+                        return;
+                    this.value(value);
+                    if (this.isSurfaceValid()) {
+                        this.operand = this._generateOperand(this.value());
+                        this.operandSurface() && this.operandSurface().dispose();
+                        this.operandSurface(this._generateSurface(this.operand));
+                    }
+                };
+                FilterEditor.prototype.focusText = function () {
+                    var _this = this;
+                    setTimeout(function (_) {
+                        var editor = _this.editorContainer();
+                        if (editor.renderer)
+                            editor.renderer.updateText();
+                        editor.focus();
+                    }, 1);
+                };
+                FilterEditor.prototype.getPopupContainer = function (el) {
+                    return $(el).closest(this.options()["popupContainer"] || ".dx-viewport");
+                };
                 return FilterEditor;
-            })();
+            })(JS.Utils.Disposable);
             Widgets.FilterEditor = FilterEditor;
-            var CriteriaOperatorSurface = (function () {
+            var CriteriaSurfaceValidator = (function () {
+                function CriteriaSurfaceValidator() {
+                }
+                CriteriaSurfaceValidator.checkLeftPart = function (leftPart) {
+                    return leftPart instanceof JS.Data.OperandProperty;
+                };
+                CriteriaSurfaceValidator._checkRightPart = function (criteriOperator) {
+                    return criteriOperator instanceof JS.Data.OperandProperty
+                        || criteriOperator instanceof JS.Data.OperandParameter
+                        || criteriOperator instanceof JS.Data.OperandValue
+                        || criteriOperator instanceof JS.Data.ConstantValue
+                        || (criteriOperator instanceof JS.Data.UnaryOperator && this._checkRightPart(criteriOperator.operand));
+                };
+                CriteriaSurfaceValidator.checkRightPart = function (rigthPart) {
+                    if (Array.isArray(rigthPart)) {
+                        for (var i = 0; i < rigthPart.length; i++) {
+                            if (!this._checkRightPart(rigthPart[i])) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    else {
+                        return this._checkRightPart(rigthPart);
+                    }
+                };
+                CriteriaSurfaceValidator.aggregateIsValid = function (criteriaOperator) {
+                    return this.checkLeftPart(criteriaOperator.leftPart)
+                        && this.validateModel(criteriaOperator.condition)
+                        && (!!criteriaOperator.aggregatedExpression ? criteriaOperator.aggregatedExpression instanceof JS.Data.OperandProperty : true);
+                };
+                CriteriaSurfaceValidator.commonOperandValid = function (criteriaOperator) {
+                    return criteriaOperator.leftPart instanceof JS.Data.AggregateOperand ?
+                        this.validateModel(criteriaOperator.leftPart) : this.checkLeftPart(criteriaOperator.leftPart)
+                        && this.checkRightPart(criteriaOperator.rightPart);
+                };
+                CriteriaSurfaceValidator.groupIsValid = function (criteriaOperator) {
+                    for (var i = 0; i < criteriaOperator.operands.length; i++) {
+                        if (!this.validateModel(criteriaOperator.operands[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+                CriteriaSurfaceValidator.unaryIsValid = function (criteriaOperator) {
+                    return criteriaOperator.operand instanceof JS.Data.OperandProperty || this.validateModel(criteriaOperator.operand);
+                };
+                CriteriaSurfaceValidator.validateModel = function (criteriaOperator) {
+                    if (criteriaOperator instanceof JS.Data.AggregateOperand) {
+                        return this.aggregateIsValid(criteriaOperator);
+                    }
+                    else if (criteriaOperator instanceof JS.Data.GroupOperator) {
+                        return this.groupIsValid(criteriaOperator);
+                    }
+                    else if (criteriaOperator instanceof JS.Data.UnaryOperator) {
+                        return this.unaryIsValid(criteriaOperator);
+                    }
+                    else {
+                        return this.commonOperandValid(criteriaOperator);
+                    }
+                };
+                return CriteriaSurfaceValidator;
+            })();
+            Widgets.CriteriaSurfaceValidator = CriteriaSurfaceValidator;
+            var CriteriaOperatorSurface = (function (_super) {
+                __extends(CriteriaOperatorSurface, _super);
                 function CriteriaOperatorSurface(operator, parent, fieldListProvider, path) {
                     var _this = this;
+                    _super.call(this);
                     this.canRemove = true;
                     this.operatorType = ko.observable(null);
                     this.templateName = "dx-filtereditor-common";
@@ -9230,9 +9908,9 @@ var DevExpress;
                     this.path = path;
                     this.parent = parent;
                     this.operatorType(operator.operatorType);
-                    this.operatorType.subscribe(function (newVal) {
+                    this._disposables.push(this.operatorType.subscribe(function (newVal) {
                         _this.model.assignType(newVal);
-                    });
+                    }));
                 }
                 CriteriaOperatorSurface.prototype._createLeftPartProperty = function (value) {
                     var _this = this;
@@ -9259,6 +9937,8 @@ var DevExpress;
                         this.dataType = ko.computed(function () {
                             return surface["aggregatedExpression"]() && surface["aggregatedExpression"]().dataType() || "integer";
                         });
+                        this._disposables.push(this.specifics);
+                        this._disposables.push(this.dataType);
                     }
                     else {
                         this.specifics = surface.specifics;
@@ -9313,12 +9993,14 @@ var DevExpress;
                     else {
                         this.parent.change(type, this);
                     }
+                    this.helper.onChange();
                 };
                 CriteriaOperatorSurface.prototype.remove = function (surface) {
                     this.parent.remove(this);
+                    this.helper.onChange();
                 };
                 return CriteriaOperatorSurface;
-            })();
+            })(JS.Utils.Disposable);
             Widgets.CriteriaOperatorSurface = CriteriaOperatorSurface;
             var BinaryOperandSurface = (function (_super) {
                 __extends(BinaryOperandSurface, _super);
@@ -9344,6 +10026,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                BinaryOperandSurface.prototype.dispose = function () {
+                    this.leftOperand().dispose();
+                    this.rightOperand().dispose();
+                    _super.prototype.dispose.call(this);
+                };
                 return BinaryOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.BinaryOperandSurface = BinaryOperandSurface;
@@ -9360,11 +10047,14 @@ var DevExpress;
                         var propertyLocation = _this.getPropertyName(parent, property);
                         var model = parent.model.changeValueType(type.instance, propertyLocation);
                         if (propertyLocation.index !== null) {
+                            parent[propertyLocation.name]()[propertyLocation.index].dispose();
                             parent[propertyLocation.name].splice(propertyLocation.index, 1, parent.createChildSurface(model));
                         }
                         else {
+                            parent[propertyLocation.name]().dispose();
                             parent[propertyLocation.name](parent.createChildSurface(model));
                         }
+                        _this.helper.onChange();
                     };
                 }
                 OperandSurfaceBase.prototype.getRealParent = function (parent) {
@@ -9478,6 +10168,10 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                FunctionOperandSurface.prototype.dispose = function () {
+                    this.operands().forEach(function (x) { return x.dispose(); });
+                    _super.prototype.dispose.call(this);
+                };
                 return FunctionOperandSurface;
             })(OperandSurfaceBase);
             Widgets.FunctionOperandSurface = FunctionOperandSurface;
@@ -9513,6 +10207,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                InOperandSurface.prototype.dispose = function () {
+                    this.criteriaOperator().dispose();
+                    this.operands().forEach(function (x) { return x.dispose(); });
+                    _super.prototype.dispose.call(this);
+                };
                 return InOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.InOperandSurface = InOperandSurface;
@@ -9542,6 +10241,12 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                BetweenOperandSurface.prototype.dispose = function () {
+                    this.property().dispose();
+                    this.begin().dispose();
+                    this.end().dispose();
+                    _super.prototype.dispose.call(this);
+                };
                 return BetweenOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.BetweenOperandSurface = BetweenOperandSurface;
@@ -9567,9 +10272,11 @@ var DevExpress;
                         var propertyLocation = _this.getPropertyName(parent, property);
                         var model = parent.model.changeValue(_this.model, _this.reverse, propertyLocation);
                         if (propertyLocation.index !== null) {
+                            parent[propertyLocation.name]()[propertyLocation.index].dispose();
                             parent[propertyLocation.name].splice(propertyLocation.index, 1, parent.createChildSurface(model));
                         }
                         else {
+                            parent[propertyLocation.name]().dispose();
                             parent[propertyLocation.name](parent.createChildSurface(model));
                         }
                     };
@@ -9591,22 +10298,23 @@ var DevExpress;
                         this.specifics = parent.specifics;
                         this.dataType = parent.dataType;
                     }
-                    this.specifics.subscribe(function (newVal) {
+                    this._disposables.push(this.specifics.subscribe(function (newVal) {
                         operator.specifics = newVal;
                         _this._updateDate(newVal);
-                    });
+                    }));
                     this._value(operator.value);
-                    this._value.subscribe(function (newVal) {
+                    this._disposables.push(this._value.subscribe(function (newVal) {
                         _this.model.value = newVal;
-                    });
+                        _this.helper.onChange();
+                    }));
                     if (this._value() === null || this._value() === undefined || this._value() === "") {
                         this._updateDate(this.specifics());
                     }
-                    this.value = ko.computed({
+                    this._disposables.push(this.value = ko.computed({
                         read: function () {
                             var value = _this._value();
                             if (value instanceof Date) {
-                                value = Globalize["formatDate"](value);
+                                value = JS.Localization.Globalize["formatDate"](value);
                             }
                             if (_this.items.length > 0) {
                                 var result = _this.items.filter(function (item) { return item.value === value; })[0];
@@ -9617,7 +10325,7 @@ var DevExpress;
                             if (_this.reverse) {
                                 value = "-" + value;
                             }
-                            return value !== null && value !== undefined && value !== "" ? value : DevExpress.Designer.getLocalization(OperandValueSurface.defaultDisplay, "StringId.FilterEmptyEnter");
+                            return value !== null && value !== undefined && value !== "" ? value : _this.getDefaultValue();
                         },
                         write: function (newVal) {
                             if (newVal > 0 && !_this.reverse || newVal < 0 && _this.reverse) {
@@ -9629,8 +10337,8 @@ var DevExpress;
                                 _this.changeValue();
                             }
                         }
-                    });
-                    ko.computed(function () {
+                    }));
+                    this._disposables.push(ko.computed(function () {
                         var itemsProvider = ko.unwrap(fieldListProvider);
                         if (itemsProvider && itemsProvider.getValues && _this.parent.leftPart instanceof OperandPropertySurface) {
                             if (_this.parent.leftPart.propertyName()) {
@@ -9639,7 +10347,7 @@ var DevExpress;
                                 });
                             }
                         }
-                    });
+                    }));
                     operator.specifics = this.specifics();
                 }
                 Object.defineProperty(OperandValueSurface.prototype, "items", {
@@ -9656,7 +10364,13 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
-                OperandValueSurface.defaultDisplay = "Enter a value";
+                OperandValueSurface.prototype.isDefaultDisplay = function () {
+                    return this.value() === this.getDefaultValue();
+                };
+                OperandValueSurface.prototype.getDefaultValue = function () {
+                    return OperandValueSurface._defaultValue ? OperandValueSurface._defaultValue :
+                        OperandValueSurface._defaultValue = DevExpress.Designer.getLocalization("Enter a value", "StringId.FilterEmptyEnter");
+                };
                 return OperandValueSurface;
             })(OperandSurfaceBase);
             Widgets.OperandValueSurface = OperandValueSurface;
@@ -9697,24 +10411,30 @@ var DevExpress;
                         var newModel = this.model.change(type, surface.model, surface.leftPart instanceof AggregateOperandSurface && surface.leftPart.leftPart.specifics() !== "list");
                         var position = this.operands().indexOf(surface);
                         var operand = this.createChildSurface(newModel);
+                        this.operands()[position].dispose();
                         this.operands.splice(position, 1, operand);
                     }
                     else {
                         _super.prototype.change.call(this, type, surface);
                     }
+                    this.helper.onChange();
                 };
                 GroupOperandSurface.prototype.remove = function (surface) {
                     if (surface) {
                         this.model.remove(surface.model);
                         this.operands.remove(surface);
+                        surface.dispose();
                     }
                     else {
                         this.parent.remove(this);
+                        this.dispose();
                     }
+                    this.helper.onChange();
                 };
                 GroupOperandSurface.prototype.create = function (type) {
                     var newModel = this.model.create(type.value, new JS.Data.OperandProperty());
                     this.operands.push(this.createChildSurface(newModel));
+                    this.helper.onChange();
                 };
                 Object.defineProperty(GroupOperandSurface.prototype, "rightPart", {
                     get: function () {
@@ -9723,6 +10443,10 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                GroupOperandSurface.prototype.dispose = function () {
+                    this.operands().forEach(function (x) { return x.dispose(); });
+                    _super.prototype.dispose.call(this);
+                };
                 return GroupOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.GroupOperandSurface = GroupOperandSurface;
@@ -9739,6 +10463,7 @@ var DevExpress;
                     var childPath = ko.computed(function () {
                         return _this.path() + "." + _this.property().propertyName();
                     });
+                    this._disposables.push(childPath);
                     if (operator.aggregatedExpression) {
                         this.aggregatedExpression(this.createChildSurface(operator.aggregatedExpression, childPath));
                         this.templateName = "dx-filtereditor-aggregate-common";
@@ -9775,6 +10500,7 @@ var DevExpress;
                                 }
                             }
                         }
+                        _this.helper.onChange();
                     };
                 }
                 Object.defineProperty(AggregateOperandSurface.prototype, "leftPart", {
@@ -9791,6 +10517,12 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                AggregateOperandSurface.prototype.dispose = function () {
+                    this.property().dispose();
+                    this.condition().dispose();
+                    this.aggregatedExpression() && this.aggregatedExpression().dispose();
+                    _super.prototype.dispose.call(this);
+                };
                 return AggregateOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.AggregateOperandSurface = AggregateOperandSurface;
@@ -9802,6 +10534,7 @@ var DevExpress;
                     this.changeParameter = function (item) {
                         _this.model.parameterName = item.name;
                         _this.parameterName(item.name);
+                        _this.helper.onChange();
                     };
                     this.operatorClass = "criteria-operator-item-parameter";
                     this.parameterName = ko.observable("");
@@ -9840,6 +10573,7 @@ var DevExpress;
                         this.specifics = operand.specifics;
                     }
                     else {
+                        operand.dispose();
                         operand = this._createLeftPartProperty(operator.operand);
                     }
                     this.operand(operand);
@@ -9862,6 +10596,10 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                UnaryOperandSurface.prototype.dispose = function () {
+                    this.operand().dispose();
+                    _super.prototype.dispose.call(this);
+                };
                 return UnaryOperandSurface;
             })(CriteriaOperatorSurface);
             Widgets.UnaryOperandSurface = UnaryOperandSurface;
@@ -9881,14 +10619,21 @@ var DevExpress;
                     this.templateName = "dx-filtereditor-property";
                     this.operatorClass = "criteria-operator-item-field";
                     this.propertyName(operator.propertyName);
-                    this.fieldsOptions = this.helper.generateTreelistOptions(fieldListProvider, path);
-                    this.fieldsOptions().selectedPath.subscribe(function (newVal) {
+                    var options = this.helper.generateTreelistOptions(fieldListProvider, path);
+                    if (options.options && options.subscription) {
+                        this.fieldsOptions = options.options;
+                        this._disposables.push(options.subscription);
+                    }
+                    else {
+                        this.fieldsOptions = options;
+                    }
+                    this._disposables.push(this.fieldsOptions().selectedPath.subscribe(function (newVal) {
                         var realName = _this.fieldsOptions().selectedPath().substr(_this.path && _this.path().length > 0 ? _this.path().length + 1 : 0);
                         _this.propertyName(realName);
                         _this.model.propertyName = realName;
                         _this.popupService.visible(false);
-                    });
-                    this.fieldsOptions().selected.subscribe(function (newVal) {
+                    }));
+                    this._disposables.push(this.fieldsOptions().selected.subscribe(function (newVal) {
                         _this._updateDisplayName(path, _this.propertyName(), newVal.displayName);
                         var specifics = newVal.specifics.toLowerCase();
                         if (specifics.indexOf("calc") === 0) {
@@ -9899,12 +10644,13 @@ var DevExpress;
                             _this.dataType(newVal.dataType);
                             _this.parent.change();
                         }
-                    });
+                        _this.helper.onChange();
+                    }));
                     this.fieldsOptions().selectedPath(this.path && !!ko.unwrap(this.path) ? [ko.unwrap(this.path), this.propertyName()].join('.') : this.propertyName());
                     this._updateSpecifics();
-                    this.displayName = ko.computed(function () {
+                    this._disposables.push(this.displayName = ko.computed(function () {
                         return _this._displayName() || _this.propertyName();
-                    });
+                    }));
                 }
                 OperandPropertySurface.prototype._updateDisplayName = function (path, propertyName, displayName) {
                     var _this = this;
@@ -9966,20 +10712,26 @@ var DevExpress;
                     $(element).addClass("dx-popup-general");
                     var templateHtml = $('#dx-filtereditor').text(), $element = $(element).append(templateHtml), values = valueAccessor();
                     var itemsProvider = ko.observable(ko.unwrap(values.fieldListProvider));
-                    ko.computed(function () {
-                        if (values.options().itemsProvider) {
+                    var subscriptions = [];
+                    subscriptions.push(ko.computed(function () {
+                        if (values.options() && values.options().itemsProvider) {
                             itemsProvider(ko.unwrap(values.options().itemsProvider));
                         }
                         else {
                             itemsProvider(ko.unwrap(values.fieldListProvider));
                         }
-                    });
-                    ko.computed(function () {
+                    }));
+                    subscriptions.push(ko.computed(function () {
                         if (values.getDisplayNameByPath && values.options() && values.options().helper && !values.options().helper.getDisplayPropertyName) {
                             values.options().helper.getDisplayPropertyName = values.getDisplayNameByPath;
                         }
+                    }));
+                    var editor = new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0);
+                    ko.applyBindings(editor, $element.children()[0]);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        subscriptions.forEach(function (x) { return x.dispose(); });
+                        editor.dispose();
                     });
-                    ko.applyBindings(new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0), $element.children()[0]);
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -9997,6 +10749,12 @@ var DevExpress;
                 },
                 template: { element: 'dx-filtereditor-plain' }
             });
+            ko.bindingHandlers["cacheElement"] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var value = valueAccessor();
+                    value.action($(element));
+                }
+            };
         })(Widgets = JS.Widgets || (JS.Widgets = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -10008,7 +10766,9 @@ var DevExpress;
     (function (JS) {
         var Widgets;
         (function (Widgets) {
-            var operatorNames = [
+            Widgets.ace = DevExpress.JS.Widgets["ace"] || window["ace"];
+            Widgets.aceAvailable = !!Widgets.ace;
+            Widgets.operatorNames = [
                 { text: "+", image: "addition", descriptionStringId: 'XtraEditorsExpressionEditor.Plus.Description' },
                 { text: "-", image: "subtraction", descriptionStringId: 'XtraEditorsExpressionEditor.Minus.Description' },
                 { text: "*", image: "multiplication", descriptionStringId: 'XtraEditorsExpressionEditor.Multiply.Description' },
@@ -10035,14 +10795,15 @@ var DevExpress;
                 {
                     display: "Aggregate",
                     localizationId: 'XtraEditorsExpressionEditor.functionsTypes.Properties.AggregateItems',
+                    category: "Aggregate",
                     items: {
-                        Avg: [{ paramCount: 0, text: "[].Avg()", displayName: "Avg()", descriptionStringId: 'XtraEditorsExpressionEditor.AvgAggregate.Description' }],
-                        Count: [{ paramCount: 0, text: "[].Count()", displayName: "Count()", descriptionStringId: 'XtraEditorsExpressionEditor.CountAggregate.Description' }],
-                        Exists: [{ paramCount: 0, text: "[].Exists()", displayName: "Exists()", descriptionStringId: 'XtraEditorsExpressionEditor.ExistsAggregate.Description' }],
-                        Max: [{ paramCount: 0, text: "[].Max()", displayName: "Max()", descriptionStringId: 'XtraEditorsExpressionEditor.MaxAggregate.Description' }],
-                        Min: [{ paramCount: 0, text: "[].Min()", displayName: "Min()", descriptionStringId: 'XtraEditorsExpressionEditor.MinAggregate.Description' }],
-                        Single: [{ paramCount: 0, text: "[].Single()", displayName: "Single()", descriptionStringId: 'XtraEditorsExpressionEditor.SingleAggregate.Description' }],
-                        Sum: [{ paramCount: 0, text: "[].Sum()", displayName: "Sum()", descriptionStringId: 'XtraEditorsExpressionEditor.SumAggregate.Description' }],
+                        Avg: [{ paramCount: 1, text: "[].Avg()", displayName: "Avg()", descriptionStringId: 'XtraEditorsExpressionEditor.AvgAggregate.Description' }],
+                        Count: [{ paramCount: 1, text: "[].Count()", displayName: "Count()", descriptionStringId: 'XtraEditorsExpressionEditor.CountAggregate.Description' }],
+                        Exists: [{ paramCount: 1, text: "[].Exists()", displayName: "Exists()", descriptionStringId: 'XtraEditorsExpressionEditor.ExistsAggregate.Description' }],
+                        Max: [{ paramCount: 1, text: "[].Max()", displayName: "Max()", descriptionStringId: 'XtraEditorsExpressionEditor.MaxAggregate.Description' }],
+                        Min: [{ paramCount: 1, text: "[].Min()", displayName: "Min()", descriptionStringId: 'XtraEditorsExpressionEditor.MinAggregate.Description' }],
+                        Single: [{ paramCount: 1, text: "[].Single()", displayName: "Single()", descriptionStringId: 'XtraEditorsExpressionEditor.SingleAggregate.Description' }],
+                        Sum: [{ paramCount: 1, text: "[].Sum()", displayName: "Sum()", descriptionStringId: 'XtraEditorsExpressionEditor.SumAggregate.Description' }],
                     }
                 }, {
                     display: "Date-Time",
@@ -10050,7 +10811,9 @@ var DevExpress;
                     items: {
                         LocalDateTimeThisYear: [{ paramCount: 0, text: "LocalDateTimeThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description' }],
                         LocalDateTimeThisMonth: [{ paramCount: 0, text: "LocalDateTimeThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description' }],
+                        LocalDateTimeLastMonth: [{ paramCount: 0, text: "LocalDateTimeLastMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastMonth.Description' }],
                         LocalDateTimeLastWeek: [{ paramCount: 0, text: "LocalDateTimeLastWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description' }],
+                        LocalDateTimeLastYear: [{ paramCount: 0, text: "LocalDateTimeLastYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastYear.Description' }],
                         LocalDateTimeThisWeek: [{ paramCount: 0, text: "LocalDateTimeThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description' }],
                         LocalDateTimeYesterday: [{ paramCount: 0, text: "LocalDateTimeYesterday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description' }],
                         LocalDateTimeToday: [{ paramCount: 0, text: "LocalDateTimeToday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description' }],
@@ -10058,9 +10821,12 @@ var DevExpress;
                         LocalDateTimeTomorrow: [{ paramCount: 0, text: "LocalDateTimeTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description' }],
                         LocalDateTimeDayAfterTomorrow: [{ paramCount: 0, text: "LocalDateTimeDayAfterTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description' }],
                         LocalDateTimeNextWeek: [{ paramCount: 0, text: "LocalDateTimeNextWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description' }],
+                        LocalDateTimeTwoMonthsAway: [{ paramCount: 0, text: "LocalDateTimeTwoMonthsAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoMonthsAway.Description' }],
+                        LocalDateTimeTwoYearsAway: [{ paramCount: 0, text: "LocalDateTimeTwoYearsAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoYearsAway.Description' }],
                         LocalDateTimeTwoWeeksAway: [{ paramCount: 0, text: "LocalDateTimeTwoWeeksAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description' }],
                         LocalDateTimeNextMonth: [{ paramCount: 0, text: "LocalDateTimeNextMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description' }],
                         LocalDateTimeNextYear: [{ paramCount: 0, text: "LocalDateTimeNextYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description' }],
+                        LocalDateTimeYearBeforeToday: [{ paramCount: 0, text: "LocalDateTimeYearBeforeToday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeYearBeforeToday.Description' }],
                         IsOutlookIntervalBeyondThisYear: null,
                         IsOutlookIntervalLaterThisYear: null,
                         IsOutlookIntervalLaterThisMonth: null,
@@ -10074,9 +10840,27 @@ var DevExpress;
                         IsOutlookIntervalEarlierThisMonth: null,
                         IsOutlookIntervalEarlierThisYear: null,
                         IsOutlookIntervalPriorThisYear: null,
+                        IsLastMonth: [{ paramCount: 1, text: "IsLastMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsLastMonth.Description' }],
+                        IsLastYear: [{ paramCount: 1, text: "IsLastYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsLastYear.Description' }],
+                        IsNextMonth: [{ paramCount: 1, text: "IsNextMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNextMonth.Description' }],
+                        IsNextYear: [{ paramCount: 1, text: "IsNextYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNextYear.Description' }],
                         IsThisWeek: [{ paramCount: 1, text: "IsThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisWeek.Description' }],
                         IsThisMonth: [{ paramCount: 1, text: "IsThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisMonth.Description' }],
                         IsThisYear: [{ paramCount: 1, text: "IsThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisYear.Description' }],
+                        IsJanuary: [{ paramCount: 1, text: "IsJanuary()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJanuary.Description' }],
+                        IsFebruary: [{ paramCount: 1, text: "IsFebruary()", descriptionStringId: 'XtraEditorsExpressionEditor.IsFebruary.Description' }],
+                        IsMarch: [{ paramCount: 1, text: "IsMarch()", descriptionStringId: 'XtraEditorsExpressionEditor.IsMarch.Description' }],
+                        IsApril: [{ paramCount: 1, text: "IsApril()", descriptionStringId: 'XtraEditorsExpressionEditor.IsApril.Description' }],
+                        IsMay: [{ paramCount: 1, text: "IsMay()", descriptionStringId: 'XtraEditorsExpressionEditor.IsMay.Description' }],
+                        IsJune: [{ paramCount: 1, text: "IsJune()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJune.Description' }],
+                        IsJule: [{ paramCount: 1, text: "IsJule()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJule.Description' }],
+                        IsAugust: [{ paramCount: 1, text: "IsAugust()", descriptionStringId: 'XtraEditorsExpressionEditor.IsAugust.Description' }],
+                        IsSemptember: [{ paramCount: 1, text: "IsSemptember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsSemptember.Description' }],
+                        IsOctober: [{ paramCount: 1, text: "IsOctober()", descriptionStringId: 'XtraEditorsExpressionEditor.IsOctober.Description' }],
+                        IsNovember: [{ paramCount: 1, text: "IsNovember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNovember.Description' }],
+                        IsDecember: [{ paramCount: 1, text: "IsDecember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsDecember.Description' }],
+                        IsSameDay: [{ paramCount: 2, text: "IsSameDay(, )", descriptionStringId: 'XtraEditorsExpressionEditor.IsSameDay.Description' }],
+                        IsYearToDate: [{ paramCount: 1, text: "IsYearToDate()", descriptionStringId: 'XtraEditorsExpressionEditor.IsYearToDate.Description' }],
                         DateDiffTick: [{ paramCount: 2, text: "DateDiffTick(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffTick.Description' }],
                         DateDiffSecond: [{ paramCount: 2, text: "DateDiffSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffSecond.Description' }],
                         DateDiffMilliSecond: [{ paramCount: 2, text: "DateDiffMilliSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description' }],
@@ -10196,86 +10980,122 @@ var DevExpress;
                     }
                 }
             ];
-            var Tools = (function () {
-                function Tools(onClick, parametersOptions, fieldListOptions, functionGroups) {
+            var Tools = (function (_super) {
+                __extends(Tools, _super);
+                function Tools(onClick, parametersOptions, fieldListOptions, functionGroups, customizeCategories) {
                     var _this = this;
                     if (functionGroups === void 0) { functionGroups = Widgets.functionDisplay; }
-                    this.popularItems = [];
+                    _super.call(this);
+                    this.searchPlaceholder = function () { return DevExpress.Designer.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
+                    this.showDescription = ko.observable(true);
                     this.toolBox = [];
                     this.description = ko.observable();
-                    this.descriptionHeader = ko.observable();
-                    this.descriptionBody = ko.observable();
                     this._defaultClick = onClick;
-                    operatorNames.filter(function (item) { return !!item.descriptionStringId; }).forEach(function (item) { return _this._initDescription(item); });
-                    this.popularItems = this._generatePopularItems(operatorNames.filter(function (item) { return !!item.image; }));
-                    this.toolBox = [
-                        this._generateList(DevExpress.Designer.getLocalization("FUNCTIONS", 'XtraEditorsExpressionEditor.Functions.Text'), functionGroups.map(function (funtionGroup) {
-                            var result = {
-                                display: DevExpress.Designer.getLocalization(funtionGroup.display, funtionGroup.localizationId),
-                                collapsed: ko.observable(true),
-                                items: []
-                            };
-                            $.map(funtionGroup.items, (function (item) {
-                                if (item) {
-                                    item.forEach(function (functionItem) {
-                                        _this._initDescription(functionItem);
-                                        result.items.push(functionItem);
-                                    });
-                                }
-                            }));
-                            return result;
-                        }), "dx-expressioneditor-functions"),
-                        this._generateList(DevExpress.Designer.getLocalization("OPERATORS", 'XtraEditorsExpressionEditor.Operators.Text'), operatorNames.filter(function (item) { return !!item.descriptionStringId; }))
-                    ];
-                    this.toolBox.push(this._generateList(DevExpress.Designer.getLocalization("FIELDS", 'XtraEditorsExpressionEditor.Fields.Text'), { fields: fieldListOptions, parameters: parametersOptions }, "dx-expressioneditor-fields", "37%"));
-                    this.description.subscribe(function (val) {
-                        if (!val) {
-                            _this.descriptionHeader(val);
-                            _this.descriptionBody(val);
-                        }
-                        else {
-                            var idx = val.indexOf("\n");
-                            if (idx < 0) {
-                                _this.descriptionHeader(val);
-                                _this.descriptionBody("");
+                    var textToSearch = ko.observable("");
+                    Widgets.operatorNames.filter(function (item) { return !!item.descriptionStringId; }).forEach(function (item) { return _this._initDescription(item); });
+                    var functions = functionGroups.map(function (funtionGroup) {
+                        var result = {
+                            display: DevExpress.Designer.getLocalization(funtionGroup.display, funtionGroup.localizationId),
+                            isSelected: ko.observable(false),
+                            data: {
+                                textToSearch: textToSearch,
+                                items: [],
+                                availableItems: ko.observableArray([])
+                            },
+                            name: "dx-expressioneditor-collection-function",
+                        };
+                        $.map(funtionGroup.items, (function (item) {
+                            if (item) {
+                                item.forEach(function (functionItem) {
+                                    _this._initDescription(functionItem);
+                                    result.data.items.push(functionItem);
+                                });
                             }
-                            else {
-                                _this.descriptionHeader(val.substring(0, idx - 1));
-                                _this.descriptionBody(val.substring(idx + 1));
-                            }
-                        }
+                        }));
+                        result.data.availableItems(result.data.items);
+                        var timeout = null;
+                        _this._disposables.push(result.data.textToSearch.subscribe(function (newVal) {
+                            timeout && clearTimeout(timeout);
+                            timeout = setTimeout(function () {
+                                result.data.availableItems(result.data.items.filter(function (x) { return !!JS.Utils.findMatchesInString(x.text, newVal); }));
+                            }, 150);
+                        }));
+                        return result;
                     });
+                    var fieldsGroup = {
+                        displayName: "Fields",
+                        content: {
+                            isSelected: ko.observable(false),
+                            data: {
+                                fields: fieldListOptions, parameters: parametersOptions
+                            },
+                            name: "dx-expressioneditor-fields"
+                        }
+                    };
+                    this._disposables.push(fieldsGroup.content.isSelected.subscribe(function (newVal) {
+                        _this.showDescription(!newVal);
+                    }));
+                    var categories = [
+                        fieldsGroup,
+                        {
+                            displayName: "Constants",
+                            content: {
+                                isSelected: ko.observable(false),
+                                data: [
+                                    { text: "?", descriptionStringId: 'XtraEditorsExpressionEditor.Null.Description' },
+                                    { text: "False", descriptionStringId: 'XtraEditorsExpressionEditor.False.Description' },
+                                    { text: "True", descriptionStringId: 'XtraEditorsExpressionEditor.True.Description' }
+                                ],
+                                name: "dx-expressioneditor-collection"
+                            }
+                        },
+                        {
+                            displayName: "Functions",
+                            items: functions,
+                            collapsed: ko.observable(true)
+                        },
+                        {
+                            displayName: "Operators",
+                            content: {
+                                isSelected: ko.observable(false),
+                                data: Widgets.operatorNames,
+                                name: "dx-expressioneditor-collection"
+                            }
+                        }
+                    ];
+                    customizeCategories && customizeCategories(this, categories, onClick);
+                    var selectedContent = ko.observable(null);
+                    var firstItem = categories[0].content || categories[0].items[0];
+                    selectedContent(firstItem);
+                    firstItem.isSelected(true);
+                    this.toolBox = [
+                        this._generateTab(categories, "dx-expressioneditor-categories", "170px", function (item) {
+                            if (selectedContent() === item)
+                                return;
+                            selectedContent().isSelected(false);
+                            item.isSelected(true);
+                            selectedContent(item);
+                        }),
+                        this._generateTab(selectedContent, "dx-expressioneditor-selectedcontent", ko.computed(function () { return _this.showDescription() ? "248px" : "435px"; }), function (item) { _this.description(DevExpress.Designer.getLocalization(item.text, item.descriptionStringId)); }, this._defaultClick),
+                        this._generateTab(this.description, "dx-expressioneditor-description", undefined, undefined, undefined, this.showDescription)
+                    ];
                 }
-                Tools.prototype._generateList = function (title, content, templateName, width, click) {
-                    var _this = this;
+                Tools.prototype._generateTab = function (content, templateName, width, click, dblclick, visible) {
                     if (templateName === void 0) { templateName = null; }
                     return {
                         templateName: templateName,
                         width: width || "30%",
-                        title: title,
                         content: content,
-                        click: click || this._defaultClick,
-                        selection: function (item) { _this.description(item.description || item.text); }
+                        click: click,
+                        dblclick: dblclick,
+                        visible: visible || true
                     };
                 };
                 Tools.prototype._initDescription = function (expressionEditorItem) {
                     expressionEditorItem.description = DevExpress.Designer.getLocalization(expressionEditorItem.text, expressionEditorItem.descriptionStringId);
                 };
-                Tools.prototype._generatePopularItems = function (values, click) {
-                    var _this = this;
-                    return values.map(function (item) {
-                        return {
-                            templateName: item.templateName || null,
-                            text: item.text || item,
-                            imgClassName: "dx-image-expressioneditor-" + item.image,
-                            hasSeparator: item.hasSeparator,
-                            description: item.description,
-                            click: click || _this._defaultClick
-                        };
-                    });
-                };
                 return Tools;
-            })();
+            })(JS.Utils.Disposable);
             Widgets.Tools = Tools;
             var ExpressionEditorTreeListController = (function (_super) {
                 __extends(ExpressionEditorTreeListController, _super);
@@ -10286,14 +11106,14 @@ var DevExpress;
                     this.selectionHandler = selectionHandler;
                 }
                 ExpressionEditorTreeListController.prototype.itemsFilter = function (item) {
-                    return item.specifics !== "none" && item.name !== ko.unwrap(this.fieldName);
+                    return item.specifics !== "none" && item.name !== "ReportItems";
                 };
                 ExpressionEditorTreeListController.prototype.select = function (value) {
-                    this.selectionHandler(ko.unwrap(value.data["type"]));
+                    this.selectionHandler && this.selectionHandler(ko.unwrap(value.data["type"]));
                 };
                 ExpressionEditorTreeListController.prototype.getActions = function (item) {
                     var _this = this;
-                    return [{ clickAction: function (element) { _this.putSelectionHandler(item.path, element); } }];
+                    return [{ clickAction: function (element) { return _this.putSelectionHandler(item, $(element)); } }];
                 };
                 ExpressionEditorTreeListController.prototype.canSelect = function (value) {
                     return true;
@@ -10301,15 +11121,46 @@ var DevExpress;
                 return ExpressionEditorTreeListController;
             })(Widgets.TreeListController);
             Widgets.ExpressionEditorTreeListController = ExpressionEditorTreeListController;
-            var ExpressionEditor = (function () {
+            var ExpressionEditorParametersTreeListController = (function (_super) {
+                __extends(ExpressionEditorParametersTreeListController, _super);
+                function ExpressionEditorParametersTreeListController(customFilter, putSelectionHandler, selectionHandler) {
+                    _super.call(this);
+                    this.customFilter = customFilter;
+                    this.putSelectionHandler = putSelectionHandler;
+                    this.selectionHandler = selectionHandler;
+                }
+                ExpressionEditorParametersTreeListController.prototype.itemsFilter = function (item) {
+                    return item.specifics !== "none" && (!this.customFilter || this.customFilter(item));
+                };
+                ExpressionEditorParametersTreeListController.prototype.select = function (value) {
+                    this.selectionHandler(ko.unwrap(value.data["type"]));
+                };
+                ExpressionEditorParametersTreeListController.prototype.getActions = function (item) {
+                    var _this = this;
+                    return [{
+                            clickAction: function (element) {
+                                if (item && item.text !== "Parameters")
+                                    _this.putSelectionHandler(item.path, $(element));
+                            }
+                        }];
+                };
+                ExpressionEditorParametersTreeListController.prototype.canSelect = function (value) {
+                    return true;
+                };
+                return ExpressionEditorParametersTreeListController;
+            })(Widgets.TreeListController);
+            Widgets.ExpressionEditorParametersTreeListController = ExpressionEditorParametersTreeListController;
+            var ExpressionEditor = (function (_super) {
+                __extends(ExpressionEditor, _super);
                 function ExpressionEditor(options, fieldListProvider, disabled, rtl, _displayConverter) {
                     var _this = this;
                     if (disabled === void 0) { disabled = ko.observable(false); }
                     if (rtl === void 0) { rtl = false; }
+                    _super.call(this);
                     this.options = options;
                     this._displayConverter = _displayConverter;
                     this._updateTextAreaValue = function (item, element) {
-                        var textArea = _this._getTextArea(element), textAreaValue = _this.textAreaValue().toString(), cursorPosition = textArea && textArea.selectionStart || textAreaValue.length, newAddedText = textAreaValue[cursorPosition - 1] == " " ? (item.text || item) + " " : " " + (item.text || item) + " ";
+                        var textArea = _this._getTextArea(element), textAreaValue = _this.textAreaValue().toString(), cursorPosition = textArea && textArea.selectionStart || textAreaValue.length, newAddedText = textAreaValue[cursorPosition - 1] == " " ? (item.val || item.text || item) + " " : " " + (item.val || item.text || item) + " ";
                         _this.textAreaValue([textAreaValue.slice(0, cursorPosition), newAddedText, textAreaValue.slice(cursorPosition)].join(''));
                         if (textArea && textArea.setSelectionRange) {
                             textArea.focus();
@@ -10317,11 +11168,21 @@ var DevExpress;
                             textArea.setSelectionRange(posisition, posisition);
                         }
                     };
+                    this._updateAceValue = function (item, element) {
+                        var editor = _this.editorContainer(), _a = editor.getCursorPosition(), row = _a.row, col = _a.column, insertion = (item.val || item.text || item) + " ";
+                        if (col && editor.getSession().getValue().split("\n")[row][col - 1] !== " ")
+                            insertion = " " + insertion;
+                        editor.insert(insertion);
+                        editor.focus();
+                    };
+                    this._updateValue = function (item, element) {
+                        _this.aceAvailable ? _this._updateAceValue(item, $(element)) : _this._updateTextAreaValue(item, $(element));
+                    };
                     this.patchFieldName = function (fieldName) { return fieldName; };
                     this._parametersPutSelectionHandler = function (selectedItemPath, element) {
                         var proposedFieldName = selectedItemPath;
                         var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
-                        _this._updateTextAreaValue(newAddedString, element);
+                        _this._updateValue(newAddedString, element);
                     };
                     this._fieldsPutSelectionHandler = function (selectedItemPath, element) {
                         var path = _this.options.path.peek();
@@ -10329,88 +11190,151 @@ var DevExpress;
                         var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
                         if (_this._displayConverter) {
                             _this._displayConverter.toDisplayExpression(path, newAddedString)
-                                .done(function (result) { _this._updateTextAreaValue(result, element); })
-                                .fail(function () { _this._updateTextAreaValue(newAddedString, element); });
+                                .done(function (result) { _this._updateValue(result, element); })
+                                .fail(function () { _this._updateValue(newAddedString, element); });
                         }
                         else {
-                            _this._updateTextAreaValue(newAddedString, element);
+                            _this._updateValue(newAddedString, element);
                         }
                     };
+                    this.aceAvailable = Widgets.aceAvailable;
                     this.popupVisible = ko.observable(false);
+                    this.title = function () { return DevExpress.Designer.getLocalization('Expression Editor', 'XtraEditorsExpressionEditor.Expression.Text'); };
                     this.value = ko.observable("");
                     this.textAreaValue = ko.observable("");
+                    this.languageHelper = {
+                        getLanguageMode: function () { return "ace/mode/criteria"; },
+                        createCompleters: function (editor, bindingContext, viewModel) { return [new Widgets.CodeCompletor(editor, bindingContext, viewModel.fieldListProvider, viewModel.options.path, viewModel.options.functions, viewModel.options.rootItems)]; }
+                    };
+                    this.aceOptions = {
+                        showLineNumbers: false,
+                        showPrintMargin: false,
+                        enableBasicAutocompletion: true,
+                        enableLiveAutocompletion: true,
+                        showFoldWidgets: false,
+                        highlightActiveLine: false
+                    };
+                    this.callbacks = {
+                        focus: $.noop
+                    };
+                    this.editorContainer = ko.observable();
                     this.isValid = ko.observable(true);
                     this.buttonItems = [];
                     this.rtl = false;
                     if (options.patchFieldName) {
                         this.patchFieldName = options.patchFieldName;
                     }
+                    this.theme = options.theme;
                     this.value = options.value;
                     this.rtl = rtl;
-                    this.textAreaValue(this.value());
-                    this.popupVisible.subscribe(function (newVal) {
-                        _this.textAreaValue(_this.value());
-                    });
-                    this.fieldListProvider = ko.unwrap(fieldListProvider);
-                    this.disabled = disabled;
-                    var self = this;
-                    this.save = function (sender) {
+                    var validate = function (value, sender) {
                         try {
-                            JS.Data.CriteriaOperator.parse(_this.textAreaValue());
-                            options.value(_this.textAreaValue());
-                            _this.popupVisible(false);
+                            JS.Data.CriteriaOperator.parse(value);
+                            _this.isValid(true);
+                            return true;
                         }
                         catch (exception) {
-                            var result = JS.Data.CriteriaOperator.getNotValidRange(_this.textAreaValue(), exception.message);
-                            var textArea = _this._getTextArea(sender.element);
+                            var result = JS.Data.CriteriaOperator.getNotValidRange(value, exception.message);
+                            var textArea = _this._getTextArea(sender && sender.element);
                             textArea && textArea.setSelectionRange(result.start, result.end);
                             _this.isValid(false);
                         }
                     };
+                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
+                        if (!newVal)
+                            return;
+                        if (!_this.aceAvailable) {
+                            _this.textAreaValue(_this.value());
+                            validate(_this.value());
+                        }
+                        else {
+                            var editor = _this.editorContainer();
+                            var session = editor && editor.getSession();
+                            session && session.setValue(_this.value());
+                        }
+                    }));
+                    this.fieldListProvider = createExpressionEditorFieldListProvider(ko.unwrap(fieldListProvider), options.fieldName);
+                    this.disabled = disabled;
+                    var self = this;
+                    this.save = function (sender) {
+                        var value = _this.textAreaValue();
+                        if (_this.aceAvailable) {
+                            var editor = _this.editorContainer();
+                            var session = editor && editor.getSession();
+                            value = session && session.getValue();
+                        }
+                        if (validate(value, sender)) {
+                            options.value(value);
+                            _this.popupVisible(false);
+                        }
+                    };
+                    var selectionHandler = function (objectName) { return function (selectedItemType) {
+                        _this.tools.description(selectedItemType && selectedItemType !== "None" ? DevExpress.Designer.getLocalization("The type of this " + objectName + " is: ", 'XtraEditorsExpressionEditor.Fields Description Prefix') + " " + selectedItemType : "");
+                    }; };
                     var fieldsTreeListOptions = options.path && ko.pureComputed(function () {
-                        return options.path() && _this._createToolsOptions("field", options.path(), _this._fieldsPutSelectionHandler, options.fieldName);
+                        return options.path() && _this._createToolsOptions(options.path(), _this.fieldListProvider, new ExpressionEditorTreeListController(options.fieldName || "", function (data, element) { _this._fieldsPutSelectionHandler(data.path, element); }, selectionHandler("field")));
                     });
-                    this.tools = new Tools(this._updateTextAreaValue, this._createToolsOptions("Parameter", "Parameters", this._parametersPutSelectionHandler), fieldsTreeListOptions, options.functions);
+                    this._disposables.push(fieldsTreeListOptions);
+                    this.tools = new Tools(this._updateValue, this._createToolsOptions("", this.fieldListProvider, new ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !JS.Utils.isList(item); }, this._parametersPutSelectionHandler, selectionHandler("Parameter"))), fieldsTreeListOptions, ko.unwrap(options.functions), options.customizeCategories);
                     this._createMainPopupButtons();
+                    this._disposables.push(this.tools);
                 }
                 ExpressionEditor.prototype._createMainPopupButtons = function () {
                     var self = this;
                     this.buttonItems = [
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Save', 'XtraEditorsExpressionEditor.buttonOK.Text'), onClick: function (sender) { self.save(sender); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Cancel', 'XtraEditorsExpressionEditor.buttonCancel.Text'), onClick: function () { self.popupVisible(false); } } },
-                        { toolbar: 'bottom', location: 'before', template: function () { return $('#dx-expressioneditor-description'); }, text: self.tools.description }
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization('Cancel', 'XtraEditorsExpressionEditor.buttonCancel.Text'), onClick: function () { self.popupVisible(false); } } }
                     ];
                 };
                 ExpressionEditor.prototype._getTextArea = function (element) {
                     return element && element.parents(".dx-expressioneditor").find(":input")[0];
                 };
-                ExpressionEditor.prototype._createToolsOptions = function (objectName, path, putSelectionHandler, fieldName) {
-                    var _this = this;
-                    var selectionHandler = function (selectedItemType) {
-                        _this.tools.description(selectedItemType && selectedItemType !== "None" ? DevExpress.Designer.getLocalization("The type of this " + objectName + " is: ", 'XtraEditorsExpressionEditor.Fields Description Prefix') + " " + selectedItemType : "");
-                    };
+                ExpressionEditor.prototype._createToolsOptions = function (path, fieldListProvider, treeListController) {
                     return {
-                        itemsProvider: this.fieldListProvider,
+                        itemsProvider: fieldListProvider,
                         selectedPath: ko.observable(""),
                         path: path,
                         templateName: "dx-ee-treelist-item",
-                        treeListController: new ExpressionEditorTreeListController(fieldName || "", putSelectionHandler, selectionHandler),
+                        treeListController: treeListController,
                         rtl: this.rtl
                     };
                 };
+                ExpressionEditor.prototype.onShown = function () {
+                    this.callbacks.focus();
+                };
+                ExpressionEditor.prototype.getPopupContainer = function (el) { return $(el).closest('.dx-viewport'); };
+                ;
                 return ExpressionEditor;
-            })();
+            })(DevExpress.JS.Utils.Disposable);
             Widgets.ExpressionEditor = ExpressionEditor;
-            function wrapExpressionOptionsValue(options, converter, element) {
+            function createExpressionEditorFieldListProvider(originalProvider, fieldName) {
+                return (!fieldName || !originalProvider) ? originalProvider : {
+                    getItems: function (path) {
+                        var $deferred = $.Deferred();
+                        originalProvider.getItems(path)
+                            .done(function (data) {
+                            $deferred.resolve(data.filter(function (field) { return field.name !== ko.unwrap(fieldName); }));
+                        })
+                            .fail(function () { return $deferred.reject(); });
+                        return $deferred.promise();
+                    },
+                    getValues: originalProvider.getValues
+                };
+            }
+            function wrapExpressionOptionsValue(options, converter, element, subscriptions) {
                 if (!(converter && options.path))
                     return options;
                 var _displayValue = ko.observable(options.value());
                 converter.toDisplayExpression(options.path(), options.value()).done(function (result) {
                     _displayValue(result);
+                }).fail(function () {
+                    _displayValue(options.value());
                 });
                 var subscription = options.value.subscribe(function (newValue) {
                     converter.toDisplayExpression(options.path(), newValue).done(function (result) {
                         _displayValue(result);
+                    }).fail(function () {
+                        _displayValue(newValue);
                     });
                 });
                 var displayValue = ko.pureComputed({
@@ -10423,24 +11347,268 @@ var DevExpress;
                         });
                     }
                 });
+                if (subscriptions) {
+                    subscriptions.push(displayValue);
+                    subscriptions.push(subscription);
+                }
                 ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    subscription.dispose();
                     displayValue.dispose();
+                    subscription.dispose();
                 });
                 return $.extend({}, options, { value: displayValue });
             }
             Widgets.wrapExpressionOptionsValue = wrapExpressionOptionsValue;
+            ko.bindingHandlers["dxAceEditor"] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var values = valueAccessor(), text = values.value, editorContainer = values.editorContainer, editor, _setEditorText = function (editorInstance, text) {
+                        editorInstance.getSession().setValue(text || "");
+                        editorInstance.clearSelection();
+                        editorInstance.getSession().getUndoManager().reset();
+                    };
+                    if (Widgets.ace) {
+                        var showGutter = values.options.showGutter != undefined ? values.options.showGutter : true;
+                        var additionalOptions = values.additionalOptions;
+                        var langTools = Widgets.ace.require("ace/ext/language_tools");
+                        editor = Widgets.ace.edit(element);
+                        var guid = ko.observable(null);
+                        var theme = values.theme;
+                        if (!theme)
+                            theme = JS.Utils.classExists(".dx-designer-dark") ? "ace/theme/ambiance" : "ace/theme/dreamweaver";
+                        editor.setTheme(theme);
+                        var languageMode = viewModel.languageHelper.getLanguageMode();
+                        var session = editor.getSession();
+                        session.setMode(languageMode);
+                        session.gutterRenderer = {
+                            getWidth: function (session, lastLineNumber, config) { return 0; },
+                            getText: function (session, row) { return ""; }
+                        };
+                        var timer = null;
+                        session.on("change", function (e) {
+                            if (timer !== null)
+                                clearTimeout(timer);
+                            timer = setTimeout(function () {
+                                var value = session.getValue();
+                                if (showGutter) {
+                                    try {
+                                        JS.Data.CriteriaOperator.parse(value);
+                                        session.clearAnnotations();
+                                    }
+                                    catch (exception) {
+                                        var row = exception.hash.line;
+                                        var column = 0;
+                                        var lines = exception.message.split('\n');
+                                        var text = lines[1] + "\n" + lines[2];
+                                        session.setAnnotations([{ row: row, column: column, text: text, "type": "error" }]);
+                                    }
+                                }
+                                if (additionalOptions && additionalOptions.onChange) {
+                                    additionalOptions.onChange(value);
+                                }
+                                ;
+                            }, additionalOptions && additionalOptions.validationTimeout || 1000);
+                        });
+                        if (additionalOptions && additionalOptions.onFocus) {
+                            editor.onFocus = function (_) { return additionalOptions.onFocus(); };
+                        }
+                        if (additionalOptions && additionalOptions.onBlur) {
+                            editor.onBlur = function (_) { return additionalOptions.onBlur(); };
+                        }
+                        langTools.setCompleters(viewModel.languageHelper.createCompleters(editor, bindingContext, viewModel));
+                        editor.setOptions(values.options);
+                        editor.renderer.setShowGutter(showGutter);
+                        var oldMouseMove = editor._defaultHandlers.guttermousemove;
+                        editor._defaultHandlers.guttermousemove = function (e) {
+                            var rect = element.getBoundingClientRect();
+                            e.x = e.x - rect.left;
+                            e.y = e.y - rect.top;
+                            oldMouseMove(e);
+                        };
+                        if (ko.isSubscribable(text)) {
+                            var subscription = text.subscribe(function (newText) {
+                                if (newText !== session.getValue()) {
+                                    _setEditorText(editor, newText);
+                                }
+                            });
+                        }
+                        _setEditorText(editor, ko.unwrap(text));
+                        if (values.callbacks)
+                            values.callbacks.focus = function () {
+                                editor.focus();
+                            };
+                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                            subscription.dispose();
+                            values.options.focus = $.noop;
+                        });
+                    }
+                    if (ko.isObservable(editorContainer)) {
+                        editorContainer(editor);
+                    }
+                }
+            };
             ko.bindingHandlers['dxExpressionEditor'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var $element = $(element);
                     $element.children().remove();
                     $(element).addClass("dx-popup-general");
                     var templateHtml = $('#dx-expressioneditor').text(), $element = $element.append(templateHtml), values = valueAccessor();
-                    var editorOptions = wrapExpressionOptionsValue(ko.unwrap(values.options), values.displayExpressionConverter, element);
-                    ko.applyBindings(new ExpressionEditor(editorOptions, values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayExpressionConverter), $element.children()[0]);
+                    var editor = ko.observable(null);
+                    var subscriptions = [];
+                    var optionSubscription = null;
+                    var functionsSubscription = null;
+                    var displayExpressionConverter = values.displayExpressionConverter;
+                    if (!displayExpressionConverter && values.displayNameProvider) {
+                        var displayExpressionConverterType = DevExpress.Designer["Report"]["DisplayExpressionConverter"];
+                        if (displayExpressionConverterType) {
+                            displayExpressionConverter = new displayExpressionConverterType(values.displayNameProvider);
+                        }
+                    }
+                    var createEditor = function (options) {
+                        subscriptions.forEach(function (x) { return x.dispose(); });
+                        subscriptions.splice(0);
+                        functionsSubscription && functionsSubscription.dispose();
+                        functionsSubscription = options["functions"] && ko.isSubscribable(options["functions"])
+                            ? options["functions"].subscribe(function (_) { return editor(createEditor(options)); })
+                            : null;
+                        editor() && editor().dispose();
+                        var editorOptions = wrapExpressionOptionsValue(options, displayExpressionConverter, element, subscriptions);
+                        return new ExpressionEditor(editorOptions, values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayExpressionConverter);
+                    };
+                    if (ko.isSubscribable(values.options)) {
+                        optionSubscription = values.options.subscribe(function (newOptions) {
+                            editor(createEditor(newOptions));
+                        });
+                    }
+                    var options = ko.unwrap(values.options);
+                    editor(createEditor(ko.unwrap(values.options)));
+                    ko.applyBindings(editor, $element.children()[0]);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        editor() && editor().dispose();
+                        optionSubscription && optionSubscription.dispose();
+                        functionsSubscription && functionsSubscription.dispose();
+                        subscriptions.forEach(function (x) { return x.dispose(); });
+                        subscriptions.splice(0);
+                    });
                     return { controlsDescendantBindings: true };
                 }
             };
+        })(Widgets = JS.Widgets || (JS.Widgets = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
+        var Widgets;
+        (function (Widgets) {
+            var FilterEditorCodeCompletor = (function (_super) {
+                __extends(FilterEditorCodeCompletor, _super);
+                function FilterEditorCodeCompletor(editor, bindingContext, fieldListProvider, path) {
+                    _super.call(this, editor, bindingContext, fieldListProvider, path);
+                    var helper = new Widgets.FilterEditorHelper();
+                    var functions = [];
+                    var aggregate = [];
+                    var operators = [];
+                    var groups = Object.keys(helper.filterEditorOperators);
+                    groups.forEach(function (groupName) {
+                        helper.filterEditorOperators[groupName].forEach(function (operator) {
+                            if (operator.insertVal) {
+                                var name = operator.name, insertVal = operator.insertVal, paramCount = operator.paramCount;
+                                if (operator.type === JS.Data.FunctionOperatorType && functions.filter(function (x) { return x.name === name; }).length === 0) {
+                                    functions.push({ name: name, insertVal: insertVal });
+                                }
+                                else if (operator.type === JS.Data.Aggregate && aggregate.filter(function (x) { return x.name === name; }).length === 0) {
+                                    aggregate.push({ name: name, insertVal: insertVal });
+                                }
+                                else if (operator.type !== JS.Data.Aggregate && operator.type !== JS.Data.FunctionOperatorType && operators.filter(function (x) { return x.name === name; }).length === 0) {
+                                    operators.push({ name: name, insertVal: insertVal, paramCount: paramCount });
+                                }
+                            }
+                        });
+                    });
+                    this.filterEditorAvailable = { operators: operators, aggregate: aggregate, functions: functions };
+                }
+                FilterEditorCodeCompletor.prototype.getFunctionsCompletions = function () {
+                    var functions = [];
+                    this.filterEditorAvailable.functions.forEach(function (funcItem) {
+                        functions.push(Widgets.createFunctionCompletion({ text: funcItem.name, paramCount: funcItem.insertVal.split(',').length }, funcItem.insertVal, funcItem.insertVal));
+                    });
+                    return functions;
+                };
+                FilterEditorCodeCompletor.prototype.getAggregateCompletions = function () {
+                    var functions = [];
+                    this.filterEditorAvailable.aggragate.forEach(function (funcItem) {
+                        functions.push(Widgets.createFunctionCompletion({ text: funcItem.name, paramCount: 0 }, funcItem.insertVal, funcItem.insertVal));
+                    });
+                    return functions;
+                };
+                FilterEditorCodeCompletor.prototype.getOperatorCompletions = function (prefix) {
+                    var operators = [];
+                    this.filterEditorAvailable.operators.forEach(function (operator) {
+                        operators.push((operator.insertVal.match(new RegExp("[\(][^\(\)]*[\)]", "g"))) ?
+                            Widgets.createFunctionCompletion({ text: operator.name, paramCount: operator.paramCount || operator.insertVal.split(',').length }, operator.insertVal, operator.insertVal) :
+                            { caption: operator.insertVal, snippet: prefix + operator.insertVal, meta: "operator" });
+                    });
+                    return operators;
+                };
+                FilterEditorCodeCompletor.prototype.beforeInsertMatch = function (editor, token, parentPrefix) {
+                    if (parentPrefix === "Parameters.") {
+                        var cursorPosition = editor.getCursorPosition();
+                        token = token || !this["_isInContext"]() && editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
+                        if (token) {
+                            var trimmedText = token.value.trim();
+                            var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
+                            if ((token.type === "support.variable" || token.type === "support.function")) {
+                                editor.session.remove({
+                                    start: { column: token.start - 1 || 0, row: cursorPosition.row },
+                                    end: { column: Math.max(token.start + token.value.length, cursorPosition.column), row: cursorPosition.row }
+                                });
+                            }
+                            else if (lastNonSpaceSymbol === "?") {
+                                editor.session.remove({
+                                    start: { column: (token.start + token.value.length - 1) || 0, row: cursorPosition.row },
+                                    end: { column: Math.max(token.start + token.value.length, cursorPosition.column), row: cursorPosition.row }
+                                });
+                            }
+                        }
+                    }
+                    else {
+                        _super.prototype.beforeInsertMatch.call(this, editor, token, parentPrefix);
+                    }
+                };
+                FilterEditorCodeCompletor.prototype.insertMatch = function (editor, parentPrefix, fieldName) {
+                    if (parentPrefix === "Parameters.") {
+                        editor.insert("?" + fieldName);
+                    }
+                    else {
+                        _super.prototype.insertMatch.call(this, editor, parentPrefix, fieldName);
+                    }
+                };
+                FilterEditorCodeCompletor.prototype.generateFieldDisplayName = function (parentPrefix, displayName) {
+                    if (parentPrefix === "Parameters.") {
+                        return "?" + displayName;
+                    }
+                    return _super.prototype.generateFieldDisplayName.call(this, parentPrefix, displayName);
+                };
+                FilterEditorCodeCompletor.prototype.defaultProcess = function (token, text, completions) {
+                    var _this = this;
+                    var trimmedText = text.trim();
+                    var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
+                    if (lastNonSpaceSymbol === '?' && text[text.length - 1] !== " ") {
+                        var $deferred = $.Deferred();
+                        var $parametersPromise = this["_fieldListProvider"].getItems(new Widgets.PathRequest("Parameters"))
+                            .done(function (fields) {
+                            completions.push.apply(completions, _this["_convertDataMemberInfoToCompletions"](fields, token, "Parameters."));
+                        });
+                        $.when($parametersPromise).always(function () { $deferred.resolve(completions); });
+                        return $deferred.promise();
+                    }
+                    else {
+                        return _super.prototype.defaultProcess.call(this, token, text, completions);
+                    }
+                };
+                return FilterEditorCodeCompletor;
+            })(Widgets.CodeCompletor);
+            Widgets.FilterEditorCodeCompletor = FilterEditorCodeCompletor;
         })(Widgets = JS.Widgets || (JS.Widgets = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -10472,6 +11640,15 @@ var DevExpress;
                     this.selectedFormats = ko.observable([]);
                     this.selectedTypes = ko.observable([]);
                     this.popupVisible = ko.observable(false);
+                    this.localizationIdMap = {
+                        'title': { text: 'FormatString Editor', localizationId: 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Title' },
+                        'category': { text: 'Category', localizationId: 'DevExpress.XtraPrinting.XlDocumentOptions.Category' },
+                        'preview': { text: 'Preview', localizationId: 'ASPxReportsStringId.ReportDesigner_TooltipButtons_Preview' },
+                        'types': { text: 'Types', localizationId: 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Types' },
+                        'add': { text: 'Add', localizationId: 'ChartStringId.MenuItemAdd' },
+                        'prefix': { text: 'Prefix', localizationId: 'DevExpress.XtraPrinting.Recipient.Prefix' },
+                        'suffix': { text: 'Suffix', localizationId: 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Suffix' }
+                    };
                     this.option("value", value);
                     this.option("disabled", disabled || false);
                     this.option("rtl", rtl || false);
@@ -10554,7 +11731,7 @@ var DevExpress;
                     ];
                 };
                 FormatStringEditor.prototype._convertArray = function (array, canRemove) {
-                    return array.map(function (item) { return { name: item, canRemove: !!canRemove }; });
+                    return array.map(function (item) { return { name: item, displayName: DevExpress.Designer.getLocalization(item), canRemove: !!canRemove }; });
                 };
                 FormatStringEditor.prototype._scrollToBottom = function () {
                     var $scrollView = $(".dx-format-string .dx-format-string-formats").find(".dx-scrollview").filter(":visible");
@@ -10686,6 +11863,12 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                FormatStringEditor.prototype.getDisplayText = function (key) {
+                    return DevExpress.Designer.getLocalization(this.localizationIdMap[key].text, this.localizationIdMap[key].localizationId);
+                };
+                FormatStringEditor.prototype.getPopupContainer = function (el) {
+                    return $(el).closest(this.option("popupContainer"));
+                };
                 return FormatStringEditor;
             })(DevExpress.JS.Utils.Disposable);
             Widgets.FormatStringEditor = FormatStringEditor;
@@ -10694,7 +11877,7 @@ var DevExpress;
                     $(element).children().remove();
                     $(element).addClass("dx-popup-general");
                     var templateHtml = $('#dx-format-string').text(), $element = $(element).append(templateHtml), values = valueAccessor();
-                    var formatEditor = new FormatStringEditor(values.value, values['disabled'], values['standardPatterns'], values['customPatterns'], values['actions'], values['rtl'], values['popupContainer']);
+                    var formatEditor = new FormatStringEditor(values.value, values['disabled'], values['standardPatterns'], values['customPatterns'] || DevExpress.Designer["Report"] && DevExpress.Designer["Report"]["formatStringEditorCustomSet"], values['actions'] || DevExpress.Designer["Report"] && DevExpress.Designer["Report"]["FormatStringService"].actions, values['rtl'], values['popupContainer']);
                     ko.applyBindings(formatEditor, $element.children()[0]);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                         formatEditor.dispose();
@@ -10744,6 +11927,23 @@ var DevExpress;
                 return JS.Widgets.ValueEditorHelper.isValid(this.value, "float", stringValue) ? stringValue : defaultValue;
             }
             Utils.floatValueConverter = floatValueConverter;
+            function classExists(selector) {
+                var lowerCaseSelector = selector.toLowerCase(), result = false;
+                for (var sheetIndex = 0; sheetIndex < (document.styleSheets || []).length; sheetIndex++) {
+                    var rules = document.styleSheets[sheetIndex]["rules"] ? document.styleSheets[sheetIndex]["rules"] : document.styleSheets[sheetIndex]["cssRules"];
+                    for (var ruleIndex = 0; ruleIndex < (rules || []).length; ruleIndex++) {
+                        if (rules[ruleIndex].selectorText && rules[ruleIndex].selectorText.toLowerCase() === lowerCaseSelector) {
+                            result = true;
+                            break;
+                        }
+                    }
+                    if (result) {
+                        break;
+                    }
+                }
+                return result;
+            }
+            Utils.classExists = classExists;
             ko.bindingHandlers["focus"] = {
                 init: function (element, valueAccessor) {
                     var visible = valueAccessor().on || valueAccessor();
@@ -10759,6 +11959,10 @@ var DevExpress;
                     });
                 }
             };
+            function isList(data) {
+                return data.isList === true || data.specifics === "List" || data.specifics === "ListSource";
+            }
+            Utils.isList = isList;
         })(Utils = JS.Utils || (JS.Utils = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11001,7 +12205,7 @@ var DevExpress;
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-ko-widgets.js.map
-/* parser generated by jison 0.4.17 */
+/* parser generated by jison 0.4.18 */
 /*
   Returns a Parser object of the following structure:
 
@@ -11075,12 +12279,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,14],$V8=[1,19],$V9=[1,30],$Va=[1,32],$Vb=[1,25],$Vc=[1,24],$Vd=[1,34],$Ve=[1,31],$Vf=[1,33],$Vg=[1,13],$Vh=[1,5],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,40],$Vq=[1,39],$Vr=[1,50],$Vs=[1,52],$Vt=[1,53],$Vu=[1,56],$Vv=[1,55],$Vw=[1,51],$Vx=[1,54],$Vy=[1,36],$Vz=[1,37],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,27,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,27,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,28,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,27,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,31,43,44,45,46,47,48,49,53,63,64,66,67,68,69],$V71=[5,11,31,44,45,53],$V81=[16,53],$V91=[15,16,17,22,25,26,27,28,29,30,53],$Va1=[16,17,20],$Vb1=[5,11,17,19,20,23,27,31,43,44,45,46,47,48,49,53,63,64,66,67,68,69],$Vc1=[5,11,31,43,44,45,48,49,53,66,67],$Vd1=[5,11,19,20,31,43,44,45,48,49,53,66,67,68,69],$Ve1=[11,31],$Vf1=[5,11,16,17,19,20,23,26,27,28,31,43,44,45,46,47,48,49,53,61,62,63,64,66,67,68,69];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,10],$V6=[1,21],$V7=[1,14],$V8=[1,19],$V9=[1,30],$Va=[1,32],$Vb=[1,25],$Vc=[1,24],$Vd=[1,34],$Ve=[1,31],$Vf=[1,33],$Vg=[1,13],$Vh=[1,5],$Vi=[1,3],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,40],$Vq=[1,39],$Vr=[1,37],$Vs=[1,50],$Vt=[1,52],$Vu=[1,53],$Vv=[1,56],$Vw=[1,55],$Vx=[1,51],$Vy=[1,54],$Vz=[1,36],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,26,27,30,32,44,45,46,47,48,49,50,54,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,26,27,30,32,44,45,46,47,48,49,50,54,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,26,27,28,30,32,44,45,46,47,48,49,50,54,62,63,64,66,67,68,69],$VN=[1,94],$VO=[1,95],$VP=[1,93],$VQ=[1,78],$VR=[1,79],$VS=[1,80],$VT=[1,81],$VU=[1,82],$VV=[1,83],$VW=[1,84],$VX=[1,85],$VY=[1,86],$VZ=[1,87],$V_=[1,88],$V$=[1,89],$V01=[1,90],$V11=[1,91],$V21=[1,92],$V31=[5,11,16,17,19,20,23,26,27,30,32,44,45,46,47,48,49,50,54,62,63,64,66,67,68,69],$V41=[1,96],$V51=[1,97],$V61=[5,11,19,20,23,32,44,45,46,47,48,49,50,54,63,64,66,67,68,69],$V71=[5,11,32,45,46,54],$V81=[16,54],$V91=[1,146],$Va1=[1,152],$Vb1=[1,148],$Vc1=[1,147],$Vd1=[1,149],$Ve1=[1,150],$Vf1=[1,151],$Vg1=[1,153],$Vh1=[1,154],$Vi1=[1,155],$Vj1=[15,16,17,22,25,26,27,28,29,30,31,32,54],$Vk1=[16,17,20],$Vl1=[5,11,17,19,20,23,27,32,44,45,46,47,48,49,50,54,63,64,66,67,68,69],$Vm1=[5,11,32,44,45,46,49,50,54,66,67],$Vn1=[5,11,19,20,32,44,45,46,49,50,54,66,67,68,69],$Vo1=[11,32],$Vp1=[5,11,16,17,19,20,23,26,27,28,30,32,44,45,46,47,48,49,50,54,62,63,64,66,67,68,69];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"%":26,"-":27,"[":28,"=":29,"(":30,")":31,"param":32,"?":33,"property":34,"columnOrAggregate":35,"AGG_COUNT":36,"AGG_AVG":37,"AGG_MAX":38,"AGG_MIN":39,"AGG_SINGLE":40,"AGG_EXISTS":41,"AGG_SUM":42,"OP_LIKE":43,"AND":44,"OR":45,"OP_BETWEEN":46,"OP_IN":47,"NOT":48,"IS":49,"NULL":50,"propertyWithAggregate":51,"compositeProperty":52,"]":53,"field":54,"aggregate":55,"aggregateSuffix":56,"topLevelAggregate":57,"MinStart":58,"MaxStart":59,"CONST":60,"*":61,"/":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"%",27:"-",28:"[",29:"=",30:"(",31:")",33:"?",36:"AGG_COUNT",37:"AGG_AVG",38:"AGG_MAX",39:"AGG_MIN",40:"AGG_SINGLE",41:"AGG_EXISTS",42:"AGG_SUM",43:"OP_LIKE",44:"AND",45:"OR",46:"OP_BETWEEN",47:"OP_IN",48:"NOT",49:"IS",50:"NULL",53:"]",60:"CONST",61:"*",62:"/",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,4],[24,4],[24,4],[24,4],[32,2],[32,1],[34,1],[34,3],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[35,1],[51,1],[51,3],[52,3],[52,4],[52,5],[52,6],[54,1],[54,2],[55,4],[55,3],[55,6],[55,5],[55,4],[55,3],[55,1],[57,1],[56,1],[56,1],[56,3],[56,3],[56,4],[56,4],[56,3],[56,4],[56,2],[56,2],[58,3],[59,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"%":26,"-":27,"[":28,"=":29,"/":30,"(":31,")":32,"param":33,"?":34,"property":35,"columnOrAggregate":36,"AGG_COUNT":37,"AGG_AVG":38,"AGG_MAX":39,"AGG_MIN":40,"AGG_SINGLE":41,"AGG_EXISTS":42,"AGG_SUM":43,"OP_LIKE":44,"AND":45,"OR":46,"OP_BETWEEN":47,"OP_IN":48,"NOT":49,"IS":50,"NULL":51,"propertyWithAggregate":52,"compositeProperty":53,"]":54,"field":55,"aggregate":56,"aggregateSuffix":57,"topLevelAggregate":58,"MinStart":59,"MaxStart":60,"CONST":61,"*":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"%",27:"-",28:"[",29:"=",30:"/",31:"(",32:")",34:"?",37:"AGG_COUNT",38:"AGG_AVG",39:"AGG_MAX",40:"AGG_MIN",41:"AGG_SINGLE",42:"AGG_EXISTS",43:"AGG_SUM",44:"OP_LIKE",45:"AND",46:"OR",47:"OP_BETWEEN",48:"OP_IN",49:"NOT",50:"IS",51:"NULL",54:"]",61:"CONST",62:"*",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
+productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,4],[24,4],[24,4],[33,2],[33,1],[35,1],[35,3],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[36,1],[52,1],[52,3],[53,3],[53,4],[53,5],[53,6],[55,1],[55,2],[56,4],[56,3],[56,6],[56,5],[56,4],[56,3],[56,1],[58,1],[57,1],[57,1],[57,3],[57,3],[57,4],[57,4],[57,3],[57,4],[57,2],[57,2],[59,3],[60,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -11101,10 +12305,10 @@ break;
 case 5: case 6:
  this.$ = $$[$0-2]; this.$.push($$[$0]); 
 break;
-case 7: case 10: case 17: case 48: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 58: case 59: case 60: case 61: case 62: case 63: case 64: case 65: case 66: case 97: case 98: case 99: case 100:
+case 7: case 10: case 17: case 51: case 54: case 55: case 56: case 57: case 58: case 59: case 60: case 61: case 62: case 63: case 64: case 65: case 66: case 67: case 68: case 69: case 100: case 101: case 102: case 103:
  this.$ = $$[$0]; 
 break;
-case 8: case 90: case 91: case 123: case 133:
+case 8: case 93: case 94: case 126: case 136:
  this.$ = $$[$0-1]; 
 break;
 case 9:
@@ -11149,25 +12353,34 @@ break;
 case 38: case 39: case 40: case 41:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '=' + $$[$0] }); 
 break;
-case 42: case 43: case 44: case 45:
+case 42:
+  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '/' + $$[$0] }); 
+break;
+case 43: case 44: case 45:
+  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '/'  + $$[$0] }); 
+break;
+case 46: case 47:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1] + ')' }); 
 break;
-case 46:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
-break;
-case 47:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
+case 48:
+  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1].propertyName + ')' }); 
 break;
 case 49:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
 break;
 case 50:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
+break;
+case 52:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
+break;
+case 53:
  this.$ = $$[$0].propertyName; 
 break;
-case 67:
+case 70:
  this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
 break;
-case 68:
+case 71:
 
   var lst = [];
   lst.push($$[$0-1]);
@@ -11178,7 +12391,7 @@ case 68:
   };
  
 break;
-case 69:
+case 72:
 
 	var lst = [];
   lst.push($$[$0-2] + '.');
@@ -11189,59 +12402,59 @@ case 69:
   };
  
 break;
-case 70:
+case 73:
 
   var propertyNameObject = $$[$0-4];
   propertyNameObject.names.push($$[$0-1]);
   this.$ = propertyNameObject;
  
 break;
-case 71:
+case 74:
 
   var propertyNameObject = $$[$0-5];
   propertyNameObject.names.push($$[$0-2] + '.');
   this.$ = propertyNameObject;
  
 break;
-case 72:
+case 75:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0].names.join('.'), startColumn: $$[$0].column, startLine: $$[$0].line }); 
 break;
-case 73:
+case 76:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { }); 
 break;
-case 74:
+case 77:
 
 		var agg = $$[$0];
 		var collectionProperty = DevExpress.JS.Data.criteriaCreator.process("property", { });
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(collectionProperty, null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 75:
+case 78:
 
 		var agg = $$[$0];
 		var prop = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].names.join('.'), startColumn: $$[$0-2].column, startLine: $$[$0-2].line });
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(prop, null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 76:
+case 79:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 77:
+case 80:
 
 		var agg = $$[$0];
 		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
 	
 break;
-case 78:
+case 81:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 79:
+case 82:
  this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
 break;
-case 82: case 84:
+case 85: case 87:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11251,7 +12464,7 @@ case 82: case 84:
 		});
 	
 break;
-case 83: case 85:
+case 86: case 88:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11261,7 +12474,7 @@ case 83: case 85:
 		});
 	
 break;
-case 86:
+case 89:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11271,7 +12484,7 @@ case 86:
 		});
 	
 break;
-case 87:
+case 90:
 
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11281,7 +12494,7 @@ case 87:
 		});
 	
 break;
-case 88:
+case 91:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11291,7 +12504,7 @@ case 88:
 		});
 	
 break;
-case 89:
+case 92:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11301,7 +12514,7 @@ case 89:
 		});
 	
 break;
-case 92:
+case 95:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11311,7 +12524,7 @@ case 92:
 		});
 	
 break;
-case 93:
+case 96:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
 			property: null,
@@ -11321,69 +12534,69 @@ case 93:
 		});
 	
 break;
-case 94: case 95:
+case 97: case 98:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: $$[$0] }); 
 break;
-case 96:
+case 99:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: null }); 
 break;
-case 101:
+case 104:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Multiply }); 
 break;
-case 102:
+case 105:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Divide }); 
 break;
-case 103:
+case 106:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Plus }); 
 break;
-case 104:
+case 107:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Minus }); 
 break;
-case 105:
+case 108:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Modulo }); 
 break;
-case 106:
+case 109:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseOr }); 
 break;
-case 107:
+case 110:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd }); 
 break;
-case 108:
+case 111:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseXor }); 
 break;
-case 109:
+case 112:
 
 								this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Minus, operator: $$[$0] });
 							
 break;
-case 110:
+case 113:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Plus, operator: $$[$0] }); 
 break;
-case 111:
+case 114:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, operator: $$[$0] }); 
 break;
-case 112:
+case 115:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Equal }); 
 break;
-case 113:
+case 116:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.NotEqual }); 
 break;
-case 114:
+case 117:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Greater }); 
 break;
-case 115:
+case 118:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Less }); 
 break;
-case 116:
+case 119:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual }); 
 break;
-case 117:
+case 120:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.LessOrEqual }); 
 break;
-case 118:
+case 121:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }); 
 break;
-case 119:
+case 122:
 
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
 			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, 
@@ -11391,19 +12604,19 @@ case 119:
 		});
 	
 break;
-case 120:
+case 123:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, operator: $$[$0] }); 
 break;
-case 121:
+case 124:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 122:
+case 125:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 124:
+case 127:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-2] }); 
 break;
-case 125:
+case 128:
  
 		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
 			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not,
@@ -11411,35 +12624,35 @@ case 125:
 		}); 
 	
 break;
-case 126:
+case 129:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("in", { criteriaOperator: $$[$0-2], operands: $$[$0] }); 
 break;
-case 127:
+case 130:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("between", { property: $$[$0-6], begin: $$[$0-3], end: $$[$0-1] }); 
 break;
-case 128: case 129:
+case 131: case 132:
   this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
 break;
-case 130:
+case 133:
  this.$ = null; 
 break;
-case 131:
+case 134:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Min, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
 break;
-case 132:
+case 135:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Max, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
 break;
-case 134:
+case 137:
  this.$ = []; 
 break;
-case 135:
+case 138:
 
 							var lst = [];
 							lst.push($$[$0]);
 							this.$ = lst;
 						
 break;
-case 136:
+case 139:
 
 							var lst = $$[$0-2];
 							lst.push($$[$0]);
@@ -11448,19 +12661,15 @@ case 136:
 break;
 }
 },
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,94]),o($VG,[2,95]),o($VG,[2,96]),o($VG,[2,97]),o($VG,[2,98],{28:[1,57]}),o($VG,[2,99],{16:[1,58]}),o($VG,[2,100]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,31:[1,64],32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{30:$VH,70:65},o($VI,$VJ,{70:67,30:$VH}),{11:[1,68],31:$VK},{11:[1,70],31:$VL},o($VG,[2,47],{15:[1,72]}),o($VM,[2,72],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,35:76,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,51:75,53:[1,74]},o($V31,[2,48],{15:$V41,22:$V51}),o($VG,[2,80]),{30:[1,98]},{30:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,81]),{14:100,15:[1,101]},o($VG,[2,82],{30:[1,102]}),o($VG,[2,83],{30:[1,103]}),{30:[1,104]},{30:[1,105]},{30:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{43:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{48:[1,126],50:[1,125]},{30:$VH,70:127},{30:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,53:[1,130],54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,109]),o($VG,[2,110]),o($V61,[2,111],{17:$Vl,26:$Vp,27:$Vq,61:$Vy,62:$Vz}),o($V71,[2,120],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,133],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,130]),o($VG,[2,128]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,31:[1,135],32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,129]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,90]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,91]),o($VG,[2,46]),{28:[1,140],36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:139,58:141,59:142},o($VM,[2,73],{16:[1,143]}),{16:[1,145],53:[1,144]},o($V81,[2,66]),o($V81,[2,50],{15:[1,146],17:[1,152],22:[1,148],25:[1,147],26:[1,149],27:[1,150],28:[1,151],29:[1,153],30:[1,154]}),o($V81,[2,51]),o($V81,[2,52]),o($V81,[2,53]),o($V81,[2,54]),o($V81,[2,55]),o($V81,[2,56]),o($V81,[2,57]),o($V81,[2,58]),o($V81,[2,59]),o($V81,[2,60]),o($V81,[2,61]),o($V81,[2,62]),o($V81,[2,63]),o($V81,[2,64]),o($V81,[2,65]),o($V91,[2,19]),o($V91,[2,20]),o($V91,[2,25]),o($VI,[2,15]),o($VI,[2,16]),{4:155,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:156,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{16:[1,158],17:[1,159],20:[1,157]},o($Va1,[2,10]),{31:[1,160]},{31:[1,161]},{4:162,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{4:165,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,31:[1,164],32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,101]),o($VG,[2,102]),o($Vb1,[2,103],{26:$Vp,61:$Vy,62:$Vz}),o($Vb1,[2,104],{26:$Vp,61:$Vy,62:$Vz}),o($VG,[2,105]),o([5,11,19,20,31,43,44,45,46,47,48,49,53,63,66,67,68,69],[2,106],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,61:$Vy,62:$Vz,64:$VB}),o($V61,[2,107],{17:$Vl,26:$Vp,27:$Vq,61:$Vy,62:$Vz}),o([5,11,19,20,23,31,43,44,45,46,47,48,49,53,63,66,67,68,69],[2,108],{17:$Vl,26:$Vp,27:$Vq,61:$Vy,62:$Vz,64:$VB}),o($Vc1,[2,112],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vc1,[2,113],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vd1,[2,114],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,115],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,116],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vd1,[2,117],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB}),o($Vc1,[2,118],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($V71,[2,121],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,31,45,53],[2,122],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,124]),{50:[1,167]},o($VG,[2,126]),{4:168,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,53:[1,169],61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,79],{16:[1,170]}),o($V31,[2,49],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,123]),{11:[1,172],31:[1,171]},o($VG,[2,134]),o($Ve1,[2,135],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,173],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,174],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,75]),{15:$VN,23:$VO,24:77,25:$VP,35:76,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,51:175},{31:$VK},{31:$VL},{36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:176,58:141,59:142},o($Vf1,[2,68]),{15:$VN,23:$VO,24:77,25:$VP,35:178,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,53:[1,177]},o($V91,[2,21]),o($V91,[2,22]),o($V91,[2,23]),o($V91,[2,24]),{15:[1,179],22:[1,181],25:[1,180],26:[1,182]},{15:[1,183],22:[1,185],25:[1,184],26:[1,186]},{15:[1,187],22:[1,189],25:[1,188],26:[1,190]},{15:[1,191],22:[1,193],25:[1,192],26:[1,194]},{15:[1,195],22:[1,197],25:[1,196],26:[1,198]},o($Ve1,[2,92],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Ve1,[2,93],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,199]},{15:[1,200]},{15:[1,201]},o($VG,[2,84]),o($VG,[2,85]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,202],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,203],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,88]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,204],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vc1,[2,119],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,46:$Vu,47:$Vv,61:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,125]),{11:[1,205],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,78],{16:[1,206]}),{36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:207,58:141,59:142},o($VG,[2,133]),{4:208,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},o($VG,[2,131]),o($VG,[2,132]),{16:[1,210],53:[1,209]},o($VG,[2,74]),o($Vf1,[2,69]),o($V81,[2,67]),o($V91,[2,26]),o($V91,[2,27]),o($V91,[2,28]),o($V91,[2,29]),o($V91,[2,30]),o($V91,[2,31]),o($V91,[2,32]),o($V91,[2,33]),o($V91,[2,34]),o($V91,[2,35]),o($V91,[2,36]),o($V91,[2,37]),o($V91,[2,38]),o($V91,[2,39]),o($V91,[2,40]),o($V91,[2,41]),{31:[1,211]},{31:[1,212]},{31:[1,213]},{31:[1,214]},o($VI,[2,13]),o($Va1,[2,11]),o($Va1,[2,12]),o($VG,[2,86]),o($VG,[2,87]),o($VG,[2,89]),{4:215,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,30:$V7,32:6,33:$V8,34:8,36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,48:$Vg,50:$Vh,52:20,54:7,55:9,56:28,57:23,58:17,59:18,60:$Vi,65:$Vj,71:$Vk},{36:$V9,37:$Va,38:$Vb,39:$Vc,40:$Vd,41:$Ve,42:$Vf,56:216,58:141,59:142},o($VG,[2,77]),o($Ve1,[2,136],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vf1,[2,70]),{15:$VN,23:$VO,24:77,25:$VP,35:178,36:$VQ,37:$VR,38:$VS,39:$VT,40:$VU,41:$VV,42:$VW,43:$VX,44:$VY,45:$VZ,46:$V_,47:$V$,48:$V01,49:$V11,50:$V21,53:[1,217]},o($V91,[2,42]),o($V91,[2,43]),o($V91,[2,44]),o($V91,[2,45]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,31:[1,218],43:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,61:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,76]),o($Vf1,[2,71]),o($VG,[2,127])],
+table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,97]),o($VG,[2,98]),o($VG,[2,99]),o($VG,[2,100]),o($VG,[2,101],{28:[1,57]}),o($VG,[2,102],{16:[1,58]}),o($VG,[2,103]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,32:[1,64],33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{31:$VH,70:65},o($VI,$VJ,{70:67,31:$VH}),{11:[1,68],32:$VK},{11:[1,70],32:$VL},o($VG,[2,50],{15:[1,72]}),o($VM,[2,75],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,36:76,37:$VQ,38:$VR,39:$VS,40:$VT,41:$VU,42:$VV,43:$VW,44:$VX,45:$VY,46:$VZ,47:$V_,48:$V$,49:$V01,50:$V11,51:$V21,52:75,54:[1,74]},o($V31,[2,51],{15:$V41,22:$V51}),o($VG,[2,83]),{31:[1,98]},{31:[1,99]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,84]),{14:100,15:[1,101]},o($VG,[2,85],{31:[1,102]}),o($VG,[2,86],{31:[1,103]}),{31:[1,104]},{31:[1,105]},{31:[1,106]},{1:[2,1]},{4:107,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{44:[1,122]},{4:123,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{49:[1,126],51:[1,125]},{31:$VH,70:127},{31:[1,128]},{4:129,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,54:[1,130],55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{15:[1,132],18:26,19:$V2,21:131,23:$V4},o($VG,[2,112]),o($VG,[2,113]),o($V61,[2,114],{17:$Vl,26:$Vp,27:$Vq,30:$Vr,62:$Vz}),o($V71,[2,123],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,133],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,133]),o($VG,[2,131]),{4:136,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,32:[1,135],33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk,72:134},o($VG,[2,132]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},o($VG,[2,93]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},o($VG,[2,94]),o($VG,[2,49]),{28:[1,140],37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,57:139,59:141,60:142},o($VM,[2,76],{16:[1,143]}),{16:[1,145],54:[1,144]},o($V81,[2,69]),o($V81,[2,53],{15:$V91,17:$Va1,22:$Vb1,25:$Vc1,26:$Vd1,27:$Ve1,28:$Vf1,29:$Vg1,30:$Vh1,31:$Vi1}),o($V81,[2,54]),o($V81,[2,55]),o($V81,[2,56]),o($V81,[2,57]),o($V81,[2,58]),o($V81,[2,59]),o($V81,[2,60]),o($V81,[2,61]),o($V81,[2,62]),o($V81,[2,63]),o($V81,[2,64]),o($V81,[2,65]),o($V81,[2,66]),o($V81,[2,67]),o($V81,[2,68]),o($Vj1,[2,19]),o($Vj1,[2,20]),o($Vj1,[2,25]),o($VI,[2,15]),o($VI,[2,16]),{4:156,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:157,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{16:[1,159],17:[1,160],20:[1,158]},o($Vk1,[2,10]),{32:[1,161]},{32:[1,162]},{4:163,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:164,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{4:166,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,32:[1,165],33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},o($VG,[2,104]),o($VG,[2,105]),o($Vl1,[2,106],{26:$Vp,30:$Vr,62:$Vz}),o($Vl1,[2,107],{26:$Vp,30:$Vr,62:$Vz}),o($VG,[2,108]),o([5,11,19,20,32,44,45,46,47,48,49,50,54,63,66,67,68,69],[2,109],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,30:$Vr,62:$Vz,64:$VB}),o($V61,[2,110],{17:$Vl,26:$Vp,27:$Vq,30:$Vr,62:$Vz}),o([5,11,19,20,23,32,44,45,46,47,48,49,50,54,63,66,67,68,69],[2,111],{17:$Vl,26:$Vp,27:$Vq,30:$Vr,62:$Vz,64:$VB}),o($Vm1,[2,115],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vm1,[2,116],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($Vn1,[2,117],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB}),o($Vn1,[2,118],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB}),o($Vn1,[2,119],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB}),o($Vn1,[2,120],{17:$Vl,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB}),o($Vm1,[2,121],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:167,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},o($V71,[2,124],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,32,46,54],[2,125],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,127]),{51:[1,168]},o($VG,[2,129]),{4:169,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,54:[1,170],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,82],{16:[1,171]}),o($V31,[2,52],{15:$V41,22:$V51}),o($VI,$VJ),o($VG,[2,126]),{11:[1,173],32:[1,172]},o($VG,[2,137]),o($Vo1,[2,138],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,174],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,175],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,78]),{15:$VN,23:$VO,24:77,25:$VP,36:76,37:$VQ,38:$VR,39:$VS,40:$VT,41:$VU,42:$VV,43:$VW,44:$VX,45:$VY,46:$VZ,47:$V_,48:$V$,49:$V01,50:$V11,51:$V21,52:176},{32:$VK},{32:$VL},{37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,57:177,59:141,60:142},o($Vp1,[2,71]),{15:$VN,23:$VO,24:77,25:$VP,36:179,37:$VQ,38:$VR,39:$VS,40:$VT,41:$VU,42:$VV,43:$VW,44:$VX,45:$VY,46:$VZ,47:$V_,48:$V$,49:$V01,50:$V11,51:$V21,54:[1,178]},o($Vj1,[2,21]),o($Vj1,[2,22]),o($Vj1,[2,23]),o($Vj1,[2,24]),{15:[1,180],22:[1,182],25:[1,181],26:[1,183]},{15:[1,184],22:[1,186],25:[1,185],26:[1,187]},{15:[1,188],22:[1,190],25:[1,189],26:[1,191]},{15:[1,192],22:[1,194],25:[1,193],26:[1,195]},{15:[1,196],22:[1,198],25:[1,197],26:[1,199]},{15:$VN,22:[1,200],23:$VO,24:202,25:$VP,26:[1,201]},o($Vo1,[2,95],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vo1,[2,96],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,203]},{15:[1,204]},{15:[1,205]},o($VG,[2,87]),o($VG,[2,88]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,206],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,207],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,91]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,208],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($Vm1,[2,122],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,47:$Vv,48:$Vw,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,128]),{11:[1,209],17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,81],{16:[1,210]}),{37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,57:211,59:141,60:142},o($VG,[2,136]),{4:212,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},o($VG,[2,134]),o($VG,[2,135]),{16:[1,214],54:[1,213]},o($VG,[2,77]),o($Vp1,[2,72]),o($V81,[2,70]),o($Vj1,[2,26]),o($Vj1,[2,27]),o($Vj1,[2,28]),o($Vj1,[2,29]),o($Vj1,[2,30]),o($Vj1,[2,31]),o($Vj1,[2,32]),o($Vj1,[2,33]),o($Vj1,[2,34]),o($Vj1,[2,35]),o($Vj1,[2,36]),o($Vj1,[2,37]),o($Vj1,[2,38]),o($Vj1,[2,39]),o($Vj1,[2,40]),o($Vj1,[2,41]),o($Vj1,[2,42]),o($Vj1,[2,43]),o($Vj1,[2,44]),o($Vj1,[2,45]),{32:[1,215]},{32:[1,216]},{15:$V91,17:$Va1,22:$Vb1,25:$Vc1,26:$Vd1,27:$Ve1,28:$Vf1,29:$Vg1,30:$Vh1,31:$Vi1,32:[1,217]},o($VI,[2,13]),o($Vk1,[2,11]),o($Vk1,[2,12]),o($VG,[2,89]),o($VG,[2,90]),o($VG,[2,92]),{4:218,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,27:$V5,28:$V6,31:$V7,33:6,34:$V8,35:8,37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,49:$Vg,51:$Vh,53:20,55:7,56:9,57:28,58:23,59:17,60:18,61:$Vi,65:$Vj,71:$Vk},{37:$V9,38:$Va,39:$Vb,40:$Vc,41:$Vd,42:$Ve,43:$Vf,57:219,59:141,60:142},o($VG,[2,80]),o($Vo1,[2,139],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($Vp1,[2,73]),{15:$VN,23:$VO,24:77,25:$VP,36:179,37:$VQ,38:$VR,39:$VS,40:$VT,41:$VU,42:$VV,43:$VW,44:$VX,45:$VY,46:$VZ,47:$V_,48:$V$,49:$V01,50:$V11,51:$V21,54:[1,220]},o($Vj1,[2,46]),o($Vj1,[2,47]),o($Vj1,[2,48]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,26:$Vp,27:$Vq,30:$Vr,32:[1,221],44:$Vs,45:$Vt,46:$Vu,47:$Vv,48:$Vw,49:$Vx,50:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,79]),o($Vp1,[2,74]),o($VG,[2,130])],
 defaultActions: {35:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
-        function _parseError (msg, hash) {
-            this.message = msg;
-            this.hash = hash;
-        }
-        _parseError.prototype = Error;
-
-        throw new _parseError(str, hash);
+        var error = new Error(str);
+        error.hash = hash;
+        throw error;
     }
 },
 parse: function parse(input) {
@@ -11930,19 +13139,19 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:/* skip whitespace */
 break;
-case 1:return 46
+case 1:return 47
 break;
-case 2:return 47
+case 2:return 48
 break;
-case 3:return 48
+case 3:return 49
 break;
-case 4:return 49
+case 4:return 50
 break;
-case 5:return 50
+case 5:return 51
 break;
-case 6:return 61
+case 6:return 62
 break;
-case 7:return 62
+case 7:return 30
 break;
 case 8:return 27
 break;
@@ -11956,13 +13165,13 @@ case 12:return '!'
 break;
 case 13:return 26
 break;
-case 14:return 30
+case 14:return 31
 break;
-case 15:return 31
+case 15:return 32
 break;
 case 16:return 28
 break;
-case 17:return 53
+case 17:return 54
 break;
 case 18:return 67
 break;
@@ -11974,33 +13183,33 @@ case 21:return 20
 break;
 case 22:return 19
 break;
-case 23:return 45
+case 23:return 46
 break;
-case 24:return 44
+case 24:return 45
 break;
-case 25:return 37
+case 25:return 38
 break;
-case 26:return 38
+case 26:return 39
 break;
-case 27:return 39
+case 27:return 40
 break;
-case 28:return 40
+case 28:return 41
 break;
-case 29:return 36
+case 29:return 37
 break;
-case 30:return 41
+case 30:return 42
 break;
-case 31:return 42
+case 31:return 43
 break;
 case 32:return 66
 break;
 case 33:return 66
 break;
-case 34:return 43
+case 34:return 44
 break;
-case 35:return 44
+case 35:return 45
 break;
-case 36:return 45
+case 36:return 46
 break;
 case 37:return 5
 break;
@@ -12010,17 +13219,17 @@ case 39:return 16
 break;
 case 40:return 11
 break;
-case 41:return 33
+case 41:return 34
 break;
-case 42:return 60
+case 42:return 61
 break;
-case 43:return 60
+case 43:return 61
 break;
 case 44:return 15	
 break;
-case 45:return 60	
+case 45:return 61	
 break;
-case 46:return 60
+case 46:return 61
 break;
 case 47:return 25   
 break;
@@ -12040,24 +13249,99 @@ function Parser () {
 Parser.prototype = parser;parser.Parser = Parser;
 return new Parser;
 })();
+DevExpress.JS.Data.criteriaparser = criteriaparser;
+if(window["ace"]) {
+    var _define = window["ace"].define || define;
+    _define("ace/mode/criteria", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text"], function (require, exports, module) {
+        "use strict";
+        var oop = require("../lib/oop");
+        // defines the parent mode
+        var TextMode = require("./text").Mode;
+
+        // defines the language specific highlighters and folding rules
+        var CriteriaHighlightRules = require("./criteria_highlight_rules").CriteriaHighlightRules;
+
+        var Mode = function() {
+            // set everything up
+            this.HighlightRules = CriteriaHighlightRules;
+        };
+        oop.inherits(Mode, TextMode);
+
+        /*(function () {
+            // create worker for live syntax checking
+            this.createWorker = function (session) {
+                var worker = new WorkerClient(["ace"], "ace/mode/xpo_worker", "NewWorker");
+                worker.attachToDocument(session.getDocument());
+                worker.on("errors", function (e) {
+                    session.setAnnotations(e.data);
+                });
+                return worker;
+            };
+    
+        }).call(Mode.prototype);*/
+
+        exports.Mode = Mode;
+    });
+
+    _define("ace/mode/criteria_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (require, exports, module) {
+        "use strict";
+        var oop = require("../lib/oop");
+        var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+
+        var CriteriaHighlightRules = function() {
+
+            // regexp must not have capturing parentheses. Use (?:) instead.
+            // regexps are ordered -> the first match is used
+            this.$rules = {
+                "start": [
+                    {
+                        token: "string.quoted.single",
+                        regex: /N?'(?:\\.|[^'\\])*'?/,
+                    },
+                    {
+                        token: "constant.numeric",
+                        regex: /[+\-]?\.?\d[\d.]*/i
+                    },
+                    {
+                        token: "support.other.aggregate",
+                        regex: /\.([a-zA-Z_]\w*)?/
+                    },
+                    {
+                        token: "keyword.operator",
+                        regex: /[+\-*/%|&^<>]|==|!=|<=|>=|In|Like|Between|And|Or|Not/i
+                    },
+                    {
+                        token: "constant.language",
+                        regex: /True|False/i
+                    },
+                    {
+                        token: "support.context.start",
+                        regex: /\[(?:[^\]\)])*\]\[/
+                    },
+                    {
+                        token: "support.variable",
+                        regex: /\[(?:[^\]\)\,])*\]?/
+                    },
+                    {
+                        token: "support.context.end",
+                        regex: /\]/
+                    },
+
+                    {
+                        token: "support.function",
+                        regex: /\w+/
+                    }
+                ]
+            };
+        };
+
+        oop.inherits(CriteriaHighlightRules, TextHighlightRules);
+
+        exports.CriteriaHighlightRules = CriteriaHighlightRules;
+    });
+}
 
 
-if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = criteriaparser;
-exports.Parser = criteriaparser.Parser;
-exports.parse = function () { return criteriaparser.parse.apply(criteriaparser, arguments); };
-exports.main = function commonjsMain(args) {
-    if (!args[1]) {
-        console.log('Usage: '+args[0]+' FILE');
-        process.exit(1);
-    }
-    var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
-    return exports.parser.parse(source);
-};
-if (typeof module !== 'undefined' && require.main === module) {
-  exports.main(process.argv.slice(1));
-}
-}
 var DevExpress;
 (function (DevExpress) {
     var Designer;
@@ -12120,9 +13404,11 @@ var DevExpress;
         ko.bindingHandlers["updateTop"] = {
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                 var value = valueAccessor();
+                var $element = $(element);
                 var updateTop = function (value) {
-                    var top = (value === 0 || !!value) ? value : $(element).prev().position().top + $(element).prev().height();
-                    $(element).css('top', top + "px");
+                    var scaleY = element.getBoundingClientRect().height / element.offsetHeight;
+                    var top = (value === 0 || !!value) ? value : ($element.prev().position().top / scaleY) + $element.prev().outerHeight();
+                    $element.css('top', top + "px");
                 };
                 var subscription = value.subscribe(function (newVal) {
                     updateTop(newVal);
@@ -12138,16 +13424,22 @@ var DevExpress;
                 var values = valueAccessor();
                 if (!values)
                     return;
-                var $element = $(element), parent = $($(element).parents(".dx-designer")[0]), containment = values.containment || ".dxrd-ghost-container", initialScroll = { left: 0, top: 0 }, attachDelta = function (ui) {
-                    var $containment = parent.find(containment), $ghost_container = parent.find(".dxrd-ghost-container");
-                    ui["delta"] = { left: $ghost_container.offset().left - $containment.offset().left, top: $ghost_container.offset().top - $containment.offset().top };
-                    var $viewport = parent.find(".dxrd-viewport");
-                    ui["scroll"] = { left: $viewport.scrollLeft() - initialScroll.left, top: $viewport.scrollTop() - initialScroll.top };
-                }, options = $.extend({ snap: '.dxrd-drag-snap-line', snapTolerance: Designer.SnapLinesHelper.snapTolerance }, ko.unwrap(values), {
+                var $element = $(element), $parent = $element.closest(".dx-designer"), containment = values.containment || ".dxrd-ghost-container", $viewport, $ghostContainerOffset, $containmentOffset, initialScroll = { left: 0, top: 0 }, attachDelta = function (ui) {
+                    ui["delta"] = {
+                        left: $ghostContainerOffset.left - $containmentOffset.left,
+                        top: $ghostContainerOffset.top - $containmentOffset.top
+                    };
+                    ui["scroll"] = {
+                        left: $viewport.scrollLeft() - initialScroll.left,
+                        top: $viewport.scrollTop() - initialScroll.top
+                    };
+                }, options = $.extend({}, ko.unwrap(values), {
                     start: function (event, ui) {
                         Designer.DragDropHandler.started(true);
                         var draggable = $element.data("ui-draggable");
-                        var $viewport = parent.find(".dxrd-viewport");
+                        $viewport = $parent.find(".dxrd-viewport");
+                        $ghostContainerOffset = $parent.find(".dxrd-ghost-container").offset();
+                        $containmentOffset = $parent.find(containment).offset();
                         initialScroll.left = $viewport.scrollLeft();
                         initialScroll.top = $viewport.scrollTop();
                         values.startDrag && values.startDrag(ko.dataFor(event.currentTarget || event.toElement));
@@ -12158,31 +13450,46 @@ var DevExpress;
                         Designer.DragDropHandler.started(false);
                     },
                     drag: function (event, ui) {
-                        if (event.altKey === true || values.alwaysAlt) {
-                            $element.draggable("option", "snap", false);
-                        }
-                        else {
-                            $element.draggable("option", "snap", ".dxrd-drag-snap-line");
-                        }
                         attachDelta(ui);
                         values.drag && values.drag(event, ui);
                     },
                     helper: function (event) {
-                        $element.draggable("option", "snap", ".dxrd-drag-snap-line");
                         values.helper && values.helper(ko.dataFor(event.currentTarget || event["toElement"]), event);
-                        var $container = parent.find('.dxrd-drag-helper-source').clone().css({ 'display': 'block' });
-                        $container.prependTo(parent.find(options.containment));
+                        var $container = $parent.find('.dxrd-drag-helper-source').clone().css({ 'display': 'block' });
+                        $container.prependTo($parent.find(options.containment));
                         ko.applyBindings(bindingContext.$root, $container[0]);
                         return $container;
                     }
                 });
-                options.containment = parent.find(options.containment);
+                options.containment = $parent.find(options.containment);
                 $element.draggable(options);
             }
         };
+        function getControlNewAbsolutePositionOnResize(snapHelper, absolutePosition, ui, delta) {
+            var newAbsolutePosition = {
+                top: absolutePosition.top + delta.y,
+                left: absolutePosition.left + delta.x,
+                bottom: absolutePosition.top + ui.originalSize.height,
+                right: absolutePosition.left + ui.originalSize.width
+            };
+            if (delta.x !== 0) {
+                newAbsolutePosition.left = snapHelper.snapPosition(newAbsolutePosition.left, false);
+            }
+            else if (delta.width !== 0) {
+                newAbsolutePosition.right = snapHelper.snapPosition(absolutePosition.left + ui.size.width, false);
+            }
+            if (delta.y !== 0) {
+                newAbsolutePosition.top = snapHelper.snapPosition(newAbsolutePosition.top, true);
+            }
+            else if (delta.height !== 0) {
+                newAbsolutePosition.bottom = snapHelper.snapPosition(absolutePosition.top + ui.size.height, true);
+            }
+            return newAbsolutePosition;
+        }
+        Designer.getControlNewAbsolutePositionOnResize = getControlNewAbsolutePositionOnResize;
         ko.bindingHandlers["resizable"] = {
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var values = valueAccessor(), $element = $(element), $selectedNodes = null, options = $.extend({
+                var values = valueAccessor(), $element = $(element), $parent = $element.closest(".dx-designer"), $selectedNodes = null, absolutePosition = null, options = $.extend({
                     handles: values.handles || "all", ghost: false,
                     stop: function (event, ui) {
                         $selectedNodes.each(function (_, el) {
@@ -12202,6 +13509,9 @@ var DevExpress;
                         });
                         values.stopped();
                         values.started = false;
+                        if (values.snapHelper) {
+                            values.snapHelper.deactivateSnapLines();
+                        }
                     },
                     start: function () {
                         values.started = true;
@@ -12214,11 +13524,35 @@ var DevExpress;
                             $el.data("originalPosition", { top: parseFloat($el.css("top")), left: parseFloat($el.css("left")) });
                             $el.data("originalSize", { width: bounds.width, height: bounds.height });
                         });
+                        var elementOffset = $element.offset();
+                        var ghostContainerOffset = $parent.find(".dxrd-ghost-container").offset();
+                        if (!ghostContainerOffset) {
+                            absolutePosition = elementOffset;
+                        }
+                        else {
+                            absolutePosition = {
+                                top: elementOffset.top - ghostContainerOffset.top,
+                                left: elementOffset.left - ghostContainerOffset.left
+                            };
+                        }
+                        if (values.snapHelper) {
+                            values.snapHelper.updateSnapLines(viewModel);
+                        }
                     },
                     resize: function (event, ui) {
                         var dw = ui.size.width - ui.originalSize.width, dh = ui.size.height - ui.originalSize.height, dx = ui.position.left - ui.originalPosition.left, dy = ui.position.top - ui.originalPosition.top;
                         if (values.forceResize) {
                             values.forceResize({ size: new Designer.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
+                        }
+                        if (values.snapHelper && $selectedNodes.length === 1) {
+                            var newAbsolutePosition = getControlNewAbsolutePositionOnResize(values.snapHelper, absolutePosition, ui, { x: dx, y: dy, width: dw, height: dh });
+                            values.snapHelper.activateSnapLines(newAbsolutePosition);
+                            $element.css({
+                                left: ui.originalPosition.left + newAbsolutePosition.left - absolutePosition.left,
+                                top: ui.originalPosition.top + newAbsolutePosition.top - absolutePosition.top,
+                                width: newAbsolutePosition.right - newAbsolutePosition.left,
+                                height: newAbsolutePosition.bottom - newAbsolutePosition.top
+                            });
                         }
                         $selectedNodes
                             .each(function (key, el) {
@@ -12548,6 +13882,9 @@ var DevExpress;
                     this["controls"].splice(0, 0, control);
                 }
             };
+            ElementViewModel.prototype.isPropertyVisible = function (name) {
+                return true;
+            };
             ElementViewModel.prototype.isPropertyDisabled = function (name) {
                 return false;
             };
@@ -12849,7 +14186,6 @@ var DevExpress;
                 this.underCursor = ko.observable(new HoverInfo());
                 this.allowMultiselect = true;
                 this.absolutePosition = new Designer.Point(0, 0);
-                this.snapLines = ko.observableArray([]);
                 this.getControlModel = function () {
                     return control;
                 };
@@ -12938,7 +14274,7 @@ var DevExpress;
                 function ControlProperties(target, editorsInfo, level) {
                     var _this = this;
                     if (level === void 0) { level = 0; }
-                    _super.call(this, target, editorsInfo, level, undefined);
+                    _super.call(this, target, editorsInfo, level, undefined, undefined, ko.observable(""));
                     this.focusedItem = ko.observable();
                     this.createEditorAddOn = function (editor) {
                         var editorAddOn = new DevExpress.JS.Widgets.EditorAddOn(editor, _this.popupService);
@@ -12947,163 +14283,129 @@ var DevExpress;
                             data: editorAddOn
                         };
                     };
+                    this.editorsRendered = ko.observable(false);
+                    this.isSortingByGroups = ko.observable(true);
+                    this.isSearching = ko.observable(false);
+                    this.allEditorsCreated = ko.observable(false);
+                    this.textToSearch = ko.observable("");
+                    this._searchBox = null;
+                    this.searchPlaceholder = function () { return Designer.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
+                    this.switchSearchBox = function () {
+                        if (_this.isSearching()) {
+                            _this.isSearching(false);
+                            _this.textToSearch("");
+                        }
+                        else {
+                            _this.isSearching(true);
+                            _this._searchBox && _this._searchBox.focus();
+                        }
+                    };
                     this.popupService = new DevExpress.JS.Utils.PopupService();
-                    this.createGroups(editorsInfo.groups);
+                    this.createGroups(editorsInfo.groups, editorsInfo.groupLocalizationIDs);
                     this.update(target());
                     this.focusedImageClassName = ko.pureComputed(function () {
                         return Designer.getImageClassName(target() && target().controlType);
                     });
+                    var subscription = this.isSortingByGroups.subscribe(function (newVal) {
+                        if (!newVal) {
+                            _this.editorsRendered(true);
+                            subscription.dispose();
+                        }
+                    });
                     this.focusedItem = target;
                     this.displayExpr = function (value) { return DevExpress.Designer.getControlFullName(value); };
+                    var timeout = null;
+                    this.textToSearch.subscribe(function (newValue) {
+                        timeout && clearTimeout(timeout);
+                        timeout = setTimeout(function () {
+                            _this._textToSearch(newValue);
+                            newValue && _this.groups.forEach(function (group) { return group.collapsed() && group.editors().some(function (editor) { return editor.isSearchedProperty(); }) && group.collapsed(false); });
+                        }, 200);
+                    });
                 }
+                ControlProperties.prototype.getEditors = function () {
+                    var editors = _super.prototype.getEditors.call(this);
+                    var editorNames = editors.map(function (editor) { return editor.displayName(); }).sort();
+                    editors.sort(function (a, b) {
+                        return editorNames.indexOf(a.displayName()) - editorNames.indexOf(b.displayName());
+                    });
+                    return editors;
+                };
                 ControlProperties.prototype.update = function (viewModel) {
                     _super.prototype.update.call(this, viewModel);
-                    if (viewModel) {
-                        (this.groups || []).forEach(function (group) {
-                            group.update(viewModel);
-                        });
-                    }
+                    if (this.isSortingByGroups && !this.isSortingByGroups())
+                        return;
+                    (this.groups || []).forEach(function (group) {
+                        group.update(viewModel);
+                    });
                 };
-                ControlProperties.prototype.createGroups = function (groups) {
+                ControlProperties.prototype.createGroups = function (groups, getGroupLocalizationId) {
                     var _this = this;
                     this.groups = $.map(groups, function (groupInfo, displayName) {
-                        return new Group(displayName, groupInfo, function (serializationInfo) { return _this.createEditors(serializationInfo); });
+                        return new Group(displayName, groupInfo, function (serializationInfo) {
+                            return serializationInfo
+                                .filter(function (info) { return !!info.editor; })
+                                .map(function (info) {
+                                var editor = _this.findEditorByInfo(info);
+                                if (editor)
+                                    return editor;
+                                editor = _this.createEditor(info);
+                                _this._editors.push(editor);
+                                return editor;
+                            });
+                        }, true, getGroupLocalizationId && getGroupLocalizationId[displayName]);
                     });
+                };
+                ControlProperties.prototype.searchBox = function ($element) {
+                    this._searchBox = $element.dxTextBox("instance");
                 };
                 return ControlProperties;
             })(DevExpress.JS.Widgets.ObjectProperties);
             Widgets.ControlProperties = ControlProperties;
             var Group = (function (_super) {
                 __extends(Group, _super);
-                function Group(displayName, serializationsInfo, createEditors, collapsed) {
+                function Group(displayName, serializationsInfo, createEditors, collapsed, localizationId) {
                     var _this = this;
                     if (collapsed === void 0) { collapsed = true; }
+                    if (localizationId === void 0) { localizationId = ""; }
                     _super.call(this);
                     this.editors = ko.observableArray();
                     this.editorsCreated = ko.observable(false);
-                    this.displayName = displayName;
+                    this.editorsRendered = ko.observable(false);
+                    this._displayName = displayName;
+                    this._localizationId = localizationId;
                     this._serializationsInfo = serializationsInfo;
                     this.collapsed = ko.observable(collapsed);
-                    this.visible = ko.observable(false);
                     if (collapsed) {
-                        var subscription = this.collapsed.subscribe(function (val) {
+                        var subscription = this.collapsed.subscribe(function (newVal) {
                             subscription.dispose();
-                            _this.editors(createEditors(serializationsInfo));
-                            if (_this._viewModel) {
-                                _this.editors().forEach(function (editor) {
-                                    editor.update(_this._viewModel);
-                                });
-                            }
+                            _this.editorsRendered(true);
                         });
                     }
-                    else {
-                        this.editors(createEditors(serializationsInfo));
-                    }
+                    this.visible = ko.computed(function () {
+                        return _this.editors().some(function (editor) { return editor.visible(); });
+                    });
+                    this.editors(createEditors(serializationsInfo));
+                    this._disposables.push(this.visible);
                 }
                 Group.prototype.update = function (viewModel) {
                     var _this = this;
                     this._viewModel = viewModel;
-                    if (viewModel) {
-                        var isVisible = (viewModel.getInfo && viewModel.getInfo() || this._serializationsInfo).filter(function (modelInfo) {
-                            return _this._serializationsInfo.filter(function (info) { return info.propertyName === modelInfo.propertyName; }).length > 0
-                                && !!viewModel[modelInfo.propertyName]
-                                && ko.unwrap(modelInfo.visible) !== false;
-                        }).length > 0;
-                        this.visible(isVisible);
-                        if (isVisible) {
-                            this.editors().forEach(function (editor) {
-                                editor.update(_this._viewModel);
-                            });
-                        }
-                    }
-                    else {
-                        this.visible(false);
-                    }
+                    this.editors().forEach(function (editor) {
+                        editor.update(_this._viewModel);
+                    });
+                };
+                Group.prototype.displayName = function () {
+                    return this._localizationId ? Designer.getLocalization(this._displayName, this._localizationId) : Designer.getLocalization(this._displayName);
                 };
                 return Group;
             })(Designer.Disposable);
             Widgets.Group = Group;
-            var MultiValuesHelper = (function () {
-                function MultiValuesHelper(value, items) {
-                    var _this = this;
-                    this.selectedItems = ko.observable([]);
-                    var values = value();
-                    this.value = value;
-                    var valueHasMutated = function () {
-                        _this.editorValue.notifySubscribers(_this.displayItems[0]);
-                    };
-                    this._items = items.map(function (item) {
-                        var selected = ko.observable(_this._isValueSelected(item.value, values));
-                        return { selected: selected, value: item.value, displayValue: item.displayValue || item.value, toggleSelected: function () { selected(!selected()); valueHasMutated(); } };
-                    });
-                    this.selectedItems = ko.pureComputed(function () {
-                        return _this._items.filter(function (item) { return item.selected(); });
-                    });
-                    var selectionInProcess = ko.observable(false), isSelectedAllState, stringValue;
-                    this.selectedValuesString = ko.pureComputed({
-                        read: function () {
-                            if (selectionInProcess())
-                                return stringValue;
-                            stringValue = "";
-                            _this.selectedItems().forEach(function (item, index, array) {
-                                stringValue += item.displayValue;
-                                if (index < array.length - 1) {
-                                    stringValue += ", ";
-                                }
-                            });
-                            return stringValue;
-                        },
-                        write: function (newValue) { }
-                    });
-                    this.isSelectedAll = ko.pureComputed({
-                        read: function () {
-                            if (selectionInProcess())
-                                return isSelectedAllState;
-                            var selectedItemCount = _this.selectedItems().length;
-                            if (selectedItemCount > 0 && selectedItemCount < _this._items.length) {
-                                return undefined;
-                            }
-                            isSelectedAllState = selectedItemCount === _this._items.length;
-                            return isSelectedAllState;
-                        },
-                        write: function (newValue) {
-                            isSelectedAllState = newValue;
-                            try {
-                                selectionInProcess(true);
-                                _this._items.forEach(function (item) { item.selected(newValue); });
-                            }
-                            finally {
-                                selectionInProcess(false);
-                            }
-                        }
-                    });
-                    var selectAllItem = { selected: this.isSelectedAll, value: null, displayValue: Designer.getLocalization('(Select All)'), toggleSelected: function () { _this.isSelectedAll(!_this.isSelectedAll()); valueHasMutated(); } };
-                    this.displayItems = [selectAllItem].concat(this._items);
-                    this.dataSource = this.displayItems;
-                    this.editorValue = ko.observable(selectAllItem);
-                    this.updateValue = function () {
-                        value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
-                    };
-                    this.onOptionChanged = function (e) {
-                        if (e.name !== "opened" || e.value)
-                            return;
-                        _this.updateValue();
-                    };
-                }
-                MultiValuesHelper.prototype._isValueSelected = function (value, array) {
-                    if (value instanceof Date) {
-                        return array.filter(function (item) { return item - value === 0; }).length > 0;
-                    }
-                    return array.indexOf(value) !== -1;
-                };
-                return MultiValuesHelper;
-            })();
-            Widgets.MultiValuesHelper = MultiValuesHelper;
             var FieldListEditor = (function (_super) {
                 __extends(FieldListEditor, _super);
-                function FieldListEditor(modelPropertyInfo, level, parentDisabled) {
+                function FieldListEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
                     var _this = this;
-                    _super.call(this, modelPropertyInfo, level, parentDisabled);
+                    _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
                     this.path = ko.pureComputed(function () {
                         return _this._model() && _this._model()["getPath"] && _this._model()["getPath"](_this.name) || "";
                     });
@@ -13114,8 +14416,8 @@ var DevExpress;
             Widgets.FieldListEditor = FieldListEditor;
             var DataMemberEditor = (function (_super) {
                 __extends(DataMemberEditor, _super);
-                function DataMemberEditor(modelPropertyInfo, level, parentDisabled) {
-                    _super.call(this, modelPropertyInfo, level, parentDisabled);
+                function DataMemberEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
+                    _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
                     this.treeListController = new Designer.DataMemberTreeListController();
                 }
                 return DataMemberEditor;
@@ -13123,9 +14425,9 @@ var DevExpress;
             Widgets.DataMemberEditor = DataMemberEditor;
             var ColorPickerEditor = (function (_super) {
                 __extends(ColorPickerEditor, _super);
-                function ColorPickerEditor(info, level, parentDisabled) {
+                function ColorPickerEditor(info, level, parentDisabled, textToSearch) {
                     var _this = this;
-                    _super.call(this, info, level, parentDisabled);
+                    _super.call(this, info, level, parentDisabled, textToSearch);
                     this.displayValue = ko.pureComputed({
                         read: function () {
                             if (_this.value() && _this.value().toLowerCase() === "transparent") {
@@ -13152,7 +14454,7 @@ var DevExpress;
         var Widgets;
         (function (Widgets) {
             Widgets.editorTemplates = {
-                guid: { header: "dxrd-guid" },
+                guid: { header: "dxrd-guid", editorType: DevExpress.JS.Widgets.GuidEditor },
                 borders: { header: "dxrd-borders" },
                 controls: { header: "dxrd-controls" },
                 objecteditorCustom: { custom: "dxrd-objectEditorContent", editorType: DevExpress.JS.Widgets.PropertyGridEditor },
@@ -13180,8 +14482,8 @@ var DevExpress;
             function createNumericEditor(dotNetTypeFullName, specifics) {
                 var DynamicNumberEditor = (function (_super) {
                     __extends(DynamicNumberEditor, _super);
-                    function DynamicNumberEditor(info, level, parentDisabled) {
-                        _super.call(this, info, level, parentDisabled);
+                    function DynamicNumberEditor(info, level, parentDisabled, textToSearch) {
+                        _super.call(this, info, level, parentDisabled, textToSearch);
                     }
                     DynamicNumberEditor.prototype.getOptions = function (templateOptions) {
                         var options = _super.prototype.getOptions.call(this, templateOptions);
@@ -13207,8 +14509,8 @@ var DevExpress;
             { propertyName: "width", displayName: "Width", localizationId: "System.Drawing.SizeF.Width", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
         ];
         Designer.locationFake = [
-            { propertyName: "x", displayName: "X", localizationId: "DevExpress.XtraCharts.ChartAnchorPoint.X", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-            { propertyName: "y", displayName: "Y", localizationId: "DevExpress.XtraCharts.ChartAnchorPoint.Y", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
+            { propertyName: "x", displayName: "X", editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+            { propertyName: "y", displayName: "Y", editor: DevExpress.JS.Widgets.editorTemplates.numeric }
         ];
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -13217,6 +14519,12 @@ var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
+        Designer.NotifyType = {
+            info: "info",
+            warning: "warning",
+            error: "error",
+            success: "success"
+        };
         Designer.DEBUG = true;
         function num(v) {
             return parseInt(v, 10) || 0;
@@ -13259,7 +14567,7 @@ var DevExpress;
         }
         Designer.getControlRect = getControlRect;
         function initGlobalize(settings) {
-            var globalize = window["Globalize"];
+            var globalize = DevExpress.JS.Localization.Globalize;
             if (globalize && settings) {
                 settings.cldrSupplemental && globalize.load(settings.cldrSupplemental);
                 settings.cldrData && globalize.load(settings.cldrData);
@@ -13290,6 +14598,13 @@ var DevExpress;
             });
         }
         Designer.deserializeChildArray = deserializeChildArray;
+        function appendStaticContextToRootViewModel(root) {
+            root.dx = DevExpress;
+            root.getLocalization = function () {
+                return Designer.getLocalization.apply(DevExpress.Designer, arguments);
+            };
+        }
+        Designer.appendStaticContextToRootViewModel = appendStaticContextToRootViewModel;
         function _processError(errorThrown, deferred, jqXHR, textStatus, processErrorCallback) {
             var message = errorThrown;
             var error = getErrorMessage(jqXHR);
@@ -13448,15 +14763,7 @@ var DevExpress;
             return text.replace(/[\W_]+/g, "_");
         }
         Designer.replaceInvalidSymbols = replaceInvalidSymbols;
-        function validateGuid(guid) {
-            return guid && (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(guid)
-                || /^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$/.test(guid)
-                || /^\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$/.test(guid)
-                || /^[0-9a-fA-F]{32}$/.test(guid));
-        }
-        Designer.validateGuid = validateGuid;
-        Designer.nameValidationRules = [{ type: "custom", validationCallback: function (options) { return validateName(options.value); }, message: DevExpress.Designer.getLocalization('Name is required and should be a valid identifier.') }];
-        Designer.guidValidationRules = [{ type: "custom", validationCallback: function (options) { return validateGuid(options.value); }, message: DevExpress.Designer.getLocalization('Guid is required and should have a valid format.') }];
+        Designer.nameValidationRules = [{ type: "custom", validationCallback: function (options) { return validateName(options.value); }, message: DevExpress.Designer.getLocalization('Name is required and should be a valid identifier.', 'ASPxReportsStringId.ReportDesigner_NameIsRequired_Error') }];
         function floatFromModel(val) {
             return ko.observable(val === undefined || val === null ? null : parseFloat(val));
         }
@@ -13571,7 +14878,7 @@ var DevExpress;
         function fromEnum(value) {
             var shotEnumValueKey = getShortTypeName(value);
             var valuesArrayItem = this.valuesArray && this.valuesArray.filter(function (item) { return item.value == shotEnumValueKey; })[0];
-            return ko.observable((valuesArrayItem || this.values && this.values[shotEnumValueKey] !== undefined) ? shotEnumValueKey : value);
+            return ko.observable((this.values && this.values[shotEnumValueKey] !== undefined || valuesArrayItem) ? shotEnumValueKey : value);
         }
         Designer.fromEnum = fromEnum;
         function getTypeNameFromFullName(controlType) {
@@ -13588,24 +14895,6 @@ var DevExpress;
             return displayName + (controlType ? (' (' + Designer.getLocalization(getShortTypeName(controlType)) + ')') : '');
         }
         Designer.getControlFullName = getControlFullName;
-        function classExists(selector) {
-            var lowerCaseSelector = selector.toLowerCase(), result = false;
-            for (var i = 0; i < (document.styleSheets || []).length; i++) {
-                var rules = document.styleSheets[i]["rules"] ? document.styleSheets[i]["rules"] : document.styleSheets[i]["cssRules"];
-                for (var i = 0; i < (rules || []).length; i++) {
-                    if (rules[i].selectorText && rules[i].selectorText.toLowerCase() === lowerCaseSelector) {
-                        result = true;
-                        break;
-                    }
-                }
-                if (result) {
-                    break;
-                }
-            }
-            ;
-            return result;
-        }
-        Designer.classExists = classExists;
         function parseBool(val) {
             return ko.observable(val !== void 0 ? String(val).toLowerCase() === "true" : val);
         }
@@ -13810,7 +15099,7 @@ var DevExpress;
                 visited.push(target);
                 for (var i = 0, len = collectionsToProcess.length; i < len; i++) {
                     if (target[collectionsToProcess[i]]) {
-                        visitor(target[collectionsToProcess[i]]);
+                        visitor(target[collectionsToProcess[i]], target);
                         (target[collectionsToProcess[i]]() || []).forEach(function (item) { return collectionsVisitor(item, visitor, collectionsToProcess, visited); });
                     }
                 }
@@ -13948,7 +15237,9 @@ var DevExpress;
                         }
                         _this._subscriptions = [];
                         _this.allControls([]);
-                        _this._collectControls(newTarget);
+                        if (newTarget) {
+                            _this._collectControls(newTarget);
+                        }
                     }));
                     unwrappedTarget = target.peek();
                 }
@@ -14569,7 +15860,7 @@ var DevExpress;
                 _super.call(this);
                 this.tabs = [];
                 this.collapsed = ko.observable(false);
-                this.toggleCollapsedText = ko.pureComputed(function () { return DevExpress.Designer.getLocalization(_this.collapsed() ? "Open" : "Collapse"); });
+                this.toggleCollapsedText = ko.pureComputed(function () { return DevExpress.Designer.getLocalization(_this.collapsed() ? "Open" : "Collapse", _this.collapsed() ? "DevExpress.XtraCharts.StockLevel.Open" : "PivotGridStringId.PopupMenuCollapse"); });
                 var _self = this;
                 this.tabs = tabs;
                 this._disposables.push(ko.computed(function () {
@@ -14644,7 +15935,8 @@ var DevExpress;
                 this.active = ko.observable(false);
                 this.visible = ko.observable();
                 imageBaseName = imageBaseName || text.toLowerCase();
-                this.text = Designer.getLocalization(text, localizationId);
+                this._text = text;
+                this._localizationId = localizationId;
                 this.imageClassName = ko.pureComputed(function () {
                     return "dxrd-image-" + imageBaseName + (_this.active() ? "-active" : "-inactive");
                 });
@@ -14657,6 +15949,13 @@ var DevExpress;
                 }));
                 this.model = model;
             }
+            Object.defineProperty(TabInfo.prototype, "text", {
+                get: function () {
+                    return Designer.getLocalization(this._text, this._localizationId);
+                },
+                enumerable: true,
+                configurable: true
+            });
             return TabInfo;
         })(Designer.Disposable);
         Designer.TabInfo = TabInfo;
@@ -14771,11 +16070,11 @@ var DevExpress;
         };
         function generateDefaultParts(model) {
             return [
-                { templateName: Designer.DesignerBaseElements.MenuButton, model: model },
-                { templateName: Designer.DesignerBaseElements.Toolbar, model: model },
-                { templateName: Designer.DesignerBaseElements.Toolbox, model: model },
-                { templateName: Designer.DesignerBaseElements.Surface, model: model },
-                { templateName: Designer.DesignerBaseElements.RightPanel, model: model }
+                { id: Designer.DesignerBaseElements.MenuButton, templateName: Designer.DesignerBaseElements.MenuButton, model: model },
+                { id: Designer.DesignerBaseElements.Toolbar, templateName: Designer.DesignerBaseElements.Toolbar, model: model },
+                { id: Designer.DesignerBaseElements.Toolbox, templateName: Designer.DesignerBaseElements.Toolbox, model: model },
+                { id: Designer.DesignerBaseElements.Surface, templateName: Designer.DesignerBaseElements.Surface, model: model },
+                { id: Designer.DesignerBaseElements.RightPanel, templateName: Designer.DesignerBaseElements.RightPanel, model: model }
             ];
         }
         Designer.generateDefaultParts = generateDefaultParts;
@@ -14817,8 +16116,6 @@ var DevExpress;
         }
         Designer.findNextSelection = findNextSelection;
         Designer.editorTypeMapper = {
-            "multiValueWithLookUp": DevExpress.Designer.Widgets.editorTemplates.multiValue,
-            "multiValue": DevExpress.Designer.Widgets.editorTemplates.multiValueEditable,
             "Enum": DevExpress.JS.Widgets.editorTemplates.combobox,
             "System.String": DevExpress.JS.Widgets.editorTemplates.text,
             "System.Guid": DevExpress.Designer.Widgets.editorTemplates.guid,
@@ -14856,17 +16153,17 @@ var DevExpress;
             };
         }
         Designer.createActionWrappingFunction = createActionWrappingFunction;
-        function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper, undoEngine, customMerge) {
+        function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper, undoEngine, customMerge, snapLinesCollector, groupLocalizationIDs) {
             if (groups === void 0) { groups = {}; }
             if (editors === void 0) { editors = []; }
             var undoEngine = undoEngine || ko.observable(new DevExpress.JS.Utils.UndoEngine(model)), actionUndoEngineWrappingFunction = createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
                 undoEngine().start();
                 handler(model);
                 undoEngine().end();
-            }), selection = selection || new Designer.SurfaceSelection(), contextActionProviders = [], snapHelper = new Designer.SnapLinesHelper(surface), controlsHelper = designControlsHelper || new DesignControlsHelper(model, [{
+            }), selection = selection || new Designer.SurfaceSelection(), contextActionProviders = [], snapHelper = new Designer.SnapLinesHelper(surface, Designer.SnapLinesHelper.snapTolerance, snapLinesCollector || new Designer.SnapLinesCollector()), controlsHelper = designControlsHelper || new DesignControlsHelper(model, [{
                     added: function (control) { },
                     deleted: function (control) { control.surface == selection.focused() && selection.focused(findNextSelection(control.surface)); }
-                }]), dragHelperContent = new Designer.DragHelperContent(selection), toolboxItems = Designer.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new InlineTextEdit(selection), editableObject = Designer.CombinedObject.getEditableObject(selection, undoEngine, customMerge).extend({ throttle: 1 }), popularProperties = new DevExpress.JS.Widgets.ObjectProperties(ko.pureComputed(function () {
+                }]), dragHelperContent = new Designer.DragHelperContent(selection), toolboxItems = Designer.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new InlineTextEdit(selection), editableObject = Designer.CombinedObject.getEditableObject(selection, undoEngine, customMerge).extend({ throttle: 1 }), propertyGrid = new Designer.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors, groupLocalizationIDs: groupLocalizationIDs }, null), popularProperties = new DevExpress.JS.Widgets.ObjectProperties(ko.pureComputed(function () {
                 var popularPropertiesObject = { getInfo: function () { return []; } }, editable = editableObject();
                 if (editable) {
                     var controlInfo = controlsFactory.controlsMap[editable.controlType], propertiesInfo = createPopularProperties(controlInfo && controlInfo.info || [], controlInfo && controlInfo.popularProperties || []);
@@ -14885,14 +16182,16 @@ var DevExpress;
                     popularPropertiesObject["getActionClassName"] = function (name) {
                         return editable["getActionClassName"] ? editable["getActionClassName"](name) : "";
                     };
-                    popularPropertiesObject["isPropertyVisible"] = editable["isPropertyVisible"];
+                    popularPropertiesObject["isPropertyVisible"] = function (propertyName) {
+                        return editable["isPropertyVisible"](propertyName);
+                    };
                     popularPropertiesObject["isPropertyDisabled"] = function (name) {
                         return editable.isPropertyDisabled ? editable.isPropertyDisabled(name) : false;
                     };
                     popularPropertiesObject["isSame"] = function (x) { return x === editable; };
                 }
                 return popularPropertiesObject;
-            }), undefined, undefined, undefined), tabPanel = new TabPanel([new TabInfo("Properties", "dxrd-propertiestab", new Designer.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors }, null), 'ReportStringId.Cmd_Properties', "properties")], undefined, rtl);
+            }), undefined, undefined, undefined), tabPanel = new TabPanel([new TabInfo("Properties", "dxrd-propertiestab", propertyGrid, 'ReportStringId.Cmd_Properties', undefined, ko.pureComputed(function () { return !!model(); }))], undefined, rtl);
             var designerModel = {
                 parts: parts,
                 model: model,
@@ -14912,6 +16211,8 @@ var DevExpress;
                 toggleAppMenu: function () {
                     appMenuVisible(!appMenuVisible());
                 },
+                getMenuPopupContainer: function (el) { return $(el).closest(".dxrd-menu-button").prev(".dxrd-menu-container"); },
+                getMenuPopupTarget: function (el) { return $(el).closest(".dxrd-menu-button").find(".dxrd-menu-place"); },
                 actionLists: new Designer.ActionLists(surface, selection, undoEngine, function () { }),
                 contextActionProviders: contextActionProviders,
                 contextActions: ko.pureComputed(function () {
@@ -14922,6 +16223,7 @@ var DevExpress;
                     actionUndoEngineWrappingFunction(contextActions);
                     return contextActions;
                 }),
+                actionsGroupTitle: function () { return Designer.getLocalization('Actions', 'ASPxReportsStringId.ReportDesigner_Actions'); },
                 inlineTextEdit: inlineTextEdit,
                 resizeHandler: {
                     starting: function () {
@@ -14932,12 +16234,14 @@ var DevExpress;
                         undoEngine().end();
                         setTimeout(function () { selection.expectClick = false; }, 100);
                     },
-                    disabled: Designer.DragDropHandler.started
+                    disabled: Designer.DragDropHandler.started,
+                    snapHelper: snapHelper
                 },
                 snapHelper: snapHelper,
                 dragHelperContent: dragHelperContent,
                 dragHandler: new Designer.SelectionDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent),
                 toolboxDragHandler: new Designer.ToolboxDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent, controlsFactory),
+                dragDropStarted: DevExpress.Designer.DragDropHandler.started,
                 updateFont: function (values) {
                     $.extend(DevExpress.JS.Widgets.availableFonts, values);
                 }
@@ -14952,10 +16256,10 @@ var DevExpress;
         function localizeNoneString(noneValue) {
             var value = ko.unwrap(noneValue);
             if (value === "none") {
-                return Designer.getLocalization("none");
+                return Designer.getLocalization("none", "DataAccessStringId.ParameterListEmpty");
             }
             else if (value === "(none)") {
-                return (Designer.getLocalization("(none)") !== "(none)") ? Designer.getLocalization("(none)") : ("(" + Designer.getLocalization("none") + ")");
+                return (Designer.getLocalization("(none)", "ChartStringId.WizNoBackImage") !== "(none)") ? Designer.getLocalization("(none)", "ChartStringId.WizNoBackImage") : ("(" + Designer.getLocalization("none", "DataAccessStringId.ParameterListEmpty") + ")");
             }
             return value;
         }
@@ -14968,6 +16272,25 @@ var DevExpress;
                 }
             }
         };
+        function binaryIndexOf(ar, el, compare) {
+            var m = 0;
+            var n = ar.length - 1;
+            while (m <= n) {
+                var k = (n + m) >> 1;
+                var cmp = compare(el, ar[k]);
+                if (cmp > 0) {
+                    m = k + 1;
+                }
+                else if (cmp < 0) {
+                    n = k - 1;
+                }
+                else {
+                    return k;
+                }
+            }
+            return ~m;
+        }
+        Designer.binaryIndexOf = binaryIndexOf;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 /// <reference path="utils.ts" />
@@ -14975,112 +16298,6 @@ var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
-        var SnapLine = (function (_super) {
-            __extends(SnapLine, _super);
-            function SnapLine(x, y, isVertical, maxHeight, maxWidth) {
-                var _this = this;
-                if (y === void 0) { y = ko.observable(0); }
-                if (isVertical === void 0) { isVertical = true; }
-                if (maxHeight === void 0) { maxHeight = ko.observable(1001); }
-                if (maxWidth === void 0) { maxWidth = ko.observable(1001); }
-                _super.call(this);
-                this.originalX = ko.observable(0);
-                this.originalY = ko.observable(0);
-                this.active = ko.observable(false);
-                this.position = new Designer.Rectangle();
-                this.isVertical = true;
-                this.maxHeight = ko.observable(0);
-                this.maxWidth = ko.observable(0);
-                this.isVertical = isVertical;
-                this._disposables.push(ko.computed(function () {
-                    _this.maxHeight(maxHeight());
-                    _this.maxWidth(maxWidth());
-                    _this.originalX(x());
-                    _this.originalY(y());
-                    if (isVertical) {
-                        _this.position.left(x());
-                        _this.position.height(maxHeight());
-                    }
-                    else {
-                        _this.position.top(y());
-                        _this.position.width(maxWidth());
-                    }
-                }));
-            }
-            SnapLine.prototype.activate = function (position) {
-                if (this.isVertical) {
-                    var top = Math.min(this.originalY(), position.top), bottom = Math.max(this.originalY(), position.top);
-                    this.position.height(bottom - top);
-                    this.position.top(top);
-                }
-                else {
-                    var left = Math.min(this.originalX(), position.left), right = Math.max(this.originalX(), position.left);
-                    this.position.width(right - left);
-                    this.position.left(left);
-                }
-                this.active(this.position.left() + this.position.width() < this.maxWidth() && this.position.height() + this.position.top() < this.maxHeight() && this.position.left() >= 0 && this.position.top() >= 0);
-            };
-            return SnapLine;
-        })(Designer.Disposable);
-        Designer.SnapLine = SnapLine;
-        var SnapLinesHelper = (function () {
-            function SnapLinesHelper(surface) {
-                if (surface === void 0) { surface = null; }
-                this.snapLines = ko.observableArray([]);
-                this._surfaceContext = surface;
-            }
-            SnapLinesHelper.prototype._getActiveSnapLines = function (position, tolerance) {
-                if (tolerance === void 0) { tolerance = SnapLinesHelper.snapTolerance; }
-                var result = [], horizontalIndex = null, horizontalDistance = null, verticalIndex = null, verticalDistance = null;
-                for (var i = 0; i < this.snapLines().length; i++) {
-                    if (this.snapLines()[i].isVertical) {
-                        var currentDistance = Math.abs(this.snapLines()[i].position.left() - position.left);
-                        if (currentDistance < tolerance && (!verticalDistance || verticalDistance > currentDistance)) {
-                            verticalDistance = currentDistance;
-                            verticalIndex = i;
-                        }
-                    }
-                    else {
-                        var currentDistance = Math.abs(this.snapLines()[i].position.top() - position.top);
-                        if (currentDistance < tolerance && (!horizontalDistance || horizontalDistance > currentDistance)) {
-                            horizontalDistance = currentDistance;
-                            horizontalIndex = i;
-                        }
-                    }
-                }
-                verticalIndex !== null && result.push(this.snapLines()[verticalIndex]);
-                horizontalIndex !== null && result.push(this.snapLines()[horizontalIndex]);
-                return result;
-            };
-            SnapLinesHelper.prototype.updateSnapLines = function () {
-                var controls = [];
-                var newSnapLines = [];
-                Designer.collectionsVisitor(this._surfaceContext(), function (targetProperty) {
-                    controls.push.apply(controls, targetProperty());
-                }, ["bands", "controls", "rows", "cells"]);
-                for (var i = 0; i < controls.length; i++) {
-                    if (controls[i].isSnapTarget) {
-                        Array.prototype.push.apply(newSnapLines, controls[i].snapLines());
-                    }
-                }
-                this.snapLines(newSnapLines);
-            };
-            SnapLinesHelper.prototype.deactivateSnapLines = function () {
-                for (var i = 0; i < this.snapLines().length; i++) {
-                    this.snapLines()[i].active(false);
-                }
-                ;
-            };
-            SnapLinesHelper.prototype.activateSnapLines = function (position) {
-                var activeSnapLines = this._getActiveSnapLines(position);
-                for (var i = 0; i < activeSnapLines.length; i++) {
-                    activeSnapLines[i].activate(position);
-                }
-            };
-            SnapLinesHelper.snapTolerance = 10;
-            return SnapLinesHelper;
-        })();
-        Designer.SnapLinesHelper = SnapLinesHelper;
         var DragHelperContent = (function (_super) {
             __extends(DragHelperContent, _super);
             function DragHelperContent(selectionProvider) {
@@ -15159,15 +16376,7 @@ var DevExpress;
             };
             DragDropHandler.prototype.startDrag = function (draggable) { };
             DragDropHandler.prototype.drag = function (event, ui) {
-                this.snapHelper && this.snapHelper.deactivateSnapLines();
-                if (event.altKey !== true) {
-                    var position = this._getAbsoluteSurfacePosition(ui);
-                    this.snapHelper && this.snapHelper.activateSnapLines(position);
-                    if (this._size.width() !== 0) {
-                        this.snapHelper && this.snapHelper.activateSnapLines({ left: position.left + (this._size.width()), top: position.top });
-                        this.snapHelper && this.snapHelper.activateSnapLines({ left: position.left, top: position.top + (this._size.height()) });
-                    }
-                }
+                var needToActivateSnapLines = event.altKey !== true;
                 if (this.selection.dropTarget) {
                     var dropTarget = this.selection.dropTarget.getControlModel().getMetaData().isContainer ? this.selection.dropTarget : (this.selection.dropTarget.parent || this.selection.dropTarget), locked = dropTarget.locked;
                     var controlModel = ko.dataFor(event.target).getControlModel && ko.dataFor(event.target).getControlModel();
@@ -15177,11 +16386,23 @@ var DevExpress;
                     }
                     if (locked) {
                         this.snapHelper && this.snapHelper.deactivateSnapLines();
+                        needToActivateSnapLines = false;
                         this.dragHelperContent && this.dragHelperContent.isLocked(true);
                     }
                     else {
                         this.dragHelperContent && this.dragHelperContent.isLocked(false);
                     }
+                }
+                if (needToActivateSnapLines) {
+                    var position = this._getAbsoluteSurfacePosition(ui);
+                    var snapDelta = this.snapHelper && this.snapHelper.activateSnapLines({
+                        left: position.left,
+                        top: position.top,
+                        right: position.left + this._size.width(),
+                        bottom: position.top + this._size.height()
+                    });
+                    ui.position.left -= snapDelta.left;
+                    ui.position.top -= snapDelta.top;
                 }
             };
             DragDropHandler.prototype.doStopDrag = function (ui, draggable, event) { };
@@ -15202,6 +16423,9 @@ var DevExpress;
                 this.containment = '.dxrd-ghost-container';
                 this["helper"] = function (draggable) {
                     _super.prototype.helper.call(_this, draggable);
+                    if (_this.selection.selectedItems.indexOf(draggable) === -1) {
+                        _this.selection.updateSelection(draggable);
+                    }
                     dragHelperContent.update(draggable);
                     _this._size.width(dragHelperContent.width());
                     _this._size.height(dragHelperContent.height());
@@ -15330,8 +16554,10 @@ var DevExpress;
     var Designer;
     (function (Designer) {
         var SurfaceSelection = (function () {
-            function SurfaceSelection() {
+            function SurfaceSelection(ignoreMultiSelectProperties) {
                 var _this = this;
+                if (ignoreMultiSelectProperties === void 0) { ignoreMultiSelectProperties = ["name"]; }
+                this.ignoreMultiSelectProperties = ignoreMultiSelectProperties;
                 this._focused = ko.observable(null);
                 this._selectedControls = ko.observableArray();
                 this._selectedControlsInner = [];
@@ -15384,6 +16610,10 @@ var DevExpress;
                 enumerable: true,
                 configurable: true
             });
+            SurfaceSelection.prototype.clear = function () {
+                this.focused(null);
+                this._selectedControls([]);
+            };
             SurfaceSelection.prototype.applySelection = function () {
                 this._selectedControls(this._selectedControlsInner);
             };
@@ -15530,24 +16760,30 @@ var DevExpress;
             };
             CombinedObject.mergeProperty = function (controls, propertyName, undoEngine, customMerge) {
                 var property = controls[0][propertyName];
-                var result = null;
+                var combinedObj = null;
+                var subscriptions = null;
                 if (controls.filter(function (x) { return !!x[propertyName]; }).length === controls.length) {
-                    result = customMerge && customMerge(propertyName, controls, undoEngine);
-                    if (!result) {
+                    combinedObj = customMerge && customMerge(propertyName, controls, undoEngine);
+                    if (!combinedObj) {
                         if (ko.isObservable(property) && !property["push"]) {
-                            result = ko.observable(controls.every(function (control) { return controls[0][propertyName].peek() === control[propertyName].peek(); }) ? controls[0][propertyName].peek() : null);
-                            result.subscribe(function (newVal) {
-                                undoEngine && undoEngine().start();
-                                controls.forEach(function (control) { control[propertyName](newVal); });
-                                undoEngine && undoEngine().end();
-                            });
+                            if (!controls.every(function (control) { return ko.isObservable(control[propertyName]); }))
+                                return combinedObj;
+                            var combinedObservable = ko.observable(controls.every(function (control) { return controls[0][propertyName].peek() === control[propertyName].peek(); }) ? controls[0][propertyName].peek() : null);
+                            combinedObj = {
+                                result: combinedObservable,
+                                subscriptions: [combinedObservable.subscribe(function (newVal) {
+                                        undoEngine && undoEngine().start();
+                                        controls.forEach(function (control) { control[propertyName](newVal); });
+                                        undoEngine && undoEngine().end();
+                                    })]
+                            };
                         }
                         else if (typeof property === "object" && !$.isArray(property)) {
-                            result = this._merge(controls.map(function (x) { return x[propertyName]; }), undoEngine, customMerge);
+                            combinedObj = this._merge(controls.map(function (x) { return x[propertyName]; }), undoEngine, customMerge);
                         }
                     }
                 }
-                return result;
+                return combinedObj;
             };
             CombinedObject._createProperty = function (result, propertyName, propertyValue) {
                 if (propertyValue) {
@@ -15556,38 +16792,61 @@ var DevExpress;
                     result[propertyName] = propertyValue;
                 }
             };
-            CombinedObject._merge = function (controls, undoEngine, customMerge) {
+            CombinedObject._merge = function (controls, undoEngine, customMerge, ignoreProperties) {
                 var _this = this;
                 var result = {};
-                ["getInfo", "isPropertyDisabled", "isPropertyVisible"].forEach(function (propertyName) {
+                var subscriptions = [];
+                ["getInfo", "isPropertyVisible", "isPropertyDisabled"].forEach(function (propertyName) {
                     if (controls[0][propertyName])
                         _this._createProperty(result, propertyName, _this[propertyName](controls));
                 });
+                if (ignoreProperties) {
+                    var oldPropertyDisabled = result["isPropertyDisabled"];
+                    result["isPropertyDisabled"] = function (name) {
+                        return (oldPropertyDisabled && oldPropertyDisabled()) || ignoreProperties.indexOf(name) !== -1;
+                    };
+                }
                 if (result && result["getInfo"]) {
                     result["getInfo"]().map(function (x) { return x.propertyName; }).forEach(function (propertyName) {
-                        _this._createProperty(result, propertyName, _this.mergeProperty(controls, propertyName, undoEngine, customMerge));
+                        var combinedObj = _this.mergeProperty(controls, propertyName, undoEngine, customMerge);
+                        if (combinedObj) {
+                            subscriptions = [].concat.apply(subscriptions, combinedObj.subscriptions);
+                            _this._createProperty(result, propertyName, combinedObj.result);
+                        }
                     });
                 }
                 else {
                     for (var propertyName in controls[0]) {
-                        this._createProperty(result, propertyName, this.mergeProperty(controls, propertyName, undoEngine, customMerge));
+                        var combinedObj = this.mergeProperty(controls, propertyName, undoEngine, customMerge);
+                        if (combinedObj) {
+                            subscriptions = [].concat.apply(subscriptions, combinedObj.subscriptions);
+                            this._createProperty(result, propertyName, combinedObj.result);
+                        }
                     }
                 }
-                return result;
+                return { result: result, subscriptions: subscriptions };
             };
-            CombinedObject.mergeControls = function (controls, undoEngine, customMerge) {
-                return $.extend(this._merge(controls, undoEngine, customMerge), { controlType: "multiselect", displayName: ko.observable("") });
+            CombinedObject.mergeControls = function (controls, undoEngine, customMerge, ignoreProperties) {
+                var combinedObj = this._merge(controls, undoEngine, customMerge, ignoreProperties);
+                return {
+                    result: $.extend(combinedObj.result, { controlType: "multiselect", displayName: ko.observable("") }),
+                    subscriptions: combinedObj.subscriptions
+                };
             };
             CombinedObject.getEditableObject = function (selectionProvider, undoEngine, customMerge) {
                 var _this = this;
                 var editableObject = ko.observable(null);
+                var subscriptions = [];
                 selectionProvider.focused.subscribe(function (newVal) {
-                    newVal && editableObject(newVal.getControlModel());
+                    editableObject(newVal && newVal.getControlModel());
                 });
                 return ko.pureComputed({
                     read: function () {
+                        subscriptions.forEach(function (x) { return x.dispose(); });
                         if (selectionProvider.selectedItems.length > 1) {
-                            return _this.mergeControls(selectionProvider.selectedItems.map(function (item) { return item.getControlModel(); }), undoEngine, customMerge);
+                            var combinedObj = _this.mergeControls(selectionProvider.selectedItems.map(function (item) { return item.getControlModel(); }), undoEngine, customMerge, selectionProvider.ignoreMultiSelectProperties);
+                            subscriptions = combinedObj.subscriptions;
+                            return combinedObj.result;
                         }
                         else {
                             return editableObject();
@@ -15607,6 +16866,225 @@ var DevExpress;
             return CombinedObject;
         })();
         Designer.CombinedObject = CombinedObject;
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var SnapLineSurface = (function () {
+            function SnapLineSurface() {
+                this._position = ko.observable(SnapLineSurface._blankPosition);
+            }
+            SnapLineSurface.prototype.transform = function () {
+                var position = this._position();
+                return "matrix(" + position.width + ", 0, 0, " + position.height + ", " + position.left + ", " + position.top + ")";
+            };
+            SnapLineSurface.prototype.updatePosition = function (position) {
+                this._position(position);
+            };
+            SnapLineSurface.prototype.reset = function () {
+                this.updatePosition(SnapLineSurface._blankPosition);
+            };
+            SnapLineSurface._blankPosition = { top: 0, left: 0, width: 0, height: 0, };
+            return SnapLineSurface;
+        })();
+        Designer.SnapLineSurface = SnapLineSurface;
+        var SnapLinesCollector = (function () {
+            function SnapLinesCollector() {
+                this._verticalSnapLines = [];
+                this._horizontalSnapLines = [];
+                this._snapTargetToIgnore = null;
+            }
+            SnapLinesCollector.prototype._appendSnapLine = function (position, limitInf, limitSup, snapLines) {
+                var line = {
+                    position: position,
+                    limitInf: limitInf,
+                    limSup: limitSup
+                };
+                var index = Designer.binaryIndexOf(snapLines, line, function (a, b) { return a.position - b.position; });
+                if (index > -1) {
+                    snapLines[index].limitInf = Math.min(snapLines[index].limitInf, limitInf);
+                    snapLines[index].limSup = Math.max(snapLines[index].limSup, limitSup);
+                }
+                else {
+                    snapLines.splice(~index, 0, line);
+                }
+            };
+            SnapLinesCollector.prototype._collectSnaplines = function (parent, parentAbsoluteProsition) {
+                var _this = this;
+                this._enumerateCollection(parent, parentAbsoluteProsition, function (item, itemAbsoluteRect) {
+                    if (item !== _this._snapTargetToIgnore) {
+                        _this._appendSnapLine(itemAbsoluteRect.left, itemAbsoluteRect.top, itemAbsoluteRect.bottom, _this._verticalSnapLines);
+                        _this._appendSnapLine(itemAbsoluteRect.right, itemAbsoluteRect.top, itemAbsoluteRect.bottom, _this._verticalSnapLines);
+                        _this._appendSnapLine(itemAbsoluteRect.top, itemAbsoluteRect.left, itemAbsoluteRect.right, _this._horizontalSnapLines);
+                        _this._appendSnapLine(itemAbsoluteRect.bottom, itemAbsoluteRect.left, itemAbsoluteRect.right, _this._horizontalSnapLines);
+                        _this._collectSnaplines(item, itemAbsoluteRect);
+                    }
+                });
+            };
+            SnapLinesCollector.prototype._getCollection = function (parent) {
+                return parent["controls"] && parent["controls"]();
+            };
+            SnapLinesCollector.prototype._enumerateCollection = function (parent, parentAbsoluteProsition, callback) {
+                var collection = this._getCollection(parent);
+                if (!collection)
+                    return;
+                for (var i = 0; i < collection.length; i++) {
+                    var itemRect = collection[i].rect && collection[i].rect();
+                    if (itemRect) {
+                        callback(collection[i], {
+                            top: itemRect.top + parentAbsoluteProsition.top,
+                            bottom: itemRect.bottom + parentAbsoluteProsition.top,
+                            left: itemRect.left + parentAbsoluteProsition.left,
+                            right: itemRect.right + parentAbsoluteProsition.left
+                        });
+                    }
+                }
+            };
+            SnapLinesCollector.prototype.collectSnaplines = function (root, snapTargetToIgnore) {
+                this._snapTargetToIgnore = snapTargetToIgnore;
+                this._verticalSnapLines.splice(0);
+                this._horizontalSnapLines.splice(0);
+                this._collectSnaplines(root, { top: 0, left: 0 });
+                return {
+                    vertical: this._verticalSnapLines,
+                    horizontal: this._horizontalSnapLines
+                };
+            };
+            return SnapLinesCollector;
+        })();
+        Designer.SnapLinesCollector = SnapLinesCollector;
+        var SnapLinesHelper = (function () {
+            function SnapLinesHelper(surface, snapTolerance, snapLinesCollector) {
+                if (surface === void 0) { surface = null; }
+                if (snapTolerance === void 0) { snapTolerance = SnapLinesHelper.snapTolerance; }
+                if (snapLinesCollector === void 0) { snapLinesCollector = new SnapLinesCollector(); }
+                this.snapLineSurfaces = [new SnapLineSurface(), new SnapLineSurface(), new SnapLineSurface(), new SnapLineSurface()];
+                this.verticalSnapLines = [];
+                this.horizontalSnapLines = [];
+                this._surfaceContext = surface;
+                this._snapTolerance = snapTolerance;
+                this._snapLinesCollector = snapLinesCollector;
+            }
+            SnapLinesHelper.prototype._findClosestSnapLine = function (position, snapLines) {
+                var line = {
+                    position: position,
+                    limitInf: 0,
+                    limSup: 0
+                };
+                var index = Designer.binaryIndexOf(snapLines, line, function (a, b) { return a.position - b.position; });
+                var snapLineCandidate;
+                if (index > -1) {
+                    snapLineCandidate = {
+                        snapLine: snapLines[index],
+                        distance: position - snapLines[index].position
+                    };
+                }
+                else {
+                    index = ~index;
+                    var delta1 = snapLines[index] ? (position - snapLines[index].position) : Number.MAX_VALUE;
+                    var delta2 = snapLines[index - 1] ? (position - snapLines[index - 1].position) : Number.MAX_VALUE;
+                    snapLineCandidate = Math.abs(delta1) > Math.abs(delta2) ?
+                        { snapLine: snapLines[index - 1], distance: delta2 } :
+                        { snapLine: snapLines[index], distance: delta1 };
+                }
+                return snapLineCandidate;
+            };
+            SnapLinesHelper.prototype._getActiveSnapLines = function (position1, position2, snapLines) {
+                var line1 = this._findClosestSnapLine(position1, snapLines);
+                var line2 = this._findClosestSnapLine(position2, snapLines);
+                var result = {
+                    lines: [],
+                    distance: 0
+                };
+                if (Math.abs(line1.distance - line2.distance) >= 1) {
+                    var line = Math.abs(line1.distance) < Math.abs(line2.distance) ? line1 : line2;
+                    if (Math.abs(line.distance) <= this._snapTolerance) {
+                        result.lines = [line];
+                        result.distance = line.distance;
+                    }
+                }
+                else if (Math.abs(line1.distance) <= this._snapTolerance) {
+                    result.lines = [line1, line2];
+                    result.distance = line1.distance;
+                }
+                return result;
+            };
+            SnapLinesHelper.prototype.updateSnapLines = function (snapTargetToIgnore) {
+                if (snapTargetToIgnore === void 0) { snapTargetToIgnore = null; }
+                this.verticalSnapLines.splice(0);
+                this.horizontalSnapLines.splice(0);
+                var result = this._snapLinesCollector.collectSnaplines(this._surfaceContext(), snapTargetToIgnore);
+                this.verticalSnapLines.push.apply(this.verticalSnapLines, result.vertical);
+                this.horizontalSnapLines.push.apply(this.horizontalSnapLines, result.horizontal);
+            };
+            SnapLinesHelper.prototype.deactivateSnapLines = function () {
+                this.snapLineSurfaces[0].reset();
+                this.snapLineSurfaces[1].reset();
+                this.snapLineSurfaces[2].reset();
+                this.snapLineSurfaces[3].reset();
+            };
+            SnapLinesHelper.prototype.activateSnapLines = function (position) {
+                var vertical = this._getActiveSnapLines(position.left, position.right, this.verticalSnapLines);
+                var horizontal = this._getActiveSnapLines(position.top, position.bottom, this.horizontalSnapLines);
+                for (var i = 0; i < 2; i++) {
+                    var line = vertical.lines[i];
+                    if (!line) {
+                        this.snapLineSurfaces[i].reset();
+                    }
+                    else {
+                        var top = Math.min(line.snapLine.limitInf, position.top);
+                        var bottom = Math.max(line.snapLine.limSup, position.bottom);
+                        if (position.top < line.snapLine.limitInf) {
+                            top -= horizontal.distance;
+                        }
+                        if (position.bottom > line.snapLine.limSup) {
+                            bottom -= horizontal.distance;
+                        }
+                        this.snapLineSurfaces[i].updatePosition({
+                            top: top,
+                            left: line.snapLine.position,
+                            height: bottom - top,
+                            width: 1
+                        });
+                    }
+                }
+                for (var i = 0; i < 2; i++) {
+                    var line = horizontal.lines[i];
+                    if (!line) {
+                        this.snapLineSurfaces[i + 2].reset();
+                    }
+                    else {
+                        var left = Math.min(line.snapLine.limitInf, position.left);
+                        var right = Math.max(line.snapLine.limSup, position.right);
+                        if (position.left < line.snapLine.limitInf) {
+                            left -= vertical.distance;
+                        }
+                        if (position.right > line.snapLine.limSup) {
+                            right -= vertical.distance;
+                        }
+                        this.snapLineSurfaces[i + 2].updatePosition({
+                            top: line.snapLine.position,
+                            left: left,
+                            width: right - left,
+                            height: 1
+                        });
+                    }
+                }
+                return {
+                    left: vertical.distance,
+                    top: horizontal.distance
+                };
+            };
+            SnapLinesHelper.prototype.snapPosition = function (position, horizontal) {
+                var line = this._findClosestSnapLine(position, horizontal ? this.horizontalSnapLines : this.verticalSnapLines);
+                return (line && Math.abs(line.distance) <= this._snapTolerance) ? (position - line.distance) : position;
+            };
+            SnapLinesHelper.snapTolerance = 10;
+            return SnapLinesHelper;
+        })();
+        Designer.SnapLinesHelper = SnapLinesHelper;
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
@@ -15678,10 +17156,10 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Cut,
                         text: "Cut",
-                        textId: "ReportStringId.UD_TTip_EditCut",
+                        displayText: function () { return Designer.getLocalization("Cut", "ReportStringId.UD_TTip_EditCut"); },
                         imageClassName: "dxrd-image-cut",
                         disabled: ko.pureComputed(function () {
-                            return !copyPasteHandler.canCopy() || selectionControlsLocked();
+                            return !surfaceContext() || !copyPasteHandler.canCopy() || selectionControlsLocked();
                         }),
                         visible: true,
                         clickAction: function () {
@@ -15694,10 +17172,10 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Copy,
                         text: "Copy",
-                        textId: "ReportStringId.Cmd_Copy",
+                        displayText: function () { return Designer.getLocalization("Copy", "ReportStringId.Cmd_Copy"); },
                         imageClassName: "dxrd-image-copy",
                         disabled: ko.pureComputed(function () {
-                            return !copyPasteHandler.canCopy() || selectionControlsLocked();
+                            return !surfaceContext() || !copyPasteHandler.canCopy() || selectionControlsLocked();
                         }),
                         visible: true,
                         clickAction: function () {
@@ -15708,10 +17186,10 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Paste,
                         text: "Paste",
-                        textId: "ReportStringId.Cmd_Paste",
+                        displayText: function () { return Designer.getLocalization("Paste", "ReportStringId.Cmd_Paste"); },
                         imageClassName: "dxrd-image-paste",
                         disabled: ko.pureComputed(function () {
-                            return !copyPasteHandler.canPaste() || selectionControlsLocked();
+                            return !surfaceContext() || !copyPasteHandler.canPaste() || selectionControlsLocked();
                         }),
                         visible: true,
                         clickAction: function () {
@@ -15724,7 +17202,7 @@ var DevExpress;
                     actions.push({
                         id: Designer.ActionId.Delete,
                         text: "Delete",
-                        textId: "ReportStringId.Cmd_Delete",
+                        displayText: function () { return Designer.getLocalization("Delete", "ReportStringId.Cmd_Delete"); },
                         imageClassName: "dxrd-image-delete",
                         disabled: ko.pureComputed(function () {
                             if (selection.focused()) {
@@ -15746,9 +17224,9 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.Undo,
                     text: "Undo",
-                    textId: "ReportStringId.UD_Capt_Undo",
+                    displayText: function () { return Designer.getLocalization("Undo", "ReportStringId.UD_Capt_Undo"); },
                     imageClassName: "dxrd-image-undo",
-                    disabled: ko.pureComputed(function () { return !undoEngine().undoEnabled() || (selection && selectionControlsLocked()); }),
+                    disabled: ko.pureComputed(function () { return !surfaceContext() || !undoEngine() || (undoEngine() && !undoEngine().undoEnabled()) || (selection && selectionControlsLocked()); }),
                     visible: true,
                     clickAction: function () {
                         undoEngine().undo();
@@ -15759,9 +17237,9 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.Redo,
                     text: "Redo",
-                    textId: "ReportStringId.UD_Capt_Redo",
+                    displayText: function () { return Designer.getLocalization("Redo", "ReportStringId.UD_Capt_Redo"); },
                     imageClassName: "dxrd-image-redo",
-                    disabled: ko.pureComputed(function () { return !undoEngine().redoEnabled() || (selection && selectionControlsLocked()); }),
+                    disabled: ko.pureComputed(function () { return !surfaceContext() || !undoEngine() || (undoEngine() && !undoEngine().redoEnabled()) || (selection && selectionControlsLocked()); }),
                     visible: true,
                     clickAction: function () {
                         undoEngine().redo();
@@ -15771,9 +17249,11 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.ZoomOut,
                     text: "Zoom Out",
-                    textId: "ReportStringId.UD_Capt_ZoomOut",
+                    displayText: function () { return Designer.getLocalization("Zoom Out", "ReportStringId.UD_Capt_ZoomOut"); },
                     imageClassName: "dxrd-image-zoomout",
-                    disabled: ko.observable(false),
+                    disabled: ko.pureComputed(function () {
+                        return !surfaceContext();
+                    }),
                     visible: true,
                     hotKey: { ctrlKey: true, keyCode: 109 },
                     zoomStep: zoomStep,
@@ -15785,8 +17265,11 @@ var DevExpress;
                 actions.push({
                     id: Designer.ActionId.ZoomSelector,
                     text: "Zoom 100%",
+                    displayText: function () { return Designer.getLocalization("Zoom 100%"); },
                     imageClassName: "dxrd-image-zoom",
-                    disabled: ko.observable(false),
+                    disabled: ko.pureComputed(function () {
+                        return !surfaceContext();
+                    }),
                     visible: true,
                     hotKey: { ctrlKey: true, keyCode: 187 },
                     clickAction: function () {
@@ -15795,16 +17278,18 @@ var DevExpress;
                     templateName: "dxrd-zoom-select-template",
                     zoomLevels: ko.observableArray([5, 2, 1.5, 1, 0.75, 0.5, 0.25]),
                     zoom: ko.pureComputed({
-                        read: function () { return surfaceContext().zoom(); },
+                        read: function () { return surfaceContext() && surfaceContext().zoom(); },
                         write: function (val) { surfaceContext().zoom(val); }
                     })
                 });
                 actions.push({
                     id: Designer.ActionId.ZoomIn,
                     text: "Zoom In",
-                    textId: "ReportStringId.UD_Capt_ZoomIn",
+                    displayText: function () { return Designer.getLocalization("Zoom In", "ReportStringId.UD_Capt_ZoomIn"); },
                     imageClassName: "dxrd-image-zoomin",
-                    disabled: ko.observable(false),
+                    disabled: ko.pureComputed(function () {
+                        return !surfaceContext();
+                    }),
                     visible: true,
                     hotKey: { ctrlKey: true, keyCode: 107 },
                     zoomStep: zoomStep,
@@ -16008,6 +17493,7 @@ var DevExpress;
     (function (Designer) {
         var ToolboxItem = (function () {
             function ToolboxItem(info) {
+                this.disabled = ko.observable(false);
                 this.info = info;
             }
             Object.defineProperty(ToolboxItem.prototype, "type", {
@@ -16019,7 +17505,7 @@ var DevExpress;
             });
             Object.defineProperty(ToolboxItem.prototype, "imageClassName", {
                 get: function () {
-                    return Designer.getImageClassName(this.type);
+                    return [Designer.getImageClassName(this.type), this.disabled() ? "dxrd-disabled-button" : ""].join(' ');
                 },
                 enumerable: true,
                 configurable: true
