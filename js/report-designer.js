@@ -1,4 +1,4 @@
-/*! DevExpress HTML/JS Designer - v16.2.10 - 2017-10-02
+/*! DevExpress HTML/JS Designer - v16.2.11 - 2017-11-07
 * http://www.devexpress.com
 * Copyright (c) 2017 Developer Express Inc; Licensed Commercial */
 
@@ -14579,6 +14579,9 @@ var DevExpress;
                                         if (changes[index].status === "added") {
                                             self.initializeLookUpValue(changes[index].value);
                                             changes[index].value.valueInfo = self.multiValueInfo;
+                                        }
+                                        else if (changes[index].status === "deleted") {
+                                            self.objectsStorage.objects.remove(changes[index].value._value());
                                         }
                                     }
                                 }, null, "arrayChange"));
