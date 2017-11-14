@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.1.8
+* Build date: 2017-11-03
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1277,8 +1277,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.1.8
+* Build date: 2017-11-03
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2313,8 +2313,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.1.8
+* Build date: 2017-11-03
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2515,8 +2515,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.1.8
+* Build date: 2017-11-03
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2597,6 +2597,7 @@
     </div>
 </script>
 <script type="text/html" id="dxrdp-search-mobile">
+    <!-- ko if: $data.enabled -->
     <div class="dxrdp-search-wrapper" data-bind="styleunit:{ height: height }, dxrdSearchBar: $data">
         <div class="dxrd-mobile-search">
             <div class="dxrdp-taptosearch" data-bind="visible: !$data.editorVisible(), dxAction: function(s) { $data.focusEditor(s); }">
@@ -2604,14 +2605,10 @@
             </div>
             <div class="dxrdp-search-panel" data-bind="visible: $data.editorVisible()">
                 <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText }"></div>
-                <!--<div class="dxrdp-search-loading">
-                    <span class="element-1"></span>
-                    <span class="element-2"></span>
-                    <span class="element-3"></span>
-                </div>-->
             </div>
         </div>
     </div>
+    <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxrdp-surface-mobile">
@@ -2967,8 +2964,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.1.8
+* Build date: 2017-11-03
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

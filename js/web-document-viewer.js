@@ -1,11 +1,26 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.1.7
-* Build date: 2017-10-02
+* Version: 17.1.8
+* Build date: 2017-11-03
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            Preview.cultureInfo = {};
+            Preview.editorTemplates = {
+                multiValue: { header: "dxrd-multivalue" },
+                multiValueEditable: { custom: "dxrd-multivalue-editable" },
+                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "TODO"); } } }
+            };
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
     var Designer;
@@ -100,7 +115,7 @@ var DevExpress;
                     { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPrinting.TextExportMode.Value" }
                 ]
             };
-            Report.csvTextSeparator = { propertyName: "separator", modelName: "@Separator", displayName: "Separator", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "," };
+            Report.csvTextSeparator = { propertyName: "separator", modelName: "@Separator", defaultVal: "", displayName: "Separator", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.Separator", editor: DevExpress.Report.Preview.editorTemplates.csvSeparator }, Report.useCustomSeparator = { propertyName: "useCustomSeparator", displayName: "Use Custom Separator", localizationId: "DevExpress.XtraPrinting.CsvExportOptions.UseCustomSeparator", editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.textEncodingType = {
                 propertyName: "encodingType", modelName: "@EncodingType", displayName: "Encoding", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Default", from: Designer.fromEnum,
                 valuesArray: [
@@ -297,8 +312,23 @@ var DevExpress;
         (function (Report) {
             var CsvExportOptions = (function () {
                 function CsvExportOptions(model, serializer) {
+                    var _this = this;
+                    this.defaultSeparatorValue = "";
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
                     serializer.deserialize(this, model);
+                    this.useCustomSeparator = ko.observable(this.separator() !== this.defaultSeparatorValue);
+                    var separatorValue = ko.observable(this.separator());
+                    this.useCustomSeparator.subscribe(function (newValue) {
+                        if (!newValue)
+                            separatorValue(_this.defaultSeparatorValue);
+                    });
+                    this.separator = ko.computed({
+                        read: function () { return separatorValue(); },
+                        write: function (newValue) {
+                            if (_this.useCustomSeparator())
+                                separatorValue(newValue);
+                        }
+                    });
                 }
                 CsvExportOptions.from = function (model, serializer) {
                     return new CsvExportOptions(model || {}, serializer);
@@ -309,6 +339,9 @@ var DevExpress;
                 CsvExportOptions.prototype.getInfo = function () {
                     return csvExportOptionsSerializationInfo;
                 };
+                CsvExportOptions.prototype.isPropertyDisabled = function (name) {
+                    return (name === "separator") && !this.useCustomSeparator();
+                };
                 return CsvExportOptions;
             })();
             Report.CsvExportOptions = CsvExportOptions;
@@ -316,7 +349,7 @@ var DevExpress;
                 Report.textEncodingType,
                 Report.textExportMode,
                 { propertyName: "quoteStringsWithSeparators", modelName: "@QuoteStringsWithSeparators", displayName: "Quote Strings with Separators", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                Report.csvTextSeparator,
+                Report.useCustomSeparator, Report.csvTextSeparator,
                 { propertyName: "skipEmptyRows", modelName: "@SkipEmptyRows", displayName: "Skip Empty Rows", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "skipEmptyColumns", modelName: "@SkipEmptyColumns", displayName: "Skip Empty Columns", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
             ];
@@ -867,6 +900,23 @@ var DevExpress;
                 { propertyName: "xlsx", modelName: "Xlsx", displayName: "XLSx Export Options", from: XlsxExportOptions.from, toJsonObject: XlsxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "docx", modelName: "Docx", displayName: "Docx Export Options", from: DocxExportOptions.from, toJsonObject: DocxExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
+            var CsvExportOptionsPreview = (function (_super) {
+                __extends(CsvExportOptionsPreview, _super);
+                function CsvExportOptionsPreview() {
+                    _super.apply(this, arguments);
+                }
+                CsvExportOptionsPreview.from = function (model, serializer) {
+                    return new CsvExportOptionsPreview(model || {}, serializer);
+                };
+                CsvExportOptionsPreview.prototype.isPropertyVisible = function (name) {
+                    return name !== Report.useCustomSeparator.propertyName;
+                };
+                CsvExportOptionsPreview.prototype.isPropertyDisabled = function (name) {
+                    return false;
+                };
+                return CsvExportOptionsPreview;
+            })(CsvExportOptions);
+            Report.CsvExportOptionsPreview = CsvExportOptionsPreview;
             var htmlExportOptionsSerializationInfoPreview = [].concat(htmlExportOptionsSerializationInfoBase);
             var HtmlExportOptionsPreview = (function (_super) {
                 __extends(HtmlExportOptionsPreview, _super);
@@ -1113,7 +1163,7 @@ var DevExpress;
                 };
                 ExportOptionsPreview.prototype._generateInfo = function () {
                     return [
-                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptionsPreview.from, toJsonObject: CsvExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: this._generateFromFunction(HtmlExportOptionsPreview), toJsonObject: HtmlExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: this._generateFromFunction(ImageExportOptionsPreview), toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: this._generateFromFunction(MhtExportOptionsPreview), toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
@@ -1143,7 +1193,7 @@ var DevExpress;
                 }
                 ExportOptionsMergedPreview.prototype._generateInfo = function () {
                     return [
-                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptions.from, toJsonObject: CsvExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                        { propertyName: "csv", modelName: "Csv", displayName: "CSV Export Options", from: CsvExportOptionsPreview.from, toJsonObject: CsvExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "html", modelName: "Html", displayName: "HTML Export Options", from: this._generateFromFunction(HtmlExportOptionsMergedPreview), toJsonObject: HtmlExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "image", modelName: "Image", displayName: "Image Export Options", from: this._generateFromFunction(ImageExportOptionsMergedPreview), toJsonObject: ImageExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                         { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", from: this._generateFromFunction(MhtExportOptionsMergedPreview), toJsonObject: MhtExportOptionsPreview.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
@@ -3208,6 +3258,7 @@ var DevExpress;
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
                 }
+                $.extend(true, DevExpress.Report.Preview.cultureInfo, viewerModel.cultureInfoList);
                 return previewModel;
             }
             Preview.createAndInitPreviewModel = createAndInitPreviewModel;
@@ -4204,7 +4255,7 @@ var DevExpress;
                     if (this.slideOptions.zoomUpdating() || this.slideOptions.galleryIsAnimated()) {
                         return;
                     }
-                    if (!this.slideOptions.searchPanel.editorVisible()) {
+                    if (Preview.searchAvailable() && !this.slideOptions.searchPanel.editorVisible()) {
                         var direction = this.getDirection(e.pageX, e.pageY);
                         if (!direction.vertical && !direction.horizontal)
                             return;
@@ -4245,14 +4296,16 @@ var DevExpress;
                             }
                         }
                     }
-                    if (this.slideOptions.searchPanel.height() >= Preview.MobileSearchViewModel.maxHeight / 2) {
-                        this.slideOptions.searchPanel.height(Preview.MobileSearchViewModel.maxHeight);
-                    }
-                    else {
-                        this.slideOptions.searchPanel.height(0);
-                    }
-                    if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
-                        this.slideOptions.autoFitBy(Preview.ZoomAutoBy.WholePage);
+                    if (Preview.searchAvailable()) {
+                        if (this.slideOptions.searchPanel.height() >= Preview.MobileSearchViewModel.maxHeight / 2) {
+                            this.slideOptions.searchPanel.height(Preview.MobileSearchViewModel.maxHeight);
+                        }
+                        else {
+                            this.slideOptions.searchPanel.height(0);
+                        }
+                        if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
+                            this.slideOptions.autoFitBy(Preview.ZoomAutoBy.WholePage);
+                        }
                     }
                     setTimeout(function () { _this.slideOptions.brickEventsDisabled(false); }, 10);
                 };
@@ -4298,6 +4351,7 @@ var DevExpress;
                     });
                     $element.on("dxpinchend", function (e) {
                         e.stopPropagation();
+                        options.zoomUpdating(false);
                     });
                 }
             };
@@ -4366,7 +4420,7 @@ var DevExpress;
                             preview.actionsVisible(false);
                         },
                         image: "dxrd-image-search-inactive",
-                        visible: true
+                        visible: Preview.searchAvailable
                     },
                     {
                         action: function () { exportToModel.visible(!exportToModel.visible()); },
@@ -4777,15 +4831,14 @@ var DevExpress;
                     this.searchPanelVisible = reportPreview.searchPanelVisible;
                     this.editorVisible = ko.observable(false);
                     this.searchPanelVisible.subscribe(function (newVal) {
-                        if (!newVal) {
-                            _this.height(0);
-                            _this.editorVisible(false);
-                            _this.searchResult(null);
+                        if (!newVal || !Preview.searchAvailable()) {
+                            _this.stopSearching();
                         }
                         else {
                             _this.height(MobileSearchViewModel.maxHeight);
                         }
                     });
+                    this.enabled = Preview.searchAvailable;
                 }
                 MobileSearchViewModel.prototype.focusEditor = function (s) {
                     if (this.searchPanelVisible()) {
@@ -4813,17 +4866,19 @@ var DevExpress;
                         });
                     }
                 };
+                MobileSearchViewModel.prototype.stopSearching = function () {
+                    this.height(0);
+                    this.editorVisible(false);
+                    this.searchResult(null);
+                };
                 MobileSearchViewModel.maxHeight = 80;
                 return MobileSearchViewModel;
             })(Preview.SearchViewModel);
             Preview.MobileSearchViewModel = MobileSearchViewModel;
-            ko.bindingHandlers["dxrdSearchBar"] = {
-                init: function (element, valueAccessor) {
-                    var viewModel = ko.unwrap(valueAccessor());
-                    var $element = $(element);
-                    element.style.display = "none";
-                    var $searchText = $element.find('.dxrdp-taptosearch-text');
-                    viewModel.height.subscribe(function (newValue) {
+            var SearchBarModel = (function () {
+                function SearchBarModel(viewModel, element, $searchText) {
+                    this.viewModel = viewModel;
+                    this.heightSubscription = viewModel.height.subscribe(function (newValue) {
                         if (!newValue) {
                             element.style.display = "none";
                         }
@@ -4833,6 +4888,24 @@ var DevExpress;
                         $searchText.css({
                             'opacity': Math.min((newValue / MobileSearchViewModel.maxHeight), 1)
                         });
+                    });
+                }
+                SearchBarModel.prototype.dispose = function () {
+                    this.viewModel.stopSearching();
+                    this.heightSubscription.dispose();
+                };
+                return SearchBarModel;
+            })();
+            Preview.SearchBarModel = SearchBarModel;
+            ko.bindingHandlers["dxrdSearchBar"] = {
+                init: function (element, valueAccessor) {
+                    var viewModel = ko.unwrap(valueAccessor());
+                    var $element = $(element);
+                    element.style.display = "none";
+                    var $searchText = $element.find('.dxrdp-taptosearch-text');
+                    var searchBarModel = new SearchBarModel(viewModel, element, $searchText);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        searchBarModel.dispose();
                     });
                 }
             };
@@ -5493,7 +5566,7 @@ var DevExpress;
                     fireEvent("CustomizeParameterEditors", { parameter: parameter, info: info });
                 }
                 function customizeParts(parts) {
-                    fireEvent(prefix + "CustomizeElements", {
+                    fireEvent([prefix, "CustomizeElements"].join(''), {
                         Elements: parts,
                         GetById: function (templateId) {
                             return templateId ? parts.filter(function (item) { return templateId === item.templateName; })[0] : null;
@@ -5501,7 +5574,7 @@ var DevExpress;
                     });
                 }
                 function customizeActions(actions) {
-                    fireEvent(prefix + "CustomizeMenuActions", {
+                    fireEvent([prefix, "CustomizeMenuActions"].join(''), {
                         Actions: actions,
                         GetById: function (actionId) {
                             return actionId ? actions.filter(function (item) { return actionId === item.id; })[0] : null;
@@ -5530,13 +5603,13 @@ var DevExpress;
                     return arg.Handled;
                 }
                 function parametersReset(model, parameters) {
-                    fireEvent(prefix + "ParametersReset", {
+                    fireEvent([prefix, "ParametersReset"].join(''), {
                         ParametersViewModel: model,
                         Parameters: parameters
                     });
                 }
                 function parametersSubmitted(model, parameters) {
-                    fireEvent(prefix + "ParametersSubmitted", {
+                    fireEvent([prefix, "ParametersSubmitted"].join(''), {
                         ParametersViewModel: model,
                         Parameters: parameters
                     });
@@ -5547,11 +5620,11 @@ var DevExpress;
                         OldValue: oldValue,
                         NewValue: newValue
                     };
-                    fireEvent(prefix + "EditingFieldChanged", arg);
+                    fireEvent([prefix, "EditingFieldChanged"].join(''), arg);
                     return arg.NewValue;
                 }
                 function documentReady(documentId, reportId, pageCount) {
-                    fireEvent(prefix + "DocumentReady", {
+                    fireEvent([prefix, "DocumentReady"].join(''), {
                         ReportId: reportId,
                         DocumentId: documentId,
                         PageCount: pageCount
