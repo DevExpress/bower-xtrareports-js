@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.2
-* Build date: 2017-10-27
+* Version: 17.2.3
+* Build date: 2017-11-14
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -231,7 +231,7 @@
         <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyUp: function() { isValid(true); } }"></div>
         <!-- /ko -->
         <!-- ko if: aceAvailable -->
-        <div class="dx-expressioneditor-textarea" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, theme: theme, options: aceOptions, callbacks: callbacks }"></div>
+        <div class="dx-expressioneditor-textarea" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, theme: theme, options: aceOptions, additionalOptions: additionalOptions, callbacks: callbacks }"></div>
         <!-- /ko -->
         <div class="dx-expressioneditor-tools">
             <!-- ko with: tools-->
@@ -942,7 +942,7 @@
 <script type="text/html" id="dx-treelist">
     <div class="dx-treelist">
         <!-- ko foreach: items -->
-        <!-- ko template: templateName -->
+        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->
         <!-- /ko -->
         <div data-bind="visible: !collapsed()">
             <!-- ko template: { name: 'dx-treelist', data: $data } -->
@@ -1350,8 +1350,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.2
-* Build date: 2017-10-30
+* Version: 17.2.3
+* Build date: 2017-11-15
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1432,6 +1432,7 @@
     </div>
 </script>
 <script type="text/html" id="dxrdp-search-mobile">
+    <!-- ko if: $data.enabled -->
     <div class="dxrdp-search-wrapper" data-bind="styleunit:{ height: height }, dxrdSearchBar: $data">
         <div class="dxrd-mobile-search">
             <div class="dxrdp-taptosearch" data-bind="visible: !$data.editorVisible(), dxAction: function(s) { $data.focusEditor(s); }">
@@ -1439,14 +1440,10 @@
             </div>
             <div class="dxrdp-search-panel" data-bind="visible: $data.editorVisible()">
                 <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText }"></div>
-                <!--<div class="dxrdp-search-loading">
-                    <span class="element-1"></span>
-                    <span class="element-2"></span>
-                    <span class="element-3"></span>
-                </div>-->
             </div>
         </div>
     </div>
+    <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxrdp-surface-mobile">
@@ -1637,7 +1634,7 @@
 </script>
 
 <script type="text/html" id="dxrd-preview-page">
-    <div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, 'brick-selection-prog': { page: $data }">
+    <div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, 'brick-selection-prog': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">
         <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { 'width': width() + 2, 'height': height() + 2 }, visible: pageLoading">
             <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { 'paddingTop': height() / 2.3 }">
                 <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>
@@ -1771,6 +1768,19 @@
     <!-- ko with: value -->
     <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems })">
     </div>
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dxrd-multivalue-selectbox">
+    <!-- ko if: options -->
+    <!-- ko with: options -->
+    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">
+        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
+            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
+            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
+        </div>
+    </div>
+    <!-- /ko -->
     <!-- /ko -->
 </script>
 

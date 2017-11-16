@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.2
-* Build date: 2017-10-27
+* Version: 17.2.3
+* Build date: 2017-11-14
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -231,7 +231,7 @@
         <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyUp: function() { isValid(true); } }"></div>
         <!-- /ko -->
         <!-- ko if: aceAvailable -->
-        <div class="dx-expressioneditor-textarea" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, theme: theme, options: aceOptions, callbacks: callbacks }"></div>
+        <div class="dx-expressioneditor-textarea" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, theme: theme, options: aceOptions, additionalOptions: additionalOptions, callbacks: callbacks }"></div>
         <!-- /ko -->
         <div class="dx-expressioneditor-tools">
             <!-- ko with: tools-->
@@ -942,7 +942,7 @@
 <script type="text/html" id="dx-treelist">
     <div class="dx-treelist">
         <!-- ko foreach: items -->
-        <!-- ko template: templateName -->
+        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->
         <!-- /ko -->
         <div data-bind="visible: !collapsed()">
             <!-- ko template: { name: 'dx-treelist', data: $data } -->
@@ -1350,8 +1350,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 17.2.2
-* Build date: 2017-10-27
+* Version: 17.2.3
+* Build date: 2017-11-14
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2364,8 +2364,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 17.2.2
-* Build date: 2017-10-30
+* Version: 17.2.3
+* Build date: 2017-11-15
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2566,8 +2566,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.2
-* Build date: 2017-10-30
+* Version: 17.2.3
+* Build date: 2017-11-15
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2648,6 +2648,7 @@
     </div>
 </script>
 <script type="text/html" id="dxrdp-search-mobile">
+    <!-- ko if: $data.enabled -->
     <div class="dxrdp-search-wrapper" data-bind="styleunit:{ height: height }, dxrdSearchBar: $data">
         <div class="dxrd-mobile-search">
             <div class="dxrdp-taptosearch" data-bind="visible: !$data.editorVisible(), dxAction: function(s) { $data.focusEditor(s); }">
@@ -2655,14 +2656,10 @@
             </div>
             <div class="dxrdp-search-panel" data-bind="visible: $data.editorVisible()">
                 <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText }"></div>
-                <!--<div class="dxrdp-search-loading">
-                    <span class="element-1"></span>
-                    <span class="element-2"></span>
-                    <span class="element-3"></span>
-                </div>-->
             </div>
         </div>
     </div>
+    <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxrdp-surface-mobile">
@@ -2853,7 +2850,7 @@
 </script>
 
 <script type="text/html" id="dxrd-preview-page">
-    <div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, 'brick-selection-prog': { page: $data }">
+    <div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, 'brick-selection-prog': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">
         <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { 'width': width() + 2, 'height': height() + 2 }, visible: pageLoading">
             <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { 'paddingTop': height() / 2.3 }">
                 <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>
@@ -2990,6 +2987,19 @@
     <!-- /ko -->
 </script>
 
+<script type="text/html" id="dxrd-multivalue-selectbox">
+    <!-- ko if: options -->
+    <!-- ko with: options -->
+    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">
+        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
+            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
+            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+</script>
+
 <script type="text/html" id="dxrd-multivalue-editable">
     <!-- ko if: value -->
     <div class="dxrd-editor" data-bind="visible: visible">
@@ -3051,8 +3061,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 17.2.2
-* Build date: 2017-10-30
+* Version: 17.2.3
+* Build date: 2017-11-15
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3418,10 +3428,10 @@
         <div class="dxrd-fieldslist-wrapper-header" data-bind="text: $root.getLocalization('Field List', 'ReportStringId.UD_Title_FieldList')"></div>
         <div id="btn-add-dataSouce" class="dxrd-collectioneditor-action" style="line-height: 20px; margin-top: 8px" data-bind="dxButton: { onClick: showPopover, icon: 'dxrd-image-add-datasource', visible: addDataSourceBtnVisible }, attr: { title: $root.getLocalization('Add Data Source', 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText') }">
         </div>
-        <div data-bind="dxPopover:{ width: 200, visible: popoverVisible, target: '#btn-add-dataSouce', title:$root.getLocalization('Add Data Source', 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText') + ':' }">
+        <div class="dxrd-add-dataSource-popup-content" data-bind="dxPopover:{ width: 200, visible: popoverVisible, target: '#btn-add-dataSouce', title:$root.getLocalization('Add Data Source', 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText') + ':' }">
             <div data-bind="dxList: { dataSource: dataSourceListItems(), onItemClick: itemClickAction }">
                 <div data-options="dxTemplate : { name: 'item' }">
-                    <div data-bind="text: name"></div>
+                    <div class="dxrd-list-item-ellipsis-text" data-bind="text: name, attr: { title: name }"></div>
                 </div>
             </div>
         </div>
@@ -3441,6 +3451,7 @@
 </svg></script>
 
 <script type="text/html" id="dxrd-navigation-panel-template">
+    <!-- ko ifnot: $root.isLoading() && tabs().length === 1-->
     <!-- ko if: allowMDI -->
     <!-- ko if: tabs().length > 0 -->
     <!-- ko template: 'dxrd-navigation-panel-template-content' -->
@@ -3453,10 +3464,11 @@
     <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
+    <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxrd-navigation-panel-template-content">
-    <div class="dxrd-navigation-panel-wrapper" data-bind="styleunit: { width: $root.surfaceSize }">
+    <div class="dxrd-navigation-panel-wrapper" data-bind="style: { width: $root.surfaceSize() ? $root.surfaceSize() + 'px' : 'auto' }">
         <div data-bind="dxTabs: { dataSource: tabs, selectedIndex: selectedIndex, showNavButtons: false }">
             <div data-options="dxTemplate: { name: 'item' }">
                 <!-- ko if: icon -->

@@ -1,11 +1,124 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.2
-* Build date: 2017-10-30
+* Version: 17.2.3
+* Build date: 2017-11-15
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            var MultiValueEditorOptions = (function (_super) {
+                __extends(MultiValueEditorOptions, _super);
+                function MultiValueEditorOptions(value, items) {
+                    var _this = this;
+                    _super.call(this);
+                    this.selectedItems = ko.observable([]);
+                    var values = value();
+                    this.value = value;
+                    var valueHasMutated = function () {
+                        _this.editorValue.notifySubscribers(_this.displayItems[0]);
+                    };
+                    this._items = items.map(function (item) {
+                        var selected = ko.observable(_this._isValueSelected(item.value, values));
+                        return { selected: selected, value: item.value, displayValue: item.displayValue || item.value, toggleSelected: function () { selected(!selected()); valueHasMutated(); } };
+                    });
+                    this._disposables.push(this.selectedItems = ko.pureComputed(function () {
+                        return _this._items.filter(function (item) { return item.selected(); });
+                    }));
+                    var selectionInProcess = ko.observable(false), isSelectedAllState, stringValue;
+                    this._disposables.push(this.selectedValuesString = ko.pureComputed({
+                        read: function () {
+                            if (selectionInProcess())
+                                return stringValue;
+                            stringValue = "";
+                            _this.selectedItems().forEach(function (item, index, array) {
+                                stringValue += item.displayValue;
+                                if (index < array.length - 1) {
+                                    stringValue += ", ";
+                                }
+                            });
+                            return stringValue;
+                        },
+                        write: function (newValue) { }
+                    }));
+                    this._disposables.push(this.isSelectedAll = ko.pureComputed({
+                        read: function () {
+                            if (selectionInProcess())
+                                return isSelectedAllState;
+                            var selectedItemCount = _this.selectedItems().length;
+                            if (selectedItemCount > 0 && selectedItemCount < _this._items.length) {
+                                return undefined;
+                            }
+                            isSelectedAllState = selectedItemCount === _this._items.length;
+                            return isSelectedAllState;
+                        },
+                        write: function (newValue) {
+                            isSelectedAllState = newValue;
+                            try {
+                                selectionInProcess(true);
+                                _this._items.forEach(function (item) { item.selected(newValue); });
+                            }
+                            finally {
+                                selectionInProcess(false);
+                            }
+                        }
+                    }));
+                    var selectAllItem = { selected: this.isSelectedAll, value: null, displayValue: DevExpress.JS.Utils.getLocalization('(Select All)'), toggleSelected: function () { _this.isSelectedAll(!_this.isSelectedAll()); valueHasMutated(); } };
+                    this.displayItems = [selectAllItem].concat(this._items);
+                    this.dataSource = this.displayItems;
+                    this.editorValue = ko.observable(selectAllItem);
+                    this.updateValue = function () {
+                        value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
+                        valueHasMutated();
+                    };
+                    this.onOptionChanged = function (e) {
+                        if (e.name !== "opened" || e.value)
+                            return;
+                        _this.updateValue();
+                    };
+                }
+                MultiValueEditorOptions.prototype._isValueSelected = function (value, array) {
+                    if (value instanceof Date) {
+                        return array.filter(function (item) { return item - value === 0; }).length > 0;
+                    }
+                    return array.indexOf(value) !== -1;
+                };
+                return MultiValueEditorOptions;
+            })(DevExpress.JS.Utils.Disposable);
+            Preview.MultiValueEditorOptions = MultiValueEditorOptions;
+            var MultiValueEditor = (function (_super) {
+                __extends(MultiValueEditor, _super);
+                function MultiValueEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
+                    var _this = this;
+                    _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
+                    this.options = ko.observable(null);
+                    this.value.subscribe(function (newVal) {
+                        _this.options() && _this.options().dispose();
+                        _this.options(_this._createOptions(newVal));
+                    });
+                    this.options(this._createOptions(this.value()));
+                }
+                MultiValueEditor.prototype._createOptions = function (helper) {
+                    if (!helper)
+                        return null;
+                    return new MultiValueEditorOptions(helper.value, helper.items);
+                };
+                return MultiValueEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Preview.MultiValueEditor = MultiValueEditor;
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
     var Report;
@@ -16,7 +129,8 @@ var DevExpress;
             Preview.editorTemplates = {
                 multiValue: { header: "dxrd-multivalue" },
                 multiValueEditable: { custom: "dxrd-multivalue-editable" },
-                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "TODO"); } } }
+                multiValueSelectBox: { header: "dxrd-multivalue-selectbox", editorType: Preview.MultiValueEditor },
+                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "TODO"); } } }
             };
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
@@ -223,11 +337,6 @@ var DevExpress;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Report;
@@ -590,11 +699,15 @@ var DevExpress;
                 PdfExportOptions.toJson = function (value, serializer, refs) {
                     return serializer.serialize(value, pdfExportOptionsSerializationInfo, refs);
                 };
+                PdfExportOptions.prototype.isPropertyDisabled = function (propertyName) {
+                    return this.pdfACompatibility() !== pdfACompatibilityValues.None &&
+                        (propertyName === "neverEmbeddedFonts" ||
+                            propertyName === "pdfPasswordSecurityOptions" ||
+                            propertyName === "showPrintDialogOnOpen")
+                        || (this.pdfACompatibility() === pdfACompatibilityValues.PdfA1b && propertyName == "exportEditingFieldsToAcroForms");
+                };
                 PdfExportOptions.prototype.getInfo = function () {
                     return pdfExportOptionsSerializationInfo;
-                };
-                PdfExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return false;
                 };
                 PdfExportOptions.prototype.hasSensitiveData = function () {
                     return this.pdfPasswordSecurityOptions && this.pdfPasswordSecurityOptions.hasSensitiveData();
@@ -602,12 +715,13 @@ var DevExpress;
                 return PdfExportOptions;
             })();
             Report.PdfExportOptions = PdfExportOptions;
+            var pdfACompatibilityValues = { None: "None", PdfA1b: "PdfA1b", PdfA2b: "PdfA2b", PdfA3b: "PdfA3b" };
             var pdfExportOptionsSerializationInfo = [
                 { propertyName: "convertImagesToJpeg", modelName: "@ConvertImagesToJpeg", displayName: "Convert Images to Jpeg", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ConvertImagesToJpeg", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "showPrintDialogOnOpen", modelName: "@ShowPrintDialogOnOpen", displayName: "Show Print Dialog on Open", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ShowPrintDialogOnOpen", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "neverEmbeddedFonts", modelName: "@NeverEmbeddedFonts", displayName: "Never Embedded Fonts", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.NeverEmbeddedFonts", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "exportEditingFieldsToAcroForms", modelName: "@ExportEditingFieldsToAcroForms", displayName: "Export Editing Fields To AcroForms", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ExportEditingFieldsToAcroForms", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "exportEditingFieldsToAcroForms", modelName: "@ExportEditingFieldsToAcroForms", displayName: "Export Editing Fields To AcroForms", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ExportEditingFieldsToAcroForms", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
                     propertyName: "imageQuality", modelName: "@ImageQuality", displayName: "Image Quality", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ImageQuality", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Highest", from: Designer.fromEnum,
                     valuesArray: [
@@ -619,12 +733,12 @@ var DevExpress;
                     ]
                 },
                 {
-                    propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.PdfACompatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
+                    propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.PdfACompatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: pdfACompatibilityValues.None, from: Designer.fromEnum,
                     valuesArray: [
-                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.None" },
-                        { value: "PdfA1b", displayValue: "PdfA1b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA1b" },
-                        { value: "PdfA2b", displayValue: "PdfA2b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA2b" },
-                        { value: "PdfA3b", displayValue: "PdfA3b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA3b" }
+                        { value: pdfACompatibilityValues.None, displayValue: pdfACompatibilityValues.None, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.None" },
+                        { value: pdfACompatibilityValues.PdfA1b, displayValue: pdfACompatibilityValues.PdfA1b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA1b" },
+                        { value: pdfACompatibilityValues.PdfA2b, displayValue: pdfACompatibilityValues.PdfA2b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA2b" },
+                        { value: pdfACompatibilityValues.PdfA3b, displayValue: pdfACompatibilityValues.PdfA3b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA3b" }
                     ]
                 },
                 Report.pageRange,
@@ -661,7 +775,7 @@ var DevExpress;
                 Report.rasterizationResolution,
                 Report.exportWatermarks
             ];
-            var emptyFirstPageHeaderFooter = { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", localizationId: "DevExpress.XtraPrinting.RtfExportOptions.EmptyFirstPageHeaderFooter", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, keepRowHeight = { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", localizationId: "DevExpress.XtraPrinting.RtfExportOptions.KeepRowHeight", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            var emptyFirstPageHeaderFooter = { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", localizationId: "DevExpress.XtraPrinting.FormattedTextExportOptions.EmptyFirstPageHeaderFooter", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, keepRowHeight = { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", localizationId: "DevExpress.XtraPrinting.FormattedTextExportOptions.KeepRowHeight", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var rtfExportOptionsSerializationInfo = [
                 emptyFirstPageHeaderFooter,
                 Report.exportPageBreaks,
@@ -1516,7 +1630,7 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
-            Preview.formatSearchResult = function (value) { return value && ('page ' + (value.pageIndex + 1)); };
+            Preview.formatSearchResult = function (value) { return value && (DevExpress.Designer.getLocalization("page", "ASPxReportsStringId.WebDocumentViewer_SearchPageNumberText") + " " + (value.pageIndex + 1)); };
             Preview.searchAvailable = ko.observable(true);
             var SearchViewModel = (function (_super) {
                 __extends(SearchViewModel, _super);
@@ -1942,9 +2056,19 @@ var DevExpress;
         (function (Preview) {
             var MultiValuesHelper = (function () {
                 function MultiValuesHelper(value, items) {
+                    var _this = this;
+                    this.items = items;
                     this.selectedItems = ko.observableArray([]);
                     this.value = value;
                     this.dataSource = items;
+                    var allValues;
+                    this.isSelectedAll = ko.pureComputed({
+                        read: function () { return _this.value.length == items.length; },
+                        write: function (selectAll) {
+                            var newValue = selectAll ? (allValues || (allValues = items.map(function (x) { return x.value; }))) : [];
+                            _this.value(newValue);
+                        }
+                    });
                 }
                 return MultiValuesHelper;
             })();
@@ -3359,12 +3483,14 @@ var DevExpress;
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
                 }
+                $.extend(true, DevExpress.Report.Preview.cultureInfo, viewerModel.cultureInfoList);
                 return previewModel;
             }
             Preview.createAndInitPreviewModel = createAndInitPreviewModel;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
 })(DevExpress || (DevExpress = {}));
+/// <reference path="sources/widgets.ts" />
 /// <reference path="sources/metadata.ts" />
 /// <reference path="sources/exportoptions.ts" />
 /// <reference path="sources/preview-page.ts" />
@@ -4355,7 +4481,7 @@ var DevExpress;
                     if (this.slideOptions.zoomUpdating() || this.slideOptions.galleryIsAnimated()) {
                         return;
                     }
-                    if (!this.slideOptions.searchPanel.editorVisible()) {
+                    if (Preview.searchAvailable() && !this.slideOptions.searchPanel.editorVisible()) {
                         var direction = this.getDirection(e.pageX, e.pageY);
                         if (!direction.vertical && !direction.horizontal)
                             return;
@@ -4396,14 +4522,16 @@ var DevExpress;
                             }
                         }
                     }
-                    if (this.slideOptions.searchPanel.height() >= Preview.MobileSearchViewModel.maxHeight / 2) {
-                        this.slideOptions.searchPanel.height(Preview.MobileSearchViewModel.maxHeight);
-                    }
-                    else {
-                        this.slideOptions.searchPanel.height(0);
-                    }
-                    if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
-                        this.slideOptions.autoFitBy(Preview.ZoomAutoBy.WholePage);
+                    if (Preview.searchAvailable()) {
+                        if (this.slideOptions.searchPanel.height() >= Preview.MobileSearchViewModel.maxHeight / 2) {
+                            this.slideOptions.searchPanel.height(Preview.MobileSearchViewModel.maxHeight);
+                        }
+                        else {
+                            this.slideOptions.searchPanel.height(0);
+                        }
+                        if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
+                            this.slideOptions.autoFitBy(Preview.ZoomAutoBy.WholePage);
+                        }
                     }
                     setTimeout(function () { _this.slideOptions.brickEventsDisabled(false); }, 10);
                 };
@@ -4525,7 +4653,7 @@ var DevExpress;
                             preview.actionsVisible(false);
                         },
                         image: "dxrd-image-search-inactive",
-                        visible: true
+                        visible: Preview.searchAvailable
                     },
                     {
                         action: function () { exportToModel.visible(!exportToModel.visible()); },
@@ -4870,15 +4998,14 @@ var DevExpress;
                     this.searchPanelVisible = reportPreview.searchPanelVisible;
                     this.editorVisible = ko.observable(false);
                     this.searchPanelVisible.subscribe(function (newVal) {
-                        if (!newVal) {
-                            _this.height(0);
-                            _this.editorVisible(false);
-                            _this.searchResult(null);
+                        if (!newVal || !Preview.searchAvailable()) {
+                            _this.stopSearching();
                         }
                         else {
                             _this.height(MobileSearchViewModel.maxHeight);
                         }
                     });
+                    this.enabled = Preview.searchAvailable;
                 }
                 MobileSearchViewModel.prototype.focusEditor = function (s) {
                     if (this.searchPanelVisible()) {
@@ -4906,17 +5033,21 @@ var DevExpress;
                         });
                     }
                 };
+                MobileSearchViewModel.prototype.stopSearching = function () {
+                    this.height(0);
+                    this.editorVisible(false);
+                    this.searchResult(null);
+                };
                 MobileSearchViewModel.maxHeight = 80;
                 return MobileSearchViewModel;
             })(Preview.SearchViewModel);
             Preview.MobileSearchViewModel = MobileSearchViewModel;
-            ko.bindingHandlers["dxrdSearchBar"] = {
-                init: function (element, valueAccessor) {
-                    var viewModel = ko.unwrap(valueAccessor());
-                    var $element = $(element);
-                    element.style.display = "none";
-                    var $searchText = $element.find('.dxrdp-taptosearch-text');
-                    viewModel.height.subscribe(function (newValue) {
+            var SearchBarModel = (function (_super) {
+                __extends(SearchBarModel, _super);
+                function SearchBarModel(viewModel, element, $searchText) {
+                    _super.call(this);
+                    this.viewModel = viewModel;
+                    this._disposables.push(viewModel.height.subscribe(function (newValue) {
                         if (!newValue) {
                             element.style.display = "none";
                         }
@@ -4926,6 +5057,24 @@ var DevExpress;
                         $searchText.css({
                             'opacity': Math.min((newValue / MobileSearchViewModel.maxHeight), 1)
                         });
+                    }));
+                }
+                SearchBarModel.prototype.dispose = function () {
+                    this.viewModel.stopSearching();
+                    _super.prototype.dispose.call(this);
+                };
+                return SearchBarModel;
+            })(DevExpress.Designer.Disposable);
+            Preview.SearchBarModel = SearchBarModel;
+            ko.bindingHandlers["dxrdSearchBar"] = {
+                init: function (element, valueAccessor) {
+                    var viewModel = ko.unwrap(valueAccessor());
+                    var $element = $(element);
+                    element.style.display = "none";
+                    var $searchText = $element.find('.dxrdp-taptosearch-text');
+                    var searchBarModel = new SearchBarModel(viewModel, element, $searchText);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        searchBarModel.dispose();
                     });
                 }
             };
@@ -5622,7 +5771,10 @@ var DevExpress;
                         Brick: brick,
                         DefaultHandler: defaultHandler,
                         GetBrickText: function () { return brick && brick.text(); },
-                        GetBrickValue: function () { return brick && brick.content && brick.content.filter(function (x) { return x.Key === "value"; })[0]; },
+                        GetBrickValue: function () {
+                            var contentValue = brick && brick.content && brick.content.filter(function (x) { return x.Key === "value"; })[0];
+                            return contentValue && contentValue.Value;
+                        },
                         Handled: false
                     };
                     fireEvent("PreviewClick", arg);
@@ -5803,10 +5955,11 @@ var DevExpress;
                     r2.bottom < r1.top);
             }
             var PreviewSelection = (function () {
-                function PreviewSelection(_element, _page) {
+                function PreviewSelection(_element, _page, _click) {
                     var _this = this;
                     this._element = _element;
                     this._page = _page;
+                    this._click = _click;
                     this._bodyEvents = {
                         move: null,
                         up: null
@@ -5818,23 +5971,23 @@ var DevExpress;
                 }
                 PreviewSelection.prototype._updateSelectionContent = function (event) {
                     if (this._startRect.left > event.pageX) {
-                        this._selectionContent.css("left", event.pageX);
+                        this._$selectionContent.css("left", event.pageX);
                     }
                     else {
-                        this._selectionContent.css("right", window.innerWidth - event.pageX);
+                        this._$selectionContent.css("right", window.innerWidth - event.pageX);
                     }
                     if (this._startRect.top > event.pageY) {
-                        this._selectionContent.css("top", event.pageY);
+                        this._$selectionContent.css("top", event.pageY);
                     }
                     else {
-                        this._selectionContent.css("bottom", window.innerHeight - event.pageY);
+                        this._$selectionContent.css("bottom", window.innerHeight - event.pageY);
                     }
                     var offset = this._$element.offset();
                     var currentRect = {
-                        left: (parseInt(this._selectionContent.css("left")) - offset.left) / this._$element.width() * 100,
-                        width: this._selectionContent.width() / this._$element.width() * 100,
-                        top: (parseInt(this._selectionContent.css("top")) - offset.top) / this._$element.height() * 100,
-                        height: this._selectionContent.height() / this._$element.height() * 100
+                        left: (parseInt(this._$selectionContent.css("left")) - offset.left) / this._$element.width() * 100,
+                        width: this._$selectionContent.width() / this._$element.width() * 100,
+                        top: (parseInt(this._$selectionContent.css("top")) - offset.top) / this._$element.height() * 100,
+                        height: this._$selectionContent.height() / this._$element.height() * 100
                     };
                     currentRect["right"] = currentRect.left + currentRect.width;
                     currentRect["bottom"] = currentRect.top + currentRect.height;
@@ -5852,19 +6005,18 @@ var DevExpress;
                 };
                 PreviewSelection.prototype._mouseMove = function (event) {
                     var _this = this;
-                    if (!this._startRect)
+                    if (!this._startRect || !this._page.active())
                         return;
                     var leftButtonPressed = event.buttons > 0 && event.which === 1;
                     if (leftButtonPressed) {
-                        if (!this._selectionContent) {
+                        if (!this._$selectionContent) {
                             if (Math.abs(this._startRect.left - event.pageX) >= 2 || Math.abs(this._startRect.top - event.pageY) >= 2) {
                                 PreviewSelection.started = true;
-                                this._selectionContent = $("<div>").appendTo(document.body);
-                                this._selectionContent.css(this._startRect);
-                                this._selectionContent.css({
-                                    position: "absolute",
-                                    border: "1px dotted black"
-                                });
+                                this._$selectionContent = $("<div>").appendTo(document.body);
+                                this._$selectionContent.css(this._startRect);
+                                this._$selectionContent.addClass("dxrd-selection-content");
+                                if (DevExpress.ui.dxPopup.prototype._zIndexInitValue)
+                                    this._$selectionContent.zIndex(DevExpress.ui.dxPopup.prototype._zIndexInitValue() + 100);
                                 this._updateSelectionContent(event);
                                 this._bodyEvents.move = function (event) { return _this._mouseMove(event); };
                                 this._bodyEvents.up = function (event) { return _this._mouseUp(event); };
@@ -5878,10 +6030,11 @@ var DevExpress;
                     }
                 };
                 PreviewSelection.prototype._mouseUp = function (event) {
-                    this._selectionContent && this._selectionContent.remove();
-                    this._selectionContent = null;
+                    this._$selectionContent && this._$selectionContent.remove();
+                    this._$selectionContent = null;
                     document.body.removeEventListener("mousemove", this._bodyEvents.move);
                     document.body.removeEventListener("mouseup", this._bodyEvents.up);
+                    this._startRect = null;
                     setTimeout(function () {
                         PreviewSelection.started = false;
                     }, 1);
@@ -5893,7 +6046,7 @@ var DevExpress;
                         right: window.innerWidth - event.pageX,
                         bottom: window.innerHeight - event.pageY
                     };
-                    this._page.active(true);
+                    this._click(this._page.pageIndex);
                 };
                 PreviewSelection.started = false;
                 return PreviewSelection;
@@ -5902,7 +6055,7 @@ var DevExpress;
             ko.bindingHandlers["brick-selection-prog"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var values = valueAccessor(), unwrappedValues = ko.unwrap(values);
-                    var selection = new PreviewSelection(element, unwrappedValues.page);
+                    var selection = new PreviewSelection(element, unwrappedValues.page, unwrappedValues.click);
                 }
             };
             ko.bindingHandlers["textCopier"] = {
