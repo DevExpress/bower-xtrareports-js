@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.2.3
-* Build date: 2017-11-14
+* Version: 17.2.4
+* Build date: 2017-12-14
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -54,6 +54,7 @@ var DevExpress;
             return (DevExpress.JS.Localization.localize(Designer.localization_values[text]) || DevExpress.JS.Localization.localize(text)) || text;
         }
         var custom_localization_values = {};
+        Designer.localization_values = DevExpress.Designer.localization_values || {};
         function isCustomizedWithUpdateLocalizationMethod(text) {
             return !!custom_localization_values[text];
         }
@@ -122,6 +123,7 @@ var DevExpress;
             'Actual Value': 'DevExpress.XtraReports.UI.XRGauge.ActualValue',
             'Custom Draw a Series Point': 'DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawSeriesPoint',
             'Row Count for Preview': 'DevExpress.XtraReports.UI.XtraReport.PreviewRowCount',
+            'Caching': 'DevExpress.XtraReports.UI.DocumentExportMode.Caching',
             'Check Edit Options': 'DevExpress.XtraReports.UI.CheckEditOptions',
             'Image Type': 'DevExpress.XtraReports.UI.XRSparkline.ImageType',
             'Synchronize Bounds': 'DevExpress.XtraReports.UI.WinControlContainer.SyncBounds',
@@ -135,8 +137,11 @@ var DevExpress;
             'Use Font': 'DevExpress.XtraReports.UI.StyleUsing.UseFont',
             'Custom Total Cell Style': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridStyles.CustomTotalCellStyle',
             'Process Duplicates Target': 'DevExpress.XtraReports.UI.XRLabel.ProcessDuplicatesTarget',
+            'Customer City': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.CustomerCity',
+            'Customer Name': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.CustomerName',
             'Parameter Bindings': 'DevExpress.XtraReports.UI.XRSubreport.ParameterBindings',
             'Lines': 'DevExpress.XtraReports.UI.XRRichText.Lines',
+            'Note': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Note',
             'Script Security Permissions': 'DevExpress.XtraReports.UI.XtraReport.ScriptSecurityPermissions',
             'Sorting Summary Get Result': 'DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryGetResult',
             'Use Text Alignment': 'DevExpress.XtraReports.UI.StylePriority.UseTextAlignment',
@@ -182,9 +187,14 @@ var DevExpress;
             'Even Style': 'DevExpress.XtraReports.UI.XRControl.XRControlStyles.EvenStyle',
             'Show Print Status Dialog': 'DevExpress.XtraReports.UI.XtraReport.ShowPrintStatusDialog',
             'Data Member': 'DevExpress.XtraReports.UI.XRSparkline.DataMember',
+            'Shipping': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Shipping',
+            'Vendor Website': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorWebsite',
+            'Ship City': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ShipCity',
+            'Ship Name': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ShipName',
             'Function': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function',
             'Condition': 'DevExpress.XtraReports.UI.FormattingRule.Condition',
             'Interactive Sorting': 'DevExpress.XtraReports.UI.XRLabel.InteractiveSorting',
+            'Invoice Number': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.InvoiceNumber',
             'Scripts': 'DevExpress.XtraReports.UI.Band.Scripts',
             'OLAP Connection String': 'DevExpress.XtraReports.UI.XRPivotGrid.OLAPConnectionString',
             'Bound Data Changed': 'DevExpress.XtraReports.UI.XRChartScripts.OnBoundDataChanged',
@@ -209,6 +219,7 @@ var DevExpress;
             'Percentage': 'DevExpress.XtraReports.UI.SummaryFunc.Percentage',
             'Bookmark Duplicate Suppress': 'DevExpress.XtraReports.UI.XtraReport.BookmarkDuplicateSuppress',
             'Custom Summary': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomSummary',
+            'Vendor Country': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorCountry',
             'Panel': 'DevExpress.XtraReports.UI.XRPanel',
             'Shape': 'DevExpress.XtraReports.UI.XRShape',
             'Using Style': 'DevExpress.XtraReports.UI.XRControlStyle.StyleUsing',
@@ -226,6 +237,7 @@ var DevExpress;
             'Double-Click in Preview': 'DevExpress.XtraReports.UI.XRControlEvents.OnPreviewDoubleClick',
             'Field Name': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.FieldName',
             'Request Parameters': 'DevExpress.XtraReports.UI.XtraReport.RequestParameters',
+            'Unit Price': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.UnitPrice',
             'MultiThread': 'DevExpress.XtraReports.UI.DocumentExportMode.MultiThread',
             'Regular': 'DevExpress.XtraReports.UI.DocumentExportMode.Regular',
             'Count (Distinct)': 'DevExpress.XtraReports.UI.SortingSummaryFunction.DCount',
@@ -234,6 +246,7 @@ var DevExpress;
             'Data Bindings': 'DevExpress.XtraReports.UI.XRControl.DataBindings',
             'Parent Changed': 'DevExpress.XtraReports.UI.XRControlEvents.OnParentChanged',
             'With Last Detail': 'DevExpress.XtraReports.UI.GroupFooterUnion.WithLastDetail',
+            'Prepayment': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Prepayment',
             'Custom Unbound Field Data': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomUnboundFieldData',
             'Custom Group Interval': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomGroupInterval',
             'Page Information': 'DevExpress.XtraReports.UI.XRPageInfo.PageInfo',
@@ -245,9 +258,10 @@ var DevExpress;
             'After the Band, Except for the Last Entry': 'DevExpress.XtraReports.UI.PageBreak.AfterBandExceptLastEntry',
             'Indent': 'DevExpress.XtraReports.UI.XRTableOfContentsLevel.Indent',
             'Sorting Summary Reset': 'DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryReset',
-            'Value': 'DevExpress.XtraReports.UI.ProcessDuplicatesTarget.Value',
+            'Value': 'ASPxReportsStringId.FilterEditor_Operand_Type_Value',
             'Show Printing Warnings': 'DevExpress.XtraReports.UI.XtraReport.ShowPrintingWarnings',
             'Multi-Column Options': 'DevExpress.XtraReports.UI.MultiColumn',
+            'Expressions': 'DevExpress.XtraReports.UI.XRControl.Expressions',
             'Draw the Watermark': 'DevExpress.XtraReports.UI.XtraReport.DrawWatermark',
             'Median': 'DevExpress.XtraReports.UI.SortingSummaryFunction.Median',
             'Background Color': 'DevExpress.XtraReports.UI.XRControl.BackColor',
@@ -297,6 +311,7 @@ var DevExpress;
             'Use Padding': 'DevExpress.XtraReports.UI.StylePriority.UsePadding',
             'View Theme': 'DevExpress.XtraReports.UI.XRGauge.ViewTheme',
             'View Style': 'DevExpress.XtraReports.UI.XRGauge.ViewStyle',
+            'Invoice Date': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.InvoiceDate',
             'Page Color': 'DevExpress.XtraReports.UI.XtraReport.PageColor',
             'With First Detail': 'DevExpress.XtraReports.UI.GroupUnion.WithFirstDetail',
             'Navigation URL': 'DevExpress.XtraReports.UI.XRControl.NavigateUrl',
@@ -306,6 +321,7 @@ var DevExpress;
             'Styles': 'DevExpress.XtraReports.UI.XRPivotGrid.Styles',
             'Standard Deviation (Distinct)': 'DevExpress.XtraReports.UI.SortingSummaryFunction.DStdDev',
             'Series Name Template': 'DevExpress.XtraReports.UI.XRChart.SeriesNameTemplate',
+            'Product Name': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ProductName',
             'Standard Population Deviation (Distinct)': 'DevExpress.XtraReports.UI.SummaryFunc.DStdDevP',
             'XML Data Path': 'DevExpress.XtraReports.UI.XtraReportBase.XmlDataPath',
             'Options Chart Data Source': 'DevExpress.XtraReports.UI.XRPivotGrid.OptionsChartDataSource',
@@ -324,6 +340,7 @@ var DevExpress;
             'Using Parent Style': 'DevExpress.XtraReports.UI.XRControl.ParentStyleUsing',
             'Drawing Method': 'DevExpress.XtraReports.UI.WinControlContainer.DrawMethod',
             'As Image': 'DevExpress.XtraReports.UI.WinControlPrintMode.AsImage',
+            'Ship Address': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ShipAddress',
             'Header Group Line Style': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridStyles.HeaderGroupLineStyle',
             'Start Band': 'DevExpress.XtraReports.UI.XRCrossBandControl.StartBand',
             'Label Scripts': 'DevExpress.XtraReports.UI.XRLabelScripts',
@@ -332,6 +349,8 @@ var DevExpress;
             'Drill-Down Control': 'DevExpress.XtraReports.UI.Band.DrillDownControl',
             'Row Changed': 'DevExpress.XtraReports.UI.XRSummaryEvents.OnRowChanged',
             'Report Source': 'DevExpress.XtraReports.UI.SubreportBase.ReportSource',
+            'Fixed': 'DevExpress.XtraReports.Wizards.TemplateValueType.Fixed',
+            'Unit Discount': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.UnitDiscount',
             'Default': 'DevExpress.XtraReports.UI.WinControlPrintMode.Default',
             'Paper Kind': 'DevExpress.XtraReports.UI.XtraReport.PaperKind',
             'Paper Name': 'DevExpress.XtraReports.UI.XtraReport.PaperName',
@@ -342,6 +361,8 @@ var DevExpress;
             'Image URL': 'DevExpress.XtraReports.UI.XRPictureBox.ImageUrl',
             'Size': 'DevExpress.XtraReports.UI.XRControl.Size',
             'Name': 'DevExpress.XtraReports.UI.XRControl.Name',
+            'Left': 'DevExpress.XtraReports.UI.XRControl.Left',
+            'Vendor': 'DevExpress.XtraReports.Wizards.TemplateFieldCategory.Vendor',
             'Control Style': 'DevExpress.XtraReports.UI.XRControlStyle',
             'Foreground Color': 'DevExpress.XtraReports.UI.XRControlStyle.ForeColor',
             'Band Level Changed': 'DevExpress.XtraReports.UI.GroupBandScripts.OnBandLevelChanged',
@@ -349,7 +370,9 @@ var DevExpress;
             'Custom Field Sort': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomFieldSort',
             'Text Edit Options': 'DevExpress.XtraReports.UI.TextEditOptions',
             'Data Source Demanded': 'DevExpress.XtraReports.UI.XtraReportScripts.OnDataSourceDemanded',
+            'Style Name': 'DevExpress.XtraReports.UI.XRControl.StyleName',
             'End Band': 'DevExpress.XtraReports.UI.XRCrossBandControl.EndBand',
+            'Customer Country': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.CustomerCountry',
             'Sorting Summary Row Changed': 'DevExpress.XtraReports.UI.GroupHeaderBandScripts.OnSortingSummaryRowChanged',
             'Cell Style': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridStyles.CellStyle',
             'Print at Bottom': 'DevExpress.XtraReports.UI.ReportFooterBand.PrintAtBottom',
@@ -357,7 +380,9 @@ var DevExpress;
             'Tag': 'DevExpress.XtraReports.UI.XRControl.Tag',
             'Show Print Margins Warning': 'DevExpress.XtraReports.UI.XtraReport.ShowPrintMarginsWarning',
             'ID': 'DevExpress.XtraReports.UI.EditOptions.ID',
+            'Text Format String': 'DevExpress.XtraReports.UI.XRControl.TextFormatString',
             'Get a Result': 'DevExpress.XtraReports.UI.XRSummaryEvents.OnGetResult',
+            'Percentage (decimal fraction)': 'DevExpress.XtraReports.Wizards.TemplateValueType.DecimalPercentage',
             'Detail Count': 'DevExpress.XtraReports.UI.ReportPrintOptions.DetailCount',
             'Right to Left': 'DevExpress.XtraReports.UI.XRControl.RightToLeft',
             'Sizing': 'DevExpress.XtraReports.UI.XRPictureBox.Sizing',
@@ -387,11 +412,13 @@ var DevExpress;
             'Ignore Null Values': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.IgnoreNullValues',
             'Script References': 'DevExpress.XtraReports.UI.XtraReport.ScriptReferences',
             'Ascending': 'DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending',
+            'Shipped Date': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ShippedDate',
             'Xlsx Format String': 'DevExpress.XtraReports.UI.XRControl.XlsxFormatString',
             'Sparkline Scripts': 'DevExpress.XtraReports.UI.XRSparklineScripts',
             'Fields': 'DevExpress.XtraReports.UI.XRPivotGrid.Fields',
             'Binding': 'DevExpress.XtraReports.Design.DataBinding.Binding',
             'First Down, then Across': 'DevExpress.XtraReports.UI.ColumnDirection.DownThenAcross',
+            'Flat': 'DevExpress.XtraReports.Wizards.TemplateValueType.Flat',
             'Print Options': 'DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint',
             'Before Print': 'DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint',
             'Sort Order': 'DevExpress.XtraReports.UI.XRGroupSortingSummary.SortOrder',
@@ -404,10 +431,14 @@ var DevExpress;
             'Custom Draw a Series': 'DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawSeries',
             'Custom Column Width': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomColumnWidth',
             'Mode': 'DevExpress.XtraReports.UI.MultiColumn.Mode',
+            'Discount': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Discount',
             'Axis Whole Range Changed': 'DevExpress.XtraReports.UI.XRChartScripts.OnAxisWholeRangeChanged',
             'Show Designer\'s Hints': 'DevExpress.XtraReports.UI.XtraReport.ShowDesignerHints',
             'Axis Visual Range Changed': 'DevExpress.XtraReports.UI.XRChartScripts.OnAxisVisualRangeChanged',
             'Fill Empty Space': 'DevExpress.XtraReports.UI.XtraReportScripts.OnFillEmptySpace',
+            'Vendor City': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorCity',
+            'Vendor Name': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorName',
+            'Vendor Logo': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorLogo',
             'Get a Value': 'DevExpress.XtraReports.UI.CalculatedFieldScripts.OnGetValue',
             'Line Scripts': 'DevExpress.XtraReports.UI.XRLineScripts',
             'Bands': 'DevExpress.XtraReports.UI.XtraReportBase.Bands',
@@ -429,6 +460,8 @@ var DevExpress;
             'Word Wrap': 'DevExpress.XtraReports.UI.XRAppearanceObject.WordWrap',
             'Hundredths of an Inch': 'DevExpress.XtraReports.UI.ReportUnit.HundredthsOfAnInch',
             'Page Height': 'DevExpress.XtraReports.UI.XtraReport.PageHeight',
+            'Unit VAT': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.UnitVAT',
+            'Unit Tax': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.UnitTax',
             'Custom Paint': 'DevExpress.XtraReports.UI.XRChartScripts.OnCustomPaint',
             'Count': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Count',
             'Population Variance (Distinct)': 'DevExpress.XtraReports.UI.SortingSummaryFunction.DVarP',
@@ -437,9 +470,11 @@ var DevExpress;
             'Orientation': 'DevExpress.XtraReports.UI.XRBarCode.BarCodeOrientation',
             'Fill Style': 'DevExpress.XtraReports.UI.XRChart.FillStyle',
             'Report Scripts': 'DevExpress.XtraReports.UI.XtraReportScripts',
+            'Vendor Address': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorAddress',
             'Report Footer': 'DevExpress.XtraReports.UI.ReportFooterBand',
             'Can Grow': 'DevExpress.XtraReports.UI.XRControl.CanGrow',
             'Running Summary': 'DevExpress.XtraReports.UI.SummaryFunc.RunningSum',
+            'Invoice Due Date': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.InvoiceDueDate',
             'Property Name': 'DevExpress.XtraReports.UI.XRBinding.PropertyName',
             'Summary': 'DevExpress.XtraReports.UI.XRLabel.Summary',
             'After the Band': 'DevExpress.XtraReports.UI.PageBreak.AfterBand',
@@ -447,12 +482,14 @@ var DevExpress;
             'Alignment': 'DevExpress.XtraReports.UI.XRBarCode.Alignment',
             'Page': 'ASPxReportsStringId.ToolBarItemText_PageLabel',
             'Detail': 'DevExpress.XtraReports.UI.DetailBand',
-            'Reset': 'ASPxReportsStringId.ParametersPanel_Reset',
+            'Reset': 'ASPxReportsStringId.ReportDesigner_PropertyGrid_PopupMenu_Reset',
             'Summary Reset': 'DevExpress.XtraReports.UI.XRLabelScripts.OnSummaryReset',
             'Text Changed': 'DevExpress.XtraReports.UI.XRControlEvents.OnTextChanged',
             'Pixels': 'DevExpress.XtraReports.UI.ReportUnit.Pixels',
             'Report': 'ASPxReportsStringId.DocumentViewer_RibbonReportGroupText',
             'Bottom': 'DevExpress.XtraReports.UI.XRDockStyle.Bottom',
+            'Ship Country': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ShipCountry',
+            'Ship Company': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ShipCompany',
             'Titles': 'DevExpress.XtraReports.UI.XRChart.Titles',
             'Draw': 'DevExpress.XtraReports.UI.XRControlEvents.OnDraw',
             'Shape Scripts': 'DevExpress.XtraReports.UI.XRShapeScripts',
@@ -468,6 +505,7 @@ var DevExpress;
             'Visible': 'DevExpress.XtraReports.UI.XRControl.Visible',
             'Standard Population Deviation': 'DevExpress.XtraReports.UI.SortingSummaryFunction.StdDevP',
             'Layout': 'DevExpress.XtraReports.UI.MultiColumn.Layout',
+            'Customer': 'DevExpress.XtraReports.Wizards.TemplateFieldCategory.Customer',
             'Snap Grid Size': 'DevExpress.XtraReports.UI.XtraReport.SnapGridSize',
             'Enabled': 'DevExpress.XtraReports.UI.EditOptions.Enabled',
             'Parameters Request Before Show': 'DevExpress.XtraReports.UI.XtraReportScripts.OnParametersRequestBeforeShow',
@@ -480,8 +518,10 @@ var DevExpress;
             'Formatting Rule Sheet': 'DevExpress.XtraReports.UI.XtraReport.FormattingRuleSheet',
             'PivotGrid Scripts': 'DevExpress.XtraReports.UI.XRPivotGridScripts',
             'Show Margin Lines in Preview': 'DevExpress.XtraReports.UI.XtraReport.ShowPreviewMarginLines',
+            'Vendor Contact Name': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorContactName',
             'Custom Row Height': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnCustomRowHeight',
             'Check State': 'DevExpress.XtraReports.UI.XRCheckBox.CheckState',
+            'Tickmark Count': 'DevExpress.XtraReports.UI.XRGauge.TickmarkCount',
             'Segment Width': 'DevExpress.XtraReports.UI.XRZipCode.SegmentWidth',
             'Value Member': 'DevExpress.XtraReports.UI.XRSparkline.ValueMember',
             'Field Header Style': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridStyles.FieldHeaderStyle',
@@ -491,10 +531,14 @@ var DevExpress;
             'Vertical Content Splitting': 'DevExpress.XtraReports.UI.XtraReport.VerticalContentSplitting',
             'Sub-Report': 'DevExpress.XtraReports.UI.XRSubreport',
             'Binary Data': 'DevExpress.XtraReports.UI.XRBarCode.BinaryData',
+            'Quantity': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Quantity',
+            'Invoice Information': 'DevExpress.XtraReports.Wizards.TemplateFieldCategory.InvoiceInfo',
             'Column Spacing': 'DevExpress.XtraReports.UI.MultiColumn.ColumnSpacing',
             'Field Value Total Style': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridStyles.FieldValueTotalStyle',
             'Custom Draw Crosshair': 'DevExpress.XtraReports.UI.XRChartScripts.OnCustomDrawCrosshair',
             'Module': 'DevExpress.XtraReports.UI.XRBarCode.Module',
+            'VAT': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VAT',
+            'Tax': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Tax',
             'Prefilter Criteria Changed': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnPrefilterCriteriaChanged',
             'Sub-Band': 'DevExpress.XtraReports.UI.SubBand',
             'Line': 'DevExpress.XtraReports.UI.XRLine',
@@ -503,6 +547,7 @@ var DevExpress;
             'Print Mode': 'DevExpress.XtraReports.UI.WinControlContainer.PrintMode',
             'Levels': 'DevExpress.XtraReports.UI.XRTableOfContents.Levels',
             'Level Title': 'DevExpress.XtraReports.UI.XRTableOfContents.LevelTitle',
+            'Order Details': 'DevExpress.XtraReports.Wizards.TemplateFieldCategory.OrderDetails',
             'Calculated Field Scripts': 'DevExpress.XtraReports.UI.CalculatedFieldScripts',
             'Stretch': 'DevExpress.XtraReports.UI.XRShape.Stretch',
             'Pivot Grid Data Source Options': 'DevExpress.XtraReports.UI.XRChart.PivotGridDataSourceOptions',
@@ -514,6 +559,7 @@ var DevExpress;
             'Group Header Band Scripts': 'DevExpress.XtraReports.UI.GroupHeaderBandScripts',
             'Data Field Options': 'DevExpress.XtraReports.UI.XRPivotGrid.OptionsDataField',
             'Print Cell': 'DevExpress.XtraReports.UI.XRPivotGridScripts.OnPrintCell',
+            'Document Export Mode': 'DevExpress.XtraReports.UI.XtraReport.DocumentExportMode',
             'Cell Horizontal Spacing': 'DevExpress.XtraReports.UI.XRCharacterComb.CellHorizontalSpacing',
             'Page Break': 'DevExpress.XtraReports.UI.Band.PageBreak',
             'Bar Code': 'DevExpress.XtraReports.UI.XRBarCode',
@@ -537,6 +583,8 @@ var DevExpress;
             'Fore Color': 'DevExpress.XtraReports.UI.XRTableOfContentsLevelBase.ForeColor',
             'Field Header': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldHeader',
             'Merge based on Tag': 'DevExpress.XtraReports.UI.ValueSuppressType.MergeByTag',
+            'Vendor Phone': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorPhone',
+            'Vendor Email': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.VendorEmail',
             'Expression': 'DevExpress.XtraReports.UI.CalculatedField.Expression',
             'Picture Box': 'DevExpress.XtraReports.UI.XRPictureBox',
             'Automatic Layout': 'DevExpress.XtraReports.UI.XRChart.AutoLayout',
@@ -547,7 +595,9 @@ var DevExpress;
             'Summary Calculated Field': 'DevExpress.XtraReports.UI.SummaryCalculatedField',
             'Field Value': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.FieldValue',
             'Parent Bookmark': 'DevExpress.XtraReports.UI.XRControl.BookmarkParent',
+            'Percentage (fraction of 100)': 'DevExpress.XtraReports.Wizards.TemplateValueType.Percentage',
             'Table Of Contents': 'DevExpress.XtraReports.UI.XRTableOfContents',
+            'Product Description': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.ProductDescription',
             'Legend': 'DevExpress.XtraReports.UI.XRChart.Legend',
             'Blank Detail Count': 'DevExpress.XtraReports.UI.ReportPrintOptions.BlankDetailCount',
             'Text Vertical Alignment': 'DevExpress.XtraReports.UI.XRAppearanceObject.TextVerticalAlignment',
@@ -570,6 +620,7 @@ var DevExpress;
             'Series Sorting': 'DevExpress.XtraReports.UI.XRChart.SeriesSorting',
             'Mouse Move in Preview': 'DevExpress.XtraReports.UI.XRControlEvents.OnPreviewMouseMove',
             'Mouse Down in Preview': 'DevExpress.XtraReports.UI.XRControlEvents.OnPreviewMouseDown',
+            'Customer Contact Name': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.CustomerContactName',
             'Printer Name': 'DevExpress.XtraReports.UI.XtraReport.PrinterName',
             'Target Value': 'DevExpress.XtraReports.UI.XRGauge.TargetValue',
             'View Type': 'DevExpress.XtraReports.UI.XRGauge.ViewType',
@@ -579,11 +630,13 @@ var DevExpress;
             'Cell Vertical Spacing': 'DevExpress.XtraReports.UI.XRCharacterComb.CellVerticalSpacing',
             'Level Default': 'DevExpress.XtraReports.UI.XRTableOfContents.LevelDefault',
             'Print when Data Source is Empty': 'DevExpress.XtraReports.UI.ReportPrintOptions.PrintOnEmptyDataSource',
+            'Comments': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.Comments',
             'Start Page Number': 'DevExpress.XtraReports.UI.XRPageInfo.StartPageNumber',
             'Style': 'DevExpress.XtraReports.UI.ConditionFormatting.Style',
             'Indicators Palette Name': 'DevExpress.XtraReports.UI.XRChart.IndicatorsPaletteName',
             'After Print': 'DevExpress.XtraReports.UI.XRControlEvents.OnAfterPrint',
             'Target Band': 'DevExpress.XtraReports.UI.SortingOptions.TargetBand',
+            'Customer Address': 'DevExpress.XtraReports.Wizards.TemplateFieldKind.CustomerAddress',
             'As Bricks': 'DevExpress.XtraReports.UI.WinControlPrintMode.AsBricks',
             'Cell': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.Cell',
             'Grand Total Cell': 'DevExpress.XtraReports.UI.PivotGrid.XRPivotGridAppearances.GrandTotalCell',
@@ -623,12 +676,14 @@ var DevExpress;
             'Status': 'DevExpress.XtraPivotGrid.PivotKPIType.Status',
             'Show Vert Lines': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ShowVertLines',
             'Month-Year': 'DevExpress.XtraPivotGrid.PivotGroupInterval.DateMonthYear',
+            'Print Column FieldValues': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnFieldValues',
             'Cell Format': 'DevExpress.XtraPivotGrid.PivotGridCustomTotalBase.CellFormat',
             'Apply To Grand Total Cell': 'DevExpress.XtraPivotGrid.PivotGridStyleFormatCondition.ApplyToGrandTotalCell',
             'Dimension Attribute': 'DevExpress.XtraPivotGrid.PivotSortMode.DimensionAttribute',
             'Filter Values': 'DevExpress.XtraPivotGrid.PivotGridGroup.FilterValues',
             'Allow Cross-Group Variation': 'DevExpress.XtraPivotGrid.PivotGridOptionsData.AllowCrossGroupVariation',
             'Day': 'DevExpress.XtraPivotGrid.PivotGroupInterval.DateDay',
+            'Non Column Criteria': 'DevExpress.XtraPivotGrid.PrefilterBase.NonColumnCriteria',
             'OLAP None': 'DevExpress.XtraPivotGrid.PivotSortMode.None',
             'Store Layout Options': 'DevExpress.XtraPivotGrid.OptionsLayoutPivotGrid.StoreLayoutOptions',
             'Hide Empty Variation Items': 'DevExpress.XtraPivotGrid.PivotGridFieldOptions.HideEmptyVariationItems',
@@ -711,6 +766,8 @@ var DevExpress;
             'Total Cell Format': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.TotalCellFormat',
             'Empty Value Text': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.EmptyValueText',
             'Expanded In Fields Group': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.ExpandedInFieldsGroup',
+            'Print Row FieldValues': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowFieldValues',
+            'Non Column Criteria As String': 'DevExpress.XtraPivotGrid.PrefilterBase.NonColumnCriteriaString',
             'Loading Panel Delay': 'DevExpress.XtraPivotGrid.PivotGridOptionsBehaviorBase.LoadingPanelDelay',
             'Row Totals Location': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.RowTotalsLocation',
             'Print Row Headers': 'DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders',
@@ -723,6 +780,7 @@ var DevExpress;
             'Copy Field Values To Clipboard Behavior': 'DevExpress.XtraPivotGrid.PivotGridOptionsBehavior.ClipboardCopyCollapsedValuesMode',
             'Top Value Show Others': 'DevExpress.XtraPivotGrid.PivotGridFieldBase.TopValueShowOthers',
             'Allow Filter': 'DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowFilter',
+            'Fast': 'DevExpress.XtraPivotGrid.PivotDataProcessingEngine.Fast',
             'OleDb': 'DevExpress.XtraPivotGrid.OLAPDataProvider.OleDb',
             'Rank In Row Largest To Smallest': 'DevExpress.Data.PivotGrid.PivotSummaryDisplayType.RankInRowLargestToSmallest',
             'Adomd': 'DevExpress.XtraPivotGrid.OLAPDataProvider.Adomd',
@@ -904,6 +962,7 @@ var DevExpress;
             'Constant Line Collection': 'DevExpress.XtraCharts.ConstantLineCollection',
             'Diamond': 'DevExpress.XtraCharts.MarkerKind.Diamond',
             'Resolve Overlapping Options': 'DevExpress.XtraCharts.AxisLabel.ResolveOverlappingOptions',
+            'Border': 'DevExpress.XtraCharts.TotalLabel.Border',
             'Candle Stick Reduction Options': 'DevExpress.XtraCharts.CandleStickReductionOptions',
             'Thousands': 'DevExpress.XtraCharts.NumericGridAlignment.Thousands',
             'Qualitative Scale Options': 'DevExpress.XtraCharts.AxisXBase.QualitativeScaleOptions',
@@ -914,7 +973,6 @@ var DevExpress;
             'Stacked Area 3D Series Label': 'DevExpress.XtraCharts.StackedArea3DSeriesLabel',
             'Stacked Bar Series Label': 'DevExpress.XtraCharts.StackedBarSeriesLabel',
             'Marker': 'DevExpress.XtraCharts.LegendMarkerMode.Marker',
-            'Left': 'DevExpress.XtraCharts.LegendAlignmentHorizontal.Left',
             'Start To Start': 'DevExpress.XtraCharts.TaskLinkType.StartToStart',
             'Shape Kind': 'DevExpress.XtraCharts.Annotation.ShapeKind',
             'Base Level Text Color': 'DevExpress.XtraCharts.FibonacciIndicatorLabel.BaseLevelTextColor',
@@ -931,7 +989,6 @@ var DevExpress;
             'Secondary Axes Y': 'DevExpress.XtraCharts.XYDiagram.SecondaryAxesY',
             'Secondary Axes X': 'DevExpress.XtraCharts.XYDiagram.SecondaryAxesX',
             'From Center': 'DevExpress.XtraCharts.CircularMarkerAnimationDirection.FromCenter',
-            'Border': 'DevExpress.XtraCharts.CustomAxisLabel.Border',
             'Axis': 'DevExpress.XtraCharts.AxisXCoordinate.Axis',
             'Marker Visibility': 'DevExpress.XtraCharts.RadarLineSeriesView.MarkerVisibility',
             'Default Pane': 'DevExpress.XtraCharts.XYDiagram2D.DefaultPane',
@@ -967,6 +1024,7 @@ var DevExpress;
             'Tool Tip Image': 'DevExpress.XtraCharts.Series.ToolTipImage',
             'Bottom Inside': 'DevExpress.XtraCharts.BarSeriesLabelPosition.BottomInside',
             'Transparency': 'DevExpress.XtraCharts.RadarAreaSeriesView.Transparency',
+            'Text Color': 'DevExpress.XtraCharts.TotalLabel.TextColor',
             'Retrieve Row Custom Totals': 'DevExpress.XtraCharts.PivotGridDataSourceOptions.RetrieveRowCustomTotals',
             'Points Count': 'DevExpress.XtraCharts.WilliamsR.PointsCount',
             'Tangent': 'DevExpress.XtraCharts.PieSeriesLabelPosition.Tangent',
@@ -998,7 +1056,6 @@ var DevExpress;
             'Allow Stagger': 'DevExpress.XtraCharts.AxisLabelResolveOverlappingOptions.AllowStagger',
             'From Right Bottom Corner': 'DevExpress.XtraCharts.XYMarkerSlideAnimationDirection.FromRightBottomCorner',
             'Signal Line Color': 'DevExpress.XtraCharts.MovingAverageConvergenceDivergence.SignalLineColor',
-            'Text Color': 'DevExpress.XtraCharts.CustomAxisLabel.TextColor',
             'Aggregate Function': 'DevExpress.XtraCharts.XYDiagram3DSeriesViewBase.AggregateFunction',
             'Max Horizontal Percentage': 'DevExpress.XtraCharts.Legend.MaxHorizontalPercentage',
             'Work Time Only': 'DevExpress.XtraCharts.DateTimeScaleOptions.WorkTimeOnly',
@@ -1048,6 +1105,7 @@ var DevExpress;
             'Area 3D Series Label': 'DevExpress.XtraCharts.Area3DSeriesLabel',
             'Auto Scale Breaks': 'DevExpress.XtraCharts.Axis.AutoScaleBreaks',
             'Begin Time': 'DevExpress.XtraCharts.AnimationBase.BeginTime',
+            'Resolve Overlapping Mode': 'DevExpress.XtraCharts.StackedBarTotalLabel.ResolveOverlappingMode',
             'Power': 'DevExpress.XtraCharts.PowerEasingFunction.Power',
             'Shape Fillet': 'DevExpress.XtraCharts.Annotation.ShapeFillet',
             'Dependent Axes Y Range': 'DevExpress.XtraCharts.XYDiagram2D.DependentAxesYRange',
@@ -1086,6 +1144,7 @@ var DevExpress;
             'Axis Label Resolve Overlapping Options': 'DevExpress.XtraCharts.AxisLabelResolveOverlappingOptions',
             'Top Left': 'DevExpress.XtraCharts.ToolTipDockCorner.TopLeft',
             'Moving Average And Envelope': 'DevExpress.XtraCharts.MovingAverageKind.MovingAverageAndEnvelope',
+            'Text Pattern': 'DevExpress.XtraCharts.TotalLabel.TextPattern',
             'Max Line Count': 'DevExpress.XtraCharts.SeriesLabelBase.MaxLineCount',
             'Thickness': 'DevExpress.XtraCharts.TickmarksBase.Thickness',
             'Minor Count': 'DevExpress.XtraCharts.AxisBase.MinorCount',
@@ -1114,6 +1173,7 @@ var DevExpress;
             'Min Allowed Size Percentage': 'DevExpress.XtraCharts.PieSeriesView.MinAllowedSizePercentage',
             'Right-to-Left': 'DevExpress.XtraCharts.Direction.RightToLeft',
             'Total Seconds': 'DevExpress.XtraCharts.TimeSpanFormat.TotalSeconds',
+            'Stacked Bar Total Label': 'DevExpress.XtraCharts.StackedBarTotalLabel',
             'Show Value Labels': 'DevExpress.XtraCharts.CrosshairOptions.ShowValueLabels',
             'Pie 3D Series Label': 'DevExpress.XtraCharts.Pie3DSeriesLabel',
             'Child Point': 'DevExpress.XtraCharts.Relation.ChildPoint',
@@ -1303,7 +1363,6 @@ var DevExpress;
             'Y Axis Scroll Bar Alignment': 'DevExpress.XtraCharts.ScrollBarOptions.YAxisScrollBarAlignment',
             'Scale Break Collection': 'DevExpress.XtraCharts.ScaleBreakCollection',
             'Legend Text': 'DevExpress.XtraCharts.Strip.LegendText',
-            'Resolve Overlapping Mode': 'DevExpress.XtraCharts.SeriesLabelBase.ResolveOverlappingMode',
             'Finish To Start': 'DevExpress.XtraCharts.TaskLinkType.FinishToStart',
             'Value Data Member Collection': 'DevExpress.XtraCharts.ValueDataMemberCollection',
             'Others': 'DevExpress.XtraCharts.PieExplodeMode.Others',
@@ -1326,7 +1385,6 @@ var DevExpress;
             'Conjunction Mode': 'DevExpress.XtraCharts.DataFilterCollection.ConjunctionMode',
             'Bubble Series Label': 'DevExpress.XtraCharts.BubbleSeriesLabel',
             'From Left Bottom Corner': 'DevExpress.XtraCharts.XYMarkerSlideAnimationDirection.FromLeftBottomCorner',
-            'Text Pattern': 'DevExpress.XtraCharts.SeriesLabelBase.TextPattern',
             'From Right Center': 'DevExpress.XtraCharts.CircularMarkerAnimationDirection.FromRightCenter',
             'Axis Label': 'DevExpress.XtraCharts.AxisLabel',
             'Holidays': 'DevExpress.XtraCharts.WorkdaysOptions.Holidays',
@@ -1433,6 +1491,7 @@ var DevExpress;
             'Y Axis Scroll Bar Visible': 'DevExpress.XtraCharts.ScrollBarOptions.YAxisScrollBarVisible',
             'Visibility': 'DevExpress.XtraCharts.BorderBase.Visibility',
             'Radar AxisY Label': 'DevExpress.XtraCharts.RadarAxisYLabel',
+            'Total Label': 'DevExpress.XtraCharts.PieSeriesView.TotalLabel',
             'Bottom Left to Top Right': 'DevExpress.XtraCharts.PolygonGradientMode.BottomLeftToTopRight',
             'Financial Indicator Point': 'DevExpress.XtraCharts.FinancialIndicatorPoint',
             'Or': 'DevExpress.XtraCharts.ConjunctionTypes.Or',
@@ -1466,6 +1525,7 @@ var DevExpress;
             'Retrieve Data by Columns': 'DevExpress.XtraCharts.PivotGridDataSourceOptions.RetrieveDataByColumns',
             'Range Area 3D Series Label': 'DevExpress.XtraCharts.RangeArea3DSeriesLabel',
             'Radar Axis X Label': 'DevExpress.XtraCharts.RadarAxisXLabel',
+            'Show Connector': 'DevExpress.XtraCharts.StackedBarTotalLabel.ShowConnector',
             'AxisY Coordinate': 'DevExpress.XtraCharts.PaneAnchorPoint.AxisYCoordinate',
             'Cap': 'DevExpress.XtraCharts.ErrorBarEndStyle.Cap',
             'Plane Depth Fixed': 'DevExpress.XtraCharts.XYDiagram3D.PlaneDepthFixed',
@@ -1616,7 +1676,7 @@ var DevExpress;
             'Month and Day': 'DevExpress.XtraCharts.DateTimeFormat.MonthAndDay',
             'Nearest Value': 'DevExpress.XtraCharts.CrosshairSnapMode.NearestValue',
             'Start Angle': 'DevExpress.XtraCharts.CircularSeriesCircularUnwindAnimation.StartAngle',
-            'Point': 'DevExpress.XtraCharts.SeriesSelectionMode.Point',
+            'Point': 'ASPxReportsStringId.ReportDesigner_FontOptions_Unit_Point',
             'Crosshair Label Pattern': 'DevExpress.XtraCharts.SeriesBase.CrosshairLabelPattern',
             'Continuous': 'DevExpress.XtraCharts.ScaleMode.Continuous',
             'Date Time Values': 'DevExpress.XtraCharts.SeriesPoint.DateTimeValues',
@@ -1647,6 +1707,7 @@ var DevExpress;
             'Value1 Label': 'DevExpress.XtraCharts.RangeAreaLabelKind.Value1Label',
             'Custom Items': 'DevExpress.XtraCharts.Legend.CustomItems',
             'Fan Grow Up': 'DevExpress.XtraCharts.PieFanGrowUpAnimation',
+            'Connector Line Style': 'DevExpress.XtraCharts.StackedBarTotalLabel.ConnectorLineStyle',
             'Connector Length': 'DevExpress.XtraCharts.RelativePosition.ConnectorLength',
             'AxisX Coordinate': 'DevExpress.XtraCharts.PaneAnchorPoint.AxisXCoordinate',
             'Funnel Diagram 3D': 'DevExpress.XtraCharts.FunnelDiagram3D',
@@ -1654,6 +1715,7 @@ var DevExpress;
             'Text Offset': 'DevExpress.XtraCharts.Legend.TextOffset',
             'Interlaced': 'DevExpress.XtraCharts.AxisBase.Interlaced',
             'Perspective Enabled': 'DevExpress.XtraCharts.Diagram3D.PerspectiveEnabled',
+            'Pie Total Label': 'DevExpress.XtraCharts.PieTotalLabel',
             'Pentagon': 'DevExpress.XtraCharts.MarkerKind.Pentagon',
             'Runtime Scrolling': 'DevExpress.XtraCharts.Diagram3D.RuntimeScrolling',
             'Max Strip Limit': 'DevExpress.XtraCharts.MaxStripLimit',
@@ -1682,6 +1744,7 @@ var DevExpress;
             'Data Type': 'DevExpress.XtraCharts.DataFilter.DataType',
             'Logarithmic Base': 'DevExpress.XtraCharts.AxisBase.LogarithmicBase',
             'Custom Border': 'DevExpress.XtraCharts.CustomBorder',
+            'Filter Criteria': 'ASPxReportsStringId.ReportDesigner_DataSource_FilterCriteriaTitle',
             'Explode Mode': 'DevExpress.XtraCharts.PieSeriesViewBase.ExplodeMode',
             'Random': 'DevExpress.XtraCharts.PointAnimationOrder.Random',
             'Line Length': 'DevExpress.XtraCharts.SeriesLabelBase.LineLength',
@@ -2062,7 +2125,6 @@ var DevExpress;
             'Tabloid': 'System.Drawing.Printing.PaperKind.Tabloid',
             'Letter Extra Transverse': 'System.Drawing.Printing.PaperKind.LetterExtraTransverse',
             'Format Type': 'DevExpress.Utils.FormatInfo.FormatType',
-            'Note': 'System.Drawing.Printing.PaperKind.Note',
             'DL Envelope': 'System.Drawing.Printing.PaperKind.DLEnvelope',
             'Page Margins': 'DevExpress.XtraPrinting.PrintingSystemCommand.PageMargins',
             'Object': 'DevExpress.XtraTreeList.Data.UnboundColumnType.Object',
@@ -2082,12 +2144,13 @@ var DevExpress;
             'Look-Up Settings': 'DevExpress.XtraReports.Parameters.Parameter.LookUpSettings',
             'BCC': 'DevExpress.XtraPrinting.RecipientFieldType.BCC',
             'Expanded': 'DevExpress.XtraPrinting.BarCode.DataBarType.Expanded',
-            'Rasterization resolution': 'DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizationResolution',
+            'Rasterization Resolution': 'DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizationResolution',
             'Allow URLs with JS Content': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.AllowURLsWithJSContent',
             'Export Mode': 'DevExpress.XtraPrinting.DocxExportOptions.ExportMode',
             'Address': 'DevExpress.XtraPrinting.Recipient.Address',
             'Rasterize Images': 'DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizeImages',
             'Human-Readable Text': 'DevExpress.XtraPrinting.BarCode.EAN128Generator.HumanReadableText',
+            'Allow Floating Pictures': 'DevExpress.XtraPrinting.DocxExportOptions.AllowFloatingPictures',
             'Compatible': 'DevExpress.XtraPrinting.XlEncryptionType.Compatible',
             'Category': 'DevExpress.XtraPrinting.XlDocumentOptions.Category',
             'Different Files': 'DevExpress.XtraPrinting.XlsxExportMode.DifferentFiles',
@@ -2111,7 +2174,7 @@ var DevExpress;
             'Image Export Options': 'DevExpress.XtraPrinting.ImageExportOptions',
             'Author': 'DevExpress.XtraPrinting.XlDocumentOptions.Author',
             'Save Mode': 'DevExpress.XtraPrinting.PrintPreviewOptions.SaveMode',
-            'Parameter': 'DevExpress.XtraReports.Parameters.Parameter',
+            'Parameter': 'ASPxReportsStringId.FilterEditor_Operand_Type_Parameter',
             'Single File': 'DevExpress.XtraPrinting.XlsxExportMode.SingleFile',
             'Fit To Printed Page Width': 'DevExpress.XtraPrinting.XlExportOptionsBase.FitToPrintedPageWidth',
             'Modulo 10': 'DevExpress.XtraPrinting.BarCode.MSICheckSum.Modulo10',
@@ -2172,6 +2235,7 @@ var DevExpress;
             'Contact Name': 'DevExpress.XtraPrinting.Recipient.ContactName',
             'X12': 'DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.X12',
             'C40': 'DevExpress.XtraPrinting.BarCode.DataMatrixCompactionMode.C40',
+            'Keywords': 'DevExpress.XtraPrinting.DocxDocumentOptions.Keywords',
             'Body': 'DevExpress.XtraPrinting.EmailOptions.Body',
             'Number of Sides': 'DevExpress.XtraPrinting.Shape.ShapePolygon.NumberOfSides',
             'High Resolution': 'DevExpress.XtraPrinting.PrintingPermissions.HighResolution',
@@ -2201,6 +2265,7 @@ var DevExpress;
             'Image Quality': 'DevExpress.XtraPrinting.PdfExportOptions.ImageQuality',
             '3-Point Star': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.ThreePointStar',
             'Single File (Page-by-Page)': 'DevExpress.XtraPrinting.XlsExportMode.SingleFilePageByPage',
+            'Use Custom Separator': 'DevExpress.XtraPrinting.CsvExportOptions.UseCustomSeparator',
             'PDF Document Options': 'DevExpress.XtraPrinting.PdfDocumentOptions',
             'Sheet Name': 'DevExpress.XtraPrinting.XlsExportOptions.SheetName',
             'Version 4 (33x33)': 'DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version4',
@@ -2225,12 +2290,12 @@ var DevExpress;
             'Recipient Name': 'DevExpress.XtraPrinting.EmailOptions.RecipientName',
             'Horizontal Line Width': 'DevExpress.XtraPrinting.Shape.ShapeCross.HorizontalLineWidth',
             'PermissionsOptions': 'DevExpress.XtraPrinting.PdfPasswordSecurityOptions.PermissionsOptions',
+            'Export Editing Fields to AcroForms': 'DevExpress.XtraPrinting.PdfExportOptions.ExportEditingFieldsToAcroForms',
             'Text Export Options': 'DevExpress.XtraPrinting.TextExportOptions',
             'Auto Height': 'DevExpress.XtraPrinting.SizeMode.AutoHeight',
             'Error Correction Level': 'DevExpress.XtraPrinting.BarCode.QRCodeGenerator.ErrorCorrectionLevel',
             'Vertical Line Width': 'DevExpress.XtraPrinting.Shape.ShapeCross.VerticalLineWidth',
             'Right Arrow': 'DevExpress.XtraPrinting.Shape.Native.ShapeId.RightArrow',
-            'Keywords': 'DevExpress.XtraPrinting.XpsDocumentOptions.Keywords',
             'Action After Export': 'DevExpress.XtraPrinting.PrintPreviewOptions.ActionAfterExport',
             'Signature Options': 'DevExpress.XtraPrinting.PdfExportOptions.SignatureOptions',
             'PrintingPermissions': 'DevExpress.XtraPrinting.PdfPermissionsOptions.PrintingPermissions',
@@ -2276,6 +2341,7 @@ var DevExpress;
             'EnableScreenReaders': 'DevExpress.XtraPrinting.PdfPermissionsOptions.EnableScreenReaders',
             'Adjust Colors To Default Palette': 'DevExpress.XtraPrinting.WorkbookColorPaletteCompliance.AdjustColorsToDefaultPalette',
             'Commenting Filling Signing': 'DevExpress.XtraPrinting.ChangingPermissions.CommentingFillingSigning',
+            'DOCx Document Options': 'DevExpress.XtraPrinting.DocxDocumentOptions',
             'Use Paper Kind': 'DevExpress.XtraPrinting.PrinterSettingsUsing.UsePaperKind',
             'Mail Message Export Options': 'DevExpress.XtraPrinting.MailMessageExportOptions',
             'Use HRef Hyperlinks': 'DevExpress.XtraPrinting.HtmlExportOptionsBase.UseHRefHyperlinks',
@@ -2332,7 +2398,6 @@ var DevExpress;
             'Default Directory': 'DevExpress.XtraPrinting.PrintPreviewOptions.DefaultDirectory',
             'Page Border\'s Color': 'DevExpress.XtraPrinting.ImageExportOptions.PageBorderColor',
             'Compressed': 'DevExpress.XtraPrinting.NativeFormatOptions.Compressed',
-            'Comments': 'DevExpress.XtraPrinting.XlDocumentOptions.Comments',
             'Page Border\'s Width': 'DevExpress.XtraPrinting.ImageExportOptions.PageBorderWidth',
             'Print Preview Options': 'DevExpress.XtraPrinting.PrintPreviewOptions',
             'CC': 'DevExpress.XtraPrinting.RecipientFieldType.CC',
@@ -2427,6 +2492,7 @@ var DevExpress;
             'Group Filter String': 'DevExpress.DataAccess.Sql.TableQuery.GroupFilterString',
             'Newline Type': 'DevExpress.DataAccess.Excel.CsvSourceOptions.NewlineType',
             'Skip Hidden Rows': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.SkipHiddenRows',
+            'Filters': 'DevExpress.DataAccess.EntityFramework.EFDataSource.Filters',
             'CSV Source Options': 'DevExpress.DataAccess.Excel.ExcelDataSource.CsvSourceOptions',
             'Import Settings': 'DevExpress.DataAccess.Excel.ExcelSourceOptions.ImportSettings',
             'Constructor': 'DevExpress.DataAccess.ObjectBinding.ObjectDataSource.Constructor',
@@ -2468,17 +2534,21 @@ var DevExpress;
             'SQL': 'DevExpress.DataAccess.Sql.CustomSqlQuery.Sql',
             'Align to Grid': 'ReportStringId.RibbonXRDesign_AlignToGrid_STipTitle',
             'Save the current report.': 'ReportStringId.RibbonXRDesign_SaveFile_Description',
+            'sumDCount(Expression)\r\n\r\nCounts the number of distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDCount',
             'Make Same Width': 'ReportStringId.RibbonXRDesign_SizeToControlWidth_STipTitle',
             'Data': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Data',
             'Load File...': 'ReportStringId.Cmd_RtfLoad',
+            'Rtf Expression': 'ReportStringId.STag_Name_RtfExpressionBinding',
+            'The type of this field is: ': 'ReportStringId.ExpressionEditor_Description_FieldsPrefix',
             'Behavior': 'ReportStringId.CatBehavior',
             'Change the font face.': 'ReportStringId.RibbonXRDesign_FontName_STipContent',
             'This operation will remove all styles. Do you wish to proceed?': 'ReportStringId.Msg_WarningRemoveStyles',
             'Justify': 'ReportStringId.UD_Capt_JustifyJustify',
             'Add the control from the clipboard': 'ReportStringId.UD_Hint_Paste',
             'Remove Vertical Spacing': 'ReportStringId.UD_TTip_VertSpaceConcatenate',
+            '{0} \'{1}\' has wrong DataMemer \'{2}\'.': 'ReportStringId.BindingsConverter_ComponentHasWrongDataMemberFormat',
             'Close the report': 'ReportStringId.UD_Hint_Close',
-            'Report has been changed. Do you want to save changes ?': 'ReportStringId.UD_Msg_ReportChanged',
+            'Report has been changed. Do you want to save changes?': 'ReportStringId.UD_Msg_ReportChanged',
             'Font Name': 'ReportStringId.UD_TTip_FormatFontName',
             'Font Size': 'ReportStringId.UD_TTip_FormatFontSize',
             'Paste': 'ReportStringId.UD_Capt_Paste',
@@ -2513,7 +2583,7 @@ var DevExpress;
             'Convert To Labels': 'ReportStringId.Cmd_TableConvertToLabels',
             'Show or hide the Scripts Editor.': 'ReportStringId.RibbonXRDesign_Scripts_STipContent',
             'Invalid binding': 'ReportStringId.BindingMapperForm_InvalidBindingWarning',
-            'Customize the current XRPivotGrid\'s layout and preview its data.': 'ReportStringId.PivotGridForm_ItemLayout_Description',
+            'Customize the current Pivot Grid\'s layout and preview its data.': 'ReportStringId.PivotGridForm_ItemLayout_Description',
             'Size to Grid': 'ReportStringId.UD_Capt_MakeSameSizeSizeToGrid',
             'Right align the selected controls': 'ReportStringId.UD_Hint_AlignRights',
             'Delete': 'ReportStringId.Cmd_Delete',
@@ -2521,8 +2591,9 @@ var DevExpress;
             'Error when trying to populate the datasource. The following exception was thrown:': 'ReportStringId.Msg_FillDataError',
             'Can\'t load the report. The file is possibly corrupted or report\'s assembly is missing.': 'ReportStringId.Msg_FileCorrupted',
             '\r\nData Type: {0}': 'ReportStringId.UD_TTip_DataTypeDescription',
+            'sumPercentage(Expression)\r\n\r\nCalculates the percent ratio of the current data row\'s value to the total of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryPercentage',
             'Open a report.': 'ReportStringId.RibbonXRDesign_OpenFile_STipContent',
-            'Assign Style To The XRControl': 'ReportStringId.Cmd_AssignStyleToXRControl',
+            'Assign Style To The Control': 'ReportStringId.Cmd_AssignStyleToXRControl',
             'Main settings(Fields, Layout).': 'ReportStringId.PivotGridForm_GroupMain_Description',
             'Decrease the vertical spacing between the selected controls.': 'ReportStringId.RibbonXRDesign_VertSpaceDecrease_STipContent',
             'Done': 'ReportStringId.RibbonXRDesign_StatusBar_HtmlDone',
@@ -2542,13 +2613,20 @@ var DevExpress;
             'Close the designer': 'ReportStringId.UD_Hint_Exit',
             'Copy the control to the clipboard': 'ReportStringId.UD_Hint_Copy',
             'Make Horizontal Spacing Equal': 'ReportStringId.UD_TTip_HorizSpaceMakeEqual',
+            'To print a Windows Forms control or a printing link, assign it to the PrintableComponent property in code.': 'ReportStringId.PrintableComponentContainerDesignMsg',
             'Side margins': 'ReportStringId.SR_Side_Margins',
             'Change the text foreground color.': 'ReportStringId.RibbonXRDesign_ForeColor_STipContent',
             'Toolbar': 'ReportStringId.UD_Capt_ToolbarName',
+            'sumVarP(Expression)\r\n\r\nCalculates the population variance of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryVarP',
+            'sumDVar(Expression)\r\n\r\nCalculates the amount of variance for all the distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDVar',
+            'sumDSum(Expression)\r\n\r\nCalculates the total of all the distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDSum',
+            'sumDAvg(Expression)\r\n\r\nCalculates the average of all the distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDAvg',
             'Report Explorer': 'ReportStringId.UD_Title_ReportExplorer',
             'Select Controls With Style': 'ReportStringId.Cmd_SelectControlsWithStyle',
             'Align Rights': 'ReportStringId.RibbonXRDesign_AlignRight_Caption',
+            'Report Items': 'ReportStringId.ExpressionEditor_ItemInfo_ReportItems',
             'Align the positions of the selected controls to the grid.': 'ReportStringId.RibbonXRDesign_AlignToGrid_STipContent',
+            'Returns a zero-based index of the current data row in a data source.': 'ReportStringId.ExpressionEditor_ItemInfo_Variables_CurrentRowIndex_Description',
             'Align Lefts': 'ReportStringId.UD_TTip_AlignLeft',
             'Commands': 'ReportStringId.Cmd_Commands',
             'New Report via Wizard...': 'ReportStringId.RibbonXRDesign_NewReportWizard_Caption',
@@ -2556,6 +2634,8 @@ var DevExpress;
             'Align text to both the left and right sides, adding extra space between words as necessary.': 'ReportStringId.RibbonXRDesign_JustifyJustify_STipContent',
             'Forward': 'ReportStringId.RibbonXRDesign_HtmlForward_Caption',
             'Bring to Front': 'ReportStringId.RibbonXRDesign_BringToFront_Caption',
+            'Expression Editor': 'ReportStringId.ExpressionEditor_ExpressionCaption',
+            'FormattingRule \'{0}\' has Value \'{1}\' which can not be converted to the Expression.': 'ReportStringId.BindingsConverter_FormattingRuleHasWrongValueFormat',
             'A parameter binding assigns a value of an incompatible type to the subreport parameter "{0}".': 'ReportStringId.Msg_ParameterBindingValueTypeMismatch',
             'Underline the font': 'ReportStringId.UD_Hint_FontUnderline',
             'Make the vertical spacing between the selected controls equal.': 'ReportStringId.RibbonXRDesign_VertSpaceMakeEqual_STipContent',
@@ -2569,11 +2649,14 @@ var DevExpress;
             'Column To Right': 'ReportStringId.Cmd_TableInsertColumnToRight',
             'Run Designer...': 'ReportStringId.Verb_RunDesigner',
             'Lefts': 'ReportStringId.UD_Capt_AlignLefts',
+            '[Collection]​[Condition].​Count​()\r\n\r\nReturns the number of entries in the Collection based on the specified Condition (optional).\r\n\r\nExample:\r\n\r\n[Products][Discontinued == False].Count()': 'ReportStringId.ExpressionEditor_Description_Function_Count',
             'Vertical Spacing': 'ReportStringId.UD_Group_VerticalSpacing',
             'Preview': 'ASPxReportsStringId.ReportDesigner_TooltipButtons_Preview',
             'Formatting Toolbar': 'ReportStringId.UD_Capt_FormattingToolbarName',
+            'Variables': 'ReportStringId.ExpressionEditor_ItemInfo_Variables',
             'Delete the control and copy it to the clipboard': 'ReportStringId.UD_Hint_Cut',
             'Column To Left': 'ReportStringId.Cmd_TableInsertColumnToLeft',
+            'sumRunningSum(Expression)\r\n\r\nSummarizes all the values, which were printed before the current data row, with the current data row\'s value.': 'ReportStringId.ExpressionEditor_Description_Function_SummaryRunningSum',
             'Clone Formatting Rule': 'ReportStringId.Cmd_CloneFormattingRule',
             'Validate': 'ReportStringId.ScriptEditor_Validate',
             'Data adapter:': 'ReportStringId.NewParameterEditorForm_DataAdapter',
@@ -2595,7 +2678,7 @@ var DevExpress;
             'Row': 'ReportStringId.Cmd_TableDeleteRow',
             'Italicize the text.': 'ReportStringId.RibbonXRDesign_FontItalic_STipContent',
             'Format String...': 'ReportStringId.Verb_FormatString',
-            'Assign Even Style To The XRControl': 'ReportStringId.Cmd_AssignEvenStyleToXRControl',
+            'Assign Even Style To The Control': 'ReportStringId.Cmd_AssignEvenStyleToXRControl',
             'Send to Back': 'ReportStringId.UD_Capt_OrderSendToBack',
             'Report Source: {0}\r\n': 'ReportStringId.XRSubreport_ReportSourceInfo',
             'Add New Folder': 'ReportStringId.Cmd_AddGalleryFolder',
@@ -2611,8 +2694,10 @@ var DevExpress;
             'Exact:': 'ReportStringId.RibbonXRDesign_ZoomExact_Caption',
             'There are following errors in script(s):\r\n{0}': 'ReportStringId.Msg_ScriptError',
             'Description:': 'ReportStringId.ExpressionEditor_FieldDescription',
+            'Report Data Source': 'ReportStringId.Wizard_PageMapTemplateFields_DataSourceName',
             'Structure': 'ReportStringId.CatStructure',
             'Export warning: The following controls are overlapped and may be exported to HTML, RTF, DOCX, XLS, XLSX, CSV and Text incorrectly - {0}.': 'ReportStringId.Msg_WarningControlsAreOverlapped',
+            'Summary Func': 'ReportStringId.STag_Name_SummaryFunc',
             'Middles': 'ReportStringId.UD_Capt_AlignMiddles',
             'Data member:': 'ReportStringId.NewParameterEditorForm_DataMember',
             'Appearances': 'ReportStringId.PivotGridForm_ItemAppearances_Caption',
@@ -2623,7 +2708,8 @@ var DevExpress;
             'Group and Sort': 'ReportStringId.UD_Title_GroupAndSort',
             'GroupFooter': 'ReportStringId.Cmd_GroupFooter',
             'New Report': 'ReportStringId.RibbonXRDesign_NewReport_Caption',
-            'Adjust the printing settings for the current XRPivotGrid.': 'ReportStringId.PivotGridForm_ItemSettings_Description',
+            'Adjust the printing settings for the current Pivot Grid.': 'ReportStringId.PivotGridForm_ItemSettings_Description',
+            'sumRecordNumber(Expression)\r\n\r\nReturns the current record number in the data source within the specified summary region (group, page or report). This means for instance, if the summary is calculated for a group, then the record number is calculated only within that group, and is reset every time a new group is started.': 'ReportStringId.ExpressionEditor_Description_Function_SummaryRecordNumber',
             'Align the bottoms of the selected controls.': 'ReportStringId.RibbonXRDesign_AlignBottom_STipContent',
             'Align Left': 'ReportStringId.UD_TTip_FormatAlignLeft',
             'Align the tops of the selected controls': 'ReportStringId.UD_Hint_AlignTops',
@@ -2637,12 +2723,14 @@ var DevExpress;
             'The specified expression is invalid.': 'ReportStringId.Msg_InvalidExpressionEx',
             'No styles are selected': 'ReportStringId.SSForm_Msg_NoStyleSelected',
             'Align Bottoms': 'ReportStringId.RibbonXRDesign_AlignBottom_Caption',
+            'Html Expression': 'ReportStringId.STag_Name_HtmlExpressionBinding',
             'Cascade': 'ReportStringId.UD_Capt_MdiCascade',
             'Launch the report wizard to create a new report.': 'ReportStringId.RibbonXRDesign_NewReportWizard_STipContent',
             'Create a new blank report.': 'ReportStringId.RibbonXRDesign_NewReport_STipContent',
             'Centers': 'ReportStringId.UD_Capt_AlignCenters',
             'Detail reports don\'t support multicolumn.': 'ReportStringId.Msg_DontSupportMulticolumn',
             'Justify the control\'s text': 'ReportStringId.UD_Hint_JustifyJustify',
+            'FormatString(String1, ... , StringN)\r\n\r\nConverts the value of columns to strings based on the specified formats and inserts them into another string.\r\nThis function can accept any number of arguments.\r\n\r\nExample:\r\n\r\nFormatString(\'{0} - {1:c}\', [Column1], [Column2])': 'ReportStringId.ExpressionEditor_Description_Function_FormatString',
             'Custom function \'{0}\' not found.': 'ReportStringId.Msg_NoCustomFunction',
             'Toolbox': 'ReportStringId.RibbonXRDesign_ToolboxControlsPage',
             'Tops': 'ReportStringId.UD_Capt_AlignTops',
@@ -2651,7 +2739,7 @@ var DevExpress;
             'New Folder': 'ReportStringId.Gallery_NewFolder',
             '(Not set)': 'ReportStringId.UD_PropertyGrid_NotSetText',
             'Elements': 'ReportStringId.CatElements',
-            '"{0}" has been changed. Do you want to save changes ?': 'ReportStringId.UD_Msg_MdiReportChanged',
+            '"{0}" has been changed. Do you want to save changes?': 'ReportStringId.UD_Msg_MdiReportChanged',
             'Increase the vertical spacing between the selected controls.': 'ReportStringId.RibbonXRDesign_VertSpaceIncrease_STipContent',
             'Save As...': 'ReportStringId.UD_Capt_SaveFileAs',
             'Increase': 'ReportStringId.UD_Capt_SpacingIncrease',
@@ -2661,7 +2749,7 @@ var DevExpress;
             'Save Report As': 'ReportStringId.RibbonXRDesign_SaveFileAs_STipTitle',
             'Add to Report Style Sheet': 'ReportStringId.Cmd_AddToReportStyleSheet',
             'Move Down': 'ReportStringId.Cmd_BandMoveDown',
-            'The XRTableOfContents control can be placed only into Report Header and Report Footer bands.': 'ReportStringId.Msg_PlacingXrTocIntoIncorrectContainer',
+            'The Table Of Contents can be placed only into Report Header and Report Footer bands.': 'ReportStringId.Msg_PlacingXrTocIntoIncorrectContainer',
             'All scripts are valid.': 'ReportStringId.ScriptEditor_ScriptsAreValid',
             'Make Same Height': 'ReportStringId.UD_TTip_SizeToControlHeight',
             'GroupHeader': 'ReportStringId.Cmd_GroupHeader',
@@ -2675,13 +2763,17 @@ var DevExpress;
             '(New)': 'ReportStringId.ScriptEditor_NewString',
             'Center Horizontally': 'ReportStringId.RibbonXRDesign_CenterHorizontally_STipTitle',
             'Paste the contents of the Clipboard.': 'ReportStringId.RibbonXRDesign_Paste_STipContent',
+            'Label \'{0}\' with a custom summary is not supported.': 'ReportStringId.BindingsConverter_CustomSummaryNotSupportedFormat',
             'Loc': 'ReportStringId.DesignerStatus_Location',
-            'Modify the XRPivotGrid\'s layout (sorting settings, field arrangement) and click the Apply button to apply the modifications to the current XRPivotGrid. You can also save the layout to an XML file (this can be loaded and applied to other views at design time and runtime).': 'ReportStringId.PivotGridFrame_Layouts_DescriptionText',
+            'Modify the Pivot Grid\'s layout (sorting settings, field arrangement) and click the Apply button to apply the modifications to the current Pivot Grid. You can also save the layout to an XML file (this can be loaded and applied to other views at design time and runtime).': 'ReportStringId.PivotGridFrame_Layouts_DescriptionText',
             'Add a Sort': 'ReportStringId.GroupSort_AddSort',
             'Zoom Toolbar': 'ReportStringId.UD_Capt_ZoomToolbarName',
             'Preview Row Count': 'ReportStringId.STag_Name_PreviewRowCount',
             'Arrange all open documents cascaded, so that they overlap each other': 'ReportStringId.UD_Hint_MdiCascade',
+            'sumCount(Expression)\r\n\r\nCounts the number of values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryCount',
+            'sumDVarP(Expression)\r\n\r\nCalculates the population variance of all the distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDVarP',
             'Move the selected controls to the back.': 'ReportStringId.RibbonXRDesign_SendToBack_STipContent',
+            'Argb(Alpha, Red, Green, Blue)\r\n\r\nReturns a string defining a color using the Alpha, Red, Green, and Blue color channel values.': 'ReportStringId.ExpressionEditor_Description_Function_Argb',
             'Decrease Vertical Spacing': 'ReportStringId.UD_TTip_VertSpaceDecrease',
             'Set the background color of the control': 'ReportStringId.UD_Hint_BackGroundColor',
             'Bind': 'ReportStringId.Verb_Bind',
@@ -2690,12 +2782,13 @@ var DevExpress;
             'Align Middles': 'ReportStringId.RibbonXRDesign_AlignHorizontalCenters_Caption',
             'Send To Back': 'ReportStringId.Cmd_SendToBack',
             'Save/Export...': 'ReportStringId.Verb_Export',
+            'The {0} contains bindings. Do you want to convert them to expressions?': 'ReportStringId.UD_Msg_ConvertBindings',
             'Unable to open file as its contents may be unsafe.': 'ReportStringId.Msg_SuspiciousCodeLoadingCanceled',
             'Top\r\nmargin': 'ReportStringId.SR_Top_Margin',
             'Align the bottoms of the selected controls': 'ReportStringId.UD_Hint_AlignBottoms',
             'Properties': 'ReportStringId.Cmd_Properties',
             'Increase Horizontal Spacing': 'ReportStringId.UD_TTip_HorizSpaceIncrease',
-            'Property': 'ReportStringId.BCForm_Lbl_Property',
+            'Property': 'ASPxReportsStringId.FilterEditor_Operand_Type_Property',
             'Drag-and-drop this item to create a control bound to it;\r\n- or -\r\nDrag this item with the right mouse button or SHIFT\r\nto select a bound control from the popup menu;\r\n- or -\r\nUse the context menu to add a calculated field or parameter.': 'ReportStringId.UD_TTip_ItemDescription',
             'Horizontally': 'ReportStringId.UD_Capt_CenterInFormHorizontally',
             'Horizontally center the selected controls within a band': 'ReportStringId.UD_Hint_CenterInFormHorizontally',
@@ -2718,15 +2811,23 @@ var DevExpress;
             'Align Right': 'ReportStringId.UD_TTip_FormatAlignRight',
             'Arrange all open documents from top to bottom': 'ReportStringId.UD_Hint_MdiTileHorizontal',
             'DetailReport': 'ReportStringId.Cmd_DetailReport',
+            '[Collection]​[Condition].​Sum​(Expression)\r\n\r\nReturns the sum of all the Expression values in the Collection based on the specified Condition (optional).\r\n\r\nExample:\r\n\r\n[Products][Discontinued].Sum([UnitsInStock])': 'ReportStringId.ExpressionEditor_Description_Function_Sum',
+            'Rgb(Red, Green, Blue)\r\n\r\nReturns a string defining a color using the Red, Green, and Blue color channel values.': 'ReportStringId.ExpressionEditor_Description_Function_Rgb',
+            '[Collection]​[Condition].​Avg​(Expression)\r\n\r\nReturns the average of all the Expression values in the Collection based on the specified Condition (optional).\r\n\r\nExample:\r\n\r\n[Products][Discontinued == False].Avg([UnitsInStock])': 'ReportStringId.ExpressionEditor_Description_Function_Avg',
+            '[Collection]​[Condition].​Min​(Expression)\r\n\r\nReturns the minimum Expression value in the specified Collection based on the defined Condition (optional).\r\n\r\nExample:\r\n\r\n[][Discontinued == False].Min([UnitPrice])': 'ReportStringId.ExpressionEditor_Description_Function_Min',
+            '[Collection]​[Condition].​Max​(Expression)\r\n\r\nReturns the maximum Expression value in the specified Collection based on the defined Condition (optional).\r\n\r\nExample:\r\n\r\n[][Discontinued == False].Max([UnitPrice])': 'ReportStringId.ExpressionEditor_Description_Function_Max',
             'Vertically center the selected controls within a band': 'ReportStringId.UD_Hint_CenterInFormVertically',
             'Align text to the right.': 'ReportStringId.RibbonXRDesign_JustifyRight_STipContent',
             'Align Centers': 'ReportStringId.RibbonXRDesign_AlignVerticalCenters_STipTitle',
-            'Assign Odd Style To The XRControl': 'ReportStringId.Cmd_AssignOddStyleToXRControl',
+            'Assign Odd Style To The Control': 'ReportStringId.Cmd_AssignOddStyleToXRControl',
             'The report currently being edited is of a different type than the one you are trying to open.\r\nDo you want to open the selected report anyway?': 'ReportStringId.Msg_CreateReportInstance',
+            'NewLine()\r\n\r\nReturns the newline string defined for this environment.': 'ReportStringId.ExpressionEditor_Description_Function_NewLine',
             'Left align the selected controls.': 'ReportStringId.RibbonXRDesign_AlignLeft_STipContent',
+            'Returns the total amount of data rows in a data source.': 'ReportStringId.ExpressionEditor_ItemInfo_Variables_RowCount_Description',
             'Remove Horizontal Spacing': 'ReportStringId.RibbonXRDesign_HorizSpaceConcatenate_Caption',
             'Main': 'ReportStringId.PivotGridForm_GroupMain_Caption',
             'Text is too large.': 'ReportStringId.Msg_LargeText',
+            'Summary Expression Editor': 'ReportStringId.ExpressionEditor_ExpressionSummaryCaption',
             'Align the centers of the selected controls vertically': 'ReportStringId.UD_Hint_AlignCenters',
             'Find the text on this page.': 'ReportStringId.RibbonXRDesign_HtmlFind_STipContent',
             'Number Across': 'ReportStringId.SR_Number_Across',
@@ -2740,13 +2841,19 @@ var DevExpress;
             'Horizontal pitch': 'ReportStringId.SR_Horizontal_Pitch',
             'Create a new blank report': 'ReportStringId.UD_Hint_NewReport',
             'Align Tops': 'ReportStringId.RibbonXRDesign_AlignTop_Caption',
+            '[Collection]​[Condition].​Single​(Expression)\r\n\r\nReturns the Expression if the Collection contains only one object meeting the specified Condition (optional).\r\n\r\nExample:\r\n\r\n[Products][UnitPrice > 200].Single(\'True\')': 'ReportStringId.ExpressionEditor_Description_Function_Single',
             'Edit Parameter Bindings...': 'ReportStringId.SubreportDesigner_EditParameterBindings',
-            'Printing option management for the current XRPivotGrid.': 'ReportStringId.PivotGridForm_GroupPrinting_Description',
+            'Printing option management for the current Pivot Grid.': 'ReportStringId.PivotGridForm_GroupPrinting_Description',
             'Close the report designer.': 'ReportStringId.RibbonXRDesign_Exit_STipContent',
             '\r\n\r\nData Member: {0}': 'ReportStringId.UD_TTip_DataMemberDescription',
             'Align Text Right': 'ReportStringId.RibbonXRDesign_JustifyRight_STipTitle',
             'Remove': 'ReportStringId.UD_Capt_SpacingRemove',
             'Printing warning: Save the following reports to preview subreports with recent changes applied - {0}.': 'ReportStringId.Msg_WarningUnsavedReports',
+            'sumSum(Expression)\r\n\r\nCalculates the total of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummarySum',
+            'sumVar(Expression)\r\n\r\nCalculates the amount of variance for all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryVar',
+            'sumMax(Expression)\r\n\r\nCalculates the maximum of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryMax',
+            'sumMin(Expression)\r\n\r\nCalculates the minimum of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryMin',
+            'sumAvg(Expression)\r\n\r\nCalculates the average of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryAvg',
             'Decrease the spacing between the selected controls': 'ReportStringId.UD_Hint_SpacingDecrease',
             'BottomMargin': 'ReportStringId.Cmd_BottomMargin',
             'Left align the selected controls': 'ReportStringId.UD_Hint_AlignLefts',
@@ -2768,6 +2875,7 @@ var DevExpress;
             'Row Below': 'ReportStringId.Cmd_TableInsertRowBelow',
             'Horizontal Spacing': 'ReportStringId.UD_Group_HorizontalSpacing',
             'one band per page': 'ReportStringId.BandDsg_QuantityPerPage',
+            'sumStdDevP(Expression)\r\n\r\nCalculates the standard population deviation of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryStdDevP',
             'User Designer': 'ReportStringId.CatUserDesigner',
             'The condition must be Boolean!': 'ReportStringId.Msg_InvalidCondition',
             'Show fields selector': 'ReportStringId.PivotGridFrame_Layouts_SelectorCaption2',
@@ -2776,35 +2884,41 @@ var DevExpress;
             'PageHeader': 'ReportStringId.Cmd_PageHeader',
             'Decrease the horizontal spacing between the selected controls.': 'ReportStringId.RibbonXRDesign_HorizSpaceDecrease_STipContent',
             'ReportFooter': 'ReportStringId.Cmd_ReportFooter',
-            'No more instances of XRTableOfContents can be added to the band.': 'ReportStringId.Msg_InvalidXrTocInstanceInBand',
+            'No more instances of Table Of Contents can be added to the band.': 'ReportStringId.Msg_InvalidXrTocInstanceInBand',
             'There are cyclic bookmarks in the report.': 'ReportStringId.Msg_CyclicBookmarks',
             'Components': 'ReportStringId.UD_Title_ReportExplorer_Components',
             'Unbound': 'ReportStringId.Cmd_InsertUnboundDetailReport',
             'Field List': 'ReportStringId.UD_Title_FieldList',
             'Drag-and-drop this item to create a table with its items;\r\n- or -\r\nDrag this item with the right mouse button or SHIFT\r\nto create a \'header\' table with field names;\r\n- or -\r\nUse the context menu to add a calculated field or parameter.': 'ReportStringId.UD_TTip_TableDescription',
+            'This operation is not available for an inherited report because of possible\r\nconflicts between bands of the source report and bands of the loaded report layout.': 'ReportStringId.Msg_InvalidOperationForInheritedReport',
             'Show/Hide Scripts': 'ReportStringId.RibbonXRDesign_Scripts_STipTitle',
             'Zoom in the design surface': 'ReportStringId.UD_Hint_ZoomIn',
             'Design': 'ReportStringId.CatDesign',
             'Report Source Url: {0}\r\n': 'ReportStringId.XRSubreport_ReportSourceUrlInfo',
             'Add Sub-Band': 'ReportStringId.Cmd_AddSubBand',
-            'Adjust the print appearances of the current XRPivotGrid.': 'ReportStringId.PivotGridForm_ItemAppearances_Description',
+            'Adjust the print appearances of the current Pivot Grid.': 'ReportStringId.PivotGridForm_ItemAppearances_Description',
             'Design in Report Wizard...': 'ReportStringId.Verb_ReportWizard',
             'Edit GroupFields...': 'ReportStringId.Verb_EditGroupFields',
             'Center text.': 'ReportStringId.RibbonXRDesign_JustifyCenter_STipContent',
             'Align the control\'s text to the center': 'ReportStringId.UD_Hint_JustifyCenter',
-            'No more instances of XRTableOfContents can be added to the report.': 'ReportStringId.Msg_InvalidXrTocInstance',
+            'No more instances of Table Of Contents can be added to the report.': 'ReportStringId.Msg_InvalidXrTocInstance',
             'Align the tops of the selected controls.': 'ReportStringId.RibbonXRDesign_AlignTop_STipContent',
             'Delete the control': 'ReportStringId.UD_Hint_Delete',
             'The Font name can\'t be empty.': 'ReportStringId.Msg_WarningFontNameCantBeEmpty',
             'PageFooter': 'ReportStringId.Cmd_PageFooter',
             'Add To Gallery': 'ReportStringId.Cmd_AddToGallery',
+            '[Collection]​[Condition].​Exists​()\r\n\r\nDetermines whether the specified Condition holds true for the defined Collection.\r\n\r\nExample:\r\n\r\n[][UnitPrice > 0].Exists()': 'ReportStringId.ExpressionEditor_Description_Function_Exists',
             'File not found.': 'ReportStringId.Msg_FileNotFound',
             'Warning: The following controls are outside the report printing area and will not be properly printed and/or exported - {0}.': 'ReportStringId.Msg_WarningControlsAreOutOfColumnPrintingArea',
             'The DrillDownControl property of the \'{0}\' band is not valid.': 'ReportStringId.Msg_InvalidDrillDownControl',
             'You selected more than one style': 'ReportStringId.SSForm_Msg_MoreThanOneStyle',
             'Change the font size.': 'ReportStringId.RibbonXRDesign_FontSize_STipContent',
             'You don\'t have sufficient permission to execute the scripts in this report.\r\n\r\nDetails:\r\n\r\n{0}': 'ReportStringId.Msg_ScriptingPermissionErrorMessage',
+            'sumDStdDevP(Expression)\r\n\r\nCalculates the standard population deviation of all the distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDStdDevP',
+            'Rtf Data Binding': 'ReportStringId.STag_Name_RtfDataBinding',
+            'Html Data Binding': 'ReportStringId.STag_Name_HtmlDataBinding',
             'Nothing': 'ReportStringId.RepTabCtl_NoReportStatus',
+            'Mail Merge': 'ReportStringId.STag_Name_MailMerge',
             'Data Binding': 'ReportStringId.STag_Name_DataBinding',
             'Align the control\'s text to the right': 'ReportStringId.UD_Hint_JustifyRight',
             'Add Field to Area': 'ReportStringId.Verb_AddFieldToArea',
@@ -2820,15 +2934,18 @@ var DevExpress;
             'Remove All Formatting Rules': 'ReportStringId.Cmd_ClearFormattingRules',
             'Load Report Template...': 'ReportStringId.Verb_LoadReportTemplate',
             'Delete Unused Styles': 'ReportStringId.Cmd_PurgeStyles',
+            'Convert': 'ReportStringId.UD_Msg_ConvertBindingsCaption',
+            'Convert to Expressions': 'ReportStringId.Verb_ConvertToExpressions',
             'Save \'{0}\'': 'ReportStringId.Dlg_SaveFile_Title',
             'Cannot obtain data columns. Make sure that the report data source and data member are valid.': 'ReportStringId.Msg_CannotObtainDataColumns',
             'Layout Toolbar': 'ReportStringId.UD_Capt_LayoutToolbarName',
             'Move forward to the next page.': 'ReportStringId.RibbonXRDesign_HtmlForward_STipContent',
-            'XRPivotGrid Fields': 'ReportStringId.PivotGridFrame_Fields_ColumnsText',
+            'Pivot Grid Fields': 'ReportStringId.PivotGridFrame_Fields_ColumnsText',
             'Rights': 'ReportStringId.UD_Capt_JustifyRight',
             'About': 'ReportStringId.Verb_About',
             'The specified expression contains invalid symbols (line {0}, character {1}).': 'ReportStringId.Msg_InvalidExpression',
             'to Grid': 'ReportStringId.UD_Capt_AlignToGrid',
+            'sumStdDev(Expression)\r\n\r\nCalculates the standard deviation of all the values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryStdDev',
             'View Code': 'ReportStringId.Cmd_ViewCode',
             'Edit and Reorder Bands...': 'ReportStringId.Verb_EditBands',
             'Report Data': 'ReportStringId.CatReportData',
@@ -2855,7 +2972,7 @@ var DevExpress;
             'Make the selected controls have the same width.': 'ReportStringId.RibbonXRDesign_SizeToControlWidth_STipContent',
             'Name: {0}\r\n': 'ReportStringId.XRSubreport_NameInfo',
             'Select and drag field to the PivotGrid fields panel to create PivotGrid field.': 'ReportStringId.PivotGridFrame_Fields_DescriptionText2',
-            'You can add and delete XRPivotGrid fields and modify their settings.': 'ReportStringId.PivotGridFrame_Fields_DescriptionText1',
+            'You can add and delete Pivot Grid fields and modify their settings.': 'ReportStringId.PivotGridFrame_Fields_DescriptionText1',
             'Exit': 'ReportStringId.UD_Capt_Exit',
             'Bring the selected controls to the front': 'ReportStringId.UD_Hint_OrderBringToFront',
             'Printing warning: The following controls are outside the right page margin, and this will cause extra pages to be printed - {0}.': 'ReportStringId.Msg_WarningControlsAreOutOfMargin',
@@ -2875,8 +2992,10 @@ var DevExpress;
             'New Report via Wizard': 'ReportStringId.RibbonXRDesign_NewReportWizard_STipTitle',
             'Remove All Styles': 'ReportStringId.Cmd_ClearStyles',
             'This method call is invalid for the object\'s current state': 'ReportStringId.Msg_InvalidMethodCall',
+            'Summary Running': 'ReportStringId.STag_Name_SummaryRunning',
             'Null': 'ReportStringId.XRSubreport_NullReportSourceInfo',
             'Clone Style': 'ReportStringId.Cmd_CloneStyle',
+            'sumMedian(Expression)\r\n\r\nFinds the middle number within a sequence.\r\nNote that if the total number of elements is odd, this function returns the value of a middle number in a sequence. If the total number of elements is even, this function returns the arithmetical mean of the two middle numbers.': 'ReportStringId.ExpressionEditor_Description_Function_SummaryMedian',
             'Summary...': 'ReportStringId.Verb_SummaryWizard',
             'This operation will remove all parameters. Do you wish to proceed?': 'ReportStringId.Msg_WarningRemoveParameters',
             'Tile Horizontal': 'ReportStringId.UD_Capt_MdiTileHorizontal',
@@ -2886,6 +3005,7 @@ var DevExpress;
             'Make the selected controls have the same size.': 'ReportStringId.RibbonXRDesign_SizeToControl_STipContent',
             'No formatting rules are selected': 'ReportStringId.FRSForm_Msg_NoRuleSelected',
             'Align text to the left.': 'ReportStringId.RibbonXRDesign_JustifyLeft_STipContent',
+            'sumDStdDev(Expression)\r\n\r\nCalculates the standard deviation of all the distinct values within the specified summary region (group, page or report).': 'ReportStringId.ExpressionEditor_Description_Function_SummaryDStdDev',
             'Decrease': 'ReportStringId.UD_Capt_SpacingDecrease',
             'New Blank Report': 'ReportStringId.RibbonXRDesign_NewReport_STipTitle',
             'Property Grid': 'ReportStringId.UD_Title_PropertyGrid',
@@ -2894,25 +3014,29 @@ var DevExpress;
             'Save All Reports': 'ReportStringId.RibbonXRDesign_SaveAll_STipTitle',
             'Not enough memory to paint. Zoom level will be reset.': 'ReportStringId.Msg_NotEnoughMemoryToPaint',
             'Toolbars': 'ReportStringId.UD_Group_ToolbarsList',
+            'Condition Editor': 'ReportStringId.ExpressionEditor_ConditionCaption',
             'Field Area for a New Field': 'ReportStringId.STag_Name_FieldArea',
             'Incorrect band type': 'ReportStringId.Msg_IncorrectBandType',
             'Remove the spacing between the selected controls': 'ReportStringId.UD_Hint_SpacingRemove',
             'Multi-Column Layout': 'ReportStringId.STag_Name_ColumnLayout',
             'Make the spacing between the selected controls equal': 'ReportStringId.UD_Hint_SpacingMakeEqual',
             'Fields Section Only': 'PivotGridStringId.CustomizationFormTopPanelOnly',
+            'Filter Editor': 'PivotGridStringId.FilterFormCaption',
             'Grand Total': 'PivotGridStringId.GrandTotal',
             '[Bottom Panel Only 2 by 2 Layout]': 'PivotGridStringId.Alt_BottomPanelOnly2by2Layout',
             '[Expand]': 'PivotGridStringId.Alt_Expand',
             '[Top Panel Only Layout]': 'PivotGridStringId.Alt_TopPanelOnlyLayout',
             '[Column Area Headers]': 'PivotGridStringId.Alt_ColumnAreaHeaders',
             '(Show Blanks)': 'PivotGridStringId.FilterShowBlanks',
-            'Hide': 'PivotGridStringId.PopupMenuHideField',
+            'Hide this Field': 'PivotGridStringId.PopupMenuHideField',
             'Fields Section and Areas Section Side-By-Side': 'PivotGridStringId.CustomizationFormStackedSideBySide',
             '(Ascending)': 'PivotGridStringId.Alt_SortedAscending',
             'Error retrieving drilldown dataset': 'PivotGridStringId.DrillDownException',
             'Good': 'PivotGridStringId.StatusGood',
+            'Hide Filter': 'PivotGridStringId.PopupMenuHideFilter',
             'Bad': 'PivotGridStringId.StatusBad',
             'Collapse All': 'PivotGridStringId.PopupMenuCollapseAll',
+            'Show Filter': 'PivotGridStringId.PopupMenuShowFilter',
             'Collapse': 'PivotGridStringId.PopupMenuCollapse',
             'Row field:': 'PivotGridStringId.SummaryFilterRowField',
             'Drop Column Fields Here': 'PivotGridStringId.ColumnHeadersCustomization',
@@ -2925,6 +3049,7 @@ var DevExpress;
             'Row Headers': 'PivotGridStringId.PrintDesignerRowHeaders',
             '(Descending)': 'PivotGridStringId.Alt_SortedDescending',
             '{0} StdDev': 'PivotGridStringId.TotalFormatStdDev',
+            'Hide': 'PivotGridStringId.Alt_DragHideField',
             'Hidden Fields': 'PivotGridStringId.CustomizationFormHiddenFields',
             'Drag Items to the PivotGrid': 'PivotGridStringId.CustomizationFormText',
             'Drag fields between areas below:': 'PivotGridStringId.CustomizationFormHint',
@@ -2933,6 +3058,7 @@ var DevExpress;
             '[Filter Area Headers]': 'PivotGridStringId.Alt_FilterAreaHeaders',
             'Vertical Lines': 'PivotGridStringId.PrintDesignerVerticalLines',
             'Measure': 'PivotGridStringId.PopupMenuFormatRulesMeasure',
+            'Edit Filter': 'PivotGridStringId.EditFilter',
             'Show Details command cannot be executed when multiple items are selected in a report filter field. Select a single item for each field in the report filter area before performing a drillthrough.': 'PivotGridStringId.OLAPDrillDownFilterException',
             'PivotGrid Prefilter': 'PivotGridStringId.PrefilterFormCaption',
             'Total': 'PivotGridStringId.Total',
@@ -2950,6 +3076,7 @@ var DevExpress;
             'Reload Data': 'PivotGridStringId.PopupMenuRefreshData',
             'Show Details command cannot be executed when Top N is applied to one of the row/column fields.': 'PivotGridStringId.OLAPDrillDownTopNException',
             'Invert Filter': 'PivotGridStringId.FilterInvert',
+            'Best Fit': 'PivotGridStringId.PopupMenuBestFit',
             'Q{0}': 'PivotGridStringId.DateTimeQuarterFormat',
             'Cancel': 'ASPxReportsStringId.SearchDialog_Cancel',
             'Hidden': 'PivotGridStringId.SummaryFilterLegendHidden',
@@ -2966,6 +3093,7 @@ var DevExpress;
             'StdDevp': 'PivotGridStringId.SummaryStdDevp',
             'Apply to specific level': 'PivotGridStringId.SummaryFilterApplyToSpecificLevel',
             'Edit Prefilter': 'PivotGridStringId.EditPrefilter',
+            'Sort by Summary': 'PivotGridStringId.PopupMenuSortBySummary',
             'Headers On Every Page': 'PivotGridStringId.PrintDesignerHeadersOnEveryPage',
             'Horizontal Lines': 'PivotGridStringId.PrintDesignerHorizontalLines',
             'Clear Sorting': 'PivotGridStringId.PopupMenuClearSorting',
@@ -2986,13 +3114,14 @@ var DevExpress;
             'Apply only to specific level': 'PivotGridStringId.PopupMenuFormatRulesIntersectionOnly',
             'Drag a field here to customize layout': 'PivotGridStringId.CustomizationFormListBoxText',
             'StdDev': 'PivotGridStringId.SummaryStdDev',
-            'This command cannot be used on multiple selections.': 'PivotGridStringId.CannotCopyMultipleSelections',
             'Clear Rules from This Intersection': 'PivotGridStringId.PopupMenuFormatRulesClearIntersectionRules',
             'Sort "{0}" by This Row': 'PivotGridStringId.PopupMenuSortFieldByRow',
             'Criteria cannot contain aggregates.': 'PivotGridStringId.ExpressionValidationNotSummaryExpressionExpected',
             'Going Up': 'PivotGridStringId.TrendGoingUp',
+            'Error occurred during processing server request ({0})': 'PivotGridStringId.ServerRequestError',
             'Defer Layout Update': 'PivotGridStringId.CustomizationFormDeferLayoutUpdate',
             'Choose fields to add to report:': 'PivotGridStringId.CustomizationFormAvailableFields',
+            'Caption: {0}\r\nType: {1}': 'PivotGridStringId.ExpressionEditorFieldDescription',
             'Search': 'ASPxReportsStringId.SearchDialog_Header',
             'Unused Filter Fields': 'PivotGridStringId.PrintDesignerUnusedFilterFields',
             'Sort A-Z': 'PivotGridStringId.PopupMenuSortAscending',
@@ -3114,6 +3243,7 @@ var DevExpress;
             'The weight of the pane should be greater than 0.': 'ChartStringId.MsgIncorrectPaneWeight',
             'Run the Chart Wizard, which allows the properties of the chart to be edited.': 'ChartStringId.VerbWizardDescription',
             'The maximum width of the label should be greater than or equal to 0.': 'ChartStringId.MsgIncorrectLabelMaxWidth',
+            'The total label indent should be greater than or equal to 0 and less than 1000.': 'ChartStringId.MsgIncorrectTotalLabelIndent',
             'Displays a wide area at the top, indicating the total points\' value, while other areas are proportionally smaller.\r\n\r\nUse it when it is necessary to represent stages in a sales process, show the amount of potential revenue for each stage, as well as identify potential problem areas in an organization\'s sales processes.': 'ChartStringId.CmdCreateFunnelChartDescription',
             'Manhattan Bar': 'ChartStringId.SvnManhattanBar',
             'It is impossible to set a custom range, if the DateTimeScaleMode is not Manual.': 'ChartStringId.MsgUnsupportedManualRangeForAutomaticDateTimeScaleMode',
@@ -3133,6 +3263,7 @@ var DevExpress;
             'BottomRightToTopLeft': 'ChartStringId.WizGradientBottomRightToTopLeft',
             'Chart titles changed': 'ChartStringId.TrnChartTitlesChanged',
             'Red Orange': 'ChartStringId.PltRedOrange',
+            'The specified overlapping mode isn\'t supported by the stacked bar total label.': 'ChartStringId.MsgUnsupportedResolveOverlappingModeInStackedBarTotalLabel',
             'Rate of Change': 'ChartStringId.IndRateOfChange',
             'Clustered Pyramid': 'ChartStringId.CmdCreatePyramidBar3DChartMenuCaption',
             'Size in pixels should be greater than or equal to -1 and less than 50.': 'ChartStringId.MsgInvalidSizeInPixels',
@@ -3150,6 +3281,7 @@ var DevExpress;
             'Blue Warm': 'ChartStringId.PltBlueWarm',
             'Bubble': 'ChartStringId.SvnBubble',
             'Stacked Area in 3-D': 'ChartStringId.CmdCreateStackedArea3DChartMenuCaption',
+            'Unknown pattern placeholder': 'ChartStringId.UnknownPatternPlaceholder',
             'Insert a point, funnel, financial, radar, polar, range, or gantt chart.': 'ChartStringId.CmdCreateOtherSeriesTypesChartPlaceHolderDescription',
             'Palettes changed': 'ChartStringId.TrnPalettesChanged',
             'Export to HTML': 'ChartStringId.CmdExportToHTMLMenuCaption',
@@ -3331,6 +3463,7 @@ var DevExpress;
             'Combine the advantages of both the Stacked Cylinder and Clustered Cylinder chart types, so that you can stack different cylinders, and combine them into groups across the same axis value.': 'ChartStringId.CmdCreateCylinderSideBySideStackedBar3DChartDescription',
             'Exploded points changed': 'ChartStringId.TrnExplodedPoints',
             '{0} data filter(s)': 'ChartStringId.WizDataFiltersEntered',
+            'Total value': 'ChartStringId.TotalValuePatternDescription',
             'Clustered Column': 'ChartStringId.CmdCreateBarChartMenuCaption',
             'Yellow Orange': 'ChartStringId.PltYellowOrange',
             'Polar Range Area': 'ChartStringId.SvnPolarRangeArea',
@@ -3885,11 +4018,14 @@ var DevExpress;
             'Path can\'t be created.': 'GaugesCoreStringId.MsgPathCreationError',
             'It\'s impossible to create an instance of a class {0} because specified text is incorrect: ': 'GaugesCoreStringId.MsgTextParsingError',
             'The gauge control can\'t be restored correctly, because the specified layout file contians the following invalid elements: {0}.': 'GaugesCoreStringId.MsgGaugeRestoreError',
+            'Select Statement Preview': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectStatementPreview_Title',
             'Bottom Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_BottomMargin',
             'We have all the information needed to process the report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportComplete_Description',
             'What summary functions would you like to calculate?': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_Description',
             'Columns selected from specific tables and/or views will be automatically included into a separate query.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMultiQuery',
             'To be able to run the Document Viewer, the client web browser must support HTML5.': 'ASPxReportsStringId.WebDocumentViewer_PlatformNotSupported_Error',
+            'The script contains error(s).': 'ASPxReportsStringId.ReportDesigner_ScriptValidation_Message_ContainsErrors',
+            'Invalid name': 'ASPxReportsStringId.ReportDesigner_NameValidationError',
             'Enter the text to find in the document.': 'ASPxReportsStringId.SearchDialog_EnterText',
             'The specified Report Service has not been found.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceConnection_Error',
             'Report Wizard': 'ASPxReportsStringId.ReportDesigner_Wizard_Header',
@@ -3898,33 +4034,45 @@ var DevExpress;
             'Next': 'ASPxReportsStringId.ReportDesigner_Wizard_Next',
             'Inch': 'ASPxReportsStringId.ReportDesigner_Wizard_Inch',
             'Ignore null values': 'ASPxReportsStringId.ReportDesigner_Wizard_SummaryOptions_IgnoreNullValues',
+            'Select control...': 'ASPxReportsStringId.ReportDesigner_ScriptEditor_Toolbar_SelectControl',
             'Choose a data connection.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection',
+            'Add New Item': 'ASPxReportsStringId.ReportDesigner_AddNewItem',
+            'Preview Select Statement...': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_PreviewSelectStatement_Tooltip',
+            'Guid is required and should have a valid format.': 'ASPxReportsStringId.ReportDesigner_GuidIsRequired_Error',
             'To log in to the Report Server, handle the RequestCredentials event.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorCredentialHandled_Error',
             'Collapsed': 'ASPxReportsStringId.ReportDesigner_Accordion_Collapsed',
             'Align Left 1': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AlignLeft1',
             'Align Left 2': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AlignLeft2',
+            'page': 'ASPxReportsStringId.WebDocumentViewer_SearchPageNumberText',
             'It is only possible to assign either the SettingsRemoteSource or ConfigurationRemoteSource property of ASPxDocumentViewer at a time.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceSettingsAndConfiguration_Error',
             'Search result': 'ASPxReportsStringId.WebDocumentViewer_SearchResultText',
             'Last Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_LastPage',
             'Insert Group Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupHeaderBand',
             'The value cannot be empty.': 'ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError',
             'Label Height:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelHeight',
+            'Select data members': 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_ChooseDataMembers_SelectDataMembers',
             'Label Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_LabelReport',
             'Join Type': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_JoinType',
             'Finish': 'ASPxReportsStringId.ReportDesigner_Wizard_Finish',
+            'Enter text to search...': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText',
             'To be able to run the Report Designer, the client web browser must support HTML5.': 'ASPxReportsStringId.ReportDesigner_PlatformNotSupported_Error',
             'Size to Control Height': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlHeight',
             'Display the specified page.': 'ASPxReportsStringId.DocumentViewer_RibbonCurrentPageToolTip',
             'Sort Type': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SortType',
             'of': 'ASPxReportsStringId.ToolBarItemText_OfLabel',
             'Delete Row': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
+            'Types': 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Types',
+            'Format String Editor': 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Title',
             'Remove calculated field': 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveCalculatedField',
+            'Select the report': 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_SelectReport',
             'Insert Page Header Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertPageHeaderBand',
             'Left Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_LeftMargin',
             'Selection Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectionProperties',
+            'Error obtaining an export status': 'ASPxReportsStringId.WebDocumentViewer_GetExportStatusError',
             'Choose a Report Layout': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Title',
             'Choose a Table or View': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Title',
             'Guid should contain 32 digits delimited with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).': 'ASPxReportsStringId.ParametersPanel_GuidValidationError',
+            'Document': 'ASPxReportsStringId.ReportDesigner_FontOptions_Unit_Document',
             'The report style specifies the appearance of your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Description',
             'Insert Field in the Column Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheColumnArea',
             'Loading...': 'ASPxReportsStringId.WebDocumentViewer_Loading',
@@ -3952,6 +4100,7 @@ var DevExpress;
             'Label Width:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth',
             'To create an item click the Add button.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParametersEmpty',
             'Insert Group Footer Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertGroupFooterBand',
+            'Edit Master-Detail Relations': 'ASPxReportsStringId.ReportDesigner_FieldListActions_EditMasterDetailRelations',
             'Match whole word only': 'ASPxReportsStringId.SearchDialog_WholeWord',
             'Insert Sub-Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertSubBand',
             'Query Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_QueryProperties',
@@ -3969,11 +4118,13 @@ var DevExpress;
             'Portrait': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Portrait',
             'There are no parameters available yet.': 'ASPxReportsStringId.ReportDesigner_FieldList_Parameters',
             'Create New Query...': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_CreateNewQuery',
+            'Drill through operation failed': 'ASPxReportsStringId.WebDocumentViewer_DrillThroughError',
             'Page Count:': 'ASPxReportsStringId.DocumentViewer_RibbonPageCountText',
             'Size to Control': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControl',
             'Current Page': 'ASPxReportsStringId.DocumentViewer_RibbonCurrentPageText',
             'Insert Field in the Data Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheDataArea',
             'Create a New Style': 'ASPxReportsStringId.ReportDesigner_StylesEditor_CreateNew',
+            'Create new parameter': 'ASPxReportsStringId.FilterEditor_Operand_CreateNewParameter',
             'Select the report type you wish to create.': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Message',
             'Choose a Report Style': 'ASPxReportsStringId.ReportDesigner_Wizard_Report_Style',
             'Insert Field in the Filter Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheFilterArea',
@@ -3987,20 +4138,26 @@ var DevExpress;
             'Export a report and show it in a new window': 'ASPxReportsStringId.ToolBarItemText_SaveToWindow',
             'Millimeter': 'ASPxReportsStringId.ReportDesigner_Wizard_Millimeter',
             'Add parameter': 'ASPxReportsStringId.ReportDesigner_FieldListActions_AddParameter',
+            'Remove Data Source': 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveDataSource',
             'Delete Column': 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteColumn',
             'Top Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_TopMargin',
             'Insert Top Margin Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertTopMarginBand',
             'Empty Report': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_EmptyReport',
             'Find Text': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_FindText',
             'The report preview initialization has failed': 'ASPxReportsStringId.WebDocumentViewer_InitializationError',
+            'Advanced Mode': 'ASPxReportsStringId.FilterEditor_AdvancedMode',
             'Next Page': 'ASPxReportsStringId.ToolBarItemText_NextPage',
+            'Select data members to assign to the report and its detail reports and fields to display in these reports.': 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_ChooseDataMembers_Description',
             'Cannot supply filtered lookup values to a report parameter editor': 'ASPxReportsStringId.WebDocumentViewer_GetLookUpValuesError',
             'First Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_FirstPage',
             'Display the search window': 'ASPxReportsStringId.ToolBarItemText_Search',
             'The document is not found. Please try opening the document once again.': 'ASPxReportsStringId.WebDocumentViewer_DocumentNotFound_Error',
+            'An error occurred during the export': 'ASPxReportsStringId.WebDocumentViewer_ExportError',
+            'Error on retrieving an exporting status: ': 'ASPxReportsStringId.WebDocumentViewer_ExportStatusError',
             'Preview Parameters': 'ASPxReportsStringId.ReportDesigner_Preview_ParametersTitle',
             'Relation Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_RelationProperties',
             'Label Product:': 'ASPxReportsStringId.ReportDesigner_Wizard_LabelProduct',
+            'Select data fields': 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_ChooseDataMembers_SelectDataFields',
             'Display the first document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_FirstPage',
             'Vertical Pitch:': 'ASPxReportsStringId.ReportDesigner_Wizard_VerticalPitch',
             'Stepped': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Stepped',
@@ -4016,9 +4173,12 @@ var DevExpress;
             'Then By': 'ASPxReportsStringId.ReportDesigner_SortFields_ThenBy',
             'Find text in the document.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_FindText',
             'Print Page': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintPage',
+            'Right Operand': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_RightOperand',
             'Add query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_AddQuery',
             'Save To Window': 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_SaveToWindow',
+            'Cross-Band Controls': 'ASPxReportsStringId.ReportDesigner_CrossBandControls',
             'Adjust the field width so all fields fit onto a page': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_AdjustFieldWidth',
+            'Select fields and assign summary functions to them': 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_SummaryOptions_SelectFieldsAndSummaries',
             'The RequestCredentials event has not been subscribed to.': 'ASPxReportsStringId.DocumentViewer_RemoteRequestCredentials_Error',
             'To view the remote report, specify the ServerUri or EndpointConfigurationName property of the ASPxDocumentViewer.SettingsRemoteSource.': 'ASPxReportsStringId.DocumentViewer_RemoteSourceSettings_Error',
             'Table Properties': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_TableProperties',
@@ -4028,29 +4188,39 @@ var DevExpress;
             'To display a report, only one of the following actions can be performed at a time:\r\n- assigning the ASPxWebDocumentViewer.ReportSourceId property;\r\n- calling the ASPxWebDocumentViewer.OpenReport method;\r\n- calling the ASPxWebDocumentViewer.OpenReportXmlLayout method.': 'ASPxReportsStringId.WebDocumentViewer_OpenReport_Error',
             'Specify the print settings and print the current page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PrintPage',
             'Groups': 'ASPxReportsStringId.ReportDesigner_Groups',
+            'Suffix': 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Suffix',
             'Insert Column To the Left': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToLeft',
             'Columnar': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Columnar',
             'Cannot find a toolbar control with the specified name: \'{0}\'.': 'ASPxReportsStringId.DocumentViewer_ExternalRibbonNotFound_Error',
             'The report layout specifies the manner in which selected data fields are arranged on individual pages.': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Description',
             'Run Wizard': 'ASPxReportsStringId.ReportDesigner_MenuButtons_RunWizard',
+            'Impossible to validate the script.': 'ASPxReportsStringId.ReportDesigner_ScriptValidation_Error',
             'Compact': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Compact',
+            'Left Operand': 'ASPxReportsStringId.ReportDesigner_QueryBuilder_LeftOperand',
             'The table or view you choose determines which columns will be available in your report.': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseDataMember_Description',
             'Insert Bottom Margin Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertBottomMarginBand',
             'To view a remote report, enable the PageByPage property of the SettingsReportViewer.': 'ASPxReportsStringId.DocumentViewer_RemotePageByPage_Error',
             'Access and modify the report parameter values.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_ParametersPanel',
             'Insert Detail Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertDetailBand',
             'To create a new item, click Add.': 'ASPxReportsStringId.ReportDesigner_GroupFields_Empty',
+            'The requested document operation cannot be performed.': 'ASPxReportsStringId.WebDocumentViewer_CustomDocumentOperationsDenied_Error',
             'Insert Report Footer Band': 'ASPxReportsStringId.ReportDesigner_ReportActions_InsertReportFooterBand',
             'Choose Columns to Display in Your Report': 'ASPxReportsStringId.ReportDesigner_Wizard_ChooseColumns_Title',
             'Insert Field in the Row Area': 'ASPxReportsStringId.ReportDesigner_PivotActions_InsertFieldInTheRowArea',
             'The user credentials cannot be empty.': 'ASPxReportsStringId.DocumentViewer_RemoteAuthenticatorCredential_Error',
+            'Cannot create a tree for this expression': 'ASPxReportsStringId.FilterEditor_TreeCreationError',
             'Configure master-detail relationships.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations',
+            'Select event...': 'ASPxReportsStringId.ReportDesigner_ScriptEditor_Toolbar_SelectEvent',
             'This command cannot be executed because a document has not yet been generated.': 'ASPxReportsStringId.DocumentViewer_NoRemoteDocumentInformation_Error',
+            'Preview is not available': 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_PreviewNotAvailable_Text',
+            'Could not open report': 'ASPxReportsStringId.WebDocumentViewer_OpenReportError',
             'Actions': 'ASPxReportsStringId.ReportDesigner_Actions',
             'Print the current page': 'ASPxReportsStringId.ToolBarItemText_PrintPage',
             'Export To': 'ASPxReportsStringId.WebDocumentViewer_ExportToText',
             'Display the previous document page.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_PreviousPage',
             'Add Data Items Here': 'ASPxReportsStringId.ReportDesigner_Pivot_AddDataItems',
+            'Select...': 'ASPxReportsStringId.ReportDesigner_PropertyGrid_Editor_EmptyText',
+            'Tap here to Search': 'ASPxReportsStringId.WebDocumentViewer_Mobile_TapHereToSearch',
             'Document is building...': 'ASPxReportsStringId.WebDocumentViewer_DocumentBuilding',
             'Remove parameter': 'ASPxReportsStringId.ReportDesigner_FieldListActions_RemoveParameter',
             'Navigate through the report\'s hierarchy of bookmarks.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_DocumentMap',
@@ -4058,22 +4228,30 @@ var DevExpress;
             'The report does not have any parameters yet. To create a new parameter, click Add Parameter.': 'ASPxReportsStringId.ReportDesigner_Parameters_CreateParameters',
             'Insert Column To the Right': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToRight',
             'Corporate': 'ASPxReportsStringId.ReportDesigner_Wizard_ReportStyle_Corporate',
+            'Add Argument': 'ASPxReportsStringId.ReportDesigner_AddArgument',
             'Size to Control Width': 'ASPxReportsStringId.ReportDesigner_ElementsAction_SizeToControlWidth',
+            'Name is required and should be a valid identifier.': 'ASPxReportsStringId.ReportDesigner_NameIsRequired_Error',
             'Choose a Report Type': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Title',
             'Access is denied. You are not granted permission to perform this operation.': 'ASPxReportsStringId.WebDocumentViewer_AccessDenied_Error',
             'DOCX': 'ASPxReportsStringId.ExportName_docx',
             'XLSX': 'ASPxReportsStringId.ExportName_xlsx',
+            'Error when trying to populate the datasource.': 'ASPxReportsStringId.WebDocumentViewer_DataRetrievalException_Message',
             'Product Number:': 'ASPxReportsStringId.ReportDesigner_Wizard_ProductNumber',
             'Edit query': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_EditQuery',
             'Toggle Multipage Mode': 'ASPxReportsStringId.WebDocumentViewer_ToggleMultipageMode',
             'Right Margin:': 'ASPxReportsStringId.ReportDesigner_Wizard_RightMargin',
             'Submit': 'ASPxReportsStringId.ParametersPanel_Submit',
+            'Summary functions': 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_SummaryOptions_SummaryFunctions',
             'No data to display': 'ASPxReportsStringId.ReportDesigner_DataPreview_Empty',
             'Data Preview (First 100 Rows Displayed)': 'ASPxReportsStringId.ReportDesigner_DataPreview_Title',
+            'Pixel': 'ASPxReportsStringId.ReportDesigner_FontOptions_Unit_Pixel',
             'Configure query parameters.': 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters',
+            'World': 'ASPxReportsStringId.ReportDesigner_FontOptions_Unit_World',
+            'The script is valid.': 'ASPxReportsStringId.ReportDesigner_ScriptValidation_Message_ValidScript',
             'Previous': 'ASPxReportsStringId.ReportDesigner_Wizard_Previous',
             'Selected fields': 'ASPxReportsStringId.ReportDesigner_Wizard_SelectedFields',
             'Save the document in a specified format and display the result in a new window.': 'ASPxReportsStringId.DocumentViewer_RibbonCommandToolTip_SaveToWindow',
+            'labels on the page': 'ASPxReportsStringId.ReportDesigner_Wizard_CustomizeLabelPage_LabelCountText',
             'Insert Row Below': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow',
             'Insert Row Above': 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
             'Available fields': 'ASPxReportsStringId.ReportDesigner_Wizard_AvailableFields',
@@ -4108,6 +4286,7 @@ var DevExpress;
             'Loading data source': 'DataAccessStringId.LoadingDataSourcePanelText',
             'Functions': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions',
             'Please wait': 'DataAccessStringId.ConnectingToDatabaseCaption',
+            'Parameter \'{2}\' type mismatch: <{0}>, <{1}> is expected.': 'DataAccessStringId.StoredProcedureParameterTypeValidationException',
             'Table Selection': 'DataAccessStringId.QueryPropertyGridTableSelectionCategoryName',
             'Cannot set relation between columns \'{0}\'.\'{1}\' of type {2} and \'{3}\'.\'{4}\' of type {5}.': 'DataAccessStringId.RelationException',
             'Operators': 'DataAccessStringId.ExpressionEditor_DocumentationCategory_Operators',
@@ -4115,6 +4294,7 @@ var DevExpress;
             'Space': 'DataAccessStringId.ExcelWizard_ValueSeparator_Space',
             'The collection already contains the \'{0}\' item': 'DataAccessStringId.MessageDuplicateItem',
             'Comma': 'DataAccessStringId.ExcelWizard_ValueSeparator_Comma',
+            'Cannot get properties for this type.': 'DataAccessStringId.ObjectDataSourceWizard_CannotGetTypeProperties',
             'One or more queries have failed to execute.': 'DataAccessStringId.QueriesFailedToExecute_ExceptionMessage',
             '{0} of {1}...': 'DataAccessStringId.LoadingDataSourcePanelCounter',
             ' (from the Server Explorer)': 'DataAccessStringId.ConnectionStringPostfixServerExplorer',
@@ -4154,7 +4334,7 @@ var DevExpress;
             'The collection of tables cannot be empty.': 'DataAccessStringId.NoTablesValidationException',
             'Group filtering cannot be applied to data that is not grouped. Please apply data grouping first.': 'DataAccessStringId.GroupFilterStringEditorNoGroups',
             'The SKIP setting is set while records are not sorted. Please apply sorting to be able to skip the first N records or reset the SKIP setting in the Filter Editor dialog.': 'DataAccessStringId.SkipWithoutSortingValidationException',
-            'The connection has been cancelled.': 'DataAccessStringId.ConnectionAborted_ExceptionMessage',
+            'The connection has been canceled.': 'DataAccessStringId.ConnectionAborted_ExceptionMessage',
             'Custom connection string': 'DataAccessStringId.WizardCustomConnectionString',
             'Column [{0}].[{1}] is used in the custom expression, but is missing in DBSchema.': 'DataAccessStringId.CustomExpressionWithMissingInSchemaColumnValidationException',
             'Stored Procedure': 'DataAccessStringId.QueryPropertyGridStoredProcCategoryName',
@@ -4174,6 +4354,7 @@ var DevExpress;
             'A query with the specified name already exists: {0}.': 'DataAccessStringId.MessageDuplicateQueryName',
             ' (in the config file)': 'DataAccessStringId.ConnectionStringPostfixAppConfig',
             'The query name cannot be empty.': 'DataAccessStringId.MessageEmptyQueryName',
+            'Cannot get properties for the type returned by this method.': 'DataAccessStringId.ObjectDataSourceWizard_CannotGetPropertiesForThisMethodReturnType',
             'A grouping criteria cannot be null.': 'DataAccessStringId.GroupNullValidationException',
             'Unable to load the {0} assembly for the {1} context. Please choose an existing external assembly and/or existing context.': 'DataAccessStringId.MessageCannotLoadCustomAssembly',
             'Unknown': 'DataAccessStringId.UnknownType',
@@ -4240,6 +4421,7 @@ var DevExpress;
             'The schema does not contain the following relation column: "{0}"."{1}".': 'DataAccessStringId.RelationColumnNotInSchemaValidationException',
             'A data member \'{0}\' does not exist.': 'DataAccessStringId.ODSErrorMissingMember',
             'Item name cannot be null or an empty string': 'DataAccessStringId.MessageInvalidItemName',
+            'A filter string cannot be null.': 'DataAccessStringId.EFFilterControl_EmptyFilterString',
             'Loading the data sources referenced in this file may harm your computer. Was this file obtained from a trusted source?\r\n\r\nClick \'Yes\' to load the data source content as is.\r\nClick \'No\' to load only trusted data source content.': 'DataAccessStringId.ObjectDataSourceLoadingWarningMessage',
             ', ': 'DataAccessStringId.QueryDesignerJoinExpressionElementSeparator',
             '[{0}] {1} join [{2}] on {3}': 'DataAccessStringId.QueryDesignerJoinTooltipPattern',
@@ -4306,7 +4488,7 @@ var DevExpress;
             'The connection uses server authentication.\r\nDo you want to save the user name and password?': 'DataAccessUIStringId.WizardPageSaveConnection_SaveCredentialsQuestion',
             'Select a data source constructor.': 'DataAccessUIStringId.WizardPageChooseObjectConstructor',
             'Select only distinct values': 'DataAccessUIStringId.FiltersView_Distinct',
-            'Column with \'{0}\' name allready exists.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns_ColumnExist',
+            'Column with \'{0}\' name already exists.': 'DataAccessUIStringId.WizardPageConfigureExcelFileColumns_ColumnExist',
             'Password:': 'DataAccessUIStringId.ConnectionProperties_Password',
             'Delete Relation': 'DataAccessUIStringId.QueryBuilder_DeleteRelation',
             'Configure Data Member': 'DataAccessUIStringId.ODSDataMemberEditorTitle',
@@ -4326,11 +4508,11 @@ var DevExpress;
             'Validating query...': 'DataAccessUIStringId.QueryEditorWaitFormValidating',
             'Select a member to bind.': 'DataAccessUIStringId.WizardPageChooseObjectMember_BindToMember',
             'Skip empty rows': 'DataAccessUIStringId.WizardPageChooseFileOptions_SkipEmptyRows',
+            'Entity Framework Filter Collection Editor': 'DataAccessUIStringId.EFFilterCollectionEditor',
             'Select a data source type.': 'DataAccessUIStringId.WizardPageChooseObjectType',
             'Data loading failed because the exception occurred.': 'DataAccessUIStringId.LoadingDataException',
             'Output': 'DataAccessUIStringId.QueryBuilderColumns_Output',
             'Connection string:': 'DataAccessUIStringId.ConnectionProperties_ConnectionString',
-            'Filter Editor': 'DataAccessUIStringId.FiltersView',
             'Join {0}': 'DataAccessUIStringId.QueryDesignControlJoinCommandPattern',
             'Preview Results...': 'DataAccessUIStringId.QueryBuilderButtons_PreviewResults',
             'Connection name: {0}\r\nError message: {1}': 'DataAccessUIStringId.ConnectionErrorFormDetailPattern',
@@ -4341,10 +4523,12 @@ var DevExpress;
             'The following errors occurred during query validation:{0}': 'DataAccessUIStringId.MasterDetailEditorMultipleValidationErrorsMessage',
             'Cannot find the specified query: "{0}". Specify an existing query name before selecting a column.': 'DataAccessUIStringId.MasterDetailEditorInvalidColumnQueryNameMessage',
             'Add Query Parameter': 'DataAccessUIStringId.QueryFilter_AddQueryParameter',
+            'Entity Name': 'DataAccessUIStringId.WizardPageConfigureEFFilters_EntityColumnName',
             'Group By': 'DataAccessUIStringId.QueryBuilderColumns_GroupBy',
             'The data source schema has been updated successfully.': 'DataAccessUIStringId.UpdateSchemaComplete',
             'Invalid property: \'{0}\'.': 'DataAccessUIStringId.ExpressionEditor_InvalidProperty',
             '<b>A data source with the specified name already exists</b>': 'DataAccessUIStringId.WizardDataSourceNameExistsMessage',
+            'Add Filter Parameter': 'DataAccessUIStringId.EFFilterControl_AddParameter',
             'Yes, save the connection as:': 'DataAccessUIStringId.WizardPageSaveConnection_ConfirmSaving',
             'Create a query or select a stored procedure.\r\nData columns selected from specific tables and/or views will be automatically included into a separate query.': 'DataAccessUIStringId.WizardPageConfigureMultiQuery',
             '{0} invalid relation(s)': 'DataAccessUIStringId.MasterDetailEditorLabelInvalidRelationsText',
@@ -4394,6 +4578,7 @@ var DevExpress;
             'Connection Editor': 'DataAccessUIStringId.ConnectionEditorTitle',
             'Specify import settings.': 'DataAccessUIStringId.WizardPageChooseFileOptions',
             'Server authentication': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_MSSqlServer',
+            'Choose Entity': 'DataAccessUIStringId.WizardPageConfigureEFFilters_ChooseEntityPlaceholder',
             'OAuth': 'DataAccessUIStringId.ConnectionProperties_AuthenticationType_BigQueryOAuth',
             'Not enough memory to load data': 'DataAccessUIStringId.LoadingDatasourceOutOfMemoryError',
             'Error loading file': 'DataAccessUIStringId.PasswordRequest',
@@ -4429,7 +4614,6 @@ var DevExpress;
             'An error occurred during query validation: {0}\r\n\r\nTo discard this query and invoke the wizard, click OK.\r\n\r\nTo keep this query, click Cancel.': 'DataAccessUIStringId.QueryEditorMessageInvalidQuery',
             '<Select a table>': 'DataAccessUIStringId.JoinEditorEmptyTableText',
             'Embedded': 'DataAccessUIStringId.ConnectionProperties_ServerTypeEmbedded',
-            'Expression Editor': 'DataAccessUIStringId.ExpressionEditorViewTitle',
             'Selected': 'DataAccessUIStringId.ParametersColumn_Selected',
             'Update schema': 'DataAccessUIStringId.UpdateSchemaCaption',
             'Select a data connection.': 'DataAccessUIStringId.WizardPageChooseConnectionNoChoice',
@@ -4469,9 +4653,11 @@ var DevExpress;
             'User name:': 'DataAccessUIStringId.ConnectionProperties_UserName',
             'Cannot specify parameters unless the DataMember property has been assigned a value.': 'DataAccessUIStringId.ODSEditorsNoDataMemberMessage',
             'Create a query or select a stored procedure.': 'DataAccessUIStringId.WizardPageConfigureQuery',
+            'Filter Parameters': 'DataAccessUIStringId.EFFilterParametersForm',
+            'No suggestions': 'DataAccessUIStringId.ExpressionEditor_NoSuggestionsMessage',
             'Is greater than or equal to': 'DataAccessUIStringId.JoinEditorGreaterOrEqualOperator',
             'A data schema contains a duplicated column \'{0}\'. Modify the query so that all columns have unique names.': 'DataAccessUIStringId.WizardDuplicatingColumnNameMessage',
-            'There are no any stored procedures in current database.': 'DataAccessUIStringId.WizardEmptyStoredProceduresListMessage',
+            'There are no stored procedures in the current database.': 'DataAccessUIStringId.WizardEmptyStoredProceduresListMessage',
             'Configure Data Source': 'DataAccessUIStringId.ODSDataSourceEditorTitle',
             'Select a data source member (if required).': 'DataAccessUIStringId.WizardPageChooseObjectMember',
             'Remove the condition': 'DataAccessUIStringId.MasterDetailEditorRemoveConditionMessage',
@@ -4491,6 +4677,7 @@ var DevExpress;
             'The link between {0}.{1} and {2}.{3} results in a circular relation and cannot be added.': 'DataAccessUIStringId.QueryBuilderCircularRelationWarning',
             'Internet': 'DataAccessUIStringId.ConnectionProperties_AdvantageServerTypeInternet',
             'Add to Query': 'DataAccessUIStringId.QueryBuilder_AddToSelect',
+            'Add filter criteria to data source tables and/or views.': 'DataAccessUIStringId.WizardPageConfigureEFFilters',
             'Select a data member': 'DataAccessUIStringId.WizardPageChooseEFDataMember',
             'Project ID:': 'DataAccessUIStringId.ConnectionProperties_ProjectID',
             'Some fields are empty. Please fill all empty fields or remove the corresponding conditions to proceed.': 'DataAccessUIStringId.JoinEditorFillAllFieldsException',
@@ -4508,10 +4695,15 @@ var DevExpress;
             'Unexpected behavior: none of the style is selected.': 'ReportBoxDesignerStringId.Wizard_ReportStyle_UnexpectedBehavior',
             'You can adjust the label\'s parameters here if required.': 'ReportBoxDesignerStringId.Wizard_LabelOptions_Description',
             'Select the report data member and data fields that will supply data to your report.': 'ReportBoxDesignerStringId.Wizard_SelectReportData_Description',
+            'Choose a template for your report.': 'ReportBoxDesignerStringId.Wizard_ChooseReportTemplate_Description',
+            'Select the report data member.': 'ReportBoxDesignerStringId.Wizard_SelectReportTemplateDataMember_Description',
+            'Specify the report options.': 'ReportBoxDesignerStringId.Wizard_SpecifyReportTemplateOptions_Description',
+            'Choose one of the available tables/views/stored procedures or create a custom query.\r\nTemplate field values can be static or bound to the data fields selected on this page.': 'ReportBoxDesignerStringId.Wizard_ConfigureReportTemplateQuery_Description',
             'Choose summary functions to calculate in reports.': 'ReportBoxDesignerStringId.Wizard_MasterDetailChooseSummaryOptions_Description',
             'Select one of the predefined labels by specifying the Product and its ID': 'ReportBoxDesignerStringId.Wizard_LabelInformation_Description',
             'Select one or more data members to assign to the report and its detail reports.\r\nChoose fields to display in these reports.': 'ReportBoxDesignerStringId.Wizard_MasterDetailSelectReportData_Description',
             'Group data in the selected reports. You can specify one or more fields for each group.': 'ReportBoxDesignerStringId.Wizard_MasterDetailAddGroupingLevel_Description',
+            'Map the data source fields to the fields available in the template.\r\nYou can use drag and drop or specify the required values in the drop-down Template Field Value lists.': 'ReportBoxDesignerStringId.Wizard_MapReportTemplateFields_Description',
             'Returns the index of the current data row in a datasource. Note that this index is zero-based.': 'XtraEditorsExpressionEditor.CurrentRowIndex.Description',
             'Log10(Value)\r\nReturns the base 10 logarithm of a specified number.': 'XtraEditorsExpressionEditor.Log10.Description',
             'AddMinutes(DateTime, MinutesCount)\r\nReturns a date-time value that is the specified number of minutes away from the specified DateTime.': 'XtraEditorsExpressionEditor.AddMinutes.Description',
@@ -4564,7 +4756,6 @@ var DevExpress;
             'ToInt(Value)\r\nConverts Value to an equivalent 32-bit signed integer.': 'XtraEditorsExpressionEditor.ToInt.Description',
             '19': 'XtraEditorsExpressionEditor.>>layoutItemButton3.ZOrder',
             'layoutItemButton8': 'XtraEditorsExpressionEditor.>>layoutItemButton8.Name',
-            'Variables': 'XtraEditorsExpressionEditor.Variables.Text',
             'UtcNow()\r\nReturns the current system date and time, expressed as Coordinated Universal Time (UTC).': 'XtraEditorsExpressionEditor.UtcNow.Description',
             'plusItemButton': 'XtraEditorsExpressionEditor.>>plusItemButton.Name',
             'IsYearToDate(DateTime)\r\nReturns True if the specified date falls within the year-to-date period (starting from the first day of the current year and continuing up to the current date).': 'XtraEditorsExpressionEditor.IsYearToDate.Description',
@@ -4640,7 +4831,6 @@ var DevExpress;
             'IsOctober(DateTime)\r\nReturns True if the specified date falls within October.': 'XtraEditorsExpressionEditor.IsOctober.Description',
             'Less than or equal to operator. Used to compare expressions.': 'XtraEditorsExpressionEditor.LessOrEqual.Description',
             'layoutItemButton10': 'XtraEditorsExpressionEditor.>>layoutItemButton10.Name',
-            'The type of this field is: ': 'XtraEditorsExpressionEditor.Fields Description Prefix',
             'IsJanuary(DateTime)\r\nReturns True if the specified date falls within January.': 'XtraEditorsExpressionEditor.IsJanuary.Description',
             'DateDiffTick(startDate, endDate)\r\nReturns the number of tick boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffTick.Description',
             'layoutItemButton11': 'XtraEditorsExpressionEditor.>>layoutItemButton11.Name',
@@ -4738,11 +4928,518 @@ var DevExpress;
             '5': 'XtraEditorsExpressionEditor.>>labelControl3.ZOrder',
             'Min(Value1, Value2)\r\nReturns the minimum value from the specified values.': 'XtraEditorsExpressionEditor.Min.Description',
             '14': 'XtraEditorsExpressionEditor.>>layoutItemButton7.ZOrder',
-            'Condition Editor': 'XtraEditorsExpressionEditor.Condition.Text',
             'Cosh(Value)\r\nReturns the hyperbolic cosine of the angle defined in radians.': 'XtraEditorsExpressionEditor.Cosh.Description',
             'Performs logical negation on an expression.': 'XtraEditorsExpressionEditor.Not.Description',
             'GetYear(DateTime)\r\nExtracts a year from the defined DateTime.': 'XtraEditorsExpressionEditor.GetYear.Description',
             'DateDiffYear(startDate, endDate)\r\nReturns the number of year boundaries between two non-nullable dates.': 'XtraEditorsExpressionEditor.DateDiffYear.Description',
+            'Char index': 'StringId.FilterCriteriaToStringFunctionCharIndex',
+            'Is August': 'StringId.FilterCriteriaToStringFunctionIsAugust',
+            'Red Fill with Red Text': 'StringId.FormatPredefinedAppearanceRedFillRedText',
+            'Is same day': 'StringId.FilterCriteriaToStringFunctionIsSameDay',
+            'Beginning With': 'StringId.ManageRuleSpecificTextBeginningWith',
+            'Is September': 'StringId.FilterCriteriaToStringFunctionIsSeptember',
+            'Bitmap Files (*.bmp)|*.bmp|Graphics Interchange Format (*.gif)|*.gif|JPEG File Interchange Format (*.jpg;*.jpeg)|*.jpg;*.jpeg|Icon Files (*.ico)|*.ico|Portable Network Graphics Format (*.png)|*.png|Scalable Vector Graphics Format (*.svg)|*.svg|All Picture Files |*.bmp;*.gif;*.jpg;*.jpeg;*.ico;*.png;*.tif|All Files |*.*': 'StringId.PictureEditOpenFileFilter',
+            'Not Between': 'StringId.ManageRuleCellValueNotBetween',
+            'Containing': 'StringId.ManageRuleSpecificTextContaining',
+            'Yesterday': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeYesterday',
+            'Axis Color:': 'StringId.ManageRuleDataBarAxisColor',
+            '=': 'StringId.FilterCriteriaToStringBinaryOperatorEqual',
+            'Add Condition': 'StringId.FilterMenuConditionAdd',
+            '<enter a parameter name>': 'StringId.FilterEmptyParameter',
+            'Use this icon set to classify column \r\nvalues into the following ranges:': 'StringId.FormatRuleMenuItemIconSetDescription',
+            '-': 'StringId.FilterCriteriaToStringBinaryOperatorMinus',
+            'Format only top or bottom ranked values': 'StringId.NewEditFormattingRuleFormatOnlyTopOrBottomRankedValues',
+            'Format values that are:': 'StringId.ManageRuleAverageFormatValuesThatAre',
+            'Draw Axis': 'StringId.ManageRuleDataBarDrawAxis',
+            'Like': 'StringId.FilterCriteriaToStringBinaryOperatorLike',
+            '<': 'StringId.FilterCriteriaToStringBinaryOperatorLess',
+            '+': 'StringId.FilterCriteriaToStringBinaryOperatorPlus',
+            'for this column with': 'StringId.FormatRuleForThisColumnWith',
+            'True': 'StringId.DefaultBooleanTrue',
+            'Duplicate Values': 'StringId.FormatRuleMenuItemDuplicate',
+            'Blue Data Bar Gradient': 'StringId.DataBarBlueGradient',
+            'There is no data to represent in a range control.': 'StringId.ChartRangeControlClientNoData',
+            'Date diff tick': 'StringId.FilterCriteriaToStringFunctionDateDiffTick',
+            'Date diff year': 'StringId.FilterCriteriaToStringFunctionDateDiffYear',
+            'Date diff hour': 'StringId.FilterCriteriaToStringFunctionDateDiffHour',
+            'Get minute': 'StringId.FilterCriteriaToStringFunctionGetMinute',
+            'Use a formula to determine which cells to format': 'StringId.NewEditFormattingRuleUseAFormulaToDetermineWhichCellsToFormat',
+            'Exporting': 'StringId.ProgressExport',
+            '(Picture)': 'StringId.ImagePopupPicture',
+            'Value:': 'StringId.ManageRuleCommonValue',
+            'Color:': 'StringId.ManageRuleCommonColor',
+            'Ends with': 'StringId.FilterClauseEndsWith',
+            'This control does not support transparent background colors': 'StringId.TransparentBackColorNotSupported',
+            'Is October': 'StringId.FilterCriteriaToStringFunctionIsOctober',
+            'Yellow - Orange - Coral': 'StringId.ColorScaleYellowOrangeCoral',
+            'Saturation': 'StringId.ColorPickSaturationAxisName',
+            'Format values that rank in the:': 'StringId.ManageRuleRankedValuesFormatValuesThatRankInThe',
+            'Last month': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeLastMonth',
+            'Scroll Right': 'StringId.TabHeaderButtonNext',
+            'Scroll Down': 'StringId.TabHeaderButtonDown',
+            'Scroll Left': 'StringId.TabHeaderButtonPrev',
+            'This Week': 'StringId.ManageRuleDatesOccurringThisWeek',
+            'Green Text': 'StringId.FormatPredefinedAppearanceGreenText',
+            'Green Fill': 'StringId.FormatPredefinedAppearanceGreenFill',
+            'Invalid hexadecimal value': 'StringId.ColorPickColorHexValidationMsg',
+            'Next Month': 'StringId.ManageRuleDatesOccurringMonthAfter1',
+            'During the month in 2 months time': 'StringId.ManageRuleDatesOccurringMonthAfter2',
+            'Apply a color gradient to a range of\r\ncells in this column. The color indicates\r\nwhere each cell falls within that range.': 'StringId.FormatRuleMenuItemColorScaleDescription',
+            'Green - White - Red': 'StringId.ColorScaleGreenWhiteRed',
+            'Red component should be in range 0..255': 'StringId.ColorPickRedValidationMsg',
+            'Editing control': 'StringId.ContainerAccessibleEditName',
+            'Removes this condition': 'StringId.FilterToolTipNodeRemove',
+            'Is Null': 'StringId.FilterCriteriaToStringUnaryOperatorIsNull',
+            'Prior to the month 6 months ago': 'StringId.ManageRuleDatesOccurringEarlier',
+            'Desaturate:': 'StringId.CameraSettingsDesaturate',
+            'Fit Image': 'StringId.PictureEditMenuFitImage',
+            'Light Blue Data Bar': 'StringId.DataBarLightBlue',
+            'Format all:': 'StringId.ManageRuleUniqueOrDuplicateFormatAll',
+            'Add a colored data bar to represent\r\nthe value in a cell. The higher the\r\nvalue, the longer the bar.': 'StringId.FormatRuleMenuItemDataBarDescription',
+            'Preview:': 'StringId.PreviewPanelText',
+            'Clear Rules from All Columns': 'StringId.FormatRuleMenuItemClearAllRules',
+            'Is none of': 'StringId.FilterClauseNoneOf',
+            'Manage Rules...': 'StringId.FormatRuleMenuItemManageRules',
+            'Is null': 'StringId.FilterClauseIsNull',
+            'Radio Mode': 'StringId.FilterPopupToolbarRadioMode',
+            'Bar Appearance:': 'StringId.ManageRuleDataBarBarAppearance',
+            '4 Arrows (Colored)': 'StringId.IconSetTitleArrows4Colored',
+            'Is this year': 'StringId.FilterCriteriaToStringFunctionIsThisYear',
+            'Is this week': 'StringId.FilterCriteriaToStringFunctionIsThisWeek',
+            'Log10': 'StringId.FilterCriteriaToStringFunctionLog10',
+            'Lower': 'StringId.FilterCriteriaToStringFunctionLower',
+            'Is May': 'StringId.FilterCriteriaToStringFunctionIsMay',
+            'Active device:': 'StringId.CameraSettingsActiveDevice',
+            'Custom Condition': 'StringId.FormatRuleMenuItemCustomCondition',
+            'Greater Than Or Equal To': 'StringId.ManageRuleCellValueGreaterThanOrEqualTo',
+            'Is last week': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLastWeek',
+            'Ascii': 'StringId.FilterCriteriaToStringFunctionAscii',
+            'New Formatting Rule': 'StringId.NewFormattingRule',
+            'Floor': 'StringId.FilterCriteriaToStringFunctionFloor',
+            'Today': 'StringId.ManageRuleDatesOccurringToday',
+            'Upper': 'StringId.FilterCriteriaToStringFunctionUpper',
+            'To str': 'StringId.FilterCriteriaToStringFunctionToStr',
+            'To int': 'StringId.FilterCriteriaToStringFunctionToInt',
+            'Is last month': 'StringId.FilterCriteriaToStringFunctionIsLastMonth',
+            'Is today': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalToday',
+            'Triangles': 'StringId.IconSetTitlePositiveNegativeTriangles',
+            'Is not like': 'StringId.FilterClauseNotLike',
+            'Creating document': 'StringId.ProgressCreateDocument',
+            'Violet Data Bar Gradient': 'StringId.DataBarVioletGradient',
+            'Equals': 'StringId.FilterClauseEquals',
+            'Field List ({0})': 'StringId.FieldListName',
+            'Top 10 Items': 'StringId.FormatRuleMenuItemTop10Items',
+            'Exists': 'StringId.FilterAggregateExists',
+            'False': 'StringId.DefaultBooleanFalse',
+            'Is next week': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalNextWeek',
+            'Next month': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeNextMonth',
+            'Bold Text': 'StringId.FormatPredefinedAppearanceBoldText',
+            '(Use the Delete or Subtract key)': 'StringId.FilterToolTipKeysRemove',
+            'Reverse Icon Order': 'StringId.ManageRuleIconSetsReverseIconOrder',
+            'Graded Color Scale': 'StringId.ManageRuleColorScale',
+            'Midpoint': 'StringId.ManageRuleColorScaleMidpoint',
+            'Arrows (Gray)': 'StringId.IconSetTitlePositiveNegativeArrowsGray',
+            'Format cells that are LESS THAN': 'StringId.FormatRuleLessThanText',
+            'Fill:': 'StringId.ManageRuleDataBarFill',
+            'Not Equal To': 'StringId.ManageRuleCellValueNotEqualTo',
+            '<>': 'StringId.FilterCriteriaToStringBinaryOperatorNotEqual',
+            'Not And': 'StringId.FilterGroupNotAnd',
+            'Orange Data Bar Gradient': 'StringId.DataBarOrangeGradient',
+            'Loading data': 'StringId.ProgressLoadingData',
+            'Get year': 'StringId.FilterCriteriaToStringFunctionGetYear',
+            'Get hour': 'StringId.FilterCriteriaToStringFunctionGetHour',
+            'Get date': 'StringId.FilterCriteriaToStringFunctionGetDate',
+            'Bar Direction': 'StringId.ManageRuleDataBarBarDirection',
+            'Saturation component should be in range 0..100': 'StringId.ColorPickSaturationValidationMsg',
+            'Clear All': 'StringId.FilterMenuClearAll',
+            'Above': 'StringId.ManageRuleAverageAbove',
+            'Below': 'StringId.ManageRuleAverageBelow',
+            'Below Average': 'StringId.ManageRuleBelowAverage',
+            'Contrast:': 'StringId.CameraSettingsContrast',
+            'Format...': 'StringId.ManageRuleSimpleRuleBaseFormat',
+            'Is next month': 'StringId.FilterCriteriaToStringFunctionIsNextMonth',
+            '(Empty)': 'StringId.ImagePopupEmpty',
+            'This month': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeThisMonth',
+            'Solid Fill': 'StringId.ManageRuleDataBarSolidFill',
+            'Multi-Selection': 'StringId.FilterPopupToolbarMultiSelection',
+            'Theme Colors': 'StringId.ColorPickPopupThemeColorsGroupCaption',
+            'Search for a column...': 'StringId.SearchForColumn',
+            'Is earlier this week': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisWeek',
+            'Is earlier this year': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisYear',
+            'Standard Colors': 'StringId.ColorPickPopupStandardColorsGroupCaption',
+            'Is the year-to-date period': 'StringId.FilterCriteriaToStringFunctionIsYearToDate',
+            'Visual': 'StringId.FilterEditorTabVisual',
+            'Navigation Options': 'StringId.OfficeNavigationOptions',
+            'Record {0} of {1}': 'StringId.NavigatorTextStringFormat',
+            'Solid Border': 'StringId.ManageRuleDataBarSolidBorder',
+            'Apply': 'StringId.Apply',
+            'hours': 'StringId.Hours',
+            'Date and time operators': 'StringId.FilterDateTimeOperatorMenuCaption',
+            '3 Traffic Lights (Rimmed)': 'StringId.IconSetTitleTrafficLights3Rimmed',
+            'Hue component should be in range 0..359': 'StringId.ColorPickHueValidationMsg',
+            'Restore Layout': 'StringId.RestoreLayoutDialogTitle',
+            'Edit Rule...': 'StringId.ManageRuleEditRule',
+            'Coral Data Bar Gradient': 'StringId.DataBarCoralGradient',
+            'Brightness': 'StringId.ColorPickBrightnessAxisName',
+            'Take Picture': 'StringId.TakePictureDialogTitle',
+            'White - Red': 'StringId.ColorScaleWhiteRed',
+            'Date diff second': 'StringId.FilterCriteriaToStringFunctionDateDiffSecond',
+            'Font style': 'StringId.ManageRuleFormatCellsFontStyle',
+            'Arrows (Colored)': 'StringId.IconSetTitlePositiveNegativeArrows',
+            'Is earlier this month': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalEarlierThisMonth',
+            'Wrong picture format': 'StringId.PictureEditOpenFileError',
+            'Font color': 'StringId.ManageRuleFormatCellsFontColor',
+            'Remove Group': 'StringId.FilterMenuRowRemove',
+            '% of column values': 'StringId.ManageRuleRankedValuesOfTheColumnsCellValues',
+            'Format only values that are above or below average': 'StringId.NewEditFormattingRuleFormatOnlyValuesThatAreAboveOrBelowAverage',
+            'Format only cells with:': 'StringId.ManageRuleThatContainFormatOnlyCellsWith',
+            'Light Blue Data Bar Gradient': 'StringId.DataBarLightBlueGradient',
+            'value is': 'StringId.ManageRuleIconSetsValueIs',
+            'This year, beyond this month': 'StringId.ManageRuleDatesOccurringLaterThisYear',
+            'This week, beyond tomorrow': 'StringId.ManageRuleDatesOccurringLaterThisWeek',
+            'Between': 'StringId.FilterCriteriaToStringBetween',
+            'Format cells that are DUPLICATE VALUES': 'StringId.FormatRuleDuplicateText',
+            'Is April': 'StringId.FilterCriteriaToStringFunctionIsApril',
+            'Is March': 'StringId.FilterCriteriaToStringFunctionIsMarch',
+            'Ignore': 'StringId.XtraMessageBoxIgnoreButtonText',
+            'Is tomorrow': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalTomorrow',
+            'Cell Value': 'StringId.ManageRuleThatContainCellValue',
+            'One year ago': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeYearBeforeToday',
+            'Format cells that rank in the BOTTOM': 'StringId.FormatRuleBottomText',
+            'Ceiling': 'StringId.FilterCriteriaToStringFunctionCeiling',
+            'Green Fill with Green Text': 'StringId.FormatPredefinedAppearanceGreenFillGreenText',
+            'Equal to or Above Average': 'StringId.ManageRuleEqualOrAboveAverage',
+            'with': 'StringId.FormatRuleWith',
+            'White - Azure': 'StringId.ColorScaleWhiteAzure',
+            'Format cells that are BETWEEN': 'StringId.FormatRuleBetweenText',
+            'White - Green': 'StringId.ColorScaleWhiteGreen',
+            'Avg': 'StringId.FilterAggregateAvg',
+            'Try Again': 'StringId.TakePictureDialogTryAgain',
+            'Get millisecond': 'StringId.FilterCriteriaToStringFunctionGetMilliSecond',
+            'XML files (*.xml)|*.xml': 'StringId.SaveLayoutDialogFileFilter',
+            'Starts with': 'StringId.FilterCriteriaToStringFunctionStartsWith',
+            'Equal Or Above': 'StringId.ManageRuleAverageEqualOrAbove',
+            'Equal Or Below': 'StringId.ManageRuleAverageEqualOrBelow',
+            'Is like': 'StringId.FilterClauseLike',
+            '*': 'StringId.FilterCriteriaToStringBinaryOperatorMultiply',
+            'Unpin': 'StringId.TabHeaderButtonUnpin',
+            '4 Ratings': 'StringId.IconSetTitleRatings4',
+            '5 Ratings': 'StringId.IconSetTitleRatings5',
+            'millisecs': 'StringId.Millisecs',
+            'Unique/Duplicate Rules': 'StringId.FormatRuleMenuItemUniqueDuplicateRules',
+            'the average of column values': 'StringId.ManageRuleAverageTheAverageForTheSelectedRange',
+            'Add Group': 'StringId.FilterMenuGroupAdd',
+            'Predefined Appearance': 'StringId.ManageRuleFormatCellsPredefinedAppearance',
+            'Date diff month': 'StringId.FilterCriteriaToStringFunctionDateDiffMonth',
+            'Apply to the row': 'StringId.ManageRuleGridCaptionApplyToTheRow',
+            'No webcam found. Check the webcam connection or the device settings.': 'StringId.CameraDeviceNotFound',
+            'Show New Field Values': 'StringId.FilterPopupToolbarShowNewValues',
+            'Format cells that rank in the TOP': 'StringId.FormatRuleTopText',
+            'XML files (*.xml)|*.xml|All files|*.*': 'StringId.RestoreLayoutDialogFileFilter',
+            'Format cells that contain a date matching these conditions': 'StringId.FormatRuleDateOccurring',
+            'Replace': 'StringId.FilterCriteriaToStringFunctionReplace',
+            'Get month': 'StringId.FilterCriteriaToStringFunctionGetMonth',
+            'Red Bold Text': 'StringId.FormatPredefinedAppearanceRedBoldText',
+            'Gradient Fill': 'StringId.ManageRuleDataBarGradientFill',
+            'Acos': 'StringId.FilterCriteriaToStringFunctionAcos',
+            'Atn2': 'StringId.FilterCriteriaToStringFunctionAtn2',
+            'Asin': 'StringId.FilterCriteriaToStringFunctionAsin',
+            'Cosh': 'StringId.FilterCriteriaToStringFunctionCosh',
+            'Trim': 'StringId.FilterCriteriaToStringFunctionTrim',
+            'Tanh': 'StringId.FilterCriteriaToStringFunctionTanh',
+            'Sign': 'StringId.FilterCriteriaToStringFunctionSign',
+            'Sinh': 'StringId.FilterCriteriaToStringFunctionSinh',
+            'Tomorrow': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeTomorrow',
+            'Bitmap Files (*.bmp)|*.bmp|Graphics Interchange Format (*.gif)|*.gif|JPEG File Interchange Format (*.jpg)|*.jpg|Portable Network Graphics Format (*.png)|*.png|Scalable Vector Graphics Format (*.svg)|*.svg': 'StringId.PictureEditSaveFileFilter',
+            'Prior to this year': 'StringId.ManageRuleDatesOccurringPriorThisYear',
+            'Is not blank': 'StringId.FilterClauseIsNotNullOrEmpty',
+            'Ending With': 'StringId.ManageRuleSpecificTextEndingWith',
+            'Save As': 'StringId.PictureEditSaveFileTitle',
+            'Cannot use the device, as it is already in use in another application.': 'StringId.CameraDeviceIsBusy',
+            'This Month': 'StringId.ManageRuleDatesOccurringThisMonth',
+            'Scroll Up': 'StringId.TabHeaderButtonUp',
+            'Does not contain': 'StringId.FilterClauseDoesNotContain',
+            'column values': 'StringId.ManageRuleUniqueOrDuplicateValuesInTheSelectedRange',
+            'Adds a new item to the list': 'StringId.FilterToolTipElementAdd',
+            'No image data': 'StringId.DataEmpty',
+            'Two weeks away': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeTwoWeeksAway',
+            'Strikeout Text': 'StringId.FormatPredefinedAppearanceStrikeoutText',
+            'Hue': 'StringId.ColorPickHueAxisName',
+            'Equal To': 'StringId.ManageRuleCellValueEqualTo',
+            'Data Bar': 'StringId.ManageRuleDataBar',
+            'Select a Rule Type:': 'StringId.NewEditFormattingRuleSelectARuleType',
+            'Abort': 'StringId.XtraMessageBoxAbortButtonText',
+            'Italic Text': 'StringId.FormatPredefinedAppearanceItalicText',
+            'More Colors...': 'StringId.ColorPickPopupMoreColorsItemCaption',
+            'Is beyond this year': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalBeyondThisYear',
+            'Add months': 'StringId.FilterCriteriaToStringFunctionAddMonths',
+            'Is February': 'StringId.FilterCriteriaToStringFunctionIsFebruary',
+            'Clear Rules from This Column': 'StringId.FormatRuleMenuItemClearColumnRules',
+            'Brightness:': 'StringId.CameraSettingsBrightness',
+            'and': 'StringId.FilterClauseBetweenAnd',
+            'Last': 'StringId.NavigatorLastButtonHint',
+            'This week': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeThisWeek',
+            'This year': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeThisYear',
+            'Date diff minute': 'StringId.FilterCriteriaToStringFunctionDateDiffMinute',
+            'To float': 'StringId.FilterCriteriaToStringFunctionToFloat',
+            'Yellow Fill with Yellow Text': 'StringId.FormatPredefinedAppearanceYellowFillYellowText',
+            'The interval  between grid lines is too small to be represented in the range control.': 'StringId.ChartRangeControlClientInvalidGrid',
+            'Capture': 'StringId.TakePictureDialogCapture',
+            'A Date Occurring': 'StringId.FormatRuleMenuItemDateOccurring',
+            'Blue Data Bar': 'StringId.DataBarBlue',
+            'Mint Data Bar': 'StringId.DataBarMint',
+            'Substring': 'StringId.FilterCriteriaToStringFunctionSubstring',
+            'Format Style:': 'StringId.ManageRuleComplexRuleBaseFormatStyle',
+            'Is this month': 'StringId.FilterCriteriaToStringFunctionIsThisMonth',
+            'Blue component should be in range 0..255': 'StringId.ColorPickBlueValidationMsg',
+            'Show rules for:': 'StringId.ManageRuleShowFormattingRules',
+            'Contains': 'StringId.FilterCriteriaToStringFunctionContains',
+            'Red Text': 'StringId.FormatPredefinedAppearanceRedText',
+            'Red Fill': 'StringId.FormatPredefinedAppearanceRedFill',
+            'Edit the Rule Description:': 'StringId.NewEditFormattingRuleEditTheRuleDescription',
+            'Bottom 10 %': 'StringId.FormatRuleMenuItemBottom10Percent',
+            'Top/Bottom Rules': 'StringId.FormatRuleMenuItemTopBottomRules',
+            'Format cells that match the following condition': 'StringId.FormatRuleCustomConditionText',
+            'New Rule...': 'StringId.ManageRuleNewRule',
+            'Show Only Available Items': 'StringId.FilterPopupToolbarShowOnlyAvailableItems',
+            'Day after tomorrow': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeDayAfterTomorrow',
+            '3 Triangles': 'StringId.IconSetTitleTriangles3',
+            'To double': 'StringId.FilterCriteriaToStringFunctionToDouble',
+            'Web-Safe': 'StringId.ColorTabWebSafeColors',
+            'Text that Contains': 'StringId.FormatRuleMenuItemTextThatContains',
+            'Calculation Error': 'StringId.CalcError',
+            'Strikethrough': 'StringId.ManageRuleFormatCellsStrikethrough',
+            'Two years away': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeTwoYearsAway',
+            'Incremental Search': 'StringId.FilterPopupToolbarIncrementalSearch',
+            '^': 'StringId.FilterCriteriaToStringBinaryOperatorBitwiseXor',
+            '3 Arrows (Colored)': 'StringId.IconSetTitleArrows3Colored',
+            'Errors': 'StringId.ManageRuleThatContainErrors',
+            'Search for a field...': 'StringId.SearchForField',
+            'Is January': 'StringId.FilterCriteriaToStringFunctionIsJanuary',
+            'Symbols': 'StringId.IconSetCategorySymbols',
+            'Blanks': 'StringId.ManageRuleThatContainBlanks',
+            'Len': 'StringId.FilterCriteriaToStringFunctionLen',
+            'Log': 'StringId.FilterCriteriaToStringFunctionLog',
+            'Iif': 'StringId.FilterCriteriaToStringFunctionIif',
+            'Now': 'StringId.FilterCriteriaToStringFunctionNow',
+            'Exp': 'StringId.FilterCriteriaToStringFunctionExp',
+            'Abs': 'StringId.FilterCriteriaToStringFunctionAbs',
+            'Atn': 'StringId.FilterCriteriaToStringFunctionAtn',
+            'Cos': 'StringId.FilterCriteriaToStringFunctionCos',
+            'Tan': 'StringId.FilterCriteriaToStringFunctionTan',
+            'Sqr': 'StringId.FilterCriteriaToStringFunctionSqr',
+            'Sin': 'StringId.FilterCriteriaToStringFunctionSin',
+            'Rnd': 'StringId.FilterCriteriaToStringFunctionRnd',
+            'Show all|Show Empty|Filter by a specific date:|Beyond|||Next week|Today|This week|This month|Earlier|{0:yyyy}, {0:MMMM}': 'StringId.FilterDateTextAlt',
+            'Icon Sets': 'StringId.ManageRuleIconSets',
+            'Effects:': 'StringId.ManageRuleFormatCellsEffects',
+            'sqrt': 'StringId.CalcButtonSqrt',
+            'Format only cells that contain': 'StringId.NewEditFormattingRuleFormatOnlyCellsThatContain',
+            'Add seconds': 'StringId.FilterCriteriaToStringFunctionAddSeconds',
+            'To decimal': 'StringId.FilterCriteriaToStringFunctionToDecimal',
+            'Add days': 'StringId.FilterCriteriaToStringFunctionAddDays',
+            'Is prior to this year': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalPriorThisYear',
+            'Format all cells based on their values': 'StringId.NewEditFormattingRuleFormatAllCellsBasedOnTheirValues',
+            'Raspberry Data Bar Gradient': 'StringId.DataBarRaspberryGradient',
+            'Edit Formatting Rule': 'StringId.EditFormattingRule',
+            '3 Traffic Lights (Unrimmed)': 'StringId.IconSetTitleTrafficLights3Unrimmed',
+            'Positive/Negative': 'StringId.IconSetCategoryPositiveNegative',
+            'The number must be between 1 and 32767.': 'StringId.IncorrectNumberCopies',
+            'End Edit': 'StringId.NavigatorEndEditButtonHint',
+            'Not valid array length.': 'StringId.NotValidArrayLength',
+            'Equal to or Below Average': 'StringId.ManageRuleEqualOrBelowAverage',
+            'Show Window List': 'StringId.TabHeaderSelectorButton',
+            'Violet Data Bar': 'StringId.DataBarViolet',
+            'Web': 'StringId.ColorTabWeb',
+            'Load': 'StringId.PictureEditMenuLoad',
+            'First': 'StringId.NavigatorFirstButtonHint',
+            '/': 'StringId.FilterCriteriaToStringBinaryOperatorDivide',
+            'Last year': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeLastYear',
+            'Last week': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeLastWeek',
+            'The entered value is incomplete.  Do you want to correct it?\r\n\t\r\n\t\r\n\tYes - return to the editor and correct the value.\r\n\tNo - leave the value as is.\r\n\tCancel - reset to the previous value.\r\n\t': 'StringId.MaskBoxValidateError',
+            'Dates Occurring': 'StringId.ManageRuleThatContainDatesOccurring',
+            'Rendering is disabled at design time.': 'StringId.CameraDesignTimeInfo',
+            'Is between': 'StringId.FilterClauseBetween',
+            '%': 'StringId.FilterCriteriaToStringBinaryOperatorModulo',
+            '<=': 'StringId.FilterCriteriaToStringBinaryOperatorLessOrEqual',
+            'Date and time constants': 'StringId.FilterDateTimeConstantMenuCaption',
+            'Unknown picture format': 'StringId.UnknownPictureFormat',
+            'Above Average': 'StringId.ManageRuleAboveAverage',
+            'Less Than Or Equal To': 'StringId.ManageRuleCellValueLessThanOrEqualTo',
+            'Is later this year': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisYear',
+            'Is later this week': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisWeek',
+            'Is blank': 'StringId.FilterClauseIsNullOrEmpty',
+            'Take Picture from Camera': 'StringId.TakePictureMenuItem',
+            'Next week': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeNextWeek',
+            'Next year': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeNextYear',
+            'Is next year': 'StringId.FilterCriteriaToStringFunctionIsNextYear',
+            '5 Arrows (Gray)': 'StringId.IconSetTitleArrows5Gray',
+            '3 Arrows (Gray)': 'StringId.IconSetTitleArrows3Gray',
+            '4 Arrows (Gray)': 'StringId.IconSetTitleArrows4Gray',
+            'Is not between': 'StringId.FilterClauseNotBetween',
+            'Is November': 'StringId.FilterCriteriaToStringFunctionIsNovember',
+            '<enter a value>': 'StringId.FilterEmptyEnter',
+            '<empty>': 'StringId.FilterEmptyValue',
+            'Format Cells': 'StringId.ManageRuleFormatCellsCaption',
+            'Duplicate': 'StringId.ManageRuleUniqueOrDuplicateDuplicate',
+            'Pad left': 'StringId.FilterCriteriaToStringFunctionPadLeft',
+            'Retry': 'StringId.XtraMessageBoxRetryButtonText',
+            'This month, beyond next week': 'StringId.ManageRuleDatesOccurringLaterThisMonth',
+            'Following the month in 2 months time': 'StringId.ManageRuleDatesOccurringBeyond',
+            '(Use the Insert or Add key)': 'StringId.FilterToolTipKeysAdd',
+            'Pin': 'StringId.TabHeaderButtonPin',
+            'Format cells that are EQUAL TO': 'StringId.FormatRuleEqualToText',
+            'Yellow Data Bar': 'StringId.DataBarYellow',
+            'Directional': 'StringId.IconSetCategoryDirectional',
+            '[EditValue is null]': 'StringId.LookUpEditValueIsNull',
+            'Green component should be in range 0..255': 'StringId.ColorPickGreenValidationMsg',
+            'Display each icon according to these rules:': 'StringId.ManageRuleIconSetsDisplayEachIconAccordingToTheseRules',
+            'Save Layout': 'StringId.SaveLayoutDialogTitle',
+            'Top 10 %': 'StringId.FormatRuleMenuItemTop10Percent',
+            'C': 'StringId.CalcButtonC',
+            'Resolution:': 'StringId.CameraSettingsResolution',
+            'Blue - White - Red': 'StringId.ColorScaleBlueWhiteRed',
+            'Not Or': 'StringId.FilterGroupNotOr',
+            'Context': 'StringId.ManageRuleDataBarContext',
+            '~': 'StringId.FilterCriteriaToStringUnaryOperatorBitwiseNot',
+            '3 Symbols (Uncircled)': 'StringId.IconSetTitleSymbols3Uncircled',
+            'Invalid LookUpEdit EditValue type.': 'StringId.LookUpInvalidEditValueType',
+            'Format values where this formula is true:': 'StringId.ManageRuleFormulaFormatValuesWhereThisFormulaIsTrue',
+            'Delete Rule': 'StringId.ManageRuleDeleteRule',
+            'Append': 'StringId.NavigatorAppendButtonHint',
+            'Last Month': 'StringId.ManageRuleDatesOccurringMonthAgo1',
+            'During the month 2 months ago': 'StringId.ManageRuleDatesOccurringMonthAgo2',
+            'During the month 3 months ago': 'StringId.ManageRuleDatesOccurringMonthAgo3',
+            'During the month 4 months ago': 'StringId.ManageRuleDatesOccurringMonthAgo4',
+            'During the month 5 months ago': 'StringId.ManageRuleDatesOccurringMonthAgo5',
+            'During the month 6 months ago': 'StringId.ManageRuleDatesOccurringMonthAgo6',
+            'Get day of year': 'StringId.FilterCriteriaToStringFunctionGetDayOfYear',
+            'Get day of week': 'StringId.FilterCriteriaToStringFunctionGetDayOfWeek',
+            'The specified expression is invalid. {0}': 'StringId.FilterCriteriaInvalidExpressionEx',
+            'Add Parameter...': 'StringId.FilterMenuAddNewParameter',
+            'Emerald - Azure - Blue': 'StringId.ColorScaleEmeraldAzureBlue',
+            'M+': 'StringId.CalcButtonMx',
+            'MC': 'StringId.CalcButtonMC',
+            'MS': 'StringId.CalcButtonMS',
+            'MR': 'StringId.CalcButtonMR',
+            'CE': 'StringId.CalcButtonCE',
+            'Custom non deterministic': 'StringId.FilterCriteriaToStringFunctionCustomNonDeterministic',
+            'secs': 'StringId.Secs',
+            'days': 'StringId.Days',
+            'mins': 'StringId.Mins',
+            'Cancel Edit': 'StringId.NavigatorCancelEditButtonHint',
+            'Conditional Formatting Rules Manager': 'StringId.ManageRuleCaption',
+            'Compare with a value / another field\'s value': 'StringId.FilterToolTipValueType',
+            'IsNull': 'StringId.FilterCriteriaToStringFunctionIsNull',
+            'Is June': 'StringId.FilterCriteriaToStringFunctionIsJune',
+            'Is July': 'StringId.FilterCriteriaToStringFunctionIsJuly',
+            '{0}%': 'StringId.PictureEditMenuZoomToolTip',
+            'Ratings': 'StringId.IconSetCategoryRatings',
+            'Use Negative Bar': 'StringId.ManageRuleDataBarUseNegativeBar',
+            'No Format Set': 'StringId.ManageRuleNoFormatSet',
+            '|': 'StringId.FilterCriteriaToStringBinaryOperatorBitwiseOr',
+            'Two months away': 'StringId.FilterCriteriaToStringFunctionLocalDateTimeTwoMonthsAway',
+            'Coral Data Bar': 'StringId.DataBarCoral',
+            'Is December': 'StringId.FilterCriteriaToStringFunctionIsDecember',
+            'Mint Data Bar Gradient': 'StringId.DataBarMintGradient',
+            'Green Data Bar': 'StringId.DataBarGreen',
+            'Background Color:': 'StringId.ManageRuleFormatCellsBackgroundColor',
+            'Does not equal': 'StringId.FilterClauseDoesNotEqual',
+            'Add milliseconds': 'StringId.FilterCriteriaToStringFunctionAddMilliSeconds',
+            '>': 'StringId.FilterCriteriaToStringBinaryOperatorGreater',
+            '3 Signs': 'StringId.IconSetTitleSigns3',
+            'Following this year': 'StringId.ManageRuleDatesOccurringBeyondThisYear',
+            'Open error': 'StringId.PictureEditOpenFileErrorCaption',
+            'Is null or empty': 'StringId.FilterCriteriaToStringFunctionIsNullOrEmpty',
+            'Color Scales': 'StringId.FormatRuleMenuItemColorScales',
+            'Recent Colors': 'StringId.ColorPickPopupRecentColorsGroupCaption',
+            '3 Stars': 'StringId.IconSetTitleStars3',
+            'Purple - White - Azure': 'StringId.ColorScalePurpleWhiteAzure',
+            'Formula': 'StringId.ManageRuleFormula',
+            'Adds a new condition to this group': 'StringId.FilterToolTipNodeAdd',
+            'Unique': 'StringId.ManageRuleUniqueOrDuplicateUnique',
+            'Green - Yellow - Red': 'StringId.ColorScaleGreenYellowRed',
+            'Format cells that are GREATER THAN': 'StringId.FormatRuleGreaterThanText',
+            'Could not copy image': 'StringId.PictureEditCopyImageError',
+            'Luminance': 'StringId.ColorPickLuminanceAxisName',
+            'Cancel pending': 'StringId.ProgressCancelPending',
+            'Get time of day': 'StringId.FilterCriteriaToStringFunctionGetTimeOfDay',
+            'Date diff day': 'StringId.FilterCriteriaToStringFunctionDateDiffDay',
+            'Last Week': 'StringId.ManageRuleDatesOccurringLastWeek',
+            'when': 'StringId.ManageRuleIconSetsWhen',
+            'Is last year': 'StringId.FilterCriteriaToStringFunctionIsLastYear',
+            'Add minutes': 'StringId.FilterCriteriaToStringFunctionAddMinutes',
+            'Next Week': 'StringId.ManageRuleDatesOccurringNextWeek',
+            'No Errors': 'StringId.ManageRuleThatContainNoErrors',
+            'Highlight Cell Rules': 'StringId.FormatRuleMenuItemHighlightCellRules',
+            '3 Symbols (Circled)': 'StringId.IconSetTitleSymbols3Circled',
+            'Not': 'StringId.FilterCriteriaToStringUnaryOperatorNot',
+            'Opacity': 'StringId.ColorPickOpacityAxisName',
+            'Date diff millisecond': 'StringId.FilterCriteriaToStringFunctionDateDiffMilliSecond',
+            'Red To Black': 'StringId.IconSetTitleRedToBlack',
+            'No Border': 'StringId.ManageRuleDataBarNoBorder',
+            'Not Like': 'StringId.FilterCriteriaToStringNotLike',
+            'Format cells that are ABOVE AVERAGE': 'StringId.FormatRuleAboveAverageText',
+            'Opacity component should be in range 0..255': 'StringId.ColorPickOpacityValidationMsg',
+            'Camera Settings': 'StringId.CameraSettingsCaption',
+            '4 Traffic Lights': 'StringId.IconSetTitleTrafficLights4',
+            'Begins with': 'StringId.FilterClauseBeginsWith',
+            'System': 'StringId.ColorTabSystem',
+            'Get day': 'StringId.FilterCriteriaToStringFunctionGetDay',
+            'Border:': 'StringId.ManageRuleDataBarBorder',
+            'Is later this month': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalLaterThisMonth',
+            'Data Bars': 'StringId.FormatRuleMenuItemDataBars',
+            'Add time span': 'StringId.FilterCriteriaToStringFunctionAddTimeSpan',
+            '5 Boxes': 'StringId.IconSetTitleBoxes5',
+            'Concat': 'StringId.FilterCriteriaToStringFunctionConcat',
+            'Show all|Show Empty|Filter by a specific date:|Beyond this year|Later this year|Later this month|Next week|Later this week|Tomorrow|Today|Yesterday|Earlier this week|Last week|Earlier this month|Earlier this year|Prior to this year': 'StringId.FilterOutlookDateText',
+            '<enter an expression>': 'StringId.FormatRuleExpressionEmptyEnter',
+            'Not Containing': 'StringId.ManageRuleSpecificTextNotContaining',
+            'Raspberry Data Bar': 'StringId.DataBarRaspberry',
+            'Is yesterday': 'StringId.FilterCriteriaToStringFunctionIsOutlookIntervalYesterday',
+            'Big mul': 'StringId.FilterCriteriaToStringFunctionBigMul',
+            '5 Quarters': 'StringId.IconSetTitleQuarters5',
+            'Orange Data Bar': 'StringId.DataBarOrange',
+            'Yellow Data Bar Gradient': 'StringId.DataBarYellowGradient',
+            'Brightness component should be in range 0..100': 'StringId.ColorPickBrightValidationMsg',
+            'Clear Rules': 'StringId.FormatRuleMenuItemClearRules',
+            'Green Data Bar Gradient': 'StringId.DataBarGreenGradient',
+            'Type:': 'StringId.ManageRuleCommonType',
+            'Format cells that are UNIQUE VALUES': 'StringId.FormatRuleUniqueText',
+            'Is not null': 'StringId.FilterClauseIsNotNull',
+            '3 Flags': 'StringId.IconSetTitleFlags3',
+            'Unique Values': 'StringId.FormatRuleMenuItemUnique',
+            '3-Color Scale': 'StringId.ManageRuleColorScale3',
+            '2-Color Scale': 'StringId.ManageRuleColorScale2',
+            'Pad right': 'StringId.FilterCriteriaToStringFunctionPadRight',
+            'Green Bold Text': 'StringId.FormatPredefinedAppearanceGreenBoldText',
+            'No Blanks': 'StringId.ManageRuleThatContainNoBlanks',
+            'Format cells that contain the text': 'StringId.FormatRuleTextThatContainsText',
+            'Zoom to:': 'StringId.PictureEditMenuZoomTo',
+            'Apply formatting to an entire row': 'StringId.FormatRuleApplyFormatProperty',
+            'Invalid Value': 'StringId.InvalidValueText',
+            'Bottom 10 Items': 'StringId.FormatRuleMenuItemBottom10Items',
+            'Utc now': 'StringId.FilterCriteriaToStringFunctionUtcNow',
+            'Is any of': 'StringId.FilterClauseAnyOf',
+            '>=': 'StringId.FilterCriteriaToStringBinaryOperatorGreaterOrEqual',
+            'Get second': 'StringId.FilterCriteriaToStringFunctionGetSecond',
+            'To long': 'StringId.FilterCriteriaToStringFunctionToLong',
+            'This month, prior to previous week': 'StringId.ManageRuleDatesOccurringEarlierThisMonth',
+            'Reset to defaults': 'StringId.CameraSettingsDefaults',
+            '5 Arrows (Colored)': 'StringId.IconSetTitleArrows5Colored',
+            'Format cells that are BELOW AVERAGE': 'StringId.FormatRuleBelowAverageText',
+            'Full Size': 'StringId.PictureEditMenuFullSize',
+            'Yellow - Green': 'StringId.ColorScaleYellowGreen',
+            'Add hours': 'StringId.FilterCriteriaToStringFunctionAddHours',
+            'Format only unique or duplicate values': 'StringId.NewEditFormattingRuleFormatOnlyUniqueOrDuplicateValues',
+            'Specific Text': 'StringId.ManageRuleThatContainSpecificText',
+            'Icon Set': 'StringId.ManageRuleIconSet',
+            'Add years': 'StringId.FilterCriteriaToStringFunctionAddYears',
+            'Add ticks': 'StringId.FilterCriteriaToStringFunctionAddTicks',
+            'Rule': 'StringId.ManageRuleGridCaptionRule',
+            'Is Not Null': 'StringId.FilterCriteriaToStringIsNotNull',
+            'This week, prior to yesterday': 'StringId.ManageRuleDatesOccurringEarlierThisWeek',
+            'This year, prior to this month': 'StringId.ManageRuleDatesOccurringEarlierThisYear',
             'Export mode:': 'PreviewStringId.ExportOption_DocxExportMode',
             'Select Picture': 'PreviewStringId.WMForm_PictureDlg_Title',
             'Export the document to Image and attach it to the e-mail.': 'PreviewStringId.RibbonPreview_SendGraphic_STipContent',
@@ -4751,7 +5448,6 @@ var DevExpress;
             'CSV File': 'PreviewStringId.RibbonPreview_ExportCsv_Caption',
             'Fit to': 'PreviewStringId.ScalePopup_FitTo',
             'Export the document to MHT and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportMht_STipContent',
-            'Document': 'PreviewStringId.RibbonPreview_PageGroup_Document',
             'Export watermarks': 'PreviewStringId.ExportOption_DocxExportWatermarks',
             'Embed images in HTML': 'PreviewStringId.ExportOption_HtmlEmbedImagesInHTML',
             '[Date Printed]': 'PreviewStringId.PageInfo_PageDate',
@@ -4798,7 +5494,6 @@ var DevExpress;
             'File "{0}" is set to read-only, try again with a different file name.': 'PreviewStringId.Msg_FileReadOnly',
             'Quote strings with separators': 'PreviewStringId.ExportOption_TextQuoteStringsWithSeparators',
             'Only Lowercase Letters': 'PreviewStringId.EditingFieldEditors_OnlyLowercaseLetters',
-            'Save As': 'PreviewStringId.SaveDlg_Title',
             'Insert ghosted text or image behind the content of a page.\r\n\r\nThis is often used to indicate that a document is to be treated specially.': 'PreviewStringId.RibbonPreview_Watermark_STipContent',
             'Choose the paper size of the document.': 'PreviewStringId.RibbonPreview_PaperSize_STipContent',
             'Raw data mode': 'PreviewStringId.ExportOption_XlsRawDataMode',
@@ -4828,7 +5523,7 @@ var DevExpress;
             'Commenting, filling in form fields, and signing existing signature fields': 'PreviewStringId.ExportOption_PdfChangingPermissions_CommentingFillingSigning',
             'Close Print Preview': 'PreviewStringId.RibbonPreview_ClosePreview_STipTitle',
             'Export to DOCX': 'PreviewStringId.RibbonPreview_ExportDocx_STipTitle',
-            'Images quality:': 'PreviewStringId.ExportOption_PdfImageQuality',
+            'Image quality:': 'PreviewStringId.ExportOption_PdfImageQuality',
             'Page border width:': 'PreviewStringId.ExportOption_ImagePageBorderWidth',
             'Cannot perform the specified task. The following library is missing: "{0}"': 'PreviewStringId.Msg_CannotFindFile',
             'E-Mail As': 'PreviewStringId.RibbonPreview_SendFile_Caption',
@@ -4838,7 +5533,7 @@ var DevExpress;
             'Open the Document Map, which allows you to navigate through a structural view of the document.': 'PreviewStringId.RibbonPreview_DocumentMap_STipContent',
             'MHT File': 'PreviewStringId.RibbonPreview_SendMht_Caption',
             'mm': 'PreviewStringId.Margin_Millimeter',
-            'Digital Signature:': 'PreviewStringId.ExportOption_PdfSignatureOptions',
+            'Digital signature:': 'PreviewStringId.ExportOption_PdfSignatureOptions',
             'Select a folder to save the exported document to:': 'PreviewStringId.FolderBrowseDlg_ExportDirectory',
             'Title:': 'PreviewStringId.ExportOption_PdfDocumentTitle',
             '% of normal size': 'PreviewStringId.ScalePopup_NormalSize',
@@ -4871,7 +5566,7 @@ var DevExpress;
             'Please confirm the Document Open Password. Be sure to make a note of the password. It will be required to open the document.': 'PreviewStringId.ExportOption_ConfirmOpenPasswordForm_Note',
             'Document Open Password:': 'PreviewStringId.ExportOption_ConfirmOpenPasswordForm_Name',
             'Send the document directly to the default printer without making changes.': 'PreviewStringId.RibbonPreview_PrintDirect_STipContent',
-            'Password Security:': 'PreviewStringId.ExportOption_PdfPasswordSecurityOptions',
+            'Password security:': 'PreviewStringId.ExportOption_PdfPasswordSecurityOptions',
             'E-Mail As DOCX': 'PreviewStringId.RibbonPreview_SendDocx_STipTitle',
             'Switch the pages between portrait and landscape layouts.': 'PreviewStringId.RibbonPreview_PageOrientation_STipContent',
             'Export the document to RTF and save it to the file on a disk.': 'PreviewStringId.RibbonPreview_ExportRtf_STipContent',
@@ -4900,7 +5595,6 @@ var DevExpress;
             'The printer is out of memory.': 'PreviewStringId.PrinterStatus_OutOfMemory',
             'No Look-Up': 'PreviewStringId.ParameterLookUpSettingsNoLookUp',
             'Last  Page ': 'PreviewStringId.RibbonPreview_ShowLastPage_Caption',
-            'Fast': 'PreviewStringId.ExportOption_XpsCompression_Fast',
             'Open (Ctrl + O)': 'PreviewStringId.RibbonPreview_Open_STipTitle',
             'E-Mail As XLS': 'PreviewStringId.RibbonPreview_SendXls_STipTitle',
             'Navigate to the next page of the document.': 'PreviewStringId.RibbonPreview_ShowNextPage_STipContent',
@@ -4925,11 +5619,11 @@ var DevExpress;
             'Last Page (Ctrl+End)': 'PreviewStringId.RibbonPreview_ShowLastPage_STipTitle',
             'A page punt has occurred.': 'PreviewStringId.PrinterStatus_PagePunt',
             'The printer door is open.': 'PreviewStringId.PrinterStatus_DoorOpen',
-            '(Picture)': 'PreviewStringId.WatermarkTypePicture',
-            'PDF/A Compatibility:': 'PreviewStringId.ExportOption_PdfACompatibility',
+            'PDF/A compatibility:': 'PreviewStringId.ExportOption_PdfACompatibility',
             'Compression:': 'PreviewStringId.ExportOption_XpsCompression',
             'Statusbar': 'PreviewStringId.MenuItem_ViewStatusbar',
             'The printer is busy.': 'PreviewStringId.PrinterStatus_Busy',
+            'Convert images to JPEG': 'PreviewStringId.ExportOption_PdfConvertImagesToJpeg',
             'Waiting...': 'PreviewStringId.PrinterStatus_Waiting',
             'The output file is too big. Please try to reduce the image resolution,\r\nor choose another export mode.': 'PreviewStringId.Msg_BigBitmapToCreate',
             'Permissions Password:': 'PreviewStringId.ExportOption_ConfirmPermissionsPasswordForm_Name',
@@ -4973,6 +5667,7 @@ var DevExpress;
             'Initializing the Preview...': 'PreviewStringId.PrinterStatus_Initializing',
             'RTF File': 'PreviewStringId.RibbonPreview_ExportRtf_Caption',
             'Pages': 'PreviewStringId.MPForm_Lbl_Pages',
+            'The "{0}" cannot be used since this could be an unsupported OpenType font.': 'PreviewStringId.Msg_NotSupportedFontException',
             'Date-Time': 'PreviewStringId.EditingFieldEditorCategories_DateTime',
             'The server is unknown.': 'PreviewStringId.PrinterStatus_ServerUnknown',
             'View Many Pages': 'PreviewStringId.RibbonPreview_MultiplePages_STipTitle',
@@ -5003,6 +5698,7 @@ var DevExpress;
             'Invalid property name': 'PreviewStringId.Msg_InvPropName',
             'Cannot find the specified path.': 'PreviewStringId.Msg_InvalidatePath',
             'Invoke the Hand tool to manually scroll through pages.': 'PreviewStringId.RibbonPreview_HandTool_STipContent',
+            'Export editing fields to AcroForms': 'PreviewStringId.ExportOption_PdfExportEditingFieldsToAcroForms',
             'Left Margin': 'PreviewStringId.Margin_LeftMargin',
             'Adjust to': 'PreviewStringId.ScalePopup_AdjustTo',
             'Export to CSV': 'PreviewStringId.RibbonPreview_ExportCsv_STipTitle',
@@ -5018,7 +5714,6 @@ var DevExpress;
             'Zoom in to get a close-up view of the document.': 'PreviewStringId.RibbonPreview_ZoomIn_STipContent',
             'The printer driver needs to be updated.': 'PreviewStringId.PrinterStatus_DriverUpdateNeeded',
             'A paper-related problem has occurred.': 'PreviewStringId.PrinterStatus_PaperProblem',
-            'Apply': 'PreviewStringId.Button_Apply',
             'Choose the page layout to arrange the document pages in preview.': 'PreviewStringId.RibbonPreview_MultiplePages_STipContent',
             'This is not a valid measurement.': 'PreviewStringId.Msg_InvalidMeasurement',
             'Middle': 'PreviewStringId.WMForm_VertAlign_Middle',
@@ -5048,6 +5743,7 @@ var DevExpress;
             'Warning!': 'PreviewStringId.Msg_CustomDrawWarning',
             'The created XLSX file is too big for the XLSX format, because it contains more than 16,384 columns.\r\nPlease try to reduce the amount of columns in your report and export the report to XLSX again.': 'PreviewStringId.Msg_XlsxMoreThanMaxColumns',
             'Stretch or shrink the printed output to a percentage of its actual size.': 'PreviewStringId.RibbonPreview_Scale_STipContent',
+            'Keep row height': 'PreviewStringId.ExportOption_DocxKeepRowHeight',
             'Export To...': 'PreviewStringId.RibbonPreview_ExportFile_STipTitle',
             'Remove carriage returns': 'PreviewStringId.ExportOption_HtmlRemoveSecondarySymbols',
             'The printer has no toner.': 'PreviewStringId.PrinterStatus_NoToner',
@@ -5062,25 +5758,32 @@ var DevExpress;
             'Choose a color for the background of the document pages.': 'PreviewStringId.RibbonPreview_FillBackground_STipContent',
             'Custom Margins...': 'PreviewStringId.RibbonPreview_PageSetup_Caption',
             'The font size cannot be set to zero or a negative number': 'PreviewStringId.Msg_FontInvalidNumber',
+            '(Using System Separator)': 'PreviewStringId.ExportOption_CsvSeparator_UsingSystem',
             'Author:': 'PreviewStringId.ExportOption_PdfDocumentAuthor',
             'Show data labels rotated at 225 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_225DegreesDescription',
+            'Animation Mode': 'ChartDesignerStringIDs.OptionsChart_AnimationMode',
             'Add Annotation': 'ChartDesignerStringIDs.Default_Elements_AddAnnotation',
+            'Incorrect Value Format': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithDateTimeScaleBreakEdge2Caption',
             'Show the title on the right of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_RightDescription',
+            'Value Level 1': 'ChartDesignerStringIDs.OptionsIndicators_ValueLevel1',
+            'Value Level 2': 'ChartDesignerStringIDs.OptionsIndicators_ValueLevel2',
             'The entered value has an incorrect type. Must be DateTime': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithDateTimeStripMaxLimitMessage',
+            'New Range Control Options': 'ChartDesignerStringIDs.RangeControlOptions',
             'Show only the label for the second value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DValue2LabelPositionDescription',
             'Fade In': 'ChartDesignerStringIDs.Bar2DFadeInAnimation',
+            'New Bar View': 'ChartDesignerStringIDs.RangeControlClientBarView',
             'Scatter Radar Line 2D': 'ChartDesignerStringIDs.RadarLineScatterSeries2D',
             'Add Pane At Right': 'ChartDesignerStringIDs.Default_Elements_AddPaneHorizontal',
-            'Incorrect Value Format': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithNumericalStripMinLimitCaption',
             'Additional Panes': 'ChartDesignerStringIDs.TreeAdditionalPanelCollection',
+            'Font Family': 'ChartDesignerStringIDs.OptionsChart_FontFamily',
             '0 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_0DegreesCaption',
             'Show data labels outside bars.': 'ChartDesignerStringIDs.SeriesOptions_Labels_OutsideDescription',
             'Diagram Options': 'ChartDesignerStringIDs.Default_Main_Diagram3DOptionsGroup',
             'Open Value:': 'ChartDesignerStringIDs.SeriesOptions_OpenValueDataMember',
-            'There is no data to visualize. To see the chart, switch to the Chart ribbon tab and choose a desired series type from the Add New Series gallery.': 'ChartDesignerStringIDs.EmptyDiagramHint',
             'Show axis labels rotated at -90 degrees.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_RotatedMinus90Description',
             'Change Series View': 'ChartDesignerStringIDs.SeriesOptions_ChangeSeriesView',
             'Add String': 'ChartDesignerStringIDs.ColorizerKeyString',
+            'Flat Glass': 'ChartDesignerStringIDs.Bar2DModelFlatGlass',
             'The labels are organized into a straight column on the right of the funnel series points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelRightColumnPointDescription',
             '-90 Degrees': 'ChartDesignerStringIDs.AxisOptions_YLabelOrientation_RotatedMinus90Caption',
             'Show axis labels.': 'ChartDesignerStringIDs.AxisOptions_CircularYLabelOrientation_NormalDescription',
@@ -5090,8 +5793,10 @@ var DevExpress;
             'Add a constant line to the primary X-axis.': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineXDescription',
             'Thickness:': 'ChartDesignerStringIDs.Indicator_Thickness',
             'Slide From Top': 'ChartDesignerStringIDs.Stock2DSlideFromTopAnimation',
+            'ToolTip Hint': 'ChartDesignerStringIDs.DragDropDataMembers_ToolTipHint',
             'Area Series': 'ChartDesignerStringIDs.ChartViewGallery_Area',
             'Polar Range Area 2D': 'ChartDesignerStringIDs.PolarRangeAreaSeries2D',
+            'TITLE': 'ChartDesignerStringIDs.Options_Title',
             'Order legend items from left to right.': 'ChartDesignerStringIDs.LegendOptions_Orientation_HorizontalDescription',
             'Envelope Percent:': 'ChartDesignerStringIDs.Indicator_MovingAverageEnvelopePercent',
             'Scatter Line 2D': 'ChartDesignerStringIDs.LineScatterSeries2D',
@@ -5100,20 +5805,28 @@ var DevExpress;
             'Axes Elements': 'ChartDesignerStringIDs.Default_Elements_AxesElementsGroupTitle',
             'Show the axis on the left of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_LeftDescription',
             'Argument Axis:': 'ChartDesignerStringIDs.SeriesOptions_ArgumentAxis',
+            'Horizontal Position': 'ChartDesignerStringIDs.OptionsLegend_HorizontalPosition',
+            'New Line View': 'ChartDesignerStringIDs.RangeControlClientLineView',
             'Stacked Bar 2D': 'ChartDesignerStringIDs.BarStackedSeries2D',
             'Argument:': 'ChartDesignerStringIDs.Indicator_Argument1',
             'Right Below': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_FarBelowHorizontal',
             'Show axis labels rotated at -45 degrees.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_RotatedMinus45Description',
+            'Series Padding': 'ChartDesignerStringIDs.OptionsDiagram_SeriesPadding',
             'Full-Stacked Line 2D': 'ChartDesignerStringIDs.LineFullStackedSeries2D',
+            'Scale Break': 'ChartDesignerStringIDs.BarItemMenu_ScaleBreak',
             'Change Chart Type': 'ChartDesignerStringIDs.Default_Main_ChangeChartTypeGroupTitle',
             'Name:': 'ChartDesignerStringIDs.Font_Family',
+            'Marker 2 Visible': 'ChartDesignerStringIDs.OptionsSeries_Marker2Visible',
             'Max:': 'ChartDesignerStringIDs.AxisOptions_WholeRangeMaxValue',
             'Advanced': 'ChartDesignerStringIDs.Indicator_AdvancedGroupCaption',
+            'The Chart has no data to visualize. Click the Add button to expand the Add menu and select the way to provide data to visualize.': 'ChartDesignerStringIDs.EmptyDiagramHintBar',
             'Only the Envelope is shown.': 'ChartDesignerStringIDs.Indicators_MovingAverageKind_EnvelopeDescription',
+            'Min Marker Visible': 'ChartDesignerStringIDs.OptionsSeries_MinMarkerVisible',
             'Add a new pane below the current pane and stack them vertically.': 'ChartDesignerStringIDs.Default_Elements_AddPaneVerticalDescription',
             'Panes Orientation': 'ChartDesignerStringIDs.Default_Main_PaneOrientationButtonCaption',
             'Show axis labels rotated at 90 degrees.': 'ChartDesignerStringIDs.AxisOptions_YLabelOrientation_Rotated90Description',
             'New Date Time Options': 'ChartDesignerStringIDs.NewDateTimeOptions',
+            'Reverse Items': 'ChartDesignerStringIDs.OptionsLegend_ReverseItems',
             'Simple': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_SimpleIndicatorsGalleryGroup',
             'Constant Line': 'ChartDesignerStringIDs.DefaultConstantLineTitle',
             'Show axis labels rotated at 45 degrees.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_Rotated45Description',
@@ -5134,21 +5847,25 @@ var DevExpress;
             'Bubble 3D': 'ChartDesignerStringIDs.BubbleSeries3D',
             'Show the title in the center of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_CenterDescription',
             'Text:': 'ChartDesignerStringIDs.ConstantLine_TitleText',
-            'Value:': 'ChartDesignerStringIDs.SeriesOptions_ValueDataMember',
             'Show data labels in the center of funnel points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelCenterPointDescription',
             '3D Simple Diagram': 'ChartDesignerStringIDs.TreeDiagramSimpleDiagram3D',
             'Slide From Right': 'ChartDesignerStringIDs.Stock2DSlideFromRightAnimation',
             'Pattern Editor': 'ChartDesignerStringIDs.PatternEditor_WindowTitle',
+            'Mirror Height': 'ChartDesignerStringIDs.OptionsPane_MirrorHeight',
             '270 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_270DegreesCaption',
             'Oscillator Indicators': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_OscillatorsGalleryGroup',
+            'WHOLE RANGE': 'ChartDesignerStringIDs.OptionsAxis_WholeRange',
             'Perspective Angle:': 'ChartDesignerStringIDs.Default_Main_Diagram3DPerspectiveAngle',
+            'Max Marker Size': 'ChartDesignerStringIDs.OptionsSeries_MaxMarkerSize',
             'Show one label in the center of the range bar with both minimum and maximum values.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarOneLabelPositionDescription',
             'Show the title on the top of an axis.': 'ChartDesignerStringIDs.AxisOptions_YTitlePosition_TopDescription',
             'DataSource Based Error Bars': 'ChartDesignerStringIDs.DataSourceBasedErrorBars',
             'New Time Interval': 'ChartDesignerStringIDs.NewTimeInterval',
             'Slide From Right Center': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromRightCenter',
+            'Series Elements': 'ChartDesignerStringIDs.BarItemMenu_SeriesElements',
             'Candle Stick 2D': 'ChartDesignerStringIDs.CandleStickSeries2D',
             'Spline 2D': 'ChartDesignerStringIDs.SplineSeries2D',
+            'Content': 'ChartDesignerStringIDs.OptionsAnnotation_Content',
             'Right Above': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_FarAboveHorizontal',
             'High Value:': 'ChartDesignerStringIDs.SeriesOptions_HighValueDataMember',
             'Trend Indicators': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_TrendIndicatorsGalleryGroup',
@@ -5157,25 +5874,35 @@ var DevExpress;
             'Full-Stacked Step Area 2D': 'ChartDesignerStringIDs.AreaStepFullStackedSeries2D',
             'Show the axis at the bottom of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_BottomDescription',
             'Text On Axis:': 'ChartDesignerStringIDs.Strip_AxisLabelText',
+            'Edge 2:': 'ChartDesignerStringIDs.ScaleBreak_Edge2',
+            'Edge 1:': 'ChartDesignerStringIDs.ScaleBreak_Edge1',
+            'Min Marker Size': 'ChartDesignerStringIDs.OptionsSeries_MinMarkerSize',
             'Slide From Left Top Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromLeftTopCorner',
             'New Tool Tip Mouse Position': 'ChartDesignerStringIDs.NewToolTipMousePosition',
+            'Grid Lines Minor Visible': 'ChartDesignerStringIDs.OptionsAxis_GridLinesMinorVisible',
             'Template': 'ChartDesignerStringIDs.SeriesTemplate',
+            'Domain Border Brush': 'ChartDesignerStringIDs.OptionsPane_DomainBorderBrush',
             '90 Degrees': 'ChartDesignerStringIDs.AxisOptions_YLabelOrientation_Rotated90Caption',
+            'There is no data to visualize. To see the chart, switch to the Chart ribbon tab and choose a desired series type from the Add New Series gallery.': 'ChartDesignerStringIDs.EmptyDiagramHintRibbon',
             'Zoom  Scroll': 'ChartDesignerStringIDs.Default_Main_NavigationHeader',
+            'Brush': 'ChartDesignerStringIDs.OptionsStrip_Brush',
             'Save and Exit': 'ChartDesignerStringIDs.SaveAndExitButtonCaption',
             'Value2': 'ChartDesignerStringIDs.ValueLevel_Value2',
             'Show Labels': 'ChartDesignerStringIDs.AxisOptions_CircularYLabelOrientation_NormalCaption',
             'Format:': 'ChartDesignerStringIDs.AxisOptions_DateTimeFormat',
             'New Reduction Stock Options': 'ChartDesignerStringIDs.NewReductionStockOptions',
+            'Vertical Position': 'ChartDesignerStringIDs.OptionsLegend_VerticalPosition',
             'New Tool Tip Options': 'ChartDesignerStringIDs.NewToolTipOptions',
             'Show the title below the line on the left.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_NearBelowHorizontal',
             'New Indicator Label': 'ChartDesignerStringIDs.NewIndicatorLabel',
             'Nested Donut 2D': 'ChartDesignerStringIDs.NestedDonutSeries2D',
             'Show Axis': 'ChartDesignerStringIDs.AxisOptions_AxisKind_CircularAxisYVisibleCaption',
             'Show data labels rotated at 45 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_45DegreesDescription',
+            'Candle Width': 'ChartDesignerStringIDs.OptionsSeries_CandleWidth',
             'Close Value:': 'ChartDesignerStringIDs.SeriesOptions_CloseValueDataMember',
             'Moving Average nd Envelope': 'ChartDesignerStringIDs.Indicators_MovingAverageKind_MovingAverageAndEnvelope',
             'Show only the label for the minimum value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DMinValueLabelPositionDescription',
+            'Show Level 0': 'ChartDesignerStringIDs.OptionsIndicators_ShowLevel0',
             'New Numeric Options': 'ChartDesignerStringIDs.NewNumericOptions',
             'Show data labels rotated at 135 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_135DegreesDescription',
             'Kind: ': 'ChartDesignerStringIDs.Indicator_MovingAverageKind',
@@ -5185,6 +5912,7 @@ var DevExpress;
             'Add Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddSecondaryAxisY',
             'Add Axis X': 'ChartDesignerStringIDs.Default_Elements_AddSecondaryAxisX',
             'Legend #': 'ChartDesignerStringIDs.TreeLegend',
+            'The entered value has an incorrect type. Must be Numerical': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithNumericalScaleBreakEdge1Message',
             '180 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_180DegreesCaption',
             'Show data labels on the right of funnel points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelRightPointDescription',
             'Constant Line Options': 'ChartDesignerStringIDs.ConstantLineCategoryTitle',
@@ -5192,11 +5920,13 @@ var DevExpress;
             'Left Below': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_NearBelowHorizontal',
             'Point Distance:': 'ChartDesignerStringIDs.SeriesOptions_FunnelPointDistance',
             'Grid Alignment:': 'ChartDesignerStringIDs.AxisOptions_DateTimeGridAlignment',
-            'Reverse Items': 'ChartDesignerStringIDs.LegendOptions_ReverseItems',
+            'Drag data members to the corresponding cell to define chart data.': 'ChartDesignerStringIDs.DragDataMembers',
             'Slide From Left': 'ChartDesignerStringIDs.Bar2DSlideFromLeftAnimation',
             'New Fibonacci Retracement': 'ChartDesignerStringIDs.NewFibonacciRetracement',
             'Show data labels outside pie slices.': 'ChartDesignerStringIDs.SeriesOptions_Labels_OutsideSlicesDescription',
             'New Workdays Options': 'ChartDesignerStringIDs.NewWorkdaysOptions',
+            'Glass Cylinder': 'ChartDesignerStringIDs.Bar2DModelGlassCylinder',
+            'Enable Axis X Navigation': 'ChartDesignerStringIDs.OptionsDiagram_EnableAxisXNavigation',
             'Secondary Axis X #': 'ChartDesignerStringIDs.SecondaryAxisXPrefix',
             'Dollar': 'ChartDesignerStringIDs.Marker2DModelDollar',
             'Height / Width:': 'ChartDesignerStringIDs.SeriesOptions_FunnelRatio',
@@ -5204,6 +5934,7 @@ var DevExpress;
             'New Simple Moving Average': 'ChartDesignerStringIDs.NewSimpleMovingAverage',
             'Add a constant line to the primary Y-axis.': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineYDescription',
             'Add Legend': 'ChartDesignerStringIDs.Default_Elements_AddLegend',
+            'New Stacked Bar Total Label': 'ChartDesignerStringIDs.NewStackedBarTotalLabel',
             'Show the axis on the top of a diagram.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_TopDescription',
             'Shape Style': 'ChartDesignerStringIDs.Default_Main_CircularDiagramShapeStyle',
             'Slide From Bottom': 'ChartDesignerStringIDs.Bar2DSlideFromBottomAnimation',
@@ -5214,7 +5945,6 @@ var DevExpress;
             'Turn off the axis title.': 'ChartDesignerStringIDs.AxisOptions_TitlePosition_NoneDescription',
             'Polar Series': 'ChartDesignerStringIDs.ChartViewGallery_Polar',
             'Pane  Axis': 'ChartDesignerStringIDs.Indicator_SeparatePaneGroupCaption',
-            'Color:': 'ChartDesignerStringIDs.SeriesOptions_ColorDataMember',
             'Funnel Series': 'ChartDesignerStringIDs.ChartViewGallery_Funnel',
             'Radar Area 2D': 'ChartDesignerStringIDs.RadarAreaSeries2D',
             'Title Visibility': 'ChartDesignerStringIDs.AxisOptions_TitleVisibility',
@@ -5222,14 +5952,18 @@ var DevExpress;
             'Dimension:': 'ChartDesignerStringIDs.Default_Main_SimpleDiagramLayoutDimensionWithColon',
             'Pie/Doughnut': 'ChartDesignerStringIDs.SeriesOptions_PieDoughnutOptionsGroup',
             'Stock 2D': 'ChartDesignerStringIDs.StockSeries2D',
-            'The entered value has an incorrect type. Must be Numerical': 'ChartDesignerStringIDs.CommandMessages_IncompatibleWithNumericalStripMaxLimitMessage',
             'New Work Time Rule': 'ChartDesignerStringIDs.NewWorkTimeRule',
             'Funnel 2D': 'ChartDesignerStringIDs.FunnelSeries2D',
+            'Tickmarks Minor Visible': 'ChartDesignerStringIDs.OptionsAxis_TickmarksMinorVisible',
+            'Add Scale Break To Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddScaleBreakY',
+            'Add Scale Break To Axis X': 'ChartDesignerStringIDs.Default_Elements_AddScaleBreakX',
+            'Steel Column': 'ChartDesignerStringIDs.Bar2DModelSteelColumn',
             'Slide To Center': 'ChartDesignerStringIDs.CircularMarkerSlideToCenterAnimation',
+            'Quasi 3D': 'ChartDesignerStringIDs.Bar2DModelQuasi3D',
             'Show the Axis Y.': 'ChartDesignerStringIDs.AxisOptions_AxisKind_CircularAxisYVisibleDescription',
-            'Stacked Series 2D': 'ChartDesignerStringIDs.AreaStackedSeries2D',
+            'Stacked Area 2D': 'ChartDesignerStringIDs.AreaStackedSeries2D',
             'Stacked Area 3D': 'ChartDesignerStringIDs.AreaStackedSeries3D',
-            'Full-Stacked Series 2D': 'ChartDesignerStringIDs.AreaFullStackedSeries2D',
+            'Full-Stacked Area 2D': 'ChartDesignerStringIDs.AreaFullStackedSeries2D',
             'Full-Stacked Area 3D': 'ChartDesignerStringIDs.AreaFullStackedSeries3D',
             'Add Indicator': 'ChartDesignerStringIDs.SeriesOptions_AddIndicatorsGroupTitle',
             'Connector:': 'ChartDesignerStringIDs.SeriesOptions_ConnectorThickness',
@@ -5238,6 +5972,7 @@ var DevExpress;
             'Add a strip to the primary X-axis.': 'ChartDesignerStringIDs.Default_Elements_AddStripXDescription',
             'DateTime Options': 'ChartDesignerStringIDs.AxisOptions_DateTimeOptionsGroup',
             'Show data labels rotated at 270 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_270DegreesDescription',
+            'Extrapolate To Infinity': 'ChartDesignerStringIDs.OptionsIndicators_ExtrapolateToInfinity',
             'Range Series': 'ChartDesignerStringIDs.ChartViewGallery_RangeSeries',
             'New Weighted Moving Average': 'ChartDesignerStringIDs.NewWeightedMovingAverage',
             'Side-by-Side Bar 2D': 'ChartDesignerStringIDs.BarSideBySideSeries2D',
@@ -5262,11 +5997,13 @@ var DevExpress;
             'Triple Exponential Moving Average (TriX)': 'ChartDesignerStringIDs.TripleExponentialMovingAverageTrix',
             'Spline Area Stacked 2D': 'ChartDesignerStringIDs.SplineAreaStackedSeries2D',
             'Visible Range': 'ChartDesignerStringIDs.AxisOptions_VisibleRangeHeader',
+            'Line Tension': 'ChartDesignerStringIDs.OptionsSeries_LineTension',
             'Chart Area Elements': 'ChartDesignerStringIDs.Default_Elements_ChartAreaElementsGroupTitle',
             'Step Line 2D': 'ChartDesignerStringIDs.LineStepSeries2D',
             'Turn off the title.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_None',
             'Weight:': 'ChartDesignerStringIDs.SeriesOptions_WeightDataMember',
             'Add Pane Below': 'ChartDesignerStringIDs.Default_Elements_AddPaneVertical',
+            'Indicator': 'ChartDesignerStringIDs.BarItemMenu_Indicator',
             'Stretch From Near': 'ChartDesignerStringIDs.Area2DStretchFromNearAnimation',
             'Price Indicators': 'ChartDesignerStringIDs.Default_Elements_AddIndicator_PriceIndicatorsGalleryGroup',
             'Bar Series': 'ChartDesignerStringIDs.ChartViewGallery_BarSeries',
@@ -5278,11 +6015,14 @@ var DevExpress;
             'New Fibonacci Arcs': 'ChartDesignerStringIDs.NewFibonacciArcs',
             'New Fibonacci Fans': 'ChartDesignerStringIDs.NewFibonacciFans',
             'Slide From Left Center': 'ChartDesignerStringIDs.CircularMarkerSlideFromLeftCenterAnimation',
+            'Show Level 100': 'ChartDesignerStringIDs.OptionsIndicators_ShowLevel100',
             '135 Degrees': 'ChartDesignerStringIDs.SeriesOptions_Labels_135DegreesCaption',
             'The labels are organized into a straight column on the left of the funnel series points.': 'ChartDesignerStringIDs.SeriesOptions_Labels_FunnelLeftColumnPointDescription',
             'Drop From Far': 'ChartDesignerStringIDs.Area2DDropFromFarAnimation',
             'Show only the label for the maximum value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DMaxValueLabelPositionDescription',
+            'Transparent': 'ChartDesignerStringIDs.Bar2DModelTransparent',
             'Show data labels in the center of bars.': 'ChartDesignerStringIDs.SeriesOptions_Labels_StackedBarCenteredInBarDescription',
+            'Axis Elements': 'ChartDesignerStringIDs.BarItemMenu_AxisElements',
             'Point 3D': 'ChartDesignerStringIDs.PointSeries3D',
             'Point 2D': 'ChartDesignerStringIDs.PointSeries2D',
             'Unwrap Horizontally': 'ChartDesignerStringIDs.Line2DUnwrapHorizontallyAnimation',
@@ -5290,7 +6030,10 @@ var DevExpress;
             'New Axis': 'ChartDesignerStringIDs.NewAxis',
             'Show the title above the line on the right.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_FarAboveVertical',
             'ColorObjectColorizer': 'ChartDesignerStringIDs.ColorObjectColorizer',
+            'Marker 2 Size': 'ChartDesignerStringIDs.OptionsSeries_Marker2Size',
+            'Marker 1 Size': 'ChartDesignerStringIDs.OptionsSeries_Marker1Size',
             'New Legend': 'ChartDesignerStringIDs.NewLegend',
+            'Add a scale break to the primary Y-axis.': 'ChartDesignerStringIDs.Default_Elements_AddScaleBreakYDescription',
             ' Polar Line 2D': 'ChartDesignerStringIDs.PolarLineSeries2D',
             'Title Options': 'ChartDesignerStringIDs.ChartTitleOptionsRibbonCategoryTitle',
             'Height / Width Auto': 'ChartDesignerStringIDs.SeriesOptions_FunnelRatioAuto',
@@ -5298,22 +6041,30 @@ var DevExpress;
             'Add Constant Line To Axis X': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineX',
             'Add Constant Line To Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddConstantLineY',
             'Step Area 2D': 'ChartDesignerStringIDs.AreaStepSeries2D',
+            'New Area View': 'ChartDesignerStringIDs.RangeControlClientAreaView',
             'Measure Unit:': 'ChartDesignerStringIDs.AxisOptions_DateTimeMeasureUnit',
+            'Moving Average Kind': 'ChartDesignerStringIDs.OptionsIndicators_MovingAverageKind',
             'Complex Content': 'ChartDesignerStringIDs.ComplexAnnotationContent',
             'New Exponential Moving Average': 'ChartDesignerStringIDs.NewExponentialMovingAverage',
             'Add Strip To Axis X': 'ChartDesignerStringIDs.Default_Elements_AddStripX',
             'Add Strip To Axis Y': 'ChartDesignerStringIDs.Default_Elements_AddStripY',
             'New Tool Tip Free Position': 'ChartDesignerStringIDs.NewToolTipFreePosition',
             'Turn off data labels.': 'ChartDesignerStringIDs.SeriesOptions_Labels_NoneDescription',
+            'Argument 2': 'ChartDesignerStringIDs.OptionsIndicators_Argument2',
+            'Argument 1': 'ChartDesignerStringIDs.OptionsIndicators_Argument1',
+            'Borderless Simple': 'ChartDesignerStringIDs.Bar2DModelBorderlessSimple',
+            'Domain Brush': 'ChartDesignerStringIDs.OptionsPane_DomainBrush',
             'Min Limit:': 'ChartDesignerStringIDs.Strip_MinLimit',
             'Show both labels with minimum and maximum values of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DTwoLabelsPositionDescription',
             'Show data labels in two columns.': 'ChartDesignerStringIDs.SeriesOptions_Labels_TwoColumnsDescription',
+            'Marker 1 Visible': 'ChartDesignerStringIDs.OptionsSeries_Marker1Visible',
             'Bar 3D (Manhattan Bar)': 'ChartDesignerStringIDs.BarSeries3D',
             'Pie Series': 'ChartDesignerStringIDs.ChartViewGallery_Pie',
             'Show On Right': 'ChartDesignerStringIDs.AxisOptions_AxisKind_RightCaption',
             'Left Above': 'ChartDesignerStringIDs.ConstantLine_TitlePositionCaption_NearAboveHorizontal',
             'Show axis labels in staggered order.': 'ChartDesignerStringIDs.AxisOptions_XLabelOrientation_StaggeredDescription',
             'Data Members': 'ChartDesignerStringIDs.SeriesOptions_DataMembersPageGroup',
+            'Pane Orientation': 'ChartDesignerStringIDs.OptionsDiagram_PaneOrientation',
             'Stretch Out': 'ChartDesignerStringIDs.Area2DStretchOutAnimation',
             'Show data labels inside pie slices.': 'ChartDesignerStringIDs.SeriesOptions_Labels_InsideSlicesDescription',
             'New Axis Range': 'ChartDesignerStringIDs.NewAxisRange',
@@ -5321,6 +6072,7 @@ var DevExpress;
             'Show both labels with minimum and maximum values.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarTwoLabelsLabelPositionDescription',
             'Slide From Right Top Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromRightTopCorner',
             'New Tool Tip Controller': 'ChartDesignerStringIDs.NewChartToolTipController',
+            'Outset': 'ChartDesignerStringIDs.Bar2DModelOutset',
             'New Axis Label': 'ChartDesignerStringIDs.NewAxisLabel',
             'New Triangular Moving Average': 'ChartDesignerStringIDs.NewTriangularMovingAverage',
             'Min:': 'ChartDesignerStringIDs.AxisOptions_WholeRangeMinValue',
@@ -5332,19 +6084,24 @@ var DevExpress;
             'Radar Point 2D': 'ChartDesignerStringIDs.RadarPointSeries2D',
             'Ring': 'ChartDesignerStringIDs.Marker2DModelRing',
             'Pie 2D': 'ChartDesignerStringIDs.PieSeries2D',
+            'Choose a datasource:': 'ChartDesignerStringIDs.ChooseDataSource',
             'Minor': 'ChartDesignerStringIDs.AxisOptions_MinorVisible',
             'End Style:': 'ChartDesignerStringIDs.Indicator_ErrorBarsEndStyle',
             'Add Constant Line': 'ChartDesignerStringIDs.Default_Elements_AddConstantLine',
+            'Series Title': 'ChartDesignerStringIDs.SeriesOptions_SeriesTitle',
             'Strip': 'ChartDesignerStringIDs.TreeStripModel',
             'Add Integer': 'ChartDesignerStringIDs.ColorizerKeyInt',
             'Order legend items from top to bottom.': 'ChartDesignerStringIDs.LegendOptions_Orientation_VerticalDescription',
             'Nested Donut': 'ChartDesignerStringIDs.SeriesOptions_NestedDonut2DOptionsGroup',
             'Show one label in the center of the range area with both minimum and maximum values.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DOneLabelPositionDescription',
+            'Font Stretch': 'ChartDesignerStringIDs.OptionsChart_FontStretch',
             'Show the title above the line on the left.': 'ChartDesignerStringIDs.ConstantLine_TitlePositionDescription_NearAboveVertical',
             'Pane #': 'ChartDesignerStringIDs.PanePrefix',
             'New Tool Tip Relative Position': 'ChartDesignerStringIDs.NewToolTipRelativePosition',
+            'The Chart\'s Data tab is actual only when data is provided using the Series Template. Select the Add Series Template menu item to use a template.': 'ChartDesignerStringIDs.AddSeriesTemplateDataTab',
             'Polar Point 2D': 'ChartDesignerStringIDs.PolarPointSeries2D',
             'Show data labels in the center of bubbles.': 'ChartDesignerStringIDs.SeriesOptions_Labels_Bubble2DCenterDescription',
+            'VISUAL RANGE': 'ChartDesignerStringIDs.OptionsAxis_VisualRange',
             'Slide From Center': 'ChartDesignerStringIDs.CircularMarkerSlideFromCenterAnimation',
             'Text In Legend:': 'ChartDesignerStringIDs.ConstantLine_LegendText',
             'New Title': 'ChartDesignerStringIDs.NewTitle',
@@ -5359,41 +6116,52 @@ var DevExpress;
             'Show only the label for the maximum range bar value.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarMaxValueLabelPositionDescription',
             'Scatter Polar Line 2D': 'ChartDesignerStringIDs.PolarLineScatterSeries2D',
             'Side-by-Side Stacked Bar 2D': 'ChartDesignerStringIDs.BarSideBySideStackedSeries2D',
+            'Chart Elements': 'ChartDesignerStringIDs.BarItemMenu_ChartElements',
             'New Series Border': 'ChartDesignerStringIDs.NewSeriesBorder',
+            'Add Chart Element': 'ChartDesignerStringIDs.AddChartElement',
+            'Enable Axis Y Navigation': 'ChartDesignerStringIDs.OptionsPane_EnableAxisYNavigation',
             'Indicator Options': 'ChartDesignerStringIDs.IndicatorCategoryTitle',
             'Hole percent:': 'ChartDesignerStringIDs.SeriesOptions_HoleRadiusPercent',
             'New Custom Legend Item': 'ChartDesignerStringIDs.NewCustomLegendItem',
+            'Borderless Gradient': 'ChartDesignerStringIDs.Bar2DModelBorderlessGradient',
             'Value 2:': 'ChartDesignerStringIDs.SeriesOptions_Value2DataMember',
             'Show On Top': 'ChartDesignerStringIDs.AxisOptions_AxisKind_TopCaption',
             'Side-By-Side Full Stacked Bar 2D': 'ChartDesignerStringIDs.BarSideBySideFullStackedSeries2D',
             'New Scroll Bar Options': 'ChartDesignerStringIDs.NewScrollBarOptions',
+            'Margin': 'ChartDesignerStringIDs.OptionsPieTotalLabel_Margin',
             'Add Double': 'ChartDesignerStringIDs.ColorizerKeyDouble',
             'Placeholders': 'ChartDesignerStringIDs.PatternEditor_PlaceholdersLabelText',
             'Show the title at the bottom of an axis.': 'ChartDesignerStringIDs.AxisOptions_XTitlePosition_BottomDescription',
             'Show only the label for the first value of a data point.': 'ChartDesignerStringIDs.SeriesOptions_RangeArea2DValue1LabelPositionDescription',
+            'Grid Lines Visible': 'ChartDesignerStringIDs.OptionsAxis_GridLinesVisible',
             'Line 2D': 'ChartDesignerStringIDs.LineSeries2D',
             'Radar Range Area 2D': 'ChartDesignerStringIDs.RadarRangeAreaSeries2D',
             'New Trend Line': 'ChartDesignerStringIDs.NewTrendLine',
+            'Edge 2': 'ChartDesignerStringIDs.OptionsScaleBreak_Edge2',
+            'Edge 1': 'ChartDesignerStringIDs.OptionsScaleBreak_Edge1',
             'Show data labels rotated at 90 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_90DegreesDescription',
             'Chart Designer': 'ChartDesignerStringIDs.ChartDesignerWindowTitle',
             'Special': 'ChartDesignerStringIDs.PatternEditor_FormatComboBox_Special',
+            'Font Weight': 'ChartDesignerStringIDs.OptionsChart_FontWeight',
             'Direction:': 'ChartDesignerStringIDs.Indicator_ErrorBarsDirection',
-            'Brush': 'ChartDesignerStringIDs.DataEditor_BrushColumnHeader',
             'Slide From Right Bottom Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromRightBottomCorner',
             'Show data labels without rotation.': 'ChartDesignerStringIDs.SeriesOptions_Labels_0DegreesDescription',
-            'Indicator': 'ChartDesignerStringIDs.Indicator_IndicatorPageTitle',
             'Stacked Step Area 2D': 'ChartDesignerStringIDs.AreaStepStackedSeries2D',
             'Add Chart Title': 'ChartDesignerStringIDs.Default_Elements_AddChartTitle',
             'Value level': 'ChartDesignerStringIDs.Indicator_ValueLevelForRegressionLine',
             'Line Series': 'ChartDesignerStringIDs.ChartViewGallery_LineSeries',
             'Show data labels on the top of point markers.': 'ChartDesignerStringIDs.SeriesOptions_Labels_3DTopDescription',
+            'Max Marker Visible': 'ChartDesignerStringIDs.OptionsSeries_MaxMarkerVisible',
             'New Series Label': 'ChartDesignerStringIDs.NewSeriesLabel',
             'New SeriesPoint': 'ChartDesignerStringIDs.NewSeriesPoint',
             'Chart Structure': 'ChartDesignerStringIDs.ChartStructureDockPanelTitle',
             'Slide From Left Bottom Corner': 'ChartDesignerStringIDs.Marker2DAnimationSlideFromLeftBottomCorner',
+            'Add a scale break to the primary X-axis.': 'ChartDesignerStringIDs.Default_Elements_AddScaleBreakXDescription',
             'Add New Series': 'ChartDesignerStringIDs.Default_Main_AddSeriesManuallyGroupTitle',
+            'New Pie Total Label': 'ChartDesignerStringIDs.NewPieTotalLabel',
             'Major': 'ChartDesignerStringIDs.AxisOptions_MajorVisible',
             'Value Axis:': 'ChartDesignerStringIDs.SeriesOptions_ValueAxis',
+            'Font Style': 'ChartDesignerStringIDs.OptionsChart_FontStyle',
             'Size:': 'ChartDesignerStringIDs.Font_Size',
             'Full-Stacked Bar 2D': 'ChartDesignerStringIDs.BarFullStackedSeries2D',
             'Cartesian Diagram': 'ChartDesignerStringIDs.TreeDiagramXYDiagram2D',
@@ -5402,9 +6170,9 @@ var DevExpress;
             'Show data labels rotated at 315 degrees.': 'ChartDesignerStringIDs.SeriesOptions_Labels_315DegreesDescription',
             'New Crosshair Free Position': 'ChartDesignerStringIDs.NewCrosshairFreePosition',
             'Indent:': 'ChartDesignerStringIDs.SeriesOptions_Indent',
+            'Tickmarks Visible': 'ChartDesignerStringIDs.OptionsAxis_TickmarksVisible',
             'Show only the label for the minimum range bar value.': 'ChartDesignerStringIDs.SeriesOptions_RangeBarMinValueLabelPositionDescription',
             'Unwrap Vertically': 'ChartDesignerStringIDs.Line2DUnwrapVerticallyAnimation',
-            'Title Collection': 'ChartDesignerStringIDs.TreeTitleCollection',
             'Africa Sunset': 'GaugesPresetsStringId.ThemeAfricaSunset',
             'Classic': 'GaugesPresetsStringId.ThemeClassic',
             'Silver Blur': 'GaugesPresetsStringId.ThemeSilverBlur',
@@ -5545,22 +6313,22 @@ var DevExpress;
                         options.undoEngine && options.undoEngine().start();
                         options.values().push(addHandler());
                         options.undoEngine && options.undoEngine().end();
-                        model.jQueryEvent.stopPropagation();
+                        model.event.stopPropagation();
                     };
                     this.up = function (model) {
                         _this._move(options.values(), -1);
-                        model.jQueryEvent.stopPropagation();
+                        model.event.stopPropagation();
                     };
                     this.down = function (model) {
                         _this._move(options.values(), 1);
-                        model.jQueryEvent.stopPropagation();
+                        model.event.stopPropagation();
                     };
                     this.remove = function (model) {
                         if (_this.selectedIndex() >= 0) {
                             options.values().splice(_this.selectedIndex(), 1);
                             _this.selectedIndex(null);
                         }
-                        model.jQueryEvent.stopPropagation();
+                        model.event.stopPropagation();
                     };
                     this.select = function (event) {
                         _this.selectedIndex(event.model.index());
@@ -6339,16 +7107,22 @@ var DevExpress;
                     this.templateName = editorTemplate.header;
                     this.contentTemplateName = editorTemplate.content;
                     this.defaultValue = editorTemplate === Widgets.editorTemplates.color ? "transparent" : null;
+                    var cachedValue = undefined;
                     this.value = ko.computed({
                         read: function () {
                             var model = _this._model();
+                            if (!model && cachedValue) {
+                                return cachedValue;
+                            }
                             var modelValue = model && model[name] !== undefined ? model[name] : value;
                             if (ko.isObservable(modelValue) && !modelValue["push"]) {
                                 var hasValueInModel = modelValue() !== undefined && modelValue() !== null;
-                                return hasValueInModel ? modelValue() : _this.defaultValue;
+                                cachedValue = hasValueInModel ? modelValue() : _this.defaultValue;
+                                return cachedValue;
                             }
                             else {
-                                return modelValue;
+                                cachedValue = modelValue;
+                                return cachedValue;
                             }
                         },
                         write: function (val) {
@@ -6383,7 +7157,9 @@ var DevExpress;
                 };
                 Editor.prototype.updateInfo = function (propertyInfo) {
                     if (propertyInfo && compareEditorInfo(propertyInfo.editor, this.info().editor)) {
-                        this.info(propertyInfo);
+                        if (this.info() !== propertyInfo) {
+                            this.info(propertyInfo);
+                        }
                         return true;
                     }
                     return !propertyInfo;
@@ -6391,7 +7167,7 @@ var DevExpress;
                 Editor.prototype.update = function (viewModel) {
                     if (!!viewModel) {
                         var propertyInfo = this.findInfo(viewModel);
-                        this.isVisibleByContent(viewModel[this.name] !== undefined && this.updateInfo(propertyInfo));
+                        this.isVisibleByContent(this.name in viewModel && this.updateInfo(propertyInfo));
                         this._model(this.isVisibleByContent() ? viewModel : null);
                     }
                     else {
@@ -6769,7 +7545,9 @@ var DevExpress;
                         if (model[propName] !== undefined) {
                             delete viewModel._model[propName];
                         }
-                        viewModel[propertyName] = _this.deserializeProperty(modelPropertyInfo, model);
+                        var property = _this.deserializeProperty(modelPropertyInfo, model);
+                        if (property !== undefined)
+                            viewModel[propertyName] = property;
                     });
                     this.linkObjects();
                 };
@@ -7695,6 +8473,7 @@ var DevExpress;
                         operands.push.apply(operands, $.isArray(this.rightPart) ? this.rightPart : [this.rightPart]);
                     return operands;
                 };
+                CriteriaOperator.prototype.accept = function (visitor) { throw "Not implemented"; };
                 return CriteriaOperator;
             })();
             Data.CriteriaOperator = CriteriaOperator;
@@ -7791,6 +8570,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                GroupOperator.prototype.accept = function (visitor) {
+                    return visitor.visitGroupOperator
+                        ? visitor.visitGroupOperator(this)
+                        : new GroupOperator(this.operatorType, this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
+                };
                 return GroupOperator;
             })(CriteriaOperator);
             Data.GroupOperator = GroupOperator;
@@ -7812,6 +8596,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                OperandProperty.prototype.accept = function (visitor) {
+                    return visitor.visitOperandProperty
+                        ? visitor.visitOperandProperty(this)
+                        : new OperandProperty(this.propertyName);
+                };
                 return OperandProperty;
             })(CriteriaOperator);
             Data.OperandProperty = OperandProperty;
@@ -7851,6 +8640,11 @@ var DevExpress;
                 function ConstantValue(value) {
                     _super.call(this, value);
                 }
+                ConstantValue.prototype.accept = function (visitor) {
+                    return visitor.visitConstantValue
+                        ? visitor.visitConstantValue(this)
+                        : new ConstantValue(this.value);
+                };
                 return ConstantValue;
             })(OperandValue);
             Data.ConstantValue = ConstantValue;
@@ -7868,6 +8662,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                OperandParameter.prototype.accept = function (visitor) {
+                    return visitor.visitOperandParameter
+                        ? visitor.visitOperandParameter(this)
+                        : new OperandParameter(this.parameterName, this.value);
+                };
                 return OperandParameter;
             })(OperandValue);
             Data.OperandParameter = OperandParameter;
@@ -7966,6 +8765,11 @@ var DevExpress;
                     this.aggregatedExpression && operands.push(this.aggregatedExpression);
                     return operands;
                 };
+                AggregateOperand.prototype.accept = function (visitor) {
+                    return visitor.visitAggregateOperand
+                        ? visitor.visitAggregateOperand(this)
+                        : new AggregateOperand(this.property && this.property.accept(visitor), this.aggregatedExpression && this.aggregatedExpression.accept(visitor), this.operatorType, this.condition && this.condition.accept(visitor));
+                };
                 return AggregateOperand;
             })(CriteriaOperator);
             Data.AggregateOperand = AggregateOperand;
@@ -7996,6 +8800,11 @@ var DevExpress;
                             aggregated: aggregated
                         });
                     }
+                };
+                JoinOperand.prototype.accept = function (visitor) {
+                    return visitor.visitJoinOperand
+                        ? visitor.visitJoinOperand(this)
+                        : new JoinOperand(this.joinTypeName, this.condition && this.condition.accept(visitor), this.operatorType, this.aggregatedExpression && this.aggregatedExpression.accept(visitor));
                 };
                 return JoinOperand;
             })(CriteriaOperator);
@@ -8062,6 +8871,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                BetweenOperator.prototype.accept = function (visitor) {
+                    return visitor.visitBetweenOperator
+                        ? visitor.visitBetweenOperator(this)
+                        : new BetweenOperator(this.property && this.property.accept(visitor), this.begin && this.begin.accept(visitor), this.end && this.end.accept(visitor));
+                };
                 return BetweenOperator;
             })(CriteriaOperator);
             Data.BetweenOperator = BetweenOperator;
@@ -8110,6 +8924,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                InOperator.prototype.accept = function (visitor) {
+                    return visitor.visitInOperator
+                        ? visitor.visitInOperator(this)
+                        : new InOperator(this.criteriaOperator && this.criteriaOperator.accept(visitor), this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
+                };
                 return InOperator;
             })(CriteriaOperator);
             Data.InOperator = InOperator;
@@ -8182,6 +9001,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                BinaryOperator.prototype.accept = function (visitor) {
+                    return visitor.visitBinaryOperator
+                        ? visitor.visitBinaryOperator(this)
+                        : new BinaryOperator(this.leftOperand && this.leftOperand.accept(visitor), this.rightOperand && this.rightOperand.accept(visitor), this.operatorType);
+                };
                 return BinaryOperator;
             })(CriteriaOperator);
             Data.BinaryOperator = BinaryOperator;
@@ -8240,6 +9064,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                UnaryOperator.prototype.accept = function (visitor) {
+                    return visitor.visitUnaryOperator
+                        ? visitor.visitUnaryOperator(this)
+                        : new UnaryOperator(this.operatorType, this.operand && this.operand.accept(visitor));
+                };
                 return UnaryOperator;
             })(CriteriaOperator);
             Data.UnaryOperator = UnaryOperator;
@@ -8437,6 +9266,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                FunctionOperator.prototype.accept = function (visitor) {
+                    return visitor.visitFunctionOperator
+                        ? visitor.visitFunctionOperator(this)
+                        : new FunctionOperator(this.operatorType, this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
+                };
                 return FunctionOperator;
             })(CriteriaOperator);
             Data.FunctionOperator = FunctionOperator;
@@ -8462,20 +9296,98 @@ var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
+        var Utils;
+        (function (Utils) {
+            var DisplayExpressionConverter = (function () {
+                function DisplayExpressionConverter(displayNameProvider) {
+                    this.displayNameProvider = displayNameProvider;
+                }
+                DisplayExpressionConverter.prototype._replaceNames = function (path, expression, getDisplayExpression) {
+                    var _this = this;
+                    var def = $.Deferred();
+                    if (!expression)
+                        return def.resolve("").promise();
+                    try {
+                        var expressionCriteria = JS.Data.CriteriaOperator.parse(expression);
+                    }
+                    catch (e) {
+                        return def.reject().promise();
+                    }
+                    var requests = [];
+                    var result = [];
+                    JS.Data.criteriaForEach(expressionCriteria, function (operator) {
+                        if (operator instanceof JS.Data.OperandProperty) {
+                            var isContainsParentRelationshipTraversalOperator = operator.propertyName.indexOf("^.") === 0;
+                            var propertyName = isContainsParentRelationshipTraversalOperator ? operator.propertyName.substring(2) : operator.propertyName;
+                            var request = getDisplayExpression ? _this.displayNameProvider.getDisplayNameByPath(path, propertyName) :
+                                _this.displayNameProvider.getRealName(path, propertyName);
+                            requests.push(request.done(function (data) { return result.push({
+                                operand: operator,
+                                convertedName: isContainsParentRelationshipTraversalOperator ? "^." + data : data
+                            }); }));
+                        }
+                    });
+                    if (requests.length === 0) {
+                        def.resolve(expression);
+                    }
+                    else {
+                        var processedRequestsCount = 0;
+                        var onAlways = function () {
+                            if (++processedRequestsCount < requests.length)
+                                return;
+                            var lines = expression.split('\n');
+                            for (var i = 0; i < lines.length; i++) {
+                                var operands = result.filter(function (value) { return value.operand.startPosition.line === i; });
+                                for (var j = 0, delta = 0; j < operands.length; j++) {
+                                    var column = operands[j].operand.startPosition.column;
+                                    var originalName = operands[j].operand.propertyName;
+                                    var convertedName = operands[j].convertedName;
+                                    if (!originalName || column < 0)
+                                        continue;
+                                    lines[i] = lines[i].substring(0, column + delta) + convertedName + lines[i].substring(column + originalName.length + delta);
+                                    delta += convertedName.length - originalName.length;
+                                }
+                            }
+                            def.resolve(lines.join('\n'));
+                        };
+                        requests.forEach(function (r) { return r.always(onAlways); });
+                    }
+                    return def.promise();
+                };
+                DisplayExpressionConverter.prototype.toDisplayExpression = function (path, expression) {
+                    return this._replaceNames(path, expression, true);
+                };
+                DisplayExpressionConverter.prototype.toRealExpression = function (path, expression) {
+                    return this._replaceNames(path, expression, false);
+                };
+                return DisplayExpressionConverter;
+            })();
+            Utils.DisplayExpressionConverter = DisplayExpressionConverter;
+        })(Utils = JS.Utils || (JS.Utils = {}));
+    })(JS = DevExpress.JS || (DevExpress.JS = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var JS;
+    (function (JS) {
         var Widgets;
         (function (Widgets) {
-            var CodeCompletor = (function () {
-                function CodeCompletor(editor, bindingContext, fieldListProvider, path, functions, rootItems) {
+            var CodeCompletor = (function (_super) {
+                __extends(CodeCompletor, _super);
+                function CodeCompletor(_options) {
                     var _this = this;
+                    _super.call(this);
+                    this._options = _options;
                     this._contextPath = null;
                     this._isInContext = function () { return _this._contextPath !== null; };
                     this._getPath = function () { return _this._contextPath ? _this._path() + "." + _this._contextPath : _this._path(); };
                     this.identifierRegexps = [/\./, /\[/];
-                    this._fieldListProvider = fieldListProvider;
-                    this._path = path;
-                    this._editor = editor;
-                    this._functions = functions || Widgets.functionDisplay;
-                    this._rootItems = rootItems || [{ name: "Parameters", needPrefix: true }];
+                    this._fieldListProvider = _options.fieldListProvider;
+                    this._path = _options.path;
+                    this._editor = _options.editor;
+                    this._functions = ko.computed(function () { return ko.unwrap(_options.functions) || Widgets.functionDisplay; });
+                    this._rootItems = _options.rootItems || [{ name: "Parameters", needPrefix: true }];
+                    this._disposables.push(this._functions);
                 }
                 CodeCompletor.prototype._previousSymbol = function () {
                     var cursorPosition = this._editor.getCursorPosition();
@@ -8503,18 +9415,31 @@ var DevExpress;
                     return (fields || []).map(function (field) {
                         var displayName = _this.generateFieldDisplayName(parentPrefix, field.displayName);
                         return {
-                            caption: field.name,
+                            caption: field.displayName || field.name,
                             snippet: displayName,
-                            meta: JS.Utils.isList(field) && "list" || "field",
+                            meta: JS.Utils.isList(field) && DevExpress.Designer.getLocalization("list", "DxDesignerStringId.CodeCompletion_List") || DevExpress.Designer.getLocalization("field", "DxDesignerStringId.CodeCompletion_Field"),
                             score: JS.Utils.isList(field) && 200 || 100,
                             completer: {
                                 insertMatch: function (editor, data) {
                                     _this.beforeInsertMatch(editor, token, parentPrefix);
-                                    _this.insertMatch(editor, parentPrefix, field.name);
+                                    _this.insertMatch(editor, parentPrefix, _this._options.getRealExpression ? (field.displayName || field.name) : field.name);
                                 }
                             }
                         };
                     });
+                };
+                CodeCompletor.prototype._getRealPath = function (path) {
+                    var pathArray = path.split('.');
+                    var $deferred = $.Deferred();
+                    if (this._options.getRealExpression) {
+                        this._options.getRealExpression(pathArray[0], this.generateFieldDisplayName(null, pathArray.splice(1).join('.'))).done(function (result) {
+                            $deferred.resolve([pathArray[0], result.slice(1, result.length - 1)].join('.'));
+                        }).fail(function () { $deferred.resolve(path); });
+                    }
+                    else {
+                        $deferred.resolve(path);
+                    }
+                    return $deferred.promise();
                 };
                 CodeCompletor.prototype._getFields = function (token, completions) {
                     var _this = this;
@@ -8533,30 +9458,34 @@ var DevExpress;
                         if (rootItem && rootItem.rootPath) {
                             path = [rootItem.rootPath, parentPrefix].join('.');
                         }
-                        this._fieldListProvider.getItems(new Widgets.PathRequest(path))
-                            .done(function (fields) {
-                            completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, parentPrefix + "."));
-                        })
-                            .always(function () { $deferred.resolve(completions); });
+                        this._getRealPath(path).done(function (result) {
+                            ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(result))
+                                .done(function (fields) {
+                                completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, parentPrefix + "."));
+                            })
+                                .always(function () { $deferred.resolve(completions); });
+                        });
                     }
                     else {
-                        var $fields = this._fieldListProvider.getItems(new Widgets.PathRequest(this._getPath()))
-                            .done(function (fields) {
-                            completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token));
-                        });
-                        if (!this._isInContext()) {
-                            var $deferreds = [$fields];
-                            this._rootItems.forEach(function (item) {
-                                $deferreds.push(_this._fieldListProvider.getItems(new Widgets.PathRequest(item.rootPath || item.name))
-                                    .done(function (fields) {
-                                    completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, item.needPrefix ? item.name + "." : ""));
-                                }));
+                        this._getRealPath(this._getPath()).done(function (path) {
+                            var $fields = ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(path))
+                                .done(function (fields) {
+                                completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token));
                             });
-                            $.when($deferreds).always(function () { $deferred.resolve(completions); });
-                        }
-                        else {
-                            $.when($fields).always(function () { $deferred.resolve(completions); });
-                        }
+                            if (!_this._isInContext()) {
+                                var $deferreds = [$fields];
+                                _this._rootItems.forEach(function (item) {
+                                    $deferreds.push(ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(item.rootPath || item.name))
+                                        .done(function (fields) {
+                                        completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, item.needPrefix ? item.name + "." : ""));
+                                    }));
+                                });
+                                $.when($deferreds).always(function () { $deferred.resolve(completions); });
+                            }
+                            else {
+                                $.when($fields).always(function () { $deferred.resolve(completions); });
+                            }
+                        });
                     }
                     return $deferred.promise();
                 };
@@ -8583,7 +9512,7 @@ var DevExpress;
                 };
                 CodeCompletor.prototype.getOperatorCompletions = function (prefix) {
                     return Widgets.operatorNames.map(function (operator) {
-                        return { caption: operator.text, snippet: prefix + operator.text, meta: "operator" };
+                        return { caption: operator.text, snippet: prefix + operator.text, meta: DevExpress.Designer.getLocalization("operator", "DxDesignerStringId.CodeCompletion_Operator") };
                     });
                 };
                 CodeCompletor.prototype._addFunctions = function (completions) {
@@ -8689,7 +9618,7 @@ var DevExpress;
                     });
                 };
                 return CodeCompletor;
-            })();
+            })(JS.Utils.Disposable);
             Widgets.CodeCompletor = CodeCompletor;
             function createFunctionCompletion(fnInfo, name, insertValue) {
                 if (insertValue === void 0) { insertValue = null; }
@@ -8697,7 +9626,7 @@ var DevExpress;
                 return {
                     caption: name,
                     snippet: insertValue,
-                    meta: "function",
+                    meta: DevExpress.Designer.getLocalization("function", "DxDesignerStringId.CodeCompletion_Function"),
                     score: 10,
                     completer: {
                         insertMatch: function (editor, data) {
@@ -8760,13 +9689,15 @@ var DevExpress;
                 return PathRequest;
             })();
             Widgets.PathRequest = PathRequest;
-            var TreeListItemViewModel = (function () {
+            var TreeListItemViewModel = (function (_super) {
+                __extends(TreeListItemViewModel, _super);
                 function TreeListItemViewModel(options, path, onItemsVisibilityChanged, rtl, resolver) {
                     var _this = this;
                     if (path === void 0) { path = []; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
                     if (resolver === void 0) { resolver = new JS.CodeResolver(); }
+                    _super.call(this);
                     this.resolver = resolver;
                     this._rtl = false;
                     this._data = ko.observable(null);
@@ -8858,7 +9789,7 @@ var DevExpress;
                         this._loader.dispose();
                     }
                     var promise = ko.observable();
-                    promise.subscribe(function (value) {
+                    this._disposables.push(promise.subscribe(function (value) {
                         if (!value)
                             return;
                         value.done(function (data) {
@@ -8928,10 +9859,10 @@ var DevExpress;
                                 }
                             }
                         });
-                    });
-                    this._loader = ko.computed(function () {
+                    }));
+                    this._disposables.push(this._loader = ko.computed(function () {
                         promise(options.itemsProvider.getItems(new PathRequest(_this.path, _this.pathParts)));
-                    });
+                    }));
                     return deferred.promise();
                 };
                 TreeListItemViewModel.prototype._selectItem = function (itemPath) {
@@ -9074,9 +10005,7 @@ var DevExpress;
                     configurable: true
                 });
                 TreeListItemViewModel.prototype.dispose = function () {
-                    if (this._loader) {
-                        this._loader.dispose();
-                    }
+                    _super.prototype.dispose.call(this);
                     this.items().forEach(function (item) { return item.dispose(); });
                 };
                 Object.defineProperty(TreeListItemViewModel.prototype, "visible", {
@@ -9096,7 +10025,7 @@ var DevExpress;
                     return this._treeListController.selectedItems && this._treeListController.selectedItems() || [];
                 };
                 return TreeListItemViewModel;
-            })();
+            })(JS.Utils.Disposable);
             Widgets.TreeListItemViewModel = TreeListItemViewModel;
             var TreeListRootItemViewModel = (function (_super) {
                 __extends(TreeListRootItemViewModel, _super);
@@ -9106,14 +10035,10 @@ var DevExpress;
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this, options, path, onItemsVisibilityChanged, rtl);
-                    var selectedPathSubscriptions = options.selectedPath.subscribe(function (newPath) {
+                    this._disposables.push(options.selectedPath.subscribe(function (newPath) {
                         _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
-                    });
+                    }));
                     this._selectItem(!!this.path ? this.path + "." + options.selectedPath() : options.selectedPath());
-                    this.dispose = function () {
-                        selectedPathSubscriptions.dispose();
-                        _super.prototype.dispose.call(_this);
-                    };
                 }
                 return TreeListRootItemViewModel;
             })(TreeListItemViewModel);
@@ -9619,16 +10544,29 @@ var DevExpress;
             Widgets.FilterEditorTreeListController = FilterEditorTreeListController;
             var FilterEditor = (function (_super) {
                 __extends(FilterEditor, _super);
-                function FilterEditor(options, fieldListProvider, rtl) {
+                function FilterEditor(options, fieldListProvider, rtl, _displayNameProvider) {
                     var _this = this;
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this);
+                    this._displayNameProvider = _displayNameProvider;
                     this._advancedMode = ko.observable(false);
                     this.textFocused = ko.observable(false);
                     this.aceAvailable = Widgets.aceAvailable;
                     this.languageHelper = {
                         getLanguageMode: function () { return "ace/mode/criteria"; },
-                        createCompleters: function (editor, bindingContext, viewModel) { return [new Widgets.FilterEditorCodeCompletor(editor, bindingContext, viewModel.fieldListProvider(), viewModel.options().path)]; }
+                        createCompleters: function (editor, bindingContext, viewModel) {
+                            var path = ko.computed(function () { return _this.path && _this.path(); }), completor = new Widgets.FilterEditorCodeCompletor({
+                                editor: editor,
+                                bindingContext: bindingContext,
+                                fieldListProvider: viewModel.fieldListProvider(),
+                                path: path,
+                                getRealExpression: function (path, expression) {
+                                    return _this.displayExpressionConverter && _this.displayExpressionConverter.toRealExpression(path, expression) || $.Deferred().resolve(expression).promise();
+                                }
+                            });
+                            completor._disposables.push(path);
+                            return [completor];
+                        }
                     };
                     this.aceOptions = {
                         showLineNumbers: false,
@@ -9686,6 +10624,26 @@ var DevExpress;
                         }
                         _this.popupVisible(false);
                     };
+                    if (_displayNameProvider) {
+                        this.displayExpressionConverter = new JS.Utils.DisplayExpressionConverter(_displayNameProvider);
+                        this.displayValue = ko.observable(this.value());
+                        this.displayExpressionConverter.toDisplayExpression(this.path(), this.value()).done(function (result) {
+                            _this.displayValue(result);
+                        }).fail(function () {
+                            _this.displayValue(_this.value());
+                        });
+                        var subscription = this.value.subscribe(function (newValue) {
+                            _this.displayExpressionConverter.toDisplayExpression(_this.path(), newValue).done(function (result) {
+                                _this.displayValue(result);
+                            }).fail(function () {
+                                _this.displayValue(newValue);
+                            });
+                        });
+                        this._disposables.push(subscription);
+                    }
+                    else {
+                        this.displayValue = this.value;
+                    }
                     this.fieldListProvider = fieldListProvider;
                     this.modelValueIsValid = ko.computed(function () {
                         return options() && _this._validateValue(options().value());
@@ -9742,7 +10700,7 @@ var DevExpress;
                     this.buttonItems = [
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Save", "StringId.OK"), disabled: saveDisabled, onClick: function () { self.save(); } } },
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Cancel", "StringId.Cancel"), onClick: function () { self.popupVisible(false); } } },
-                        { toolbar: 'bottom', location: 'before', widget: 'dxCheckBox', options: { value: self.advancedMode, text: DevExpress.Designer.getLocalization("Advanced Mode", "TODO") } }
+                        { toolbar: 'bottom', location: 'before', widget: 'dxCheckBox', options: { value: self.advancedMode, text: DevExpress.Designer.getLocalization("Advanced Mode", "ASPxReportsStringId.FilterEditor_AdvancedMode") } }
                     ];
                 };
                 FilterEditor.prototype._generateOperand = function (value) {
@@ -9765,8 +10723,13 @@ var DevExpress;
                 };
                 FilterEditor.prototype._validateValue = function (value) {
                     try {
-                        this.options().helper.serializer.deserialize(value);
-                        return true;
+                        if (this.options() && this.options().helper) {
+                            this.options().helper.serializer.deserialize(value);
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
                     }
                     catch (e) {
                         return false;
@@ -9791,14 +10754,14 @@ var DevExpress;
                 };
                 Object.defineProperty(FilterEditor.prototype, "helper", {
                     get: function () {
-                        return this.options().helper;
+                        return this.options() && this.options().helper;
                     },
                     enumerable: true,
                     configurable: true
                 });
                 Object.defineProperty(FilterEditor.prototype, "path", {
                     get: function () {
-                        return this.options().path;
+                        return this.options() && this.options().path;
                     },
                     enumerable: true,
                     configurable: true
@@ -9823,14 +10786,29 @@ var DevExpress;
                 FilterEditor.prototype.cacheElement = function ($element) {
                     this.editorContainer($element.dxTextArea("instance"));
                 };
-                FilterEditor.prototype.onValueChange = function (value) {
-                    if (this.value() === value)
-                        return;
-                    this.value(value);
+                FilterEditor.prototype.updateCriteria = function () {
                     if (this.isSurfaceValid()) {
                         this.operand = this._generateOperand(this.value());
                         this.operandSurface() && this.operandSurface().dispose();
                         this.operandSurface(this._generateSurface(this.operand));
+                    }
+                };
+                FilterEditor.prototype.onValueChange = function (value) {
+                    var _this = this;
+                    if (this.displayValue() === value)
+                        return;
+                    this.displayValue(value);
+                    if (this.displayExpressionConverter) {
+                        this.displayExpressionConverter.toRealExpression(this.path(), value).done(function (result) {
+                            _this.value(result);
+                            _this.updateCriteria();
+                        }).fail(function () {
+                            _this.value(value);
+                            _this.updateCriteria();
+                        });
+                    }
+                    else {
+                        this.updateCriteria();
                     }
                 };
                 FilterEditor.prototype.focusText = function () {
@@ -10760,7 +11738,7 @@ var DevExpress;
                             values.options().helper.getDisplayPropertyName = values.getDisplayNameByPath;
                         }
                     }));
-                    var editor = new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0);
+                    var editor = new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0, values.displayNameProvider);
                     ko.applyBindings(editor, $element.children()[0]);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                         subscriptions.forEach(function (x) { return x.dispose(); });
@@ -10772,7 +11750,7 @@ var DevExpress;
             ko.components.register("dx-filtereditor-plain", {
                 viewModel: {
                     createViewModel: function (params, componentInfo) {
-                        var viewModel = new FilterEditor(params.options, ko.observable(params.fieldListProvider));
+                        var viewModel = new FilterEditor(params.options, ko.observable(params.fieldListProvider), undefined, params.displayNameProvider);
                         viewModel.popupVisible(true);
                         params.options().value.subscribe(function () {
                             viewModel.popupVisible(false);
@@ -10782,6 +11760,21 @@ var DevExpress;
                     }
                 },
                 template: { element: 'dx-filtereditor-plain' }
+            });
+            ko.components.register("dx-filtereditor-advanced", {
+                viewModel: {
+                    createViewModel: function (params, componentInfo) {
+                        var viewModel = new FilterEditor(params.options, ko.observable(params.fieldListProvider), undefined, params.displayNameProvider);
+                        viewModel.advancedMode(true);
+                        viewModel.popupVisible(true);
+                        params.options().value.subscribe(function () {
+                            viewModel.popupVisible(false);
+                            viewModel.popupVisible(true);
+                        });
+                        return viewModel;
+                    }
+                },
+                template: { element: 'dx-filtereditor-advanced' }
             });
             ko.bindingHandlers["cacheElement"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -11016,94 +12009,49 @@ var DevExpress;
             ];
             var Tools = (function (_super) {
                 __extends(Tools, _super);
-                function Tools(onClick, parametersOptions, fieldListOptions, functionGroups, customizeCategories) {
+                function Tools(onClick, parametersOptions, options, fieldListOptions) {
                     var _this = this;
-                    if (functionGroups === void 0) { functionGroups = Widgets.functionDisplay; }
                     _super.call(this);
                     this.searchPlaceholder = function () { return DevExpress.Designer.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
+                    this._categories = ko.observableArray([]);
                     this.showDescription = ko.observable(true);
                     this.toolBox = [];
                     this.description = ko.observable();
                     this._defaultClick = onClick;
-                    var textToSearch = ko.observable("");
                     Widgets.operatorNames.filter(function (item) { return !!item.descriptionStringId; }).forEach(function (item) { return _this._initDescription(item); });
-                    var functions = functionGroups.map(function (funtionGroup) {
-                        var result = {
-                            display: DevExpress.Designer.getLocalization(funtionGroup.display, funtionGroup.localizationId),
-                            isSelected: ko.observable(false),
-                            data: {
-                                textToSearch: textToSearch,
-                                items: [],
-                                availableItems: ko.observableArray([])
-                            },
-                            name: "dx-expressioneditor-collection-function",
-                        };
-                        $.map(funtionGroup.items, (function (item) {
-                            if (item) {
-                                item.forEach(function (functionItem) {
-                                    _this._initDescription(functionItem);
-                                    result.data.items.push(functionItem);
-                                });
-                            }
-                        }));
-                        result.data.availableItems(result.data.items);
-                        var timeout = null;
-                        _this._disposables.push(result.data.textToSearch.subscribe(function (newVal) {
-                            timeout && clearTimeout(timeout);
-                            timeout = setTimeout(function () {
-                                result.data.availableItems(result.data.items.filter(function (x) { return !!JS.Utils.findMatchesInString(x.text, newVal); }));
-                            }, 150);
-                        }));
-                        return result;
-                    });
-                    var fieldsGroup = {
-                        displayName: "Fields",
-                        content: {
-                            isSelected: ko.observable(false),
-                            data: {
-                                fields: fieldListOptions, parameters: parametersOptions
-                            },
-                            name: "dx-expressioneditor-fields"
-                        }
+                    var functionGroups = ko.computed(function () {
+                        return ko.unwrap(options().functions) || Widgets.functionDisplay;
+                    }), functions = ko.computed(function () {
+                        return functionGroups().map(function (funtionGroup) {
+                            return _this._createFunctionsCategoryItem(funtionGroup.items, DevExpress.Designer.getLocalization(funtionGroup.display, funtionGroup.localizationId));
+                        });
+                    }), createDefaultCategories = function () {
+                        return [
+                            _this._createFieldsCategory(fieldListOptions, parametersOptions),
+                            _this._createConstantCategory(),
+                            _this._createFunctionsCategory(functions),
+                            _this._createOperatorsCategory(Widgets.operatorNames)
+                        ];
+                    }, selectedContent = ko.observable(null), resetCategoriesSelection = function () {
+                        var firstItem = _this._categories()[0].content;
+                        selectedContent() && selectedContent().isSelected(false);
+                        selectedContent(firstItem);
+                        firstItem.isSelected(true);
+                    }, updateCategories = function (newOptions) {
+                        _this._disposeCategories();
+                        var defaultCategories = createDefaultCategories();
+                        newOptions.customizeCategories && newOptions.customizeCategories(_this, defaultCategories, onClick);
+                        _this._categories(defaultCategories);
+                        resetCategoriesSelection();
                     };
-                    this._disposables.push(fieldsGroup.content.isSelected.subscribe(function (newVal) {
-                        _this.showDescription(!newVal);
+                    this.resetCategoriesSelection = resetCategoriesSelection;
+                    [functionGroups, functions].forEach(function (x) { return _this._disposables.push(x); });
+                    this._disposables.push(options.subscribe(function (newOptions) {
+                        updateCategories(newOptions);
                     }));
-                    var categories = [
-                        fieldsGroup,
-                        {
-                            displayName: "Constants",
-                            content: {
-                                isSelected: ko.observable(false),
-                                data: [
-                                    { text: "?", descriptionStringId: 'XtraEditorsExpressionEditor.Null.Description' },
-                                    { text: "False", descriptionStringId: 'XtraEditorsExpressionEditor.False.Description' },
-                                    { text: "True", descriptionStringId: 'XtraEditorsExpressionEditor.True.Description' }
-                                ],
-                                name: "dx-expressioneditor-collection"
-                            }
-                        },
-                        {
-                            displayName: "Functions",
-                            items: functions,
-                            collapsed: ko.observable(true)
-                        },
-                        {
-                            displayName: "Operators",
-                            content: {
-                                isSelected: ko.observable(false),
-                                data: Widgets.operatorNames,
-                                name: "dx-expressioneditor-collection"
-                            }
-                        }
-                    ];
-                    customizeCategories && customizeCategories(this, categories, onClick);
-                    var selectedContent = ko.observable(null);
-                    var firstItem = categories[0].content || categories[0].items[0];
-                    selectedContent(firstItem);
-                    firstItem.isSelected(true);
+                    updateCategories(options());
                     this.toolBox = [
-                        this._generateTab(categories, "dx-expressioneditor-categories", "170px", function (item) {
+                        this._generateTab(this._categories, "dx-expressioneditor-categories", "170px", function (item) {
                             if (selectedContent() === item)
                                 return;
                             selectedContent().isSelected(false);
@@ -11127,6 +12075,114 @@ var DevExpress;
                 };
                 Tools.prototype._initDescription = function (expressionEditorItem) {
                     expressionEditorItem.description = DevExpress.Designer.getLocalization(expressionEditorItem.text, expressionEditorItem.descriptionStringId);
+                };
+                Tools.prototype._createFieldsCategory = function (fields, parameters) {
+                    var _this = this;
+                    var disposables = [], category = {
+                        displayName: DevExpress.Designer.getLocalization("Fields", "XtraEditorsExpressionEditor.Fields.Text"),
+                        content: {
+                            isSelected: ko.observable(false),
+                            data: { fields: fields, parameters: parameters },
+                            name: "dx-expressioneditor-fields"
+                        },
+                        dispose: function () {
+                            disposables.forEach(function (x) { return x.dispose(); });
+                            disposables.splice(0, disposables.length);
+                        }
+                    };
+                    disposables.push(category.content.isSelected.subscribe(function (newVal) {
+                        _this.showDescription(!newVal);
+                    }));
+                    return category;
+                };
+                Tools.prototype._createConstantCategory = function () {
+                    return {
+                        displayName: DevExpress.Designer.getLocalization("Constants", "XtraEditorsExpressionEditor.Constants.Text"),
+                        content: {
+                            isSelected: ko.observable(false),
+                            data: [
+                                { text: "?", descriptionStringId: 'XtraEditorsExpressionEditor.Null.Description' },
+                                { text: "False", descriptionStringId: 'XtraEditorsExpressionEditor.False.Description' },
+                                { text: "True", descriptionStringId: 'XtraEditorsExpressionEditor.True.Description' }
+                            ],
+                            name: "dx-expressioneditor-collection"
+                        },
+                        dispose: function () { return void 0; }
+                    };
+                };
+                Tools.prototype._createOperatorsCategory = function (data) {
+                    return {
+                        displayName: DevExpress.Designer.getLocalization("Operators", "XtraEditorsExpressionEditor.Operators.Text"),
+                        content: {
+                            isSelected: ko.observable(false),
+                            data: data,
+                            name: "dx-expressioneditor-collection"
+                        },
+                        dispose: function () { return void 0; }
+                    };
+                };
+                Tools.prototype._createFunctionsCategoryContent = function (textToSearch, isSelected, items) {
+                    return {
+                        isSelected: isSelected,
+                        data: {
+                            textToSearch: textToSearch,
+                            items: items,
+                            availableItems: ko.observableArray(items)
+                        },
+                        name: "dx-expressioneditor-collection-function",
+                    };
+                };
+                Tools.prototype._createFunctionsCategoryItem = function (functions, display) {
+                    var _this = this;
+                    var result = {
+                        display: display,
+                        isSelected: ko.observable(false),
+                        data: [],
+                        name: "dx-expressioneditor-collection-function",
+                    };
+                    $.map(functions, (function (item) {
+                        if (item) {
+                            item.forEach(function (functionItem) {
+                                _this._initDescription(functionItem);
+                                result.data.push(functionItem);
+                            });
+                        }
+                    }));
+                    return result;
+                };
+                Tools.prototype._createFunctionsCategory = function (items) {
+                    var textToSearch = ko.observable(""), disposables = [], isSelected = ko.observable(false), timeout = null, allItems = ko.computed(function () { return (_a = []).concat.apply(_a, items().map(function (x) { return x.data; })); var _a; }), content = this._createFunctionsCategoryContent(textToSearch, isSelected, allItems()), category = {
+                        displayName: DevExpress.Designer.getLocalization("Functions", "XtraEditorsExpressionEditor.Functions.Text"),
+                        items: items, allItems: allItems, isSelected: isSelected, content: content,
+                        collapsed: ko.observable(true),
+                        updateContent: function (items, isSelected) {
+                            content.isSelected && content.isSelected(false);
+                            content.isSelected = isSelected;
+                            content.isSelected(true);
+                            content.data.items = items;
+                            content.data.availableItems(content.data.items.filter(function (x) { return !!JS.Utils.findMatchesInString(x.text, textToSearch()); }));
+                        },
+                        templateName: "dx-expressioneditor-category-accordion",
+                        dispose: function () {
+                            disposables.forEach(function (x) { return x.dispose(); });
+                            disposables.splice(0, disposables.length);
+                        }
+                    };
+                    disposables.push(allItems);
+                    disposables.push(textToSearch.subscribe(function (newVal) {
+                        timeout && clearTimeout(timeout);
+                        timeout = setTimeout(function () {
+                            category.content.data.availableItems(category.content.data.items.filter(function (x) { return !!JS.Utils.findMatchesInString(x.text, newVal); }));
+                        }, 150);
+                    }));
+                    return category;
+                };
+                Tools.prototype._disposeCategories = function () {
+                    this._categories().forEach(function (category) { return category.dispose && category.dispose(); });
+                };
+                Tools.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._disposeCategories();
                 };
                 return Tools;
             })(JS.Utils.Disposable);
@@ -11186,13 +12242,13 @@ var DevExpress;
             Widgets.ExpressionEditorParametersTreeListController = ExpressionEditorParametersTreeListController;
             var ExpressionEditor = (function (_super) {
                 __extends(ExpressionEditor, _super);
-                function ExpressionEditor(options, fieldListProvider, disabled, rtl, _displayConverter) {
+                function ExpressionEditor(options, fieldListProvider, disabled, rtl, _displayNameProvider) {
                     var _this = this;
                     if (disabled === void 0) { disabled = ko.observable(false); }
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this);
                     this.options = options;
-                    this._displayConverter = _displayConverter;
+                    this._displayNameProvider = _displayNameProvider;
                     this._updateTextAreaValue = function (item, element) {
                         var textArea = _this._getTextArea(element), textAreaValue = _this.textAreaValue().toString(), cursorPosition = textArea && textArea.selectionStart || textAreaValue.length, newAddedText = textAreaValue[cursorPosition - 1] == " " ? (item.val || item.text || item) + " " : " " + (item.val || item.text || item) + " ";
                         _this.textAreaValue([textAreaValue.slice(0, cursorPosition), newAddedText, textAreaValue.slice(cursorPosition)].join(''));
@@ -11223,11 +12279,11 @@ var DevExpress;
                         _this._updateValue(newAddedString, element);
                     };
                     this._fieldsPutSelectionHandler = function (selectedItemPath, element) {
-                        var path = _this.options.path.peek();
+                        var path = _this.koOptions.peek().path.peek();
                         var proposedFieldName = selectedItemPath.substring(path.length + 1);
                         var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
-                        if (_this._displayConverter) {
-                            _this._displayConverter.toDisplayExpression(path, newAddedString)
+                        if (_this._displayNameProvider) {
+                            _this.displayExpressionConverter.toDisplayExpression(path, newAddedString)
                                 .done(function (result) { _this._updateValue(result, element); })
                                 .fail(function () { _this._updateValue(newAddedString, element); });
                         }
@@ -11242,7 +12298,21 @@ var DevExpress;
                     this.textAreaValue = ko.observable("");
                     this.languageHelper = {
                         getLanguageMode: function () { return "ace/mode/criteria"; },
-                        createCompleters: function (editor, bindingContext, viewModel) { return [new Widgets.CodeCompletor(editor, bindingContext, viewModel.fieldListProvider, viewModel.options.path, viewModel.options.functions, viewModel.options.rootItems)]; }
+                        createCompleters: function (editor, bindingContext, viewModel) {
+                            var path = ko.computed(function () { return ko.unwrap(viewModel.koOptions().path) || ""; }), functions = ko.computed(function () { return ko.unwrap(viewModel.koOptions().functions); }), completor = new Widgets.CodeCompletor({
+                                editor: editor,
+                                bindingContext: bindingContext,
+                                fieldListProvider: viewModel.fieldListProvider,
+                                path: path,
+                                functions: functions,
+                                rootItems: viewModel.options.rootItems,
+                                getRealExpression: function (path, member) {
+                                    return _this.displayExpressionConverter && _this.displayExpressionConverter.toRealExpression(path, member) || $.Deferred().resolve(member).promise();
+                                }
+                            });
+                            [path, functions].forEach(function (x) { return completor._disposables.push(x); });
+                            return [completor];
+                        }
                     };
                     this.aceOptions = {
                         showLineNumbers: false,
@@ -11256,7 +12326,10 @@ var DevExpress;
                         onChange: function (session) {
                             var value = session.getValue();
                             try {
-                                JS.Data.CriteriaOperator.parse(value);
+                                var operator = JS.Data.CriteriaOperator.parse(value);
+                                if (_this.koOptions().validate) {
+                                    _this.isValid(_this.koOptions().validate(operator));
+                                }
                                 session.clearAnnotations();
                             }
                             catch (exception) {
@@ -11271,15 +12344,31 @@ var DevExpress;
                     this.callbacks = {
                         focus: $.noop
                     };
+                    this.koOptions = ko.observable(null);
                     this.editorContainer = ko.observable();
                     this.isValid = ko.observable(true);
                     this.buttonItems = [];
                     this.rtl = false;
-                    if (options.patchFieldName) {
-                        this.patchFieldName = options.patchFieldName;
+                    this.koOptions(options);
+                    this.patchFieldName = function (fieldName) {
+                        return _this.koOptions().patchFieldName && _this.koOptions().patchFieldName(fieldName) || fieldName;
+                    };
+                    this.theme = this.koOptions().theme;
+                    this._disposables.push(this.value = ko.computed({
+                        read: function () {
+                            var value = ko.unwrap(_this.koOptions().value);
+                            return (value && value.toString()) || "";
+                        },
+                        write: function (newVal) { return _this.koOptions().value(newVal); }
+                    }));
+                    if (_displayNameProvider && options.path) {
+                        this.displayExpressionConverter = new JS.Utils.DisplayExpressionConverter(_displayNameProvider);
+                        var pathFunc = function () { return _this.koOptions().path && _this.koOptions().path(); };
+                        this.displayValue = wrapExpressionValue(pathFunc, this.value, this.displayExpressionConverter, this._disposables);
                     }
-                    this.theme = options.theme;
-                    this.value = options.value;
+                    else {
+                        this.displayValue = this.value;
+                    }
                     this.rtl = rtl;
                     var validate = function (value, sender) {
                         try {
@@ -11297,17 +12386,19 @@ var DevExpress;
                     this._disposables.push(this.popupVisible.subscribe(function (newVal) {
                         if (!newVal)
                             return;
+                        _this.tools.resetCategoriesSelection && _this.tools.resetCategoriesSelection();
+                        _this.textAreaValue(_this.displayValue());
                         if (!_this.aceAvailable) {
-                            _this.textAreaValue(_this.value());
                             validate(_this.value());
                         }
                         else {
                             var editor = _this.editorContainer();
                             var session = editor && editor.getSession();
-                            session && session.setValue(_this.value());
+                            session && session.setValue(_this.textAreaValue());
                         }
                     }));
-                    this.fieldListProvider = createExpressionEditorFieldListProvider(ko.unwrap(fieldListProvider), options.fieldName);
+                    var fieldName = ko.computed(function () { return _this.koOptions() && _this.koOptions().fieldName && _this.koOptions().fieldName(); });
+                    this._disposables.push(this.fieldListProvider = createExpressionEditorFieldListProvider(fieldListProvider, fieldName));
                     this.disabled = disabled;
                     var self = this;
                     this.save = function (sender) {
@@ -11318,20 +12409,23 @@ var DevExpress;
                             value = session && session.getValue();
                         }
                         if (validate(value, sender)) {
-                            options.value(value);
+                            _this.displayValue(value);
                             _this.popupVisible(false);
                         }
                     };
                     var selectionHandler = function (objectName) { return function (selectedItemType) {
                         _this.tools.description(selectedItemType && selectedItemType !== "None" ? DevExpress.Designer.getLocalization("The type of this " + objectName + " is: ", 'XtraEditorsExpressionEditor.Fields Description Prefix') + " " + selectedItemType : "");
                     }; };
-                    var fieldsTreeListOptions = options.path && ko.pureComputed(function () {
-                        return options.path() && _this._createToolsOptions(options.path(), _this.fieldListProvider, new ExpressionEditorTreeListController(options.fieldName || "", function (data, element) { _this._fieldsPutSelectionHandler(data.path, element); }, selectionHandler("field")));
+                    var fieldsTreeListOptions = ko.pureComputed(function () {
+                        return _this.koOptions().path && _this.koOptions().path() && _this._createToolsOptions(_this.koOptions().path(), _this.fieldListProvider(), new ExpressionEditorTreeListController(fieldName, function (data, element) { _this._fieldsPutSelectionHandler(data.path, element); }, selectionHandler("field")));
                     });
-                    this._disposables.push(fieldsTreeListOptions);
-                    this.tools = new Tools(this._updateValue, this._createToolsOptions("", this.fieldListProvider, new ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !JS.Utils.isList(item); }, this._parametersPutSelectionHandler, selectionHandler("Parameter"))), fieldsTreeListOptions, ko.unwrap(options.functions), options.customizeCategories);
+                    this.parametersTreeListController = new ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !JS.Utils.isList(item); }, this._parametersPutSelectionHandler, selectionHandler("Parameter"));
+                    var parametersTreeListOptions = ko.pureComputed(function () {
+                        return _this._createToolsOptions("", _this.fieldListProvider(), _this.parametersTreeListController);
+                    });
+                    this._disposables.push(this.tools = new Tools(this._updateValue, parametersTreeListOptions, this.koOptions, fieldsTreeListOptions));
                     this._createMainPopupButtons();
-                    this._disposables.push(this.tools);
+                    [fieldName, fieldsTreeListOptions, parametersTreeListOptions].forEach(function (x) { return _this._disposables.push(x); });
                 }
                 ExpressionEditor.prototype._createMainPopupButtons = function () {
                     var self = this;
@@ -11362,30 +12456,36 @@ var DevExpress;
             })(DevExpress.JS.Utils.Disposable);
             Widgets.ExpressionEditor = ExpressionEditor;
             function createExpressionEditorFieldListProvider(originalProvider, fieldName) {
-                return (!fieldName || !originalProvider) ? originalProvider : {
-                    getItems: function (path) {
-                        var $deferred = $.Deferred();
-                        originalProvider.getItems(path)
-                            .done(function (data) {
-                            $deferred.resolve(data.filter(function (field) { return field.name !== ko.unwrap(fieldName); }));
-                        })
-                            .fail(function () { return $deferred.reject(); });
-                        return $deferred.promise();
-                    },
-                    getValues: originalProvider.getValues
-                };
+                return ko.computed(function () {
+                    var provider = ko.unwrap(originalProvider);
+                    var unwrappedFieldName = ko.unwrap(fieldName);
+                    return !unwrappedFieldName ? provider : {
+                        getItems: function (path) {
+                            var $deferred = $.Deferred();
+                            provider.getItems(path)
+                                .done(function (data) {
+                                $deferred.resolve(data.filter(function (field) { return field.name !== unwrappedFieldName; }));
+                            })
+                                .fail(function () { return $deferred.reject(); });
+                            return $deferred.promise();
+                        },
+                        getValues: function (path) {
+                            return provider.getValues(path);
+                        }
+                    };
+                });
             }
-            function wrapExpressionOptionsValue(options, converter, element, subscriptions) {
-                if (!(converter && options.path))
-                    return options;
-                var _displayValue = ko.observable(options.value());
-                converter.toDisplayExpression(options.path(), options.value()).done(function (result) {
+            function wrapExpressionValue(path, value, converter, subscriptions) {
+                if (!(converter && path))
+                    return value;
+                var _displayValue = ko.observable(value());
+                converter.toDisplayExpression(path(), value()).done(function (result) {
                     _displayValue(result);
                 }).fail(function () {
-                    _displayValue(options.value());
+                    _displayValue(value());
                 });
-                var subscription = options.value.subscribe(function (newValue) {
-                    converter.toDisplayExpression(options.path(), newValue).done(function (result) {
+                var subscription = value.subscribe(function (newValue) {
+                    converter.toDisplayExpression(path(), newValue).done(function (result) {
                         _displayValue(result);
                     }).fail(function () {
                         _displayValue(newValue);
@@ -11394,10 +12494,10 @@ var DevExpress;
                 var displayValue = ko.pureComputed({
                     read: function () { return _displayValue(); },
                     write: function (newValue) {
-                        converter.toRealExpression(options.path(), newValue).done(function (result) {
-                            options.value(result);
+                        converter.toRealExpression(path(), newValue).done(function (result) {
+                            value(result);
                         }).fail(function () {
-                            options.value(newValue);
+                            value(newValue);
                         });
                     }
                 });
@@ -11405,17 +12505,13 @@ var DevExpress;
                     subscriptions.push(displayValue);
                     subscriptions.push(subscription);
                 }
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    displayValue.dispose();
-                    subscription.dispose();
-                });
-                return $.extend({}, options, { value: displayValue });
+                return displayValue;
             }
-            Widgets.wrapExpressionOptionsValue = wrapExpressionOptionsValue;
+            Widgets.wrapExpressionValue = wrapExpressionValue;
             ko.bindingHandlers["dxAceEditor"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var values = valueAccessor(), text = values.value, editorContainer = values.editorContainer, editor, _setEditorText = function (editorInstance, text) {
-                        editorInstance.getSession().setValue(text || "");
+                        editorInstance.getSession().setValue((text && text.toString()) || "");
                         editorInstance.clearSelection();
                         editorInstance.getSession().getUndoManager().reset();
                     };
@@ -11453,7 +12549,8 @@ var DevExpress;
                         if (additionalOptions && additionalOptions.onBlur) {
                             editor.onBlur = function (_) { return additionalOptions.onBlur(); };
                         }
-                        langTools.setCompleters(viewModel.languageHelper.createCompleters(editor, bindingContext, viewModel));
+                        var completers = viewModel.languageHelper.createCompleters(editor, bindingContext, viewModel);
+                        langTools.setCompleters(completers);
                         editor.setOptions(values.options);
                         editor.renderer.setShowGutter(showGutter);
                         var oldMouseMove = editor._defaultHandlers.guttermousemove;
@@ -11478,6 +12575,7 @@ var DevExpress;
                         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                             subscription.dispose();
                             values.options.focus = $.noop;
+                            completers.forEach(function (x) { return x.dispose && x.dispose(); });
                         });
                     }
                     if (ko.isObservable(editorContainer)) {
@@ -11491,40 +12589,18 @@ var DevExpress;
                     $element.children().remove();
                     $(element).addClass("dx-popup-general");
                     var templateHtml = $('#dx-expressioneditor').text(), $element = $element.append(templateHtml), values = valueAccessor();
-                    var editor = ko.observable(null);
                     var subscriptions = [];
                     var optionSubscription = null;
-                    var functionsSubscription = null;
-                    var displayExpressionConverter = values.displayExpressionConverter;
-                    if (!displayExpressionConverter && values.displayNameProvider) {
-                        var displayExpressionConverterType = DevExpress.Designer["Report"]["DisplayExpressionConverter"];
-                        if (displayExpressionConverterType) {
-                            displayExpressionConverter = new displayExpressionConverterType(values.displayNameProvider);
-                        }
-                    }
-                    var createEditor = function (options) {
-                        subscriptions.forEach(function (x) { return x.dispose(); });
-                        subscriptions.splice(0);
-                        functionsSubscription && functionsSubscription.dispose();
-                        functionsSubscription = options["functions"] && ko.isSubscribable(options["functions"])
-                            ? options["functions"].subscribe(function (_) { return editor(createEditor(options)); })
-                            : null;
-                        editor() && editor().dispose();
-                        var editorOptions = wrapExpressionOptionsValue(options, displayExpressionConverter, element, subscriptions);
-                        return new ExpressionEditor(editorOptions, values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayExpressionConverter);
-                    };
+                    var editor = new ExpressionEditor(ko.unwrap(values.options), values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayNameProvider);
                     if (ko.isSubscribable(values.options)) {
                         optionSubscription = values.options.subscribe(function (newOptions) {
-                            editor(createEditor(newOptions));
+                            newOptions && editor.koOptions(newOptions);
                         });
                     }
-                    var options = ko.unwrap(values.options);
-                    editor(createEditor(ko.unwrap(values.options)));
                     ko.applyBindings(editor, $element.children()[0]);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        editor() && editor().dispose();
+                        editor.dispose();
                         optionSubscription && optionSubscription.dispose();
-                        functionsSubscription && functionsSubscription.dispose();
                         subscriptions.forEach(function (x) { return x.dispose(); });
                         subscriptions.splice(0);
                     });
@@ -11542,8 +12618,8 @@ var DevExpress;
         (function (Widgets) {
             var FilterEditorCodeCompletor = (function (_super) {
                 __extends(FilterEditorCodeCompletor, _super);
-                function FilterEditorCodeCompletor(editor, bindingContext, fieldListProvider, path) {
-                    _super.call(this, editor, bindingContext, fieldListProvider, path);
+                function FilterEditorCodeCompletor(options) {
+                    _super.call(this, options);
                     var helper = new Widgets.FilterEditorHelper();
                     var functions = [];
                     var aggregate = [];
@@ -11576,7 +12652,7 @@ var DevExpress;
                 };
                 FilterEditorCodeCompletor.prototype.getAggregateCompletions = function () {
                     var functions = [];
-                    this.filterEditorAvailable.aggragate.forEach(function (funcItem) {
+                    this.filterEditorAvailable.aggregate.forEach(function (funcItem) {
                         functions.push(Widgets.createFunctionCompletion({ text: funcItem.name, paramCount: 0 }, funcItem.insertVal, funcItem.insertVal));
                     });
                     return functions;
@@ -11635,7 +12711,7 @@ var DevExpress;
                     var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
                     if (lastNonSpaceSymbol === '?' && text[text.length - 1] !== " ") {
                         var $deferred = $.Deferred();
-                        var $parametersPromise = this["_fieldListProvider"].getItems(new Widgets.PathRequest("Parameters"))
+                        var $parametersPromise = ko.unwrap(this["_fieldListProvider"]).getItems(new Widgets.PathRequest("Parameters"))
                             .done(function (fields) {
                             completions.push.apply(completions, _this["_convertDataMemberInfoToCompletions"](fields, token, "Parameters."));
                         });
@@ -12319,12 +13395,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,3],$V6=[1,30],$V7=[1,32],$V8=[1,25],$V9=[1,24],$Va=[1,34],$Vb=[1,31],$Vc=[1,33],$Vd=[1,13],$Ve=[1,5],$Vf=[1,10],$Vg=[1,21],$Vh=[1,14],$Vi=[1,19],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,50],$Vq=[1,52],$Vr=[1,53],$Vs=[1,56],$Vt=[1,55],$Vu=[1,51],$Vv=[1,54],$Vw=[1,40],$Vx=[1,39],$Vy=[1,37],$Vz=[1,36],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,34,35,36,37,38,39,40,42,43,46,48,55,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,34,35,36,37,38,39,40,42,43,46,48,55,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,34,35,36,37,38,39,40,42,43,44,46,48,55,62,63,64,66,67,68,69],$VN=[1,79],$VO=[1,96],$VP=[1,78],$VQ=[1,80],$VR=[1,81],$VS=[1,82],$VT=[1,83],$VU=[1,84],$VV=[1,85],$VW=[1,86],$VX=[1,87],$VY=[1,88],$VZ=[1,89],$V_=[1,90],$V$=[1,91],$V01=[1,92],$V11=[1,93],$V21=[1,94],$V31=[1,95],$V41=[5,11,16,17,19,20,23,34,35,36,37,38,39,40,42,43,46,48,55,62,63,64,66,67,68,69],$V51=[1,97],$V61=[1,98],$V71=[5,11,19,20,23,34,35,36,37,38,39,40,48,55,63,64,66,67,68,69],$V81=[5,11,35,36,48,55],$V91=[16,55],$Va1=[1,147],$Vb1=[1,169],$Vc1=[1,165],$Vd1=[1,164],$Ve1=[1,148],$Vf1=[1,149],$Vg1=[1,150],$Vh1=[1,151],$Vi1=[1,152],$Vj1=[1,153],$Vk1=[1,154],$Vl1=[1,155],$Vm1=[1,156],$Vn1=[1,157],$Vo1=[1,158],$Vp1=[1,159],$Vq1=[1,160],$Vr1=[1,161],$Vs1=[1,162],$Vt1=[1,163],$Vu1=[1,166],$Vv1=[1,167],$Vw1=[1,168],$Vx1=[1,170],$Vy1=[1,171],$Vz1=[1,172],$VA1=[15,16,17,22,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,55],$VB1=[16,17,20],$VC1=[5,11,17,19,20,23,34,35,36,37,38,39,40,43,48,55,63,64,66,67,68,69],$VD1=[5,11,34,35,36,39,40,48,55,66,67],$VE1=[5,11,19,20,34,35,36,39,40,48,55,66,67,68,69],$VF1=[11,48],$VG1=[5,11,16,17,19,20,23,34,35,36,37,38,39,40,42,43,44,46,48,55,62,63,64,66,67,68,69];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,28],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,23],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,25],$Vk=[1,27],$Vl=[1,26],$Vm=[1,30],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,49,50,51,53,54,55],$VJ=[1,57],$VK=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VL=[5,26,27,29,35,50],$VM=[1,109],$VN=[1,110],$VO=[1,104],$VP=[1,106],$VQ=[1,107],$VR=[1,105],$VS=[1,108],$VT=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VU=[5,18,19,24,25,26,27,29,30,35,50],$VV=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,50],$VW=[29,35];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"CONST":26,"AGG_COUNT":27,"AGG_AVG":28,"AGG_MAX":29,"AGG_MIN":30,"AGG_SINGLE":31,"AGG_EXISTS":32,"AGG_SUM":33,"OP_LIKE":34,"AND":35,"OR":36,"OP_BETWEEN":37,"OP_IN":38,"NOT":39,"IS":40,"NULL":41,"%":42,"-":43,"[":44,"=":45,"/":46,"(":47,")":48,"param":49,"?":50,"property":51,"columnOrAggregate":52,"propertyWithAggregate":53,"compositeProperty":54,"]":55,"field":56,"aggregate":57,"aggregateSuffix":58,"topLevelAggregate":59,"MinStart":60,"MaxStart":61,"*":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"CONST",27:"AGG_COUNT",28:"AGG_AVG",29:"AGG_MAX",30:"AGG_MIN",31:"AGG_SINGLE",32:"AGG_EXISTS",33:"AGG_SUM",34:"OP_LIKE",35:"AND",36:"OR",37:"OP_BETWEEN",38:"OP_IN",39:"NOT",40:"IS",41:"NULL",42:"%",43:"-",44:"[",45:"=",46:"/",47:"(",48:")",50:"?",55:"]",62:"*",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,4],[24,4],[24,4],[49,2],[49,1],[51,1],[51,3],[52,1],[53,1],[53,3],[54,3],[54,4],[54,5],[54,6],[56,1],[56,2],[57,4],[57,3],[57,6],[57,5],[57,4],[57,3],[57,1],[59,1],[58,1],[58,1],[58,3],[58,3],[58,4],[58,4],[58,3],[58,4],[58,2],[58,2],[60,3],[61,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"property":48,"[":49,"]":50,".":51,"agg":52,"FIELD_END":53,"CH":54,"ESC_CH":55,"FIELD_START":56,"?":57,"NAME_SOFT":58,"commaseparated":59,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",49:"[",50:"]",51:".",53:"FIELD_END",54:"CH",55:"ESC_CH",56:"FIELD_START",57:"?",58:"NAME_SOFT"},
+productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[52,3],[52,1],[52,3],[52,1],[52,4],[52,4],[52,3],[52,4],[52,4],[52,4],[48,2],[48,2],[48,2],[48,3],[48,3],[48,1],[48,1],[48,1],[8,2],[8,2],[8,1],[33,2],[33,3],[59,1],[59,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -12334,375 +13410,248 @@ case 1:
  return $$[$0-1]; 
 break;
 case 2:
- result = new DevExpress.JS.Data.CriteriaOperator(); 
-break;
-case 3:
- result = $$[$0-1]; 
-break;
-case 4:
- this.$ = [ $$[$0] ]; 
-break;
-case 5: case 6:
- this.$ = $$[$0-2]; this.$.push($$[$0]); 
-break;
-case 7: case 10: case 17: case 83: case 86: case 117: case 118: case 119: case 120:
- this.$ = $$[$0]; 
-break;
-case 8: case 110: case 111: case 143: case 153:
- this.$ = $$[$0-1]; 
-break;
-case 9:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.OrderDescToken, operand: $$[$0-1] }); 
-break;
-case 11:
- this.$ =  DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
-break;
-case 12:
- this.$ =	DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '+' + $$[$0].propertyName }); 
-break;
-case 13:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: '<' + $$[$0-2].propertyName + '>' + $$[$0].propertyName }); 
-break;
-case 14: case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31: case 32: case 33: case 34: case 35: case 36:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0] }); 
-break;
-case 15: case 16: case 37: case 38: case 39: case 40: case 41: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-1].propertyName + ' ' + $$[$0] }); 
-break;
-case 18:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "^" }); 
-break;
-case 19:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0] }); 
-break;
-case 54: case 55: case 56:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-1].propertyName + ' ' + $$[$0] }); 
-break;
-case 57:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "^" }); 
-break;
-case 58: case 59: case 60: case 61:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '-' + $$[$0] }); 
-break;
-case 62: case 63: case 64: case 65:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '[' + $$[$0] }); 
-break;
-case 66: case 67: case 68: case 69:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '+' + $$[$0] }); 
-break;
-case 70: case 71: case 72: case 73:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '=' + $$[$0] }); 
-break;
-case 74:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '/' + $$[$0] }); 
-break;
-case 75: case 76: case 77:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '/'  + $$[$0] }); 
-break;
-case 78: case 79:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1] + ')' }); 
-break;
-case 80:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1].propertyName + ')' }); 
-break;
-case 81:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
-break;
-case 82:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
-break;
-case 84:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
-break;
-case 85:
- this.$ = $$[$0].propertyName; 
-break;
-case 87:
- this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
-break;
-case 88:
-
-  var lst = [];
-  lst.push($$[$0-1]);
-  this.$ = {
-   column: _$[$0-1].first_column,
-   line: _$[$0-1].first_line - 1,
-   names: lst
-  };
- 
-break;
-case 89:
-
-	var lst = [];
-  lst.push($$[$0-2] + '.');
-  this.$ = {
-   column: _$[$0-2].first_column,
-   line: _$[$0-2].first_line - 1,
-   names: lst
-  };
- 
-break;
-case 90:
-
-  var propertyNameObject = $$[$0-4];
-  propertyNameObject.names.push($$[$0-1]);
-  this.$ = propertyNameObject;
- 
-break;
-case 91:
-
-  var propertyNameObject = $$[$0-5];
-  propertyNameObject.names.push($$[$0-2] + '.');
-  this.$ = propertyNameObject;
- 
-break;
-case 92:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0].names.join('.'), startColumn: $$[$0].column, startLine: $$[$0].line }); 
-break;
-case 93:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { }); 
-break;
-case 94:
-
-		var agg = $$[$0];
-		var collectionProperty = DevExpress.JS.Data.criteriaCreator.process("property", { });
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(collectionProperty, null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 95:
-
-		var agg = $$[$0];
-		var prop = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].names.join('.'), startColumn: $$[$0-2].column, startLine: $$[$0-2].line });
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(prop, null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 96:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 97:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 98:
- this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 99:
- this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 102: case 104:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: null,
-			aggregateType:  DevExpress.JS.Data.Aggregate.Count,
-			condition: null
-		});
-	
-break;
-case 103: case 105:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: null,
-			aggregateType:  DevExpress.JS.Data.Aggregate.Exists,
-			condition: null
-		});
-	
-break;
-case 106:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0-1],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Avg,
-			condition: null
-		});
-	
-break;
-case 107:
-
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0-1],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Sum,
-			condition: null
-		});
-	
-break;
-case 108:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "This" }),
-			aggregateType:  DevExpress.JS.Data.Aggregate.Single,
-			condition: null
-		});
-	
-break;
-case 109:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0-1],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Single,
-			condition: null
-		});
-	
-break;
-case 112:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Min,
-			condition: null
-		});
-	
-break;
-case 113:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Max,
-			condition: null
-		});
-	
-break;
-case 114: case 115:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: $$[$0] }); 
 break;
-case 116:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: null }); 
+case 3: case 4: case 40: case 41: case 42: case 43:
+ this.$ = $$[$0]; 
 break;
-case 121:
+case 5:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Multiply }); 
 break;
-case 122:
+case 6:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Divide }); 
 break;
-case 123:
+case 7:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Plus }); 
 break;
-case 124:
+case 8:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Minus }); 
 break;
-case 125:
+case 9:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Modulo }); 
 break;
-case 126:
+case 10:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseOr }); 
 break;
-case 127:
+case 11:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd }); 
 break;
-case 128:
+case 12:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseXor }); 
 break;
-case 129:
-
-								this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Minus, operator: $$[$0] });
-							
+case 13:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Minus, operator: $$[$0] }); 
 break;
-case 130:
+case 14:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Plus, operator: $$[$0] }); 
 break;
-case 131:
+case 15:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, operator: $$[$0] }); 
 break;
-case 132:
+case 16:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Equal }); 
 break;
-case 133:
+case 17:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.NotEqual }); 
 break;
-case 134:
+case 18:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Greater }); 
 break;
-case 135:
+case 19:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Less }); 
 break;
-case 136:
+case 20:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual }); 
 break;
-case 137:
+case 21:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.LessOrEqual }); 
 break;
-case 138:
+case 22:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }); 
 break;
-case 139:
+case 23:
 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
-			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, 
-			operator: DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-3], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }) 
-		});
-	
+            this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
+                operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, 
+                operator: DevExpress.JS.Data.criteriaCreator.process("binary", { left: $$[$0-3], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }) 
+            });
+        
 break;
-case 140:
+case 24:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, operator: $$[$0] }); 
 break;
-case 141:
+case 25:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 142:
+case 26:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 144:
+case 27: case 62: case 74:
+ this.$ = $$[$0-1]; 
+break;
+case 28:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-2] }); 
 break;
-case 145:
+case 29:
  
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
-			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not,
-			operator: DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-3] })
-		}); 
-	
+            this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
+                operatorType: DevExpress.JS.Data.UnaryOperatorType.Not,
+                operator: DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-3] })
+            }); 
+        
 break;
-case 146:
+case 30:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("in", { criteriaOperator: $$[$0-2], operands: $$[$0] }); 
 break;
-case 147:
+case 31:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("between", { property: $$[$0-6], begin: $$[$0-3], end: $$[$0-1] }); 
 break;
-case 148: case 149:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
+case 32:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
 break;
-case 150:
+case 33:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Min, operands: $$[$0] }); 
+break;
+case 34:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Max, operands: $$[$0] }); 
+break;
+case 35:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Count"] || "Count", operands: $$[$0] }); 
+break;
+case 36:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Avg"] || "Avg", operands: $$[$0] }); 
+break;
+case 37:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Sum"] || "Sum", operands: $$[$0] }); 
+break;
+case 38:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Exists"] || "Exists", operands: $$[$0] }); 
+break;
+case 39:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Single"] || "Single", operands: $$[$0] }); 
+break;
+case 44:
  this.$ = null; 
 break;
-case 151:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Min, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
+case 45:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-5].name, startColumn: $$[$0-5].col, startLine: $$[$0-5].line }), 
+                $$[$0-3], $$[$0].type, $$[$0].expr
+            ); 
+        
 break;
-case 152:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Max, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
+case 46:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-4].name, startColumn: $$[$0-4].col, startLine: $$[$0-4].line }), 
+                null, $$[$0].type, $$[$0].expr
+            ); 
+        
 break;
-case 154:
+case 47:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
+                null, $$[$0].type, $$[$0].expr
+            ); 
+        
+break;
+case 48:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].name, startColumn: $$[$0-3].col, startLine: $$[$0-3].line }), 
+                $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null
+            );
+        
+break;
+case 49:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
+                null, DevExpress.JS.Data.Aggregate.Exists, null);
+        
+break;
+case 50:
+ 
+            this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0].name, startColumn: $$[$0].col, startLine: $$[$0].line }); 
+        
+break;
+case 51:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { }), 
+                null, $$[$0].type, $$[$0].expr
+            ); 
+        
+break;
+case 52:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Count  };  
+break;
+case 53:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Count };   
+break;
+case 54: case 55:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Exists }; 
+break;
+case 56:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Avg, expr: $$[$0-1] }; 
+break;
+case 57:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Sum, expr: $$[$0-1] }; 
+break;
+case 58:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Single, expr: DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "This" }) }; 
+break;
+case 59:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Single, expr: $$[$0-1] }; 
+break;
+case 60:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Min, expr: $$[$0-1] }; 
+break;
+case 61:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Max, expr: $$[$0-1] }; 
+break;
+case 63:
+ this.$ = { name: $$[$0-1].name + $$[$0], line: $$[$0-1].line, col: $$[$0-1].col }; 
+break;
+case 64:
+ this.$ = { name: $$[$0-1].name +$$[$0].substr(1), line: $$[$0-1].line, col: $$[$0-1].col }; 
+break;
+case 65:
+ this.$ = { name: $$[$0-2].name + ".", line: $$[$0-2].line, col: $$[$0-2].col }; 
+break;
+case 66:
+ this.$ = { name: $$[$0-2].name + "." + $$[$0], line: $$[$0-2].line, col: $$[$0-2].col }; 
+break;
+case 67:
+ this.$ = { name: "", line: _$[$0].first_line - 1, col: _$[$0].first_column + 1 }; 
+break;
+case 68:
+ this.$ = { name: $$[$0], line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
+break;
+case 69:
+ this.$ = { name: "^", line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
+break;
+case 70: case 71:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
+break;
+case 72:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
+break;
+case 73:
  this.$ = []; 
 break;
-case 155:
-
-							var lst = [];
-							lst.push($$[$0]);
-							this.$ = lst;
-						
+case 75:
+ this.$ = [$$[$0]]; 
 break;
-case 156:
-
-							var lst = $$[$0-2];
-							lst.push($$[$0]);
-							this.$ = lst;
-						
+case 76:
+ this.$ = $$[$0-2].concat($$[$0]); 
 break;
 }
 },
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,114]),o($VG,[2,115]),o($VG,[2,116]),o($VG,[2,117]),o($VG,[2,118],{44:[1,57]}),o($VG,[2,119],{16:[1,58]}),o($VG,[2,120]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,48:[1,64],49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{47:$VH,70:65},o($VI,$VJ,{70:67,47:$VH}),{11:[1,68],48:$VK},{11:[1,70],48:$VL},o($VG,[2,82],{15:[1,72]}),o($VM,[2,92],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:76,53:75,55:[1,74]},o($V41,[2,83],{15:$V51,22:$V61}),o($VG,[2,100]),{47:[1,99]},{47:[1,100]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,101]),{14:101,15:[1,102]},o($VG,[2,102],{47:[1,103]}),o($VG,[2,103],{47:[1,104]}),{47:[1,105]},{47:[1,106]},{47:[1,107]},{1:[2,1]},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:122,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{34:[1,123]},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:125,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{39:[1,127],41:[1,126]},{47:$VH,70:128},{47:[1,129]},{4:130,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,55:[1,131],56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{15:[1,133],18:26,19:$V2,21:132,23:$V4},o($VG,[2,129]),o($VG,[2,130]),o($V71,[2,131],{17:$Vl,42:$Vw,43:$Vx,46:$Vy,62:$Vz}),o($V81,[2,140],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,134],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,150]),o($VG,[2,148]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,48:[1,136],49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk,72:135},o($VG,[2,149]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,110]),{4:139,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,111]),o($VG,[2,81]),{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,44:[1,141],58:140,60:142,61:143},o($VM,[2,93],{16:[1,144]}),{16:[1,146],55:[1,145]},o($V91,[2,86]),o($V91,[2,85],{15:$Va1,17:$Vb1,22:$Vc1,25:$Vd1,26:$Ve1,27:$Vf1,28:$Vg1,29:$Vh1,30:$Vi1,31:$Vj1,32:$Vk1,33:$Vl1,34:$Vm1,35:$Vn1,36:$Vo1,37:$Vp1,38:$Vq1,39:$Vr1,40:$Vs1,41:$Vt1,42:$Vu1,43:$Vv1,44:$Vw1,45:$Vx1,46:$Vy1,47:$Vz1}),o($VA1,[2,19]),o($VA1,[2,20]),o($VA1,[2,21]),o($VA1,[2,22]),o($VA1,[2,23]),o($VA1,[2,24]),o($VA1,[2,25]),o($VA1,[2,26]),o($VA1,[2,27]),o($VA1,[2,28]),o($VA1,[2,29]),o($VA1,[2,30]),o($VA1,[2,31]),o($VA1,[2,32]),o($VA1,[2,33]),o($VA1,[2,34]),o($VA1,[2,35]),o($VA1,[2,36]),o($VA1,[2,57]),o($VI,[2,15]),o($VI,[2,16]),{4:173,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:174,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{16:[1,176],17:[1,177],20:[1,175]},o($VB1,[2,10]),{48:[1,178]},{48:[1,179]},{4:180,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:181,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:183,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,48:[1,182],49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,121]),o($VG,[2,122]),o($VC1,[2,123],{42:$Vw,46:$Vy,62:$Vz}),o($VC1,[2,124],{42:$Vw,46:$Vy,62:$Vz}),o($VG,[2,125]),o([5,11,19,20,34,35,36,37,38,39,40,48,55,63,66,67,68,69],[2,126],{17:$Vl,23:$Vo,42:$Vw,43:$Vx,46:$Vy,62:$Vz,64:$VB}),o($V71,[2,127],{17:$Vl,42:$Vw,43:$Vx,46:$Vy,62:$Vz}),o([5,11,19,20,23,34,35,36,37,38,39,40,48,55,63,66,67,68,69],[2,128],{17:$Vl,42:$Vw,43:$Vx,46:$Vy,62:$Vz,64:$VB}),o($VD1,[2,132],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VD1,[2,133],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VE1,[2,134],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VE1,[2,135],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VE1,[2,136],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VE1,[2,137],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VD1,[2,138],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:184,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($V81,[2,141],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,36,48,55],[2,142],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,144]),{41:[1,185]},o($VG,[2,146]),{4:186,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,55:[1,187],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,99],{16:[1,188]}),o($V41,[2,84],{15:$V51,22:$V61}),o($VI,$VJ),o($VG,[2,143]),{11:[1,190],48:[1,189]},o($VG,[2,154]),o($VF1,[2,155],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,191],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,192],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,95]),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:76,53:193},{48:$VK},{48:$VL},{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,58:194,60:142,61:143},o($VG1,[2,88]),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:196,55:[1,195]},o($VA1,[2,37]),o($VA1,[2,38]),o($VA1,[2,39]),o($VA1,[2,40]),o($VA1,[2,41]),o($VA1,[2,42]),o($VA1,[2,43]),o($VA1,[2,44]),o($VA1,[2,45]),o($VA1,[2,46]),o($VA1,[2,47]),o($VA1,[2,48]),o($VA1,[2,49]),o($VA1,[2,50]),o($VA1,[2,51]),o($VA1,[2,52]),o($VA1,[2,53]),o($VA1,[2,54]),o($VA1,[2,55]),o($VA1,[2,56]),{15:[1,197],22:[1,199],25:[1,198],42:[1,200]},{15:[1,201],22:[1,203],25:[1,202],42:[1,204]},{15:[1,205],22:[1,207],25:[1,206],42:[1,208]},{15:[1,209],22:[1,211],25:[1,210],42:[1,212]},{15:[1,213],22:[1,215],25:[1,214],42:[1,216]},{15:$VN,22:[1,217],23:$VO,24:219,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,42:[1,218]},o($VF1,[2,112],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VF1,[2,113],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,220]},{15:[1,221]},{15:[1,222]},o($VG,[2,104]),o($VG,[2,105]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,223],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,224],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,108]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,225],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VD1,[2,139],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,145]),{11:[1,226],17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,98],{16:[1,227]}),{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,58:228,60:142,61:143},o($VG,[2,153]),{4:229,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,151]),o($VG,[2,152]),{16:[1,231],55:[1,230]},o($VG,[2,94]),o($VG1,[2,89]),o($V91,[2,87]),o($VA1,[2,58]),o($VA1,[2,59]),o($VA1,[2,60]),o($VA1,[2,61]),o($VA1,[2,62]),o($VA1,[2,63]),o($VA1,[2,64]),o($VA1,[2,65]),o($VA1,[2,66]),o($VA1,[2,67]),o($VA1,[2,68]),o($VA1,[2,69]),o($VA1,[2,70]),o($VA1,[2,71]),o($VA1,[2,72]),o($VA1,[2,73]),o($VA1,[2,74]),o($VA1,[2,75]),o($VA1,[2,76]),o($VA1,[2,77]),{48:[1,232]},{48:[1,233]},{15:$Va1,17:$Vb1,22:$Vc1,25:$Vd1,26:$Ve1,27:$Vf1,28:$Vg1,29:$Vh1,30:$Vi1,31:$Vj1,32:$Vk1,33:$Vl1,34:$Vm1,35:$Vn1,36:$Vo1,37:$Vp1,38:$Vq1,39:$Vr1,40:$Vs1,41:$Vt1,42:$Vu1,43:$Vv1,44:$Vw1,45:$Vx1,46:$Vy1,47:$Vz1,48:[1,234]},o($VI,[2,13]),o($VB1,[2,11]),o($VB1,[2,12]),o($VG,[2,106]),o($VG,[2,107]),o($VG,[2,109]),{4:235,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,58:236,60:142,61:143},o($VG,[2,97]),o($VF1,[2,156],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG1,[2,90]),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:196,55:[1,237]},o($VA1,[2,78]),o($VA1,[2,79]),o($VA1,[2,80]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,238],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,96]),o($VG1,[2,91]),o($VG,[2,147])],
-defaultActions: {35:[2,1]},
+table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{1:[3]},{5:[1,29],9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG},o($VH,[2,2]),o($VH,[2,3]),o($VH,[2,4]),{4:51,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VI,[2,68],{33:56,28:$VJ}),{28:$VJ,33:58},{28:$VJ,33:59},{28:$VJ,33:60},{28:$VJ,33:61},{28:$VJ,33:62},{28:$VJ,33:63},{28:$VJ,33:64},o($VH,[2,40]),o($VH,[2,41]),o($VH,[2,42]),o($VH,[2,43]),o($VH,[2,44]),o($VH,[2,50],{49:[1,65],51:[1,66],53:[1,67],54:[1,68],55:[1,69]}),{50:[1,70]},o($VH,[2,72],{36:[1,71],58:[1,72]}),o($VI,[2,67]),o($VI,[2,69]),{1:[2,1]},{4:73,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:74,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{24:[1,88]},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:90,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{25:[1,92],31:[1,91]},{28:$VJ,33:93},{28:[1,94]},o($VH,[2,13]),o($VH,[2,14]),o($VK,[2,15],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq}),o($VL,[2,24],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,30:$VE,32:$VF,34:$VG}),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,95],30:$VE,32:$VF,34:$VG},o($VH,[2,32]),{4:98,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,96],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl,59:97},o($VH,[2,33]),o($VH,[2,34]),o($VH,[2,35]),o($VH,[2,36]),o($VH,[2,37]),o($VH,[2,38]),o($VH,[2,39]),{4:99,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,50:[1,100],56:$Vk,57:$Vl},{36:[1,103],37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:101,56:[1,102]},o($VI,[2,62]),o($VI,[2,63]),o($VI,[2,64]),{51:[1,111]},o($VH,[2,70]),o($VH,[2,71]),o($VH,[2,5]),o($VH,[2,6]),o($VT,[2,7],{9:$Vm,10:$Vn,13:$Vq}),o($VT,[2,8],{9:$Vm,10:$Vn,13:$Vq}),o($VH,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],[2,10],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,15:$Vs,16:$Vt}),o($VK,[2,11],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],[2,12],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,15:$Vs}),o($VU,[2,16],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),o($VU,[2,17],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),o($VV,[2,18],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VV,[2,19],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VV,[2,20],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VV,[2,21],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VU,[2,22],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),{4:112,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VL,[2,25],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,30:$VE,32:$VF,34:$VG}),o([5,27,29,35,50],[2,26],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,30:$VE,32:$VF,34:$VG}),o($VH,[2,28]),{31:[1,113]},o($VH,[2,30]),{4:114,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VH,[2,27]),o($VH,[2,73]),{29:[1,115],35:[1,116]},o($VW,[2,75],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG}),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG,50:[1,117]},o($VH,[2,49],{51:[1,118]}),o($VH,[2,47]),o($VI,[2,65]),o($VI,[2,66]),o($VH,[2,53],{28:[1,119]}),o($VH,[2,55],{28:[1,120]}),{28:[1,121]},{28:[1,122]},{28:[1,123]},{28:[1,124]},{28:[1,125]},{37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:126},o($VU,[2,23],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),o($VH,[2,29]),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG,35:[1,127]},o($VH,[2,74]),{4:128,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VH,[2,48],{51:[1,129]}),{37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:130},{29:[1,131]},{29:[1,132]},{4:133,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:134,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:136,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,135],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VH,[2,51]),{4:139,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VW,[2,76],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG}),{37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:140},o($VH,[2,46]),o($VH,[2,52]),o($VH,[2,54]),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,141],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,142],30:$VE,32:$VF,34:$VG},o($VH,[2,58]),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,143],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,144],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,145],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,146],30:$VE,32:$VF,34:$VG},o($VH,[2,45]),o($VH,[2,56]),o($VH,[2,57]),o($VH,[2,59]),o($VH,[2,60]),o($VH,[2,61]),o($VH,[2,31])],
+defaultActions: {29:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -13177,108 +14126,120 @@ options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:/* skip whitespace */
+case 0: this.begin('INITIAL'); return 49; 
 break;
-case 1:return 37
+case 1: this.begin('INITIAL'); return 53; 
 break;
-case 2:return 38
+case 2:return 55;
 break;
-case 3:return 39
+case 3:return 54;
 break;
-case 4:return 40
+case 4:return 'INVALID';
 break;
-case 5:return 41
+case 5:return 44
 break;
-case 6:return 62
+case 6:return 46
 break;
-case 7:return 46
+case 7:return 45
 break;
-case 8:return 43
+case 8:return 47
 break;
-case 9:return 17
+case 9:return 47
 break;
-case 10:return 23
+case 10:/* skip whitespace */
 break;
-case 11:return 67
+case 11:return 34
 break;
-case 12:return '!'
+case 12:return 32
 break;
-case 13:return 42
+case 13:return 25
 break;
-case 14:return 47
+case 14:return 30
 break;
-case 15:return 48
+case 15:return 31
 break;
-case 16:return 44
+case 16:return 9
 break;
-case 17:return 55
+case 17:return 10
 break;
-case 18:return 67
+case 18:return 12
 break;
-case 19:return 68
+case 19:return 11
 break;
-case 20:return 69
+case 20:return 16
 break;
-case 21:return 20
+case 21:return 17
 break;
 case 22:return 19
 break;
-case 23:return 36
+case 23:return '!'
 break;
-case 24:return 35
+case 24:return 13
 break;
-case 25:return 28
+case 25:return 19
 break;
-case 26:return 29
+case 26:return 22
 break;
-case 27:return 30
+case 27:return 23
 break;
-case 28:return 31
+case 28:return 20
 break;
-case 29:return 27
+case 29:return 21
 break;
-case 30:return 32
+case 30:return 27
 break;
-case 31:return 33
+case 31:return 26
 break;
-case 32:return 66
+case 32:return 40
 break;
-case 33:return 66
+case 33:return 38
 break;
-case 34:return 34
+case 34:return 37
 break;
-case 35:return 35
+case 35:return 43
 break;
-case 36:return 36
+case 36:return 39
 break;
-case 37:return 5
+case 37:return 42
 break;
-case 38:return 22
+case 38:return 41
 break;
-case 39:return 16
+case 39:return 18
 break;
-case 40:return 11
+case 40:return 18
 break;
-case 41:return 50
+case 41:return 24
 break;
 case 42:return 26
 break;
-case 43:return 26
+case 43:return 27
 break;
-case 44:return 15	
+case 44: this.begin('fieldname'); return 56; 
 break;
-case 45:return 26	
+case 45:return 50;
 break;
-case 46:return 26
+case 46:return 28
 break;
-case 47:return 25   
+case 47:return 29
 break;
-case 48:return 'INVALID'
+case 48:return 51
+break;
+case 49:return 35
+break;
+case 50:return 57
+break;
+case 51:return 36
+break;
+case 52:return 58
+break;
+case 53:return 'INVALID'
+break;
+case 54:return 5
 break;
 }
 },
-rules: [/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:$)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:'[^']*')/i,/^(?:#[^#]*#)/i,/^(?:.+(?=\]))/i,/^(?:.)/i],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],"inclusive":true}}
+rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
+conditions: {"fieldname":{"rules":[0,1,2,3,4],"inclusive":false},"INITIAL":{"rules":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54],"inclusive":true}}
 });
 return lexer;
 })();
@@ -15900,7 +16861,10 @@ var DevExpress;
                 _super.call(this);
                 this.tabs = [];
                 this.collapsed = ko.observable(false);
-                this.toggleCollapsedText = ko.pureComputed(function () { return DevExpress.Designer.getLocalization(_this.collapsed() ? "Open" : "Collapse", _this.collapsed() ? "DevExpress.XtraCharts.StockLevel.Open" : "PivotGridStringId.PopupMenuCollapse"); });
+                this.toggleCollapsedText = ko.pureComputed(function () {
+                    var actionString = _this.collapsed() ? "Open" : "Collapse";
+                    return DevExpress.Designer.getLocalization(actionString, "ASPxReportsStringId.SidePanel_" + actionString);
+                });
                 var _self = this;
                 this.tabs = tabs;
                 this._disposables.push(ko.computed(function () {
@@ -16208,7 +17172,8 @@ var DevExpress;
                 if (editable) {
                     var controlInfo = controlsFactory.controlsMap[editable.controlType], propertiesInfo = createPopularProperties(controlInfo && controlInfo.info || [], controlInfo && controlInfo.popularProperties || []);
                     (propertiesInfo).forEach(function (item) {
-                        popularPropertiesObject[item.propertyName] = editable[item.propertyName];
+                        if (item.propertyName in editable)
+                            popularPropertiesObject[item.propertyName] = editable[item.propertyName];
                     });
                     popularPropertiesObject.getInfo = function () {
                         return propertiesInfo;

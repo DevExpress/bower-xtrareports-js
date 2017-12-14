@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.3
-* Build date: 2017-11-14
+* Version: 17.2.4
+* Build date: 2017-12-14
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -231,7 +231,7 @@
         <div class="dx-expressioneditor-textarea" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyUp: function() { isValid(true); } }"></div>
         <!-- /ko -->
         <!-- ko if: aceAvailable -->
-        <div class="dx-expressioneditor-textarea" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, theme: theme, options: aceOptions, additionalOptions: additionalOptions, callbacks: callbacks }"></div>
+        <div class="dx-expressioneditor-textarea" data-bind="dxAceEditor: { value: textAreaValue, editorContainer: editorContainer, theme: theme, options: aceOptions, additionalOptions: additionalOptions, callbacks: callbacks }"></div>
         <!-- /ko -->
         <div class="dx-expressioneditor-tools">
             <!-- ko with: tools-->
@@ -251,7 +251,7 @@
 </script>
 <script type="text/html" id="dx-expressioneditor">
     <div>
-        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: value, buttonAction: function() { popupVisible(true); }, disabled: disabled }"></div>
+        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: displayValue, buttonAction: function() { popupVisible(true); }, disabled: disabled }"></div>
         <div class="dx-expressioneditor dx-popup-general" data-bind="dxPopup: {
             showTitle: true,
             title: title(),
@@ -265,7 +265,9 @@
             position: { of: getPopupContainer($element)},
             onShown: onShown
         }">
+            <!-- ko if: popupVisible -->
             <!-- ko template: "dx-expressioneditor-main" -->
+            <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
@@ -301,26 +303,31 @@
 <script type="text/html" id="dx-expressioneditor-categories">
     <div class="dx-expressioneditor-tools-tab-content-wrapper" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
         <!-- ko foreach: content -->
-        <!-- ko if: $data.items -->
-        <div class="dx-fieldset" style="margin: 0;">
-            <div data-bind="dxdAccordion: { collapsed: collapsed }">
-                <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header">
-                    <div class="dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
-                    <span class="dx-expressioneditor-tools-tab-header" data-bind="text: displayName"></span>
-                </div>
-                <div class="dx-accordion-content">
-                    <!-- ko foreach: items-->
-                    <div class="dx-expressioneditor-tools-tab-item" data-bind="css: {'dx-expressioneditor-state-selected': isSelected }, text: $data.display, dxAction: function() { $parents[1].click($data); }"></div>
-                    <!-- /ko -->
-                </div>
-            </div>
-        </div>
+        <!-- ko if: $data.templateName -->
+        <!-- ko template: $data.templateName-->
         <!-- /ko -->
-        <!-- ko ifnot: $data.items -->
+        <!-- /ko -->
+        <!-- ko ifnot: $data.templateName -->
         <div class="dx-expressioneditor-tools-tab-category" data-bind="css: {'dx-expressioneditor-state-selected': content.isSelected }, text: displayName, dxAction: function() { $parent.click($data.content) }">
         </div>
         <!-- /ko -->
         <!-- /ko -->
+    </div>
+</script>
+
+<script type="text/html" id="dx-expressioneditor-category-accordion">
+    <div class="dx-fieldset" style="margin: 0;">
+        <div data-bind="dxdAccordion: { collapsed: collapsed }">
+            <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header" data-bind="css: {'dx-expressioneditor-state-selected': $data.isSelected }, dxAction: function() { $data.updateContent($data.allItems(), $data.isSelected); $parent.click($data.content) }">
+                <div class=" dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
+                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: displayName"></span>
+            </div>
+            <div class="dx-accordion-content">
+                <!-- ko foreach: items-->
+                <div class="dx-expressioneditor-tools-tab-item" data-bind="css: {'dx-expressioneditor-state-selected': isSelected }, text: $data.display, dxAction: function() { $parent.updateContent($data.data, $data.isSelected); $parents[1].click($parent.content); }"></div>
+                <!-- /ko -->
+            </div>
+        </div>
     </div>
 </script>
 
@@ -385,9 +392,18 @@
     <!-- /ko -->
 </script>
 
-<script type="text/html" id="dx-filtereditor-plain">
+<script type="text/html" id="dx-filtereditor-advanced">
     <div class="dx-filtereditor" style="width: 100%; height: 100%;" data-bind="style: { pointerEvents: $data.options().disabled() ? 'none' : '' }">
         <!-- ko template: 'dx-filtereditor-content' -->
+        <!-- /ko -->
+        <!-- ko template: 'dx-filtereditor-content-popups' -->
+        <!-- /ko -->
+    </div>
+</script>
+
+<script type="text/html" id="dx-filtereditor-plain">
+    <div class="dx-filtereditor" style="width: 100%; height: 100%;" data-bind="style: { pointerEvents: $data.options().disabled() ? 'none' : '' }">
+        <!-- ko template: 'dx-filtereditor-content-plain' -->
         <!-- /ko -->
         <!-- ko template: 'dx-filtereditor-content-popups' -->
         <!-- /ko -->
@@ -399,6 +415,18 @@
     <!-- /ko -->
     <div class="dx-filtereditor-text-container" data-bind="css: { 'advanced': advancedMode }, visible: textVisible">
         <!-- ko template: 'dx-filtereditor-content-text'-->
+        <!-- /ko -->
+    </div>
+</script>
+
+<script type="text/html" id="dx-filtereditor-content-plain">
+    <div class="dx-filtereditor-plain-advanced" data-bind="dxCheckBox: { value: advancedMode, text: 'Advanced Mode' }"></div>
+    <div class="dx-filtereditor-plain-content">
+        <div class="dx-filtereditor-text-container" data-bind="css: { 'advanced': advancedMode }, visible: textVisible">
+            <!-- ko template: 'dx-filtereditor-content-text'-->
+            <!-- /ko -->
+        </div>
+        <!-- ko template: 'dx-filtereditor-content-tree' -->
         <!-- /ko -->
     </div>
 </script>
@@ -424,12 +452,12 @@
 
 <script type="text/html" id="dx-filtereditor-content-text">
     <!-- ko if: !aceAvailable -->
-    <div class="dx-filtereditor-text" data-bind="dxTextArea: { value: value, isValid: isValid, onInput: onInput, spellcheck: false }, cacheElement: { action: function(element) { cacheElement(element) } }"></div>
+    <div class="dx-filtereditor-text" data-bind="dxTextArea: { value: displayValue, isValid: isValid, onInput: onInput, spellcheck: false }, cacheElement: { action: function(element) { cacheElement(element) } }"></div>
     <!-- /ko -->
     <!-- ko if: aceAvailable -->
     <div class="dx-filtereditor-text dx-texteditor dx-textarea" data-bind="css: {'dx-invalid': !$data.isValid(), 'dx-state-focused': textFocused }">
         <div class="dx-texteditor-container">
-            <div class="dx-filtereditor-ace" data-bind="dxAceEditor: { value: value, theme: helper.aceTheme, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }"></div>
+            <div class="dx-filtereditor-ace" data-bind="dxAceEditor: { value: $data.displayValue, theme: helper.aceTheme, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }"></div>
             <div class="dx-texteditor-buttons-container"></div>
         </div>
     </div>
@@ -1276,11 +1304,11 @@
 </script>
 
 <script type="text/html" id="dxrd-filterstring">
-    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath }"></div>
+    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>
 </script>
 
 <script type="text/html" id="dxrd-filterstringgroup">
-    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath }"></div>
+    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>
 </script>
 
 <script type="text/html" id="dxrd-formatstring">
@@ -1350,8 +1378,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.3
-* Build date: 2017-11-15
+* Version: 17.2.4
+* Build date: 2017-12-14
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1482,13 +1510,13 @@
     <div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading }">
         <div class="dxrdp-loading-wrapper" data-bind="styleunit: { width: width, height: height, lineHeight: height }, style: { 'background-color': color }, visible: pageLoading, text: loadingText">
         </div>
-        <img style="width:100%; height:100%;" data-bind="event: { load: function(s, e) { setTimeout(onPageLoaded, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }, style:{ 'background-color': color }" />
+        <img style="width:100%; height:100%;" data-bind="event: { load: function(s, e) { setTimeout(function() { onPageLoaded(s,e); }, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }, style:{ 'background-color': color }" />
         <div class="dxrdp-active-border" data-bind="css: { 'dxrdp-active': active() && $parents[1].blocks().length > 1 }, visible: !$root.slideOptions.readerMode"></div>
         <!-- ko foreach: activeBricks -->
         <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
         <!--/ko-->
         <!--/ko-->
-        <!-- ko if: !pageLoading() && $data.editingFields-->
+        <!-- ko if: !brickLoading() && $data.editingFields-->
         <!-- ko foreach: editingFields -->
         <!-- ko template: template -->
         <!--/ko-->
@@ -1532,7 +1560,7 @@
     <div class="dxrdp-mobile-actions" data-bind="visible: visible">
         <div class="dxrdp-mobile-actions-content">
             <!-- ko foreach: actions -->
-            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: image, dxAction: action">
+            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: imageClassName, dxAction: clickAction">
             </div>
             <!-- ko if: $data.content -->
             <!-- ko template: $data.content -->
@@ -1640,7 +1668,7 @@
                 <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>
             </div>
         </div>
-        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="event: { load: function(s, e) { setTimeout(onPageLoaded, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }" />
+        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="event: { load: function(s, e) { setTimeout(function() { onPageLoaded(s,e); }, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }" />
         <!-- ko foreach: activeBricks -->
         <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
         <!--/ko-->
