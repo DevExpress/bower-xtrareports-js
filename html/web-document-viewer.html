@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.1.8
-* Build date: 2017-11-03
+* Version: 17.1.9
+* Build date: 2017-12-19
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -888,7 +888,7 @@
 <script type="text/html" id="dx-treelist">
     <div class="dx-treelist">
         <!-- ko foreach: items -->
-        <!-- ko template: templateName -->
+        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->
         <!-- /ko -->
         <div data-bind="visible: !collapsed()">
             <!-- ko template: { name: 'dx-treelist', data: $data } -->
@@ -1277,8 +1277,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.1.8
-* Build date: 2017-11-03
+* Version: 17.1.9
+* Build date: 2017-12-19
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1409,13 +1409,13 @@
     <div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading }">
         <div class="dxrdp-loading-wrapper" data-bind="styleunit: { width: width, height: height, lineHeight: height }, style: { 'background-color': color }, visible: pageLoading, text: loadingText">
         </div>
-        <img style="width:100%; height:100%;" data-bind="event: { load: function(s, e) { setTimeout(onPageLoaded, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }, style:{ 'background-color': color }" />
+        <img style="width:100%; height:100%;" data-bind="event: { load: function(s, e) { setTimeout(function() { onPageLoaded(s,e); }, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }, style:{ 'background-color': color }" />
         <div class="dxrdp-active-border" data-bind="css: { 'dxrdp-active': active() && $parents[1].blocks().length > 1 }, visible: !$root.slideOptions.readerMode"></div>
         <!-- ko foreach: activeBricks -->
         <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
         <!--/ko-->
         <!--/ko-->
-        <!-- ko if: !pageLoading() && $data.editingFields-->
+        <!-- ko if: !brickLoading() && $data.editingFields -->
         <!-- ko foreach: editingFields -->
         <!-- ko template: template -->
         <!--/ko-->
@@ -1459,7 +1459,7 @@
     <div class="dxrdp-mobile-actions" data-bind="visible: visible">
         <div class="dxrdp-mobile-actions-content">
             <!-- ko foreach: actions -->
-            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: image, dxAction: action">
+            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: imageClassName, dxAction: clickAction">
             </div>
             <!-- ko if: $data.content -->
             <!-- ko template: $data.content -->
@@ -1555,7 +1555,7 @@
                 <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>
             </div>
         </div>
-        <img style="width: 100%; height: 100%" data-bind="event: { load: function(s, e) { setTimeout(onPageLoaded, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }" />
+        <img style="width: 100%; height: 100%" data-bind="event: { load: function(s, e) { setTimeout(function() { onPageLoaded(s,e); }, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }" />
         <!-- ko if: brick -->
         <!-- ko template: { name: "dxrd-page-brick", data: brick } -->
         <!--/ko-->

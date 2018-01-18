@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.1.8
-* Build date: 2017-11-03
+* Version: 17.1.9
+* Build date: 2017-12-19
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -27,18 +27,18 @@ var DevExpress;
     (function (Designer) {
         var Report;
         (function (Report) {
-            Report.pageBorderColor = { propertyName: "pageBorderColor", modelName: "@PageBorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Page Border Color", editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "Black" };
-            Report.pageBorderWidth = { propertyName: "pageBorderWidth", modelName: "@PageBorderWidth", displayName: "Page Border Width", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
-            Report.pageRange = { propertyName: "pageRange", modelName: "@PageRange", displayName: "Page Range", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
-            Report.expotOptionsTitle = { propertyName: "title", modelName: "@Title", displayName: "Title", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "Document" };
-            Report.tableLayout = { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
-            Report.allowURLsWithJSContent = { propertyName: "allowURLsWithJSContent", modelName: "@AllowURLsWithJSContent", displayName: "Allow URLs with JS Content", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
-            Report.useHRefHyperlinks = { propertyName: "useHRefHyperlinks", modelName: "@UseHRefHyperlinks", displayName: "Use HRef Hyperlinks", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
-            Report.exportWatermarks = { propertyName: "exportWatermarks", modelName: "@ExportWatermarks", displayName: "Export Watermarks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
-            Report.inlineCss = { propertyName: "inlineCss", modelName: "@InlineCss", displayName: "Inline Css", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
-            Report.removeSecondarySymbols = { propertyName: "removeSecondarySymbols", modelName: "@RemoveSecondarySymbols", displayName: "Remove Secondary Symbols", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
+            Report.pageBorderColor = { propertyName: "pageBorderColor", modelName: "@PageBorderColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString, displayName: "Page Border Color", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.PageBorderColor", editor: Designer.Widgets.editorTemplates.customColorEditor, defaultVal: "Black" };
+            Report.pageBorderWidth = { propertyName: "pageBorderWidth", modelName: "@PageBorderWidth", displayName: "Page Border Width", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.PageBorderWidth", from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            Report.pageRange = { propertyName: "pageRange", modelName: "@PageRange", displayName: "Page Range", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.PageRange", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" };
+            Report.expotOptionsTitle = { propertyName: "title", modelName: "@Title", displayName: "Title", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.Title", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "Document" };
+            Report.tableLayout = { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.TableLayout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
+            Report.allowURLsWithJSContent = { propertyName: "allowURLsWithJSContent", modelName: "@AllowURLsWithJSContent", displayName: "Allow URLs with JS Content", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.AllowURLsWithJSContent", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: true };
+            Report.useHRefHyperlinks = { propertyName: "useHRefHyperlinks", modelName: "@UseHRefHyperlinks", displayName: "Use HRef Hyperlinks", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.UseHRefHyperlinks", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
+            Report.exportWatermarks = { propertyName: "exportWatermarks", modelName: "@ExportWatermarks", displayName: "Export Watermarks", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.ExportWatermarks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            Report.inlineCss = { propertyName: "inlineCss", modelName: "@InlineCss", displayName: "Inline Css", localizationId: "DevExpress.XtraPrinting.HtmlExportOptions.InlineCss", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            Report.removeSecondarySymbols = { propertyName: "removeSecondarySymbols", modelName: "@RemoveSecondarySymbols", displayName: "Remove Secondary Symbols", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.RemoveSecondarySymbols", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
             Report.characterSet = {
-                propertyName: "characterSet", modelName: "@CharacterSet", displayName: "Character Set", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "utf-8",
+                propertyName: "characterSet", modelName: "@CharacterSet", displayName: "Character Set", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.CharacterSet", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "utf-8",
                 values: {
                     "windows-1256": "Arabic (Windows)",
                     "iso-8859-4": "Baltic (ISO)",
@@ -67,49 +67,48 @@ var DevExpress;
                 { value: "SingleFilePageByPage", displayValue: "Single File PageByPage", localizationId: "PreviewStringId.ExportOption_HtmlExportMode_SingleFilePageByPage" },
                 { value: "DifferentFiles", displayValue: "Different Files", localizationId: "PreviewStringId.ExportOption_HtmlExportMode_DifferentFiles" }
             ];
-            Report.exportPageBreaks = { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            Report.exportPageBreaks = { propertyName: "exportPageBreaks", modelName: "@ExportPageBreaks", displayName: "Export Page Breaks", localizationId: "DevExpress.XtraPrinting.FormattedTextExportOptions.ExportPageBreaks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             Report.rtfExportMode = {
                 propertyName: "rtfExportMode", modelName: "@ExportMode", defaultVal: "SingleFilePageByPage",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode", localizationId: "DevExpress.XtraPrinting.RtfExportOptions.ExportMode",
                 valuesArray: Report.defaultExportModePreview
             };
             Report.rtfExportModeMergedPreview = $.extend({}, Report.rtfExportMode, {
-                from: excludeModesForMergedDocuments,
                 valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.htmlExportMode = {
                 propertyName: "htmlExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.ExportMode",
                 valuesArray: Report.defaultExportMode
             };
             Report.embedImagesInHTML = {
                 propertyName: "embedImagesInHTML", modelName: "@EmbedImagesInHTML", defaultVal: false,
-                editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, displayName: "Embed Images In HTML"
+                editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, displayName: "Embed Images In HTML", localizationId: "DevExpress.XtraPrinting.HtmlExportOptions.EmbedImagesInHTML"
             };
             Report.imageExportMode = {
                 propertyName: "imageExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode", localizationId: "DevExpress.XtraPrinting.ImageExportOptions.ExportMode",
                 valuesArray: Report.defaultExportMode
             };
             Report.xlsExportMode = {
                 propertyName: "xlsExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.ExportMode",
                 valuesArray: Report.defaultExportMode
             };
             Report.xlsxExportMode = {
                 propertyName: "xlsxExportMode", modelName: "@ExportMode", defaultVal: "SingleFile",
-                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Export Mode", localizationId: "DevExpress.XtraPrinting.XlsxExportOptions.ExportMode",
                 valuesArray: Report.defaultExportMode
             };
             Report.textExportMode = {
-                propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", defaultVal: "Text", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.TextExportMode", defaultVal: "Text", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 valuesArray: [
                     { value: "Text", displayValue: "Text", localizationId: "DevExpress.XtraPrinting.TextExportMode.Text" },
                     { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPrinting.TextExportMode.Value" }
                 ]
             };
             Report.xlsTextExportMode = {
-                propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", defaultVal: "Value", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                propertyName: "textExportMode", modelName: "@TextExportMode", displayName: "Text Export Mode", localizationId: "DevExpress.XtraPrinting.XlExportOptionsBase.TextExportMode", defaultVal: "Value", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 valuesArray: [
                     { value: "Text", displayValue: "Text", localizationId: "DevExpress.XtraPrinting.TextExportMode.Text" },
                     { value: "Value", displayValue: "Value", localizationId: "DevExpress.XtraPrinting.TextExportMode.Value" }
@@ -117,7 +116,7 @@ var DevExpress;
             };
             Report.csvTextSeparator = { propertyName: "separator", modelName: "@Separator", defaultVal: "", displayName: "Separator", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.Separator", editor: DevExpress.Report.Preview.editorTemplates.csvSeparator }, Report.useCustomSeparator = { propertyName: "useCustomSeparator", displayName: "Use Custom Separator", localizationId: "DevExpress.XtraPrinting.CsvExportOptions.UseCustomSeparator", editor: DevExpress.JS.Widgets.editorTemplates.bool };
             Report.textEncodingType = {
-                propertyName: "encodingType", modelName: "@EncodingType", displayName: "Encoding", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Default", from: Designer.fromEnum,
+                propertyName: "encodingType", modelName: "@EncodingType", displayName: "Encoding", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.Encoding", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Default", from: Designer.fromEnum,
                 valuesArray: [
                     { value: "Default", displayValue: "Windows-1252", localizationId: "DevExpress.XtraPrinting.EncodingType.Default" },
                     { value: "ASCII", displayValue: "us-ascii", localizationId: "DevExpress.XtraPrinting.EncodingType.ASCII" },
@@ -129,16 +128,16 @@ var DevExpress;
                 ]
             };
             Report.xlsExportHyperlinks = {
-                propertyName: "exportHyperlinks", modelName: "@ExportHyperlinks", displayName: "Export Hyperlinks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
+                propertyName: "exportHyperlinks", modelName: "@ExportHyperlinks", displayName: "Export Hyperlinks", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.ExportHyperlinks", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
             };
             Report.xlsRawDataMode = {
-                propertyName: "rawDataMode", modelName: "@RawDataMode", displayName: "Raw Data Mode", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
+                propertyName: "rawDataMode", modelName: "@RawDataMode", displayName: "Raw Data Mode", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.RawDataMode", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
             };
             Report.xlsShowGridLines = {
-                propertyName: "showGridLines", modelName: "@ShowGridLines", displayName: "Show Grid Lines", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
+                propertyName: "showGridLines", modelName: "@ShowGridLines", displayName: "Show Grid Lines", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.ShowGridLines", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool
             };
             Report.xlsExportOptionsSheetName = {
-                propertyName: "sheetName", modelName: "@SheetName", displayName: "Sheet Name", defaultVal: "Sheet", editor: DevExpress.JS.Widgets.editorTemplates.text
+                propertyName: "sheetName", modelName: "@SheetName", displayName: "Sheet Name", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.SheetName", defaultVal: "Sheet", editor: DevExpress.JS.Widgets.editorTemplates.text
             };
             function excludeModesForMergedDocuments(val) {
                 return ko.observable("SingleFilePageByPage");
@@ -157,7 +156,6 @@ var DevExpress;
                 valuesArray: Report.defaultExportModePreview
             });
             Report.htmlExportModeMergedPreview = $.extend({}, Report.htmlExportModePreviewBase, {
-                from: excludeModesForMergedDocuments,
                 valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.xlsExportModePreviewBase = {
@@ -169,7 +167,6 @@ var DevExpress;
                 valuesArray: Report.defaultExportModePreview
             });
             Report.xlsExportModeMergedPreview = $.extend({}, Report.xlsExportModePreviewBase, {
-                from: excludeModesForMergedDocuments,
                 valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.imageExportModePreviewBase = {
@@ -181,7 +178,6 @@ var DevExpress;
                 valuesArray: Report.defaultExportModePreview
             });
             Report.imageExportModeMergedPreview = $.extend({}, Report.imageExportModePreviewBase, {
-                from: excludeModesForMergedDocuments,
                 valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.xlsxExportModePreviewBase = {
@@ -193,7 +189,6 @@ var DevExpress;
                 valuesArray: Report.defaultExportModePreview
             });
             Report.xlsxExportModeMergedPreview = $.extend({}, Report.xlsxExportModePreviewBase, {
-                from: excludeModesForMergedDocuments,
                 valuesArray: Report.defaultExportModeMerdedPreview
             });
             Report.previewBackColor = { propertyName: "backColor", modelName: "@BackColor", from: Designer.colorFromString, toJsonObject: Designer.colorToString };
@@ -348,10 +343,10 @@ var DevExpress;
             var csvExportOptionsSerializationInfo = [
                 Report.textEncodingType,
                 Report.textExportMode,
-                { propertyName: "quoteStringsWithSeparators", modelName: "@QuoteStringsWithSeparators", displayName: "Quote Strings with Separators", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "quoteStringsWithSeparators", modelName: "@QuoteStringsWithSeparators", displayName: "Quote Strings with Separators", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.QuoteStringsWithSeparators", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 Report.useCustomSeparator, Report.csvTextSeparator,
-                { propertyName: "skipEmptyRows", modelName: "@SkipEmptyRows", displayName: "Skip Empty Rows", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "skipEmptyColumns", modelName: "@SkipEmptyColumns", displayName: "Skip Empty Columns", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+                { propertyName: "skipEmptyRows", modelName: "@SkipEmptyRows", displayName: "Skip Empty Rows", localizationId: "DevExpress.XtraPrinting.CsvExportOptions.SkipEmptyRows", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "skipEmptyColumns", modelName: "@SkipEmptyColumns", displayName: "Skip Empty Columns", localizationId: "DevExpress.XtraPrinting.CsvExportOptions.SkipEmptyColumns", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
             ];
             var ImageExportOptions = (function () {
                 function ImageExportOptions(model, serializer) {
@@ -377,9 +372,9 @@ var DevExpress;
                 Report.pageBorderColor,
                 Report.pageBorderWidth,
                 Report.pageRange,
-                { propertyName: "resolution", modelName: "@Resolution", displayName: "Resolution", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 96 },
+                { propertyName: "resolution", modelName: "@Resolution", displayName: "Resolution", localizationId: "DevExpress.XtraPrinting.ImageExportOptions.Resolution", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 96 },
                 {
-                    propertyName: "format", modelName: "@Format", displayName: "Format", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Png", from: Designer.fromEnum,
+                    propertyName: "format", modelName: "@Format", displayName: "Format", localizationId: "DevExpress.XtraPrinting.ImageExportOptions.Format", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Png", from: Designer.fromEnum,
                     valuesArray: [
                         { value: "Bmp", displayValue: "BMP" },
                         { value: "Gif", displayValue: "GIF" },
@@ -392,9 +387,9 @@ var DevExpress;
                 }
             ];
             var imageExportOptionsSerializationInfo = [Report.imageExportMode,
-                { propertyName: "retainBackgroundTransparency", modelName: "@RetainBackgroundTransparency", displayName: "Retain Background Transparency", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "retainBackgroundTransparency", modelName: "@RetainBackgroundTransparency", displayName: "Retain Background Transparency", localizationId: "DevExpress.XtraPrinting.ImageExportOptions.RetainBackgroundTransparency", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
-                    propertyName: "textRenderingMode", modelName: "@TextRenderingMode", displayName: "Text Rendering Mode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "SystemDefault", from: Designer.fromEnum,
+                    propertyName: "textRenderingMode", modelName: "@TextRenderingMode", displayName: "Text Rendering Mode", localizationId: "DevExpress.XtraPrinting.ImageExportOptions.TextRenderingMode", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "SystemDefault", from: Designer.fromEnum,
                     valuesArray: [
                         { value: "SystemDefault", displayValue: "SystemDefault", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.SystemDefault" },
                         { value: "SingleBitPerPixelGridFit", displayValue: "SingleBitPerPixelGridFit", localizationId: "DevExpress.XtraPrinting.TextRenderingMode.SingleBitPerPixelGridFit" },
@@ -488,10 +483,10 @@ var DevExpress;
                 return PdfExportDocumentOptions;
             })();
             Report.PdfExportDocumentOptions = PdfExportDocumentOptions;
-            var author = { propertyName: "author", modelName: "@Author", displayName: "Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, application = { propertyName: "application", modelName: "@Application", displayName: "Application", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, title = { propertyName: "title", modelName: "@Title", displayName: "Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, subject = { propertyName: "subject", modelName: "@Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
+            var author = { propertyName: "author", modelName: "@Author", displayName: "Author", localizationId: "DevExpress.XtraPrinting.PdfDocumentOptions.Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, application = { propertyName: "application", modelName: "@Application", displayName: "Application", localizationId: "DevExpress.XtraPrinting.PdfDocumentOptions.Application", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, title = { propertyName: "title", modelName: "@Title", displayName: "Title", localizationId: "DevExpress.XtraPrinting.PdfDocumentOptions.Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }, subject = { propertyName: "subject", modelName: "@Subject", displayName: "Subject", localizationId: "DevExpress.XtraPrinting.PdfDocumentOptions.Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text };
             var pdfExportDocumentOptionsSerializationInfo = [
                 author, application, title, subject,
-                { propertyName: "keywords", modelName: "@Keywords", displayName: "Keywords", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+                { propertyName: "keywords", modelName: "@Keywords", displayName: "Keywords", localizationId: "DevExpress.XtraPrinting.PdfDocumentOptions.Keywords", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
             ];
             var PdfPermissionsOptions = (function () {
                 function PdfPermissionsOptions(model, serializer) {
@@ -512,7 +507,7 @@ var DevExpress;
             Report.PdfPermissionsOptions = PdfPermissionsOptions;
             var pdfExportPermissionsOptionsSerializationInfo = [
                 {
-                    propertyName: "printingPermissions", modelName: "@PrintingPermissions", displayName: "Printing Permissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    propertyName: "printingPermissions", modelName: "@PrintingPermissions", displayName: "Printing Permissions", localizationId: "DevExpress.XtraPrinting.PdfPermissionsOptions.PrintingPermissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                     valuesArray: [
                         { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.PrintingPermissions.None" },
                         { value: "LowResolution", displayValue: "LowResolution", localizationId: "DevExpress.XtraPrinting.PrintingPermissions.LowResolution" },
@@ -520,7 +515,7 @@ var DevExpress;
                     ]
                 },
                 {
-                    propertyName: "changingPermissions", modelName: "@ChangingPermissions", displayName: "Changing Permissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                    propertyName: "changingPermissions", modelName: "@ChangingPermissions", displayName: "Changing Permissions", localizationId: "DevExpress.XtraPrinting.PdfPermissionsOptions.ChangingPermissions", defaultVal: "None", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                     valuesArray: [
                         { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.None" },
                         { value: "InsertingDeletingRotating", displayValue: "InsertingDeletingRotating", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.InsertingDeletingRotating" },
@@ -529,8 +524,8 @@ var DevExpress;
                         { value: "AnyExceptExtractingPages", displayValue: "AnyExceptExtractingPages", localizationId: "DevExpress.XtraPrinting.ChangingPermissions.AnyExceptExtractingPages" }
                     ]
                 },
-                { propertyName: "enableCopying", modelName: "@EnableCopying", displayName: "Enable Copying", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "enableScreenReaders", modelName: "@EnableScreenReaders", displayName: "Enable Screen Readers", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+                { propertyName: "enableCopying", modelName: "@EnableCopying", displayName: "Enable Copying", localizationId: "DevExpress.XtraPrinting.PdfPermissionsOptions.EnableCopying", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "enableScreenReaders", modelName: "@EnableScreenReaders", displayName: "Enable Screen Readers", localizationId: "DevExpress.XtraPrinting.PdfPermissionsOptions.EnableScreenReaders", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
             ];
             var PdfPasswordSecurityOptions = (function () {
                 function PdfPasswordSecurityOptions(model, serializer) {
@@ -562,7 +557,7 @@ var DevExpress;
             })();
             Report.PdfPasswordSecurityOptions = PdfPasswordSecurityOptions;
             var pdfEncryptionLevel = {
-                propertyName: "encryptionLevel", modelName: "@EncryptionLevel", displayName: "Encryption Level", defaultVal: "AES128", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
+                propertyName: "encryptionLevel", modelName: "@EncryptionLevel", displayName: "Encryption Level", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions.EncryptionLevel", defaultVal: "AES128", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 valuesArray: [
                     { value: "ARC4", displayValue: "ARC4", localizationId: "DevExpress.XtraPrinting.PdfEncryptionLevel.ARC4" },
                     { value: "AES128", displayValue: "AES128", localizationId: "DevExpress.XtraPrinting.PdfEncryptionLevel.AES128" },
@@ -570,10 +565,10 @@ var DevExpress;
                 ]
             };
             var pdfExportPasswordSecurityOptionsSerializationInfo = [
-                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
+                { propertyName: "openPassword", modelName: "@OpenPassword", displayName: "Open Password", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions.OpenPassword", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
                 pdfEncryptionLevel,
-                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
-                { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                { propertyName: "permissionsPassword", modelName: "@PermissionsPassword", displayName: "Permissions Password", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions.PermissionsPassword", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } },
+                { propertyName: "permissionsOptions", modelName: "PermissionsOptions", displayName: "Pdf Permissions Options", localizationId: "DevExpress.XtraPrinting.PdfPermissionsOptions", from: PdfPermissionsOptions.from, toJsonObject: PdfPermissionsOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var PdfExportOptions = (function () {
                 function PdfExportOptions(model, serializer) {
@@ -599,12 +594,12 @@ var DevExpress;
             })();
             Report.PdfExportOptions = PdfExportOptions;
             var pdfExportOptionsSerializationInfo = [
-                { propertyName: "convertImagesToJpeg", modelName: "@ConvertImagesToJpeg", displayName: "Convert Images to Jpeg", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "showPrintDialogOnOpen", modelName: "@ShowPrintDialogOnOpen", displayName: "Show Print Dialog on Open", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "neverEmbeddedFonts", modelName: "@NeverEmbeddedFonts", displayName: "Never Embedded Fonts", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "convertImagesToJpeg", modelName: "@ConvertImagesToJpeg", displayName: "Convert Images to Jpeg", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ConvertImagesToJpeg", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "showPrintDialogOnOpen", modelName: "@ShowPrintDialogOnOpen", displayName: "Show Print Dialog on Open", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ShowPrintDialogOnOpen", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "neverEmbeddedFonts", modelName: "@NeverEmbeddedFonts", displayName: "Never Embedded Fonts", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.NeverEmbeddedFonts", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
-                    propertyName: "imageQuality", modelName: "@ImageQuality", displayName: "Image Quality", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Highest", from: Designer.fromEnum,
+                    propertyName: "imageQuality", modelName: "@ImageQuality", displayName: "Image Quality", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ImageQuality", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "Highest", from: Designer.fromEnum,
                     valuesArray: [
                         { value: "Lowest", displayValue: "Lowest", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Lowest" },
                         { value: "Low", displayValue: "Low", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Low" },
@@ -614,7 +609,7 @@ var DevExpress;
                     ]
                 },
                 {
-                    propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
+                    propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.PdfACompatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum,
                     valuesArray: [
                         { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.None" },
                         { value: "PdfA1b", displayValue: "PdfA1b", localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA1b" },
@@ -623,8 +618,8 @@ var DevExpress;
                     ]
                 },
                 Report.pageRange,
-                { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
-                { propertyName: "pdfPasswordSecurityOptions", modelName: "PasswordSecurityOptions", displayName: "Pdf Password Security Options", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+                { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.DocumentOptions", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                { propertyName: "pdfPasswordSecurityOptions", modelName: "PasswordSecurityOptions", displayName: "Pdf Password Security Options", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
             var RtfExportOptions = (function () {
                 function RtfExportOptions(model, serializer) {
@@ -655,7 +650,7 @@ var DevExpress;
                 Report.pageRange,
                 Report.exportWatermarks
             ];
-            var emptyFirstPageHeaderFooter = { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, keepRowHeight = { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            var emptyFirstPageHeaderFooter = { propertyName: "emptyFirstPageHeaderFooter", modelName: "@EmptyFirstPageHeaderFooter", displayName: "Empty First Page Header Footer", localizationId: "DevExpress.XtraPrinting.FormattedTextExportOptions.EmptyFirstPageHeaderFooter", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, keepRowHeight = { propertyName: "keepRowHeight", modelName: "@KeepRowHeight", displayName: "Keep Row Height", localizationId: "DevExpress.XtraPrinting.FormattedTextExportOptions.KeepRowHeight", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
             var rtfExportOptionsSerializationInfo = [
                 emptyFirstPageHeaderFooter,
                 Report.exportPageBreaks,
@@ -681,29 +676,29 @@ var DevExpress;
             Report.TextExportOptions = TextExportOptions;
             var textExportOptionsSerializationInfo = [
                 Report.textEncodingType,
-                { propertyName: "quoteStringsWithSeparators", modelName: "@QuoteStringsWithSeparators", displayName: "Quote Strings with Separators", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "separator", modelName: "@Separator", displayName: "Separator", defaultVal: "TAB", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "quoteStringsWithSeparators", modelName: "@QuoteStringsWithSeparators", displayName: "Quote Strings with Separators", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.QuoteStringsWithSeparators", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "separator", modelName: "@Separator", displayName: "Separator", localizationId: "DevExpress.XtraPrinting.TextExportOptionsBase.Separator", defaultVal: "TAB", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 Report.textExportMode
             ];
             var documentOptionsSerializationsInfo = [
                 author, application, title, subject,
-                { propertyName: "tags", modelName: "@Tags", displayName: "Tags", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "category", modelName: "@Category", displayName: "Category", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "comments", modelName: "@Comments", displayName: "Comments", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "company", modelName: "@Company", displayName: "Company", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
+                { propertyName: "tags", modelName: "@Tags", displayName: "Tags", localizationId: "DevExpress.XtraPrinting.XlDocumentOptions.Tags", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "category", modelName: "@Category", displayName: "Category", localizationId: "DevExpress.XtraPrinting.XlDocumentOptions.Category", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "comments", modelName: "@Comments", displayName: "Comments", localizationId: "DevExpress.XtraPrinting.XlDocumentOptions.Comments", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "company", modelName: "@Company", displayName: "Company", localizationId: "DevExpress.XtraPrinting.XlDocumentOptions.Company", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text }
             ];
-            var documentOptions = { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", info: documentOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var documentOptions = { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.DocumentOptions", info: documentOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var encryptionOptionsSerializationsInfo = [
                 {
-                    propertyName: "type", modelName: "@Type", displayName: "Type", defaultVal: "Strong", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
+                    propertyName: "type", modelName: "@Type", displayName: "Type", localizationId: "DevExpress.XtraPrinting.XlEncryptionOptions.Type", defaultVal: "Strong", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
                     valuesArray: [
                         { value: "Strong", displayValue: "Strong", localizationId: "DevExpress.XtraPrinting.XlEncryptionType.Strong" },
                         { value: "Compatible", displayValue: "Compatible", localizationId: "DevExpress.XtraPrinting.XlEncryptionType.Compatible" }
                     ]
                 },
-                { propertyName: "password", modelName: "@Password", displayName: "Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } }
+                { propertyName: "password", modelName: "@Password", displayName: "Password", localizationId: "DevExpress.XtraPrinting.XlEncryptionOptions.Password", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text, editorOptions: { mode: 'password' } }
             ];
-            var encryptionOptions = { propertyName: "encryptionOptions", modelName: "EncryptionOptions", displayName: "Encryption Options", info: encryptionOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var encryptionOptions = { propertyName: "encryptionOptions", modelName: "EncryptionOptions", displayName: "Encryption Options", localizationId: "DevExpress.XtraPrinting.XlExportOptionsBase.EncryptionOptions", info: encryptionOptionsSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var xlsExportOptionsSerializationInfoCommon = [
                 Report.xlsExportHyperlinks,
                 Report.pageRange,
@@ -711,18 +706,18 @@ var DevExpress;
                 Report.xlsExportOptionsSheetName,
                 Report.xlsShowGridLines,
                 Report.xlsTextExportMode,
-                { propertyName: "rasterizeImages", modelName: "@RasterizeImages", displayName: "Rasterize Images", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "rasterizationResolution", modelName: "@RasterizationResolution", displayName: "Rasterization Resolution", defaultVal: 96, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
-                { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "fitToPrintedPageHeight", modelName: "@FitToPrintedPageHeight", displayName: "Fit To Printed Page Height", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "rasterizeImages", modelName: "@RasterizeImages", displayName: "Rasterize Images", localizationId: "DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizeImages", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "rasterizationResolution", modelName: "@RasterizationResolution", displayName: "Rasterization Resolution", localizationId: "DevExpress.XtraPrinting.PageByPageExportOptionsBase.RasterizationResolution", defaultVal: 96, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "fitToPrintedPageWidth", modelName: "@FitToPrintedPageWidth", displayName: "Fit To Printed Page Width", localizationId: "DevExpress.XtraPrinting.XlExportOptionsBase.FitToPrintedPageWidth", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "fitToPrintedPageHeight", modelName: "@FitToPrintedPageHeight", displayName: "Fit To Printed Page Height", localizationId: "DevExpress.XtraPrinting.XlExportOptionsBase.FitToPrintedPageHeight", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
-                    propertyName: "ignoreErrors", modelName: "@IgnoreErrors", displayName: "Ignore Errors", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum, valuesArray: [
+                    propertyName: "ignoreErrors", modelName: "@IgnoreErrors", displayName: "Ignore Errors", localizationId: "DevExpress.XtraPrinting.XlExportOptionsBase.IgnoreErrors", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "None", from: Designer.fromEnum, valuesArray: [
                         { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.XlIgnoreErrors.None" },
                         { value: "NumberStoredAsText", displayValue: "Number Stored As Text", localizationId: "DevExpress.XtraPrinting.XlIgnoreErrors.NumberStoredAsText" }
                     ]
                 },
                 {
-                    propertyName: "rightToLeftDocument", modelName: "@RightToLeftDocument", displayName: "Right To Left Document", defaultVal: "Default", from: Designer.fromEnum, editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    propertyName: "rightToLeftDocument", modelName: "@RightToLeftDocument", displayName: "Right To Left Document", localizationId: "DevExpress.XtraPrinting.XlExportOptionsBase.RightToLeftDocument", defaultVal: "Default", from: Designer.fromEnum, editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
                         { value: "True", displayValue: "True", localizationId: "DevExpress.Utils.DefaultBoolean.True" },
                         { value: "False", displayValue: "False", localizationId: "DevExpress.Utils.DefaultBoolean.False" },
                         { value: "Default", displayValue: "Default", localizationId: "DevExpress.Utils.DefaultBoolean.Default" }
@@ -732,10 +727,10 @@ var DevExpress;
                 encryptionOptions
             ];
             var xlsExportOptionsSerializationInfoBase = [
-                { propertyName: "suppress256ColumnsWarning", modelName: "@Suppress256ColumnsWarning", displayName: "Suppress 256 Columns Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "suppress65536RowsWarning", modelName: "@Suppress65536RowsWarning", displayName: "Suppress 65536 Rows Warning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "suppress256ColumnsWarning", modelName: "@Suppress256ColumnsWarning", displayName: "Suppress 256 Columns Warning", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.Suppress256ColumnsWarning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "suppress65536RowsWarning", modelName: "@Suppress65536RowsWarning", displayName: "Suppress 65536 Rows Warning", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.Suppress65536RowsWarning", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 {
-                    propertyName: "workbookColorPaletteCompliance", modelName: "@WorkbookColorPaletteCompliance", displayName: "Workbook Color Palette Compliance", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "ReducePaletteForExactColors", from: Designer.fromEnum,
+                    propertyName: "workbookColorPaletteCompliance", modelName: "@WorkbookColorPaletteCompliance", displayName: "Workbook Color Palette Compliance", localizationId: "DevExpress.XtraPrinting.XlsExportOptions.WorkbookColorPaletteCompliance", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "ReducePaletteForExactColors", from: Designer.fromEnum,
                     valuesArray: [
                         { value: "ReducePaletteForExactColors", displayValue: "ReducePaletteForExactColors", localizationId: "DevExpress.XtraPrinting.WorkbookColorPaletteCompliance.ReducePaletteForExactColors" },
                         { value: "AdjustColorsToDefaultPalette", displayValue: "AdjustColorsToDefaultPalette", localizationId: "DevExpress.XtraPrinting.WorkbookColorPaletteCompliance.AdjustColorsToDefaultPalette" }
@@ -797,8 +792,8 @@ var DevExpress;
                 emptyFirstPageHeaderFooter,
                 keepRowHeight,
                 Report.exportPageBreaks,
-                { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
-                { propertyName: "allowFloatingPictures", modelName: "@AllowFloatingPictures", displayName: "Allow Floating Pictures", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+                { propertyName: "tableLayout", modelName: "@TableLayout", displayName: "Table Layout", localizationId: "DevExpress.XtraPrinting.DocxExportOptions.TableLayout", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+                { propertyName: "allowFloatingPictures", modelName: "@AllowFloatingPictures", localizationId: "DevExpress.XtraPrinting.DocxExportOptions.AllowFloatingPictures", displayName: "Allow Floating Pictures", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
             ];
             var DocxExportOptions = (function () {
                 function DocxExportOptions(model, serializer) {
@@ -846,15 +841,15 @@ var DevExpress;
             })();
             Report.ExportOptions = ExportOptions;
             var nativeFormatOptionsSerializationInfo = [
-                { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
-                { propertyName: "showOptionsBeforeSave", modelName: "@ShowOptionsBeforeSave", displayName: "Show Options Before Save", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
+                { propertyName: "compressed", modelName: "@Compressed", displayName: "Compressed", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.Compressed", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
+                { propertyName: "showOptionsBeforeSave", modelName: "@ShowOptionsBeforeSave", displayName: "Show Options Before Save", localizationId: "DevExpress.XtraPrinting.NativeFormatOptions.ShowOptionsBeforeSave", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }
             ];
             var additionalRecipientSerializationsInfo = [
-                { propertyName: "ContactName", modelName: "@ContactName", displayName: "ContactName", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "Address", modelName: "@Address", displayName: "Address", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
-                { propertyName: "Prefix", modelName: "@Prefix", displayName: "Prefix", defaultVal: "SMTP:", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "ContactName", modelName: "@ContactName", displayName: "ContactName", localizationId: "DevExpress.XtraPrinting.Recipient.ContactName", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "Address", modelName: "@Address", displayName: "Address", localizationId: "DevExpress.XtraPrinting.Recipient.Address", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "Prefix", modelName: "@Prefix", displayName: "Prefix", localizationId: "DevExpress.XtraPrinting.Recipient.Prefix", defaultVal: "SMTP:", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 {
-                    propertyName: "fieldType", modelName: "@FieldType", displayName: "Field Type", defaultVal: "TO", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
+                    propertyName: "fieldType", modelName: "@FieldType", displayName: "Field Type", localizationId: "DevExpress.XtraPrinting.Recipient.FieldType", defaultVal: "TO", editor: DevExpress.JS.Widgets.editorTemplates.combobox, from: Designer.fromEnum,
                     valuesArray: [
                         { value: "TO", displayValue: "TO", localizationId: "DevExpress.XtraPrinting.RecipientFieldType.TO" },
                         { value: "CC", displayValue: "CC", localizationId: "DevExpress.XtraPrinting.RecipientFieldType.CC" },
@@ -876,7 +871,7 @@ var DevExpress;
                 return AdditionalRecipientModel;
             })();
             Report.AdditionalRecipientModel = AdditionalRecipientModel;
-            Report.additionalRecipients = { propertyName: "additionalRecipients", modelName: "AdditionalRecipients", displayName: "Additional Recipients", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.AdditionalRecipientModel.createNew, template: '#dxrd-commonCollectionItem' };
+            Report.additionalRecipients = { propertyName: "additionalRecipients", modelName: "AdditionalRecipients", displayName: "Additional Recipients", localizationId: "DevExpress.XtraPrinting.EmailOptions.AdditionalRecipients", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.AdditionalRecipientModel.createNew, template: '#dxrd-commonCollectionItem' };
             var emailOptionsSerializationInfo = [
                 { propertyName: "recipientName", modelName: "@RecipientName", displayName: "Recipient Name", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 { propertyName: "recipientAddress", modelName: "@RecipientAddress", displayName: "Recipient Address", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
@@ -938,8 +933,9 @@ var DevExpress;
             Report.HtmlExportOptionsPreview = HtmlExportOptionsPreview;
             var HtmlExportOptionsMergedPreview = (function (_super) {
                 __extends(HtmlExportOptionsMergedPreview, _super);
-                function HtmlExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function HtmlExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this.htmlExportMode(Report.excludeModesForMergedDocuments(this.htmlExportMode())());
                 }
                 HtmlExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.htmlExportModeMergedPreview];
@@ -971,8 +967,9 @@ var DevExpress;
             Report.ImageExportOptionsPreview = ImageExportOptionsPreview;
             var ImageExportOptionsMergedPreview = (function (_super) {
                 __extends(ImageExportOptionsMergedPreview, _super);
-                function ImageExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function ImageExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this.imageExportMode(Report.excludeModesForMergedDocuments(this.imageExportMode())());
                 }
                 ImageExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.imageExportModeMergedPreview];
@@ -1004,8 +1001,9 @@ var DevExpress;
             Report.MhtExportOptionsPreview = MhtExportOptionsPreview;
             var MhtExportOptionsMergedPreview = (function (_super) {
                 __extends(MhtExportOptionsMergedPreview, _super);
-                function MhtExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function MhtExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this.htmlExportMode(Report.excludeModesForMergedDocuments(this.htmlExportMode())());
                 }
                 MhtExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.htmlExportModeMergedPreview];
@@ -1037,8 +1035,9 @@ var DevExpress;
             Report.RtfExportOptionsPreview = RtfExportOptionsPreview;
             var RtfExportOptionsMergedPreview = (function (_super) {
                 __extends(RtfExportOptionsMergedPreview, _super);
-                function RtfExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function RtfExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this.rtfExportMode(Report.excludeModesForMergedDocuments(this.rtfExportMode())());
                 }
                 RtfExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.rtfExportModeMergedPreview];
@@ -1070,8 +1069,9 @@ var DevExpress;
             Report.XlsExportOptionsPreview = XlsExportOptionsPreview;
             var XlsExportOptionsMergedPreview = (function (_super) {
                 __extends(XlsExportOptionsMergedPreview, _super);
-                function XlsExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function XlsExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this.xlsExportMode(Report.excludeModesForMergedDocuments(this.xlsExportMode())());
                 }
                 XlsExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.xlsExportModeMergedPreview];
@@ -1103,8 +1103,9 @@ var DevExpress;
             Report.XlsxExportOptionsPreview = XlsxExportOptionsPreview;
             var XlsxExportOptionsMergedPreview = (function (_super) {
                 __extends(XlsxExportOptionsMergedPreview, _super);
-                function XlsxExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function XlsxExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this.xlsxExportMode(Report.excludeModesForMergedDocuments(this.xlsxExportMode())());
                 }
                 XlsxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.xlsxExportModeMergedPreview];
@@ -1139,8 +1140,9 @@ var DevExpress;
             Report.DocxExportOptionsPreview = DocxExportOptionsPreview;
             var DocxExportOptionsMergedPreview = (function (_super) {
                 __extends(DocxExportOptionsMergedPreview, _super);
-                function DocxExportOptionsMergedPreview() {
-                    _super.apply(this, arguments);
+                function DocxExportOptionsMergedPreview(model, serializer) {
+                    _super.call(this, model, serializer);
+                    this["rtfExportMode"](Report.excludeModesForMergedDocuments(this["rtfExportMode"]())());
                 }
                 DocxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                     return [Report.rtfExportModeMergedPreview];
@@ -1277,6 +1279,8 @@ var DevExpress;
                     this.realZoom = ko.observable(1);
                     this.actualResolution = 0;
                     this.pageLoadFailed = ko.observable(false);
+                    this.imageHeight = ko.observable(0);
+                    this.imageWidth = ko.observable(0);
                     this.imageSrc = ko.observable("");
                     this.cachedImageSrc = ko.observable("");
                     this.brick = ko.observable(null);
@@ -1294,6 +1298,7 @@ var DevExpress;
                     this.originalHeight(ko.unwrap(height));
                     this.originalWidth(ko.unwrap(width));
                     this.zoom = zoom;
+                    this.zoom.subscribe(function (newVal) { _this.imageHeight(0); _this.imageWidth(0); });
                     this.isClientVisible.subscribe(function (newVal) {
                         if (_this.isClientVisible()) {
                             _this._setPageImgSrc(_this.documentId(), unifier(), _this.zoom());
@@ -1301,16 +1306,20 @@ var DevExpress;
                     });
                     this.color = color;
                     this.width = ko.pureComputed(function () {
-                        return Math.ceil(_this.originalWidth() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution);
+                        return Math.max(_this.imageWidth(), Math.ceil(_this.originalWidth() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution));
                     });
                     this.height = ko.pureComputed(function () {
-                        return Math.ceil(_this.originalHeight() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution);
+                        return Math.max(_this.imageHeight(), Math.ceil(_this.originalHeight() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution));
                     });
                     var _self = this;
                     this.isEmpty = pageIndex === -1 && !brickProvider && !processClick;
                     this.onPageLoaded = function (_s, _e) {
                         _self.pageLoading(false);
                         _self.pageLoadFailed(false);
+                        if (_self.imageHeight() === 0 && _self.imageWidth() === 0) {
+                            _self.imageHeight(_e.currentTarget.height);
+                            _self.imageWidth(_e.currentTarget.width);
+                        }
                         if (_self.cachedImageSrc() !== _self.imageSrc()) {
                             _self.originalHeight() && ko.isObservable(height) && height(_self.originalHeight());
                             _self.originalWidth() && ko.isObservable(width) && width(_self.originalWidth());
@@ -1463,7 +1472,7 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
-            Preview.formatSearchResult = function (value) { return value && ('page ' + (value.pageIndex + 1)); };
+            Preview.formatSearchResult = function (value) { return value && (DevExpress.Designer.getLocalization("page", "ASPxReportsStringId.WebDocumentViewer_SearchPageNumberText") + " " + (value.pageIndex + 1)); };
             Preview.searchAvailable = ko.observable(true);
             var SearchViewModel = (function (_super) {
                 __extends(SearchViewModel, _super);
@@ -4392,12 +4401,12 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
-            function getPreviewActionsMobile(preview, exportModel, parametersModel, searchModel, exportTypes) {
+            function getPreviewActionsMobile(options) {
                 var exportToModel = {
                     visible: ko.observable(false),
                     items: ko.pureComputed(function () {
-                        var allFormats = exportModel._getExportFormatItems();
-                        var availableFormats = exportTypes().filter(function (x) { return allFormats.indexOf(x) !== -1; });
+                        var allFormats = options.exportModel._getExportFormatItems();
+                        var availableFormats = options.exportTypes().filter(function (x) { return allFormats.indexOf(x) !== -1; });
                         if (availableFormats.length > 9) {
                             availableFormats.splice(9, availableFormats.length - 9);
                         }
@@ -4406,25 +4415,25 @@ var DevExpress;
                             availableFormats.push.apply(availableFormats, notUsedFormats.slice(0, 9 - availableFormats.length));
                         }
                         return availableFormats.map(function (item) {
-                            item.action = function (e) { exportModel._exportDocumentByFormat(e.model && e.model.format); };
+                            item.action = function (e) { options.exportModel._exportDocumentByFormat(e.model && e.model.format); };
                             return item;
                         });
                     })
                 };
-                return new Preview.MobileActionList([
+                var actions = [
                     {
-                        action: function () {
-                            searchModel.searchPanelVisible(true);
-                            searchModel.editorVisible(true);
-                            searchModel.focusEditor({ element: $('.dxrdp-taptosearch') });
-                            preview.actionsVisible(false);
+                        clickAction: function () {
+                            options.searchModel.searchPanelVisible(true);
+                            options.searchModel.editorVisible(true);
+                            options.searchModel.focusEditor({ element: $('.dxrdp-taptosearch') });
+                            options.reportPreview.actionsVisible(false);
                         },
-                        image: "dxrd-image-search-inactive",
+                        imageClassName: "dxrd-image-search-inactive",
                         visible: Preview.searchAvailable
                     },
                     {
-                        action: function () { exportToModel.visible(!exportToModel.visible()); },
-                        image: "dxrd-image-export-to",
+                        clickAction: function () { exportToModel.visible(!exportToModel.visible()); },
+                        imageClassName: "dxrd-image-export-to",
                         visible: true,
                         content: {
                             name: "dxrd-menu-export-content",
@@ -4432,14 +4441,16 @@ var DevExpress;
                         }
                     },
                     {
-                        action: function () {
-                            parametersModel.popupInfo.visible(!parametersModel.popupInfo.visible());
-                            preview.actionsVisible(false);
+                        clickAction: function () {
+                            options.parametersModel.popupInfo.visible(!options.parametersModel.popupInfo.visible());
+                            options.reportPreview.actionsVisible(false);
                         },
-                        image: "dxrd-image-parameters-inactive",
-                        visible: parametersModel.popupInfo.notEmpty
+                        imageClassName: "dxrd-image-parameters-inactive",
+                        visible: options.parametersModel.popupInfo.notEmpty
                     }
-                ]);
+                ];
+                options.callbacks && options.callbacks.customizeActions && options.callbacks.customizeActions(actions);
+                return new Preview.MobileActionList(actions);
             }
             function updatePreviewContentSizeMobile(previewSize, root, rtl) {
                 return function () {
@@ -4465,7 +4476,7 @@ var DevExpress;
                     Preview.ExportFormatID.RTF, Preview.ExportFormatID.DOCX, Preview.ExportFormatID.HTML,
                     Preview.ExportFormatID.Text, Preview.ExportFormatID.CSV, Preview.ExportFormatID.Image
                 ]);
-                var mobileActions = getPreviewActionsMobile(reportPreview, exportModel, parametersModel, searchModel, exportTypes);
+                var mobileActions = getPreviewActionsMobile({ reportPreview: reportPreview, exportModel: exportModel, parametersModel: parametersModel, searchModel: searchModel, exportTypes: exportTypes, callbacks: callbacks });
                 reportPreview.pageIndex.subscribe(function (newVal) { mobileActions.visible(false); });
                 reportPreview.actionsVisible = mobileActions.visible;
                 var contentSize = ko.observable({ width: 0, height: 0 });
@@ -5596,7 +5607,10 @@ var DevExpress;
                         Brick: brick,
                         DefaultHandler: defaultHandler,
                         GetBrickText: function () { return brick && brick.text(); },
-                        GetBrickValue: function () { return brick && brick.content && brick.content.filter(function (x) { return x.Key === "value"; })[0]; },
+                        GetBrickValue: function () {
+                            var contentValue = brick && brick.content && brick.content.filter(function (x) { return x.Key === "value"; })[0];
+                            return contentValue && contentValue.Value;
+                        },
                         Handled: false
                     };
                     fireEvent("PreviewClick", arg);
@@ -6020,7 +6034,9 @@ var DevExpress;
                                     self._sender.OpenReport(newVal);
                                 });
                             }
-                            self._sender.OpenReport(ko.unwrap(self._options.reportUrl));
+                            if (!self._options.reportId) {
+                                self._sender.OpenReport(ko.unwrap(self._options.reportUrl));
+                            }
                         }
                         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                             subscription && subscription.dispose();

@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.1.8
-* Build date: 2017-11-03
+* Version: 17.1.9
+* Build date: 2017-12-19
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5899,23 +5899,29 @@ var DevExpress;
                     resolver = parsedBindings.resolver;
                     parsedBindings = parsedBindings.innerBindings;
                 }
+                var isDisposed = false;
                 $.each(parsedBindings, function (innerBindingKey, innerBindingParameters) {
                     var innerBinding = ko.bindingHandlers[innerBindingKey];
                     resolver.execute(function () {
-                        var isInitialized = false;
-                        ko.computed({
-                            read: function () {
-                                if (!isInitialized && innerBinding.init) {
-                                    innerBinding.init(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
-                                    isInitialized = true;
-                                }
-                                if (innerBinding.update) {
-                                    innerBinding.update(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
-                                }
-                            },
-                            disposeWhenNodeIsRemoved: element
-                        });
+                        if (!isDisposed) {
+                            var isInitialized = false;
+                            ko.computed({
+                                read: function () {
+                                    if (!isInitialized && innerBinding.init) {
+                                        innerBinding.init(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                        isInitialized = true;
+                                    }
+                                    if (innerBinding.update) {
+                                        innerBinding.update(element, function () { return innerBindingParameters; }, allBindings, viewModel, bindingContext);
+                                    }
+                                },
+                                disposeWhenNodeIsRemoved: element
+                            });
+                        }
                     }, 1);
+                });
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    isDisposed = true;
                 });
                 return { controlsDescendantBindings: true };
             }
@@ -6682,7 +6688,7 @@ var DevExpress;
                         if (!modelPropertyInfo.modelName) {
                             return;
                         }
-                        if ((value !== undefined && value !== null) && ((Utils.isPlainObject(value) || !Utils.isEmptyObject(value)) || (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && !Utils.isPlainObject(value))) && (value !== defaultVal)) {
+                        if (modelPropertyInfo.alwaysSerialize || ((value !== undefined && value !== null) && ((Utils.isPlainObject(value) || !Utils.isEmptyObject(value)) || (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && !Utils.isPlainObject(value))) && (value !== defaultVal))) {
                             if (modelPropertyInfo.link) {
                                 refs.linkObjTable.push({
                                     obj: value,
@@ -6734,7 +6740,7 @@ var DevExpress;
                             else {
                                 throw new Error("Invalid info '" + serializationsInfo.stringify() + "'");
                             }
-                            if (_this._isSerializableValue(resultValue)) {
+                            if (modelPropertyInfo.alwaysSerialize || _this._isSerializableValue(resultValue)) {
                                 result[modelPropertyInfo.modelName] = resultValue;
                             }
                         }
@@ -7504,6 +7510,7 @@ var DevExpress;
                         operands.push.apply(operands, $.isArray(this.rightPart) ? this.rightPart : [this.rightPart]);
                     return operands;
                 };
+                CriteriaOperator.prototype.accept = function (visitor) { throw "Not implemented"; };
                 return CriteriaOperator;
             })();
             Data.CriteriaOperator = CriteriaOperator;
@@ -7600,6 +7607,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                GroupOperator.prototype.accept = function (visitor) {
+                    return visitor.visitGroupOperator
+                        ? visitor.visitGroupOperator(this)
+                        : new GroupOperator(this.operatorType, this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
+                };
                 return GroupOperator;
             })(CriteriaOperator);
             Data.GroupOperator = GroupOperator;
@@ -7621,6 +7633,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                OperandProperty.prototype.accept = function (visitor) {
+                    return visitor.visitOperandProperty
+                        ? visitor.visitOperandProperty(this)
+                        : new OperandProperty(this.propertyName);
+                };
                 return OperandProperty;
             })(CriteriaOperator);
             Data.OperandProperty = OperandProperty;
@@ -7660,6 +7677,11 @@ var DevExpress;
                 function ConstantValue(value) {
                     _super.call(this, value);
                 }
+                ConstantValue.prototype.accept = function (visitor) {
+                    return visitor.visitConstantValue
+                        ? visitor.visitConstantValue(this)
+                        : new ConstantValue(this.value);
+                };
                 return ConstantValue;
             })(OperandValue);
             Data.ConstantValue = ConstantValue;
@@ -7677,6 +7699,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                OperandParameter.prototype.accept = function (visitor) {
+                    return visitor.visitOperandParameter
+                        ? visitor.visitOperandParameter(this)
+                        : new OperandParameter(this.parameterName, this.value);
+                };
                 return OperandParameter;
             })(OperandValue);
             Data.OperandParameter = OperandParameter;
@@ -7775,6 +7802,11 @@ var DevExpress;
                     this.aggregatedExpression && operands.push(this.aggregatedExpression);
                     return operands;
                 };
+                AggregateOperand.prototype.accept = function (visitor) {
+                    return visitor.visitAggregateOperand
+                        ? visitor.visitAggregateOperand(this)
+                        : new AggregateOperand(this.property && this.property.accept(visitor), this.aggregatedExpression && this.aggregatedExpression.accept(visitor), this.operatorType, this.condition && this.condition.accept(visitor));
+                };
                 return AggregateOperand;
             })(CriteriaOperator);
             Data.AggregateOperand = AggregateOperand;
@@ -7805,6 +7837,11 @@ var DevExpress;
                             aggregated: aggregated
                         });
                     }
+                };
+                JoinOperand.prototype.accept = function (visitor) {
+                    return visitor.visitJoinOperand
+                        ? visitor.visitJoinOperand(this)
+                        : new JoinOperand(this.joinTypeName, this.condition && this.condition.accept(visitor), this.operatorType, this.aggregatedExpression && this.aggregatedExpression.accept(visitor));
                 };
                 return JoinOperand;
             })(CriteriaOperator);
@@ -7871,6 +7908,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                BetweenOperator.prototype.accept = function (visitor) {
+                    return visitor.visitBetweenOperator
+                        ? visitor.visitBetweenOperator(this)
+                        : new BetweenOperator(this.property && this.property.accept(visitor), this.begin && this.begin.accept(visitor), this.end && this.end.accept(visitor));
+                };
                 return BetweenOperator;
             })(CriteriaOperator);
             Data.BetweenOperator = BetweenOperator;
@@ -7919,6 +7961,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                InOperator.prototype.accept = function (visitor) {
+                    return visitor.visitInOperator
+                        ? visitor.visitInOperator(this)
+                        : new InOperator(this.criteriaOperator && this.criteriaOperator.accept(visitor), this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
+                };
                 return InOperator;
             })(CriteriaOperator);
             Data.InOperator = InOperator;
@@ -7991,6 +8038,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                BinaryOperator.prototype.accept = function (visitor) {
+                    return visitor.visitBinaryOperator
+                        ? visitor.visitBinaryOperator(this)
+                        : new BinaryOperator(this.leftOperand && this.leftOperand.accept(visitor), this.rightOperand && this.rightOperand.accept(visitor), this.operatorType);
+                };
                 return BinaryOperator;
             })(CriteriaOperator);
             Data.BinaryOperator = BinaryOperator;
@@ -8049,6 +8101,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                UnaryOperator.prototype.accept = function (visitor) {
+                    return visitor.visitUnaryOperator
+                        ? visitor.visitUnaryOperator(this)
+                        : new UnaryOperator(this.operatorType, this.operand && this.operand.accept(visitor));
+                };
                 return UnaryOperator;
             })(CriteriaOperator);
             Data.UnaryOperator = UnaryOperator;
@@ -8246,6 +8303,11 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                FunctionOperator.prototype.accept = function (visitor) {
+                    return visitor.visitFunctionOperator
+                        ? visitor.visitFunctionOperator(this)
+                        : new FunctionOperator(this.operatorType, this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
+                };
                 return FunctionOperator;
             })(CriteriaOperator);
             Data.FunctionOperator = FunctionOperator;
@@ -8295,11 +8357,13 @@ var DevExpress;
             })();
             Widgets.PathRequest = PathRequest;
             var TreeListItemViewModel = (function () {
-                function TreeListItemViewModel(options, path, onItemsVisibilityChanged, rtl) {
+                function TreeListItemViewModel(options, path, onItemsVisibilityChanged, rtl, resolver) {
                     var _this = this;
                     if (path === void 0) { path = []; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
+                    if (resolver === void 0) { resolver = new JS.CodeResolver(); }
+                    this.resolver = resolver;
                     this._rtl = false;
                     this._data = ko.observable(null);
                     this.level = -1;
@@ -8376,6 +8440,13 @@ var DevExpress;
                         }
                     });
                 };
+                TreeListItemViewModel.prototype._createItemsObj = function (items) {
+                    var obj = {};
+                    for (var i = 0; i < items.length; i++) {
+                        obj[items[i].name] = { item: items[i], index: i };
+                    }
+                    return obj;
+                };
                 TreeListItemViewModel.prototype._loadItems = function (options) {
                     var _this = this;
                     var deferred = $.Deferred();
@@ -8389,38 +8460,44 @@ var DevExpress;
                         value.done(function (data) {
                             var _data = data;
                             var items = _this.items.peek();
+                            var dataObj = _this._createItemsObj(_data);
                             var isMutated = false;
-                            [].concat.apply([], items).forEach(function (i) {
-                                if (_data.filter(function (d) { return d.name === i.data.name; }).length === 0) {
-                                    i.dispose();
-                                    items.splice(items.indexOf(i), 1);
+                            var splicedItems = 0;
+                            var tempItems = [].concat.apply([], items);
+                            for (var i = 0; i < tempItems.length; i++) {
+                                if (!dataObj[tempItems[i].data.name]) {
+                                    tempItems[i].dispose();
+                                    items.splice(i - splicedItems, 1);
+                                    splicedItems++;
                                     isMutated = true;
                                 }
-                            });
+                            }
+                            var itemsObj = _this._createItemsObj(items);
                             var resorted = false;
                             var showIconsForChildItems = !_this._treeListController.showIconsForChildItems || _this._treeListController.showIconsForChildItems(_this);
                             _data.forEach(function (d, index) {
-                                var currentItem = items.filter(function (i) { return d.name === i.data.name; })[0];
+                                var currentItem = itemsObj[d.name];
                                 if (!currentItem) {
                                     isMutated = true;
-                                    var newItem = new TreeListItemViewModel(options, _this.pathParts, _this._onItemsVisibilityChanged, _this._rtl);
+                                    var newItem = new TreeListItemViewModel(options, _this.pathParts, _this._onItemsVisibilityChanged, _this._rtl, _this.resolver);
                                     newItem.data = d;
                                     newItem.level = _this.level + 1;
                                     newItem.parent = _this;
                                     newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
                                     newItem.imageClassName = newItem._getImageClassName(showIconsForChildItems);
                                     items.splice(index, 0, newItem);
+                                    itemsObj[d.name] = { item: newItem, index: index };
                                 }
                                 else {
-                                    if (!_this._equal(d, currentItem.data))
-                                        currentItem.data = d;
+                                    if (!_this._equal(d, currentItem.item.data))
+                                        currentItem.item.data = d;
                                     if (!resorted)
-                                        resorted = items.indexOf(currentItem) !== index;
+                                        resorted = currentItem.index !== index;
                                 }
                             });
                             if (resorted) {
                                 var index = items.reduce(function (acc, x, index) {
-                                    var max = Math.abs(index - _data.indexOf(x.data));
+                                    var max = Math.abs(index - (dataObj[x.data.name] ? dataObj[x.data.name].index : -1));
                                     if (!acc || acc.max < max) {
                                         return { max: max, index: index };
                                     }
@@ -8428,7 +8505,7 @@ var DevExpress;
                                 }, null).index;
                                 var curItem = items[index];
                                 items.splice(index, 1);
-                                items.splice(_data.indexOf(curItem.data), 0, curItem);
+                                items.splice(dataObj[curItem.data.name] ? dataObj[curItem.data.name].index : -1, 0, curItem);
                                 isMutated = true;
                             }
                             isMutated && _this.items.valueHasMutated();
@@ -8437,7 +8514,7 @@ var DevExpress;
                                     item._loadItems(options);
                                 }
                             });
-                            _this.nodeImageClass(_this.items.peek().filter(function (x) { return x.visible; }).length > 0 ? "dx-collapsing-image dx-image-expanded" : "dx-image-leaf-node");
+                            _this.nodeImageClass(_this.items.peek().some(function (x) { return x.visible; }) ? "dx-collapsing-image dx-image-expanded" : "dx-image-leaf-node");
                             deferred.resolve(_this.items.peek());
                             var selectedPath = options.selectedPath.peek();
                             if (selectedPath) {
@@ -11119,12 +11196,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[1,11],$V2=[1,29],$V3=[1,4],$V4=[1,27],$V5=[1,3],$V6=[1,30],$V7=[1,32],$V8=[1,25],$V9=[1,24],$Va=[1,34],$Vb=[1,31],$Vc=[1,33],$Vd=[1,13],$Ve=[1,5],$Vf=[1,10],$Vg=[1,21],$Vh=[1,14],$Vi=[1,19],$Vj=[1,12],$Vk=[1,15],$Vl=[1,38],$Vm=[1,47],$Vn=[1,46],$Vo=[1,43],$Vp=[1,50],$Vq=[1,52],$Vr=[1,53],$Vs=[1,56],$Vt=[1,55],$Vu=[1,51],$Vv=[1,54],$Vw=[1,40],$Vx=[1,39],$Vy=[1,37],$Vz=[1,36],$VA=[1,41],$VB=[1,42],$VC=[1,44],$VD=[1,45],$VE=[1,48],$VF=[1,49],$VG=[5,11,17,19,20,23,34,35,36,37,38,39,40,42,43,46,48,55,62,63,64,66,67,68,69],$VH=[1,66],$VI=[5,11,15,16,17,19,20,22,23,34,35,36,37,38,39,40,42,43,46,48,55,62,63,64,66,67,68,69],$VJ=[2,14],$VK=[1,69],$VL=[1,71],$VM=[5,11,17,19,20,23,34,35,36,37,38,39,40,42,43,44,46,48,55,62,63,64,66,67,68,69],$VN=[1,79],$VO=[1,96],$VP=[1,78],$VQ=[1,80],$VR=[1,81],$VS=[1,82],$VT=[1,83],$VU=[1,84],$VV=[1,85],$VW=[1,86],$VX=[1,87],$VY=[1,88],$VZ=[1,89],$V_=[1,90],$V$=[1,91],$V01=[1,92],$V11=[1,93],$V21=[1,94],$V31=[1,95],$V41=[5,11,16,17,19,20,23,34,35,36,37,38,39,40,42,43,46,48,55,62,63,64,66,67,68,69],$V51=[1,97],$V61=[1,98],$V71=[5,11,19,20,23,34,35,36,37,38,39,40,48,55,63,64,66,67,68,69],$V81=[5,11,35,36,48,55],$V91=[16,55],$Va1=[1,147],$Vb1=[1,169],$Vc1=[1,165],$Vd1=[1,164],$Ve1=[1,148],$Vf1=[1,149],$Vg1=[1,150],$Vh1=[1,151],$Vi1=[1,152],$Vj1=[1,153],$Vk1=[1,154],$Vl1=[1,155],$Vm1=[1,156],$Vn1=[1,157],$Vo1=[1,158],$Vp1=[1,159],$Vq1=[1,160],$Vr1=[1,161],$Vs1=[1,162],$Vt1=[1,163],$Vu1=[1,166],$Vv1=[1,167],$Vw1=[1,168],$Vx1=[1,170],$Vy1=[1,171],$Vz1=[1,172],$VA1=[15,16,17,22,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,55],$VB1=[16,17,20],$VC1=[5,11,17,19,20,23,34,35,36,37,38,39,40,43,48,55,63,64,66,67,68,69],$VD1=[5,11,34,35,36,39,40,48,55,66,67],$VE1=[5,11,19,20,34,35,36,39,40,48,55,66,67,68,69],$VF1=[11,48],$VG1=[5,11,16,17,19,20,23,34,35,36,37,38,39,40,42,43,44,46,48,55,62,63,64,66,67,68,69];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,8],$V3=[1,9],$V4=[1,10],$V5=[1,23],$V6=[1,11],$V7=[1,12],$V8=[1,13],$V9=[1,14],$Va=[1,15],$Vb=[1,16],$Vc=[1,17],$Vd=[1,18],$Ve=[1,19],$Vf=[1,20],$Vg=[1,21],$Vh=[1,22],$Vi=[1,25],$Vj=[1,27],$Vk=[1,26],$Vl=[1,29],$Vm=[1,30],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VH=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,49,50,51,53,54,55],$VI=[1,56],$VJ=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VK=[5,26,27,29,35,50],$VL=[1,108],$VM=[1,109],$VN=[1,103],$VO=[1,105],$VP=[1,106],$VQ=[1,104],$VR=[1,107],$VS=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VT=[5,18,19,24,25,26,27,29,30,35,50],$VU=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,50],$VV=[29,35];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"criteriaList":6,"\\0":7,"queryCollection":8,"expOrSort":9,";":10,",":11,"SORT_ASC":12,"SORT_DESC":13,"type":14,"COL":15,".":16,"+":17,"upcast":18,"OP_LT":19,"OP_GT":20,"column":21,"NUM":22,"^":23,"fieldColumn":24,"something":25,"CONST":26,"AGG_COUNT":27,"AGG_AVG":28,"AGG_MAX":29,"AGG_MIN":30,"AGG_SINGLE":31,"AGG_EXISTS":32,"AGG_SUM":33,"OP_LIKE":34,"AND":35,"OR":36,"OP_BETWEEN":37,"OP_IN":38,"NOT":39,"IS":40,"NULL":41,"%":42,"-":43,"[":44,"=":45,"/":46,"(":47,")":48,"param":49,"?":50,"property":51,"columnOrAggregate":52,"propertyWithAggregate":53,"compositeProperty":54,"]":55,"field":56,"aggregate":57,"aggregateSuffix":58,"topLevelAggregate":59,"MinStart":60,"MaxStart":61,"*":62,"|":63,"&":64,"~":65,"OP_EQ":66,"OP_NE":67,"OP_GE":68,"OP_LE":69,"argumentslist":70,"FUNCTION":71,"commadelimitedlist":72,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"\\0",10:";",11:",",12:"SORT_ASC",13:"SORT_DESC",15:"COL",16:".",17:"+",19:"OP_LT",20:"OP_GT",22:"NUM",23:"^",25:"something",26:"CONST",27:"AGG_COUNT",28:"AGG_AVG",29:"AGG_MAX",30:"AGG_MIN",31:"AGG_SINGLE",32:"AGG_EXISTS",33:"AGG_SUM",34:"OP_LIKE",35:"AND",36:"OR",37:"OP_BETWEEN",38:"OP_IN",39:"NOT",40:"IS",41:"NULL",42:"%",43:"-",44:"[",45:"=",46:"/",47:"(",48:")",50:"?",55:"]",62:"*",63:"|",64:"&",65:"~",66:"OP_EQ",67:"OP_NE",68:"OP_GE",69:"OP_LE",71:"FUNCTION"},
-productions_: [0,[3,2],[6,1],[6,2],[8,1],[8,3],[8,3],[9,1],[9,2],[9,2],[14,1],[14,3],[14,3],[18,4],[21,1],[21,2],[21,2],[21,1],[21,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,1],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,2],[24,1],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,3],[24,4],[24,4],[24,4],[49,2],[49,1],[51,1],[51,3],[52,1],[53,1],[53,3],[54,3],[54,4],[54,5],[54,6],[56,1],[56,2],[57,4],[57,3],[57,6],[57,5],[57,4],[57,3],[57,1],[59,1],[58,1],[58,1],[58,3],[58,3],[58,4],[58,4],[58,3],[58,4],[58,2],[58,2],[60,3],[61,3],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,4],[4,4],[70,3],[70,2],[72,1],[72,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"property":48,"[":49,"]":50,".":51,"agg":52,"FIELD_END":53,"CH":54,"ESC_CH":55,"FIELD_START":56,"?":57,"NAME_SOFT":58,"commaseparated":59,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",49:"[",50:"]",51:".",53:"FIELD_END",54:"CH",55:"ESC_CH",56:"FIELD_START",57:"?",58:"NAME_SOFT"},
+productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[52,3],[52,1],[52,3],[52,1],[52,4],[52,4],[52,3],[52,4],[52,4],[52,4],[48,2],[48,2],[48,2],[48,3],[48,3],[48,1],[48,1],[8,2],[8,2],[8,1],[33,2],[33,3],[59,1],[59,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -11134,375 +11211,245 @@ case 1:
  return $$[$0-1]; 
 break;
 case 2:
- result = new DevExpress.JS.Data.CriteriaOperator(); 
-break;
-case 3:
- result = $$[$0-1]; 
-break;
-case 4:
- this.$ = [ $$[$0] ]; 
-break;
-case 5: case 6:
- this.$ = $$[$0-2]; this.$.push($$[$0]); 
-break;
-case 7: case 10: case 17: case 83: case 86: case 117: case 118: case 119: case 120:
- this.$ = $$[$0]; 
-break;
-case 8: case 110: case 111: case 143: case 153:
- this.$ = $$[$0-1]; 
-break;
-case 9:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.OrderDescToken, operand: $$[$0-1] }); 
-break;
-case 11:
- this.$ =  DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
-break;
-case 12:
- this.$ =	DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '+' + $$[$0].propertyName }); 
-break;
-case 13:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: '<' + $$[$0-2].propertyName + '>' + $$[$0].propertyName }); 
-break;
-case 14: case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31: case 32: case 33: case 34: case 35: case 36:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0] }); 
-break;
-case 15: case 16: case 37: case 38: case 39: case 40: case 41: case 42: case 43: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 51: case 52: case 53:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-1].propertyName + ' ' + $$[$0] }); 
-break;
-case 18:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "^" }); 
-break;
-case 19:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0] }); 
-break;
-case 54: case 55: case 56:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-1].propertyName + ' ' + $$[$0] }); 
-break;
-case 57:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "^" }); 
-break;
-case 58: case 59: case 60: case 61:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '-' + $$[$0] }); 
-break;
-case 62: case 63: case 64: case 65:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '[' + $$[$0] }); 
-break;
-case 66: case 67: case 68: case 69:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '+' + $$[$0] }); 
-break;
-case 70: case 71: case 72: case 73:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '=' + $$[$0] }); 
-break;
-case 74:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '/' + $$[$0] }); 
-break;
-case 75: case 76: case 77:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '/'  + $$[$0] }); 
-break;
-case 78: case 79:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1] + ')' }); 
-break;
-case 80:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].propertyName + ' (' + $$[$0-1].propertyName + ')' }); 
-break;
-case 81:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
-break;
-case 82:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
-break;
-case 84:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].propertyName + '.' + $$[$0].propertyName }); 
-break;
-case 85:
- this.$ = $$[$0].propertyName; 
-break;
-case 87:
- this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; 
-break;
-case 88:
-
-  var lst = [];
-  lst.push($$[$0-1]);
-  this.$ = {
-   column: _$[$0-1].first_column,
-   line: _$[$0-1].first_line - 1,
-   names: lst
-  };
- 
-break;
-case 89:
-
-	var lst = [];
-  lst.push($$[$0-2] + '.');
-  this.$ = {
-   column: _$[$0-2].first_column,
-   line: _$[$0-2].first_line - 1,
-   names: lst
-  };
- 
-break;
-case 90:
-
-  var propertyNameObject = $$[$0-4];
-  propertyNameObject.names.push($$[$0-1]);
-  this.$ = propertyNameObject;
- 
-break;
-case 91:
-
-  var propertyNameObject = $$[$0-5];
-  propertyNameObject.names.push($$[$0-2] + '.');
-  this.$ = propertyNameObject;
- 
-break;
-case 92:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0].names.join('.'), startColumn: $$[$0].column, startLine: $$[$0].line }); 
-break;
-case 93:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { }); 
-break;
-case 94:
-
-		var agg = $$[$0];
-		var collectionProperty = DevExpress.JS.Data.criteriaCreator.process("property", { });
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(collectionProperty, null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 95:
-
-		var agg = $$[$0];
-		var prop = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].names.join('.'), startColumn: $$[$0-2].column, startLine: $$[$0-2].line });
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(prop, null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 96:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-5], $$[$0-3], agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 97:
-
-		var agg = $$[$0];
-		this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-4], null, agg.operatorType, agg.aggregatedExpression);
-	
-break;
-case 98:
- this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-3], $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 99:
- this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate($$[$0-2], null, DevExpress.JS.Data.Aggregate.Exists, null); 
-break;
-case 102: case 104:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: null,
-			aggregateType:  DevExpress.JS.Data.Aggregate.Count,
-			condition: null
-		});
-	
-break;
-case 103: case 105:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: null,
-			aggregateType:  DevExpress.JS.Data.Aggregate.Exists,
-			condition: null
-		});
-	
-break;
-case 106:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0-1],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Avg,
-			condition: null
-		});
-	
-break;
-case 107:
-
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0-1],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Sum,
-			condition: null
-		});
-	
-break;
-case 108:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "This" }),
-			aggregateType:  DevExpress.JS.Data.Aggregate.Single,
-			condition: null
-		});
-	
-break;
-case 109:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0-1],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Single,
-			condition: null
-		});
-	
-break;
-case 112:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Min,
-			condition: null
-		});
-	
-break;
-case 113:
- 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("aggregate", { 
-			property: null,
-			aggregatedExpression: $$[$0],
-			aggregateType:  DevExpress.JS.Data.Aggregate.Max,
-			condition: null
-		});
-	
-break;
-case 114: case 115:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: $$[$0] }); 
 break;
-case 116:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("const", { value: null }); 
+case 3: case 4: case 40: case 41: case 42: case 43:
+ this.$ = $$[$0]; 
 break;
-case 121:
+case 5:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Multiply }); 
 break;
-case 122:
+case 6:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Divide }); 
 break;
-case 123:
+case 7:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Plus }); 
 break;
-case 124:
+case 8:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Minus }); 
 break;
-case 125:
+case 9:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Modulo }); 
 break;
-case 126:
+case 10:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseOr }); 
 break;
-case 127:
+case 11:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseAnd }); 
 break;
-case 128:
+case 12:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.BitwiseXor }); 
 break;
-case 129:
-
-								this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Minus, operator: $$[$0] });
-							
+case 13:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Minus, operator: $$[$0] }); 
 break;
-case 130:
+case 14:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Plus, operator: $$[$0] }); 
 break;
-case 131:
+case 15:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.BitwiseNot, operator: $$[$0] }); 
 break;
-case 132:
+case 16:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Equal }); 
 break;
-case 133:
+case 17:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.NotEqual }); 
 break;
-case 134:
+case 18:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Greater }); 
 break;
-case 135:
+case 19:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Less }); 
 break;
-case 136:
+case 20:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.GreaterOrEqual }); 
 break;
-case 137:
+case 21:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.LessOrEqual }); 
 break;
-case 138:
+case 22:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }); 
 break;
-case 139:
+case 23:
 
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
-			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, 
-			operator: DevExpress.JS.Data.criteriaCreator.process("binary",  { left: $$[$0-3], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }) 
-		});
-	
+            this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
+                operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, 
+                operator: DevExpress.JS.Data.criteriaCreator.process("binary", { left: $$[$0-3], right: $$[$0], operatorType: DevExpress.JS.Data.BinaryOperatorType.Like }) 
+            });
+        
 break;
-case 140:
+case 24:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.Not, operator: $$[$0] }); 
 break;
-case 141:
+case 25:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 142:
+case 26:
  this.$ = DevExpress.JS.Data.GroupOperator.combine(DevExpress.JS.Data.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 144:
+case 27: case 62: case 73:
+ this.$ = $$[$0-1]; 
+break;
+case 28:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-2] }); 
 break;
-case 145:
+case 29:
  
-		this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
-			operatorType: DevExpress.JS.Data.UnaryOperatorType.Not,
-			operator: DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-3] })
-		}); 
-	
+            this.$ = DevExpress.JS.Data.criteriaCreator.process("unary", { 
+                operatorType: DevExpress.JS.Data.UnaryOperatorType.Not,
+                operator: DevExpress.JS.Data.criteriaCreator.process("unary", { operatorType: DevExpress.JS.Data.UnaryOperatorType.IsNull, operator: $$[$0-3] })
+            }); 
+        
 break;
-case 146:
+case 30:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("in", { criteriaOperator: $$[$0-2], operands: $$[$0] }); 
 break;
-case 147:
+case 31:
  this.$ = DevExpress.JS.Data.criteriaCreator.process("between", { property: $$[$0-6], begin: $$[$0-3], end: $$[$0-1] }); 
 break;
-case 148: case 149:
-  this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
+case 32:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
 break;
-case 150:
+case 33:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Min, operands: $$[$0] }); 
+break;
+case 34:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Max, operands: $$[$0] }); 
+break;
+case 35:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Count"] || "Count", operands: $$[$0] }); 
+break;
+case 36:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Avg"] || "Avg", operands: $$[$0] }); 
+break;
+case 37:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Sum"] || "Sum", operands: $$[$0] }); 
+break;
+case 38:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Exists"] || "Exists", operands: $$[$0] }); 
+break;
+case 39:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType["Single"] || "Single", operands: $$[$0] }); 
+break;
+case 44:
  this.$ = null; 
 break;
-case 151:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Min, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
+case 45:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-5].name, startColumn: $$[$0-5].col, startLine: $$[$0-5].line }), 
+                $$[$0-3], $$[$0].type, $$[$0].expr
+            ); 
+        
 break;
-case 152:
- this.$ = DevExpress.JS.Data.criteriaCreator.process("function", { operatorType: DevExpress.JS.Data.FunctionOperatorType.Max, operands: [$$[$0-3].aggregatedExpression, $$[$0-1]] }); 
+case 46:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-4].name, startColumn: $$[$0-4].col, startLine: $$[$0-4].line }), 
+                null, $$[$0].type, $$[$0].expr
+            ); 
+        
 break;
-case 154:
+case 47:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
+                null, $$[$0].type, $$[$0].expr
+            ); 
+        
+break;
+case 48:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-3].name, startColumn: $$[$0-3].col, startLine: $$[$0-3].line }), 
+                $$[$0-1], DevExpress.JS.Data.Aggregate.Exists, null
+            );
+        
+break;
+case 49:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
+                null, DevExpress.JS.Data.Aggregate.Exists, null);
+        
+break;
+case 50:
+ 
+            this.$ = DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: $$[$0].name, startColumn: $$[$0].col, startLine: $$[$0].line }); 
+        
+break;
+case 51:
+ 
+            this.$ = DevExpress.JS.Data.JoinOperand.joinOrAggregate(
+                DevExpress.JS.Data.criteriaCreator.process("property", { }), 
+                null, $$[$0].type, $$[$0].expr
+            ); 
+        
+break;
+case 52:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Count  };  
+break;
+case 53:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Count };   
+break;
+case 54: case 55:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Exists }; 
+break;
+case 56:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Avg, expr: $$[$0-1] }; 
+break;
+case 57:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Sum, expr: $$[$0-1] }; 
+break;
+case 58:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Single, expr: DevExpress.JS.Data.criteriaCreator.process("property", { propertyName: "This" }) }; 
+break;
+case 59:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Single, expr: $$[$0-1] }; 
+break;
+case 60:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Min, expr: $$[$0-1] }; 
+break;
+case 61:
+ this.$ = { type:  DevExpress.JS.Data.Aggregate.Max, expr: $$[$0-1] }; 
+break;
+case 63:
+ this.$ = { name: $$[$0-1].name + $$[$0], line: $$[$0-1].line, col: $$[$0-1].col }; 
+break;
+case 64:
+ this.$ = { name: $$[$0-1].name +$$[$0].substr(1), line: $$[$0-1].line, col: $$[$0-1].col }; 
+break;
+case 65:
+ this.$ = { name: $$[$0-2].name + ".", line: $$[$0-2].line, col: $$[$0-2].col }; 
+break;
+case 66:
+ this.$ = { name: $$[$0-2].name + "." + $$[$0], line: $$[$0-2].line, col: $$[$0-2].col }; 
+break;
+case 67:
+ this.$ = { name: "", line: _$[$0].first_line - 1, col: _$[$0].first_column + 1 }; 
+break;
+case 68:
+ this.$ = { name: $$[$0], line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
+break;
+case 69: case 70:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
+break;
+case 71:
+ this.$ = DevExpress.JS.Data.criteriaCreator.process("value", { }); 
+break;
+case 72:
  this.$ = []; 
 break;
-case 155:
-
-							var lst = [];
-							lst.push($$[$0]);
-							this.$ = lst;
-						
+case 74:
+ this.$ = [$$[$0]]; 
 break;
-case 156:
-
-							var lst = $$[$0-2];
-							lst.push($$[$0]);
-							this.$ = lst;
-						
+case 75:
+ this.$ = $$[$0-2].concat($$[$0]); 
 break;
 }
 },
-table: [{3:1,4:2,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{1:[3]},{5:[1,35],17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,114]),o($VG,[2,115]),o($VG,[2,116]),o($VG,[2,117]),o($VG,[2,118],{44:[1,57]}),o($VG,[2,119],{16:[1,58]}),o($VG,[2,120]),{4:59,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:60,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:61,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:62,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:63,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,48:[1,64],49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{47:$VH,70:65},o($VI,$VJ,{70:67,47:$VH}),{11:[1,68],48:$VK},{11:[1,70],48:$VL},o($VG,[2,82],{15:[1,72]}),o($VM,[2,92],{16:[1,73]}),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:76,53:75,55:[1,74]},o($V41,[2,83],{15:$V51,22:$V61}),o($VG,[2,100]),{47:[1,99]},{47:[1,100]},o($VI,[2,17]),o($VI,[2,18]),o($VG,[2,101]),{14:101,15:[1,102]},o($VG,[2,102],{47:[1,103]}),o($VG,[2,103],{47:[1,104]}),{47:[1,105]},{47:[1,106]},{47:[1,107]},{1:[2,1]},{4:108,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:109,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:110,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:111,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:112,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:113,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:114,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:115,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:116,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:117,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:118,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:119,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:120,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:121,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:122,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{34:[1,123]},{4:124,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:125,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{39:[1,127],41:[1,126]},{47:$VH,70:128},{47:[1,129]},{4:130,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,55:[1,131],56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{15:[1,133],18:26,19:$V2,21:132,23:$V4},o($VG,[2,129]),o($VG,[2,130]),o($V71,[2,131],{17:$Vl,42:$Vw,43:$Vx,46:$Vy,62:$Vz}),o($V81,[2,140],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,134],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,150]),o($VG,[2,148]),{4:137,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,48:[1,136],49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk,72:135},o($VG,[2,149]),{4:138,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,110]),{4:139,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,111]),o($VG,[2,81]),{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,44:[1,141],58:140,60:142,61:143},o($VM,[2,93],{16:[1,144]}),{16:[1,146],55:[1,145]},o($V91,[2,86]),o($V91,[2,85],{15:$Va1,17:$Vb1,22:$Vc1,25:$Vd1,26:$Ve1,27:$Vf1,28:$Vg1,29:$Vh1,30:$Vi1,31:$Vj1,32:$Vk1,33:$Vl1,34:$Vm1,35:$Vn1,36:$Vo1,37:$Vp1,38:$Vq1,39:$Vr1,40:$Vs1,41:$Vt1,42:$Vu1,43:$Vv1,44:$Vw1,45:$Vx1,46:$Vy1,47:$Vz1}),o($VA1,[2,19]),o($VA1,[2,20]),o($VA1,[2,21]),o($VA1,[2,22]),o($VA1,[2,23]),o($VA1,[2,24]),o($VA1,[2,25]),o($VA1,[2,26]),o($VA1,[2,27]),o($VA1,[2,28]),o($VA1,[2,29]),o($VA1,[2,30]),o($VA1,[2,31]),o($VA1,[2,32]),o($VA1,[2,33]),o($VA1,[2,34]),o($VA1,[2,35]),o($VA1,[2,36]),o($VA1,[2,57]),o($VI,[2,15]),o($VI,[2,16]),{4:173,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:174,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{16:[1,176],17:[1,177],20:[1,175]},o($VB1,[2,10]),{48:[1,178]},{48:[1,179]},{4:180,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:181,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{4:183,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,48:[1,182],49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,121]),o($VG,[2,122]),o($VC1,[2,123],{42:$Vw,46:$Vy,62:$Vz}),o($VC1,[2,124],{42:$Vw,46:$Vy,62:$Vz}),o($VG,[2,125]),o([5,11,19,20,34,35,36,37,38,39,40,48,55,63,66,67,68,69],[2,126],{17:$Vl,23:$Vo,42:$Vw,43:$Vx,46:$Vy,62:$Vz,64:$VB}),o($V71,[2,127],{17:$Vl,42:$Vw,43:$Vx,46:$Vy,62:$Vz}),o([5,11,19,20,23,34,35,36,37,38,39,40,48,55,63,66,67,68,69],[2,128],{17:$Vl,42:$Vw,43:$Vx,46:$Vy,62:$Vz,64:$VB}),o($VD1,[2,132],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VD1,[2,133],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VE1,[2,134],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VE1,[2,135],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VE1,[2,136],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VE1,[2,137],{17:$Vl,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB}),o($VD1,[2,138],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),{4:184,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($V81,[2,141],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o([5,11,36,48,55],[2,142],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG,[2,144]),{41:[1,185]},o($VG,[2,146]),{4:186,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,55:[1,187],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,99],{16:[1,188]}),o($V41,[2,84],{15:$V51,22:$V61}),o($VI,$VJ),o($VG,[2,143]),{11:[1,190],48:[1,189]},o($VG,[2,154]),o($VF1,[2,155],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,191],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,192],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,95]),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:76,53:193},{48:$VK},{48:$VL},{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,58:194,60:142,61:143},o($VG1,[2,88]),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:196,55:[1,195]},o($VA1,[2,37]),o($VA1,[2,38]),o($VA1,[2,39]),o($VA1,[2,40]),o($VA1,[2,41]),o($VA1,[2,42]),o($VA1,[2,43]),o($VA1,[2,44]),o($VA1,[2,45]),o($VA1,[2,46]),o($VA1,[2,47]),o($VA1,[2,48]),o($VA1,[2,49]),o($VA1,[2,50]),o($VA1,[2,51]),o($VA1,[2,52]),o($VA1,[2,53]),o($VA1,[2,54]),o($VA1,[2,55]),o($VA1,[2,56]),{15:[1,197],22:[1,199],25:[1,198],42:[1,200]},{15:[1,201],22:[1,203],25:[1,202],42:[1,204]},{15:[1,205],22:[1,207],25:[1,206],42:[1,208]},{15:[1,209],22:[1,211],25:[1,210],42:[1,212]},{15:[1,213],22:[1,215],25:[1,214],42:[1,216]},{15:$VN,22:[1,217],23:$VO,24:219,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,42:[1,218]},o($VF1,[2,112],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VF1,[2,113],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),{15:[1,220]},{15:[1,221]},{15:[1,222]},o($VG,[2,104]),o($VG,[2,105]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,223],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,224],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,108]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,225],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VD1,[2,139],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,37:$Vs,38:$Vt,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,68:$VE,69:$VF}),o($VG,[2,145]),{11:[1,226],17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,98],{16:[1,227]}),{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,58:228,60:142,61:143},o($VG,[2,153]),{4:229,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},o($VG,[2,151]),o($VG,[2,152]),{16:[1,231],55:[1,230]},o($VG,[2,94]),o($VG1,[2,89]),o($V91,[2,87]),o($VA1,[2,58]),o($VA1,[2,59]),o($VA1,[2,60]),o($VA1,[2,61]),o($VA1,[2,62]),o($VA1,[2,63]),o($VA1,[2,64]),o($VA1,[2,65]),o($VA1,[2,66]),o($VA1,[2,67]),o($VA1,[2,68]),o($VA1,[2,69]),o($VA1,[2,70]),o($VA1,[2,71]),o($VA1,[2,72]),o($VA1,[2,73]),o($VA1,[2,74]),o($VA1,[2,75]),o($VA1,[2,76]),o($VA1,[2,77]),{48:[1,232]},{48:[1,233]},{15:$Va1,17:$Vb1,22:$Vc1,25:$Vd1,26:$Ve1,27:$Vf1,28:$Vg1,29:$Vh1,30:$Vi1,31:$Vj1,32:$Vk1,33:$Vl1,34:$Vm1,35:$Vn1,36:$Vo1,37:$Vp1,38:$Vq1,39:$Vr1,40:$Vs1,41:$Vt1,42:$Vu1,43:$Vv1,44:$Vw1,45:$Vx1,46:$Vy1,47:$Vz1,48:[1,234]},o($VI,[2,13]),o($VB1,[2,11]),o($VB1,[2,12]),o($VG,[2,106]),o($VG,[2,107]),o($VG,[2,109]),{4:235,15:$V0,17:$V1,18:26,19:$V2,21:22,22:$V3,23:$V4,26:$V5,27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,39:$Vd,41:$Ve,43:$Vf,44:$Vg,47:$Vh,49:6,50:$Vi,51:8,54:20,56:7,57:9,58:28,59:23,60:17,61:18,65:$Vj,71:$Vk},{27:$V6,28:$V7,29:$V8,30:$V9,31:$Va,32:$Vb,33:$Vc,58:236,60:142,61:143},o($VG,[2,97]),o($VF1,[2,156],{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF}),o($VG1,[2,90]),{15:$VN,23:$VO,24:77,25:$VP,26:$VQ,27:$VR,28:$VS,29:$VT,30:$VU,31:$VV,32:$VW,33:$VX,34:$VY,35:$VZ,36:$V_,37:$V$,38:$V01,39:$V11,40:$V21,41:$V31,52:196,55:[1,237]},o($VA1,[2,78]),o($VA1,[2,79]),o($VA1,[2,80]),{17:$Vl,19:$Vm,20:$Vn,23:$Vo,34:$Vp,35:$Vq,36:$Vr,37:$Vs,38:$Vt,39:$Vu,40:$Vv,42:$Vw,43:$Vx,46:$Vy,48:[1,238],62:$Vz,63:$VA,64:$VB,66:$VC,67:$VD,68:$VE,69:$VF},o($VG,[2,96]),o($VG1,[2,91]),o($VG,[2,147])],
-defaultActions: {35:[2,1]},
+table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{1:[3]},{5:[1,28],9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,30:$VD,32:$VE,34:$VF},o($VG,[2,2]),o($VG,[2,3]),o($VG,[2,4]),{4:50,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:51,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:52,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},o($VH,[2,68],{33:55,28:$VI}),{28:$VI,33:57},{28:$VI,33:58},{28:$VI,33:59},{28:$VI,33:60},{28:$VI,33:61},{28:$VI,33:62},{28:$VI,33:63},o($VG,[2,40]),o($VG,[2,41]),o($VG,[2,42]),o($VG,[2,43]),o($VG,[2,44]),o($VG,[2,50],{49:[1,64],51:[1,65],53:[1,66],54:[1,67],55:[1,68]}),{50:[1,69]},o($VG,[2,71],{36:[1,70],58:[1,71]}),o($VH,[2,67]),{1:[2,1]},{4:72,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:73,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:74,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{24:[1,87]},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{25:[1,91],31:[1,90]},{28:$VI,33:92},{28:[1,93]},o($VG,[2,13]),o($VG,[2,14]),o($VJ,[2,15],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp}),o($VK,[2,24],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,30:$VD,32:$VE,34:$VF}),{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,94],30:$VD,32:$VE,34:$VF},o($VG,[2,32]),{4:97,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,29:[1,95],31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk,59:96},o($VG,[2,33]),o($VG,[2,34]),o($VG,[2,35]),o($VG,[2,36]),o($VG,[2,37]),o($VG,[2,38]),o($VG,[2,39]),{4:98,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,50:[1,99],56:$Vj,57:$Vk},{36:[1,102],37:$VL,38:$VM,39:$VN,40:$VO,41:$VP,42:$VQ,43:$VR,52:100,56:[1,101]},o($VH,[2,62]),o($VH,[2,63]),o($VH,[2,64]),{51:[1,110]},o($VG,[2,69]),o($VG,[2,70]),o($VG,[2,5]),o($VG,[2,6]),o($VS,[2,7],{9:$Vl,10:$Vm,13:$Vp}),o($VS,[2,8],{9:$Vl,10:$Vm,13:$Vp}),o($VG,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],[2,10],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,15:$Vr,16:$Vs}),o($VJ,[2,11],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],[2,12],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,15:$Vr}),o($VT,[2,16],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,20:$Vv,21:$Vw,22:$Vx,23:$Vy,32:$VE,34:$VF}),o($VT,[2,17],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,20:$Vv,21:$Vw,22:$Vx,23:$Vy,32:$VE,34:$VF}),o($VU,[2,18],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,32:$VE,34:$VF}),o($VU,[2,19],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,32:$VE,34:$VF}),o($VU,[2,20],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,32:$VE,34:$VF}),o($VU,[2,21],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,32:$VE,34:$VF}),o($VT,[2,22],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,20:$Vv,21:$Vw,22:$Vx,23:$Vy,32:$VE,34:$VF}),{4:111,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},o($VK,[2,25],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,30:$VD,32:$VE,34:$VF}),o([5,27,29,35,50],[2,26],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,30:$VD,32:$VE,34:$VF}),o($VG,[2,28]),{31:[1,112]},o($VG,[2,30]),{4:113,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},o($VG,[2,27]),o($VG,[2,72]),{29:[1,114],35:[1,115]},o($VV,[2,74],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,30:$VD,32:$VE,34:$VF}),{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,30:$VD,32:$VE,34:$VF,50:[1,116]},o($VG,[2,49],{51:[1,117]}),o($VG,[2,47]),o($VH,[2,65]),o($VH,[2,66]),o($VG,[2,53],{28:[1,118]}),o($VG,[2,55],{28:[1,119]}),{28:[1,120]},{28:[1,121]},{28:[1,122]},{28:[1,123]},{28:[1,124]},{37:$VL,38:$VM,39:$VN,40:$VO,41:$VP,42:$VQ,43:$VR,52:125},o($VT,[2,23],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,20:$Vv,21:$Vw,22:$Vx,23:$Vy,32:$VE,34:$VF}),o($VG,[2,29]),{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,30:$VD,32:$VE,34:$VF,35:[1,126]},o($VG,[2,73]),{4:127,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},o($VG,[2,48],{51:[1,128]}),{37:$VL,38:$VM,39:$VN,40:$VO,41:$VP,42:$VQ,43:$VR,52:129},{29:[1,130]},{29:[1,131]},{4:132,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:133,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:135,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,29:[1,134],31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:136,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},o($VG,[2,51]),{4:138,6:3,7:4,8:5,11:$V0,12:$V1,17:$V2,25:$V3,28:$V4,31:$V5,36:$V6,37:$V7,38:$V8,39:$V9,40:$Va,41:$Vb,42:$Vc,43:$Vd,44:$Ve,45:$Vf,46:$Vg,47:$Vh,48:24,49:$Vi,56:$Vj,57:$Vk},o($VV,[2,75],{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,30:$VD,32:$VE,34:$VF}),{37:$VL,38:$VM,39:$VN,40:$VO,41:$VP,42:$VQ,43:$VR,52:139},o($VG,[2,46]),o($VG,[2,52]),o($VG,[2,54]),{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,140],30:$VD,32:$VE,34:$VF},{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,141],30:$VD,32:$VE,34:$VF},o($VG,[2,58]),{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,142],30:$VD,32:$VE,34:$VF},{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,143],30:$VD,32:$VE,34:$VF},{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,144],30:$VD,32:$VE,34:$VF},{9:$Vl,10:$Vm,11:$Vn,12:$Vo,13:$Vp,14:$Vq,15:$Vr,16:$Vs,18:$Vt,19:$Vu,20:$Vv,21:$Vw,22:$Vx,23:$Vy,24:$Vz,25:$VA,26:$VB,27:$VC,29:[1,145],30:$VD,32:$VE,34:$VF},o($VG,[2,45]),o($VG,[2,56]),o($VG,[2,57]),o($VG,[2,59]),o($VG,[2,60]),o($VG,[2,61]),o($VG,[2,31])],
+defaultActions: {28:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -11977,108 +11924,120 @@ options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:/* skip whitespace */
+case 0: this.begin('INITIAL'); return 49; 
 break;
-case 1:return 37
+case 1: this.begin('INITIAL'); return 53; 
 break;
-case 2:return 38
+case 2:return 55;
 break;
-case 3:return 39
+case 3:return 54;
 break;
-case 4:return 40
+case 4:return 'INVALID';
 break;
-case 5:return 41
+case 5:return 44
 break;
-case 6:return 62
+case 6:return 46
 break;
-case 7:return 46
+case 7:return 45
 break;
-case 8:return 43
+case 8:return 47
 break;
-case 9:return 17
+case 9:return 47
 break;
-case 10:return 23
+case 10:/* skip whitespace */
 break;
-case 11:return 67
+case 11:return 34
 break;
-case 12:return '!'
+case 12:return 32
 break;
-case 13:return 42
+case 13:return 25
 break;
-case 14:return 47
+case 14:return 30
 break;
-case 15:return 48
+case 15:return 31
 break;
-case 16:return 44
+case 16:return 9
 break;
-case 17:return 55
+case 17:return 10
 break;
-case 18:return 67
+case 18:return 12
 break;
-case 19:return 68
+case 19:return 11
 break;
-case 20:return 69
+case 20:return 16
 break;
-case 21:return 20
+case 21:return 17
 break;
 case 22:return 19
 break;
-case 23:return 36
+case 23:return '!'
 break;
-case 24:return 35
+case 24:return 13
 break;
-case 25:return 28
+case 25:return 19
 break;
-case 26:return 29
+case 26:return 22
 break;
-case 27:return 30
+case 27:return 23
 break;
-case 28:return 31
+case 28:return 20
 break;
-case 29:return 27
+case 29:return 21
 break;
-case 30:return 32
+case 30:return 27
 break;
-case 31:return 33
+case 31:return 26
 break;
-case 32:return 66
+case 32:return 40
 break;
-case 33:return 66
+case 33:return 38
 break;
-case 34:return 34
+case 34:return 37
 break;
-case 35:return 35
+case 35:return 43
 break;
-case 36:return 36
+case 36:return 39
 break;
-case 37:return 5
+case 37:return 42
 break;
-case 38:return 22
+case 38:return 41
 break;
-case 39:return 16
+case 39:return 18
 break;
-case 40:return 11
+case 40:return 18
 break;
-case 41:return 50
+case 41:return 24
 break;
 case 42:return 26
 break;
-case 43:return 26
+case 43:return 27
 break;
-case 44:return 15	
+case 44: this.begin('fieldname'); return 56; 
 break;
-case 45:return 26	
+case 45:return 50;
 break;
-case 46:return 26
+case 46:return 28
 break;
-case 47:return 25   
+case 47:return 29
 break;
-case 48:return 'INVALID'
+case 48:return 51
+break;
+case 49:return 35
+break;
+case 50:return 57
+break;
+case 51:return 36
+break;
+case 52:return 58
+break;
+case 53:return 'INVALID'
+break;
+case 54:return 5
 break;
 }
 },
-rules: [/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:$)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:'[^']*')/i,/^(?:#[^#]*#)/i,/^(?:.+(?=\]))/i,/^(?:.)/i],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],"inclusive":true}}
+rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
+conditions: {"fieldname":{"rules":[0,1,2,3,4],"inclusive":false},"INITIAL":{"rules":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54],"inclusive":true}}
 });
 return lexer;
 })();
@@ -12089,24 +12048,7 @@ function Parser () {
 Parser.prototype = parser;parser.Parser = Parser;
 return new Parser;
 })();
-
-
-if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = criteriaparser;
-exports.Parser = criteriaparser.Parser;
-exports.parse = function () { return criteriaparser.parse.apply(criteriaparser, arguments); };
-exports.main = function commonjsMain(args) {
-    if (!args[1]) {
-        console.log('Usage: '+args[0]+' FILE');
-        process.exit(1);
-    }
-    var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
-    return exports.parser.parse(source);
-};
-if (typeof module !== 'undefined' && require.main === module) {
-  exports.main(process.argv.slice(1));
-}
-}
+DevExpress.JS.Data.criteriaparser = criteriaparser;
 var DevExpress;
 (function (DevExpress) {
     var Designer;
@@ -15251,6 +15193,9 @@ var DevExpress;
                 this.containment = '.dxrd-ghost-container';
                 this["helper"] = function (draggable) {
                     _super.prototype.helper.call(_this, draggable);
+                    if (_this.selection.selectedItems.indexOf(draggable) === -1) {
+                        _this.selection.updateSelection(draggable);
+                    }
                     dragHelperContent.update(draggable);
                     _this._size.width(dragHelperContent.width());
                     _this._size.height(dragHelperContent.height());
