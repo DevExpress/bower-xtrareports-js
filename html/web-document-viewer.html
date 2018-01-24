@@ -1,9 +1,9 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-22
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -420,7 +420,7 @@
 </script>
 
 <script type="text/html" id="dx-filtereditor-content-plain">
-    <div class="dx-filtereditor-plain-advanced" data-bind="dxCheckBox: { value: advancedMode, text: 'Advanced Mode' }"></div>
+    <div class="dx-filtereditor-plain-advanced" data-bind="dxCheckBox: { value: advancedMode, text: advancedModeText }"></div>
     <div class="dx-filtereditor-plain-content">
         <div class="dx-filtereditor-text-container" data-bind="css: { 'advanced': advancedMode }, visible: textVisible">
             <!-- ko template: 'dx-filtereditor-content-text'-->
@@ -1378,9 +1378,9 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-23
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -1482,8 +1482,8 @@
         <div class="dxrd-mobile-content">
             <div class="dxrd-mobile-gallery" data-bind="style: { pointerEvents: $data.zoomUpdating() ? 'none' : '', touchEvents: $data.zoomUpdating() ? 'none' : '' }, dxGalleryReportPreview: { dataSource: $root.gallery.items, gallery: $root.gallery, animationEnabled: $root.gallery.animationEnabled, selectedIndex: $root.gallery.selectedIndex, width:'100%', height: '100%', showIndicator: false, loop: true, onSelectionChanged: onSlide, swipeEnabled: $root.slideOptions.swipeEnabled }">
                 <div data-options="dxTemplate: { name: 'item' }">
-                    <div class="dxrd-scrollView-mobile" data-bind="dxScrollView: { onUpdated: function(e) { $root.reportPreview.setScrollReached(e); }, showScrollbar: true, direction: 'both', useNative: false, bounceEnabled: false }">
-                        <div class="dxrd-gallery-blocks">
+                    <div class="dxrd-scrollView-mobile" data-bind="dxScrollView: $root.reportPreview.getScrollViewOptions()">
+                        <div class="dxrd-gallery-blocks" data-bind="styleunit: $root.gallery.contentSize()">
                             <!-- ko foreach: $data.blocks() -->
                             <!-- ko if: $data.page -->
                             <div class="dxrd-gallery-block" data-bind="styleunit: position, css: $data.classSet">
@@ -1507,7 +1507,7 @@
 </script>
 
 <script type="text/html" id="dxrd-preview-page-mobile">
-    <div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading }">
+    <div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading, skipIfInvisible: true }">
         <div class="dxrdp-loading-wrapper" data-bind="styleunit: { width: width, height: height, lineHeight: height }, style: { 'background-color': color }, visible: pageLoading, text: loadingText">
         </div>
         <img style="width:100%; height:100%;" data-bind="event: { load: function(s, e) { setTimeout(function() { onPageLoaded(s,e); }, 1); }, error: onPageLoadFailed }, attr: { src: imageSrc }, style:{ 'background-color': color }" />
@@ -1650,7 +1650,7 @@
 </div></script>
 
 <script type="text/html" id="dxrd-page-brick-clickable">
-    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.jQueryEvent); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
+    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
         <!-- ko if: $data.navigation -->
         <div class="dxrd-report-preview-brick-navigation">
             <!-- ko if: navigation.drillDownKey -->
@@ -1771,7 +1771,7 @@
 </script>
 
 <script type="text/html" id="dxrd-page-brick">
-    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.jQueryEvent); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
+    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
         <!-- ko if: $data.navigation -->
         <div class="dxrd-report-preview-brick-navigation">
             <!-- ko if: navigation.drillDownKey -->
@@ -1784,6 +1784,10 @@
         <!--/ko-->
         <!--/ko-->
     </div>
+</script>
+
+<script type="text/html" id="dx-selectbox">
+    <div data-bind="dxSelectBox: { dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dxrd-zoom-autofit-select-template">

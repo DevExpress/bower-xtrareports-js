@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.light.css)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-22
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -741,6 +741,9 @@
   width: 100%;
   height: 100%;
 }
+.dx-filtereditor .dx-filtereditor-text-container .dx-filtereditor-text .dx-texteditor-container .dx-filtereditor-ace .ace_hidden-cursors .ace_cursor {
+  opacity: 1;
+}
 .dx-filtereditor .dx-filtereditor-tree-container {
   height: 100%;
   position: relative;
@@ -758,7 +761,8 @@
   left: 0;
   bottom: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background-color: #ffffff;
+  opacity: 0.8;
   color: #b0b0b0;
   text-align: center;
 }
@@ -3024,9 +3028,9 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-22
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -3168,9 +3172,9 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.light.css)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-22
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -4219,9 +4223,9 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-light.css)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-23
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -4693,9 +4697,9 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-light.css)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-23
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -5767,9 +5771,9 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-light.css)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-23
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 

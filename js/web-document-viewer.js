@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-23
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -130,7 +130,8 @@ var DevExpress;
                 multiValue: { header: "dxrd-multivalue" },
                 multiValueEditable: { custom: "dxrd-multivalue-editable" },
                 multiValueSelectBox: { header: "dxrd-multivalue-selectbox", editorType: Preview.MultiValueEditor },
-                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "PreviewStringId.ExportOption_CsvSeparator_UsingSystem"); } } }
+                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "PreviewStringId.ExportOption_CsvSeparator_UsingSystem"); } } },
+                selectBox: { header: "dx-selectbox" }
             };
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
@@ -445,8 +446,8 @@ var DevExpress;
                     this.separator = ko.computed({
                         read: function () { return separatorValue(); },
                         write: function (newValue) {
-                            if (_this.useCustomSeparator())
-                                separatorValue(newValue);
+                            separatorValue(newValue);
+                            _this.useCustomSeparator(newValue !== _this.defaultSeparatorValue);
                         }
                     });
                 }
@@ -1477,8 +1478,9 @@ var DevExpress;
                         _self.pageLoading(false);
                         _self.pageLoadFailed(false);
                         if (_self.imageHeight() === 0 && _self.imageWidth() === 0) {
-                            _self.imageHeight(_e.currentTarget.height);
-                            _self.imageWidth(_e.currentTarget.width);
+                            var _target = _e.currentTarget || _e.target || _e.path && _e.path[0];
+                            _self.imageHeight(_target.height);
+                            _self.imageWidth(_target.width);
                         }
                         if (_self.cachedImageSrc() !== _self.imageSrc()) {
                             _self.originalHeight() && ko.isObservable(height) && height(_self.originalHeight());
@@ -1569,7 +1571,7 @@ var DevExpress;
                             if (!editingField)
                                 return [];
                             pageFieldViewModels.push(editingField.createViewModel(_this.realZoom, originalWidth, originalHeight, function () { return allEditingFields; }, brick.absoluteBounds));
-                            brick.text = function () { return brickText(brick, function () { return allEditingFields; }); };
+                            brick.text = (function (brick) { return (function () { return brickText(brick, function () { return allEditingFields; }); }); })(brick);
                         }
                         return pageFieldViewModels;
                     });
@@ -1675,8 +1677,6 @@ var DevExpress;
                     this.resetSearchResult();
                     this._resultNavigator = SearchViewModel.createResultNavigator(this, reportPreview);
                     this.clean = function () { _this.searchText(""); };
-                    var lastMatchCase = this.matchCase();
-                    var lastMatchWholeWord = this.matchWholeWord();
                     this._disposables.push(reportPreview._currentDocumentId.subscribe(function (newVal) {
                         _this.resetSearchResult();
                     }));
@@ -1686,11 +1686,9 @@ var DevExpress;
                     this.findUp = function () { _this.searchUp(true); _this.findNext(); };
                     this.findDown = function () { _this.searchUp(false); _this.findNext(); };
                     this.goToResult = function (result) { _this._resultNavigator.goToResult(result.id); };
-                    var newSearch = function (text) {
+                    var newSearch = function (text, matchCase, matchWholeWord) {
                         _this.searchResult([]);
                         _this._resultNavigator.currentResult(null);
-                        lastMatchCase = _this.matchCase();
-                        lastMatchWholeWord = _this.matchWholeWord();
                         if (!text) {
                             reportPreview.pages() && reportPreview.pages()[reportPreview.pageIndex()] && reportPreview.pages()[reportPreview.pageIndex()].selectBrick("");
                             return;
@@ -1717,9 +1715,9 @@ var DevExpress;
                         if (_this.loading()) {
                             return;
                         }
-                        (lastMatchCase === _this.matchCase() || _this.searchText().toUpperCase() === _this.searchText().toLowerCase()) && lastMatchWholeWord === _this.matchWholeWord() && _this._resultNavigator.next(_this.searchUp()) || newSearch(_this.searchText());
+                        _this._resultNavigator.next(_this.searchUp()) || newSearch(_this.searchText(), _this.matchCase(), _this.matchWholeWord());
                     };
-                    this._disposables.push(this.searchText.subscribe(function (newVal) { newSearch(newVal); }));
+                    this._disposables.push(this.searchText.subscribe(function (newVal) { newSearch(newVal, _this.matchCase(), _this.matchWholeWord()); }), this.matchCase.subscribe(function (newVal) { newSearch(_this.searchText(), newVal, _this.matchWholeWord()); }), this.matchWholeWord.subscribe(function (newVal) { newSearch(_this.searchText(), _this.matchCase(), newVal); }));
                     var disabled = ko.pureComputed(function () {
                         var documentId = reportPreview["_currentDocumentId"]();
                         var pageIndex = reportPreview.pageIndex();
@@ -2105,6 +2103,9 @@ var DevExpress;
                 }
                 if (typeString === "multiValue") {
                     return DevExpress.Report.Preview.editorTemplates.multiValueEditable;
+                }
+                if (typeString === "Enum") {
+                    return DevExpress.Report.Preview.editorTemplates.selectBox;
                 }
                 return undefined;
             }
@@ -2619,11 +2620,11 @@ var DevExpress;
                     return this.parametersLoading();
                 };
                 PreviewParametersViewModel.prototype.getLookUpValues = function (changedParameterPath) {
+                    var _this = this;
                     var requiredParameterPaths = this.getPathsAfterPath(changedParameterPath);
                     if (!requiredParameterPaths || requiredParameterPaths.length === 0) {
                         return;
                     }
-                    this.parametersLoading(true);
                     var argsObject = {
                         reportId: this._reportPreview.reportId,
                         reportUrl: this._reportPreview.reportUrl,
@@ -2631,9 +2632,12 @@ var DevExpress;
                         parameters: this.serializeParameters(),
                         timeZoneOffset: 0 - new Date().getTimezoneOffset()
                     };
-                    this._getLookUpValueRequest(argsObject)
-                        .done(this._getDoneGetLookUpValueHandler())
-                        .fail(this._getFailGetLookUpValueHandler());
+                    setTimeout(function () {
+                        _this.parametersLoading(true);
+                        _this._getLookUpValueRequest(argsObject)
+                            .done(_this._getDoneGetLookUpValueHandler())
+                            .fail(_this._getFailGetLookUpValueHandler());
+                    }, 10);
                 };
                 return PreviewParametersViewModel;
             })(DevExpress.Designer.Disposable);
@@ -3365,9 +3369,8 @@ var DevExpress;
                 };
             }
             Preview.updatePreviewContentSize = updatePreviewContentSize;
-            function updatePreviewZoomWithAutoFit(width, height, element, autoFitBy) {
+            function updatePreviewZoomWithAutoFit(width, height, $element, autoFitBy) {
                 if (autoFitBy === void 0) { autoFitBy = Preview.ZoomAutoBy.WholePage; }
-                var $element = $(element);
                 var $previewWrapper = $element.closest(".dxrd-preview-wrapper");
                 var $preview = $element.closest(".dxrd-preview");
                 if ($previewWrapper.length === 0 || $preview.length === 0) {
@@ -3461,7 +3464,7 @@ var DevExpress;
                 DevExpress["config"]({ rtlEnabled: !!rtl });
                 var designerModel;
                 if (isMobile) {
-                    designerModel = Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
+                    designerModel = DevExpress.Report.Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
                 }
                 else {
                     designerModel = createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
@@ -4436,6 +4439,7 @@ var DevExpress;
                     };
                     this.isLeftMove = false;
                     this.isRightMove = false;
+                    this.$window = $(window);
                     this.$element = $(element),
                         this.$gallery = this.$element.find(".dxrd-mobile-gallery");
                     this.$galleryblocks = this.$gallery.find(".dxrd-gallery-blocks");
@@ -4503,7 +4507,6 @@ var DevExpress;
                     this.initialize(e.pageX, e.pageY);
                 };
                 EventProcessor.prototype.move = function (e) {
-                    e.preventDefault();
                     if (this.slideOptions.zoomUpdating() || this.slideOptions.galleryIsAnimated()) {
                         return;
                     }
@@ -4512,7 +4515,7 @@ var DevExpress;
                         if (!direction.vertical && !direction.horizontal)
                             return;
                         if (direction.vertical || this.slideOptions.searchPanel.height() !== 0) {
-                            if (this.slideOptions.reachedTop()) {
+                            if (this.slideOptions.reachedTop() && (Preview.MobileSearchViewModel.maxHeight + this.$element.offset().top) > this.$window.scrollTop()) {
                                 this.slideOptions.brickEventsDisabled(true);
                                 e.stopPropagation();
                                 var currentHeight = this.slideOptions.searchPanel.height();
@@ -4540,15 +4543,15 @@ var DevExpress;
                     if (this.slideOptions.scrollAvailable()) {
                         if (direction.horizontal && this.slideOptions.swipeEnabled()) {
                             var galleryInstance = this.$gallery["dxGalleryReportPreview"]("instance");
-                            if (this.slideOptions.reachedLeft() && this.isRightMove) {
+                            if (this.slideOptions.reachedLeft() && this.isRightMove && galleryInstance.gallery.swipeLeftEnable()) {
                                 galleryInstance.prevItem();
                             }
-                            else if (this.slideOptions.reachedRight() && this.isLeftMove) {
+                            else if (this.slideOptions.reachedRight() && this.isLeftMove && galleryInstance.gallery.swipeRightEnable()) {
                                 galleryInstance.nextItem();
                             }
                         }
                     }
-                    if (Preview.searchAvailable()) {
+                    if (Preview.searchAvailable() && !this.slideOptions.searchPanel.editorVisible()) {
                         if (this.slideOptions.searchPanel.height() >= Preview.MobileSearchViewModel.maxHeight / 2) {
                             this.slideOptions.searchPanel.height(Preview.MobileSearchViewModel.maxHeight);
                         }
@@ -4556,7 +4559,7 @@ var DevExpress;
                             this.slideOptions.searchPanel.height(0);
                         }
                         if (this.slideOptions.searchPanel.height() == Preview.MobileSearchViewModel.maxHeight) {
-                            this.slideOptions.autoFitBy(Preview.ZoomAutoBy.WholePage);
+                            this.slideOptions.autoFitBy(Preview.ZoomAutoBy.PageWidth);
                         }
                     }
                     setTimeout(function () { _this.slideOptions.brickEventsDisabled(false); }, 10);
@@ -4712,6 +4715,29 @@ var DevExpress;
                 };
             }
             Preview.updatePreviewContentSizeMobile = updatePreviewContentSizeMobile;
+            function updateMobilePreviewActionsPosition($actions, $viewer, $window) {
+                return function (viewer) {
+                    if ($viewer.length === 0)
+                        $viewer = $(viewer);
+                    if ($actions.length === 0)
+                        $actions = $viewer.find(".dxrdp-mobile-actions");
+                    if ($window.length === 0)
+                        $window = $(window);
+                    var actionTop = parseInt($actions.css("bottom")) + $actions.height();
+                    var viewerTop = $viewer.offset().top;
+                    var viewerHeight = $viewer.height();
+                    var windowContentHeight = $window.height() + $window.scrollTop();
+                    var result = viewerTop + viewerHeight - windowContentHeight;
+                    if (result > 0 && result < viewerHeight - actionTop) {
+                        var transform = "translateY(-" + result + "px)";
+                        $actions.css({
+                            '-webkit-transform': transform,
+                            'transform': transform
+                        });
+                    }
+                };
+            }
+            Preview.updateMobilePreviewActionsPosition = updateMobilePreviewActionsPosition;
             function createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings) {
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
@@ -4765,7 +4791,7 @@ var DevExpress;
                         if (searchModel.height() > 0 && !searchModel.editorVisible()) {
                             return false;
                         }
-                        if (!(reportPreview.scrollReachedLeft() || reportPreview.scrollReachedRight())) {
+                        if (!reportPreview.scrollReachedLeft() && !reportPreview.scrollReachedRight()) {
                             return false;
                         }
                         return true;
@@ -4798,8 +4824,22 @@ var DevExpress;
                     { id: Preview.MobilePreviewElements.MobileActions, templateName: Preview.MobilePreviewElements.MobileActions, model: mobileActions },
                     { id: Preview.MobilePreviewElements.Parameters, templateName: Preview.MobilePreviewElements.Parameters, model: parametersPopup }
                 ];
+                var $viewer = $(element);
+                var $actions = $viewer.find(".dxrdp-mobile-actions");
+                var $window = $(window);
+                var updateMobilePreviewActionsPosition_ = updateMobilePreviewActionsPosition($actions, $viewer, $window);
                 $(window).bind("resize", function () {
                     updatePreviewContentSize_();
+                    if (reportPreview.actionsVisible())
+                        updateMobilePreviewActionsPosition_(element);
+                });
+                reportPreview.actionsVisible.subscribe(function (newValue) {
+                    if (newValue)
+                        updateMobilePreviewActionsPosition_(element);
+                });
+                $(window).bind("scroll", function () {
+                    if (reportPreview.actionsVisible())
+                        updateMobilePreviewActionsPosition_(element);
                 });
                 DevExpress.Designer.appendStaticContextToRootViewModel(designerModel);
                 if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
@@ -4935,6 +4975,7 @@ var DevExpress;
                     this.readerMode = mobileSettings.readerMode;
                     var globalAnimationEnabled = mobileSettings.animationEnabled;
                     this.animationSettings = { zoomEnabled: ko.observable(globalAnimationEnabled), swipeEnabled: ko.observable(globalAnimationEnabled) };
+                    this.preventNativeScrollView = (DevExpress.devices) && !(DevExpress.devices.current().ios);
                     this.canSwitchToDesigner = false;
                     this.autoFitBy(Preview.ZoomAutoBy.PageWidth);
                     this.showMultipagePreview(true);
@@ -4980,6 +5021,19 @@ var DevExpress;
                     this.scrollReachedRight(true);
                     if (this.autoFitBy() === Preview.ZoomAutoBy.None && e.removedItems && e.removedItems[0].blocks().length === 1 && e.addedItems && e.addedItems[0].blocks().length === 1)
                         this.autoFitBy(Preview.ZoomAutoBy.PageWidth);
+                };
+                MobileReportPreview.prototype.getScrollViewOptions = function () {
+                    var _this = this;
+                    var options = {
+                        onUpdated: function (e) { _this.setScrollReached(e); },
+                        showScrollbar: true,
+                        direction: 'both',
+                        bounceEnabled: false
+                    };
+                    if (this.preventNativeScrollView) {
+                        options['useNative'] = false;
+                    }
+                    return options;
                 };
                 MobileReportPreview.prototype.setScrollReached = function (e) {
                     this.scrollReachedLeft(e.reachedLeft);
@@ -5226,6 +5280,15 @@ var DevExpress;
                     this.selectedIndexReal = ko.observable(0);
                     this.selectedIndex = ko.observable(0);
                     var oldIndex = this.selectedIndex();
+                    this.contentSize = ko.pureComputed(function () {
+                        var blocks = _this.items()[_this.selectedIndex()].blocks();
+                        var width = 'auto', height = 'auto';
+                        if (blocks.length === 1) {
+                            width = Math.max(blocks[0].position().width, blocks[0].page.width()).toString();
+                            height = Math.max(blocks[0].position().height, blocks[0].page.height()).toString();
+                        }
+                        return { width: width, height: height };
+                    });
                     this.animationEnabled = preview.animationSettings.swipeEnabled;
                     var _calcHorizontalVertical = function () {
                         var pageHeight = Math.ceil(preview._pageHeight() * Preview.getCurrentResolution(preview._zoom()) / Preview.previewDefaultResolution);
@@ -5283,7 +5346,7 @@ var DevExpress;
                     previewPage.maxZoom = 1;
                     var classSet = {};
                     if (this.animationEnabled()) {
-                        classSet[className] = true;
+                        className && (classSet[className] = true);
                         classSet["dxrdp-animation"] = true;
                     }
                     return {
@@ -5807,8 +5870,9 @@ var DevExpress;
                         Brick: brick,
                         DefaultHandler: defaultHandler,
                         GetBrickText: function () { return brick && brick.text(); },
-                        GetBrickValue: function () {
-                            var contentValue = brick && brick.content && brick.content.filter(function (x) { return x.Key === "value"; })[0];
+                        GetBrickValue: function (key) {
+                            if (key === void 0) { key = "value"; }
+                            var contentValue = brick && brick.content && brick.content.filter(function (x) { return x.Key === key; })[0];
                             return contentValue && contentValue.Value;
                         },
                         Handled: false
@@ -5949,38 +6013,34 @@ var DevExpress;
             };
             ko.bindingHandlers["lazyImages"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var $element = $(element), enabled = valueAccessor().enabled, loadVisibleImages = function () {
-                        if (!enabled()) {
-                            return;
-                        }
-                        var visibleArea = $element.height() + 100;
-                        for (var i = 0; i < element.children.length; i++) {
-                            var previewPage = element.children[i], rect = previewPage.getBoundingClientRect(), pageTop = rect.top;
-                            if (visibleArea > pageTop && pageTop >= 0 || pageTop < 0 && pageTop + rect.height > -100) {
-                                var previewPageModel = ko.dataFor(previewPage);
-                                previewPageModel && previewPageModel.isClientVisible && previewPageModel.isClientVisible(true);
+                    var $element = $(element), enabled = valueAccessor().enabled, load = null, loadVisibleImages = function (time) {
+                        if (time === void 0) { time = 300; }
+                        load && clearTimeout(load);
+                        load = setTimeout(function () {
+                            if (!enabled()) {
+                                return;
                             }
-                        }
+                            var visibleArea = $element.height() + 100;
+                            for (var i = 0; i < element.children.length; i++) {
+                                var previewPage = element.children[i], rect = previewPage.getBoundingClientRect(), pageTop = rect.top;
+                                if (visibleArea > pageTop && pageTop >= 0 || pageTop < 0 && pageTop + rect.height > -100) {
+                                    var previewPageModel = ko.dataFor(previewPage);
+                                    previewPageModel && previewPageModel.isClientVisible && previewPageModel.isClientVisible(true);
+                                }
+                            }
+                        }, time);
                     };
                     if (ko.isObservable(valueAccessor().updateCallback)) {
                         valueAccessor().updateCallback(loadVisibleImages);
                     }
-                    var load;
-                    var throttledLoad = function () {
-                        if (load) {
-                            clearTimeout(load);
-                        }
-                        load = setTimeout(function () { loadVisibleImages(); load = undefined; }, 700);
-                    };
                     var subscribtion = enabled.subscribe(function (newVal) {
-                        if (newVal) {
-                            loadVisibleImages();
-                        }
+                        newVal && loadVisibleImages(500);
                     });
-                    $element.on("scroll", throttledLoad);
-                    setTimeout(loadVisibleImages, 500);
+                    var scrollLoad = function () { return loadVisibleImages(700); };
+                    $element.on("scroll", scrollLoad);
+                    loadVisibleImages(500);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        $element.off("scroll", throttledLoad);
+                        $element.off("scroll", scrollLoad);
                         subscribtion.dispose();
                     });
                 }
@@ -6069,8 +6129,8 @@ var DevExpress;
                 PreviewSelection.prototype._mouseUp = function (event) {
                     this._$selectionContent && this._$selectionContent.remove();
                     this._$selectionContent = null;
-                    document.body.removeEventListener("mousemove", this._bodyEvents.move);
-                    document.body.removeEventListener("mouseup", this._bodyEvents.up);
+                    this._bodyEvents.move && document.body.removeEventListener("mousemove", this._bodyEvents.move);
+                    this._bodyEvents.up && document.body.removeEventListener("mouseup", this._bodyEvents.up);
                     this._startRect = null;
                     setTimeout(function () {
                         PreviewSelection.started = false;
@@ -6130,9 +6190,12 @@ var DevExpress;
                     var options = valueAccessor();
                     var subscriptions = [];
                     var updateZoom = function (newOptions) {
+                        var $element = $(element);
                         var autoFitBy = newOptions.autoFitBy();
                         if (autoFitBy != Preview.ZoomAutoBy.None && ((!newOptions.brickLoading || (newOptions.brickLoading && !newOptions.brickLoading())) || options.alwaysRecalculate)) {
-                            var newZoom = Math.floor(Preview.updatePreviewZoomWithAutoFit(newOptions.width(), newOptions.height(), element, autoFitBy) * 100) / 100;
+                            if (options.skipIfInvisible && $element.filter(":visible").length == 0)
+                                return;
+                            var newZoom = Math.floor(Preview.updatePreviewZoomWithAutoFit(newOptions.width(), newOptions.height(), $element, autoFitBy) * 100) / 100;
                             newOptions.zoom(Math.max(newZoom, 0.1));
                         }
                     };

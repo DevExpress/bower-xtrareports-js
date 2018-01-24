@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.2.4
-* Build date: 2017-12-14
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.5
+* Build date: 2018-01-22
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -6532,7 +6532,7 @@ var DevExpress;
     (function (JS) {
         var Widgets;
         (function (Widgets) {
-            Widgets.availableFonts = {
+            Widgets.availableFonts = ko.observable({
                 "Times New Roman": "Times New Roman",
                 "Arial": "Arial",
                 "Arial Black": "Arial Black",
@@ -6550,7 +6550,7 @@ var DevExpress;
                 "Symbol": "Symbol",
                 "Webdings": "Webdings",
                 "Wingdings": "Wingdings"
-            };
+            });
             Widgets.availableUnits = [
                 { value: "pt", displayValue: "Point", localizationId: "DevExpress.ReportDesigner_FontOptions_Unit_Point" },
                 { value: "world", displayValue: "World", localizationId: "ASPxReportsStringId.ReportDesigner_FontOptions_Unit_World" },
@@ -7059,7 +7059,7 @@ var DevExpress;
                         if (_values) {
                             return _values;
                         }
-                        _values = _this.info().values;
+                        _values = ko.unwrap(_this.info().values);
                         if (_values) {
                             return $.map(_values, function (displayValue, value) {
                                 return { value: value, displayValue: displayValue };
@@ -7353,6 +7353,9 @@ var DevExpress;
             }
             Utils.isPlainObject = isPlainObject;
             function isEmptyObject(obj) {
+                if ((typeof obj) === "string") {
+                    return false;
+                }
                 for (var name in obj) {
                     return false;
                 }
@@ -7578,7 +7581,7 @@ var DevExpress;
                         if (!modelPropertyInfo.modelName) {
                             return;
                         }
-                        if ((value !== undefined && value !== null) && ((Utils.isPlainObject(value) || !Utils.isEmptyObject(value)) || (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && !Utils.isPlainObject(value))) && (value !== defaultVal)) {
+                        if (modelPropertyInfo.alwaysSerialize || ((value !== undefined && value !== null) && ((Utils.isPlainObject(value) || !Utils.isEmptyObject(value)) || (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && !Utils.isPlainObject(value))) && (value !== defaultVal))) {
                             if (modelPropertyInfo.link) {
                                 refs.linkObjTable.push({
                                     obj: value,
@@ -7630,7 +7633,7 @@ var DevExpress;
                             else {
                                 throw new Error("Invalid info '" + serializationsInfo.stringify() + "'");
                             }
-                            if (_this._isSerializableValue(resultValue)) {
+                            if (modelPropertyInfo.alwaysSerialize || _this._isSerializableValue(resultValue)) {
                                 result[modelPropertyInfo.modelName] = resultValue;
                             }
                         }
@@ -8760,7 +8763,6 @@ var DevExpress;
                 });
                 AggregateOperand.prototype.children = function () {
                     var operands = [];
-                    this.property && operands.push(this.property);
                     this.condition && operands.push(this.condition);
                     this.aggregatedExpression && operands.push(this.aggregatedExpression);
                     return operands;
@@ -9284,9 +9286,16 @@ var DevExpress;
                 "LessOrEqual": "<=",
                 "GreaterOrEqual": ">="
             };
-            function criteriaForEach(operator, callback) {
-                callback(operator);
-                operator.children().forEach(function (item) { return criteriaForEach(item, callback); });
+            function criteriaForEach(operator, callback, path) {
+                if (path === void 0) { path = ""; }
+                callback(operator, path);
+                if (operator instanceof AggregateOperand) {
+                    operator.leftPart && criteriaForEach(operator.leftPart, callback, path);
+                    if (operator.leftPart && operator.leftPart["propertyName"]) {
+                        path = path ? [path, operator.leftPart["propertyName"]].join('.') : operator.leftPart["propertyName"];
+                    }
+                }
+                operator.children().forEach(function (item) { return criteriaForEach(item, callback, path); });
             }
             Data.criteriaForEach = criteriaForEach;
         })(Data = JS.Data || (JS.Data = {}));
@@ -9315,16 +9324,21 @@ var DevExpress;
                     }
                     var requests = [];
                     var result = [];
-                    JS.Data.criteriaForEach(expressionCriteria, function (operator) {
+                    JS.Data.criteriaForEach(expressionCriteria, function (operator, innerPath) {
                         if (operator instanceof JS.Data.OperandProperty) {
                             var isContainsParentRelationshipTraversalOperator = operator.propertyName.indexOf("^.") === 0;
                             var propertyName = isContainsParentRelationshipTraversalOperator ? operator.propertyName.substring(2) : operator.propertyName;
+                            propertyName = innerPath ? [innerPath, propertyName].join('.') : propertyName;
                             var request = getDisplayExpression ? _this.displayNameProvider.getDisplayNameByPath(path, propertyName) :
                                 _this.displayNameProvider.getRealName(path, propertyName);
-                            requests.push(request.done(function (data) { return result.push({
-                                operand: operator,
-                                convertedName: isContainsParentRelationshipTraversalOperator ? "^." + data : data
-                            }); }));
+                            requests.push(request.done(function (data) {
+                                var convertedName = isContainsParentRelationshipTraversalOperator ? "^." + data : data;
+                                convertedName = innerPath ? convertedName.split('.').slice(innerPath.split('.').length).join('.') : convertedName;
+                                result.push({
+                                    operand: operator,
+                                    convertedName: convertedName
+                                });
+                            }));
                         }
                     });
                     if (requests.length === 0) {
@@ -9396,12 +9410,20 @@ var DevExpress;
                 CodeCompletor.prototype.beforeInsertMatch = function (editor, token, parentPrefix) {
                     var cursorPosition = editor.getCursorPosition();
                     token = token || editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
-                    if (token && (token.type === "support.variable" || token.type === "support.function")) {
+                    if (!token)
+                        return;
+                    var endColumn = null;
+                    if (token.type === "support.variable" || token.type === "support.function") {
+                        endColumn = Math.max(token.start + token.value.length, cursorPosition.column);
+                    }
+                    else if (token.type === "support.context.start" && cursorPosition.column < token.start + token.value.length) {
+                        endColumn = token.start + token.value.length - 1;
+                    }
+                    if (endColumn !== null)
                         editor.session.remove({
                             start: { column: token.start || 0, row: cursorPosition.row },
-                            end: { column: Math.max(token.start + token.value.length, cursorPosition.column), row: cursorPosition.row }
+                            end: { column: endColumn, row: cursorPosition.row }
                         });
-                    }
                 };
                 CodeCompletor.prototype.insertMatch = function (editor, parentPrefix, fieldName) {
                     editor.insert("[" + (parentPrefix || "") + fieldName + "]");
@@ -9428,12 +9450,37 @@ var DevExpress;
                         };
                     });
                 };
+                CodeCompletor.prototype._combinePath = function (parentPrefix) {
+                    var path = this._getPath();
+                    if (parentPrefix) {
+                        var rootItem = this._rootItems.filter(function (item) { return parentPrefix.indexOf(item.name) === 0; })[0];
+                        if (rootItem && rootItem.rootPath)
+                            path = [rootItem.rootPath, parentPrefix].join('.');
+                        else
+                            path = [path, parentPrefix].join('.');
+                    }
+                    return path;
+                };
+                CodeCompletor.prototype._getParentPrefix = function (token) {
+                    var position = this._editor.getCursorPosition().column - token.start - 1;
+                    var dotIndex = token.value.lastIndexOf(".", position);
+                    var closeIndex = token.value.lastIndexOf("]", position);
+                    dotIndex = Math.max(closeIndex, dotIndex);
+                    var startIndex = token.type === "support.variable" || token.type === "support.context.start" ? 1 : 0;
+                    var parentPrefix = token.value.substring(startIndex, dotIndex);
+                    if (parentPrefix[0] === "[")
+                        parentPrefix = parentPrefix.substr(1);
+                    if (parentPrefix[parentPrefix.length - 1] === "]")
+                        parentPrefix = parentPrefix.substring(0, parentPrefix.length - 1);
+                    return parentPrefix;
+                };
                 CodeCompletor.prototype._getRealPath = function (path) {
                     var pathArray = path.split('.');
                     var $deferred = $.Deferred();
                     if (this._options.getRealExpression) {
                         this._options.getRealExpression(pathArray[0], this.generateFieldDisplayName(null, pathArray.splice(1).join('.'))).done(function (result) {
-                            $deferred.resolve([pathArray[0], result.slice(1, result.length - 1)].join('.'));
+                            result = result.slice(1, result.length - 1);
+                            $deferred.resolve(result && [pathArray[0], result].join('.') || pathArray[0]);
                         }).fail(function () { $deferred.resolve(path); });
                     }
                     else {
@@ -9441,57 +9488,38 @@ var DevExpress;
                     }
                     return $deferred.promise();
                 };
-                CodeCompletor.prototype._getFields = function (token, completions) {
+                CodeCompletor.prototype._getFields = function (token, completions, ignorePrefix) {
                     var _this = this;
                     if (token === void 0) { token = null; }
                     if (completions === void 0) { completions = []; }
+                    if (ignorePrefix === void 0) { ignorePrefix = false; }
                     var $deferred = $.Deferred();
-                    if (token && (token.type === "support.variable" || token.type === "support.function") && token.value.indexOf(".") > -1) {
-                        var dotIndex = token.value.lastIndexOf(".", this._editor.getCursorPosition().column - token.start);
-                        var startIndex = token.type === "support.variable" ? 1 : 0;
-                        var parentPrefix = token.value.substring(startIndex, dotIndex);
-                        if (parentPrefix[0] === "[" && parentPrefix[parentPrefix.length - 1] === "]") {
-                            parentPrefix = parentPrefix.substring(1, parentPrefix.length - 1);
-                        }
-                        var rootItem = this._rootItems.filter(function (item) { return parentPrefix.indexOf(item.name) === 0; })[0];
-                        var path = (rootItem ? "" : (this._getPath() + ".")) + parentPrefix;
-                        if (rootItem && rootItem.rootPath) {
-                            path = [rootItem.rootPath, parentPrefix].join('.');
-                        }
-                        this._getRealPath(path).done(function (result) {
-                            ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(result))
-                                .done(function (fields) {
-                                completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, parentPrefix + "."));
-                            })
-                                .always(function () { $deferred.resolve(completions); });
-                        });
+                    var parentPrefix = undefined;
+                    if (token && (token.type === "support.variable" || token.type === "support.function" || token.type === "support.context.start")) {
+                        parentPrefix = this._getParentPrefix(token);
                     }
-                    else {
-                        this._getRealPath(this._getPath()).done(function (path) {
-                            var $fields = ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(path))
-                                .done(function (fields) {
-                                completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token));
+                    this._getRealPath(this._combinePath(parentPrefix)).done(function (path) {
+                        var $fields = ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(path))
+                            .done(function (fields) {
+                            completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, ignorePrefix ? null : parentPrefix && parentPrefix + "."));
+                        });
+                        var $deferreds = [$fields];
+                        if (!parentPrefix) {
+                            _this._rootItems.forEach(function (item) {
+                                $deferreds.push(ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(item.rootPath || item.name))
+                                    .done(function (fields) {
+                                    completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, item.needPrefix ? item.name + "." : ""));
+                                }));
                             });
-                            if (!_this._isInContext()) {
-                                var $deferreds = [$fields];
-                                _this._rootItems.forEach(function (item) {
-                                    $deferreds.push(ko.unwrap(_this._fieldListProvider).getItems(new Widgets.PathRequest(item.rootPath || item.name))
-                                        .done(function (fields) {
-                                        completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(fields, token, item.needPrefix ? item.name + "." : ""));
-                                    }));
-                                });
-                                $.when($deferreds).always(function () { $deferred.resolve(completions); });
-                            }
-                            else {
-                                $.when($fields).always(function () { $deferred.resolve(completions); });
-                            }
-                        });
-                    }
+                        }
+                        $.when($deferreds).always(function () { $deferred.resolve(completions); });
+                    });
                     return $deferred.promise();
                 };
                 CodeCompletor.prototype.getFunctionsCompletions = function () {
                     var functions = [];
-                    ko.unwrap(this._functions).forEach(function (fnDisplay) {
+                    var functionsWithoutAggregates = ko.unwrap(this._functions).filter(function (fnDisplay) { return fnDisplay.category !== "Aggregate"; });
+                    functionsWithoutAggregates.forEach(function (fnDisplay) {
                         Object.keys(fnDisplay.items).forEach(function (fnKey) {
                             if (fnDisplay.items[fnKey]) {
                                 functions.push(createFunctionCompletion(fnDisplay.items[fnKey][0], fnKey));
@@ -9548,40 +9576,113 @@ var DevExpress;
                         return this._getOperands();
                     }
                 };
+                CodeCompletor.prototype._findStartContextTokenPosition = function (tokens, index) {
+                    var blocks = 0;
+                    var path = [];
+                    for (var i = index; i > -1; i--) {
+                        if (tokens[i].type === "support.context.end") {
+                            blocks++;
+                        }
+                        else if (tokens[i].type === "support.context.start") {
+                            if (blocks > 0)
+                                blocks--;
+                            else
+                                return i;
+                        }
+                    }
+                };
+                CodeCompletor.prototype._findOpenedStartContext = function (tokens, index) {
+                    var openedContextIndexes = [];
+                    var contextItems = tokens.filter(function (token, tokenIndex) { return (token.type === "support.context.start" || token.type === "support.context.end") && tokenIndex < index; });
+                    for (var i = 0; i < contextItems.length; i++) {
+                        if (contextItems[i].type === "support.context.start") {
+                            openedContextIndexes.push(tokens.indexOf(contextItems[i]));
+                        }
+                        else {
+                            openedContextIndexes.pop();
+                        }
+                    }
+                    return openedContextIndexes;
+                };
+                CodeCompletor.prototype._findOpenedAggregates = function (tokens, index) {
+                    var openedAggregatesIndexes = [];
+                    var aggregates = tokens.filter(function (token, tokenIndex) { return token.type === "support.other.aggregate" && tokenIndex < index; });
+                    if (aggregates.length > 0) {
+                        var currentToken = tokens[index];
+                        var currentCursorPosition = this._editor.getCursorPosition().column - (currentToken && currentToken.start || 0);
+                        for (var i = aggregates.length - 1; i > -1; i--) {
+                            var aggregateIndex = tokens.indexOf(aggregates[i]);
+                            var openBrace = 0;
+                            var closeBrace = 0;
+                            var isClosedAggregate = false;
+                            if (aggregateIndex + 1 === index && tokens[aggregateIndex + 1].value.substr(0, currentCursorPosition).indexOf("()") !== -1 ||
+                                aggregateIndex + 1 < index && tokens[aggregateIndex + 1].value.indexOf("()") !== -1) {
+                                isClosedAggregate = true;
+                                index = aggregateIndex;
+                                continue;
+                            }
+                            for (var j = aggregateIndex; j < index; j++) {
+                                if (tokens[j].value.trim() === "(") {
+                                    openBrace++;
+                                }
+                                else if (tokens[j].value.trim() === ")") {
+                                    closeBrace++;
+                                }
+                                if (openBrace === closeBrace && openBrace !== 0) {
+                                    isClosedAggregate = true;
+                                    break;
+                                }
+                            }
+                            if (!isClosedAggregate)
+                                openedAggregatesIndexes.splice(0, 0, aggregateIndex);
+                            index = aggregateIndex;
+                        }
+                    }
+                    return openedAggregatesIndexes;
+                };
+                CodeCompletor.prototype._getContextPath = function (tokens, currentPosition) {
+                    var path = [];
+                    var openedAggregatePositions = this._findOpenedAggregates(tokens, currentPosition);
+                    var openedContextPositions = this._findOpenedStartContext(tokens, currentPosition);
+                    var contextPath = openedContextPositions.concat.apply(openedContextPositions, openedAggregatePositions).sort(function (a, b) { return a - b; });
+                    if (contextPath.length > 0) {
+                        for (var i = 0; i < contextPath.length; i++) {
+                            if (tokens[contextPath[i]].type === "support.other.aggregate") {
+                                if (tokens[contextPath[i] - 1].type === "support.context.end") {
+                                    var startContextToken = this._findStartContextTokenPosition(tokens, contextPath[i] - 2);
+                                    var member = trimBrackets(tokens[startContextToken].value.match(/^\[(?:[^\]\)])*\]/)[0]);
+                                    path.push(member);
+                                }
+                                else if (tokens[contextPath[i] - 1].type === "support.variable") {
+                                    path.push(trimBrackets(tokens[contextPath[i] - 1].value));
+                                }
+                            }
+                            else {
+                                var member = trimBrackets(tokens[contextPath[i]].value.match(/^\[(?:[^\]\)])*\]/)[0]);
+                                path.push(member);
+                            }
+                        }
+                    }
+                    return path.filter(function (x) { return !!x; }).join('.');
+                };
                 CodeCompletor.prototype._getCompletions = function (editor, session, pos, prefix) {
                     var $deferred;
                     var completions = [];
                     var currentToken = session.getTokenAt(pos.row, pos.column);
                     var text = editor.session.getLine(pos.row).substring(0, pos.column);
                     var tokens = session.getTokens(pos.row);
-                    this._contextPath = null;
                     var currentTokenIndex = currentToken ? currentToken.index : -1;
-                    for (var i = currentTokenIndex; i > -1; i--) {
-                        var t = tokens[i];
-                        if (t.type === "support.context.start") {
-                            var cursorPositionInToken = pos.column - (t.start || 0);
-                            if (t.value.length <= cursorPositionInToken) {
-                                text = text.substring(t.start + t.value.length);
-                                if (!text.trim()) {
-                                    currentToken = null;
-                                }
-                            }
-                            else {
-                                currentToken = {
-                                    type: "support.variable",
-                                    value: t.value.substring(0, t.value.length - 1),
-                                    start: currentToken.start
-                                };
-                            }
-                            this._contextPath = trimBrackets(t.value.match(/^\[(?:[^\]\)])*\]/)[0]);
-                            break;
-                        }
-                        else if (t.type === "support.context.end") {
-                            break;
-                        }
-                    }
+                    this._contextPath = this._getContextPath(tokens, currentTokenIndex);
                     if (!currentToken) {
                         $deferred = this._getOperands();
+                    }
+                    else if (currentToken.type === "support.context.start") {
+                        var ignorePrefix = this._editor.getCursorPosition().column - currentToken.start === currentToken.value.length;
+                        if (ignorePrefix) {
+                            var functions = [];
+                            this._addFunctions(functions);
+                        }
+                        $deferred = this._getFields(currentToken, functions, ignorePrefix);
                     }
                     else if (currentToken.type === "string.quoted.single") {
                     }
@@ -9592,16 +9693,14 @@ var DevExpress;
                         $deferred = this.defaultProcess(currentToken, text.substring(0, currentToken.start), completions);
                     }
                     else if (currentToken.type === "support.other.aggregate") {
-                        var previousToken = tokens[currentToken.index - 1];
-                        if (previousToken && ["support.function", "support.variable"].indexOf(previousToken.type) > -1) {
-                            this._addAggregates(completions);
-                            if (trimBrackets(previousToken.value).trim()) {
-                                $deferred = this._getFields({
-                                    start: (currentToken.start - (previousToken.value || "").length) || 0,
-                                    value: previousToken.value + currentToken.value,
-                                    type: "support.function"
-                                }, completions);
-                            }
+                        var previousToken = tokens[currentTokenIndex - 1];
+                        this._addAggregates(completions);
+                        if (trimBrackets(previousToken.value).trim()) {
+                            $deferred = this._getFields({
+                                start: (currentToken.start - (previousToken.value || "").length) || 0,
+                                value: previousToken.value + currentToken.value,
+                                type: "support.function"
+                            }, completions);
                         }
                     }
                     else {
@@ -9647,10 +9746,7 @@ var DevExpress;
                                 }
                             }
                             editor.insert(insertValue);
-                            if (fnInfo.paramCount > 0) {
-                                var cursorPosition = editor.getCursorPosition();
-                                editor.gotoLine(cursorPosition.row + 1, cursorPosition.column - (insertValue.length - 1 - insertValue.lastIndexOf("(")));
-                            }
+                            JS.Utils.setCursorInFunctionParameter(fnInfo.paramCount, editor, insertValue);
                         }
                     }
                 };
@@ -10606,6 +10702,7 @@ var DevExpress;
                         },
                     });
                     this.invalidMessage = function () { return DevExpress.Designer.getLocalization("Cannot create a tree for this expression", "ASPxReportsStringId.FilterEditor_TreeCreationError"); };
+                    this.advancedModeText = function () { return DevExpress.Designer.getLocalization("Advanced Mode", "ASPxReportsStringId.FilterEditor_AdvancedMode"); };
                     this.operandSurface = ko.observable(null);
                     this.operand = null;
                     this.popupVisible = ko.observable(false);
@@ -10700,7 +10797,7 @@ var DevExpress;
                     this.buttonItems = [
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Save", "StringId.OK"), disabled: saveDisabled, onClick: function () { self.save(); } } },
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Designer.getLocalization("Cancel", "StringId.Cancel"), onClick: function () { self.popupVisible(false); } } },
-                        { toolbar: 'bottom', location: 'before', widget: 'dxCheckBox', options: { value: self.advancedMode, text: DevExpress.Designer.getLocalization("Advanced Mode", "ASPxReportsStringId.FilterEditor_AdvancedMode") } }
+                        { toolbar: 'bottom', location: 'before', widget: 'dxCheckBox', options: { value: self.advancedMode, text: self.advancedModeText() } }
                     ];
                 };
                 FilterEditor.prototype._generateOperand = function (value) {
@@ -12264,10 +12361,7 @@ var DevExpress;
                             insertion = " " + insertion;
                         editor.insert(insertion);
                         editor.focus();
-                        if (item.paramCount && item.paramCount > 0) {
-                            var cursorPosition = editor.getCursorPosition();
-                            editor.gotoLine(cursorPosition.row + 1, cursorPosition.column - (insertion.length - 1 - insertion.lastIndexOf("(")));
-                        }
+                        JS.Utils.setCursorInFunctionParameter(item.paramCount, editor, insertion);
                     };
                     this._updateValue = function (item, element) {
                         _this.aceAvailable ? _this._updateAceValue(item, $(element)) : _this._updateTextAreaValue(item, $(element));
@@ -12363,8 +12457,9 @@ var DevExpress;
                     }));
                     if (_displayNameProvider && options.path) {
                         this.displayExpressionConverter = new JS.Utils.DisplayExpressionConverter(_displayNameProvider);
-                        var pathFunc = function () { return _this.koOptions().path && _this.koOptions().path(); };
+                        var pathFunc = ko.pureComputed(function () { return _this.koOptions().path && _this.koOptions().path(); });
                         this.displayValue = wrapExpressionValue(pathFunc, this.value, this.displayExpressionConverter, this._disposables);
+                        this._disposables.push(pathFunc);
                     }
                     else {
                         this.displayValue = this.value;
@@ -12484,12 +12579,17 @@ var DevExpress;
                 }).fail(function () {
                     _displayValue(value());
                 });
-                var subscription = value.subscribe(function (newValue) {
+                var valueSubscription = value.subscribe(function (newValue) {
                     converter.toDisplayExpression(path(), newValue).done(function (result) {
                         _displayValue(result);
                     }).fail(function () {
                         _displayValue(newValue);
                     });
+                });
+                var pathSubscription = path.subscribe(function (newPath) {
+                    converter.toDisplayExpression(newPath, value())
+                        .done(function (result) { _displayValue(result); })
+                        .fail(function (_) { _displayValue(value()); });
                 });
                 var displayValue = ko.pureComputed({
                     read: function () { return _displayValue(); },
@@ -12501,10 +12601,8 @@ var DevExpress;
                         });
                     }
                 });
-                if (subscriptions) {
-                    subscriptions.push(displayValue);
-                    subscriptions.push(subscription);
-                }
+                if (subscriptions)
+                    [displayValue, valueSubscription, pathSubscription].forEach(function (x) { return subscriptions.push(x); });
                 return displayValue;
             }
             Widgets.wrapExpressionValue = wrapExpressionValue;
@@ -13060,6 +13158,15 @@ var DevExpress;
                 return result;
             }
             Utils.classExists = classExists;
+            function setCursorInFunctionParameter(paramCount, editor, insertValue) {
+                if (!paramCount || paramCount <= 0)
+                    return;
+                var cursorPosition = editor.getCursorPosition(), lastIndexOpeningBracket = insertValue.lastIndexOf("(");
+                if (insertValue.charAt(lastIndexOpeningBracket + 1) === "'")
+                    lastIndexOpeningBracket++;
+                editor.gotoLine(cursorPosition.row + 1, cursorPosition.column - (insertValue.length - 1 - lastIndexOpeningBracket));
+            }
+            Utils.setCursorInFunctionParameter = setCursorInFunctionParameter;
             ko.bindingHandlers["focus"] = {
                 init: function (element, valueAccessor) {
                     var visible = valueAccessor().on || valueAccessor();
@@ -14891,6 +14998,8 @@ var DevExpress;
             };
             ElementViewModel.prototype.isPropertyModified = function (name) {
                 var needName = this["_" + name] ? "_" + name : name;
+                if (this[needName] === undefined)
+                    throw Error([this.controlType, name].join('.') + " is undefined");
                 if (this[needName].isPropertyModified) {
                     return this[needName].isPropertyModified();
                 }
@@ -17248,7 +17357,7 @@ var DevExpress;
                 toolboxDragHandler: new Designer.ToolboxDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent, controlsFactory),
                 dragDropStarted: DevExpress.Designer.DragDropHandler.started,
                 updateFont: function (values) {
-                    $.extend(DevExpress.JS.Widgets.availableFonts, values);
+                    DevExpress.JS.Widgets.availableFonts($.extend(DevExpress.JS.Widgets.availableFonts(), values));
                 }
             };
             designerModel["popularVisible"] = ko.pureComputed(function () {
