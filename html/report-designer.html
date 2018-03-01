@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.5
-* Build date: 2018-01-22
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -141,7 +141,7 @@
 </script>
 
 <script type="text/html" id="dx-combobox-editable">
-    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', editEnabled: true, disabled: disabled })"></div>
+    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', editEnabled: true, disabled: disabled, placeholder: $root.dx.JS.Localization.selectPlaceholder() })"></div>
 </script>
 
 <script type="text/html" id="dx-boolean">
@@ -366,7 +366,7 @@
 </script>
 <script type="text/html" id="dx-filtereditor">
     <div>
-        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: options().value, isValid: modelValueIsValid, disabled: options().disabled, buttonAction: function() { popupVisible(true); } }"></div>
+        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: modelDisplayValue, isValid: modelValueIsValid, disabled: options().disabled, buttonAction: function() { popupVisible(true); } }"></div>
         <!-- ko template: 'dx-filtereditor-popup' -->
         <!-- /ko -->
     </div>
@@ -582,30 +582,30 @@
 </script>
 
 <script id="dx-filtereditor-value" type="text/html">
-    <div class="criteria-operator-item">
+    <div class="criteria-operator-item" data-bind="visible: isEditable">
         <!-- ko if: $data.items.length === 0 -->
         <!-- ko if: $data.specifics() === "string" || $data.specifics() === "guid" -->
-        <div class="criteria-operator-item-editor" data-bind="dxTextBox: { value: _value, onFocusOut: function() { isEditable(false); } }, focus: { on: isEditable }, visible: isEditable"></div>
+        <div class="criteria-operator-item-editor" data-bind="dxTextBox: { value: _value, onFocusOut: function() { isEditable(false); } }, focus: { on: isEditable }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() === "bool" -->
-        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: 'True', text: 'Yes', localizationId: 'ASPxReportsStringId.ParametersPanel_True' }, { val: 'False', text: 'No', localizationId: 'ASPxReportsStringId.ParametersPanel_False' }], valueExpr: 'val', displayExpr: 'text', value: _value, onFocusOut: function() { isEditable(false); } }"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: 'True', text: 'Yes', localizationId: 'ASPxReportsStringId.ParametersPanel_True' }, { val: 'False', text: 'No', localizationId: 'ASPxReportsStringId.ParametersPanel_False' }], valueExpr: 'val', displayExpr: 'text', value: _value, onFocusOut: function() { isEditable(false); } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() === "date" -->
-        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: 'date', onFocusOut: function() { isEditable(false); } }"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: 'date', onFocusOut: function() { isEditable(false); } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() !== "string" && $data.specifics() !== "bool" && $data.specifics() !== "date" && $data.specifics() !== "guid" -->
-        <div class="criteria-operator-item-editor" data-bind="dxTextBox: getNumberEditorOptions(), focus: { on: isEditable }, visible: isEditable"></div>
+        <div class="criteria-operator-item-editor" data-bind="dxTextBox: getNumberEditorOptions(), focus: { on: isEditable }"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: $data.items.length > 0 && typeof $data.items[0] === "object" -->
-        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxSelectBox: { value: _value, dataSource: items, valueExpr: 'value', displayExpr: 'display', searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: items, valueExpr: 'value', displayExpr: 'display', searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
         <!-- /ko -->
         <!-- ko if: $data.items.length > 0 && typeof $data.items[0] !== "object" -->
-        <div class="criteria-operator-item-editor" data-bind="visible: isEditable, focus: isEditable, dxSelectBox: { value: _value, dataSource: items, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: items, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
         <!-- /ko -->
     </div>
-    <div class="criteria-operator-text criteria-operator-item-value clickable" data-bind="visible: !isEditable()">
-        <div class="criteria-operator-text" data-bind="text: value, click: function() { isEditable(true); }, css: { 'default': $data.isDefaultDisplay() } "></div>
+    <div class="criteria-operator-text criteria-operator-item-value" data-bind="visible: !isEditable()">
+        <div class="criteria-operator-text clickable" data-bind="text: value, click: function() { isEditable(true); }, css: { 'default': $data.isDefaultDisplay() } "></div>
         <div data-bind="service: { name: 'createChangeValueType' }"></div>
     </div>
 </script>
@@ -1065,7 +1065,7 @@
 
     <div class="dxrd-right-tabs">
         <!-- ko foreach: tabPanel.tabs -->
-        <div class="dxrd-tab-item" data-bind="dxAction: $parent.tabPanel.selectTab, css: { 'dxrd-tab-item-active': active }, attr: { title: text }, visible: visible">
+        <div class="dxrd-tab-item" data-bind="dxAction: $parent.tabPanel.selectTab, css: { 'dxrd-tab-item-active': active, 'dxrd-tab-item-disabled': disabled }, attr: { title: text }, visible: visible">
             <div class="dxrd-image-padding" data-bind="css: imageClassName"></div>
         </div>
         <!-- /ko -->
@@ -1378,8 +1378,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 17.2.5
-* Build date: 2018-01-22
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1566,7 +1566,7 @@
                 <!-- ko foreach: masterQueries -->
                 <div class="criteria-operator-group">
                     <div class="criteria-operator-group-item">
-                        <div class="criteria-operator-text criteria-operator-item-group" data-bind="text: queryName"></div>
+                        <div class="criteria-operator-text criteria-operator-item-group stylized" data-bind="text: queryName"></div>
                         <div data-bind="service: { name: 'createRelation' }"></div>
                     </div>
                     <div class="criteria-operator-content">
@@ -1603,7 +1603,7 @@
 </script>
 
 <script type="text/html" id="dx-masterDetail-editor-keyColumn">
-    <div class="criteria-operator-text criteria-operator-item-field" data-bind="text: queryName"></div>
+    <div class="criteria-operator-text criteria-operator-item-field stylized" data-bind="text: queryName"></div>
     <div class="criteria-operator-text">.</div>
     <div class="criteria-operator-text">
         <div data-bind="service: { name: 'setColumn' }"></div>
@@ -1616,11 +1616,11 @@
             <div class="criteria-operator-action" data-bind="dxAction: function() {  $parent.remove($data); }">
                 <div class="criteria-operator-action-image dx-image-filtereditor-remove"></div>
             </div>
-            <div class="criteria-operator-item">
-                <div class="criteria-operator-item-editor" data-bind="dxTextBox: { value: relationName, onFocusOut: function() { isEditable(false); } }, focus: { on: isEditable }, visible: isEditable"></div>
+            <div class="criteria-operator-item" data-bind="visible: isEditable">
+                <div class="criteria-operator-item-editor" data-bind="dxTextBox: { value: relationName, onFocusOut: function() { isEditable(false); } }, focus: { on: isEditable }"></div>
             </div>
-            <div class="criteria-operator-text criteria-operator-item-value clickable" data-bind="visible: !isEditable()">
-                <div class="criteria-operator-text" data-bind="text: relationName, click: function() { isEditable(true); }"></div>
+            <div class="criteria-operator-text criteria-operator-item-value" data-bind="visible: !isEditable()">
+                <div class="criteria-operator-text clickable" data-bind="text: relationName, click: function() { isEditable(true); }"></div>
             </div>
             <div class="criteria-operator-action" data-bind="dxAction: create">
                 <div class="criteria-operator-action-image dx-image-filtereditor-add"></div>
@@ -1837,8 +1837,8 @@
 </script>
 
 <script id="dxqb-filtereditor-changeparameter" type="text/html">
-    <div class="criteria-operator-item">
-        <div class="criteria-operator-item" data-bind="dxTextBox: { value: target._parameterName, onFocusOut: function() { target.createParameter(); target.isEditable(false); } }, visible: target.isEditable"></div>
+    <div class="criteria-operator-item" data-bind="visible: target.isEditable">
+        <div class="criteria-operator-item" data-bind="dxTextBox: { value: target._parameterName, onFocusOut: function() { target.createParameter(); target.isEditable(false); } }"></div>
     </div>
     <div class="criteria-operator-text clickable " data-bind="text: target.parameterName, dxAction: showPopup, css: { 'selected': target.isSelected, 'default': target.isDefaultTextDisplayed() }, visible: $data.target.isEditable() === false"></div>
 </script>
@@ -2193,7 +2193,7 @@
             <!-- ko foreach: masterQueries -->
             <div class="criteria-operator-group">
                 <div class="criteria-operator-group-item">
-                    <div class="criteria-operator-text criteria-operator-item-group" data-bind="text: queryName"></div>
+                    <div class="criteria-operator-text criteria-operator-item-group stylized" data-bind="text: queryName"></div>
                     <div data-bind="service: { name: 'createRelation' }"></div>
                 </div>
                 <div class="criteria-operator-content">
@@ -2225,7 +2225,7 @@
 </script>
 <script type="text/html" id="dxrd-page-connectionstring">
     <div class="dxrd-wizard-page">
-        <div class="dxrd-wizard-list" data-bind="dxList: { items: connectionStrings, selectedItems: selectedConnectionString, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false }">
+        <div class="dxrd-wizard-list" data-bind="dxList: { items: connectionStrings, selectedItems: selectedConnectionString, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false, noDataText: $root.dx.JS.Localization.noDataText() }">
             <div data-options="dxTemplate : { name: 'item' }">
                 <div data-bind="text: $data['description'] || $data['name']"></div>
             </div>
@@ -2392,8 +2392,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 17.2.5
-* Build date: 2018-01-23
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2451,7 +2451,7 @@
 </script>
 
 <script type="text/html" id="dxcd-collection-lookup-header">
-    <div data-bind="dxSelectBox: { items: array, displayExpr: 'name', value: selectedItem, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { items: array, displayExpr: 'name', value: selectedItem, disabled: disabled,  placeholder: $root.dx.JS.Localization.selectPlaceholder(), noDataText: $root.dx.JS.Localization.noDataText() }"></div>
 </script>
 
 <script type="text/html" id="dxcd-collection-item">
@@ -2492,7 +2492,9 @@
 
 
 <script type="text/html" id="dxcd-datasource">
-    <div data-bind="dxSelectBox: { items: $root.chartDataSources, value: value, valueExpr: 'value', displayExpr: 'displayName', displayCustomValue: true, disabled: ko.computed(function() { return $data.disabled() || $root.chartDataSources().length === 0; }) }"></div>
+    <!-- ko with: generateOptions($root.chartDataSources) -->
+    <div data-bind="dxSelectBox: $data"></div>
+    <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxcd-viewHeader">
@@ -2523,7 +2525,7 @@
                 <div class="propertygrid-editor-displayName" data-bind="text: $parent.getLocalization('Function', 'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function'), attr: { 'title': $parent.getLocalization('Function', 'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function') }"></div>
             </div>
             <div class="dx-field-value">
-                <div data-bind="dxSelectBox: { value: functionName, dataSource: $parent.availableItems() ,acceptCustomValue: true, disabled: $parent.disabled() }"></div>
+                <div data-bind="dxSelectBox: { value: functionName, dataSource: $parent.availableItems() ,acceptCustomValue: true, disabled: $parent.disabled(), placeholder: $root.dx.JS.Localization.selectPlaceholder() }"></div>
             </div>
         </div>
         <!-- ko foreach: args -->
@@ -2594,8 +2596,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.5
-* Build date: 2018-01-23
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3003,7 +3005,7 @@
 </script>
 
 <script type="text/html" id="dx-selectbox">
-    <div data-bind="dxSelectBox: { dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
+    <div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }), dxValidator: { validationRules: $data.validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dxrd-zoom-autofit-select-template">
@@ -3014,7 +3016,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems })">
+    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems, placeholder: $root.dx.JS.Localization.selectPlaceholder() })">
     </div>
     <!-- /ko -->
 </script>
@@ -3023,7 +3025,7 @@
     <!-- ko if: options -->
     <!-- ko with: options -->
     <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">
-        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.jQueryEvent.stopPropagation(); }">
+        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.event.stopPropagation(); }">
             <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
             <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
         </div>
@@ -3093,8 +3095,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 17.2.5
-* Build date: 2018-01-23
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3438,7 +3440,10 @@
                         <div class="dxrd-properties-focused-item" style="margin:0" data-bind="dxSelectBox: {
                         dataSource: $root.controlsStore.dataSource,
                         value: $root.editableObject,
-                        displayExpr: function(value) { return $root.dx.Designer.getControlFullName(value) }
+                        displayExpr: function(value) { 
+                            var showValue = value || $root.editableObject();
+                             return $root.dx.Designer.getControlFullName(showValue)  
+                        }
                 }">
                         </div>
                     </div>
@@ -4306,7 +4311,7 @@
         <div data-bind="dxCollectionEditor: options">
             <div data-bind="dxdAccordion: { collapsed: collapsed }">
                 <div class="dxrd-group-header dx-accordion-header">
-                    <div class="dxrd-formatting-rule-checkbox" data-bind="dxCheckBox: { value: value().selected, disabled: editor.disabled }, dxAction: function(args) { args.jQueryEvent.stopPropagation(); }"></div>
+                    <div class="dxrd-formatting-rule-checkbox" data-bind="dxCheckBox: { value: value().selected, disabled: editor.disabled }, dxAction: function(args) { args.event.stopPropagation(); }"></div>
                     <div class="dxrd-formatting-rule-collapsed dx-collapsing-image" data-bind="css: { 'dx-image-expanded': !collapsed() }"></div>
                     <div class="dxrd-formatting-rule-displayName">
                         <div class="propertygrid-editor-displayName" data-bind="text: value().name, attr: { title: value().name }"></div>
@@ -4318,6 +4323,10 @@
             </div>
         </div>
     </div>
+</script>
+
+<script type="text/html" id="dxrd-fields-combobox">
+    <div data-bind="dxSelectBox: { dataSource: wrapValues($root.displayNameProvider), value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dxrd-style">
@@ -4382,7 +4391,7 @@
 </script>
 
 <script type="text/html" id="dxrd-scriptsbox">
-    <div data-bind="dxEventDropDownEditor: { items: $root.events, value: value, editEnabled: true, disabled: disabled, secondAction: function() { $root.gotoEvent && $root.gotoEvent($data.value(), name, $parents[1]._model && $parents[1]._model()); } }"></div>
+    <div data-bind="dxEventDropDownEditor: { items: $root.events, value: value, editEnabled: true, disabled: disabled, secondAction: function() { $root.gotoEvent && $root.gotoEvent($data.value(), name, $parents[1]._model && $parents[1]._model()); }, placeholder: $root.dx.JS.Localization.selectPlaceholder(), noDataText: $root.dx.JS.Localization.noDataText() }"></div>
 </script>
 
 <script type="text/html" id="dxrd-collection-item-group">
@@ -4608,7 +4617,7 @@
         </div>
     </div>
     <!-- /ko -->
-    <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: 'single', activeStateEnabled: false, disabled: createNewDataSource }">
+    <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: 'single', activeStateEnabled: false, disabled: createNewDataSource, noDataText: $root.dx.JS.Localization.noDataText() }">
         <div data-options="dxTemplate : { name: 'item' }">
             <div data-bind="text: name"></div>
         </div>
@@ -4619,7 +4628,7 @@
 <div class="dxrd-wizard-page dxrd-wizard-groups-page">
     <div class="dxrd-wizard-left-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: fields.caption"></div>
-        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: fields.items, selectedItems: fields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick }">
+        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: fields.items, selectedItems: fields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick, noDataText: $root.dx.JS.Localization.noDataText() }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
                 <div data-bind="text: $data"></div>
             </div>
@@ -4634,7 +4643,7 @@
     </div>
     <div class="dxrd-wizard-right-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: groups.caption"></div>
-        <div class="dxrd-wizard-list" data-bind="dxList: { items: groups.items, height: 257, selectionMode: 'single', selectedItems: groups.activeItemArray, activeStateEnabled: false, onItemClick: groupClick }">
+        <div class="dxrd-wizard-list" data-bind="dxList: { items: groups.items, height: 257, selectionMode: 'single', selectedItems: groups.activeItemArray, activeStateEnabled: false, onItemClick: groupClick, noDataText: $root.dx.JS.Localization.noDataText() }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
                 <div data-bind="text: fields().join(', ')"></div>
             </div>
@@ -4648,7 +4657,7 @@
     <!-- /ko -->
     <div class="dxrd-wizard-left-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: fieldCaption"></div>
-        <div class="dxrd-wizard-list" data-bind="dxList: { items: currentFields().items, selectedItems: currentFields().activeItemArray, height: 245, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick }">
+        <div class="dxrd-wizard-list" data-bind="dxList: { items: currentFields().items, selectedItems: currentFields().activeItemArray, height: 245, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick, noDataText: $root.dx.JS.Localization.noDataText() }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
                 <div data-bind="text: $data"></div>
             </div>
@@ -4663,7 +4672,7 @@
     </div>
     <div class="dxrd-wizard-right-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: groupCaption"></div>
-        <div class="dxrd-wizard-list" data-bind="dxList: { items: currentGroups().items, height: 245, selectionMode: 'single', selectedItems: currentGroups().activeItemArray, activeStateEnabled: false, onItemClick: groupClick }">
+        <div class="dxrd-wizard-list" data-bind="dxList: { items: currentGroups().items, height: 245, selectionMode: 'single', selectedItems: currentGroups().activeItemArray, activeStateEnabled: false, onItemClick: groupClick, noDataText: $root.dx.JS.Localization.noDataText() }">
             <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
                 <div data-bind="text: fields().join(', ')"></div>
             </div>
@@ -4697,7 +4706,7 @@
         <div data-bind="foreach: summaryInfos">
             <div class="dxrd-wizard-summary-infos">
                 <div class="dxrd-wizard-summary-infos-container">
-                    <div data-bind="dxSelectBox: { dataSource: $parent.displayedFields[$parent.currentPath()], itemTemplate: 'visibleItems', displayExpr: 'displayName', value: field}">
+                    <div data-bind="dxSelectBox: { dataSource: $parent.displayedFields[$parent.currentPath()], itemTemplate: 'visibleItems', displayExpr: 'displayName', value: field, placeholder: $root.dx.JS.Localization.selectPlaceholder() }">
                         <div data-options="dxTemplate:{ name:'visibleItems' }" style="text-align: left;">
                             <!-- ko if: visible-->
                             <div data-bind="text: name"></div>

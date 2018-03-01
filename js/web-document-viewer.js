@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.5
-* Build date: 2018-01-23
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -437,7 +437,7 @@ var DevExpress;
                     this.defaultSeparatorValue = "";
                     serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
                     serializer.deserialize(this, model);
-                    this.useCustomSeparator = ko.observable(this.separator() !== this.defaultSeparatorValue);
+                    this.useCustomSeparator = ko.observable(this.separator && this.separator() !== this.defaultSeparatorValue);
                     var separatorValue = ko.observable(this.separator());
                     this.useCustomSeparator.subscribe(function (newValue) {
                         if (!newValue)
@@ -447,7 +447,8 @@ var DevExpress;
                         read: function () { return separatorValue(); },
                         write: function (newValue) {
                             separatorValue(newValue);
-                            _this.useCustomSeparator(newValue !== _this.defaultSeparatorValue);
+                            if (_this.useCustomSeparator)
+                                _this.useCustomSeparator(newValue !== _this.defaultSeparatorValue);
                         }
                     });
                 }
@@ -461,7 +462,7 @@ var DevExpress;
                     return csvExportOptionsSerializationInfo;
                 };
                 CsvExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return (name === "separator") && !this.useCustomSeparator();
+                    return (name === "separator") && !(this.useCustomSeparator && this.useCustomSeparator());
                 };
                 return CsvExportOptions;
             })();
@@ -489,7 +490,7 @@ var DevExpress;
                     return imageExportOptionsSerializationInfo;
                 };
                 ImageExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return ((name === "pageRange") || (name === "pageBorderWidth")) && this.imageExportMode() === "SingleFile";
+                    return ((name === "pageRange") || (name === "pageBorderWidth")) && ((this.imageExportMode ? this.imageExportMode() : Report.imageExportMode.defaultVal) === "SingleFile");
                 };
                 return ImageExportOptions;
             })();
@@ -555,7 +556,7 @@ var DevExpress;
                     return htmlExportOptionsSerializationInfo;
                 };
                 HtmlExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return ((name === "pageRange") || (name === "pageBorderWidth") || (name === "exportWatermarks")) && this.htmlExportMode() === "SingleFile";
+                    return ((name === "pageRange") || (name === "pageBorderWidth") || (name === "exportWatermarks")) && ((this.htmlExportMode ? this.htmlExportMode() : Report.htmlExportMode.defaultVal) === "SingleFile");
                 };
                 return HtmlExportOptions;
             })();
@@ -589,7 +590,7 @@ var DevExpress;
                     return mhtExportOptionsSerializationInfo;
                 };
                 MhtExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return ((name === "pageRange") || (name === "pageBorderWidth")) && this.htmlExportMode() === "SingleFile";
+                    return ((name === "pageRange") || (name === "pageBorderWidth")) && ((this.htmlExportMode ? this.htmlExportMode() : Report.htmlExportMode.defaultVal) === "SingleFile");
                 };
                 return MhtExportOptions;
             })();
@@ -670,16 +671,16 @@ var DevExpress;
                     return pdfExportPasswordSecurityOptionsSerializationInfo;
                 };
                 PdfPasswordSecurityOptions.prototype.isPropertyDisabled = function (name) {
-                    var openPass = this.openPassword();
-                    if (!this.permissionsPassword()) {
+                    if (!(this.permissionsPassword && this.permissionsPassword())) {
                         if (name === "permissionsOptions")
                             return true;
-                        if (!openPass && name === pdfEncryptionLevel.propertyName)
-                            return true;
+                        if (name === pdfEncryptionLevel.propertyName)
+                            return !(this.openPassword && this.openPassword());
+                        return false;
                     }
                 };
                 PdfPasswordSecurityOptions.prototype.hasSensitiveData = function () {
-                    return !!(this.openPassword() || this.permissionsPassword());
+                    return !!(this.openPassword && this.openPassword() || this.permissionsPassword && this.permissionsPassword());
                 };
                 return PdfPasswordSecurityOptions;
             })();
@@ -710,11 +711,14 @@ var DevExpress;
                     return serializer.serialize(value, pdfExportOptionsSerializationInfo, refs);
                 };
                 PdfExportOptions.prototype.isPropertyDisabled = function (propertyName) {
-                    return this.pdfACompatibility() !== pdfACompatibilityValues.None &&
-                        (propertyName === "neverEmbeddedFonts" ||
-                            propertyName === "pdfPasswordSecurityOptions" ||
-                            propertyName === "showPrintDialogOnOpen")
-                        || (this.pdfACompatibility() === pdfACompatibilityValues.PdfA1b && propertyName == "exportEditingFieldsToAcroForms");
+                    var compatibility = this.pdfACompatibility ? this.pdfACompatibility() : pdfACompatibility.defaultVal;
+                    if (compatibility === pdfACompatibilityValues.None)
+                        return false;
+                    if (compatibility === pdfACompatibilityValues.PdfA1b)
+                        return propertyName === "exportEditingFieldsToAcroForms";
+                    return propertyName === "neverEmbeddedFonts"
+                        || propertyName === "pdfPasswordSecurityOptions"
+                        || propertyName === "showPrintDialogOnOpen";
                 };
                 PdfExportOptions.prototype.getInfo = function () {
                     return pdfExportOptionsSerializationInfo;
@@ -726,6 +730,15 @@ var DevExpress;
             })();
             Report.PdfExportOptions = PdfExportOptions;
             var pdfACompatibilityValues = { None: "None", PdfA1b: "PdfA1b", PdfA2b: "PdfA2b", PdfA3b: "PdfA3b" };
+            var pdfACompatibility = {
+                propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.PdfACompatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: pdfACompatibilityValues.None, from: Designer.fromEnum,
+                valuesArray: [
+                    { value: pdfACompatibilityValues.None, displayValue: pdfACompatibilityValues.None, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.None" },
+                    { value: pdfACompatibilityValues.PdfA1b, displayValue: pdfACompatibilityValues.PdfA1b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA1b" },
+                    { value: pdfACompatibilityValues.PdfA2b, displayValue: pdfACompatibilityValues.PdfA2b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA2b" },
+                    { value: pdfACompatibilityValues.PdfA3b, displayValue: pdfACompatibilityValues.PdfA3b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA3b" }
+                ]
+            };
             var pdfExportOptionsSerializationInfo = [
                 { propertyName: "convertImagesToJpeg", modelName: "@ConvertImagesToJpeg", displayName: "Convert Images to Jpeg", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ConvertImagesToJpeg", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
                 { propertyName: "showPrintDialogOnOpen", modelName: "@ShowPrintDialogOnOpen", displayName: "Show Print Dialog on Open", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.ShowPrintDialogOnOpen", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool },
@@ -742,15 +755,7 @@ var DevExpress;
                         { value: "Highest", displayValue: "Highest", localizationId: "DevExpress.XtraPrinting.PdfJpegImageQuality.Highest" }
                     ]
                 },
-                {
-                    propertyName: "pdfACompatibility", modelName: "@PdfACompatibility", displayName: "PDF A Compatibility", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.PdfACompatibility", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: pdfACompatibilityValues.None, from: Designer.fromEnum,
-                    valuesArray: [
-                        { value: pdfACompatibilityValues.None, displayValue: pdfACompatibilityValues.None, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.None" },
-                        { value: pdfACompatibilityValues.PdfA1b, displayValue: pdfACompatibilityValues.PdfA1b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA1b" },
-                        { value: pdfACompatibilityValues.PdfA2b, displayValue: pdfACompatibilityValues.PdfA2b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA2b" },
-                        { value: pdfACompatibilityValues.PdfA3b, displayValue: pdfACompatibilityValues.PdfA3b, localizationId: "DevExpress.XtraPrinting.PdfACompatibility.PdfA3b" }
-                    ]
-                },
+                pdfACompatibility,
                 Report.pageRange,
                 { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.DocumentOptions", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "pdfPasswordSecurityOptions", modelName: "PasswordSecurityOptions", displayName: "Pdf Password Security Options", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
@@ -770,7 +775,7 @@ var DevExpress;
                     return rtfExportOptionsSerializationInfo;
                 };
                 RtfExportOptions.prototype.isPropertyDisabled = function (name) {
-                    var exportMode = this.rtfExportMode();
+                    var exportMode = this.rtfExportMode ? this.rtfExportMode() : Report.rtfExportMode.defaultVal;
                     if (name === "pageRange")
                         return exportMode === "SingleFile";
                     else if (name === "emptyFirstPageHeaderFooter" || name === "exportPageBreaks" || name === "keepRowHeight") {
@@ -888,7 +893,7 @@ var DevExpress;
                     return xlsExportOptionsSerializationInfo;
                 };
                 XlsExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return name === "pageRange" && this.xlsExportMode() === "SingleFile";
+                    return name === "pageRange" && (this.xlsExportMode ? this.xlsExportMode() : Report.xlsExportMode.defaultVal) === "SingleFile";
                 };
                 XlsExportOptions.prototype.hasSensitiveData = function () {
                     return !!(this.encryptionOptions && this.encryptionOptions.password());
@@ -912,7 +917,7 @@ var DevExpress;
                     return xlsxExportOptionsSerializationInfo;
                 };
                 XlsxExportOptions.prototype.isPropertyDisabled = function (name) {
-                    return name === "pageRange" && this.xlsxExportMode() === "SingleFile";
+                    return name === "pageRange" && (this.xlsxExportMode ? this.xlsxExportMode() : Report.xlsxExportMode.defaultVal) === "SingleFile";
                 };
                 XlsxExportOptions.prototype.hasSensitiveData = function () {
                     return !!(this.encryptionOptions && this.encryptionOptions.password());
@@ -947,7 +952,7 @@ var DevExpress;
                     return docxExportOptionsSerializationInfo;
                 };
                 DocxExportOptions.prototype.isPropertyDisabled = function (name) {
-                    var exportMode = this.docxExportMode();
+                    var exportMode = this.docxExportMode ? this.docxExportMode() : Report.docxExportMode.defaultVal;
                     if (name === "pageRange" || name === "tableLayout")
                         return exportMode === "SingleFile";
                     else if (name === "emptyFirstPageHeaderFooter" || name === "exportPageBreaks") {
@@ -1467,10 +1472,10 @@ var DevExpress;
                     });
                     this.color = color;
                     this.width = ko.pureComputed(function () {
-                        return Math.max(_this.imageWidth(), Math.ceil(_this.originalWidth() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution));
+                        return Math.max(_this.imageWidth() / _this._getPixelRatio(), Math.ceil(_this.originalWidth() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution));
                     });
                     this.height = ko.pureComputed(function () {
-                        return Math.max(_this.imageHeight(), Math.ceil(_this.originalHeight() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution));
+                        return Math.max(_this.imageHeight() / _this._getPixelRatio(), Math.ceil(_this.originalHeight() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution));
                     });
                     var _self = this;
                     this.isEmpty = pageIndex === -1 && !brickProvider && !processClick;
@@ -1576,6 +1581,9 @@ var DevExpress;
                         return pageFieldViewModels;
                     });
                 };
+                PreviewPage.prototype._getPixelRatio = function () {
+                    return window["devicePixelRatio"] || 1;
+                };
                 PreviewPage.prototype.updateSize = function (zoom) {
                     var newResolution = getCurrentResolution(zoom);
                     this.realZoom(newResolution / Preview.previewDefaultResolution);
@@ -1605,7 +1613,7 @@ var DevExpress;
                         return;
                     }
                     this.actualResolution = newResolution;
-                    var imageResolution = Math.floor(newResolution * (window["devicePixelRatio"] || 1));
+                    var imageResolution = Math.floor(newResolution * this._getPixelRatio());
                     this.imageSrc(Preview.HandlerUri +
                         "?actionKey=getPage&unifier=" + unifier +
                         "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution })));
@@ -5741,16 +5749,14 @@ var DevExpress;
                 function reportSaved(args) {
                     var arg = {
                         Url: args.url,
-                        Report: args.report,
-                        Cancel: args.cancel
+                        Report: args.report
                     };
                     fireEvent("ReportSaved", arg);
                 }
                 function reportOpened(args) {
                     var arg = {
                         Url: args.url,
-                        Report: args.report,
-                        Cancel: args.cancel
+                        Report: args.report
                     };
                     fireEvent("ReportOpened", arg);
                 }
@@ -5939,6 +5945,13 @@ var DevExpress;
             JSDesignerBindingCommon.prototype._fireEvent = function (eventName, args) {
                 this._options.callbacks && this._options.callbacks[eventName] && this._options.callbacks[eventName](this._sender, args);
             };
+            JSDesignerBindingCommon.prototype._getServerActionUrl = function (host, uri) {
+                host = host || "";
+                if (host && host[host.length - 1] === '/' && uri && uri[0] === '/') {
+                    return host + uri.substring(1);
+                }
+                return host + uri;
+            };
             JSDesignerBindingCommon.prototype._getAvailableEvents = function (events, prefix) {
                 var _this = this;
                 var result = events;
@@ -5971,8 +5984,10 @@ var DevExpress;
             JSDesignerBindingCommon.prototype._getLocalizationRequest = function () {
                 var self = this;
                 var deferred = $.Deferred();
-                if (!!this._options.requestOptions.getLocalizationAction) {
-                    $.getJSON((this._options.requestOptions.host || "") + this._options.requestOptions.getLocalizationAction)
+                var requestOptions = this._options.requestOptions;
+                if (!!requestOptions.getLocalizationAction) {
+                    var actionUrl = this._getServerActionUrl(requestOptions.host, requestOptions.getLocalizationAction);
+                    $.getJSON(actionUrl)
                         .fail(function (jqXHR, textStatus, errorThrown) {
                         alert(textStatus + ": " + errorThrown.message);
                         deferred.reject();
@@ -6314,6 +6329,7 @@ var DevExpress;
                     this._fireEvent("Init");
                 };
                 JSReportViewerBinding.prototype.applyBindings = function (element) {
+                    var _this = this;
                     var self = this;
                     this._loadTemplates().done(function () {
                         var _$element = $(element);
@@ -6322,11 +6338,12 @@ var DevExpress;
                             self._applyBindings(self._options, _$element);
                             return;
                         }
-                        if (!!self._options.requestOptions) {
+                        var requestOptions = self._options.requestOptions;
+                        if (!!requestOptions) {
                             self._getLocalizationRequest().done(function (localization) {
                                 localization && DevExpress.JS.Localization.addCultureInfo(localization);
                             });
-                            DevExpress.Report.Preview.HandlerUri = (self._options.requestOptions.host || "") + self._options.requestOptions.invokeAction;
+                            DevExpress.Report.Preview.HandlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                         }
                         self._sender.previewModel = (self._createModel(element));
                         ;

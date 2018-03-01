@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 17.2.5
-* Build date: 2018-01-22
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -796,7 +796,6 @@
   display: inline-block;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-group-item .criteria-operator-item .criteria-operator-item-editor {
-  margin-top: -4px;
   height: 24px;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-group-item:hover > .criteria-operator-action .criteria-operator-action-image {
@@ -805,7 +804,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .dx-texteditor {
   height: 22px;
   vertical-align: middle;
-  margin-top: -1px;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .dx-texteditor .dx-texteditor-input {
   font-size: 14px;
@@ -817,8 +815,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operarator-text-item {
   text-align: center;
   min-width: 30px;
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 5px;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-item-editor {
@@ -833,9 +829,16 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-item-editor .dx-texteditor-container .dx-texteditor-input {
   background-color: #343434;
 }
+.dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operarator-text-item-padding {
+  padding: 0 5px;
+}
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.clickable {
-  min-height: 10px;
-  min-width: 24px;
+  padding: 0 5px;
+  min-height: 24px;
+  min-width: 30px;
+}
+.dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.stylized {
+  padding: 0 5px;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.default {
   opacity: .5;
@@ -844,8 +847,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.criteria-operator-item-group {
   text-align: center;
   min-width: 30px;
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 5px;
   background-color: #dd507b;
 }
@@ -859,8 +860,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.criteria-operator-item-field {
   text-align: center;
   min-width: 30px;
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 5px;
   background-color: #5382c8;
 }
@@ -877,8 +876,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.criteria-operator-item-parameter {
   text-align: center;
   min-width: 30px;
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 5px;
   background-color: #e36612;
 }
@@ -895,8 +892,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.criteria-operator-item-operator {
   text-align: center;
   min-width: 30px;
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 5px;
   background-color: #52a557;
 }
@@ -910,8 +905,6 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.criteria-operator-item-value {
   text-align: center;
   min-width: 30px;
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 5px;
   background-color: #7e7e7e;
 }
@@ -924,10 +917,10 @@
   display: inline-block;
   line-height: 24px;
   color: #ffffff;
+  vertical-align: top;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-action {
-  vertical-align: middle;
-  margin-top: -5px;
+  vertical-align: top;
   display: inline-block;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-action .criteria-operator-action-image {
@@ -2894,6 +2887,9 @@
 .dxrd-designer-wrapper .dxrd-right-tabs .dxrd-tab-item-active {
   background-color: #4d4d4d;
 }
+.dxrd-designer-wrapper .dxrd-right-tabs .dxrd-tab-item-disabled {
+  opacity: 0.3;
+}
 .dxrd-designer-wrapper .dxrd-transform-origin-left-top {
   -moz-transform-origin: 0% 0%;
   -ms-transform-origin: 0% 0%;
@@ -3028,8 +3024,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 17.2.5
-* Build date: 2018-01-23
+* Version: 17.2.6
+* Build date: 2018-02-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
