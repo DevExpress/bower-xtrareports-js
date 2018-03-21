@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3024,8 +3024,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3168,8 +3168,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.dark.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4222,8 +4222,8 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-dark.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4697,8 +4697,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5422,6 +5422,9 @@
   font-weight: bold;
   color: #ffffff;
 }
+.dxrd-prevent-refresh {
+  overscroll-behavior: contain;
+}
 .dxrdp-animation {
   -webkit-transition: all 0.4s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
@@ -5688,10 +5691,6 @@
   height: 100%;
   width: 100%;
 }
-.dxrd-mobile-gallery .dxrd-gallery-blocks {
-  width: 100%;
-  height: 100%;
-}
 .dxrd-mobile-gallery .dxrd-gallery-block {
   position: absolute;
 }
@@ -5771,8 +5770,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-dark.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

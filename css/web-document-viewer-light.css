@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.light.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3024,8 +3024,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-light.css)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3749,6 +3749,9 @@
   font-weight: bold;
   color: #ffffff;
 }
+.dxrd-prevent-refresh {
+  overscroll-behavior: contain;
+}
 .dxrdp-animation {
   -webkit-transition: all 0.4s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
@@ -4014,10 +4017,6 @@
 .dxrd-mobile-gallery .dxrd-scrollView-mobile {
   height: 100%;
   width: 100%;
-}
-.dxrd-mobile-gallery .dxrd-gallery-blocks {
-  width: 100%;
-  height: 100%;
 }
 .dxrd-mobile-gallery .dxrd-gallery-block {
   position: absolute;

@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1378,8 +1378,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2392,8 +2392,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2596,8 +2596,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2685,7 +2685,7 @@
                 <div class="dxrdp-taptosearch-text" data-bind="text: $root.getLocalization('Tap here to Search', 'ASPxReportsStringId.WebDocumentViewer_Mobile_TapHereToSearch')"></div>
             </div>
             <div class="dxrdp-search-panel" data-bind="visible: $data.editorVisible()">
-                <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText }"></div>
+                <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText, onEnterKey: function() { $data.startSearch(); } }"></div>
             </div>
         </div>
     </div>
@@ -2693,7 +2693,7 @@
 </script>
 
 <script type="text/html" id="dxrdp-surface-mobile">
-    <div class="dxrd-preview-wrapper dxrdp-fullscreen" data-bind="style: { pointerEvents: $data.documentId === null ? 'none' : '', touchEvents: $data.documentId === null ? 'none' : '' }, styleunit: { top: topOffset }, slide: $root.slideOptions, mobileZoom: { zoom: mobileZoom, zoomUpdating: zoomUpdating }, dxclick: function(s,e) { if(!$root.brickEventsDisabled()) { $data.showActions(s,e); } }">
+    <div class="dxrd-preview-wrapper dxrdp-fullscreen" data-bind="style: { pointerEvents: $data.documentId === null ? 'none' : '', touchEvents: $data.documentId === null ? 'none' : '' }, styleunit: { top: topOffset, height: previewWrapperSize().height, width: previewWrapperSize().width }, slide: $root.slideOptions, mobileZoom: { zoom: mobileZoom, zoomUpdating: zoomUpdating }, dxclick: function(s,e) { if(!$root.brickEventsDisabled()) { $data.showActions(s,e); } }">
         <!-- ko template: {name: 'dxrd-preview-progress-bar', data: progressBar }-->
         <!-- /ko -->
 
@@ -2701,7 +2701,7 @@
             <div class="dxrd-mobile-gallery" data-bind="style: { pointerEvents: $data.zoomUpdating() ? 'none' : '', touchEvents: $data.zoomUpdating() ? 'none' : '' }, dxGalleryReportPreview: { dataSource: $root.gallery.items, gallery: $root.gallery, animationEnabled: $root.gallery.animationEnabled, selectedIndex: $root.gallery.selectedIndex, width:'100%', height: '100%', showIndicator: false, loop: true, onSelectionChanged: onSlide, swipeEnabled: $root.slideOptions.swipeEnabled }">
                 <div data-options="dxTemplate: { name: 'item' }">
                     <div class="dxrd-scrollView-mobile" data-bind="dxScrollView: $root.reportPreview.getScrollViewOptions()">
-                        <div class="dxrd-gallery-blocks" data-bind="styleunit: $root.gallery.contentSize()">
+                        <div class="dxrd-gallery-blocks" data-bind="style: $root.gallery.contentSize()">
                             <!-- ko foreach: $data.blocks() -->
                             <!-- ko if: $data.page -->
                             <div class="dxrd-gallery-block" data-bind="styleunit: position, css: $data.classSet">
@@ -3095,8 +3095,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 17.2.6
-* Build date: 2018-02-26
+* Version: 17.2.7
+* Build date: 2018-03-19
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
