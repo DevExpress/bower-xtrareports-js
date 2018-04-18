@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.light.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-16
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -564,6 +564,17 @@
 .dx-popup-general .dx-overlay-content .dx-toolbar.dx-popup-bottom .dx-toolbar-after {
   padding-top: 8px;
 }
+.dx-sql_editor.ace_editor {
+  font-size: 1em;
+  height: 100%;
+  width: 100%;
+}
+.dx-sql_editor.dx-disabled-ace {
+  opacity: 0.65;
+}
+.dx-sql_editor.dx-disabled-ace .ace_cursor {
+  display: none;
+}
 .dx-rtl .dx-treelist .dx-treelist-item .dx-treelist-collapsedbutton {
   float: right;
   margin-left: 9px;
@@ -833,9 +844,10 @@
   padding: 0 5px;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.clickable {
-  padding: 0 5px;
   min-height: 24px;
   min-width: 30px;
+  padding: 0 5px;
+  vertical-align: top;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.stylized {
   padding: 0 5px;
@@ -914,10 +926,10 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text {
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
+  vertical-align: top;
   display: inline-block;
   line-height: 24px;
   color: #2b2b2b;
-  vertical-align: top;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-action {
   vertical-align: top;
@@ -1119,6 +1131,15 @@
   overflow: visible;
 }
 .dx-expressioneditor .dx-expression-tree .dx-expressioneditor-tools .dx-expressioneditor-description {
+  padding: 5px;
+  color: #2b2b2b;
+  font-size: 11px;
+  font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
+  -ms-word-wrap: break-word;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.ace_tooltip.ace_doc-tooltip {
   padding: 5px;
   color: #2b2b2b;
   font-size: 11px;
@@ -3024,8 +3045,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-16
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3168,8 +3189,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.light.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-16
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3598,7 +3619,7 @@
 }
 .dxqb-preview .dxqb-preview-popup-content {
   height: 100%;
-  padding-bottom: 68px;
+  padding-bottom: 76px;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -3614,6 +3635,10 @@
 .dxqb-preview .dxqb-show-query-string-content .dxrd-show-query-string-editor textarea {
   background: transparent;
   padding: 7px 21px 8px;
+}
+.dxqb-preview .dxqb-show-query-string-content .dxrd-show-query-string-editor .dxrd-show-query-string-editor-content {
+  margin: 7px 21px 8px;
+  height: 100%;
 }
 .dxqb-preview .dxqb-preview-popup-buttons {
   border-top: 1px solid #d3d3d3;
@@ -3841,6 +3866,13 @@
   margin-top: 5px;
   height: 150px;
 }
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-create-query-page .dxrd-create-query-page-content .dxrd-create-query-page-editor.dxrd-create-query-page-editor-border {
+  border: 1px solid #d1d1d1;
+}
+.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-create-query-page .dxrd-create-query-page-content .dxrd-create-query-page-editor .dxrd-create-query-page-editor-content {
+  padding: 7px 9px 8px;
+  height: 100%;
+}
 .dxrd-wizard .dxrd-wizard-navigation {
   bottom: 0;
   position: absolute;
@@ -4004,6 +4036,13 @@
 .dxrd-querybuilder-popup .dxrd-wizard-content .dxrd-wizard-create-query-page .dxrd-create-query-page-content .dxrd-create-query-page-editor {
   margin-top: 5px;
   height: 150px;
+}
+.dxrd-querybuilder-popup .dxrd-wizard-content .dxrd-wizard-create-query-page .dxrd-create-query-page-content .dxrd-create-query-page-editor.dxrd-create-query-page-editor-border {
+  border: 1px solid #d1d1d1;
+}
+.dxrd-querybuilder-popup .dxrd-wizard-content .dxrd-wizard-create-query-page .dxrd-create-query-page-content .dxrd-create-query-page-editor .dxrd-create-query-page-editor-content {
+  padding: 7px 9px 8px;
+  height: 100%;
 }
 .dxrd-querybuilder-popup .dxrd-wizard-navigation {
   bottom: 0;
@@ -4194,7 +4233,7 @@
   height: 12px;
 }
 .dxrd-image-fieldlist-table {
-  background-image: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzZENkQ2RDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCAwaDIydjRIMHpNMTIgMTJoNHY0aC00ek0xMiAxOGg0djRoLTR6TTE4IDZoNHY0aC00ek0wIDEyaDR2NEgwek0xOCAxOGg0djRoLTR6TTEyIDZoNHY0aC00ek02IDEyaDR2NEg2ek02IDE4aDR2NEg2ek02IDZoNHY0SDZ6TTAgMThoNHY0SDB6TTAgNmg0djRIMHpNMTggMTJoNHY0aC00eiIvPjwvc3ZnPg==);
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%236D6D6D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M0%200h22v4H0zM12%2012h4v4h-4zM12%2018h4v4h-4zM18%206h4v4h-4zM0%2012h4v4H0zM18%2018h4v4h-4zM12%206h4v4h-4zM6%2012h4v4H6zM6%2018h4v4H6zM6%206h4v4H6zM0%2018h4v4H0zM0%206h4v4H0zM18%2012h4v4h-4z%22%2F%3E%3C%2Fsvg%3E');
   background-repeat: no-repeat;
 }
 .dxrd-focused .ui-resizable-handle,
@@ -4202,25 +4241,25 @@
   border-color: #000000;
 }
 .dxqb-image-field-group-by {
-  background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMiA0aDE0djZIMnpNOCAxNGgxNHY2SDh6Ii8+PC9zdmc+) no-repeat;
+  background: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M2%204h14v6H2zM8%2014h14v6H8z%22%2F%3E%3C%2Fsvg%3E') no-repeat;
 }
 .dxqb-image-field-sorting-asc {
-  background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNOCAwSDR2MTRIMmw0IDggNC04SDh6TTE0IDE0aDZsLTYgNnYyaDh2LTJoLTZsNi02di0yaC04ek0xOS40IDBMMTQgMTBoMmwuOS0ySDIwdjJoMlYwaC0yLjZ6bS42IDZoLTEuOUwyMCAydjR6Ii8+PC9zdmc+) no-repeat;
+  background: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M8%200H4v14H2l4%208%204-8H8zM14%2014h6l-6%206v2h8v-2h-6l6-6v-2h-8zM19.4%200L14%2010h2l.9-2H20v2h2V0h-2.6zm.6%206h-1.9L20%202v4z%22%2F%3E%3C%2Fsvg%3E') no-repeat;
 }
 .dxqb-image-field-sorting-desc {
-  background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNOCAwSDR2MTRIMmw0IDggNC04SDh6TTIyIDBoLTh2Mmg2bC02IDZ2Mmg4VjhoLTZsNi02ek0xNCAyMmgybC45LTJIMjB2MmgyVjEyaC0yLjZMMTQgMjJ6bTYtNGgtMS45bDEuOS00djR6Ii8+PC9zdmc+) no-repeat;
+  background: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M8%200H4v14H2l4%208%204-8H8zM22%200h-8v2h6l-6%206v2h8V8h-6l6-6zM14%2022h2l.9-2H20v2h2V12h-2.6L14%2022zm6-4h-1.9l1.9-4v4z%22%2F%3E%3C%2Fsvg%3E') no-repeat;
 }
 .dxqb-image-field-aggregate {
-  background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjEgMEgzdjRsOCA4LTggOHY0aDE4di00SDdsOC04LTgtOGgxNHoiLz48L3N2Zz4=) no-repeat;
+  background: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M21%200H3v4l8%208-8%208v4h18v-4H7l8-8-8-8h14z%22%2F%3E%3C%2Fsvg%3E') no-repeat;
 }
 .dxqb-image-save {
-  background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxzdHlsZT4uc3Qwe2ZpbGw6IzNEM0QzRDt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTAgMGg2djZoLTZ6Ii8+PHBhdGggY2xhc3M9InN0MCIgZD0iTTE4IDB2OEg0VjBIMkwwIDJ2MjBoMjJWMGgtNHptMCAxOEg0di02aDE0djZ6Ii8+PC9zdmc+) no-repeat;
+  background: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M10%200h6v6h-6z%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M18%200v8H4V0H2L0%202v20h22V0h-4zm0%2018H4v-6h14v6z%22%2F%3E%3C%2Fsvg%3E') no-repeat;
 }
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-light.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4693,8 +4732,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-light.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5766,8 +5805,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-light.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5984,6 +6023,9 @@
 }
 .dxrd-image-surface-bounded:before {
   background-image: url('data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0D%0A%3C!--%20Generator%3A%20Adobe%20Illustrator%2019.1.0%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200)%20%20--%3E%0D%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0D%0A%09%20viewBox%3D%22-5%207%2012%2012%22%20style%3D%22enable-background%3Anew%20-5%207%2012%2012%3B%22%20xml%3Aspace%3D%22preserve%22%3E%0D%0A%3Cstyle%20type%3D%22text%2Fcss%22%3E%0D%0A%09.st0%7Bfill%3A%233D3D3D%3B%7D%0D%0A%3C%2Fstyle%3E%0D%0A%3Cg%3E%0D%0A%09%3Cellipse%20class%3D%22st0%22%20cx%3D%221%22%20cy%3D%228%22%20rx%3D%224%22%20ry%3D%221%22%2F%3E%0D%0A%09%3Cpath%20class%3D%22st0%22%20d%3D%22M5%2C10c0%2C0.5-1.8%2C1-4%2C1s-3.9-0.4-4-0.9V18c0%2C0.5%2C1.8%2C1%2C4%2C1s4-0.4%2C4-1V10L5%2C10L5%2C10z%22%2F%3E%0D%0A%3C%2Fg%3E%0D%0A%3C%2Fsvg%3E%0D%0A');
+}
+.dxrd-image-surface-bounded-notvalid:before {
+  background-image: url('data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!--%20Generator%3A%20Adobe%20Illustrator%2019.1.0%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200)%20%20--%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20viewBox%3D%22-5%207%2012%2012%22%20style%3D%22enable-background%3Anew%20-5%207%2012%2012%3B%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cstyle%20type%3D%22text%2Fcss%22%3E%0A%09.st0%7Bfill%3A%23FF0000%3B%7D%0A%3C%2Fstyle%3E%0A%3Cg%3E%0A%09%3Cellipse%20class%3D%22st0%22%20cx%3D%221%22%20cy%3D%228%22%20rx%3D%224%22%20ry%3D%221%22%2F%3E%0A%09%3Cpath%20class%3D%22st0%22%20d%3D%22M5%2C10c0%2C0.5-1.8%2C1-4%2C1s-3.9-0.4-4-0.9V18c0%2C0.5%2C1.8%2C1%2C4%2C1s4-0.4%2C4-1V10L5%2C10L5%2C10z%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A');
 }
 .dxrd-image-actions-delete_cell {
   background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%236D6D6D%3B%7D%20.st1%7Bfill%3A%23939393%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M20%2012l-2-2-3%203-3-3-2%202%203%203-3%203%202%202%203-3%203%203%202-2-3-3z%22%2F%3E%3Cpath%20class%3D%22st1%22%20d%3D%22M10%202h2v2h-2zM10%206h2v2h-2zM6%2014h2v2H6zM14%202h2v2h-2zM14%206h2v2h-2zM6%202h2v2H6z%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M6%206h2v2H6z%22%2F%3E%3Cpath%20class%3D%22st1%22%20d%3D%22M6%2010h2v2H6zM2%202h2v2H2zM2%206h2v2H2zM2%2010h2v2H2zM2%2014h2v2H2z%22%2F%3E%3C%2Fsvg%3E');
@@ -6669,6 +6711,10 @@
   background-repeat: no-repeat;
   background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M12%200H0v16h2V2h10z%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M10%2010h6V4H4v16h10v-2l-4-4z%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M12%2012v2l4%204v4h2v-4l4-4v-2z%22%2F%3E%3C%2Fsvg%3E');
 }
+.dx-image-fieldlist-components {
+  background-repeat: no-repeat;
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Ccircle%20class%3D%22st0%22%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M20%2010h-.3c-.2-.7-.5-1.4-.9-2.1l.2-.2c.8-.8.8-2.1%200-2.8-.8-.8-2.1-.8-2.8%200l-.2.2c-.6-.4-1.3-.7-2.1-.9V4c0-1.1-.9-2-2-2S10%202.9%2010%204v.3c-.7.2-1.4.4-2.1.8l-.1-.2c-.8-.7-2.1-.7-2.9%200-.7.8-.7%202.1%200%202.9l.2.2c-.4.6-.6%201.3-.8%202H4c-1.1%200-2%20.9-2%202s.9%202%202%202h.3c.2.7.5%201.4.9%202.1l-.2.2c-.8.8-.8%202.1%200%202.8.8.8%202.1.8%202.8%200l.2-.2c.6.4%201.3.7%202.1.9v.2c0%201.1.9%202%202%202s2-.9%202-2v-.3c.7-.2%201.4-.5%202.1-.9l.2.2c.8.8%202.1.8%202.8%200%20.8-.8.8-2.1%200-2.8L19%2016c.4-.6.7-1.3.9-2.1h.1c1.1%200%202-.9%202-2%200-1-.9-1.9-2-1.9zm-8%206c-2.2%200-4-1.8-4-4s1.8-4%204-4%204%201.8%204%204-1.8%204-4%204z%22%2F%3E%3C%2Fsvg%3E');
+}
 .dx-image-fieldlist-stylemodel {
   background-repeat: no-repeat;
   background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M6%2020c1-.3%201.5-1.1%201.7-2%20.2-.5.4-1%20.8-1.4.3-.3.5-.5.9-.6%200%200%20.7-.1%201-.5.1-.1.2-.3.2-.3l.7-1.3c.1-.2.8-.9.8-.9.6-.7%201.3-1.4%201.9-2.1V2H0v18h6zm5.4-6.4c-.1.3-.2.4%200%200zM21.8%208.1c-.2-.2-.5-.1-.8.1-.4.4-.9.7-1.3%201.1-2%201.7-3.5%203.4-5.3%205.3-.1.1-.5.5-.5.6-.2.2-.3.4-.6.8.6.5%201.5%201.2%202.1%201.7.4-.3.6-.6.6-.6l.4-.4c.7-.9%201.1-1.5%201.8-2.4%201.3-1.7%202.5-3.5%203.5-5.4.4-.3.3-.6.1-.8zM12.5%2018.1c-.1-.1-.2-.1-.3-.1-.7-.1-1.2.2-1.7.7-.3.3-.6.8-.8%201.3-.2.9-.7%201.7-1.7%202h2.6c1%200%201.8-.4%202.5-1.1.4-.4.7-.9.6-1.5%200-.2-.1-.4-.2-.5-.3-.3-.7-.5-1-.8z%22%2F%3E%3C%2Fsvg%3E');
@@ -6676,6 +6722,10 @@
 .dx-image-fieldlist-formattingrule {
   background-repeat: no-repeat;
   background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M10%2010h6V2H2v18h12v-2l-4-4z%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M12%2012v2l4%204v4h2v-4l4-4v-2z%22%2F%3E%3C%2Fsvg%3E');
+}
+.dx-image-fieldlist-component {
+  background-repeat: no-repeat;
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cellipse%20class%3D%22st0%22%20cx%3D%2211%22%20cy%3D%224%22%20rx%3D%227%22%20ry%3D%222%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M11%2010c-3.9%200-7-.9-7-2v12c0%201.1%203.1%202%207%202s7-.9%207-2V8c0%201.1-3.1%202-7%202z%22%2F%3E%3C%2Fsvg%3E');
 }
 .dxrd-image-ghost-stylemodel {
   border-width: 0;
@@ -8236,13 +8286,17 @@
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-control .dxrd-table-row-control {
   position: absolute;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-control .dxrd-table-row-control .dxrd-table-cell-control {
   position: absolute;
   height: 100%;
   line-height: 100%;
   box-sizing: border-box;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-control .dxrd-table-row-control .dxrd-table-cell-control.dxrd-table-cell-over-rowSpan .ui-resizable-handle {
+  height: 0;
+  border: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-control {
   position: absolute;
@@ -8620,6 +8674,18 @@
   background-size: 12px 12px;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-image-surface-bounded:before {
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  background-position: right top;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: absolute;
+  content: " ";
+  z-index: 1;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-image-surface-bounded-notvalid:before {
   background-repeat: no-repeat;
   background-size: 12px 12px;
   background-position: right top;

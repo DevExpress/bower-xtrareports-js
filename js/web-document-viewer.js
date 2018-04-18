@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -157,21 +157,7 @@ var DevExpress;
             Report.removeSecondarySymbols = { propertyName: "removeSecondarySymbols", modelName: "@RemoveSecondarySymbols", displayName: "Remove Secondary Symbols", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.RemoveSecondarySymbols", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false };
             Report.characterSet = {
                 propertyName: "characterSet", modelName: "@CharacterSet", displayName: "Character Set", localizationId: "DevExpress.XtraPrinting.HtmlExportOptionsBase.CharacterSet", editor: DevExpress.JS.Widgets.editorTemplates.combobox, defaultVal: "utf-8",
-                values: {
-                    "windows-1256": "Arabic (Windows)",
-                    "iso-8859-4": "Baltic (ISO)",
-                    "windows-1257": "Baltic (Windows)",
-                    "iso-8859-2": "Central European (ISO)",
-                    "windows-1250": "Central European (Windows)",
-                    "iso-8859-5": "Cyrillic (ISO)",
-                    "koi8-r": "Cyrillic (KOI8-r)",
-                    "windows-1251": "Cyrillic (Windows)",
-                    "iso-8859-15": "Latin 9 (ISO)",
-                    "utf-7": "Unicode (UTF-7)",
-                    "utf-8": "Unicode (UTF-8)",
-                    "iso-8859-1": "Western European (ISO)",
-                    "windows-1252": "Western European (Windows)"
-                }
+                valuesArray: [{ value: "windows-1256", displayValue: "Arabic (Windows)" }, { value: "iso-8859-4", displayValue: "Baltic (ISO)" }, { value: "windows-1257", displayValue: "Baltic (Windows)" }, { value: "iso-8859-2", displayValue: "Central European (ISO)" }, { value: "windows-1250", displayValue: "Central European (Windows)" }, { value: "iso-8859-5", displayValue: "Cyrillic (ISO)" }, { value: "koi8-r", displayValue: "Cyrillic (KOI8-r)" }, { value: "windows-1251", displayValue: "Cyrillic (Windows)" }, { value: "iso-8859-15", displayValue: "Latin 9 (ISO)" }, { value: "utf-7", displayValue: "Unicode (UTF-7)" }, { value: "utf-8", displayValue: "Unicode (UTF-8)" }, { value: "iso-8859-1", displayValue: "Western European (ISO)" }, { value: "windows-1252", displayValue: "Western European (Windows)" }]
             };
             function getExportModeValues(format, preview, merged) {
                 if (format === void 0) { format = "Html"; }
@@ -1411,22 +1397,13 @@ var DevExpress;
                 brick.text = function () { return brickText(brick); };
             }
             Preview.initializeBrick = initializeBrick;
-            var PreviewPageBrickProvider = (function () {
-                function PreviewPageBrickProvider(handlerUri, documentId, ignoreErrorPredicate) {
-                    this.getBricks = function (pageIndex) {
-                        return DevExpress.Designer.ajax(handlerUri, 'getBrickMap', encodeURIComponent(JSON.stringify({ pageIndex: pageIndex, documentId: documentId })), undefined, ignoreErrorPredicate);
-                    };
-                }
-                return PreviewPageBrickProvider;
-            })();
-            Preview.PreviewPageBrickProvider = PreviewPageBrickProvider;
             function getCurrentResolution(zoom) {
                 return Math.floor((zoom || 1) * Preview.previewDefaultResolution);
             }
             Preview.getCurrentResolution = getCurrentResolution;
             var PreviewPage = (function (_super) {
                 __extends(PreviewPage, _super);
-                function PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, previewEditingFields) {
+                function PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, previewEditingFields, isCachingBuilder) {
                     var _this = this;
                     _super.call(this);
                     this.isClientVisible = ko.observable(false);
@@ -1436,10 +1413,11 @@ var DevExpress;
                     this.realZoom = ko.observable(1);
                     this.actualResolution = 0;
                     this.pageLoadFailed = ko.observable(false);
+                    this.currentScaleFactor = ko.observable(1);
                     this.imageHeight = ko.observable(0);
                     this.imageWidth = ko.observable(0);
                     this.imageSrc = ko.observable("");
-                    this.cachedImageSrc = ko.observable("");
+                    this.displayImageSrc = ko.observable("");
                     this.brick = ko.observable(null);
                     this.brickLoading = ko.observable(true);
                     this.bricks = ko.computed(function () {
@@ -1457,80 +1435,44 @@ var DevExpress;
                     this._lastZoom = 0;
                     this._selectedBrickPath = null;
                     this.pageIndex = pageIndex;
+                    var timeout = null;
+                    this.imageSrc.subscribe(function (newVal) {
+                        var zoom = _this.zoom();
+                        timeout && clearTimeout(timeout);
+                        timeout = setTimeout(function () {
+                            Preview.PreviewRequestWrapper.getPage(newVal).done(function (response) {
+                                _this.imageHeight(response.height);
+                                _this.imageWidth(response.width);
+                                _this.currentScaleFactor(zoom);
+                                _this.displayImageSrc("data:image/png;base64," + response.base64string);
+                                _this._onPageLoaded(response, processClick, previewEditingFields);
+                            }).fail(function () {
+                                _this._onPageLoadFailed();
+                            });
+                        }, 100);
+                    });
                     this.documentId = documentId || ko.observable(null);
                     unifier = ko.isObservable(unifier) ? unifier : ko.observable(unifier || Preview.generateGuid());
-                    this.brickProvider = brickProvider;
                     this.pageLoading = loading || ko.observable(true);
                     this.originalHeight(ko.unwrap(height));
                     this.originalWidth(ko.unwrap(width));
                     this.zoom = zoom;
-                    this.zoom.subscribe(function (newVal) { _this.imageHeight(0); _this.imageWidth(0); });
+                    this.imageWidth(this.originalWidth() * this.zoom() / this._getPixelRatio());
+                    this.imageHeight(this.originalHeight() * this.zoom() / this._getPixelRatio());
                     this.isClientVisible.subscribe(function (newVal) {
                         if (_this.isClientVisible()) {
                             _this._setPageImgSrc(_this.documentId(), unifier(), _this.zoom());
                         }
                     });
                     this.color = color;
-                    this.pureWidth = ko.pureComputed(function () {
-                        return Math.ceil(_this.originalWidth() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution);
-                    });
-                    this.pureHeight = ko.pureComputed(function () {
-                        return Math.ceil(_this.originalHeight() * getCurrentResolution(_this.zoom()) / Preview.previewDefaultResolution);
-                    });
                     this.width = ko.pureComputed(function () {
-                        return Math.max(_this.imageWidth() / _this._getPixelRatio(), _this.pureWidth());
+                        return _this.imageWidth() * _this.zoom() / _this.currentScaleFactor() / _this._getPixelRatio();
                     });
                     this.height = ko.pureComputed(function () {
-                        return Math.max(_this.imageHeight() / _this._getPixelRatio(), _this.pureHeight());
+                        return _this.imageHeight() * _this.zoom() / _this.currentScaleFactor() / _this._getPixelRatio();
                     });
                     var _self = this;
-                    this.isEmpty = pageIndex === -1 && !brickProvider && !processClick;
-                    this.onPageLoaded = function (_s, _e) {
-                        _self.pageLoading(false);
-                        _self.pageLoadFailed(false);
-                        if (_self.imageHeight() === 0 && _self.imageWidth() === 0) {
-                            var _target = _e.currentTarget || _e.target || _e.path && _e.path[0];
-                            _self.imageHeight(_target.naturalHeight || _target.height);
-                            _self.imageWidth(_target.naturalWidth || _target.width);
-                        }
-                        if (_self.cachedImageSrc() !== _self.imageSrc()) {
-                            _self.originalHeight() && ko.isObservable(height) && height(_self.originalHeight());
-                            _self.originalWidth() && ko.isObservable(width) && width(_self.originalWidth());
-                            if (!_self.brick() && _self.brickProvider) {
-                                _self.brickProvider.getBricks(_self.pageIndex)
-                                    .done(function (result) {
-                                    try {
-                                        if (!result || !result.brick) {
-                                            return;
-                                        }
-                                        _self.brickColumnWidthArray = result.columnWidthArray;
-                                        _self.originalWidth(result.brick.width);
-                                        _self.originalHeight(result.brick.height);
-                                        var editignFieldBricks = [];
-                                        _self.initializeBrick(result.brick, processClick, _self.zoom, editignFieldBricks);
-                                        _self._initializeEditingFields(editignFieldBricks, previewEditingFields, result.brick.width, result.brick.height);
-                                        _self._selectedBrickPath && _self.selectBrick(_self._selectedBrickPath);
-                                    }
-                                    finally {
-                                        _self.brickLoading(false);
-                                    }
-                                }).fail(function (error) {
-                                    _self.brickLoading(false);
-                                });
-                            }
-                            else {
-                                _self.brickLoading(false);
-                            }
-                            _self.cachedImageSrc(_self.imageSrc());
-                        }
-                    };
-                    this.onPageLoadFailed = function (s, e) {
-                        if (_self.pageIndex !== -1 && _self.isClientVisible()) {
-                            _self.pageLoadFailed(true);
-                            _self.pageLoading(false);
-                            _self.brickLoading(false);
-                        }
-                    };
+                    this.isEmpty = pageIndex === -1 && !this.brick() && !processClick;
                     this.resetBrickRecusive = function (brick) {
                         if (brick && brick.active) {
                             brick.active(false);
@@ -1590,13 +1532,38 @@ var DevExpress;
                 PreviewPage.prototype._getPixelRatio = function () {
                     return window["devicePixelRatio"] || 1;
                 };
+                PreviewPage.prototype._onPageLoaded = function (result, processClick, previewEditingFields) {
+                    this.pageLoading(false);
+                    this.pageLoadFailed(false);
+                    try {
+                        if (!result || !result.brick) {
+                            return;
+                        }
+                        this.brickColumnWidthArray = result.columnWidthArray;
+                        this.originalWidth(result.brick.width);
+                        this.originalHeight(result.brick.height);
+                        var editignFieldBricks = [];
+                        this.initializeBrick(result.brick, processClick, this.zoom, editignFieldBricks);
+                        this._initializeEditingFields(editignFieldBricks, previewEditingFields, result.brick.width, result.brick.height);
+                        this._selectedBrickPath && this.selectBrick(this._selectedBrickPath);
+                    }
+                    finally {
+                        this.brickLoading(false);
+                    }
+                };
+                PreviewPage.prototype._onPageLoadFailed = function () {
+                    if (this.pageIndex !== -1 && this.isClientVisible()) {
+                        this.pageLoadFailed(true);
+                        this.pageLoading(false);
+                        this.brickLoading(false);
+                    }
+                };
                 PreviewPage.prototype.updateSize = function (zoom) {
                     var newResolution = getCurrentResolution(zoom);
                     this.realZoom(newResolution / Preview.previewDefaultResolution);
                     return newResolution;
                 };
                 PreviewPage.prototype.clearBricks = function () {
-                    this.brick(null);
                     this.brickLoading(true);
                 };
                 PreviewPage.prototype._setPageImgSrc = function (documentId, unifier, zoom) {
@@ -1622,11 +1589,11 @@ var DevExpress;
                     var imageResolution = Math.floor(newResolution * this._getPixelRatio());
                     this.imageSrc(Preview.HandlerUri +
                         "?actionKey=getPage&unifier=" + unifier +
-                        "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution })));
+                        "&arg=" + encodeURIComponent(JSON.stringify({ pageIndex: this.pageIndex, documentId: documentId, resolution: imageResolution, includeBricks: this.brickLoading() })));
                 };
                 PreviewPage.prototype._clear = function () {
                     this.pageIndex = -1;
-                    this.brick(null);
+                    this.isClientVisible(false);
                     this._setPageImgSrc(null, null, 1);
                     this.actualResolution = 0;
                 };
@@ -1969,6 +1936,19 @@ var DevExpress;
             var DocumentMapModel = (function () {
                 function DocumentMapModel(reportPreview) {
                     var _this = this;
+                    this._selectedPath = ko.observable("0");
+                    this._setSelectedPathByNavigationNode = function (nodes, brickNavigation, path) {
+                        if (path === void 0) { path = "0"; }
+                        nodes.forEach(function (item, index) {
+                            if (item.indexes === brickNavigation.indexes && item.pageIndex === brickNavigation.pageIndex) {
+                                _this._selectedPath(path + "." + index.toString());
+                            }
+                            else if (item.nodes) {
+                                _this._selectedPath(_this._setSelectedPathByNavigationNode(item.nodes, brickNavigation, path + "." + index.toString()));
+                            }
+                        });
+                        return _this._selectedPath();
+                    };
                     var treeListController = new DocumentMapTreeListController();
                     this.isEmpty = ko.pureComputed(function () {
                         return !(reportPreview.documentMap() && reportPreview.documentMap().nodes && (reportPreview.documentMap().nodes.length !== 0));
@@ -1980,6 +1960,10 @@ var DevExpress;
                             reportPreview.pages.peek()[pageIndex].selectBrick(bookmark.indexes);
                         }
                     };
+                    reportPreview.brickClickDocumentMapHandler = function (brickNavigation) {
+                        if (reportPreview.documentMap && reportPreview.documentMap())
+                            _this._setSelectedPathByNavigationNode(reportPreview.documentMap().nodes, brickNavigation);
+                    };
                     this.documentMapOptions = ko.pureComputed(function () {
                         var rootNodeSubscribtion = treeListController.selectedItem.subscribe(function (item) {
                             item.path === "0" && item.collapsed() && item.toggleCollapsed();
@@ -1987,7 +1971,7 @@ var DevExpress;
                         });
                         return {
                             itemsProvider: new DocumentMapItemsProvider(reportPreview.documentMap()),
-                            selectedPath: ko.observable("0"),
+                            selectedPath: _this._selectedPath,
                             treeListController: treeListController
                         };
                     });
@@ -2162,6 +2146,7 @@ var DevExpress;
                     var info = {
                         propertyName: "value",
                         displayName: parameterDescriptor["displayName"],
+                        localizationId: parameterDescriptor["localizationId"],
                         editor: getEditorType(typeString) || DevExpress.Designer.getEditorType(typeString)
                     };
                     this.assignValueStore(info, parameter);
@@ -2667,6 +2652,9 @@ var DevExpress;
         (function (Preview) {
             DevExpress.JS.Utils.getLocalization = DevExpress.Designer.getLocalization;
             Preview.HandlerUri = "DXXRDV.axd";
+            Preview.ReportServerDownloadUri = "";
+            var ReportServerInvokeUri = "/RSWebDocumentViewerApi/Invoke";
+            var ReportServerExportUri = "/RSWebDocumentViewerApi/Download";
             Preview.TimeOut = 120000;
             Preview.MessageHandler = {
                 processError: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); },
@@ -2690,12 +2678,6 @@ var DevExpress;
                     var _this = this;
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this);
-                    this.getPreviewPageBrickProvider = function (handlerUri, documentId) {
-                        var ignoreErrorPredicate = function () {
-                            return _this._closeDocumentRequests[documentId];
-                        };
-                        return new Preview.PreviewPageBrickProvider(handlerUri, documentId, ignoreErrorPredicate);
-                    };
                     this.predefinedZoomLevels = ko.observableArray([5, 2, 1.5, 1, 0.75, 0.5, 0.25]);
                     this._pageWidth = ko.observable(818);
                     this._pageHeight = ko.observable(1058);
@@ -2703,6 +2685,7 @@ var DevExpress;
                     this._currentReportId = ko.observable(null);
                     this._currentReportUrl = ko.observable(null);
                     this._currentDocumentId = ko.observable(null);
+                    this._isCachingBuilder = ko.observable(false);
                     this._unifier = ko.observable("");
                     this._currentOperationId = ko.observable(null);
                     this._stopBuildRequests = {};
@@ -2712,6 +2695,7 @@ var DevExpress;
                     this._editingValuesSubscriptions = [];
                     this._drillDownState = [];
                     this._sortingState = [];
+                    this._window = null;
                     this.rtlReport = ko.observable(false);
                     this.currentPage = ko.observable(null);
                     this.originalParametersInfo = ko.observable(null);
@@ -2775,15 +2759,19 @@ var DevExpress;
                     }
                     this.documentBuilding.subscribe(function (newVal) {
                         if (!newVal) {
+                            _this._unifier(Preview.generateGuid());
+                            var documentId = _this._currentDocumentId();
                             var pageCount = _this.pages().length;
                             for (var i = 0; i < pageCount; i++) {
                                 var page = _this.pages()[i];
                                 if (!page.pageLoading()) {
                                     page.clearBricks();
                                 }
+                                page.updateSize(_this._zoom());
+                                page.actualResolution = 0;
+                                page.isClientVisible() && page._setPageImgSrc(documentId, _this._unifier(), _this._zoom());
                             }
                             if (callbacks && callbacks.documentReady) {
-                                var documentId = _this._currentDocumentId();
                                 documentId && callbacks.documentReady(documentId, _this._currentReportId(), pageCount);
                             }
                         }
@@ -2908,10 +2896,10 @@ var DevExpress;
                     this.pageIndex(-1);
                     this.pageLoading(true);
                     this.progressBar.complete();
-                    this.pages([this.createPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, this._unifier, this._pageBackColor.peek(), null, this.pageLoading)]);
+                    this.pages([this.createPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, this._unifier, this._pageBackColor.peek(), this.pageLoading, undefined, this._isCachingBuilder())]);
                 };
-                ReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick) {
-                    return new Preview.PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, this._editingFields);
+                ReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, isCachingBuilder) {
+                    return new Preview.PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, this._editingFields, isCachingBuilder);
                 };
                 ReportPreview.prototype._cleanTabInfo = function () {
                     this.exportOptionsModel(null);
@@ -2922,16 +2910,18 @@ var DevExpress;
                     this.closeReport();
                     this.originalParametersInfo(null);
                 };
-                ReportPreview.prototype._export = function (args, actionUri, inlineResult) {
+                ReportPreview.prototype._export = function (args, actionUri, inlineResult, printable) {
                     var _this = this;
+                    if (printable === void 0) { printable = false; }
                     var deffered = $.Deferred();
                     if (this._editingFields().length > 0 || Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
+                        this._window = window.open();
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'));
                         this.progressBar.startProgress(function () { _this._currentOperationId(null); });
                         this.requestWrapper.getStartExportOperation(args)
-                            .done(function (response) { self.previewHandlersHelper.doneStartExportHandler(deffered, inlineResult, response); })
+                            .done(function (response) { self.previewHandlersHelper.doneStartExportHandler(deffered, inlineResult, response, printable); })
                             .fail(function (error) { self.previewHandlersHelper.errorStartExportHandler(deffered, error); });
                     }
                     else {
@@ -2940,8 +2930,9 @@ var DevExpress;
                     }
                     return deffered.promise();
                 };
-                ReportPreview.prototype._safelyRunWindowOpen = function (url, target) {
+                ReportPreview.prototype._safelyRunWindowOpen = function (url, target, useIFrame) {
                     if (target === void 0) { target = "_blank"; }
+                    if (useIFrame === void 0) { useIFrame = false; }
                     var newWindow = window.open(url, target);
                     target === "_blank" && newWindow && (newWindow.opener = null);
                     return newWindow;
@@ -2969,6 +2960,7 @@ var DevExpress;
                                     if (targetPage) {
                                         _self.goToPage(brickNavigation.pageIndex);
                                         targetPage.selectBrick(brickNavigation.indexes);
+                                        _self.brickClickDocumentMapHandler && _self.brickClickDocumentMapHandler(brickNavigation);
                                     }
                                 }
                                 else {
@@ -3026,12 +3018,14 @@ var DevExpress;
                     this._currentReportId(null);
                     this._currentReportUrl(null);
                     this._currentDocumentId(null);
+                    this._isCachingBuilder(false);
                     this._initialize();
                     initializeDataPromise.done(function (previewInitialize) {
                         if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
                             _this._currentReportId(previewInitialize.reportId);
                             _this._currentReportUrl(previewInitialize.reportUrl);
                             _this._currentDocumentId(previewInitialize.documentId);
+                            _this._isCachingBuilder(previewInitialize.isCachingBuilder);
                             _this.rtlReport(previewInitialize.rtlReport);
                             var pageSettings = previewInitialize.pageSettings;
                             if (pageSettings) {
@@ -3045,7 +3039,7 @@ var DevExpress;
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
-                                var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
+                                var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc(previewInitialize.isCachingBuilder);
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
                         }
@@ -3069,10 +3063,32 @@ var DevExpress;
                     this._currentDocumentId(null);
                     this._currentReportId(null);
                     this._currentReportUrl(null);
+                    this._isCachingBuilder(false);
                 };
                 ReportPreview.prototype.startBuild = function () {
                     this._initialize();
                     return this._startBuildRequest();
+                };
+                ReportPreview.prototype.updateExportStatus = function (progress) {
+                    this.progressBar && this.progressBar.progress(progress);
+                    if (this._window) {
+                        var div = this._window.document.getElementById("loading");
+                        if (!div) {
+                            div = this._window.document.createElement("div");
+                            div.id = "loading";
+                            div.style.position = "absolute";
+                            div.style.left = "0";
+                            div.style.top = "0";
+                            div.style.bottom = "0";
+                            div.style.right = "0";
+                            div.style["text-align"] = "center";
+                            div.style.margin = "auto";
+                            div.style.height = "0";
+                            div.style.fontSize = "32px";
+                            this._window.document.body.appendChild(div);
+                        }
+                        div.innerText = DevExpress.Designer.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument') + " " + progress + "%";
+                    }
                 };
                 ReportPreview.prototype.customDocumentOperation = function (customData, hideMessageFromUser) {
                     var documentId = this._currentDocumentId();
@@ -3138,32 +3154,40 @@ var DevExpress;
                     }, 250);
                     return deffered.promise();
                 };
-                ReportPreview.prototype.getExportResult = function (operationId, inlineDisposition) {
-                    var arg = encodeURIComponent(JSON.stringify({ id: operationId, inlineResult: !!inlineDisposition }));
-                    var newWindow = this._safelyRunWindowOpen(Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg);
+                ReportPreview.prototype.getExportResult = function (operationId, inlineDisposition, token, printable) {
+                    if (printable === void 0) { printable = false; }
+                    var uri = "";
+                    if (token) {
+                        var arg = DevExpress.JS.Utils.formatUnicorn("?token={0}&printable={1}", encodeURIComponent(token), printable);
+                        uri = Preview.ReportServerDownloadUri + arg;
+                    }
+                    else {
+                        var arg = encodeURIComponent(JSON.stringify({ id: operationId, inlineResult: !!inlineDisposition }));
+                        uri = Preview.HandlerUri + "?actionKey=getExportResult&arg=" + arg;
+                    }
+                    this._window && this._window.location.replace(uri);
                 };
-                ReportPreview.prototype.getBuildStatus = function (documentId) {
+                ReportPreview.prototype.getBuildStatus = function (documentId, isCachingBuilder) {
                     var _this = this;
                     var deffered = $.Deferred();
                     setTimeout(function () {
                         var ignorePredicate = function () { return _this._closeDocumentRequests[documentId]; };
-                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
+                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate, isCachingBuilder)
                             .done(function (response) { _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
                             .fail(function (error) { _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
                     }, 250);
                     return deffered.promise();
                 };
-                ReportPreview.prototype.getDoGetBuildStatusFunc = function () {
+                ReportPreview.prototype.getDoGetBuildStatusFunc = function (isCachingBuilder) {
                     var preview = this;
                     var doGetBuildStatus = function (documentId) {
-                        var promise = preview.getBuildStatus(documentId);
+                        var promise = preview.getBuildStatus(documentId, isCachingBuilder);
                         promise.done(function (result) {
                             if (result && result.requestAgain && !preview._stopBuildRequests[documentId] && !preview._closeDocumentRequests[documentId]) {
                                 doGetBuildStatus(documentId);
                             }
                             else {
                                 try {
-                                    preview._unifier(Preview.generateGuid());
                                     if (result.error || !result.requestAgain && !result.pageCount) {
                                         preview.removeEmptyPages(!result.pageCount);
                                         if (!preview.pages().length)
@@ -3174,13 +3198,6 @@ var DevExpress;
                                         return;
                                     }
                                     preview.getDocumentData(documentId);
-                                    preview.pages().forEach(function (page) {
-                                        page.updateSize(preview._zoom());
-                                        var isCurrentPage = page.pageIndex === preview.pageIndex();
-                                        page.actualResolution = 0;
-                                        page.isClientVisible(isCurrentPage);
-                                        isCurrentPage && page._setPageImgSrc(documentId, preview._unifier(), preview._zoom());
-                                    });
                                 }
                                 finally {
                                     preview.progressBar.complete();
@@ -3251,7 +3268,7 @@ var DevExpress;
                         inlineResult: true,
                         editingFieldValues: this._editingFields && this._editingFields().map(function (item) { return item.editValue(); })
                     }));
-                    this._export(args, Preview.HandlerUri, true);
+                    this._export(args, Preview.HandlerUri, true, true);
                 };
                 ReportPreview.prototype.stopBuild = function (documentId) {
                     var id = documentId || this._currentDocumentId();
@@ -3467,7 +3484,7 @@ var DevExpress;
                 return designerModel;
             }
             Preview.createDesktopPreview = createDesktopPreview;
-            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent) {
+            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent, remoteSettings) {
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
@@ -3476,6 +3493,22 @@ var DevExpress;
                 });
                 callbacks && callbacks.customizeLocalization && callbacks.customizeLocalization();
                 DevExpress["config"]({ rtlEnabled: !!rtl });
+                if (remoteSettings && (remoteSettings.authToken || remoteSettings.serverUri)) {
+                    Object.defineProperty(Preview, "AsyncExportApproach", {
+                        get: function () { return true; },
+                        set: function (newVal) { }
+                    });
+                    handlerUri = Report.RequestHelper.generateUri(remoteSettings.serverUri, ReportServerInvokeUri);
+                    Preview.searchAvailable(false);
+                    Preview.ReportServerDownloadUri = Report.RequestHelper.generateUri(remoteSettings.serverUri, ReportServerExportUri);
+                    if (remoteSettings.authToken) {
+                        DevExpress.Analytics.Utils.ajaxSetup.ajaxSettings = {
+                            headers: {
+                                'Authorization': 'Bearer ' + remoteSettings.authToken
+                            }
+                        };
+                    }
+                }
                 var designerModel;
                 if (isMobile) {
                     designerModel = DevExpress.Report.Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
@@ -3523,9 +3556,12 @@ var DevExpress;
             Preview.createPreview = createPreview;
             function createAndInitPreviewModel(viewerModel, element, callbacks, applyBindings) {
                 DevExpress.Designer.initGlobalize(viewerModel);
-                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent);
+                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent, viewerModel.remoteSettings);
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
+                }
+                else if (viewerModel.reportUrl) {
+                    previewModel.OpenReport(ko.unwrap(viewerModel.reportUrl));
                 }
                 $.extend(true, DevExpress.Report.Preview.cultureInfo, viewerModel.cultureInfoList);
                 return previewModel;
@@ -3787,7 +3823,7 @@ var DevExpress;
                                 return DevExpress.Designer.getLocalization('Page Width', 'DevExpress.XtraReports.UI.XtraReport.PageWidth');
                             }
                             else if (Math.round(val * 100) === 0) {
-                                return DevExpress.Designer.getLocalization('Whole Page', 'DevExpress.XtraReports.UI.GroupUnion.WholePage');
+                                return DevExpress.Designer.getLocalization('Whole Page', 'PreviewStringId.MenuItem_ZoomWholePage');
                             }
                             else {
                                 return Math.round((val || reportPreview.zoom.peek()) * 100) + '%';
@@ -4941,11 +4977,9 @@ var DevExpress;
         (function (Preview) {
             var MobilePreviewPage = (function (_super) {
                 __extends(MobilePreviewPage, _super);
-                function MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, editingFields) {
+                function MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, editingFields, isCachingBuilder) {
                     var _this = this;
-                    _super.call(this, pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, editingFields);
-                    this.width = this.pureWidth;
-                    this.height = this.pureHeight;
+                    _super.call(this, pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, editingFields);
                     this.selectBrick = function (path, ctrlKey) {
                         var currentBrick = _this.brick();
                         !ctrlKey && _this.resetBrickRecusive(currentBrick);
@@ -5018,8 +5052,8 @@ var DevExpress;
                         }
                     });
                 }
-                MobileReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick) {
-                    return new Preview.MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, brickProvider, loading, processClick, this._editingFields);
+                MobileReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, isCachingBuilder) {
+                    return new Preview.MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, this._editingFields, isCachingBuilder);
                 };
                 MobileReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
                     var _this = this;
@@ -6016,6 +6050,19 @@ var DevExpress;
             return EventGenerator;
         })();
         Report.EventGenerator = EventGenerator;
+        var RequestHelper = (function () {
+            function RequestHelper() {
+            }
+            RequestHelper.generateUri = function (host, uri) {
+                host = host || "";
+                if (host && host[host.length - 1] === '/' && uri && uri[0] === '/') {
+                    return host + uri.substring(1);
+                }
+                return host + uri;
+            };
+            return RequestHelper;
+        })();
+        Report.RequestHelper = RequestHelper;
         var JSDesignerBindingCommon = (function () {
             function JSDesignerBindingCommon(_options) {
                 this._options = _options;
@@ -6025,11 +6072,7 @@ var DevExpress;
                 this._options.callbacks && this._options.callbacks[eventName] && this._options.callbacks[eventName](this._sender, args);
             };
             JSDesignerBindingCommon.prototype._getServerActionUrl = function (host, uri) {
-                host = host || "";
-                if (host && host[host.length - 1] === '/' && uri && uri[0] === '/') {
-                    return host + uri.substring(1);
-                }
-                return host + uri;
+                return RequestHelper.generateUri(host, uri);
             };
             JSDesignerBindingCommon.prototype._getAvailableEvents = function (events, prefix) {
                 var _this = this;
@@ -6198,7 +6241,7 @@ var DevExpress;
                     var _this = this;
                     if (!this._startRect || !this._page.active())
                         return;
-                    var leftButtonPressed = event.buttons > 0 && event.which === 1;
+                    var leftButtonPressed = event.which === 1;
                     if (leftButtonPressed) {
                         if (!this._$selectionContent) {
                             if (Math.abs(this._startRect.left - event.pageX) >= 2 || Math.abs(this._startRect.top - event.pageY) >= 2) {
@@ -6433,9 +6476,6 @@ var DevExpress;
                                     self._sender.OpenReport(newVal);
                                 });
                             }
-                            if (!self._options.reportId) {
-                                self._sender.OpenReport(ko.unwrap(self._options.reportUrl));
-                            }
                         }
                         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                             subscription && subscription.dispose();
@@ -6479,8 +6519,9 @@ var DevExpress;
                 function PreviewHandlersHelper(preview) {
                     this._preview = preview;
                 }
-                PreviewHandlersHelper.prototype.doneStartExportHandler = function (deffered, inlineResult, response) {
+                PreviewHandlersHelper.prototype.doneStartExportHandler = function (deffered, inlineResult, response, printable) {
                     var _this = this;
+                    if (printable === void 0) { printable = false; }
                     try {
                         if (!response) {
                             this._preview.progressBar.complete();
@@ -6491,13 +6532,13 @@ var DevExpress;
                             var promise = _this._preview.getExportStatus(operationId);
                             promise.done(function (result) {
                                 if (result && result.requestAgain) {
-                                    _this._preview.progressBar && _this._preview.progressBar.progress(result.progress);
+                                    _this._preview.updateExportStatus(result.progress);
                                     doGetExportStatus(operationId);
                                 }
                                 else {
                                     _this._preview.progressBar.complete();
                                     if (!result.requestAgain && result.completed) {
-                                        _this._preview.getExportResult(operationId, inlineResult);
+                                        _this._preview.getExportResult(operationId, inlineResult, result.token, printable);
                                     }
                                     if (result.error) {
                                         _this._preview._processError(DevExpress.Designer.getLocalization("Error on retrieving an exporting status: ", "ASPxReportsStringId.WebDocumentViewer_ExportStatusError") + result.error);
@@ -6574,7 +6615,7 @@ var DevExpress;
                             return;
                         }
                         this._preview._currentDocumentId(response.documentId);
-                        var doGetBuildStatus = this._preview.getDoGetBuildStatusFunc();
+                        var doGetBuildStatus = this._preview.getDoGetBuildStatusFunc(this._preview._isCachingBuilder());
                         doGetBuildStatus(this._preview._currentDocumentId());
                     }
                     finally {
@@ -6615,10 +6656,9 @@ var DevExpress;
                         if (wereNoPagesAndNewOnesExist) {
                             this._preview.pageIndex(0);
                         }
-                        var brickProvider = this._preview.getPreviewPageBrickProvider(Preview.HandlerUri, documentId);
                         for (var i = 0; i < response.pageCount && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate(); i++) {
                             var createNewPage = function (index) {
-                                return _this._preview.createPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, _this._preview._unifier, _this._preview._pageBackColor.peek(), brickProvider, null, _this._preview.createBrickClickProcessor(index));
+                                return _this._preview.createPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, _this._preview._unifier, _this._preview._pageBackColor.peek(), null, _this._preview.createBrickClickProcessor(index), _this._preview._isCachingBuilder());
                             };
                             if (i < this._preview.pages().length) {
                                 var page = this._preview.pages()[i];
@@ -6628,7 +6668,9 @@ var DevExpress;
                                 }
                                 if (page.pageIndex === -1) {
                                     page.pageIndex = i;
-                                    page.brickProvider = brickProvider;
+                                    if (this._preview.pageIndex.peek() === i) {
+                                        page.isClientVisible(true);
+                                    }
                                 }
                             }
                             else {
@@ -6719,6 +6761,9 @@ var DevExpress;
                         this[name] = handlers[name];
                     }
                 }
+                PreviewRequestWrapper.getPage = function (url) {
+                    return DevExpress.Designer.ajax(url, undefined, undefined, undefined, undefined, { type: "GET" });
+                };
                 PreviewRequestWrapper.prototype.initialize = function (reportPreview, parametersModel, searchModel) {
                     this._reportPreview = reportPreview;
                     this._parametersModel = parametersModel;
@@ -6754,9 +6799,10 @@ var DevExpress;
                         parameters: parameters
                     })));
                 };
-                PreviewRequestWrapper.prototype.getBuildStatusRequest = function (documentId, shouldIgnoreError) {
+                PreviewRequestWrapper.prototype.getBuildStatusRequest = function (documentId, shouldIgnoreError, isCachingBuilder) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'getBuildStatus', encodeURIComponent(JSON.stringify({
                         documentId: documentId,
+                        isCachingBuilder: isCachingBuilder,
                         timeOut: Math.max(5000, DevExpress.Report.Preview.TimeOut)
                     })), undefined, shouldIgnoreError);
                 };

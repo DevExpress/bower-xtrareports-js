@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-16
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -564,6 +564,17 @@
 .dx-popup-general .dx-overlay-content .dx-toolbar.dx-popup-bottom .dx-toolbar-after {
   padding-top: 8px;
 }
+.dx-sql_editor.ace_editor {
+  font-size: 1em;
+  height: 100%;
+  width: 100%;
+}
+.dx-sql_editor.dx-disabled-ace {
+  opacity: 0.65;
+}
+.dx-sql_editor.dx-disabled-ace .ace_cursor {
+  display: none;
+}
 .dx-rtl .dx-treelist .dx-treelist-item .dx-treelist-collapsedbutton {
   float: right;
   margin-left: 9px;
@@ -833,9 +844,10 @@
   padding: 0 5px;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.clickable {
-  padding: 0 5px;
   min-height: 24px;
   min-width: 30px;
+  padding: 0 5px;
+  vertical-align: top;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text.stylized {
   padding: 0 5px;
@@ -914,10 +926,10 @@
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-text {
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
+  vertical-align: top;
   display: inline-block;
   line-height: 24px;
   color: #ffffff;
-  vertical-align: top;
 }
 .dx-filtereditor .dx-filtereditor-tree .criteria-operator-group .criteria-operator-action {
   vertical-align: top;
@@ -1119,6 +1131,15 @@
   overflow: visible;
 }
 .dx-expressioneditor .dx-expression-tree .dx-expressioneditor-tools .dx-expressioneditor-description {
+  padding: 5px;
+  color: #ffffff;
+  font-size: 11px;
+  font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
+  -ms-word-wrap: break-word;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.ace_tooltip.ace_doc-tooltip {
   padding: 5px;
   color: #ffffff;
   font-size: 11px;
@@ -3024,8 +3045,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 18.1.1-pre-18103
+* Build date: 2018-04-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
