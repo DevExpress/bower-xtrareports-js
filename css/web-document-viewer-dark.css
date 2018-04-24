@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 18.1.1-pre-18103
-* Build date: 2018-04-16
+* Version: 18.1.2
+* Build date: 2018-04-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -726,7 +726,17 @@
   height: 100%;
 }
 .dx-filtereditor .dx-filtereditor-plain-content .dx-filtereditor-text-container {
+  visibility: hidden;
+  margin-top: inherit;
+  -moz-transition: height ease-in-out 200ms, margin ease-in-out 200ms;
+  -o-transition: height ease-in-out 200ms, margin ease-in-out 200ms;
+  -webkit-transition: height ease-in-out 200ms, margin ease-in-out 200ms;
+  transition: height ease-in-out 200ms, margin ease-in-out 200ms;
+}
+.dx-filtereditor .dx-filtereditor-plain-content .dx-filtereditor-text-container.advanced {
+  visibility: visible;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 .dx-filtereditor .dx-filtereditor-text-container {
   height: 0;
@@ -3045,8 +3055,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 18.1.1-pre-18103
-* Build date: 2018-04-17
+* Version: 18.1.2
+* Build date: 2018-04-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

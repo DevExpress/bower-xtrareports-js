@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 18.1.1-pre-18103
-* Build date: 2018-04-16
+* Version: 18.1.2
+* Build date: 2018-04-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -7784,10 +7784,58 @@ var DevExpress;
                     return { controlsDescendantBindings: true };
                 }
             };
+            var FilterEditorPlain = (function (_super) {
+                __extends(FilterEditorPlain, _super);
+                function FilterEditorPlain(element, options, fieldListProvider, rtl, _displayNameProvider) {
+                    var _this = this;
+                    if (rtl === void 0) { rtl = false; }
+                    _super.call(this, options, fieldListProvider, rtl, _displayNameProvider);
+                    this.element = element;
+                    this._contentMargins = 20;
+                    this._topOffset = 30;
+                    this._defaultActiveTextContentHeightPerc = 25;
+                    this._defaultActiveTreeContentHeightPerc = 75;
+                    this._currentActiveTextContentHeightPerc = this._defaultActiveTextContentHeightPerc;
+                    this._currentActiveTreeContentHeightPerc = this._defaultActiveTreeContentHeightPerc;
+                    this.plainContentHeightPerc = ko.observable("100%");
+                    this.textContentHeightPerc = ko.observable(null);
+                    this.treeContentHeightPerc = ko.observable(null);
+                    var $element = $(element);
+                    var updateHeight = function () {
+                        var currentHeight = $element.height();
+                        _this.plainContentHeightPerc((1 - _this._topOffset / currentHeight) * 100 + "%");
+                        var diffPerc = (_this._contentMargins / (currentHeight - _this._topOffset)) * 100 / 2;
+                        _this._currentActiveTextContentHeightPerc = _this._defaultActiveTextContentHeightPerc - diffPerc;
+                        _this._currentActiveTreeContentHeightPerc = _this._defaultActiveTreeContentHeightPerc - diffPerc;
+                        if (_this.advancedMode()) {
+                            _this.treeContentHeightPerc(_this._currentActiveTreeContentHeightPerc);
+                            _this.textContentHeightPerc(_this._currentActiveTextContentHeightPerc);
+                        }
+                    };
+                    updateHeight();
+                    this._disposables.push(this.advancedMode.subscribe(function (newVal) {
+                        if (newVal) {
+                            _this.treeContentHeightPerc(_this._currentActiveTreeContentHeightPerc + "%");
+                            _this.textContentHeightPerc(_this._currentActiveTextContentHeightPerc + "%");
+                        }
+                        else {
+                            _this.treeContentHeightPerc(null);
+                            _this.textContentHeightPerc(null);
+                        }
+                    }));
+                    window.addEventListener("resize", updateHeight);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        window.removeEventListener("resize", updateHeight);
+                        _this.dispose();
+                    });
+                }
+                return FilterEditorPlain;
+            })(FilterEditor);
+            Widgets.FilterEditorPlain = FilterEditorPlain;
             ko.components.register("dx-filtereditor-plain", {
                 viewModel: {
                     createViewModel: function (params, componentInfo) {
-                        var viewModel = new FilterEditor(params.options, ko.observable(params.fieldListProvider), undefined, params.displayNameProvider);
+                        var viewModel = new FilterEditorPlain(componentInfo.element, params.options, ko.observable(params.fieldListProvider), undefined, params.displayNameProvider);
                         viewModel.popupVisible(true);
                         params.options().value.subscribe(function () {
                             viewModel.popupVisible(false);
@@ -10363,7 +10411,10 @@ var DevExpress;
                         if (values.forceResize) {
                             values.forceResize({ size: new Analytics.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
                         }
-                        if (values.snapHelper && $selectedNodes.length === 1) {
+                        if (!!event.altKey) {
+                            values.snapHelper && values.snapHelper.deactivateSnapLines();
+                        }
+                        else if (values.snapHelper && $selectedNodes.length === 1) {
                             var newAbsolutePosition = Analytics.Internal.getControlNewAbsolutePositionOnResize(values.snapHelper, absolutePosition, ui, { x: dx, y: dy, width: dw, height: dh });
                             values.snapHelper.activateSnapLines(newAbsolutePosition);
                             $element.css({

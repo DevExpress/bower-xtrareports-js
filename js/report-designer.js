@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.1-pre-18103
-* Build date: 2018-04-16
+* Version: 18.1.2
+* Build date: 2018-04-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8028,8 +8028,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.1-pre-18103
-* Build date: 2018-04-17
+* Version: 18.1.2
+* Build date: 2018-04-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -31074,7 +31074,7 @@ var DevExpress;
                         displayText: function () { return Designer.getLocalization("Validate", "ReportStringId.ScriptEditor_Validate"); },
                         imageClassName: "dxrd-image-validate",
                         disabled: ko.pureComputed(function () {
-                            return !self.report() || _this.validateDisabled();
+                            return !self.report() || self.validateDisabled() || !self.editorContainer();
                         }),
                         visible: this.editorVisible,
                         hotKey: { ctrlKey: true, keyCode: "L".charCodeAt(0) },
@@ -31083,6 +31083,8 @@ var DevExpress;
                             self.validateDisabled(true);
                             self._setScriptsText();
                             Report.ReportScriptService.validateScripts(self.report()).done(function (result) {
+                                if (!self.editorContainer())
+                                    return;
                                 var errors = [];
                                 result.forEach(function (error) {
                                     var linesCount = self.editorContainer().getSession().getLength();
