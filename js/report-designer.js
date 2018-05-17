@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.2
-* Build date: 2018-04-18
+* Version: 18.1.3
+* Build date: 2018-05-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1523,13 +1523,15 @@ var DevExpress;
                     $column.width(maxWidth);
                 });
                 var contentScroll = $(".dxd-tableview-data").dxScrollView("instance");
-                contentScroll.option("onScroll", function (e) {
-                    if (e.scrollOffset.left >= 0) {
-                        $titles.offset({ left: $content.offset().left, top: $titles.offset().top });
+                if (contentScroll) {
+                    contentScroll.option("onScroll", function (e) {
+                        if (e.scrollOffset.left >= 0) {
+                            $titles.offset({ left: $content.offset().left, top: $titles.offset().top });
+                        }
+                    });
+                    if (!!bindingContext.$root.rtl) {
+                        contentScroll.scrollTo({ left: contentScroll.scrollWidth(), top: 0 });
                     }
-                });
-                if (!!bindingContext.$root.rtl) {
-                    contentScroll.scrollTo({ left: contentScroll.scrollWidth(), top: 0 });
                 }
                 return { controlsDescendantBindings: true };
             }
@@ -1642,6 +1644,11 @@ var DevExpress;
                     _super.call(this);
                     this._serializationsInfo = _serializationsInfo;
                     this._valueInfo = ko.observable(Data.parameterValueSerializationsInfo);
+                    this._parametersFunctions = (function (addins) { return Analytics.Widgets.Internal.insertInFunctionDisplay(addins); })({
+                        "String": {
+                            "CreateTable": [{ paramCount: 1, text: "CreateTable(, )", displayName: "CreateTable(Column1, ..., ColumnN)", descriptionStringId: "ExpressionEditorStringId.Function_CreateTable" }]
+                        }
+                    });
                     this.isValid = ko.observable(true);
                     serializer = serializer || new DevExpress.Analytics.Utils.ModelSerializer();
                     serializer.deserialize(this, $.extend(model, { "@ItemType": "Parameter" }));
@@ -1650,7 +1657,10 @@ var DevExpress;
                         write: function (value) { if (DataSourceParameter.validateName(value))
                             _this._name(value); }
                     });
-                    this._expressionValue = ko.observable({ value: this._value });
+                    this._expressionValue = ko.observable({
+                        value: this._value,
+                        functions: this._parametersFunctions
+                    });
                     this._disposables.push(this.type.subscribe(function (val) { _this._updateValueInfo(val); }));
                     this.value = ko.pureComputed({
                         read: function () {
@@ -3923,12 +3933,14 @@ var DevExpress;
             Widgets.createDefaultSQLAceOptions = createDefaultSQLAceOptions;
             function createDefaultSQLAdditionalOptions(value) {
                 return {
-                    onBlur: function (session) {
+                    onChange: function (session) {
                         value(session.getValue());
                     },
                     onValueChange: function (editor) {
                         editor.resize(true);
                     },
+                    changeTimeout: 200,
+                    overrideEditorFocus: true,
                     setUseWrapMode: true
                 };
             }
@@ -4071,7 +4083,9 @@ var DevExpress;
                 isVisible: ko.observable(false),
                 title: function () { return DevExpress.Analytics.getLocalization("Data Preview (First 100 Rows Displayed)", "ASPxReportsStringId.ReportDesigner_DataPreview_Title"); },
                 template: "dxqb-data-preview",
-                data: ko.observable(),
+                data: {
+                    value: ko.observable()
+                },
                 okButtonText: function () { return DevExpress.Analytics.getLocalization('OK', 'PivotGridStringId.FilterOk'); },
                 okButtonHandler: function (e) {
                     e.model.isVisible(false);
@@ -4087,7 +4101,7 @@ var DevExpress;
                     value: ko.observable(),
                     aceOptions: DevExpress.QueryBuilder.Widgets.createDefaultSQLAceOptions(true),
                     aceAvailable: DevExpress.Analytics.Widgets.aceAvailable,
-                    additionalOptions: DevExpress.QueryBuilder.Widgets.createDefaultSQLAdditionalOptions(function (newVal) { designerModel.selectStatmentPreview.value(newVal); }),
+                    additionalOptions: DevExpress.QueryBuilder.Widgets.createDefaultSQLAdditionalOptions(function (newVal) { designerModel.selectStatmentPreview.data.value(newVal); }),
                     languageHelper: DevExpress.QueryBuilder.Widgets.createDefaultSQLLanguageHelper()
                 },
                 okButtonText: function () { return DevExpress.Analytics.getLocalization('OK', 'PivotGridStringId.FilterOk'); },
@@ -4225,7 +4239,7 @@ var DevExpress;
                 designerModel.dataPreview.isLoading(true);
                 designerModel.dataPreview.isVisible(true);
                 QueryBuilder.Utils.RequestWrapper.getDataPreview(data.dbSchemaProvider().connection, JSON.stringify(query().serialize(true))).done(function (data) {
-                    designerModel.dataPreview.data(JSON.parse(data.dataPreviewJSON));
+                    designerModel.dataPreview.data.value(JSON.parse(data.dataPreviewJSON));
                     designerModel.dataPreview.isLoading(false);
                 }).fail(function (data) {
                     designerModel.dataPreview.isVisible(false);
@@ -5751,7 +5765,7 @@ var DevExpress;
                     this._proceduresList = new Wizard.Utils.StoredProceduresQueryControl();
                     this._selectStatementControl = new Wizard.Utils.SelectStatementQueryControl(new Wizard.Utils.SelectQuerySqlTextProvider(callbacks.selectStatement || DevExpress.QueryBuilder.Utils.RequestWrapper.getSelectStatement, this._connection), disableCustomSql);
                     this.selectedQueryType.subscribe(function (value) {
-                        if (value === _this.queryTypeItems[1]) {
+                        if (value === CreateQueryPage.SP_TEXT) {
                             _this._wrapWizardIndicator(function () {
                                 return _this._dataSource().dbSchemaProvider.getDbStoredProcedures().done(function (procedures) {
                                     _this._proceduresList.storedProcedures([]);
@@ -6396,9 +6410,12 @@ var DevExpress;
                                 if (_this._query().type() !== Analytics.Data.Utils.SqlQueryType.customSqlQuery) {
                                     var customQuery = new Analytics.Data.CustomSqlQuery({ "@Name": _this._query().name() }, _this._query().parent);
                                     customQuery.parameters(_this._query().parameters());
+                                    customQuery.sqlString(val);
                                     _this._query(customQuery);
                                 }
-                                _this._query().sqlString(val);
+                                else {
+                                    _this._query().sqlString(val);
+                                }
                             }
                         });
                         this.isNextDisabled = ko.pureComputed(function () {
@@ -8028,8 +8045,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.2
-* Build date: 2018-04-18
+* Version: 18.1.3
+* Build date: 2018-05-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -10472,7 +10489,9 @@ var DevExpress;
             var sweepDirection = {
                 propertyName: "sweepDirection", modelName: "@SweepDirection", displayName: "Sweep Direction", localizationId: "DevExpress.XtraCharts.PieSeriesViewBase.SweepDirection", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Counterclockwise", displayValue: "Counterclockwise", localizationId: 'DevExpress.XtraCharts.PieSweepDirection.Counterclockwise' }, { value: "Clockwise", displayValue: "Clockwise", localizationId: 'DevExpress.XtraCharts.PieSweepDirection.Clockwise' }], defaultVal: "Counterclockwise"
             };
-            var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var totalLabelInfo = [Chart.textColor, Chart.backColor, enableAntialiasing, Chart.maxWidth, Chart.maxLineCount, Chart.textAlignment, Chart.textPattern, visible, Chart.tag, Chart.font12, border, fillStyle, shadow];
+            var totalLabel = { propertyName: "totalLabel", modelName: "TotalLabel", displayName: "Total Label", localizationId: "DevExpress.XtraCharts.PieSeriesView.TotalLabel", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: totalLabelInfo, };
+            var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag, totalLabel];
             var thickness2 = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.LineStyle.Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 1 } };
             var lineStyleInfo1 = [thickness2, dashStyle, lineJoin, Chart.tag,];
             var lineStyle2 = { propertyName: "lineStyle", modelName: "LineStyle", displayName: "Line Style", localizationId: "DevExpress.XtraCharts.SwiftPlotSeriesView.LineStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineStyleInfo1, };
@@ -10533,7 +10552,7 @@ var DevExpress;
             var pieFillStyle = { propertyName: "pieFillStyle", modelName: "PieFillStyle", displayName: "Pie Fill Style", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.PieFillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pieFillStyleInfo, };
             var doughnut3DSeriesViewinfo = [holeRadiusPercent2, depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
             var holeRadiusPercent3 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.DoughnutSeriesView.HoleRadiusPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 60, editorOptions: { min: 0, max: 100 } };
-            var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag, totalLabel];
             var size2 = { propertyName: "size", modelName: "@Size", displayName: "Size", localizationId: "DevExpress.XtraCharts.SimpleMarker.Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 8, editorOptions: { min: 1 } };
             var pointMarkerOptionsInfo = [size2, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
             var pointMarkerOptions = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.RadarPointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
@@ -10592,7 +10611,7 @@ var DevExpress;
             var manhattanBarSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
             var overlappedRangeBarSeriesViewinfo = [minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var pie3DSeriesViewinfo = [depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
-            var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag, totalLabel];
             var pointMarkerOptions1 = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
             var pointSeriesViewinfo = [pointMarkerOptions1, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var barDistance6 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
@@ -12076,7 +12095,7 @@ var DevExpress;
             Preview.getCurrentResolution = getCurrentResolution;
             var PreviewPage = (function (_super) {
                 __extends(PreviewPage, _super);
-                function PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, previewEditingFields, isCachingBuilder) {
+                function PreviewPage(preview, pageIndex, processClick, loading) {
                     var _this = this;
                     _super.call(this);
                     this.isClientVisible = ko.observable(false);
@@ -12085,7 +12104,6 @@ var DevExpress;
                     this.loadingText = DevExpress.Designer.getLocalization("Loading...", "ASPxReportsStringId.WebDocumentViewer_Loading");
                     this.realZoom = ko.observable(1);
                     this.actualResolution = 0;
-                    this.pageLoadFailed = ko.observable(false);
                     this.currentScaleFactor = ko.observable(1);
                     this.imageHeight = ko.observable(0);
                     this.imageWidth = ko.observable(0);
@@ -12109,27 +12127,29 @@ var DevExpress;
                     this._selectedBrickPath = null;
                     this.pageIndex = pageIndex;
                     var timeout = null;
+                    this.documentId = preview._currentDocumentId || ko.observable(null);
                     this.imageSrc.subscribe(function (newVal) {
+                        var documentId = _this.documentId.peek();
+                        var ignoreError = preview._closeDocumentRequests && (function () { return preview._closeDocumentRequests[documentId]; });
                         var zoom = _this.zoom();
                         timeout && clearTimeout(timeout);
                         timeout = setTimeout(function () {
-                            Preview.PreviewRequestWrapper.getPage(newVal).done(function (response) {
+                            Preview.PreviewRequestWrapper.getPage(newVal, ignoreError).done(function (response) {
                                 _this.imageHeight(response.height);
                                 _this.imageWidth(response.width);
                                 _this.currentScaleFactor(zoom);
                                 _this.displayImageSrc("data:image/png;base64," + response.base64string);
-                                _this._onPageLoaded(response, processClick, previewEditingFields);
-                            }).fail(function () {
+                                _this._onPageLoaded(response, processClick, preview._editingFields);
+                            }).fail(function (_e) {
                                 _this._onPageLoadFailed();
                             });
                         }, 100);
                     });
-                    this.documentId = documentId || ko.observable(null);
-                    unifier = ko.isObservable(unifier) ? unifier : ko.observable(unifier || Preview.generateGuid());
+                    var unifier = ko.isObservable(preview._unifier) ? preview._unifier : ko.observable(preview._unifier || Preview.generateGuid());
                     this.pageLoading = loading || ko.observable(true);
-                    this.originalHeight(ko.unwrap(height));
-                    this.originalWidth(ko.unwrap(width));
-                    this.zoom = zoom;
+                    this.originalHeight(ko.unwrap(preview._pageHeight));
+                    this.originalWidth(ko.unwrap(preview._pageWidth));
+                    this.zoom = preview._zoom;
                     this.imageWidth(this.originalWidth() * this.zoom() / this._getPixelRatio());
                     this.imageHeight(this.originalHeight() * this.zoom() / this._getPixelRatio());
                     this.isClientVisible.subscribe(function (newVal) {
@@ -12137,7 +12157,7 @@ var DevExpress;
                             _this._setPageImgSrc(_this.documentId(), unifier(), _this.zoom());
                         }
                     });
-                    this.color = color;
+                    this.color = ko.isObservable(preview._pageBackColor) ? preview._pageBackColor.peek() : "";
                     this.width = ko.pureComputed(function () {
                         return _this.imageWidth() * _this.zoom() / _this.currentScaleFactor() / _this._getPixelRatio();
                     });
@@ -12207,7 +12227,6 @@ var DevExpress;
                 };
                 PreviewPage.prototype._onPageLoaded = function (result, processClick, previewEditingFields) {
                     this.pageLoading(false);
-                    this.pageLoadFailed(false);
                     try {
                         if (!result || !result.brick) {
                             return;
@@ -12226,7 +12245,6 @@ var DevExpress;
                 };
                 PreviewPage.prototype._onPageLoadFailed = function () {
                     if (this.pageIndex !== -1 && this.isClientVisible()) {
-                        this.pageLoadFailed(true);
                         this.pageLoading(false);
                         this.brickLoading(false);
                     }
@@ -12240,7 +12258,6 @@ var DevExpress;
                     this.brickLoading(true);
                 };
                 PreviewPage.prototype._setPageImgSrc = function (documentId, unifier, zoom) {
-                    this.pageLoadFailed(false);
                     if (!documentId || this.pageIndex === -1) {
                         return;
                     }
@@ -13358,7 +13375,6 @@ var DevExpress;
                     this._currentReportId = ko.observable(null);
                     this._currentReportUrl = ko.observable(null);
                     this._currentDocumentId = ko.observable(null);
-                    this._isCachingBuilder = ko.observable(false);
                     this._unifier = ko.observable("");
                     this._currentOperationId = ko.observable(null);
                     this._stopBuildRequests = {};
@@ -13565,14 +13581,16 @@ var DevExpress;
                     this._sortingState = [];
                     this.closeDocument();
                     this._editingFields([]);
+                    this._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
+                    this._editingValuesSubscriptions = [];
                     this.documentMap(null);
                     this.pageIndex(-1);
                     this.pageLoading(true);
                     this.progressBar.complete();
-                    this.pages([this.createPage(-1, this._pageWidth, this._pageHeight, this._zoom, this._currentDocumentId, this._unifier, this._pageBackColor.peek(), this.pageLoading, undefined, this._isCachingBuilder())]);
+                    this.pages([this.createPage(-1, undefined, this.pageLoading)]);
                 };
-                ReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, isCachingBuilder) {
-                    return new Preview.PreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, this._editingFields, isCachingBuilder);
+                ReportPreview.prototype.createPage = function (pageIndex, processClick, loading) {
+                    return new Preview.PreviewPage(this, pageIndex, processClick, loading);
                 };
                 ReportPreview.prototype._cleanTabInfo = function () {
                     this.exportOptionsModel(null);
@@ -13659,6 +13677,7 @@ var DevExpress;
                     };
                 };
                 ReportPreview.prototype.openReport = function (reportName) {
+                    var _this = this;
                     this._clearReportInfo();
                     var deferred = $.Deferred();
                     this._openReportOperationDeferred = deferred;
@@ -13666,7 +13685,7 @@ var DevExpress;
                         deferred.resolve(response);
                     }).fail(function (error) {
                         deferred.reject(error);
-                        DevExpress.Designer.getSpecificLocalizationWithAddition("Could not open report '" + reportName + "'", "Could not open report", " '" + reportName + "'", "ASPxReportsStringId.WebDocumentViewer_OpenReportError");
+                        _this._processError(DevExpress.Designer.getLocalization("Could not open report", "ASPxReportsStringId.WebDocumentViewer_OpenReportError") + " '" + reportName + "'", error);
                     });
                     return this.initialize(deferred.promise());
                 };
@@ -13691,14 +13710,12 @@ var DevExpress;
                     this._currentReportId(null);
                     this._currentReportUrl(null);
                     this._currentDocumentId(null);
-                    this._isCachingBuilder(false);
                     this._initialize();
                     initializeDataPromise.done(function (previewInitialize) {
                         if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
                             _this._currentReportId(previewInitialize.reportId);
                             _this._currentReportUrl(previewInitialize.reportUrl);
                             _this._currentDocumentId(previewInitialize.documentId);
-                            _this._isCachingBuilder(previewInitialize.isCachingBuilder);
                             _this.rtlReport(previewInitialize.rtlReport);
                             var pageSettings = previewInitialize.pageSettings;
                             if (pageSettings) {
@@ -13712,7 +13729,7 @@ var DevExpress;
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
-                                var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc(previewInitialize.isCachingBuilder);
+                                var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
                         }
@@ -13736,7 +13753,6 @@ var DevExpress;
                     this._currentDocumentId(null);
                     this._currentReportId(null);
                     this._currentReportUrl(null);
-                    this._isCachingBuilder(false);
                 };
                 ReportPreview.prototype.startBuild = function () {
                     this._initialize();
@@ -13840,22 +13856,24 @@ var DevExpress;
                     }
                     this._window && this._window.location.replace(uri);
                 };
-                ReportPreview.prototype.getBuildStatus = function (documentId, isCachingBuilder) {
+                ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
                     var deffered = $.Deferred();
                     setTimeout(function () {
                         var ignorePredicate = function () { return _this._closeDocumentRequests[documentId]; };
-                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate, isCachingBuilder)
+                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
                             .done(function (response) { _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
                             .fail(function (error) { _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
                     }, 250);
                     return deffered.promise();
                 };
-                ReportPreview.prototype.getDoGetBuildStatusFunc = function (isCachingBuilder) {
+                ReportPreview.prototype.getDoGetBuildStatusFunc = function () {
                     var preview = this;
                     var doGetBuildStatus = function (documentId) {
-                        var promise = preview.getBuildStatus(documentId, isCachingBuilder);
+                        var promise = preview.getBuildStatus(documentId);
                         promise.done(function (result) {
+                            if (documentId !== preview._currentDocumentId())
+                                return;
                             if (result && result.requestAgain && !preview._stopBuildRequests[documentId] && !preview._closeDocumentRequests[documentId]) {
                                 doGetBuildStatus(documentId);
                             }
@@ -13903,6 +13921,7 @@ var DevExpress;
                             if (_this.editingFieldChanged) {
                                 field.editingFieldChanged = _this.editingFieldChanged;
                             }
+                            _this._editingValuesSubscriptions.push(field.editValue);
                             return field;
                         }));
                     })
@@ -14173,6 +14192,7 @@ var DevExpress;
                     });
                     handlerUri = Report.RequestHelper.generateUri(remoteSettings.serverUri, ReportServerInvokeUri);
                     Preview.searchAvailable(false);
+                    Preview.editablePreviewEnabled(false);
                     Preview.ReportServerDownloadUri = Report.RequestHelper.generateUri(remoteSettings.serverUri, ReportServerExportUri);
                     if (remoteSettings.authToken) {
                         DevExpress.Analytics.Utils.ajaxSetup.ajaxSettings = {
@@ -14532,7 +14552,11 @@ var DevExpress;
                         text: DevExpress.Designer.getLocalization("Highlight Editing Fields", "DevExpress.XtraPrinting.PrintingSystemCommand.HighlightEditingFields"),
                         imageClassName: "dxrp-image-hightlight-editing-fields",
                         disabled: ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; }),
-                        visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                        visible: ko.pureComputed(function () {
+                            var available = Preview.editablePreviewEnabled();
+                            var viewerVisible = reportPreview.previewVisible();
+                            return available && viewerVisible;
+                        }),
                         selected: ko.pureComputed(function () { return reportPreview.editingFieldsHighlighted(); }),
                         hotKey: { ctrlKey: true, keyCode: 72 },
                         clickAction: function () {
@@ -14811,6 +14835,7 @@ var DevExpress;
             })(Preview.CheckState || (Preview.CheckState = {}));
             var CheckState = Preview.CheckState;
             ;
+            Preview.editablePreviewEnabled = ko.observable(true);
             var TextEditingFieldViewModel = (function () {
                 function TextEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
                     var _this = this;
@@ -15650,9 +15675,9 @@ var DevExpress;
         (function (Preview) {
             var MobilePreviewPage = (function (_super) {
                 __extends(MobilePreviewPage, _super);
-                function MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, editingFields, isCachingBuilder) {
+                function MobilePreviewPage(preview, pageIndex, processClick, loading) {
                     var _this = this;
-                    _super.call(this, pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, editingFields);
+                    _super.call(this, preview, pageIndex, processClick, loading);
                     this.selectBrick = function (path, ctrlKey) {
                         var currentBrick = _this.brick();
                         !ctrlKey && _this.resetBrickRecusive(currentBrick);
@@ -15725,8 +15750,8 @@ var DevExpress;
                         }
                     });
                 }
-                MobileReportPreview.prototype.createPage = function (pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, isCachingBuilder) {
-                    return new Preview.MobilePreviewPage(pageIndex, width, height, zoom, documentId, unifier, color, loading, processClick, this._editingFields, isCachingBuilder);
+                MobileReportPreview.prototype.createPage = function (pageIndex, processClick, loading) {
+                    return new Preview.MobilePreviewPage(this, pageIndex, processClick, loading);
                 };
                 MobileReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
                     var _this = this;
@@ -16780,12 +16805,16 @@ var DevExpress;
                 var self = this;
                 var deferred = $.Deferred();
                 var requestOptions = this._options.requestOptions;
-                if (!!requestOptions.getLocalizationAction) {
+                if (requestOptions.getLocalizationAction) {
                     var actionUrl = this._getServerActionUrl(requestOptions.host, requestOptions.getLocalizationAction);
                     $.getJSON(actionUrl)
                         .fail(function (jqXHR, textStatus, errorThrown) {
-                        alert(textStatus + ": " + errorThrown.message);
-                        deferred.reject();
+                        try {
+                            DevExpress.Designer._processError(errorThrown.message, $.Deferred(), jqXHR, textStatus);
+                        }
+                        finally {
+                            deferred.reject();
+                        }
                     }).done(function (localization) {
                         deferred.resolve(localization);
                     });
@@ -17134,26 +17163,34 @@ var DevExpress;
                             return;
                         }
                         var requestOptions = self._options.requestOptions;
-                        if (!!requestOptions) {
+                        var subscription = null;
+                        var applyModel = function () {
+                            self._sender.previewModel = self._createModel(element);
+                            if (requestOptions && requestOptions.invokeAction) {
+                                DevExpress.Report.Preview.HandlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
+                            }
+                            if (self._options.reportUrl) {
+                                if (ko.isSubscribable(self._options.reportUrl)) {
+                                    subscription = self._options.reportUrl.subscribe(function (newVal) {
+                                        self._sender.OpenReport(newVal);
+                                    });
+                                }
+                            }
+                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                                subscription && subscription.dispose();
+                            });
+                            self._applyBindings(self._sender.previewModel, _$element);
+                        };
+                        if (requestOptions) {
                             self._getLocalizationRequest().done(function (localization) {
                                 localization && DevExpress.JS.Localization.addCultureInfo(localization);
+                            }).always(function () {
+                                applyModel();
                             });
-                            DevExpress.Report.Preview.HandlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                         }
-                        self._sender.previewModel = (self._createModel(element));
-                        ;
-                        var subscription = null;
-                        if (!!self._options.reportUrl) {
-                            if (ko.isSubscribable(self._options.reportUrl)) {
-                                subscription = self._options.reportUrl.subscribe(function (newVal) {
-                                    self._sender.OpenReport(newVal);
-                                });
-                            }
+                        else {
+                            applyModel();
                         }
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                            subscription && subscription.dispose();
-                        });
-                        self._applyBindings(self._sender.previewModel, _$element);
                     });
                 };
                 return JSReportViewerBinding;
@@ -17288,7 +17325,7 @@ var DevExpress;
                             return;
                         }
                         this._preview._currentDocumentId(response.documentId);
-                        var doGetBuildStatus = this._preview.getDoGetBuildStatusFunc(this._preview._isCachingBuilder());
+                        var doGetBuildStatus = this._preview.getDoGetBuildStatusFunc();
                         doGetBuildStatus(this._preview._currentDocumentId());
                     }
                     finally {
@@ -17331,7 +17368,7 @@ var DevExpress;
                         }
                         for (var i = 0; i < response.pageCount && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate(); i++) {
                             var createNewPage = function (index) {
-                                return _this._preview.createPage(index, _this._preview._pageWidth, _this._preview._pageHeight, _this._preview._zoom, _this._preview._currentDocumentId, _this._preview._unifier, _this._preview._pageBackColor.peek(), null, _this._preview.createBrickClickProcessor(index), _this._preview._isCachingBuilder());
+                                return _this._preview.createPage(index, _this._preview.createBrickClickProcessor(index));
                             };
                             if (i < this._preview.pages().length) {
                                 var page = this._preview.pages()[i];
@@ -17434,8 +17471,11 @@ var DevExpress;
                         this[name] = handlers[name];
                     }
                 }
-                PreviewRequestWrapper.getPage = function (url) {
-                    return DevExpress.Designer.ajax(url, undefined, undefined, undefined, undefined, { type: "GET" });
+                PreviewRequestWrapper.processError = function (message, jqXHR, textStatus) {
+                    Preview.MessageHandler.processError(message, true);
+                };
+                PreviewRequestWrapper.getPage = function (url, ignoreError) {
+                    return DevExpress.Designer.ajax(url, undefined, undefined, PreviewRequestWrapper.processError, ignoreError, { type: "GET" });
                 };
                 PreviewRequestWrapper.prototype.initialize = function (reportPreview, parametersModel, searchModel) {
                     this._reportPreview = reportPreview;
@@ -17472,10 +17512,9 @@ var DevExpress;
                         parameters: parameters
                     })));
                 };
-                PreviewRequestWrapper.prototype.getBuildStatusRequest = function (documentId, shouldIgnoreError, isCachingBuilder) {
+                PreviewRequestWrapper.prototype.getBuildStatusRequest = function (documentId, shouldIgnoreError) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'getBuildStatus', encodeURIComponent(JSON.stringify({
                         documentId: documentId,
-                        isCachingBuilder: isCachingBuilder,
                         timeOut: Math.max(5000, DevExpress.Report.Preview.TimeOut)
                     })), undefined, shouldIgnoreError);
                 };
@@ -17488,10 +17527,10 @@ var DevExpress;
                         customData: customData,
                         exportOptions: serializedExportOptions,
                         editingFieldValues: editindFields
-                    })), hideMessageFromUser ? undefined : Preview.MessageHandler.processError);
+                    })), hideMessageFromUser ? undefined : PreviewRequestWrapper.processError);
                 };
                 PreviewRequestWrapper.prototype.openReport = function (reportName) {
-                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName), Preview.MessageHandler.processError);
+                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName), PreviewRequestWrapper.processError);
                 };
                 PreviewRequestWrapper.prototype.drillThrough = function (customData) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'drillThrough', encodeURIComponent(JSON.stringify({
@@ -18193,14 +18232,14 @@ var DevExpress;
                     this.onComponentAdded({ parent: dropTarget.getControlModel(), model: control });
                 };
                 FieldListDragDropHandler.prototype._isDefaultBindingAssigned = function (control, treeListItem) {
-                    if (control["defaultDataBinding"] && !isList(treeListItem.data)) {
+                    if (control["hasDefaultBindingProperty"] && !isList(treeListItem.data)) {
                         if (this.dataBindingMode() === Report.DataBindingMode.Bindings) {
-                            var dataBinding = control["defaultDataBinding"];
+                            var dataBinding = control.getDefaultBinding();
                             dataBinding.updateBinding(treeListItem.path, this._dataSources.peek());
                         }
                         else {
                             var dataSourceInfo = Report.getDataSourceDataMember(control);
-                            var expression = control["defaultExpression"];
+                            var expression = control.getDefaultBinding();
                             var path = treeListItem.data instanceof Report.Parameter ? treeListItem.path : new DevExpress.JS.Widgets.PathRequest(treeListItem.path).path;
                             expression.value(getExpressionPath(control, path));
                         }
@@ -18216,7 +18255,7 @@ var DevExpress;
                         var dropTargetControl = dropTarget.getControlModel();
                         var boundedClass = "dxrd-image-ghost-bounded";
                         var dragHelperContent = this.dragHelperContent.controls()[0];
-                        if (dropTargetControl["defaultDataBinding"] && !isList(draggable.data)) {
+                        if (dropTargetControl["hasDefaultBindingProperty"] && !isList(draggable.data)) {
                             if (!this._needToChangeHelperContent(dragHelperContent, boundedClass)) {
                                 var rect = new Designer.Rectangle(12, 12, 12, 12);
                                 rect.className = boundedClass;
@@ -18225,6 +18264,7 @@ var DevExpress;
                                 this.dragHelperContent.setContent(rect);
                             }
                             $(element).draggable("option", "snap", false);
+                            this.snapHelper.deactivateSnapLines();
                             event.altKey = true;
                         }
                         else if (this._needToChangeHelperContent(dragHelperContent, boundedClass)) {
@@ -18404,6 +18444,15 @@ var DevExpress;
                 return ContentByTypeEditor;
             })(DevExpress.JS.Widgets.PropertyGridEditor);
             Report.ContentByTypeEditor = ContentByTypeEditor;
+            var LinesEditor = (function (_super) {
+                __extends(LinesEditor, _super);
+                function LinesEditor() {
+                    _super.apply(this, arguments);
+                    this.collapsed = ko.observable(false);
+                }
+                return LinesEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Report.LinesEditor = LinesEditor;
             var GaugeStyleEditor = (function (_super) {
                 __extends(GaugeStyleEditor, _super);
                 function GaugeStyleEditor(info, level, parentDisabled, textToSearch) {
@@ -19131,7 +19180,7 @@ var DevExpress;
             Report.name = { propertyName: "name", modelName: "@Name", displayName: "Name", localizationId: "DevExpress.XtraReports.UI.XRControl.Name", editor: Report.editorTemplates.name, validationRules: Designer.nameValidationRules };
             Report.displayName = { propertyName: "displayNameObject", modelName: "@DisplayName", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "", displayName: "Display Name", localizationId: "DevExpress.XtraReports.UI.XtraReport.DisplayName" };
             Report.text = { propertyName: "text", modelName: "@Text", defaultVal: "", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text", editor: DevExpress.JS.Widgets.editorTemplates.text };
-            Report.textArea = { propertyName: "textArea", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.stringArray };
+            Report.textArea = { propertyName: "textArea", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text", defaultVal: "", editor: $.extend({}, DevExpress.JS.Widgets.editorTemplates.stringArray, { editorType: Report.LinesEditor }) };
             Report.textTrimming = {
                 propertyName: "textTrimming", modelName: "@TextTrimming", displayName: "Text Trimming", localizationId: "DevExpress.XtraReports.UI.XRControl.TextTrimming", defaultVal: "Character", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 valuesArray: [
@@ -19202,9 +19251,9 @@ var DevExpress;
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 valuesArray: [
                     { value: "None", displayValue: "None", localizationId: "DevExpress.XtraReports.UI.TextFitMode.None" },
-                    { value: "OnlyGrow", displayValue: "Only Grow", localizationId: "DevExpress.XtraReports.UI.TextFitMode.OnlyGrow" },
-                    { value: "OnlyShrink", displayValue: "Only Shrink", localizationId: "DevExpress.XtraReports.UI.TextFitMode.OnlyShrink" },
-                    { value: "GrowAndShrink", displayValue: "Grow And Shrink", localizationId: "DevExpress.XtraReports.UI.TextFitMode.GrowAndShrink" }
+                    { value: "GrowOnly", displayValue: "Grow Only", localizationId: "DevExpress.XtraReports.UI.TextFitMode.GrowOnly" },
+                    { value: "ShrinkOnly", displayValue: "Shrink Only", localizationId: "DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly" },
+                    { value: "ShrinkAndGrow", displayValue: "Shrink And Grow", localizationId: "DevExpress.XtraReports.UI.TextFitMode.ShrinkAndGrow" }
                 ]
             };
             Report.angle = { propertyName: "angle", modelName: "@Angle", defaultVal: 0, from: Designer.floatFromModel, displayName: "Angle", localizationId: "DevExpress.XtraReports.UI.XRLabel.Angle", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
@@ -19265,24 +19314,38 @@ var DevExpress;
                     from: Report.DataBinding.initialize
                 };
             };
-            Report.defaultBindings = function (binding) {
-                var options = typeof binding === "string" ? { propertyName: binding } : binding;
-                return [Report.defaultDataBinding(options), Report.defaultExpression(options)];
+            Report.createSinglePopularBindingInfos = function (propertyName) {
+                return [Report.createPopularBindingInfo({ bindingName: propertyName, propertyName: "" }, false), Report.createPopularBindingInfo({ bindingName: propertyName, propertyName: "" })];
             };
-            Report.defaultDataBinding = function (options) { return ({
-                propertyName: "defaultDataBinding" + (options.createNewProperty ? options.propertyName : ""),
-                displayName: options.createNewProperty && (options.displayName || options.propertyName) || "Data Binding",
-                localizationId: options.localizationId || "ReportStringId.STag_Name_DataBinding",
-                editor: Report.editorTemplates.dataBinding,
-                bindingName: options.propertyName
-            }); };
-            Report.defaultExpression = function (options) { return ({
-                propertyName: "defaultExpression" + (options.createNewProperty ? options.propertyName : ""),
-                displayName: options.customExpressionName || "Expression",
-                localizationId: options.customExpressionLocalizationId || 'DevExpress.XtraReports.UI.CalculatedField.Expression',
-                editor: Report.editorTemplates.reportexpression,
-                expressionName: options.propertyName
-            }); };
+            Report.createPopularBindingInfos = function (options) {
+                var dataBindingOptions = {
+                    propertyName: "popularDataBinding" + options.propertyName,
+                    displayName: options.propertyName,
+                    localizationId: options.localizationId,
+                    bindingName: options.propertyName,
+                };
+                var expressionOptions = {
+                    propertyName: "popularExpression" + options.propertyName,
+                    displayName: options.propertyName,
+                    localizationId: options.localizationId,
+                    bindingName: options.propertyName,
+                };
+                return [Report.createPopularBindingInfo(dataBindingOptions, false), Report.createPopularBindingInfo(expressionOptions)];
+            };
+            Report.createPopularBindingInfo = function (options, isExpression) {
+                if (isExpression === void 0) { isExpression = true; }
+                var newInfo = {
+                    propertyName: options.propertyName || (isExpression ? "popularExpression" : "popularDataBinding"),
+                    displayName: options.displayName || (isExpression ? "Expression" : "Data Binding"),
+                    localizationId: options.localizationId || (isExpression ? "DevExpress.XtraReports.UI.CalculatedField.Expression" : "ReportStringId.STag_Name_DataBinding"),
+                    editor: isExpression ? Report.editorTemplates.reportexpression : Report.editorTemplates.dataBinding,
+                };
+                if (isExpression)
+                    newInfo["expressionName"] = options.bindingName;
+                else
+                    newInfo["bindingName"] = options.bindingName;
+                return newInfo;
+            };
             Report.filterString = { propertyName: "_filterString", modelName: "@FilterString" };
             Report.filterStringEditable = { propertyName: "filterString", displayName: "Filter String", localizationId: "DevExpress.XtraReports.UI.XtraReportBase.FilterString", defaultVal: "", editor: Designer.Widgets.editorTemplates.filterEditor };
             Report.bookmark = { propertyName: "bookmark", modelName: "@Bookmark", displayName: "Bookmark", localizationId: "DevExpress.XtraReports.UI.XRControl.Bookmark", editor: DevExpress.JS.Widgets.editorTemplates.text };
@@ -19494,7 +19557,7 @@ var DevExpress;
                 Report.textEditOptions,
                 Report.autoWidth, Report.anchorVertical, Report.anchorHorizontal, Report.labelScripts, Report.textTrimming,
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark"])
-            ].concat(Report.defaultBindings("Text"), Report.sizeLocation, Report.labelGroup);
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.labelGroup);
             Report.panelSerializationsInfo = [
                 Report.canGrow, Report.canShrink, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag"]),
@@ -19506,20 +19569,12 @@ var DevExpress;
                 Report.serializableRtfString,
                 Report.rtf, Report.textRtf,
                 Report.nullValueText, Report.keepTogetherDefaultValueFalse, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
-                Report.dataBindings(["Bookmark", "Html", "NavigateUrl", "Rtf", "Tag"])
-            ].concat(Report.defaultBindings({
-                propertyName: "Html",
-                displayName: "Html Data Binding",
-                customExpressionName: "Html Expression",
-                customExpressionLocalizationId: "ReportStringId.STag_Name_HtmlExpressionBinding",
-                createNewProperty: true,
-                localizationId: 'ReportStringId.STag_Name_HtmlDataBinding' }), Report.defaultBindings({
-                propertyName: "Rtf",
-                displayName: "Rtf Data Binding",
-                customExpressionName: "Rtf Expression",
-                customExpressionLocalizationId: "ReportStringId.STag_Name_RtfExpressionBinding",
-                createNewProperty: true,
-                localizationId: 'ReportStringId.STag_Name_RtfDataBinding' }), Report.sizeLocation, Report.fontGroup, Report.commonControlProperties, Report.navigationGroup, Report.processGroup, Report.canGrowShrinkGroup);
+                Report.dataBindings(["Bookmark", "Html", "NavigateUrl", "Rtf", "Tag"]),
+                Report.createPopularBindingInfo({ bindingName: "Html", propertyName: "popularDataBindingHtml", displayName: "Html", localizationId: "ReportStringId.STag_Name_HtmlDataBinding" }, false),
+                Report.createPopularBindingInfo({ bindingName: "Html", propertyName: "popularExpressionHtml", displayName: "Html", localizationId: "ReportStringId.STag_Name_HtmlExpressionBinding" }),
+                Report.createPopularBindingInfo({ bindingName: "Rtf", propertyName: "popularDataBindingRtf", displayName: "Rtf", localizationId: "ReportStringId.STag_Name_RtfDataBinding" }, false),
+                Report.createPopularBindingInfo({ bindingName: "Rtf", propertyName: "popularExpressionRtf", displayName: "Rtf", localizationId: "ReportStringId.STag_Name_RtfExpressionBinding" }),
+            ].concat(Report.sizeLocation, Report.fontGroup, Report.commonControlProperties, Report.navigationGroup, Report.processGroup, Report.canGrowShrinkGroup);
             Report.unknownSerializationsInfo = [].concat(Report.baseControlProperties, Report.sizeLocation);
             Report.dataBindingsSerializationInfo = [
                 { propertyName: "ActualValue", editor: Report.editorTemplates.dataBinding, displayName: "Actual Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.ActualValue" },
@@ -19536,8 +19591,8 @@ var DevExpress;
                 { propertyName: "TargetValue", editor: Report.editorTemplates.dataBinding, displayName: "Target Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.TargetValue" },
                 { propertyName: "Text", editor: Report.editorTemplates.dataBinding, displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text" }
             ];
-            Report.popularPropertiesLabel = ["text", "textArea", "defaultDataBinding", "defaultExpression", "textFormatString", "Summary", "angle", "bookmark", "bookmarkParent", "autoWidth", "canGrow", "canShrink", "multiline", "wordWrap"];
-            Report.popularPropertiesRichText = ["rtf", "defaultDataBindingRtf", "defaultExpressionRtf", "html", "defaultDataBindingHtml", "defaultExpressionHtml", "bookmark", "bookmarkParent", "canGrow", "canShrink"];
+            Report.popularPropertiesLabel = ["text", "textArea", "popularDataBinding", "popularExpression", "textFormatString", "Summary", "angle", "bookmark", "bookmarkParent", "autoWidth", "canGrow", "canShrink", "multiline", "wordWrap"];
+            Report.popularPropertiesRichText = ["rtf", "popularDataBindingRtf", "popularExpressionRtf", "html", "popularDataBindingHtml", "popularExpressionHtml", "bookmark", "bookmarkParent", "canGrow", "canShrink"];
             Report.rtlLayout = {
                 propertyName: "rtlLayout", modelName: "@RightToLeftLayout", displayName: "Right To Left Layout", localizationId: "DevExpress.XtraReports.UI.XtraReport.RightToLeftLayout", defaultVal: "No", editor: Report.editorTemplates.reportRtlProperty,
                 valuesArray: [
@@ -19846,31 +19901,30 @@ var DevExpress;
                     }
                     _super.prototype.addChild.call(this, control);
                 };
-                ReportElementViewModel.prototype.initDataBindingProperty = function (name) {
-                    var defaultBinding = this.getInfo().filter(function (value) {
-                        return name ? value["bindingName"] && value["bindingName"] === name : value["bindingName"];
-                    })[0];
-                    if (defaultBinding) {
-                        this[defaultBinding.propertyName] = this.dataBindings()["findBinding"](defaultBinding["bindingName"]);
-                    }
-                };
-                ReportElementViewModel.prototype.initExpressionProperty = function (name) {
+                ReportElementViewModel.prototype.initDataBindingProperties = function () {
                     var _this = this;
-                    if (this.expressionBindings) {
-                        this.expressionObj = this.getControlFactory()._createExpressionObject(this.controlType, this.expressionBindings, ko.pureComputed(function () {
-                            return _this.getPath("expression");
-                        }), this["Summary"] && this["Summary"]["Running"] && ko.computed(function () { return _this["Summary"]["Running"]() != "None"; }));
-                        var expressionInfo = this.getInfo().filter(function (value) {
-                            return name ? value["expressionName"] && value["expressionName"] === name : value["expressionName"];
-                        })[0];
-                        if (expressionInfo && this.expressionObj) {
-                            this[expressionInfo.propertyName] = this.expressionObj().getExpression(expressionInfo["expressionName"], "BeforePrint");
-                        }
-                    }
+                    var bindingInfos = this.getInfo().filter(function (info) { return "bindingName" in info; });
+                    bindingInfos.forEach(function (info) {
+                        _this[info.propertyName] = _this.dataBindings()["findBinding"](info["bindingName"]);
+                    });
                 };
-                ReportElementViewModel.prototype.initBindings = function (name) {
-                    this.initDataBindingProperty(name);
-                    this.initExpressionProperty(name);
+                ReportElementViewModel.prototype.initExpressionProperties = function () {
+                    var _this = this;
+                    if (!this.expressionBindings)
+                        return;
+                    this.expressionObj = this.getControlFactory()._createExpressionObject(this.controlType, this.expressionBindings, ko.pureComputed(function () {
+                        return _this.getPath("expression");
+                    }), this["Summary"] && this["Summary"]["Running"] && ko.computed(function () { return _this["Summary"]["Running"]() != "None"; }));
+                    if (!this.expressionObj)
+                        return;
+                    var expressionInfos = this.getInfo().filter(function (info) { return "expressionName" in info; });
+                    expressionInfos.forEach(function (info) {
+                        _this[info.propertyName] = _this.expressionObj().getExpression(info["expressionName"], "BeforePrint");
+                    });
+                };
+                ReportElementViewModel.prototype.initBindings = function () {
+                    this.initDataBindingProperties();
+                    this.initExpressionProperties();
                 };
                 ReportElementViewModel.prototype.isStyleProperty = function (propertyName) {
                     var _this = this;
@@ -19920,10 +19974,10 @@ var DevExpress;
                         return name !== "dataBindings"
                             && name !== "formattingRuleLinks"
                             && name !== "formattingRuleSheet"
-                            && name.indexOf("defaultDataBinding") !== 0;
+                            && name.indexOf("popularDataBinding") !== 0;
                     }
                     else {
-                        return name.indexOf("defaultExpression") !== 0;
+                        return name.indexOf("popularExpression") !== 0;
                     }
                     return true;
                 };
@@ -20157,6 +20211,13 @@ var DevExpress;
                     }
                     return !!(this.expressionBindings && this.expressionBindings().filter(function (binding) { return binding.propertyName() === property; }).length > 0);
                 };
+                Object.defineProperty(ControlViewModel.prototype, "hasDefaultBindingProperty", {
+                    get: function () {
+                        return !!this.getControlInfo().defaultBindingName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 ControlViewModel.prototype.getExpressionBinding = function (property, event) {
                     if (property === void 0) { property = "Text"; }
                     if (event === void 0) { event = "BeforePrint"; }
@@ -20164,6 +20225,18 @@ var DevExpress;
                         return null;
                     var binding = this.expressionBindings().filter(function (binding) { return binding.propertyName() === property && binding.eventName() === event; })[0];
                     return binding && binding.expression();
+                };
+                ControlViewModel.prototype.getControlInfo = function () {
+                    return _super.prototype.getControlInfo.call(this);
+                };
+                ControlViewModel.prototype.getDefaultBinding = function () {
+                    var bindingName = this.getControlInfo().defaultBindingName;
+                    if (this.dataBindingMode !== Report.DataBindingMode.Bindings) {
+                        return this.expressionObj().getExpression(bindingName, "BeforePrint");
+                    }
+                    else {
+                        return this.dataBindings().filter(function (x) { return x.propertyName() === bindingName; })[0];
+                    }
                 };
                 return ControlViewModel;
             })(Report.ReportElementViewModel);
@@ -20373,8 +20446,30 @@ var DevExpress;
             var ControlSurface = (function (_super) {
                 __extends(ControlSurface, _super);
                 function ControlSurface(control, context) {
+                    var _this = this;
                     _super.call(this, control, context, ControlSurface._unitProperties);
                     this["multiline"] = control["multiline"] || false;
+                    this.getUsefulRect = function () {
+                        var borderWidth = ko.unwrap(control["borderWidth"]), borderFlags = control["borders"]();
+                        var rect = { top: 0, left: 0, width: _this.rect().width, height: _this.rect().height };
+                        if (borderWidth) {
+                            if (borderFlags === "All") {
+                                rect.height -= 2 * borderWidth;
+                                rect.width -= 2 * borderWidth;
+                            }
+                            else {
+                                if (borderFlags.indexOf("Top") >= 0)
+                                    rect.height -= borderWidth;
+                                if (borderFlags.indexOf("Right") >= 0)
+                                    rect.width -= borderWidth;
+                                if (borderFlags.indexOf("Bottom") >= 0)
+                                    rect.height -= borderWidth;
+                                if (borderFlags.indexOf("Left") >= 0)
+                                    rect.width -= borderWidth;
+                            }
+                        }
+                        return rect;
+                    };
                 }
                 ControlSurface._unitProperties = {
                     _height: function (o) {
@@ -23360,7 +23455,8 @@ var DevExpress;
                             return _this.root.size.width() - (_this.root["margins"] ? ((_this.root["margins"].left && _this.root["margins"].left()) + (_this.root["margins"].right && _this.root["margins"].right())) : 0);
                         }, write: function (newVal) { return void 0; }
                     });
-                    this.size.isPropertyDisabled = function (name) { return name === "width"; };
+                    this.size.isPropertyDisabled = function (name) { return name === "width" || name === "height" && ko.unwrap(DevExpress.Designer.Report.controlsFactory.getPropertyInfo("DetailBand", "Height").disabled); };
+                    this.size.isPropertyVisible = function (name) { return name !== "height" || ko.unwrap(DevExpress.Designer.Report.controlsFactory.getPropertyInfo("DetailBand", "Height").visible) !== false; };
                 };
                 BandViewModel.prototype.removeChild = function (control) {
                     if (control instanceof BandViewModel) {
@@ -23577,6 +23673,18 @@ var DevExpress;
                         var minHeight = _this.heightFromControls() + _this.subBandsHeight();
                         return minHeight || 1;
                     });
+                    this.getUsefulRect = function () {
+                        var usefulWidth = _this.rect().width;
+                        if (_this["grayAreaWidth"] && _this["grayAreaWidth"]()) {
+                            usefulWidth -= _this["grayAreaWidth"]() + _this["columnSpacing"]();
+                        }
+                        else {
+                            var margins = _this.getControlModel().root["margins"];
+                            var farMarginWidth = margins ? (_this._context.rtl() ? margins.left && margins.left() : margins.right && margins.right()) || 0 : 0;
+                            usefulWidth -= Designer.unitsToPixel(farMarginWidth, _this._context.measureUnit(), _this._context.zoom());
+                        }
+                        return { top: 0, left: 0, width: usefulWidth, height: _this.rect().height };
+                    };
                 }
                 BandSurface.prototype.markerClick = function (selection) {
                     if (selection.expectClick) {
@@ -23650,7 +23758,7 @@ var DevExpress;
             })(Designer.SurfaceElementBase);
             Report.BandSurface = BandSurface;
             var multiColumnSerializationsInfo = [
-                { propertyName: "columnCount", modelName: "@ColumnCount", displayName: "Column Count", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric },
+                { propertyName: "columnCount", modelName: "@ColumnCount", displayName: "Column Count", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
                 { propertyName: "columnWidth", modelName: "@ColumnWidth", displayName: "Column Width", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnWidth", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
                 { propertyName: "columnSpacing", modelName: "@ColumnSpacing", displayName: "Column Spacing", localizationId: "DevExpress.XtraReports.UI.MultiColumn.ColumnSpacing", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric, from: Designer.floatFromModel },
                 {
@@ -23812,9 +23920,6 @@ var DevExpress;
                             _this.checkState("Unchecked");
                         }
                     }));
-                    ["Text", "CheckState"].forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 return CheckBoxViewModel;
             })(Report.ControlViewModel);
@@ -23886,8 +23991,8 @@ var DevExpress;
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark", "CheckState"]),
                 Report.rtl,
                 Report.chekEditOptions
-            ].concat(Report.defaultBindings({ propertyName: "CheckState", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState", createNewProperty: true }), Report.defaultBindings({ propertyName: "Text", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.Text", createNewProperty: true }), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup);
-            Report.popularPropertiesCheckBox = ["checkState", "defaultDataBindingCheckState", "defaultExpressionCheckState", "text", "defaultDataBindingText", "defaultExpressionText", "bookmark", "bookmarkParent"];
+            ].concat(Report.createPopularBindingInfos({ propertyName: "CheckState", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState" }), Report.createPopularBindingInfos({ propertyName: "Text", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.Text" }), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup);
+            Report.popularPropertiesCheckBox = ["checkState", "popularDataBindingCheckState", "popularExpressionCheckState", "text", "popularDataBindingText", "popularExpressionText", "bookmark", "bookmarkParent"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -24860,7 +24965,7 @@ var DevExpress;
                     { value: "Name", displayValue: "Name", localizationId: "DevExpress.XtraPivotGrid.DataFieldNaming.Name" }
                 ]
             }, rowHeaderWidth = { propertyName: "rowHeaderWidth", modelName: "@RowHeaderWidth", displayName: "Row Header Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.RowHeaderWidth", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataFieldEx.RowValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, optionsDataFieldInfo = [area, areaIndex, Designer.Pivot.caption, columnValueLineCount, fieldNaming, rowHeaderWidth, rowValueLineCount], optionsDataField = { propertyName: "optionsDataField", modelName: "OptionsDataField", displayName: "Data Field Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsDataField", info: optionsDataFieldInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnFieldValues = { propertyName: "printColumnFieldValues", modelName: "@PrintColumnFieldValues", displayName: "Print Column FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeadersOnEveryPage = { propertyName: "printRowHeadersOnEveryPage", modelName: "@PrintRowHeadersOnEveryPage", displayName: "Print Row Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowFieldValues = { propertyName: "printRowFieldValues", modelName: "@PrintRowFieldValues", displayName: "Print Row FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
+            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, columnHeaderPaddingBottom = { propertyName: "columnHeaderPaddingBottom", modelName: "@ColumnHeaderPaddingBottom", displayName: "Column Header Padding Bottom", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnHeaderPaddingBottom", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnFieldValues = { propertyName: "printColumnFieldValues", modelName: "@PrintColumnFieldValues", displayName: "Print Column FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeadersOnEveryPage = { propertyName: "printRowHeadersOnEveryPage", modelName: "@PrintRowHeadersOnEveryPage", displayName: "Print Row Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowFieldValues = { propertyName: "printRowFieldValues", modelName: "@PrintRowFieldValues", displayName: "Print Row FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, columnHeaderPaddingBottom, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
                 printHeadersOnEveryPage, printHorzLines, printRowFieldValues, printRowHeaders, printRowHeadersOnEveryPage, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var columnTotalsLocation = { propertyName: "columnTotalsLocation", modelName: "@ColumnTotalsLocation", displayName: "Column Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ColumnTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Near" }, { value: "Far", displayValue: "Far ", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Far" }] }, groupFieldsInCustomizationWindow = { propertyName: "groupFieldsInCustomizationWindow", modelName: "@GroupFieldsInCustomizationWindow", displayName: "Group Fields in the Customization Window", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsView.GroupFieldsInCustomizationWindow", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, rowTotalsLocation = {
                 propertyName: "rowTotalsLocation", modelName: "@RowTotalsLocation", displayName: "Row Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.RowTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
@@ -24972,9 +25077,6 @@ var DevExpress;
                             _this.imageUrl(Report.imageUrl.defaultVal);
                         }
                     }));
-                    ["Image", "ImageUrl"].forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 Object.defineProperty(XRPictureBoxViewModel.prototype, "isAutoSize", {
                     get: function () {
@@ -25068,9 +25170,9 @@ var DevExpress;
             };
             Report.pictureBoxSerializationsInfo = [
                 Report.image, Report.imageUrl, Report.sizing, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts,
-                Report.dataBindings(["Bookmark", "Image", "ImageUrl", "NavigateUrl", "Tag"])
-            ].concat(Report.defaultBindings({ propertyName: "Image", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image", createNewProperty: true }), Report.defaultBindings({ propertyName: "ImageUrl", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl", createNewProperty: true }), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup, Report.processGroup);
-            Report.popularPropertiesPicture = ["image", "defaultDataBindingImage", "defaultExpressionImage", "imageUrl", "defaultDataBindingImageUrl", "defaultExpressionImageUrl", "sizing", "bookmark", "bookmarkParent"];
+                Report.dataBindings(["Bookmark", "Image", "ImageUrl", "NavigateUrl", "Tag"]),
+            ].concat(Report.createPopularBindingInfos({ propertyName: "Image", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image" }), Report.createPopularBindingInfos({ propertyName: "ImageUrl", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl" }), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup, Report.processGroup);
+            Report.popularPropertiesPicture = ["image", "popularDataBindingImage", "popularExpressionImage", "imageUrl", "popularDataBindingImageUrl", "popularExpressionImageUrl", "sizing", "bookmark", "bookmarkParent"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -25146,7 +25248,7 @@ var DevExpress;
                         "@HeigthF": selectedRowHeight,
                     }, this), indexSelectedRow = this.rows.indexOf(selectedRow);
                     selectedRow.cells().forEach(function (cell) {
-                        newRow.createChild({ "@ControlType": "XRTableCell", "@Weight": cell.weight(), "@Padding": "2,2,0,0,100" });
+                        newRow.createChild({ "@ControlType": "XRTableCell", "@Weight": cell.weight(), "@Padding": "2,2,0,0,100", "@Multiline": "true" });
                     });
                     this.addChild(newRow, indexSelectedRow + (isRowAbove ? 0 : 1));
                     this.size.height(this.size.height() + selectedRowHeight);
@@ -25265,7 +25367,7 @@ var DevExpress;
                     }
                 };
                 TableRowViewModel.prototype.insertCellCopy = function (selectedCell, isRight) {
-                    var newCellWeight = selectedCell.weight() / 2, newCell = new TableCellViewModel({ "@ControlType": "XRTableCell", "@Weight": newCellWeight, "@Padding": selectedCell.padding() }, this), indexSelectedCell = this.cells.indexOf(selectedCell);
+                    var newCellWeight = selectedCell.weight() / 2, newCell = new TableCellViewModel({ "@ControlType": "XRTableCell", "@Weight": newCellWeight, "@Padding": selectedCell.padding(), "@Multiline": "true" }, this), indexSelectedCell = this.cells.indexOf(selectedCell);
                     this.addChild(newCell, indexSelectedCell + (isRight ? 1 : 0));
                     if (newCell["text"]) {
                         newCell["text"](newCell.name());
@@ -25575,6 +25677,26 @@ var DevExpress;
                         var hasRowSpan = _this.rowSpan() > 1;
                         return hasRowSpan && (_this.selected() || _this.focused()) && 2 || hasRowSpan && 1 || null;
                     };
+                    this.getUsefulRect = function () {
+                        var borderWidth = ko.unwrap(control["borderWidth"]), borderFlags = control.borders();
+                        var rect = { top: 0, left: 0, width: _this.rect().width, height: _this.rect().height };
+                        if (borderWidth) {
+                            var allBorders = borderFlags === "All";
+                            if ((allBorders || borderFlags.indexOf("Top") >= 0) && _this._isShowBorder("Top")) {
+                                rect.top += borderWidth;
+                                rect.height -= borderWidth;
+                            }
+                            if (allBorders || borderFlags.indexOf("Right") >= 0)
+                                rect.width -= borderWidth;
+                            if (allBorders || borderFlags.indexOf("Bottom") >= 0)
+                                rect.height -= borderWidth;
+                            if ((allBorders || borderFlags.indexOf("Left") >= 0) && _this._isShowBorder("Left")) {
+                                rect.left += borderWidth;
+                                rect.width -= borderWidth;
+                            }
+                        }
+                        return rect;
+                    };
                 }
                 TableCellSurface.prototype._getAdjacentCellByRowIndex = function (rowIndex) {
                     var nextRow = this._table.rows()[rowIndex];
@@ -25644,17 +25766,17 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Insert Row Above",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
+                            displayText: function () { return Designer.getLocalization("Insert Row Above", "ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove"); },
                             imageClassName: "dxrd-image-actions-insert_row_above",
                             clickAction: function () { _this.insertRowAbove(); },
                         }, {
                             text: "Insert Row Below",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow',
+                            displayText: function () { return Designer.getLocalization("Insert Row Below", "ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow"); },
                             imageClassName: "dxrd-image-actions-insert_row_below",
                             clickAction: function () { _this.insertRowBelow(); },
                         }, {
                             text: "Delete Row",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
+                            displayText: function () { return Designer.getLocalization("Delete Row", "ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow"); },
                             imageClassName: "dxrd-image-actions-delete_row",
                             clickAction: function () { _this.deleteRow(); },
                         }
@@ -25697,50 +25819,44 @@ var DevExpress;
                     _super.prototype.initActions.call(this, [
                         {
                             text: "Insert Row Above",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove',
+                            displayText: function () { return Designer.getLocalization("Insert Row Above", "ASPxReportsStringId.ReportDesigner_TableActions_InsertRowAbove"); },
                             imageClassName: "dxrd-image-actions-insert_row_above",
                             clickAction: function () { _this.insertRowAbove(); },
                         }, {
                             text: "Insert Row Below",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow',
+                            displayText: function () { return Designer.getLocalization("Insert Row Below", "ASPxReportsStringId.ReportDesigner_TableActions_InsertRowBelow"); },
                             imageClassName: "dxrd-image-actions-insert_row_below",
                             clickAction: function () { _this.insertRowBelow(); },
                         }, {
                             text: "Delete Row",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow',
+                            displayText: function () { return Designer.getLocalization("Delete Row", "ASPxReportsStringId.ReportDesigner_TableActions_DeleteRow"); },
                             imageClassName: "dxrd-image-actions-delete_row",
                             clickAction: function () { _this.deleteRow(); },
                         }, {
                             text: "Insert Cell",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertCell',
+                            displayText: function () { return Designer.getLocalization("Insert Cell", "ASPxReportsStringId.ReportDesigner_TableActions_InsertCell"); },
                             imageClassName: "dxrd-image-actions-insert_cell",
                             clickAction: function () { _this.insertCell(); },
                         }, {
                             text: "Delete Cell",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteCell',
+                            displayText: function () { return Designer.getLocalization("Delete Cell", "ASPxReportsStringId.ReportDesigner_TableActions_DeleteCell"); },
                             imageClassName: "dxrd-image-actions-delete_cell",
                             clickAction: function () { _this.deleteCell(); },
                         }, {
                             text: "Insert Column To Left",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToLeft',
+                            displayText: function () { return Designer.getLocalization("Insert Column To Left", "ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToLeft"); },
                             imageClassName: "dxrd-image-actions-insert_column_to_left",
                             clickAction: function () { _this.insertColumn(false); },
                         }, {
                             text: "Insert Column To Right",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToRight',
+                            displayText: function () { return Designer.getLocalization("Insert Column To Right", "ASPxReportsStringId.ReportDesigner_TableActions_InsertColumnToRight"); },
                             imageClassName: "dxrd-image-actions-insert_column_to_right",
                             clickAction: function () { _this.insertColumn(true); },
                         }, {
                             text: "Delete Column",
-                            textId: 'ASPxReportsStringId.ReportDesigner_TableActions_DeleteColumn',
+                            displayText: function () { return Designer.getLocalization("Delete Column", "ASPxReportsStringId.ReportDesigner_TableActions_DeleteColumn"); },
                             imageClassName: "dxrd-image-actions-delete_column",
                             clickAction: function () { _this.deleteColumn(); },
-                        }, {
-                            text: "Fit Text Size By Control",
-                            displayText: function () { return Designer.getLocalization("Fit Text To Bounds", 'TODO'); },
-                            imageClassName: "dxrd-image-actions-align_to_grid",
-                            disabled: ko.computed(function () { return _this._inaccessibleFitTextToBoundsAction(); }),
-                            clickAction: function () { _this._cellSurface.fitTextToBounds(); }
                         }
                     ]);
                 }
@@ -25773,11 +25889,6 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
-                TableCellActions.prototype._inaccessibleFitTextToBoundsAction = function () {
-                    if (this._cellSurface && this._cellSurface.getText && this._cellSurface.getText() === "")
-                        return true;
-                    return !!(this._cellSurface && this._cellSurface.hasDataBindingByName && this._cellSurface.hasDataBindingByName("Text"));
-                };
                 TableCellActions.prototype.insertCell = function () {
                     this._row.insertCellCopy(this._cell, false);
                 };
@@ -25809,12 +25920,14 @@ var DevExpress;
                     this._selectionProvider = selectionProvider;
                     this._distributeColumnsAction = {
                         text: "Distribute Columns Evenly",
-                        imageClassName: "dxrd-image-actions-align_to_grid",
+                        displayText: function () { return Designer.getLocalization("Distribute Columns Evenly", "ReportStringId.Cmd_TableDistributeColumnsEvenly"); },
+                        imageClassName: "dxrd-image-actions-distribute_columns_evenly",
                         clickAction: function () { _this._distributeColumns(); }
                     };
                     this._distributeRowsAction = {
                         text: "Distribute Rows Evenly",
-                        imageClassName: "dxrd-image-actions-align_to_grid",
+                        displayText: function () { return Designer.getLocalization("Distribute Rows Evenly", "ReportStringId.Cmd_TableDistributeRowsEvenly"); },
+                        imageClassName: "dxrd-image-actions-distribute_rows_evenly",
                         clickAction: function () { _this._distributeRows(); }
                     };
                     _super.prototype.initActions.call(this, [
@@ -25977,14 +26090,14 @@ var DevExpress;
                 { propertyName: "controls", modelName: "Controls", array: true },
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark"]),
                 Report.textEditOptions
-            ].concat(Report.defaultBindings("Text"), Report.labelGroup);
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.labelGroup);
             Report.tableRowSerializationsInfo = [
                 Report.weight, Report.textAlignment, Report.keepTogether, Report.controlScripts,
                 { propertyName: "height", displayName: "Height", localizationId: "DevExpress.XtraReports.UI.XRControl.Height" },
                 { propertyName: "cells", modelName: "Cells", array: true },
             ].concat(Report.commonControlProperties, Report.fontGroup);
             Report.popularPropertiesTable = ["bookmark", "bookmarkParent"];
-            Report.popularPropertiesTableCell = ["text", "textArea", "defaultDataBinding", "defaultExpression", "textFormatString", "Summary", "canGrow", "canShrink", "multiline", "wordWrap"];
+            Report.popularPropertiesTableCell = ["text", "textArea", "popularDataBinding", "popularExpression", "textFormatString", "Summary", "canGrow", "canShrink", "multiline", "wordWrap"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -26688,8 +26801,8 @@ var DevExpress;
                 $.extend({}, Report.textAlignment, { defaultVal: "BottomLeft" }),
                 Report.textControlScripts, Report.barcodeFake,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag", "Text"]),
-            ].concat(Report.defaultBindings("Text"), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup, Report.processGroup);
-            Report.popularPropertiesBarCode = ["barcodeFake", "module", "autoModule", "barCodeOrientation", "text", "defaultDataBinding", "defaultExpression", "textFormatString", "bookmark", "bookmarkParent", "showText"];
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup, Report.processGroup);
+            Report.popularPropertiesBarCode = ["barcodeFake", "module", "autoModule", "barCodeOrientation", "text", "popularDataBinding", "popularExpression", "textFormatString", "bookmark", "bookmarkParent", "showText"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -26730,8 +26843,8 @@ var DevExpress;
                 Report.foreColor, Report.segmentWidth, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
                 $.extend({}, Report.text, { defaultVal: "0" }, Report.textFormatString),
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag", "Text"])
-            ].concat(Report.defaultBindings("Text"), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
-            Report.popularPropertiesZipCode = ["text", "defaultDataBinding", "defaultExpression", "segmentWidth", "bookmark", "bookmarkParent"];
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
+            Report.popularPropertiesZipCode = ["text", "popularDataBinding", "popularExpression", "segmentWidth", "bookmark", "bookmarkParent"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -26749,9 +26862,6 @@ var DevExpress;
                     this._disposables.push(this.viewType.subscribe(function (val) {
                         return _this.viewStyle(val === "Circular" ? Report.circularValues[0].value : Report.linearValues[0].value);
                     }));
-                    XRGaugeViewModel.bindings.forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 XRGaugeViewModel.prototype.getInfo = function () {
                     var viewStyleProperty = Report.xrGaugeSerializationInfo.filter(function (info) { return info.propertyName === "viewStyle"; })[0];
@@ -26798,10 +26908,14 @@ var DevExpress;
             Report.xrGaugeSerializationInfo = [
                 Report.viewStyle, Report.viewTheme, Report.viewType, Report.actualValue, Report.tickmarkCount, Report.maximum, Report.minimum, Report.targetValue, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts, Report.imageType,
                 Report.dataBindings(["ActualValue", "Bookmark", "Maximum", "Minimum", "NavigateUrl", "Tag", "TargetValue"])
-            ].concat(XRGaugeViewModel.bindings.map(function (name) { return Report.defaultBindings({ propertyName: name, localizationId: "DevExpress.XtraReports.UI.XRGauge." + name, createNewProperty: true }); }).reduce(function (a, b) { return a.concat(b); }))
+            ].concat(XRGaugeViewModel.bindings
+                .map(function (name) {
+                return Report.createPopularBindingInfos({ propertyName: name, localizationId: "DevExpress.XtraReports.UI.XRGauge." + name });
+            })
+                .reduce(function (a, b) { return a.concat(b); }))
                 .concat(Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
-            Report.popularPropertiesGauge = ["viewType", "viewStyle", "viewTheme", "actualValue", "defaultDataBindingActualValue", "defaultExpressionActualValue", "targetValue", "defaultDataBindingTargetValue", "defaultExpressionTargetValue",
-                "minimum", "defaultDataBindingMinimum", "defaultExpressionMinimum", "maximum", "defaultDataBindingMaximum", "defaultExpressionMaximum"];
+            Report.popularPropertiesGauge = ["viewType", "viewStyle", "viewTheme", "actualValue", "popularDataBindingActualValue", "popularExpressionActualValue", "targetValue", "popularDataBindingTargetValue", "popularExpressionTargetValue",
+                "minimum", "popularDataBindingMinimum", "popularExpressionMinimum", "maximum", "popularDataBindingMaximum", "popularExpressionMaximum"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -27573,7 +27687,7 @@ var DevExpress;
             Report.parameterBindings = { propertyName: "parameterBindings", modelName: "ParameterBindings", displayName: "Parameter Bindings", localizationId: "DevExpress.XtraReports.UI.XRSubreport.ParameterBindings", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.ParameterBinding.createNew, template: '#dxrd-commonCollectionItem' };
             var subreportProperties = Report.commonControlProperties.filter(function (item) { return item !== Report.tag && item !== Report.canPublish; });
             Report.subreportSerializationsInfo = [
-                Report.reportSource, Report.reportSourceUrl, Report.subreportScripts, Report.parameterBindings
+                Report.reportSource, Report.reportSourceUrl, Report.subreportScripts, Report.parameterBindings, Report.bookmarkParent
             ].concat(Report.sizeLocation, subreportProperties, Report.canGrowShrinkGroup);
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
@@ -27857,6 +27971,10 @@ var DevExpress;
                 function XRCharacterComb(control, parent, serializer) {
                     var _this = this;
                     _super.call(this, control, parent, serializer);
+                    var _originalCellWidth = this.cellWidth;
+                    var _originalCellHeight = this.cellHeight;
+                    this.cellWidth = this._createCellSideFromOriginalSide(_originalCellWidth, false);
+                    this.cellHeight = this._createCellSideFromOriginalSide(_originalCellHeight, true);
                     var fontModel = new DevExpress.JS.Widgets.FontModel(this.font);
                     var borderWidth = ko.computed(function () {
                         if (_this["borders"]() && _this["borders"]() !== "None") {
@@ -27867,28 +27985,20 @@ var DevExpress;
                         }
                     });
                     var textSizeHelper = new Report.TextElementSizeHelper();
+                    this.autoCellSide = ko.observable(this.cellHeight());
                     ko.computed(function () {
-                        var characterHeight = textSizeHelper.getTextContainerSize("a", {
-                            "font-size": fontModel.size() + fontModel.unit(),
-                            "font-family": fontModel.family(),
-                            "height": "auto",
-                            "width": "auto"
-                        }).height;
-                        var side = characterHeight * 1.5 + 2 * borderWidth();
-                        if (_this.parentModel()) {
-                            side = Designer.pixelToUnits(side, _this.parentModel().root["measureUnit"](), 1);
-                        }
-                        switch (_this.sizeMode()) {
-                            case "AutoSize":
-                                _this.cellHeight(side);
-                                _this.cellWidth(side);
-                                break;
-                            case "AutoWidth":
-                                _this.cellWidth(side);
-                                break;
-                            case "AutoHeight":
-                                _this.cellHeight(side);
-                                break;
+                        if (_this.sizeMode() !== "Custom") {
+                            var characterHeight = textSizeHelper.getTextContainerSize("a", {
+                                "font-size": fontModel.size() + fontModel.unit(),
+                                "font-family": fontModel.family(),
+                                "height": "auto",
+                                "width": "auto"
+                            }, 0).height;
+                            var side = characterHeight * 1.5 + 2 * borderWidth();
+                            if (_this.parentModel()) {
+                                side = Designer.pixelToUnits(side, _this.parentModel().root["measureUnit"](), 1);
+                            }
+                            _this.autoCellSide(side);
                         }
                     });
                 }
@@ -27903,6 +28013,29 @@ var DevExpress;
                         return this.sizeMode() === "AutoSize" || this.sizeMode() === "AutoHeight";
                     }
                     _super.prototype.isPropertyDisabled.call(this, name);
+                };
+                XRCharacterComb.prototype._createCellSideFromOriginalSide = function (originalCellSide, isHeight) {
+                    var _this = this;
+                    return ko.pureComputed({
+                        read: function () {
+                            switch (_this.sizeMode()) {
+                                case "AutoSize":
+                                    return null;
+                                case "AutoWidth":
+                                    return isHeight ? originalCellSide() : null;
+                                    ;
+                                case "AutoHeight":
+                                    return !isHeight ? originalCellSide() : null;
+                                case "Custom":
+                                    return originalCellSide();
+                            }
+                        },
+                        write: function (val) { originalCellSide(val); }
+                    });
+                };
+                XRCharacterComb.prototype.roundSize = function () {
+                    this.size.width(Math.ceil(this.size.width()));
+                    this.size.height(Math.ceil(this.size.height()));
                 };
                 XRCharacterComb.unitProperties = ["cellWidth", "cellHeight", "verticalSpacing", "horizontalSpacing"];
                 return XRCharacterComb;
@@ -27932,10 +28065,10 @@ var DevExpress;
                     });
                     this.cellSize = {
                         width: ko.computed(function () {
-                            return Designer.unitsToPixel(control.cellWidth(), context.measureUnit(), 1);
+                            return Designer.unitsToPixel(control.cellWidth() || control.autoCellSide(), context.measureUnit(), 1);
                         }),
                         height: ko.computed(function () {
-                            return Designer.unitsToPixel(control.cellHeight(), context.measureUnit(), 1);
+                            return Designer.unitsToPixel(control.cellHeight() || control.autoCellSide(), context.measureUnit(), 1);
                         }),
                         isPropertyDisabled: function (name) { return false; }
                     };
@@ -27958,8 +28091,8 @@ var DevExpress;
                     this.vertical = ko.computed(function () {
                         var _borderWidth = _this._getBorderWidthBySpacing(_this.verticalSpacing()) * context.zoom();
                         var fullCellHeight = _this.fullCellHeight() * context.zoom();
-                        var vertical = Math.floor((_this.rect().height - _borderWidth) / fullCellHeight);
-                        if (_this._roundTwoDesimals(_this.rect().height - (vertical * fullCellHeight + _borderWidth)) >= _this._roundTwoDesimals(_this.cellSize.height() * context.zoom() - _borderWidth)) {
+                        var vertical = Math.floor(_this._roundingTwoDecimals((_this.rect().height - _borderWidth) / fullCellHeight));
+                        if (_this._roundingTwoDecimals(_this.rect().height - (vertical * fullCellHeight + _borderWidth)) >= _this._roundingTwoDecimals(_this.cellSize.height() * context.zoom() - _borderWidth)) {
                             vertical += 1;
                         }
                         return vertical;
@@ -27967,8 +28100,8 @@ var DevExpress;
                     this.horizontal = ko.computed(function () {
                         var _borderWidth = _this._getBorderWidthBySpacing(_this.horizontalSpacing()) * context.zoom();
                         var fullCellWidth = _this.fullCellWidth() * context.zoom();
-                        var horizontal = Math.floor((_this.rect().width - _borderWidth) / fullCellWidth);
-                        if (_this._roundTwoDesimals(_this.rect().width - (horizontal * fullCellWidth + _borderWidth)) >= _this._roundTwoDesimals(_this.cellSize.width() * context.zoom() - _borderWidth)) {
+                        var horizontal = Math.floor(_this._roundingTwoDecimals((_this.rect().width - _borderWidth) / fullCellWidth));
+                        if (_this._roundingTwoDecimals(_this.rect().width - (horizontal * fullCellWidth + _borderWidth)) >= _this._roundingTwoDecimals(_this.cellSize.width() * context.zoom() - _borderWidth)) {
                             horizontal += 1;
                         }
                         return horizontal;
@@ -28031,7 +28164,7 @@ var DevExpress;
                         return Report.CharacterCombHelper.getTextOffset(texts, position, alignments.vertical, alignments.horizontal, _this.vertical.peek(), _this.horizontal.peek());
                     });
                 };
-                XRCharacterCombSurface.prototype._roundTwoDesimals = function (val) {
+                XRCharacterCombSurface.prototype._roundingTwoDecimals = function (val) {
                     return Math.round(val * 100) / 100;
                 };
                 XRCharacterCombSurface.prototype._getBorderWidthBySpacing = function (spacing) {
@@ -28056,8 +28189,8 @@ var DevExpress;
                         var newCellsLefts = newCells.filter(function (cell) { return !cell.isEmpty; }).map(function (cell) { return cell.left(); });
                         newRect.left += Math.min.apply(Math, newCellsLefts);
                     }
-                    newRect.height = this.fullCellHeight() * newVertical - this.verticalSpacing() + this._getBorderWidthBySpacing(this.verticalSpacing());
-                    newRect.width = this.fullCellWidth() * newHorizontal - this.horizontalSpacing() + this._getBorderWidthBySpacing(this.horizontalSpacing());
+                    newRect.height = (this.cellSize.height() + this.verticalSpacing()) * newVertical - this.verticalSpacing() - Designer.unitsToPixel(this._getBorderWidthBySpacing(this.verticalSpacing()) * (newVertical - 1), this._context.measureUnit(), 1);
+                    newRect.width = (this.cellSize.width() + this.horizontalSpacing()) * newHorizontal - this.horizontalSpacing() - Designer.unitsToPixel(this._getBorderWidthBySpacing(this.horizontalSpacing()) * (newHorizontal - 1), this._context.measureUnit(), 1);
                 };
                 XRCharacterCombSurface.prototype.updateArray = function (cellsCount, array) {
                     var cells = array || this.cells.peek();
@@ -28081,52 +28214,27 @@ var DevExpress;
                     Object.keys(oldRect).forEach(function (propertyName) {
                         newRect[propertyName] = oldRect[propertyName] / zoom;
                     });
-                    var newHorizVert = Report.CharacterCombHelper.getHorizontalVerticalByText(_multiline, _wordwrap, this.displayText(), this.horizontal(), this.vertical());
+                    var newHorizVert = Report.CharacterCombHelper.getHorizontalVerticalByText(_multiline, _wordwrap, this.displayText(), this.horizontal() || 1, this.vertical() || 1);
                     this._applyBounds(newRect, newHorizVert.horizontal, newHorizVert.vertical, _multiline, _wordwrap);
-                    if (newRect.top !== oldRect.top || newRect.height !== oldRect.height || newRect.left !== oldRect.left || newRect.width !== oldRect.width)
+                    if (newRect.top !== oldRect.top || newRect.height !== oldRect.height || newRect.left !== oldRect.left || newRect.width !== oldRect.width) {
                         this.rect({ top: Math.round(newRect.top * zoom), height: newRect.height * zoom, left: Math.round(newRect.left * zoom), width: newRect.width * zoom });
+                        this.getControlModel().roundSize();
+                    }
+                };
+                XRCharacterCombSurface.prototype.getText = function () {
+                    return this.displayText();
                 };
                 return XRCharacterCombSurface;
             })(Report.ControlSurface);
             Report.XRCharacterCombSurface = XRCharacterCombSurface;
-            var CharacterCombAction = (function (_super) {
-                __extends(CharacterCombAction, _super);
-                function CharacterCombAction(_selectionProvider) {
-                    var _this = this;
-                    _super.call(this);
-                    this._selectionProvider = _selectionProvider;
-                    _super.prototype.initActions.call(this, [
-                        {
-                            text: "Fit Control Size By Text",
-                            displayText: function () { return Designer.getLocalization("Fit Bounds To Text", 'TODO'); },
-                            imageClassName: "dxrd-image-actions-align_to_grid",
-                            disabled: ko.computed(function () { return _this._inaccessibleAction(); }),
-                            clickAction: function () { _this._textControl.fitBoundsToText(); }
-                        }
-                    ]);
-                }
-                Object.defineProperty(CharacterCombAction.prototype, "_textControl", {
-                    get: function () {
-                        return this._selectionProvider.focused();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                CharacterCombAction.prototype._inaccessibleAction = function () {
-                    if (this._textControl && this._textControl.displayText && this._textControl.displayText() === "")
-                        return true;
-                    return !!(this._textControl && this._textControl.hasDataBindingByName && this._textControl.hasDataBindingByName("Text"));
-                };
-                CharacterCombAction.prototype.condition = function (context) {
-                    return context && context.controlType === "XRCharacterComb";
-                };
-                return CharacterCombAction;
-            })(Designer.BaseActionsProvider);
-            Report.CharacterCombAction = CharacterCombAction;
             Report.cellVerticalSpacing = { propertyName: "verticalSpacing", modelName: "@CellVerticalSpacing", defaultVal: 0, displayName: "Cell Vertical Spacing", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellVerticalSpacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
             Report.cellHorizontalSpacing = { propertyName: "horizontalSpacing", modelName: "@CellHorizontalSpacing", defaultVal: 0, displayName: "Cell Horizontal Spacing", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHorizontalSpacing", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.cellWidth = { propertyName: "cellWidth", modelName: "@CellWidth", defaultVal: 25, displayName: "Cell Width", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
-            Report.cellHeight = { propertyName: "cellHeight", modelName: "@CellHeight", defaultVal: 25, displayName: "Cell Height", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHeight", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            Report.cellWidth = {
+                propertyName: "cellWidth", modelName: "@CellWidth", defaultVal: 25, displayName: "Cell Width", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, editorOptions: { placeholder: function () { return DevExpress.Designer.getLocalization("(Auto)", "ASPxReportsStringId.ReportDesigner_PropertyGrid_AutoValueString"); } }
+            };
+            Report.cellHeight = {
+                propertyName: "cellHeight", modelName: "@CellHeight", defaultVal: 25, displayName: "Cell Height", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHeight", editor: DevExpress.JS.Widgets.editorTemplates.numeric, editorOptions: { placeholder: function () { return DevExpress.Designer.getLocalization("(Auto)", "ASPxReportsStringId.ReportDesigner_PropertyGrid_AutoValueString"); } }
+            };
             Report.cellSizeMode = {
                 propertyName: "sizeMode", modelName: "@CellSizeMode", displayName: "Cell Size Mode", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellSizeMode", defaultVal: "AutoSize", editor: Report.editorTemplates.comboboxUndo,
                 valuesArray: [
@@ -28145,7 +28253,7 @@ var DevExpress;
                 Report.formattingRuleLinks, Report.cellSizeMode, wordWrap, Report.cellWidth, Report.cellHeight, Report.cellVerticalSpacing, Report.cellHorizontalSpacing, Report.dataBindings(["Text"]),
                 Report.textAlignment, Report.text, Report.textFormatString, Report.textArea, Report.nullValueText, Report.keepTogetherDefaultValueFalse, Report.summary, Report.multiline, wordWrap,
                 Report.xlsxFormatString, Report.rtl, Report.characterCombBorders, Report.borderWidth, Report.characterCombBorderDashStyle, Report.borderColor, Report.characterCombFont, Report.foreColor, Report.editOptions, Report.interactiveSorting
-            ].concat(Report.defaultBindings("Text"), Report.baseControlProperties, Report.navigationGroup, Report.canGrowShrinkGroup, Report.processGroup, Report.sizeLocation);
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.baseControlProperties, Report.navigationGroup, Report.canGrowShrinkGroup, Report.processGroup, Report.sizeLocation);
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -28163,34 +28271,40 @@ var DevExpress;
                     this._selectionProvider = _selectionProvider;
                     _super.prototype.initActions.call(this, [
                         {
-                            text: "Fit Control Size By Text",
-                            displayText: function () { return Designer.getLocalization("Fit Bounds To Text", 'TODO'); },
-                            imageClassName: "dxrd-image-actions-align_to_grid",
+                            text: "Fit Bounds To Text",
+                            displayText: function () { return Designer.getLocalization("Fit Bounds To Text", 'ReportStringId.Cmd_FitBoundsToText'); },
+                            imageClassName: "dxrd-image-actions-fit_bounds_to_text",
                             disabled: ko.computed(function () { return _this._inaccessibleAction(); }),
-                            clickAction: function () { _this._textControl.fitBoundsToText(); }
+                            visible: ko.pureComputed(function () {
+                                return _this._selectionProvider.selectedItems.every(function (item) { return item.getControlModel().controlType === "XRLabel" || item.getControlModel().controlType === "XRCharacterComb"; });
+                            }),
+                            clickAction: function () { _this._textControls.forEach(function (item) { return item.fitBoundsToText(); }); }
                         }, {
-                            text: "Fit Text Size By Control",
-                            displayText: function () { return Designer.getLocalization("Fit Text To Bounds", 'TODO'); },
-                            imageClassName: "dxrd-image-actions-align_to_grid",
+                            text: "Fit Text To Bounds",
+                            displayText: function () { return Designer.getLocalization("Fit Text To Bounds", 'ReportStringId.Cmd_FitTextToBounds'); },
+                            imageClassName: "dxrd-image-actions-fit_text_to_bounds",
                             disabled: ko.computed(function () { return _this._inaccessibleAction(); }),
-                            clickAction: function () { _this._textControl.fitTextToBounds(); }
+                            visible: ko.pureComputed(function () {
+                                return _this._selectionProvider.selectedItems.every(function (item) { return item.getControlModel().controlType === "XRLabel" || item.getControlModel().controlType === "XRTableCell"; });
+                            }),
+                            clickAction: function () { _this._textControls.forEach(function (item) { return item.fitTextToBounds(); }); }
                         },
                     ]);
                 }
-                Object.defineProperty(TextElementAction.prototype, "_textControl", {
+                Object.defineProperty(TextElementAction.prototype, "_textControls", {
                     get: function () {
-                        return this._selectionProvider.focused();
+                        return this._selectionProvider.selectedItems;
                     },
                     enumerable: true,
                     configurable: true
                 });
                 TextElementAction.prototype._inaccessibleAction = function () {
-                    if (this._textControl && this._textControl.getText && this._textControl.getText() === "")
+                    if (this._textControls && this._textControls.some(function (item) { return item.getText && item.getText() === ""; }))
                         return true;
-                    return !!(this._textControl && this._textControl.hasDataBindingByName && this._textControl.hasDataBindingByName("Text"));
+                    return !!(this._textControls && this._textControls.every(function (item) { return item.hasDataBindingByName && item.hasDataBindingByName("Text"); }));
                 };
                 TextElementAction.prototype.condition = function (context) {
-                    return context && context.controlType === "XRLabel";
+                    return context && (context.controlType === "XRLabel" || context.controlType === "XRTableCell" || context.controlType === "XRCharacterComb" || context.controlType === "multiselect");
                 };
                 return TextElementAction;
             })(Designer.BaseActionsProvider);
@@ -28242,8 +28356,9 @@ var DevExpress;
                             clickAction: function () { alignHandler.sendToBack(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled || !alignHandler.canChangeZOrder(); }),
                         }, {
-                            text: "Fit to Container",
-                            imageClassName: "dxrd-image-actions-align_to_grid",
+                            text: "Fit Bounds To Container",
+                            displayText: function () { return Designer.getLocalization("Fit Bounds To Container", 'ReportStringId.Cmd_FitBoundsToContainer'); },
+                            imageClassName: "dxrd-image-actions-fit_to_сontainer",
                             clickAction: function () { fitToContainerAction.doAction(); },
                             disabled: ko.pureComputed(function () { return _this._generalDisabled || !fitToContainerAction.allowed(); }),
                             visible: ko.pureComputed(function () {
@@ -28739,49 +28854,50 @@ var DevExpress;
                     this._expressionWrapper = new Report.ExpressionWrapper(bindingMode, this.fieldListProvider);
                 }
                 ControlsFactory.prototype._registerCommonExpressions = function (controlType) {
-                    this.SetPropertyDescription(controlType, "Text", this._beforePrintPrintOnPage);
-                    this.SetPropertyDescription(controlType, "Visible", this._beforePrintPrintOnPage);
-                    this.SetPropertyDescription(controlType, "NavigateUrl", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "Bookmark", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "Tag", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "LeftF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "TopF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "WidthF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "HeightF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "StyleName", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "ForeColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BackColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BorderColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "Borders", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BorderWidth", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BorderDashStyle", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "TextAlignment", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "Font", this._beforePrintPrintOnPage, "Appearance", ["Name", "Size", "Italic", "Strikeout", "Bold", "Underline"]);
-                    this.SetPropertyDescription(controlType, "Padding", this._beforePrintPrintOnPage, "Appearance", ["Left", "Right", "Top", "Bottom"]);
+                    this.setPropertyDescription(controlType, "Text", this._beforePrintPrintOnPage);
+                    this.setPropertyDescription(controlType, "Visible", this._beforePrintPrintOnPage);
+                    this.setPropertyDescription(controlType, "NavigateUrl", this._beforePrint);
+                    this.setPropertyDescription(controlType, "Bookmark", this._beforePrint);
+                    this.setPropertyDescription(controlType, "Tag", this._beforePrint);
+                    this.setPropertyDescription(controlType, "LeftF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "TopF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "WidthF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "HeightF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "StyleName", this._beforePrint);
+                    this.setPropertyDescription(controlType, "ForeColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BackColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BorderColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "Borders", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BorderWidth", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BorderDashStyle", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "TextAlignment", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "Font", this._beforePrintPrintOnPage, "Appearance", ["Name", "Size", "Italic", "Strikeout", "Bold", "Underline"]);
+                    this.setPropertyDescription(controlType, "Padding", this._beforePrintPrintOnPage, "Appearance", ["Left", "Right", "Top", "Bottom"]);
                 };
-                ControlsFactory.prototype._registerExtensions = function (controlType) {
+                ControlsFactory.prototype._registerExtensions = function (controlType, metadata) {
+                    var parentType = metadata && metadata.parentType || controlType;
                     this._registerCommonExpressions(controlType);
-                    switch (controlType) {
+                    switch (parentType) {
                         case "XRCheckBox":
-                            this.SetPropertyDescription(controlType, "CheckState", this._beforePrintPrintOnPage);
+                            this.setPropertyDescription(controlType, "CheckState", this._beforePrintPrintOnPage);
                             break;
                         case "XRPictureBox":
-                            this.SetPropertyDescription(controlType, "Image", this._beforePrintPrintOnPage);
-                            this.SetPropertyDescription(controlType, "ImageUrl", this._beforePrintPrintOnPage);
-                            this.HidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
+                            this.setPropertyDescription(controlType, "Image", this._beforePrintPrintOnPage);
+                            this.setPropertyDescription(controlType, "ImageUrl", this._beforePrintPrintOnPage);
+                            this.hidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
                             break;
                         case "XRBarCode":
-                            this.SetPropertyDescription(controlType, "BinaryData", this._beforePrint);
+                            this.setPropertyDescription(controlType, "BinaryData", this._beforePrint);
                             break;
                         case "XRGauge":
-                            this.HidePropertyDescriptions(controlType, "Text", "TextAlignment", "Font", "ForeColor");
-                            this.SetPropertyDescription(controlType, "TargetValue", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "ActualValue", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "Minimum", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "Maximum", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Text", "TextAlignment", "Font", "ForeColor");
+                            this.setPropertyDescription(controlType, "TargetValue", this._beforePrint);
+                            this.setPropertyDescription(controlType, "ActualValue", this._beforePrint);
+                            this.setPropertyDescription(controlType, "Minimum", this._beforePrint);
+                            this.setPropertyDescription(controlType, "Maximum", this._beforePrint);
                             break;
                         case "XRCharacterComb":
-                            this.HidePropertyDescriptions(controlType, "Padding");
+                            this.hidePropertyDescriptions(controlType, "Padding");
                             break;
                         case "TopMarginBand":
                         case "BottomMarginBand":
@@ -28793,95 +28909,106 @@ var DevExpress;
                         case "PageHeaderBand":
                         case "ReportHeaderBand":
                         case "ReportFooterBand":
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "WidthF", "LeftF", "TopF");
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "WidthF", "LeftF", "TopF");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
                             break;
                         case "XRSubreport":
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Padding", "StyleName");
-                            this.HidePropertyDescriptions(controlType, "BackColor", "BorderColor", "BorderWidth", "BorderDashStyle", "Borders", "Font", "ForeColor", "TextAlignment", "Tag", "Text", "NavigateUrl");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Padding", "StyleName");
+                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "BorderWidth", "BorderDashStyle", "Borders", "Font", "ForeColor", "TextAlignment", "Tag", "Text", "NavigateUrl");
                             break;
                         case "XRCrossBandBox":
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
-                            this.HidePropertyDescriptions(controlType, "ForeColor", "Visible");
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "ForeColor", "Visible");
                             break;
                         case "XRCrossBandLine":
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
-                            this.HidePropertyDescriptions(controlType, "BorderColor", "BorderDashStyle", "Borders", "BorderWidth", "Visible");
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "BorderColor", "BorderDashStyle", "Borders", "BorderWidth", "Visible");
                             break;
                         case "XRChart":
-                            this.HidePropertyDescriptions(controlType, "Text", "Font", "ForeColor", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "Text", "Font", "ForeColor", "TextAlignment");
                             break;
                         case "XRLine":
-                            this.HidePropertyDescriptions(controlType, "Font", "Text", "TextAlignment", "NavigateUrl", "Bookmark");
+                            this.hidePropertyDescriptions(controlType, "Font", "Text", "TextAlignment", "NavigateUrl", "Bookmark");
                             break;
                         case "XRPivotGrid":
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Text", "NavigateUrl", "StyleName");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Text", "NavigateUrl", "StyleName");
                             break;
                         case "XRPageBreak":
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Tag", "Text", "NavigateUrl", "LeftF", "WidthF", "HeightF", "Bookmark", "StyleName");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Tag", "Text", "NavigateUrl", "LeftF", "WidthF", "HeightF", "Bookmark", "StyleName");
                             break;
                         case "XRPageInfo":
-                            this.HidePropertyDescriptions(controlType, "Text");
+                            this.hidePropertyDescriptions(controlType, "Text");
                             break;
                         case "XRPanel":
-                            this.HidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
                             break;
                         case "XRRichText":
-                            this.HidePropertyDescriptions(controlType, "Text");
-                            this.SetPropertyDescription(controlType, "Rtf", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "Html", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Text");
+                            this.setPropertyDescription(controlType, "Rtf", this._beforePrint);
+                            this.setPropertyDescription(controlType, "Html", this._beforePrint);
                             break;
                         case "XRShape":
-                            this.HidePropertyDescriptions(controlType, "Font", "TextAlignment", "Text");
+                            this.hidePropertyDescriptions(controlType, "Font", "TextAlignment", "Text");
                             break;
                         case "XRSparkline":
-                            this.HidePropertyDescriptions(controlType, "Text", "Font", "TextAlignment", "ForeColor");
+                            this.hidePropertyDescriptions(controlType, "Text", "Font", "TextAlignment", "ForeColor");
                             break;
                         case "XRTableOfContents":
-                            this.HidePropertyDescriptions(controlType, "NavigateUrl", "Text", "TextAlignment", "Bookmark", "Font", "LeftF", "WidthF");
+                            this.hidePropertyDescriptions(controlType, "NavigateUrl", "Text", "TextAlignment", "Bookmark", "Font", "LeftF", "WidthF");
                             break;
                         case "XRTableRow":
-                            this.HidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "Text", "NavigateUrl", "Bookmark");
+                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "Text", "NavigateUrl", "Bookmark");
                             break;
                         case "XRTableCell":
-                            this.HidePropertyDescriptions(controlType, "LeftF", "TopF", "HeightF");
+                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "HeightF");
                             break;
                         case "XRTable":
-                            this.HidePropertyDescriptions(controlType, "Text", "NavigateUrl");
+                            this.hidePropertyDescriptions(controlType, "Text", "NavigateUrl");
                             break;
                         case "XRZipCode":
-                            this.HidePropertyDescriptions(controlType, "Font", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "Font", "TextAlignment");
                             break;
                         case "DevExpress.XtraReports.UI.XtraReport":
-                            this.HidePropertyDescriptions(controlType, "StyleName", "Text", "NavigateUrl");
-                            this.SetPropertyDescription(controlType, "Bookmark", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "HeightF");
+                            this.hidePropertyDescriptions(controlType, "StyleName", "Text", "NavigateUrl");
+                            this.setPropertyDescription(controlType, "Bookmark", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "HeightF");
                             break;
                     }
                 };
                 ControlsFactory.prototype.registerControl = function (typeName, metadata) {
                     _super.prototype.registerControl.call(this, typeName, metadata);
-                    this._registerExtensions(typeName);
+                    this._registerExtensions(typeName, metadata);
                 };
                 ControlsFactory.prototype._createExpressionObject = function (typeName, expressions, path, summaryRunning) {
                     return this._expressionWrapper.createExpressionsObject(typeName, expressions, path, summaryRunning);
                 };
-                ControlsFactory.prototype.SetPropertyDescription = function (controlType, propertyName, events, group, objectProperties) {
+                ControlsFactory.prototype.setPropertyDescription = function (controlType, propertyName, events, group, objectProperties) {
                     this._expressionWrapper.setPropertyDescription(controlType, propertyName, events, objectProperties, group);
                 };
-                ControlsFactory.prototype.SetLocalizationIdForExpression = function (propertyName, localizationId) {
+                ControlsFactory.prototype.setLocalizationIdForExpression = function (propertyName, localizationId) {
                     this._expressionWrapper.setLocalizationId(propertyName, localizationId);
                 };
-                ControlsFactory.prototype.HidePropertyDescriptions = function (type) {
+                ControlsFactory.prototype.hidePropertyDescriptions = function (type) {
                     var propertyNames = [];
                     for (var _i = 1; _i < arguments.length; _i++) {
                         propertyNames[_i - 1] = arguments[_i];
                     }
                     (_a = this._expressionWrapper).hidePropertyDescriptions.apply(_a, [type].concat(propertyNames));
                     var _a;
+                };
+                ControlsFactory.prototype.inheritControl = function (parentType, extendedOptions) {
+                    var parentInfo = this.getControlInfo(parentType);
+                    var copyParentSerializationsInfo = $.extend(true, [], parentInfo.info);
+                    var newInfo = [].concat(copyParentSerializationsInfo, extendedOptions.info || []);
+                    var newPopularProperties = [].concat(parentInfo.popularProperties, extendedOptions.popularProperties || []);
+                    return $.extend({}, parentInfo, extendedOptions, {
+                        parentType: parentType,
+                        info: newInfo,
+                        popularProperties: newPopularProperties
+                    });
                 };
                 return ControlsFactory;
             })(Designer.ControlsFactory);
@@ -29186,9 +29313,9 @@ var DevExpress;
                         });
                     }
                     actions.push({
-                        text: "Validation Mode",
-                        displayText: function () { return Designer.getLocalization('Validation Mode', 'TODO'); },
-                        imageClassName: "dxrd-image-validate",
+                        text: "Validate Bindings",
+                        displayText: function () { return Designer.getLocalization("Validate Bindings", "ASPxReportsStringId.ReportDesigner_ToolBarItemText_ValidateBindings"); },
+                        imageClassName: "dxrd-image-validateBindingMode",
                         disabled: ko.pureComputed(function () { return !report(); }),
                         selected: designerModel.validationMode,
                         visible: true,
@@ -29734,7 +29861,7 @@ var DevExpress;
                 });
                 var controlHelper = new Designer.DesignControlsHelper(model, [{
                         added: function (control) { },
-                        deleted: function (control) { control.surface == selection.focused() && selection.focused(Designer.findNextSelection(control.surface)); }
+                        deleted: function (control) { control.surface === selection.focused() && selection.focused(Designer.findNextSelection(control.surface)); }
                     }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet", "components"]);
                 reportConverter = new Report.ReportConverter(controlHelper, undoEngine, data.dataBindingMode);
                 init(model());
@@ -29819,7 +29946,7 @@ var DevExpress;
                     init(newModel);
                 });
                 designerModel.navigateByReports = navigation;
-                designerModel.contextActionProviders.push(new ReportElementActions(surface, designerModel.selection), new Report.ElementsGroupActions(surface, designerModel.selection), new Report.ReportActions(), new Report.TableRowActions(designerModel.selection), new Report.TableCellActions(designerModel.selection), new Report.TextElementAction(designerModel.selection), new Report.CharacterCombAction(designerModel.selection), new Report.TableCellGroupActions(designerModel.selection), new Report.PivotGridActions());
+                designerModel.contextActionProviders.push(new ReportElementActions(surface, designerModel.selection), new Report.ElementsGroupActions(surface, designerModel.selection), new Report.ReportActions(), new Report.TableRowActions(designerModel.selection), new Report.TableCellActions(designerModel.selection), new Report.TextElementAction(designerModel.selection), new Report.TableCellGroupActions(designerModel.selection), new Report.PivotGridActions());
                 designerModel.calculatedFieldsSource = calculatedFieldsSource;
                 designerModel.parameters = parameters;
                 var popoverVisible = ko.observable(false), fieldListModel = {
@@ -30128,8 +30255,10 @@ var DevExpress;
                     toolboxIndex: 0,
                     defaultVal: {
                         "@Padding": "2,2,0,0,100",
+                        "@Multiline": "true",
                         "@SizeF": "100,23"
                     },
+                    defaultBindingName: "Text",
                     surfaceType: Report.TextControlSurfaceBase,
                     type: Report.ControlViewModel,
                     popularProperties: Report.popularPropertiesLabel
@@ -30143,6 +30272,7 @@ var DevExpress;
                         "@SizeF": "100,23",
                         "@Padding": "2,2,0,0,100"
                     },
+                    defaultBindingName: "CheckState",
                     popularProperties: Report.popularPropertiesCheckBox
                 });
                 if (!Report.limitation) {
@@ -30155,6 +30285,7 @@ var DevExpress;
                         },
                         surfaceType: Report.XRRichSurface,
                         type: Report.XRRichViewModel,
+                        defaultBindingName: "Rtf",
                         popularProperties: Report.popularPropertiesRichText
                     });
                 }
@@ -30166,6 +30297,7 @@ var DevExpress;
                     },
                     type: Report.XRPictureBoxViewModel,
                     surfaceType: Report.PictureBoxSurface,
+                    defaultBindingName: "Image",
                     popularProperties: Report.popularPropertiesPicture
                 });
                 Report.controlsFactory.registerControl("XRPanel", {
@@ -30192,16 +30324,19 @@ var DevExpress;
                                     "Item1": {
                                         "@ControlType": "XRTableCell",
                                         "@Weight": "1",
+                                        "@Multiline": "true",
                                         "@Padding": "2,2,0,0,100"
                                     },
                                     "Item2": {
                                         "@ControlType": "XRTableCell",
                                         "@Weight": "1",
+                                        "@Multiline": "true",
                                         "@Padding": "2,2,0,0,100"
                                     },
                                     "Item3": {
                                         "@ControlType": "XRTableCell",
                                         "@Weight": "1",
+                                        "@Multiline": "true",
                                         "@Padding": "2,2,0,0,100"
                                     }
                                 }
@@ -30217,8 +30352,10 @@ var DevExpress;
                     info: Report.characterCombSerializationsInfo,
                     toolboxIndex: 6,
                     defaultVal: {
-                        "@SizeF": "200,80"
+                        "@SizeF": "200,80",
+                        "@Multiline": "true",
                     },
+                    defaultBindingName: "Text",
                     surfaceType: Report.XRCharacterCombSurface,
                     type: Report.XRCharacterComb,
                     popularProperties: Report.popularPropertiesLabel
@@ -30239,6 +30376,7 @@ var DevExpress;
                     defaultVal: {
                         "@SizeF": "100,23"
                     },
+                    defaultBindingName: "Tag",
                     type: Report.ShapeViewModel,
                     surfaceType: Report.ShapeControlSurface,
                     popularProperties: Report.popularPropertiesShape
@@ -30254,6 +30392,7 @@ var DevExpress;
                         },
                         "@Text": ""
                     },
+                    defaultBindingName: "Text",
                     surfaceType: Report.XRBarcodeSurface,
                     type: Report.XRBarCodeViewModel,
                     popularProperties: Report.popularPropertiesBarCode
@@ -30287,6 +30426,7 @@ var DevExpress;
                             "DataContainer": {}
                         }
                     },
+                    defaultBindingName: "Tag",
                     type: Report.XRChartViewModel,
                     surfaceType: Report.ChartSurface,
                     popularProperties: ["name"]
@@ -30299,6 +30439,7 @@ var DevExpress;
                     defaultVal: {
                         "@SizeF": "220,120"
                     },
+                    defaultBindingName: "Tag",
                     popularProperties: Report.popularPropertiesGauge
                 });
                 Report.controlsFactory.registerControl("XRSparkline", {
@@ -30311,6 +30452,7 @@ var DevExpress;
                         },
                     },
                     surfaceType: Report.SparkLineSurface,
+                    defaultBindingName: "Tag",
                     type: Report.XRSparklineViewModel,
                     popularProperties: Report.popularPropertiesSparkline
                 });
@@ -30328,6 +30470,7 @@ var DevExpress;
                         },
                         "OptionsView": {}
                     },
+                    defaultBindingName: "Tag",
                     type: Report.XRPivotGridViewModel,
                     surfaceType: Report.PivotGridSurface,
                     popularProperties: ["dataSource", "dataMember"]
@@ -30559,12 +30702,14 @@ var DevExpress;
                     defaultVal: {
                         "@Weight": "1",
                         "@WidthF": "100",
+                        "@Multiline": "true",
                         "@Padding": "2,2,0,0,100"
                     },
                     nonToolboxItem: true,
                     surfaceType: Report.TableCellSurface,
                     popularProperties: Report.popularPropertiesTableCell,
                     isContainer: true,
+                    defaultBindingName: "Text",
                     isCopyDeny: true,
                     canDrop: function (dropTarget) { return dropTarget.getControlModel().controlType === "XRTableRow"; }
                 });
@@ -30741,8 +30886,6 @@ var DevExpress;
                         data: {
                             reportUrl: reportUrl
                         }
-                    }).fail(function (jqXHR, textStatus, errorThrown) {
-                        alert(textStatus + ": " + errorThrown.message);
                     }).done(function (result) {
                         result.handlerUri = self._getServerActionUrl(requestOptions.host, result.handlerUri);
                         result.viewerHandlerUri = self._getServerActionUrl(requestOptions.host, result.viewerHandlerUri);
@@ -30760,8 +30903,11 @@ var DevExpress;
                             return;
                         }
                         var subscriptions = [];
+                        var applyBindingsFunc = function (newData) {
+                            self._applyBindings(self._createModel(newData, element), _$element);
+                        };
                         subscriptions.push(self._initializationData.subscribe(function (newVal) {
-                            self._applyBindings(self._createModel(newVal, element), _$element);
+                            applyBindingsFunc(newVal);
                         }));
                         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                             subscriptions.forEach(function (x) { return x && x.dispose(); });
@@ -30769,16 +30915,23 @@ var DevExpress;
                         if (self._options.requestOptions) {
                             self._getLocalizationRequest().done(function (localization) {
                                 localization && DevExpress.JS.Localization.addCultureInfo(localization);
-                                self._getDesignerModelRequest(ko.unwrap(self._options.reportUrl));
+                            }).always(function () {
+                                if (self._options.requestOptions.getDesignerModelAction) {
+                                    if (ko.isSubscribable(self._options.reportUrl)) {
+                                        subscriptions.push(self._options.reportUrl.subscribe(function (newVal) {
+                                            self._getDesignerModelRequest(newVal);
+                                        }));
+                                    }
+                                    self._getDesignerModelRequest(ko.unwrap(self._options.reportUrl));
+                                }
+                                else {
+                                    applyBindingsFunc(self._initializationData());
+                                }
                             });
-                            if (ko.isSubscribable(self._options.reportUrl)) {
-                                subscriptions.push(self._options.reportUrl.subscribe(function (newVal) {
-                                    self._getDesignerModelRequest(newVal);
-                                }));
-                            }
-                            return;
                         }
-                        self._applyBindings(self._createModel(self._initializationData(), element), _$element);
+                        else {
+                            applyBindingsFunc(self._initializationData());
+                        }
                     });
                 };
                 return JSReportDesignerBinding;
@@ -33307,63 +33460,9 @@ var DevExpress;
                     var _this = this;
                     this._control = _control;
                     this._container = ko.pureComputed(function () { return _this._control() && _this._control().parent; });
-                    this._fitRect = function () {
-                        var container = _this._container(), newRect = {
-                            top: 0,
-                            left: 0,
-                            width: container.rect().width,
-                            height: container.rect().height
-                        }, containerModel = container.getControlModel();
-                        if (container instanceof Report.BandSurface) {
-                            newRect.width -= Designer.unitsToPixel(_this._farMarginWidth(containerModel.root["margins"]), _this._control()._context.measureUnit(), _this._control()._context.zoom());
-                        }
-                        else {
-                            _this._correctRectOutOfBorders(containerModel, newRect);
-                        }
-                        return newRect;
-                    };
-                    this._farMarginWidth = function (margins) {
-                        return margins ? (_this._control()._context.rtl() ? margins.left && margins.left() : margins.right && margins.right()) || 0 : 0;
-                    };
-                    this._correctRectOutOfBorders = function (containerModel, rect) {
-                        var borderWidth = ko.unwrap(containerModel["borderWidth"]), borderFlags = containerModel["borders"]();
-                        if (borderWidth) {
-                            if (_this._container() instanceof Report.TableCellSurface) {
-                                var allBorders = borderFlags === "All";
-                                if ((allBorders || borderFlags.indexOf("Top") >= 0) && _this._container()["_isShowBorder"]("Top")) {
-                                    rect.top += borderWidth;
-                                    rect.height -= borderWidth;
-                                }
-                                if (allBorders || borderFlags.indexOf("Right") >= 0)
-                                    rect.width -= borderWidth;
-                                if (allBorders || borderFlags.indexOf("Bottom") >= 0)
-                                    rect.height -= borderWidth;
-                                if ((allBorders || borderFlags.indexOf("Left") >= 0) && _this._container()["_isShowBorder"]("Left")) {
-                                    rect.left += borderWidth;
-                                    rect.width -= borderWidth;
-                                }
-                            }
-                            else {
-                                if (borderFlags === "All") {
-                                    rect.height -= 2 * borderWidth;
-                                    rect.width -= 2 * borderWidth;
-                                }
-                                else {
-                                    if (borderFlags.indexOf("Top") >= 0)
-                                        rect.height -= borderWidth;
-                                    if (borderFlags.indexOf("Right") >= 0)
-                                        rect.width -= borderWidth;
-                                    if (borderFlags.indexOf("Bottom") >= 0)
-                                        rect.height -= borderWidth;
-                                    if (borderFlags.indexOf("Left") >= 0)
-                                        rect.width -= borderWidth;
-                                }
-                            }
-                        }
-                    };
                 }
                 FitToContainerAction.prototype.doAction = function () {
-                    this._control().rect(this._fitRect());
+                    this._control().rect(this._container().getUsefulRect());
                 };
                 FitToContainerAction.prototype.allowed = function () {
                     var container = this._container();
@@ -33438,9 +33537,10 @@ var DevExpress;
                     var _this = this;
                     return this._$createElement(options, function ($element) { return $element.html(_this._spaceSymbol); });
                 };
-                TextElementSizeHelper.prototype.getTextContainerSize = function (text, options) {
+                TextElementSizeHelper.prototype.getTextContainerSize = function (text, options, increaseHeight) {
+                    if (increaseHeight === void 0) { increaseHeight = 2; }
                     var $div = text !== this._spaceSymbol ? this.$createTextElement(text, options) : this.$createSpaceElement(options);
-                    $div.height($div.height() + 2);
+                    $div.height($div.height() + increaseHeight);
                     var rect = $div[0].getBoundingClientRect();
                     var height = Math.ceil(rect.height);
                     var width = Math.ceil(rect.width);
@@ -33622,15 +33722,7 @@ var DevExpress;
     (function (Designer) {
         var Report;
         (function (Report) {
-            Report.reportFunctionDisplay = (function (addins) {
-                return DevExpress.JS.Widgets.functionDisplay.map(function (cat) {
-                    var ext = addins[cat.display];
-                    return ext ? {
-                        display: cat.display, category: cat.category, localizationId: cat.localizationId,
-                        items: $.extend(ext, cat.items)
-                    } : cat;
-                });
-            })({
+            Report.reportFunctionDisplay = (function (addins) { return DevExpress.Analytics.Widgets.Internal.insertInFunctionDisplay(addins); })({
                 "String": {
                     "NewLine": [{ paramCount: 0, text: "NewLine()", descriptionStringId: "ReportStringId.ExpressionEditor_Description_Function_NewLine" }],
                     "FormatString": [{ paramCount: 1, text: "FormatString('')", descriptionStringId: "ReportStringId.ExpressionEditor_Description_Function_FormatString" }],
@@ -34631,7 +34723,7 @@ var DevExpress;
                 function ReportPreviewService() {
                 }
                 ReportPreviewService.initializePreview = function (report) {
-                    return Designer.ajax(Report.HandlerUri, "initializePreview", encodeURIComponent(JSON.stringify({ "XtraReportsLayoutSerializer": report.serialize() })), DevExpress.Report.Preview.MessageHandler.processError);
+                    return Designer.ajax(Report.HandlerUri, "initializePreview", encodeURIComponent(JSON.stringify({ "XtraReportsLayoutSerializer": report.serialize() })), DevExpress.Report.Preview.PreviewRequestWrapper.processError);
                 };
                 return ReportPreviewService;
             })();
@@ -34798,9 +34890,6 @@ var DevExpress;
                             nameSubscribe && nameSubscribe.dispose();
                         }
                     }).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1 } });
-                    ["Rtf", "Html"].forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 Object.defineProperty(XRRichViewModel.prototype, "textEditableProperty", {
                     get: function () { return this.textRtf; },
@@ -34907,7 +34996,7 @@ var DevExpress;
                     this.popupButtons = [
                         {
                             toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
-                                text: Designer.getLocalization('Open', 'DevExpress.XtraCharts.StockLevel.Open'), onClick: function () {
+                                text: Designer.getLocalization('Open', 'ASPxReportsStringId.SidePanel_Open'), onClick: function () {
                                     popup.open(self.reportUrl());
                                 }
                             }, disabled: ko.pureComputed(function () { return !_this.reportUrl(); })
@@ -35277,14 +35366,20 @@ var DevExpress;
                             else if (model === (reportModel() && reportModel().formattingRuleSheet())) {
                                 path = "Formatting Rules";
                             }
+                            else if (model === (reportModel() && reportModel().components())) {
+                                path = "Components";
+                            }
                             else if (model instanceof Report.StyleModel) {
-                                path = ["Styles", "Styles", reportModel() && reportModel().styles().indexOf(model)].join(".");
+                                path = _this._getPathNonControl(model, "Styles", "styles", editableObject, reportModel);
                             }
                             else if (model instanceof Report.FormattingRule) {
-                                path = ["Formatting Rules", "Formatting Rules", reportModel() && reportModel().formattingRuleSheet().indexOf(model)].join(".");
+                                path = _this._getPathNonControl(model, "Formatting Rules", "formattingRuleSheet", editableObject, reportModel);
                             }
                             else if (model instanceof Report.ComponentsModel) {
-                                path = ["Components", "Components", reportModel().components().indexOf(model)].join(".");
+                                path = _this._getPathNonControl(model, "Components", "components", editableObject, reportModel);
+                            }
+                            else if (model === (reportModel() && reportModel().crossBandControls())) {
+                                path = "Crossband Controls";
                             }
                         }
                         return path;
@@ -35298,8 +35393,8 @@ var DevExpress;
                         return propertyNames ? propertyNames.indexOf(realPropertyName) !== -1 || $.isNumeric(realPropertyName) : true;
                     };
                     this.treeListController.getActions = function (item) {
-                        if (item.data.displayName !== "Crossband Controls" && item.data.displayName !== "Components") {
-                            if (item.data.displayName !== "Styles" && item.data.displayName !== "Formatting Rules") {
+                        if (item.data.name !== "Crossband Controls" && item.data.name !== "Components") {
+                            if (item.data.name !== "Styles" && item.data.name !== "Formatting Rules") {
                                 return _this._createActionsForOneElement(clickHandler, selection, editableObject, reportModel, item);
                             }
                             else {
@@ -35374,12 +35469,12 @@ var DevExpress;
                     return actions;
                 };
                 ReportExplorerModel.prototype._createActionsForArray = function (item, reportModel) {
-                    if (item.data.displayName === "Styles" || item.data.displayName === "Formatting Rules") {
+                    if (item.data.name === "Styles" || item.data.name === "Formatting Rules") {
                         return [{
-                                text: "Add New " + (item.data.displayName === "Styles" ? "Style" : "Formatting Rule"),
+                                text: "Add New " + (item.data.name === "Styles" ? "Style" : "Formatting Rule"),
                                 imageClassName: "dx-image-add",
                                 clickAction: function () {
-                                    if (item.data.displayName === "Styles") {
+                                    if (item.data.name === "Styles") {
                                         var newStyleName = Designer.getUniqueNameForNamedObjectsArray(reportModel().styles(), "xrControlStyle");
                                         reportModel().styles.push(new Report.StyleModel({ "@Name": newStyleName }));
                                     }
@@ -35390,6 +35485,15 @@ var DevExpress;
                             }];
                     }
                     return [];
+                };
+                ReportExplorerModel.prototype._getPathNonControl = function (model, rootName, arrayName, editableObject, reportModel) {
+                    var array = reportModel() && reportModel()[arrayName]();
+                    var index = array && array.indexOf(model) || 0;
+                    if (index < 0) {
+                        editableObject(array[0] || reportModel());
+                        return array.length > 0 ? [rootName, rootName, 0].join(".") : "Report";
+                    }
+                    return [rootName, rootName, index].join(".");
                 };
                 return ReportExplorerModel;
             })();

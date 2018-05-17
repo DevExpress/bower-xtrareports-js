@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 18.1.2
-* Build date: 2018-04-18
+* Version: 18.1.3
+* Build date: 2018-05-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -479,12 +479,6 @@ var DevExpress;
             return result || _getLocalization(text);
         }
         Analytics.getLocalization = getLocalization;
-        function getSpecificLocalizationWithAddition(text, defaultText, addition, id) {
-            if (addition === void 0) { addition = ""; }
-            if (id === void 0) { id = null; }
-            return isCustomizedWithUpdateLocalizationMethod(text) ? getLocalization(text) : (getLocalization(defaultText, id) + addition);
-        }
-        Analytics.getSpecificLocalizationWithAddition = getSpecificLocalizationWithAddition;
         function updateLocalization(object) {
             $.extend(custom_localization_values, object);
             var messages = {};
@@ -1941,8 +1935,6 @@ var DevExpress;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "isCustomizedWithUpdateLocalizationMethod");
         Designer.getLocalization = DevExpress.Analytics.getLocalization;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "getLocalization");
-        Designer.getSpecificLocalizationWithAddition = DevExpress.Analytics.getSpecificLocalizationWithAddition;
-        DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "getSpecificLocalizationWithAddition");
         Designer.updateLocalization = DevExpress.Analytics.updateLocalization;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "updateLocalization");
         Designer.StringId = undefined;
@@ -2838,9 +2830,14 @@ var DevExpress;
                                 if (timer !== null)
                                     clearTimeout(timer);
                                 timer = setTimeout(function () {
-                                    additionalOptions.onChange(session);
+                                    text() !== session.getValue() && additionalOptions.onChange(session);
                                 }, additionalOptions && additionalOptions.changeTimeout || 1000);
                             });
+                        }
+                        if (additionalOptions && additionalOptions.overrideEditorFocus) {
+                            editor.focus = function (a, e) {
+                                editor.textInput.getElement().focus();
+                            };
                         }
                         if (additionalOptions && additionalOptions.onFocus) {
                             editor.onFocus = function (_) { return additionalOptions.onFocus(session); };
@@ -2983,9 +2980,9 @@ var DevExpress;
                         items: {
                             LocalDateTimeThisYear: [{ paramCount: 0, text: "LocalDateTimeThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description' }],
                             LocalDateTimeThisMonth: [{ paramCount: 0, text: "LocalDateTimeThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description' }],
-                            LocalDateTimeLastMonth: [{ paramCount: 0, text: "LocalDateTimeLastMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastMonth.Description' }],
+                            LocalDateTimeLastMonth: [{ paramCount: 0, text: "LocalDateTimeLastMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeLastMonth' }],
                             LocalDateTimeLastWeek: [{ paramCount: 0, text: "LocalDateTimeLastWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description' }],
-                            LocalDateTimeLastYear: [{ paramCount: 0, text: "LocalDateTimeLastYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastYear.Description' }],
+                            LocalDateTimeLastYear: [{ paramCount: 0, text: "LocalDateTimeLastYear()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeLastYear' }],
                             LocalDateTimeThisWeek: [{ paramCount: 0, text: "LocalDateTimeThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description' }],
                             LocalDateTimeYesterday: [{ paramCount: 0, text: "LocalDateTimeYesterday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description' }],
                             LocalDateTimeToday: [{ paramCount: 0, text: "LocalDateTimeToday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description' }],
@@ -2993,12 +2990,12 @@ var DevExpress;
                             LocalDateTimeTomorrow: [{ paramCount: 0, text: "LocalDateTimeTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description' }],
                             LocalDateTimeDayAfterTomorrow: [{ paramCount: 0, text: "LocalDateTimeDayAfterTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description' }],
                             LocalDateTimeNextWeek: [{ paramCount: 0, text: "LocalDateTimeNextWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description' }],
-                            LocalDateTimeTwoMonthsAway: [{ paramCount: 0, text: "LocalDateTimeTwoMonthsAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoMonthsAway.Description' }],
-                            LocalDateTimeTwoYearsAway: [{ paramCount: 0, text: "LocalDateTimeTwoYearsAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoYearsAway.Description' }],
+                            LocalDateTimeTwoMonthsAway: [{ paramCount: 0, text: "LocalDateTimeTwoMonthsAway()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeTwoMonthsAway' }],
+                            LocalDateTimeTwoYearsAway: [{ paramCount: 0, text: "LocalDateTimeTwoYearsAway()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeTwoYearsAway' }],
                             LocalDateTimeTwoWeeksAway: [{ paramCount: 0, text: "LocalDateTimeTwoWeeksAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description' }],
                             LocalDateTimeNextMonth: [{ paramCount: 0, text: "LocalDateTimeNextMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description' }],
                             LocalDateTimeNextYear: [{ paramCount: 0, text: "LocalDateTimeNextYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description' }],
-                            LocalDateTimeYearBeforeToday: [{ paramCount: 0, text: "LocalDateTimeYearBeforeToday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeYearBeforeToday.Description' }],
+                            LocalDateTimeYearBeforeToday: [{ paramCount: 0, text: "LocalDateTimeYearBeforeToday()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeYearBeforeToday' }],
                             IsOutlookIntervalBeyondThisYear: null,
                             IsOutlookIntervalLaterThisYear: null,
                             IsOutlookIntervalLaterThisMonth: null,
@@ -3012,27 +3009,27 @@ var DevExpress;
                             IsOutlookIntervalEarlierThisMonth: null,
                             IsOutlookIntervalEarlierThisYear: null,
                             IsOutlookIntervalPriorThisYear: null,
-                            IsLastMonth: [{ paramCount: 1, text: "IsLastMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsLastMonth.Description' }],
-                            IsLastYear: [{ paramCount: 1, text: "IsLastYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsLastYear.Description' }],
-                            IsNextMonth: [{ paramCount: 1, text: "IsNextMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNextMonth.Description' }],
-                            IsNextYear: [{ paramCount: 1, text: "IsNextYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNextYear.Description' }],
+                            IsLastMonth: [{ paramCount: 1, text: "IsLastMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_IsLastMonth' }],
+                            IsLastYear: [{ paramCount: 1, text: "IsLastYear()", descriptionStringId: 'ExpressionEditorStringId.Function_IsLastYear' }],
+                            IsNextMonth: [{ paramCount: 1, text: "IsNextMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNextMonth' }],
+                            IsNextYear: [{ paramCount: 1, text: "IsNextYear()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNextYear' }],
                             IsThisWeek: [{ paramCount: 1, text: "IsThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisWeek.Description' }],
                             IsThisMonth: [{ paramCount: 1, text: "IsThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisMonth.Description' }],
                             IsThisYear: [{ paramCount: 1, text: "IsThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisYear.Description' }],
-                            IsJanuary: [{ paramCount: 1, text: "IsJanuary()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJanuary.Description' }],
-                            IsFebruary: [{ paramCount: 1, text: "IsFebruary()", descriptionStringId: 'XtraEditorsExpressionEditor.IsFebruary.Description' }],
-                            IsMarch: [{ paramCount: 1, text: "IsMarch()", descriptionStringId: 'XtraEditorsExpressionEditor.IsMarch.Description' }],
-                            IsApril: [{ paramCount: 1, text: "IsApril()", descriptionStringId: 'XtraEditorsExpressionEditor.IsApril.Description' }],
-                            IsMay: [{ paramCount: 1, text: "IsMay()", descriptionStringId: 'XtraEditorsExpressionEditor.IsMay.Description' }],
-                            IsJune: [{ paramCount: 1, text: "IsJune()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJune.Description' }],
-                            IsJule: [{ paramCount: 1, text: "IsJule()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJule.Description' }],
-                            IsAugust: [{ paramCount: 1, text: "IsAugust()", descriptionStringId: 'XtraEditorsExpressionEditor.IsAugust.Description' }],
-                            IsSemptember: [{ paramCount: 1, text: "IsSemptember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsSemptember.Description' }],
-                            IsOctober: [{ paramCount: 1, text: "IsOctober()", descriptionStringId: 'XtraEditorsExpressionEditor.IsOctober.Description' }],
-                            IsNovember: [{ paramCount: 1, text: "IsNovember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNovember.Description' }],
-                            IsDecember: [{ paramCount: 1, text: "IsDecember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsDecember.Description' }],
-                            IsSameDay: [{ paramCount: 2, text: "IsSameDay(, )", descriptionStringId: 'XtraEditorsExpressionEditor.IsSameDay.Description' }],
-                            IsYearToDate: [{ paramCount: 1, text: "IsYearToDate()", descriptionStringId: 'XtraEditorsExpressionEditor.IsYearToDate.Description' }],
+                            IsJanuary: [{ paramCount: 1, text: "IsJanuary()", descriptionStringId: 'ExpressionEditorStringId.Function_IsJanuary' }],
+                            IsFebruary: [{ paramCount: 1, text: "IsFebruary()", descriptionStringId: 'ExpressionEditorStringId.Function_IsFebruary' }],
+                            IsMarch: [{ paramCount: 1, text: "IsMarch()", descriptionStringId: 'ExpressionEditorStringId.Function_IsMarch' }],
+                            IsApril: [{ paramCount: 1, text: "IsApril()", descriptionStringId: 'ExpressionEditorStringId.Function_IsApril' }],
+                            IsMay: [{ paramCount: 1, text: "IsMay()", descriptionStringId: 'ExpressionEditorStringId.Function_IsMay' }],
+                            IsJune: [{ paramCount: 1, text: "IsJune()", descriptionStringId: 'ExpressionEditorStringId.Function_IsJune' }],
+                            IsJuly: [{ paramCount: 1, text: "IsJuly()", descriptionStringId: 'ExpressionEditorStringId.Function_IsJuly' }],
+                            IsAugust: [{ paramCount: 1, text: "IsAugust()", descriptionStringId: 'ExpressionEditorStringId.Function_IsAugust' }],
+                            IsSeptember: [{ paramCount: 1, text: "IsSeptember()", descriptionStringId: 'ExpressionEditorStringId.Function_IsSeptember' }],
+                            IsOctober: [{ paramCount: 1, text: "IsOctober()", descriptionStringId: 'ExpressionEditorStringId.Function_IsOctober' }],
+                            IsNovember: [{ paramCount: 1, text: "IsNovember()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNovember' }],
+                            IsDecember: [{ paramCount: 1, text: "IsDecember()", descriptionStringId: 'ExpressionEditorStringId.Function_IsDecember' }],
+                            IsSameDay: [{ paramCount: 2, text: "IsSameDay(, )", descriptionStringId: 'ExpressionEditorStringId.Function_IsSameDay' }],
+                            IsYearToDate: [{ paramCount: 1, text: "IsYearToDate()", descriptionStringId: 'ExpressionEditorStringId.Function_IsYearToDate' }],
                             DateDiffTick: [{ paramCount: 2, text: "DateDiffTick(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffTick.Description' }],
                             DateDiffSecond: [{ paramCount: 2, text: "DateDiffSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffSecond.Description' }],
                             DateDiffMilliSecond: [{ paramCount: 2, text: "DateDiffMilliSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description' }],
@@ -3155,6 +3152,16 @@ var DevExpress;
                         }
                     }
                 ];
+                function insertInFunctionDisplay(addins) {
+                    return Internal.functionDisplay.map(function (cat) {
+                        var ext = addins[cat.display];
+                        return ext ? {
+                            display: cat.display, category: cat.category, localizationId: cat.localizationId,
+                            items: $.extend({}, cat.items, ext)
+                        } : cat;
+                    });
+                }
+                Internal.insertInFunctionDisplay = insertInFunctionDisplay;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12212,7 +12219,7 @@ var DevExpress;
                         write: function (newVal) {
                             if (!!newVal) {
                                 var root = !!_this.path() ? _this.path().split('.')[0] : newVal.split('.')[0];
-                                var rootItem = rootITems.filter(function (x) { return x.displayName === root; })[0];
+                                var rootItem = rootITems.filter(function (x) { return x.name === root; })[0];
                                 if (!!rootItem) {
                                     member(_this.getMemberByPath(ko.unwrap(rootItem.model), _this.path() ? [_this.path(), newVal].join('.') : newVal));
                                 }
@@ -12746,6 +12753,7 @@ var DevExpress;
                                 selectionProvider.focused(val.surface);
                             }
                             else {
+                                selectionProvider.updateSelection(null);
                                 editableObject(val);
                             }
                         }
@@ -13910,7 +13918,7 @@ var DevExpress;
                     this.controlsMap[typeName].info = $.extend(true, [], metadata.info);
                 };
                 ControlsFactory.prototype._getPropertyInfo = function (info, path, position) {
-                    var propertyInfo = info.filter(function (x) { return x.displayName === path[position]; })[0];
+                    var propertyInfo = info.filter(function (x) { return x.displayName === path[position] || x.propertyName === path[position] || x.modelName === path[position]; })[0];
                     if (position === path.length - 1) {
                         return propertyInfo || null;
                     }
@@ -14290,21 +14298,19 @@ var DevExpress;
                     data: requestData,
                     url: uri
                 }, customOptions)).fail(function (jqXHR, textStatus, errorThrown) {
-                    var _failData = requestData;
                     if (ignoreError && ignoreError())
                         return;
-                    Analytics.Internal._errorProcessor.call({ jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown });
+                    Analytics.Internal._errorProcessor.call({ jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, getRequestDetails: function () { return requestData || uri; } });
                     Analytics.Internal._processError(errorThrown, deferred, jqXHR, textStatus, processErrorCallback);
                 })
                     .done(function (data, textStatus, jqXHR) {
-                    var _doneData = requestData;
                     if (data.success) {
                         deferred.resolve(data.result);
                     }
                     else {
                         if (ignoreError && ignoreError())
                             return;
-                        Analytics.Internal._errorProcessor.call({ jqXHR: jqXHR, data: data, textStatus: textStatus });
+                        Analytics.Internal._errorProcessor.call({ jqXHR: jqXHR, data: data, textStatus: textStatus, getRequestDetails: function () { return requestData || uri; } });
                         Analytics.Internal._processError("Internal Server Error", deferred, jqXHR, textStatus, processErrorCallback);
                     }
                 });
@@ -14370,7 +14376,7 @@ var DevExpress;
                     undoEngine().end();
                 }), selection = selection || new Analytics.Internal.SurfaceSelection(), contextActionProviders = [], snapHelper = new Analytics.Internal.SnapLinesHelper(surface, Analytics.Internal.SnapLinesHelper.snapTolerance, snapLinesCollector || new Analytics.Internal.SnapLinesCollector()), controlsHelper = designControlsHelper || new Analytics.Internal.DesignControlsHelper(model, [{
                         added: function (control) { },
-                        deleted: function (control) { control.surface == selection.focused() && selection.focused(Analytics.Internal.findNextSelection(control.surface)); }
+                        deleted: function (control) { control.surface === selection.focused() && selection.focused(Analytics.Internal.findNextSelection(control.surface)); }
                     }]), dragHelperContent = new Analytics.Internal.DragHelperContent(selection), toolboxItems = Analytics.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new Analytics.Internal.InlineTextEdit(selection), editableObject = Analytics.Internal.CombinedObject.getEditableObject(selection, undoEngine, customMerge).extend({ throttle: 1 }), propertyGrid = new Analytics.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors, groupLocalizationIDs: groupLocalizationIDs }, null), popularProperties = new Analytics.Widgets.ObjectProperties(ko.pureComputed(function () {
                     var popularPropertiesObject = { getInfo: function () { return []; } }, editable = editableObject();
                     if (editable) {
