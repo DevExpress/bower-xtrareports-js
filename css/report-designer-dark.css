@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-06
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3024,8 +3024,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-06
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3168,8 +3168,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-06
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4222,8 +4222,8 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-07
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4697,8 +4697,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-07
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5407,7 +5407,7 @@
 .dxrd-preview-export-toolbar-item .dxrd-preview-export-menu-item .dxrd-preview-export-item-text {
   padding: 1px 10px 6px 10px;
 }
-.dx-overlay-wrapper .dx-context-menu .dx-submenu {
+.dx-overlay-wrapper .dx-context-menu.dxrdp-export-to-menu .dx-submenu {
   max-height: 400px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -5770,8 +5770,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-dark.css)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-07
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

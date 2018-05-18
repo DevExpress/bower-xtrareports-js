@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-07
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2994,6 +2994,7 @@ var DevExpress;
                     };
                 };
                 ReportPreview.prototype.openReport = function (reportName) {
+                    var _this = this;
                     this._clearReportInfo();
                     var deferred = $.Deferred();
                     this._openReportOperationDeferred = deferred;
@@ -3001,7 +3002,7 @@ var DevExpress;
                         deferred.resolve(response);
                     }).fail(function (error) {
                         deferred.reject(error);
-                        DevExpress.Designer.getSpecificLocalizationWithAddition("Could not open report '" + reportName + "'", "Could not open report", " '" + reportName + "'", "ASPxReportsStringId.WebDocumentViewer_OpenReportError");
+                        _this._processError(DevExpress.Designer.getLocalization("Could not open report", "ASPxReportsStringId.WebDocumentViewer_OpenReportError") + " '" + reportName + "'", error);
                     });
                     return this.initialize(deferred.promise());
                 };

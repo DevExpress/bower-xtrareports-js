@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-06
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1391,18 +1391,34 @@ var DevExpress;
             return deferred;
         }
         Data.getDBSchemaCallback = getDBSchemaCallback;
+        function getDBStoredProceduresCallback(connection) {
+            var deferred = $.Deferred();
+            DevExpress.Designer.QueryBuilder.RequestWrapper.getDbStoredProcedures(connection)
+                .done(function (data) {
+                deferred.resolve(new Data.DBSchema(JSON.parse(data.dbSchemaJSON)).procedures);
+            })
+                .fail(function (data) {
+                DevExpress.Designer.ShowMessage(DevExpress.JS.Utils.formatUnicorn(DevExpress.Designer.getLocalization('Stored procedures loading failed. {0}', 'DxDesignerStringId.Error_SchemaLoadingFailed'), DevExpress.Designer.getErrorMessage(data)));
+                deferred.reject();
+            });
+            return deferred;
+        }
+        Data.getDBStoredProceduresCallback = getDBStoredProceduresCallback;
         var DBSchemaProvider = (function (_super) {
             __extends(DBSchemaProvider, _super);
-            function DBSchemaProvider(connection, _getDBSchemaCallback) {
+            function DBSchemaProvider(connection, _getDBSchemaCallback, _getDBStoredProcedures) {
                 var _this = this;
                 if (_getDBSchemaCallback === void 0) { _getDBSchemaCallback = Data.getDBSchemaCallback; }
+                if (_getDBStoredProcedures === void 0) { _getDBStoredProcedures = Data.getDBStoredProceduresCallback; }
                 _super.call(this);
                 this._getDBSchemaCallback = _getDBSchemaCallback;
+                this._getDBStoredProcedures = _getDBStoredProcedures;
                 this._tables = {};
                 this.connection = connection;
                 this._disposables.push(this.connection.name.subscribe(function () {
                     _this._tables = {};
                     _this._dbSchema = null;
+                    _this._dbStoredProceduresSchema = null;
                 }));
                 this.getItems = function (pathRequest) {
                     var result = $.Deferred();
@@ -1433,6 +1449,11 @@ var DevExpress;
                 if (!this._dbSchema || this._dbSchema.state() === "rejected")
                     this._dbSchema = this._getDBSchema();
                 return this._dbSchema;
+            };
+            DBSchemaProvider.prototype.getDbStoredProcedures = function () {
+                if (!this._dbStoredProceduresSchema || this._dbStoredProceduresSchema.state() === "rejected")
+                    this._dbStoredProceduresSchema = this._getDBStoredProcedures(this.connection);
+                return this._dbStoredProceduresSchema;
             };
             DBSchemaProvider.prototype.getDbTable = function (tableName) {
                 var _this = this;
@@ -3256,9 +3277,11 @@ var DevExpress;
                         this._selectStatementControl = new SelectStatementQueryControl(new Wizard.SelectQuerySqlTextProvider(callbacks.selectStatement || Designer.QueryBuilder.RequestWrapper.getSelectStatement, this._connection), disableCustomSql);
                         this.selectedQueryType.subscribe(function (value) {
                             if (value === _this.queryTypeItems[1]) {
-                                _this._retrieveDbSchema(function (dbSchema) {
-                                    _this._proceduresList.storedProcedures([]);
-                                    _this._proceduresList.storedProcedures(dbSchema.procedures);
+                                _this._wrapWizardIndicator(function () {
+                                    return _this._dataSource().dbSchemaProvider.getDbStoredProcedures().done(function (procedures) {
+                                        _this._proceduresList.storedProcedures([]);
+                                        _this._proceduresList.storedProcedures(procedures);
+                                    });
                                 });
                                 _this.queryControl(_this._proceduresList);
                             }
@@ -3278,23 +3301,23 @@ var DevExpress;
                             wizard.cancel();
                         };
                     }
-                    CreateQueryPage.prototype._retrieveDbSchema = function (onDoneCallback) {
+                    CreateQueryPage.prototype._wrapWizardIndicator = function (callBack) {
                         var _this = this;
                         this.wizard.indicatorVisible(true);
-                        this._dataSource().dbSchemaProvider.getDbSchema().done(function (dbSchema) {
-                            onDoneCallback(dbSchema);
-                        }).always(function () { _this.wizard.indicatorVisible(false); });
+                        callBack().always(function () { _this.wizard.indicatorVisible(false); });
                     };
                     CreateQueryPage.prototype.runQueryBuilder = function () {
                         var _this = this;
-                        this._retrieveDbSchema(function (dbSchema) {
-                            var query = _this.queryControl().getQuery();
-                            if (query.type() === DevExpress.Data.SqlQueryType.tableQuery) {
-                                _this.popupQueryBuilder.show(query, _this._dataSource());
-                            }
-                            else {
-                                _this.popupQueryBuilder.show(new DevExpress.Data.TableQuery({ "@Name": query.name() }, _this._dataSource()), _this._dataSource());
-                            }
+                        this._wrapWizardIndicator(function () {
+                            return _this._dataSource().dbSchemaProvider.getDbSchema().done(function (dbSchema) {
+                                var query = _this.queryControl().getQuery();
+                                if (query.type() === DevExpress.Data.SqlQueryType.tableQuery) {
+                                    _this.popupQueryBuilder.show(query, _this._dataSource());
+                                }
+                                else {
+                                    _this.popupQueryBuilder.show(new DevExpress.Data.TableQuery({ "@Name": query.name() }, _this._dataSource()), _this._dataSource());
+                                }
+                            });
                         });
                     };
                     CreateQueryPage.prototype.localizeQueryType = function (queryTypeString) {
@@ -4901,6 +4924,13 @@ var DevExpress;
                     });
                     return RequestWrapper.sendRequest("getDBSchema", encodeURIComponent(requestJson));
                 };
+                RequestWrapper.getDbStoredProcedures = function (connection) {
+                    var serializer = new DevExpress.JS.Utils.ModelSerializer();
+                    var requestJson = JSON.stringify({
+                        connectionJSON: RequestWrapper.getConnectionJSON(connection)
+                    });
+                    return RequestWrapper.sendRequest("getDBStoredProcedures", encodeURIComponent(requestJson));
+                };
                 RequestWrapper.getSelectStatement = function (connection, queryJSON) {
                     var serializer = new DevExpress.JS.Utils.ModelSerializer();
                     var requestJson = JSON.stringify({
@@ -5038,9 +5068,9 @@ var DevExpress;
                                 });
                             }
                             else if (pathRequest.fullPath === "procedures") {
-                                dbSchemaProvider.getDbSchema().done(function (dbSchema) {
+                                dbSchemaProvider.getDbStoredProcedures().done(function (storedProcedures) {
                                     if (_this._procedures.children().length === 0) {
-                                        var procedures = dbSchema.procedures.map(function (proc) {
+                                        var procedures = storedProcedures.map(function (proc) {
                                             return new Wizard.TreeLeafNode(proc.name, Wizard.StoredProceduresQueryControl.generateStoredProcedureDisplayName(proc), "procedure", _this._procedures.checked.peek(), proc.arguments, afterCheckToggled);
                                         });
                                         _this._procedures.initializeChildern(procedures);
@@ -6059,8 +6089,8 @@ var DevExpress;
 //# sourceMappingURL=dx-query-builder-core.js.map
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-07
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8924,7 +8954,9 @@ var DevExpress;
                     "Clockwise": "Clockwise",
                 }, defaultVal: "Counterclockwise"
             };
-            var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var totalLabelInfo = [Chart.textColor, Chart.backColor, enableAntialiasing, Chart.maxWidth, Chart.maxLineCount, Chart.textAlignment, Chart.textPattern, visible, Chart.tag, Chart.font12, border, fillStyle, shadow];
+            var totalLabel = { propertyName: "totalLabel", modelName: "TotalLabel", displayName: "Total Label", localizationId: "DevExpress.XtraCharts.PieSeriesView.TotalLabel", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: totalLabelInfo, };
+            var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag, totalLabel];
             var thickness2 = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.LineStyle.Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 1 } };
             var lineStyleInfo1 = [thickness2, dashStyle, lineJoin, Chart.tag,];
             var lineStyle2 = { propertyName: "lineStyle", modelName: "LineStyle", displayName: "Line Style", localizationId: "DevExpress.XtraCharts.SwiftPlotSeriesView.LineStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: lineStyleInfo1, };
@@ -8985,7 +9017,7 @@ var DevExpress;
             var pieFillStyle = { propertyName: "pieFillStyle", modelName: "PieFillStyle", displayName: "Pie Fill Style", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.PieFillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pieFillStyleInfo, };
             var doughnut3DSeriesViewinfo = [holeRadiusPercent2, depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
             var holeRadiusPercent3 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.DoughnutSeriesView.HoleRadiusPercent", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 60, editorOptions: { min: 0, max: 100 } };
-            var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag, totalLabel];
             var size2 = { propertyName: "size", modelName: "@Size", displayName: "Size", localizationId: "DevExpress.XtraCharts.SimpleMarker.Size", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 8, editorOptions: { min: 1 } };
             var pointMarkerOptionsInfo = [size2, kind, starPointCount, fillStyle1, borderVisible, borderColor, Chart.tag,];
             var pointMarkerOptions = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.RadarPointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
@@ -9071,7 +9103,7 @@ var DevExpress;
             var manhattanBarSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
             var overlappedRangeBarSeriesViewinfo = [minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var pie3DSeriesViewinfo = [depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
-            var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag,];
+            var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Chart.tag, totalLabel];
             var pointMarkerOptions1 = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
             var pointSeriesViewinfo = [pointMarkerOptions1, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var barDistance6 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
@@ -12150,6 +12182,7 @@ var DevExpress;
                     };
                 };
                 ReportPreview.prototype.openReport = function (reportName) {
+                    var _this = this;
                     this._clearReportInfo();
                     var deferred = $.Deferred();
                     this._openReportOperationDeferred = deferred;
@@ -12157,7 +12190,7 @@ var DevExpress;
                         deferred.resolve(response);
                     }).fail(function (error) {
                         deferred.reject(error);
-                        DevExpress.Designer.getSpecificLocalizationWithAddition("Could not open report '" + reportName + "'", "Could not open report", " '" + reportName + "'", "ASPxReportsStringId.WebDocumentViewer_OpenReportError");
+                        _this._processError(DevExpress.Designer.getLocalization("Could not open report", "ASPxReportsStringId.WebDocumentViewer_OpenReportError") + " '" + reportName + "'", error);
                     });
                     return this.initialize(deferred.promise());
                 };
@@ -16630,14 +16663,14 @@ var DevExpress;
                     this.onComponentAdded({ parent: dropTarget.getControlModel(), model: control });
                 };
                 FieldListDragDropHandler.prototype._isDefaultBindingAssigned = function (control, treeListItem) {
-                    if (control["defaultDataBinding"] && !isList(treeListItem.data)) {
+                    if (control["popularDataBinding"] && !isList(treeListItem.data)) {
                         if (this.dataBindingMode() === Report.DataBindingMode.Bindings) {
-                            var dataBinding = control["defaultDataBinding"];
+                            var dataBinding = control["popularDataBinding"];
                             dataBinding.updateBinding(treeListItem.path, this._dataSources.peek());
                         }
                         else {
                             var dataSourceInfo = Report.getDataSourceDataMember(control);
-                            var expression = control["defaultExpression"];
+                            var expression = control["popularExpression"];
                             var path = treeListItem.data instanceof Report.Parameter ? treeListItem.path : new DevExpress.JS.Widgets.PathRequest(treeListItem.path).path;
                             expression.value(getExpressionPath(control, path));
                         }
@@ -16653,7 +16686,7 @@ var DevExpress;
                         var dropTargetControl = dropTarget.getControlModel();
                         var boundedClass = "dxrd-image-ghost-bounded";
                         var dragHelperContent = this.dragHelperContent.controls()[0];
-                        if (dropTargetControl["defaultDataBinding"] && !isList(draggable.data)) {
+                        if (dropTargetControl["popularDataBinding"] && !isList(draggable.data)) {
                             if (!this._needToChangeHelperContent(dragHelperContent, boundedClass)) {
                                 var rect = new Designer.Rectangle(12, 12, 12, 12);
                                 rect.className = boundedClass;
@@ -17661,24 +17694,38 @@ var DevExpress;
                     from: Report.DataBinding.initialize
                 };
             };
-            Report.defaultBindings = function (binding) {
-                var options = typeof binding === "string" ? { propertyName: binding } : binding;
-                return [Report.defaultDataBinding(options), Report.defaultExpression(options)];
+            Report.createSinglePopularBindingInfos = function (propertyName) {
+                return [Report.createPopularBindingInfo({ bindingName: propertyName, propertyName: "" }, false), Report.createPopularBindingInfo({ bindingName: propertyName, propertyName: "" })];
             };
-            Report.defaultDataBinding = function (options) { return ({
-                propertyName: "defaultDataBinding" + (options.createNewProperty ? options.propertyName : ""),
-                displayName: options.createNewProperty && (options.displayName || options.propertyName) || "Data Binding",
-                localizationId: options.localizationId || "ReportStringId.STag_Name_DataBinding",
-                editor: Report.editorTemplates.dataBinding,
-                bindingName: options.propertyName
-            }); };
-            Report.defaultExpression = function (options) { return ({
-                propertyName: "defaultExpression" + (options.createNewProperty ? options.propertyName : ""),
-                displayName: options.customExpressionName || "Expression",
-                localizationId: options.customExpressionLocalizationId || "ReportStringId.STag_Name_Expression",
-                editor: Report.editorTemplates.reportexpression,
-                expressionName: options.propertyName
-            }); };
+            Report.createPopularBindingInfos = function (options) {
+                var dataBindingOptions = {
+                    propertyName: "popularDataBinding" + options.propertyName,
+                    displayName: options.propertyName,
+                    localizationId: options.localizationId,
+                    bindingName: options.propertyName,
+                };
+                var expressionOptions = {
+                    propertyName: "popularExpression" + options.propertyName,
+                    displayName: options.propertyName,
+                    localizationId: options.localizationId,
+                    bindingName: options.propertyName,
+                };
+                return [Report.createPopularBindingInfo(dataBindingOptions, false), Report.createPopularBindingInfo(expressionOptions)];
+            };
+            Report.createPopularBindingInfo = function (options, isExpression) {
+                if (isExpression === void 0) { isExpression = true; }
+                var newInfo = {
+                    propertyName: options.propertyName || (isExpression ? "popularExpression" : "popularDataBinding"),
+                    displayName: options.displayName || (isExpression ? "Expression" : "Data Binding"),
+                    localizationId: options.localizationId || (isExpression ? "DevExpress.XtraReports.UI.CalculatedField.Expression" : "ReportStringId.STag_Name_DataBinding"),
+                    editor: isExpression ? Report.editorTemplates.reportexpression : Report.editorTemplates.dataBinding,
+                };
+                if (isExpression)
+                    newInfo["expressionName"] = options.bindingName;
+                else
+                    newInfo["bindingName"] = options.bindingName;
+                return newInfo;
+            };
             Report.filterString = { propertyName: "_filterString", modelName: "@FilterString" };
             Report.filterStringEditable = { propertyName: "filterString", displayName: "Filter String", localizationId: "DevExpress.XtraReports.UI.XtraReportBase.FilterString", defaultVal: "", editor: Designer.Widgets.editorTemplates.filterEditor };
             Report.bookmark = { propertyName: "bookmark", modelName: "@Bookmark", displayName: "Bookmark", localizationId: "DevExpress.XtraReports.UI.XRControl.Bookmark", editor: DevExpress.JS.Widgets.editorTemplates.text };
@@ -17888,7 +17935,7 @@ var DevExpress;
                 Report.textEditOptions,
                 Report.autoWidth, Report.anchorVertical, Report.anchorHorizontal, Report.labelScripts, Report.textTrimming,
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark"])
-            ].concat(Report.defaultBindings("Text"), Report.sizeLocation, Report.labelGroup);
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.labelGroup);
             Report.panelSerializationsInfo = [
                 Report.canGrow, Report.canShrink, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag"]),
@@ -17900,20 +17947,12 @@ var DevExpress;
                 Report.serializableRtfString,
                 Report.rtf, Report.textRtf,
                 Report.nullValueText, Report.keepTogetherDefaultValueFalse, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
-                Report.dataBindings(["Bookmark", "Html", "NavigateUrl", "Rtf", "Tag"])
-            ].concat(Report.defaultBindings({
-                propertyName: "Html",
-                displayName: "Html Data Binding",
-                customExpressionName: "Html Expression",
-                customExpressionLocalizationId: "ReportStringId.STag_Name_HtmlExpressionBinding",
-                createNewProperty: true
-            }), Report.defaultBindings({
-                propertyName: "Rtf",
-                displayName: "Rtf Data Binding",
-                customExpressionName: "Rtf Expression",
-                customExpressionLocalizationId: "ReportStringId.STag_Name_RtfExpressionBinding",
-                createNewProperty: true
-            }), Report.sizeLocation, Report.fontGroup, Report.commonControlProperties, Report.navigationGroup, Report.processGroup, Report.canGrowShrinkGroup);
+                Report.dataBindings(["Bookmark", "Html", "NavigateUrl", "Rtf", "Tag"]),
+                Report.createPopularBindingInfo({ bindingName: "Html", propertyName: "popularDataBindingHtml", displayName: "Html", localizationId: "ReportStringId.STag_Name_HtmlDataBinding" }, false),
+                Report.createPopularBindingInfo({ bindingName: "Html", propertyName: "popularExpressionHtml", displayName: "Html", localizationId: "ReportStringId.STag_Name_HtmlExpressionBinding" }),
+                Report.createPopularBindingInfo({ bindingName: "Rtf", propertyName: "popularDataBindingRtf", displayName: "Rtf", localizationId: "ReportStringId.STag_Name_RtfDataBinding" }, false),
+                Report.createPopularBindingInfo({ bindingName: "Rtf", propertyName: "popularExpressionRtf", displayName: "Rtf", localizationId: "ReportStringId.STag_Name_RtfExpressionBinding" }),
+            ].concat(Report.sizeLocation, Report.fontGroup, Report.commonControlProperties, Report.navigationGroup, Report.processGroup, Report.canGrowShrinkGroup);
             Report.unknownSerializationsInfo = [].concat(Report.baseControlProperties, Report.sizeLocation);
             Report.dataBindingsSerializationInfo = [
                 { propertyName: "ActualValue", editor: Report.editorTemplates.dataBinding, displayName: "Actual Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.ActualValue" },
@@ -17930,8 +17969,8 @@ var DevExpress;
                 { propertyName: "TargetValue", editor: Report.editorTemplates.dataBinding, displayName: "Target Value", localizationId: "DevExpress.XtraReports.UI.XRGauge.TargetValue" },
                 { propertyName: "Text", editor: Report.editorTemplates.dataBinding, displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRControl.Text" }
             ];
-            Report.popularPropertiesLabel = ["text", "textArea", "defaultDataBinding", "defaultExpression", "textFormatString", "Summary", "angle", "bookmark", "bookmarkParent", "autoWidth", "canGrow", "canShrink", "multiline", "wordWrap"];
-            Report.popularPropertiesRichText = ["rtf", "defaultDataBindingRtf", "defaultExpressionRtf", "html", "defaultDataBindingHtml", "defaultExpressionHtml", "bookmark", "bookmarkParent", "canGrow", "canShrink"];
+            Report.popularPropertiesLabel = ["text", "textArea", "popularDataBinding", "popularExpression", "textFormatString", "Summary", "angle", "bookmark", "bookmarkParent", "autoWidth", "canGrow", "canShrink", "multiline", "wordWrap"];
+            Report.popularPropertiesRichText = ["rtf", "popularDataBindingRtf", "popularExpressionRtf", "html", "popularDataBindingHtml", "popularExpressionHtml", "bookmark", "bookmarkParent", "canGrow", "canShrink"];
             Report.rtlLayout = {
                 propertyName: "rtlLayout", modelName: "@RightToLeftLayout", displayName: "Right To Left Layout", localizationId: "DevExpress.XtraReports.UI.XtraReport.RightToLeftLayout", defaultVal: "No", editor: Report.editorTemplates.reportRtlProperty,
                 valuesArray: [
@@ -18188,31 +18227,30 @@ var DevExpress;
                     }
                     _super.prototype.addChild.call(this, control);
                 };
-                ReportElementViewModel.prototype.initDataBindingProperty = function (name) {
-                    var defaultBinding = this.getInfo().filter(function (value) {
-                        return name ? value["bindingName"] && value["bindingName"] === name : value["bindingName"];
-                    })[0];
-                    if (defaultBinding) {
-                        this[defaultBinding.propertyName] = this.dataBindings()["findBinding"](defaultBinding["bindingName"]);
-                    }
-                };
-                ReportElementViewModel.prototype.initExpressionProperty = function (name) {
+                ReportElementViewModel.prototype.initDataBindingProperties = function () {
                     var _this = this;
-                    if (this.expressionBindings) {
-                        this.expressionObj = this.getControlFactory()._createExpressionObject(this.controlType, this.expressionBindings, ko.pureComputed(function () {
-                            return _this.getPath("expression");
-                        }), this["Summary"] && this["Summary"]["Running"] && ko.computed(function () { return _this["Summary"]["Running"]() != "None"; }));
-                        var expressionInfo = this.getInfo().filter(function (value) {
-                            return name ? value["expressionName"] && value["expressionName"] === name : value["expressionName"];
-                        })[0];
-                        if (expressionInfo && this.expressionObj) {
-                            this[expressionInfo.propertyName] = this.expressionObj().getExpression(expressionInfo["expressionName"], "BeforePrint");
-                        }
-                    }
+                    var bindingInfos = this.getInfo().filter(function (info) { return "bindingName" in info; });
+                    bindingInfos.forEach(function (info) {
+                        _this[info.propertyName] = _this.dataBindings()["findBinding"](info["bindingName"]);
+                    });
                 };
-                ReportElementViewModel.prototype.initBindings = function (name) {
-                    this.initDataBindingProperty(name);
-                    this.initExpressionProperty(name);
+                ReportElementViewModel.prototype.initExpressionProperties = function () {
+                    var _this = this;
+                    if (!this.expressionBindings)
+                        return;
+                    this.expressionObj = this.getControlFactory()._createExpressionObject(this.controlType, this.expressionBindings, ko.pureComputed(function () {
+                        return _this.getPath("expression");
+                    }), this["Summary"] && this["Summary"]["Running"] && ko.computed(function () { return _this["Summary"]["Running"]() != "None"; }));
+                    if (!this.expressionObj)
+                        return;
+                    var expressionInfos = this.getInfo().filter(function (info) { return "expressionName" in info; });
+                    expressionInfos.forEach(function (info) {
+                        _this[info.propertyName] = _this.expressionObj().getExpression(info["expressionName"], "BeforePrint");
+                    });
+                };
+                ReportElementViewModel.prototype.initBindings = function () {
+                    this.initDataBindingProperties();
+                    this.initExpressionProperties();
                 };
                 ReportElementViewModel.prototype.isStyleProperty = function (propertyName) {
                     var _this = this;
@@ -18262,10 +18300,10 @@ var DevExpress;
                         return name !== "dataBindings"
                             && name !== "formattingRuleLinks"
                             && name !== "formattingRuleSheet"
-                            && name.indexOf("defaultDataBinding") !== 0;
+                            && name.indexOf("popularDataBinding") !== 0;
                     }
                     else {
-                        return name.indexOf("defaultExpression") !== 0;
+                        return name.indexOf("popularExpression") !== 0;
                     }
                     return true;
                 };
@@ -20085,19 +20123,6 @@ var DevExpress;
                     };
                     this._expressionsInfo = {};
                     this._expressionsSerializationInfoCache = {};
-                    this._summaryFunctions = Report.reportFunctionDisplay
-                        .filter(function (cat) { return cat.category != "Aggregate"; })
-                        .concat([
-                        {
-                            display: "Summary",
-                            category: "Summary",
-                            items: ["Avg", "Count", "Sum", "RunningSum", "Percentage", "Max", "Min", "Median", "Var", "VarP", "StdDev", "StdDevP", "DAvg", "DCount", "DSum", "DVar", "DVarP", "DStdDev", "DStdDevP", "RecordNumber"]
-                                .reduce(function (acc, f) {
-                                acc["sum" + f] = [{ paramCount: 1, text: "sum" + f + "()", descriptionStringId: "ReportStringId.ExpressionEditor_Description_Function_Summary" + f }];
-                                return acc;
-                            }, {})
-                        }
-                    ]);
                 }
                 ExpressionWrapper.createExpression = function (propertyName, eventName, expression) {
                     return {
@@ -20184,7 +20209,7 @@ var DevExpress;
                     var expressionOptions = new WrappedExpressionOptions({
                         path: path || ko.observable(""),
                         functions: !!summaryRunning
-                            ? ko.computed(function () { return summaryRunning() ? _this._summaryFunctions : Report.reportFunctionDisplay; })
+                            ? ko.computed(function () { return summaryRunning() ? _this._summaryFunctions() : Report.reportFunctionDisplay; })
                             : Report.reportFunctionDisplay
                     }, {
                         addExpression: function (newVal) {
@@ -20196,6 +20221,21 @@ var DevExpress;
                     });
                     expressionOptions.expression(this._getExpressionFromArray(propertyName, eventName, expressions));
                     return expressionOptions;
+                };
+                ExpressionWrapper.prototype._summaryFunctions = function () {
+                    return Report.reportFunctionDisplay
+                        .filter(function (cat) { return cat.category != "Aggregate"; })
+                        .concat([
+                        {
+                            display: "Summary",
+                            category: "Summary",
+                            items: ["Avg", "Count", "Sum", "RunningSum", "Percentage", "Max", "Min", "Median", "Var", "VarP", "StdDev", "StdDevP", "DAvg", "DCount", "DSum", "DVar", "DVarP", "DStdDev", "DStdDevP", "RecordNumber"]
+                                .reduce(function (acc, f) {
+                                acc["sum" + f] = [{ paramCount: 1, text: "sum" + f + "()", descriptionStringId: "ReportStringId.ExpressionEditor_Description_Function_Summary" + f }];
+                                return acc;
+                            }, {})
+                        }
+                    ]);
                 };
                 ExpressionWrapper.prototype._mapExpressionsToObjectByEventName = function (object, eventName, expressions, subscriptions, path, summaryRunning) {
                     var _this = this;
@@ -20351,6 +20391,9 @@ var DevExpress;
                     }
                     path = path.slice(1);
                     var control = this._getControlByName(allControls, path[0]);
+                    if (!control) {
+                        return [];
+                    }
                     var info = control.getInfo();
                     var controlsPath = path.slice(1);
                     for (var i = 0; i < controlsPath.length; i++) {
@@ -20369,7 +20412,7 @@ var DevExpress;
                         });
                     }
                     else {
-                        return null;
+                        return [];
                     }
                 };
                 return ReportItemsProvider;
@@ -21289,7 +21332,7 @@ var DevExpress;
                     if (this.controlType === "GroupHeaderBand") {
                         this["groupFields"] = DevExpress.JS.Utils.deserializeArray(band.GroupFields, function (field) { return new Report.GroupFieldModel(field, serializer); });
                     }
-                    if (this.controlType === "SubBand") {
+                    if (this.controlType === "SubBand" && parent["multiColumn"]) {
                         this["multiColumn"] = parent["multiColumn"];
                     }
                     var bands = [];
@@ -21923,9 +21966,6 @@ var DevExpress;
                             _this.checkState("Unchecked");
                         }
                     }));
-                    ["Text", "CheckState"].forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 return CheckBoxViewModel;
             })(Report.ControlViewModel);
@@ -21997,8 +22037,8 @@ var DevExpress;
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark", "CheckState"]),
                 Report.rtl,
                 Report.chekEditOptions
-            ].concat(Report.defaultBindings({ propertyName: "CheckState", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState", createNewProperty: true }), Report.defaultBindings({ propertyName: "Text", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.Text", createNewProperty: true }), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup);
-            Report.popularPropertiesCheckBox = ["checkState", "defaultDataBindingCheckState", "defaultExpressionCheckState", "text", "defaultDataBindingText", "defaultExpressionText", "bookmark", "bookmarkParent"];
+            ].concat(Report.createPopularBindingInfos({ propertyName: "CheckState", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState" }), Report.createPopularBindingInfos({ propertyName: "Text", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.Text" }), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup);
+            Report.popularPropertiesCheckBox = ["checkState", "popularDataBindingCheckState", "popularExpressionCheckState", "text", "popularDataBindingText", "popularExpressionText", "bookmark", "bookmarkParent"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -23083,9 +23123,6 @@ var DevExpress;
                             _this.imageUrl(Report.imageUrl.defaultVal);
                         }
                     }));
-                    ["Image", "ImageUrl"].forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 Object.defineProperty(XRPictureBoxViewModel.prototype, "isAutoSize", {
                     get: function () {
@@ -23179,9 +23216,9 @@ var DevExpress;
             };
             Report.pictureBoxSerializationsInfo = [
                 Report.image, Report.imageUrl, Report.sizing, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts,
-                Report.dataBindings(["Bookmark", "Image", "ImageUrl", "NavigateUrl", "Tag"])
-            ].concat(Report.defaultBindings({ propertyName: "Image", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image", createNewProperty: true }), Report.defaultBindings({ propertyName: "ImageUrl", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl", createNewProperty: true }), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup, Report.processGroup);
-            Report.popularPropertiesPicture = ["image", "defaultDataBindingImage", "defaultExpressionImage", "imageUrl", "defaultDataBindingImageUrl", "defaultExpressionImageUrl", "sizing", "bookmark", "bookmarkParent"];
+                Report.dataBindings(["Bookmark", "Image", "ImageUrl", "NavigateUrl", "Tag"]),
+            ].concat(Report.createPopularBindingInfos({ propertyName: "Image", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image" }), Report.createPopularBindingInfos({ propertyName: "ImageUrl", localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl" }), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup, Report.processGroup);
+            Report.popularPropertiesPicture = ["image", "popularDataBindingImage", "popularExpressionImage", "imageUrl", "popularDataBindingImageUrl", "popularExpressionImageUrl", "sizing", "bookmark", "bookmarkParent"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -23810,6 +23847,14 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                Object.defineProperty(TableCellActions.prototype, "_cellSurface", {
+                    get: function () {
+                        var cell = this.selection.focused();
+                        return cell instanceof TableCellSurface && cell || null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 TableCellActions.prototype.insertCell = function () {
                     this._row.insertCellCopy(this._cell, false);
                 };
@@ -23817,18 +23862,18 @@ var DevExpress;
                     Designer.deleteSelection(this.selection);
                 };
                 TableCellActions.prototype.deleteRow = function () {
-                    this.selection.initialize(this.selection.focused().parent);
+                    this.selection.initialize(this._cellSurface.parent);
                     Designer.deleteSelection(this.selection);
                 };
                 TableCellActions.prototype.insertColumn = function (isRight) {
                     this._table.insertColumn(this._cell, isRight);
                 };
                 TableCellActions.prototype.deleteColumn = function () {
-                    this.selection.focused().selectColumn(this.selection);
+                    this._cellSurface.selectColumn(this.selection);
                     Designer.deleteSelection(this.selection);
                 };
                 TableCellActions.prototype.condition = function (context) {
-                    return context instanceof TableCellViewModel;
+                    return context instanceof TableCellViewModel && !!this._cellSurface;
                 };
                 return TableCellActions;
             })(TableRowActions);
@@ -23848,14 +23893,14 @@ var DevExpress;
                 { propertyName: "controls", modelName: "Controls", array: true },
                 Report.dataBindings(["Text", "NavigateUrl", "Tag", "Bookmark"]),
                 Report.textEditOptions
-            ].concat(Report.defaultBindings("Text"), Report.labelGroup);
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.labelGroup);
             Report.tableRowSerializationsInfo = [
                 Report.weight, Report.textAlignment, Report.keepTogether, Report.controlScripts,
                 { propertyName: "height", displayName: "Height", localizationId: "DevExpress.XtraReports.UI.XRControl.Height" },
                 { propertyName: "cells", modelName: "Cells", array: true },
             ].concat(Report.commonControlProperties, Report.fontGroup);
             Report.popularPropertiesTable = ["bookmark", "bookmarkParent"];
-            Report.popularPropertiesTableCell = ["text", "textArea", "defaultDataBinding", "defaultExpression", "textFormatString", "Summary", "canGrow", "canShrink", "multiline", "wordWrap"];
+            Report.popularPropertiesTableCell = ["text", "textArea", "popularDataBinding", "popularExpression", "textFormatString", "Summary", "canGrow", "canShrink", "multiline", "wordWrap"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -24559,8 +24604,8 @@ var DevExpress;
                 $.extend({}, Report.textAlignment, { defaultVal: "BottomLeft" }),
                 Report.textControlScripts, Report.barcodeFake,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag", "Text"]),
-            ].concat(Report.defaultBindings("Text"), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup, Report.processGroup);
-            Report.popularPropertiesBarCode = ["barcodeFake", "module", "autoModule", "barCodeOrientation", "text", "defaultDataBinding", "defaultExpression", "textFormatString", "bookmark", "bookmarkParent", "showText"];
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup, Report.processGroup);
+            Report.popularPropertiesBarCode = ["barcodeFake", "module", "autoModule", "barCodeOrientation", "text", "popularDataBinding", "popularExpression", "textFormatString", "bookmark", "bookmarkParent", "showText"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -24601,8 +24646,8 @@ var DevExpress;
                 Report.foreColor, Report.segmentWidth, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
                 $.extend({}, Report.text, { defaultVal: "0" }, Report.textFormatString),
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag", "Text"])
-            ].concat(Report.defaultBindings("Text"), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
-            Report.popularPropertiesZipCode = ["text", "defaultDataBinding", "defaultExpression", "segmentWidth", "bookmark", "bookmarkParent"];
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
+            Report.popularPropertiesZipCode = ["text", "popularDataBinding", "popularExpression", "segmentWidth", "bookmark", "bookmarkParent"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -24620,9 +24665,6 @@ var DevExpress;
                     this._disposables.push(this.viewType.subscribe(function (val) {
                         return _this.viewStyle(val === "Circular" ? Report.circularValues[0].value : Report.linearValues[0].value);
                     }));
-                    XRGaugeViewModel.bindings.forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 XRGaugeViewModel.prototype.getInfo = function () {
                     var viewStyleProperty = Report.xrGaugeSerializationInfo.filter(function (info) { return info.propertyName === "viewStyle"; })[0];
@@ -24669,10 +24711,14 @@ var DevExpress;
             Report.xrGaugeSerializationInfo = [
                 Report.viewStyle, Report.viewTheme, Report.viewType, Report.actualValue, Report.tickmarkCount, Report.maximum, Report.minimum, Report.targetValue, Report.anchorVertical, Report.anchorHorizontal, Report.controlScripts, Report.imageType,
                 Report.dataBindings(["ActualValue", "Bookmark", "Maximum", "Minimum", "NavigateUrl", "Tag", "TargetValue"])
-            ].concat(XRGaugeViewModel.bindings.map(function (name) { return Report.defaultBindings({ propertyName: name, localizationId: "DevExpress.XtraReports.UI.XRGauge." + name, createNewProperty: true }); }).reduce(function (a, b) { return a.concat(b); }))
+            ].concat(XRGaugeViewModel.bindings
+                .map(function (name) {
+                return Report.createPopularBindingInfos({ propertyName: name, localizationId: "DevExpress.XtraReports.UI.XRGauge." + name });
+            })
+                .reduce(function (a, b) { return a.concat(b); }))
                 .concat(Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
-            Report.popularPropertiesGauge = ["viewType", "viewStyle", "viewTheme", "actualValue", "defaultDataBindingActualValue", "defaultExpressionActualValue", "targetValue", "defaultDataBindingTargetValue", "defaultExpressionTargetValue",
-                "minimum", "defaultDataBindingMinimum", "defaultExpressionMinimum", "maximum", "defaultDataBindingMaximum", "defaultExpressionMaximum"];
+            Report.popularPropertiesGauge = ["viewType", "viewStyle", "viewTheme", "actualValue", "popularDataBindingActualValue", "popularExpressionActualValue", "targetValue", "popularDataBindingTargetValue", "popularExpressionTargetValue",
+                "minimum", "popularDataBindingMinimum", "popularExpressionMinimum", "maximum", "popularDataBindingMaximum", "popularExpressionMaximum"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -26016,7 +26062,7 @@ var DevExpress;
                 Report.formattingRuleLinks, Report.cellSizeMode, wordWrap, Report.cellWidth, Report.cellHeight, Report.cellVerticalSpacing, Report.cellHorizontalSpacing, Report.dataBindings(["Text"]),
                 Report.textAlignment, Report.text, Report.textFormatString, Report.textArea, Report.nullValueText, Report.keepTogetherDefaultValueFalse, Report.summary, Report.multiline, wordWrap,
                 Report.xlsxFormatString, Report.rtl, Report.characterCombBorders, Report.borderWidth, Report.characterCombBorderDashStyle, Report.borderColor, Report.characterCombFont, Report.foreColor, Report.editOptions, Report.interactiveSorting
-            ].concat(Report.defaultBindings("Text"), Report.baseControlProperties, Report.navigationGroup, Report.canGrowShrinkGroup, Report.processGroup, Report.sizeLocation);
+            ].concat(Report.createSinglePopularBindingInfos("Text"), Report.baseControlProperties, Report.navigationGroup, Report.canGrowShrinkGroup, Report.processGroup, Report.sizeLocation);
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -26557,49 +26603,50 @@ var DevExpress;
                     this._expressionWrapper = new Report.ExpressionWrapper(bindingMode);
                 }
                 ControlsFactory.prototype._registerCommonExpressions = function (controlType) {
-                    this.SetPropertyDescription(controlType, "Text", this._beforePrintPrintOnPage);
-                    this.SetPropertyDescription(controlType, "Visible", this._beforePrintPrintOnPage);
-                    this.SetPropertyDescription(controlType, "NavigateUrl", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "Bookmark", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "Tag", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "LeftF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "TopF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "WidthF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "HeightF", this._beforePrint, "Layout");
-                    this.SetPropertyDescription(controlType, "StyleName", this._beforePrint);
-                    this.SetPropertyDescription(controlType, "ForeColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BackColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BorderColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "Borders", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BorderWidth", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "BorderDashStyle", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "TextAlignment", this._beforePrintPrintOnPage, "Appearance");
-                    this.SetPropertyDescription(controlType, "Font", this._beforePrintPrintOnPage, "Appearance", ["Name", "Size", "Italic", "Strikeout", "Bold", "Underline"]);
-                    this.SetPropertyDescription(controlType, "Padding", this._beforePrintPrintOnPage, "Appearance", ["Left", "Right", "Top", "Bottom"]);
+                    this.setPropertyDescription(controlType, "Text", this._beforePrintPrintOnPage);
+                    this.setPropertyDescription(controlType, "Visible", this._beforePrintPrintOnPage);
+                    this.setPropertyDescription(controlType, "NavigateUrl", this._beforePrint);
+                    this.setPropertyDescription(controlType, "Bookmark", this._beforePrint);
+                    this.setPropertyDescription(controlType, "Tag", this._beforePrint);
+                    this.setPropertyDescription(controlType, "LeftF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "TopF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "WidthF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "HeightF", this._beforePrint, "Layout");
+                    this.setPropertyDescription(controlType, "StyleName", this._beforePrint);
+                    this.setPropertyDescription(controlType, "ForeColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BackColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BorderColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "Borders", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BorderWidth", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "BorderDashStyle", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "TextAlignment", this._beforePrintPrintOnPage, "Appearance");
+                    this.setPropertyDescription(controlType, "Font", this._beforePrintPrintOnPage, "Appearance", ["Name", "Size", "Italic", "Strikeout", "Bold", "Underline"]);
+                    this.setPropertyDescription(controlType, "Padding", this._beforePrintPrintOnPage, "Appearance", ["Left", "Right", "Top", "Bottom"]);
                 };
-                ControlsFactory.prototype._registerExtensions = function (controlType) {
+                ControlsFactory.prototype._registerExtensions = function (controlType, metadata) {
+                    var parentType = metadata && metadata.parentType || controlType;
                     this._registerCommonExpressions(controlType);
-                    switch (controlType) {
+                    switch (parentType) {
                         case "XRCheckBox":
-                            this.SetPropertyDescription(controlType, "CheckState", this._beforePrintPrintOnPage);
+                            this.setPropertyDescription(controlType, "CheckState", this._beforePrintPrintOnPage);
                             break;
                         case "XRPictureBox":
-                            this.SetPropertyDescription(controlType, "Image", this._beforePrintPrintOnPage);
-                            this.SetPropertyDescription(controlType, "ImageUrl", this._beforePrintPrintOnPage);
-                            this.HidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
+                            this.setPropertyDescription(controlType, "Image", this._beforePrintPrintOnPage);
+                            this.setPropertyDescription(controlType, "ImageUrl", this._beforePrintPrintOnPage);
+                            this.hidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
                             break;
                         case "XRBarCode":
-                            this.SetPropertyDescription(controlType, "BinaryData", this._beforePrint);
+                            this.setPropertyDescription(controlType, "BinaryData", this._beforePrint);
                             break;
                         case "XRGauge":
-                            this.HidePropertyDescriptions(controlType, "Text", "TextAlignment", "Font", "ForeColor");
-                            this.SetPropertyDescription(controlType, "TargetValue", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "ActualValue", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "Minimum", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "Maximum", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Text", "TextAlignment", "Font", "ForeColor");
+                            this.setPropertyDescription(controlType, "TargetValue", this._beforePrint);
+                            this.setPropertyDescription(controlType, "ActualValue", this._beforePrint);
+                            this.setPropertyDescription(controlType, "Minimum", this._beforePrint);
+                            this.setPropertyDescription(controlType, "Maximum", this._beforePrint);
                             break;
                         case "XRCharacterComb":
-                            this.HidePropertyDescriptions(controlType, "Padding");
+                            this.hidePropertyDescriptions(controlType, "Padding");
                             break;
                         case "TopMarginBand":
                         case "BottomMarginBand":
@@ -26611,95 +26658,106 @@ var DevExpress;
                         case "PageHeaderBand":
                         case "ReportHeaderBand":
                         case "ReportFooterBand":
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "WidthF", "LeftF", "TopF");
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "WidthF", "LeftF", "TopF");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
                             break;
                         case "XRSubreport":
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Padding", "StyleName");
-                            this.HidePropertyDescriptions(controlType, "BackColor", "BorderColor", "BorderWidth", "BorderDashStyle", "Borders", "Font", "ForeColor", "TextAlignment", "Tag", "Text", "NavigateUrl");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Padding", "StyleName");
+                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "BorderWidth", "BorderDashStyle", "Borders", "Font", "ForeColor", "TextAlignment", "Tag", "Text", "NavigateUrl");
                             break;
                         case "XRCrossBandBox":
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
-                            this.HidePropertyDescriptions(controlType, "ForeColor", "Visible");
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "ForeColor", "Visible");
                             break;
                         case "XRCrossBandLine":
-                            this.HidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
-                            this.HidePropertyDescriptions(controlType, "BorderColor", "BorderDashStyle", "Borders", "BorderWidth", "Visible");
+                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "BorderColor", "BorderDashStyle", "Borders", "BorderWidth", "Visible");
                             break;
                         case "XRChart":
-                            this.HidePropertyDescriptions(controlType, "Text", "Font", "ForeColor", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "Text", "Font", "ForeColor", "TextAlignment");
                             break;
                         case "XRLine":
-                            this.HidePropertyDescriptions(controlType, "Font", "Text", "TextAlignment", "NavigateUrl", "Bookmark");
+                            this.hidePropertyDescriptions(controlType, "Font", "Text", "TextAlignment", "NavigateUrl", "Bookmark");
                             break;
                         case "XRPivotGrid":
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Text", "NavigateUrl", "StyleName");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Text", "NavigateUrl", "StyleName");
                             break;
                         case "XRPageBreak":
-                            this.SetPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Tag", "Text", "NavigateUrl", "LeftF", "WidthF", "HeightF", "Bookmark", "StyleName");
+                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Tag", "Text", "NavigateUrl", "LeftF", "WidthF", "HeightF", "Bookmark", "StyleName");
                             break;
                         case "XRPageInfo":
-                            this.HidePropertyDescriptions(controlType, "Text");
+                            this.hidePropertyDescriptions(controlType, "Text");
                             break;
                         case "XRPanel":
-                            this.HidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
                             break;
                         case "XRRichText":
-                            this.HidePropertyDescriptions(controlType, "Text");
-                            this.SetPropertyDescription(controlType, "Rtf", this._beforePrint);
-                            this.SetPropertyDescription(controlType, "Html", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "Text");
+                            this.setPropertyDescription(controlType, "Rtf", this._beforePrint);
+                            this.setPropertyDescription(controlType, "Html", this._beforePrint);
                             break;
                         case "XRShape":
-                            this.HidePropertyDescriptions(controlType, "Font", "TextAlignment", "Text");
+                            this.hidePropertyDescriptions(controlType, "Font", "TextAlignment", "Text");
                             break;
                         case "XRSparkline":
-                            this.HidePropertyDescriptions(controlType, "Text", "Font", "TextAlignment", "ForeColor");
+                            this.hidePropertyDescriptions(controlType, "Text", "Font", "TextAlignment", "ForeColor");
                             break;
                         case "XRTableOfContents":
-                            this.HidePropertyDescriptions(controlType, "NavigateUrl", "Text", "TextAlignment", "Bookmark", "Font", "LeftF", "WidthF");
+                            this.hidePropertyDescriptions(controlType, "NavigateUrl", "Text", "TextAlignment", "Bookmark", "Font", "LeftF", "WidthF");
                             break;
                         case "XRTableRow":
-                            this.HidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "Text", "NavigateUrl", "Bookmark");
+                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "Text", "NavigateUrl", "Bookmark");
                             break;
                         case "XRTableCell":
-                            this.HidePropertyDescriptions(controlType, "LeftF", "TopF", "HeightF");
+                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "HeightF");
                             break;
                         case "XRTable":
-                            this.HidePropertyDescriptions(controlType, "Text", "NavigateUrl");
+                            this.hidePropertyDescriptions(controlType, "Text", "NavigateUrl");
                             break;
                         case "XRZipCode":
-                            this.HidePropertyDescriptions(controlType, "Font", "TextAlignment");
+                            this.hidePropertyDescriptions(controlType, "Font", "TextAlignment");
                             break;
                         case "DevExpress.XtraReports.UI.XtraReport":
-                            this.HidePropertyDescriptions(controlType, "StyleName", "Text", "NavigateUrl");
-                            this.SetPropertyDescription(controlType, "Bookmark", this._beforePrint);
-                            this.HidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "HeightF");
+                            this.hidePropertyDescriptions(controlType, "StyleName", "Text", "NavigateUrl");
+                            this.setPropertyDescription(controlType, "Bookmark", this._beforePrint);
+                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "HeightF");
                             break;
                     }
                 };
                 ControlsFactory.prototype.registerControl = function (typeName, metadata) {
                     _super.prototype.registerControl.call(this, typeName, metadata);
-                    this._registerExtensions(typeName);
+                    this._registerExtensions(typeName, metadata);
                 };
                 ControlsFactory.prototype._createExpressionObject = function (typeName, expressions, path, summaryRunning) {
                     return this._expressionWrapper.createExpressionsObject(typeName, expressions, path, summaryRunning);
                 };
-                ControlsFactory.prototype.SetPropertyDescription = function (controlType, propertyName, events, group, objectProperties) {
+                ControlsFactory.prototype.setPropertyDescription = function (controlType, propertyName, events, group, objectProperties) {
                     this._expressionWrapper.setPropertyDescription(controlType, propertyName, events, objectProperties, group);
                 };
-                ControlsFactory.prototype.SetLocalizationIdForExpression = function (propertyName, localizationId) {
+                ControlsFactory.prototype.setLocalizationIdForExpression = function (propertyName, localizationId) {
                     this._expressionWrapper.setLocalizationId(propertyName, localizationId);
                 };
-                ControlsFactory.prototype.HidePropertyDescriptions = function (type) {
+                ControlsFactory.prototype.hidePropertyDescriptions = function (type) {
                     var propertyNames = [];
                     for (var _i = 1; _i < arguments.length; _i++) {
                         propertyNames[_i - 1] = arguments[_i];
                     }
                     (_a = this._expressionWrapper).hidePropertyDescriptions.apply(_a, [type].concat(propertyNames));
                     var _a;
+                };
+                ControlsFactory.prototype.inheritControl = function (parentType, extendedOptions) {
+                    var parentInfo = this.getControlInfo(parentType);
+                    var copyParentSerializationsInfo = $.extend(true, [], parentInfo.info);
+                    var newInfo = [].concat(copyParentSerializationsInfo, extendedOptions.info || []);
+                    var newPopularProperties = [].concat(parentInfo.popularProperties, extendedOptions.popularProperties || []);
+                    return $.extend({}, parentInfo, extendedOptions, {
+                        parentType: parentType,
+                        info: newInfo,
+                        popularProperties: newPopularProperties
+                    });
                 };
                 return ControlsFactory;
             })(Designer.ControlsFactory);
@@ -27538,7 +27596,7 @@ var DevExpress;
                 });
                 var controlHelper = new Designer.DesignControlsHelper(model, [{
                         added: function (control) { },
-                        deleted: function (control) { control.surface == selection.focused() && selection.focused(Designer.findNextSelection(control.surface)); }
+                        deleted: function (control) { control.surface === selection.focused() && selection.focused(Designer.findNextSelection(control.surface)); }
                     }], ["controls", "bands", "subBands", "crossBandControls", "rows", "cells", "fields", "styles", "formattingRuleSheet"]);
                 reportConverter = new Report.ReportConverter(controlHelper, undoEngine, data.dataBindingMode);
                 init(model());
@@ -27673,9 +27731,16 @@ var DevExpress;
                         if (newValue) {
                             var focusedControl = designerModel.selection.focused().getControlModel();
                             designerModel.scriptsEditor.selectedControl(!!focusedControl.scripts ? focusedControl : focusedControl.parentModel());
-                            setTimeout(function () {
+                            var resizeFunction = function () { return setTimeout(function () {
                                 designerModel.scriptsEditor.editorContainer().resize();
-                            }, 1);
+                            }, 1); };
+                            if (!designerModel.scriptsEditor.editorContainer())
+                                var innerSubscription = designerModel.scriptsEditor.editorContainer.subscribe(function (newVal) {
+                                    innerSubscription.dispose();
+                                    resizeFunction();
+                                });
+                            else
+                                resizeFunction();
                         }
                         designMode(!newValue);
                     });
@@ -28853,7 +28918,7 @@ var DevExpress;
                         displayText: function () { return Designer.getLocalization("Validate", "ReportStringId.ScriptEditor_Validate"); },
                         imageClassName: "dxrd-image-validate",
                         disabled: ko.pureComputed(function () {
-                            return !self.report() || _this.validateDisabled();
+                            return !self.report() || self.validateDisabled() || !self.editorContainer();
                         }),
                         visible: this.editorVisible,
                         hotKey: { ctrlKey: true, keyCode: "L".charCodeAt(0) },
@@ -28862,6 +28927,8 @@ var DevExpress;
                             self.validateDisabled(true);
                             self._setScriptsText();
                             Report.ReportScriptService.validateScripts(self.report()).done(function (result) {
+                                if (!self.editorContainer())
+                                    return;
                                 var errors = [];
                                 result.forEach(function (error) {
                                     var linesCount = self.editorContainer().getSession().getLength();
@@ -28985,8 +29052,7 @@ var DevExpress;
                 };
                 Object.defineProperty(ScriptsEditor.prototype, "allFunctionNames", {
                     get: function () {
-                        var editorContainer = this.editorContainer();
-                        return editorContainer ? this.languageHelper.getFunctionNamesFromScript(editorContainer.getValue()) : [];
+                        return this.scriptsText() ? this.languageHelper.getFunctionNamesFromScript(this.scriptsText()) : [];
                     },
                     enumerable: true,
                     configurable: true
@@ -30702,11 +30768,14 @@ var DevExpress;
                             if (cache[request.fullPath])
                                 return cache[request.fullPath];
                             patchRequest(request, dataSources.peek(), state());
-                            return cache[request.fullPath] = fieldsCallback(request);
+                            if (!!request.dataSource)
+                                return cache[request.fullPath] = fieldsCallback(request);
+                            cache[request.fullPath] = undefined;
+                            return $.Deferred().reject().promise();
                         }
                         else {
                             patchRequest(request, dataSources.peek(), state());
-                            return fieldsCallback(request);
+                            return !!request.dataSource ? fieldsCallback(request) : $.Deferred().reject().promise();
                         }
                     };
                 };
@@ -30876,6 +30945,7 @@ var DevExpress;
                 };
                 DisplayNameProvider.prototype._getByPath = function (path, dataMember, getNameFunc) {
                     var _this = this;
+                    path = path || "";
                     var request = this._createRequestInfo(null, path, dataMember, "", false);
                     var pathParts = path.split('.');
                     if (pathParts.length === 1) {
@@ -32083,9 +32153,6 @@ var DevExpress;
                             nameSubscribe && nameSubscribe.dispose();
                         }
                     }).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1 } });
-                    ["Rtf", "Html"].forEach(function (itemName) {
-                        _this.initBindings(itemName);
-                    });
                 }
                 Object.defineProperty(XRRichViewModel.prototype, "textEditableProperty", {
                     get: function () { return this.textRtf; },
@@ -32571,10 +32638,13 @@ var DevExpress;
                                 path = "Formatting Rules";
                             }
                             else if (model instanceof Report.StyleModel) {
-                                path = ["Styles", "Styles", reportModel() && reportModel().styles().indexOf(model)].join(".");
+                                path = _this._getPathNonControl(model, "Styles", "styles", editableObject, reportModel);
                             }
                             else if (model instanceof Report.FormattingRule) {
-                                path = ["Formatting Rules", "Formatting Rules", reportModel() && reportModel().formattingRuleSheet().indexOf(model)].join(".");
+                                path = _this._getPathNonControl(model, "Formatting Rules", "formattingRuleSheet", editableObject, reportModel);
+                            }
+                            else if (model === (reportModel() && reportModel().crossBandControls())) {
+                                path = "Crossband Controls";
                             }
                         }
                         return path;
@@ -32588,8 +32658,8 @@ var DevExpress;
                         return propertyNames ? propertyNames.indexOf(realPropertyName) !== -1 || $.isNumeric(realPropertyName) : true;
                     };
                     this.treeListController.getActions = function (item) {
-                        if (item.data.displayName !== "Crossband Controls") {
-                            if (item.data.displayName !== "Styles" && item.data.displayName !== "Formatting Rules") {
+                        if (item.data.name !== "Crossband Controls") {
+                            if (item.data.name !== "Styles" && item.data.name !== "Formatting Rules") {
                                 return _this._createActionsForOneElement(clickHandler, selection, editableObject, reportModel, item);
                             }
                             else {
@@ -32659,12 +32729,12 @@ var DevExpress;
                     return actions;
                 };
                 ReportExplorerModel.prototype._createActionsForArray = function (item, reportModel) {
-                    if (item.data.displayName === "Styles" || item.data.displayName === "Formatting Rules") {
+                    if (item.data.name === "Styles" || item.data.name === "Formatting Rules") {
                         return [{
-                                text: "Add New " + (item.data.displayName === "Styles" ? "Style" : "Formatting Rule"),
+                                text: "Add New " + (item.data.name === "Styles" ? "Style" : "Formatting Rule"),
                                 imageClassName: "dx-image-add",
                                 clickAction: function () {
-                                    if (item.data.displayName === "Styles") {
+                                    if (item.data.name === "Styles") {
                                         var newStyleName = Designer.getUniqueNameForNamedObjectsArray(reportModel().styles(), "xrControlStyle");
                                         reportModel().styles.push(new Report.StyleModel({ "@Name": newStyleName }));
                                     }
@@ -32675,6 +32745,15 @@ var DevExpress;
                             }];
                     }
                     return [];
+                };
+                ReportExplorerModel.prototype._getPathNonControl = function (model, rootName, arrayName, editableObject, reportModel) {
+                    var array = reportModel() && reportModel()[arrayName]();
+                    var index = array && array.indexOf(model) || 0;
+                    if (index < 0) {
+                        editableObject(array[0] || reportModel());
+                        return array.length > 0 ? [rootName, rootName, 0].join(".") : "Report";
+                    }
+                    return [rootName, rootName, index].join(".");
                 };
                 return ReportExplorerModel;
             })();

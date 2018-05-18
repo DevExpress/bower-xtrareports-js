@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.2.7
-* Build date: 2018-03-19
+* Version: 17.2.8
+* Build date: 2018-05-06
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -68,12 +68,6 @@ var DevExpress;
             return result || _getLocalization(text);
         }
         Designer.getLocalization = getLocalization;
-        function getSpecificLocalizationWithAddition(text, defaultText, addition, id) {
-            if (addition === void 0) { addition = ""; }
-            if (id === void 0) { id = null; }
-            return isCustomizedWithUpdateLocalizationMethod(text) ? getLocalization(text) : (getLocalization(defaultText, id) + addition);
-        }
-        Designer.getSpecificLocalizationWithAddition = getSpecificLocalizationWithAddition;
         function updateLocalization(object) {
             $.extend(custom_localization_values, object);
             var messages = {};
@@ -8035,16 +8029,18 @@ var DevExpress;
                         this._inUndoRedo = true;
                         if (this.undoEnabled()) {
                             var changeSet = this._observers[this._position];
-                            if (Array.isArray(changeSet)) {
-                                changeSet.reverse().forEach(function (item) { return _this.undoChangeSet(item); });
+                            if (changeSet) {
+                                if (Array.isArray(changeSet)) {
+                                    changeSet.reverse().forEach(function (item) { return _this.undoChangeSet(item); });
+                                }
+                                else {
+                                    this.undoChangeSet(changeSet);
+                                }
+                                this._position = this._position - 1;
+                                this.isDirty(true);
+                                this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
+                                this.redoEnabled(true);
                             }
-                            else {
-                                this.undoChangeSet(changeSet);
-                            }
-                            this._position = this._position - 1;
-                            this.isDirty(true);
-                            this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
-                            this.redoEnabled(true);
                         }
                     }
                     finally {
@@ -8057,16 +8053,18 @@ var DevExpress;
                         this._inUndoRedo = true;
                         if (this.redoEnabled()) {
                             var changeSet = this._observers[this._position + 1];
-                            if (Array.isArray(changeSet)) {
-                                changeSet.reverse().forEach(function (item) { return _this.redoChangeSet(item); });
+                            if (changeSet) {
+                                if (Array.isArray(changeSet)) {
+                                    changeSet.reverse().forEach(function (item) { return _this.redoChangeSet(item); });
+                                }
+                                else {
+                                    this.redoChangeSet(changeSet);
+                                }
+                                this._position = this._position + 1;
+                                this.isDirty(true);
+                                this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
+                                this.redoEnabled(this._position + 1 < this._observers.length);
                             }
-                            else {
-                                this.redoChangeSet(changeSet);
-                            }
-                            this._position = this._position + 1;
-                            this.isDirty(true);
-                            this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
-                            this.redoEnabled(this._position + 1 < this._observers.length);
                         }
                     }
                     finally {
@@ -10905,13 +10903,20 @@ var DevExpress;
                     }
                 };
                 FilterEditor.prototype.focusText = function () {
-                    var _this = this;
-                    setTimeout(function (_) {
-                        var editor = _this.editorContainer();
-                        if (editor.renderer)
-                            editor.renderer.updateText();
-                        editor.focus();
-                    }, 1);
+                    var focusFn = function (editor) {
+                        setTimeout(function (_) {
+                            if (editor.renderer)
+                                editor.renderer.updateText();
+                            editor.focus();
+                        }, 1);
+                    };
+                    if (!this.editorContainer())
+                        var subscription = this.editorContainer.subscribe(function (editor) {
+                            subscription.dispose();
+                            focusFn(editor);
+                        });
+                    else
+                        focusFn(this.editorContainer());
                 };
                 FilterEditor.prototype.getPopupContainer = function (el) {
                     return $(el).closest(this.options()["popupContainer"] || ".dx-viewport");
@@ -11973,9 +11978,9 @@ var DevExpress;
                         IsApril: [{ paramCount: 1, text: "IsApril()", descriptionStringId: 'XtraEditorsExpressionEditor.IsApril.Description' }],
                         IsMay: [{ paramCount: 1, text: "IsMay()", descriptionStringId: 'XtraEditorsExpressionEditor.IsMay.Description' }],
                         IsJune: [{ paramCount: 1, text: "IsJune()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJune.Description' }],
-                        IsJule: [{ paramCount: 1, text: "IsJule()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJule.Description' }],
+                        IsJuly: [{ paramCount: 1, text: "IsJuly()", descriptionStringId: 'XtraEditorsExpressionEditor.IsJuly.Description' }],
                         IsAugust: [{ paramCount: 1, text: "IsAugust()", descriptionStringId: 'XtraEditorsExpressionEditor.IsAugust.Description' }],
-                        IsSemptember: [{ paramCount: 1, text: "IsSemptember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsSemptember.Description' }],
+                        IsSeptember: [{ paramCount: 1, text: "IsSeptember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsSeptember.Description' }],
                         IsOctober: [{ paramCount: 1, text: "IsOctober()", descriptionStringId: 'XtraEditorsExpressionEditor.IsOctober.Description' }],
                         IsNovember: [{ paramCount: 1, text: "IsNovember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNovember.Description' }],
                         IsDecember: [{ paramCount: 1, text: "IsDecember()", descriptionStringId: 'XtraEditorsExpressionEditor.IsDecember.Description' }],
@@ -12623,11 +12628,15 @@ var DevExpress;
                         editor.$blockScrolling = Infinity;
                         var languageMode = viewModel.languageHelper.getLanguageMode();
                         var session = editor.getSession();
-                        session.setMode(languageMode);
                         session.gutterRenderer = {
-                            getWidth: function (session, lastLineNumber, config) { return 0; },
-                            getText: function (session, row) { return ""; }
+                            getWidth: function (session, lastLineNumber, config) {
+                                return lastLineNumber.toString().length * config.characterWidth;
+                            },
+                            getText: function (session, row) {
+                                return row + 1;
+                            }
                         };
+                        session.setMode(languageMode);
                         if (additionalOptions && additionalOptions.onChange) {
                             var timer = null;
                             session.on("change", function (e) {
@@ -12647,7 +12656,9 @@ var DevExpress;
                         var completers = viewModel.languageHelper.createCompleters(editor, bindingContext, viewModel);
                         langTools.setCompleters(completers);
                         editor.setOptions(values.options);
-                        editor.renderer.setShowGutter(showGutter);
+                        if (!showGutter) {
+                            editor.renderer.setShowGutter(showGutter);
+                        }
                         var oldMouseMove = editor._defaultHandlers.guttermousemove;
                         editor._defaultHandlers.guttermousemove = function (e) {
                             var rect = element.getBoundingClientRect();
@@ -12665,11 +12676,14 @@ var DevExpress;
                         _setEditorText(editor, ko.unwrap(text));
                         if (values.callbacks)
                             values.callbacks.focus = function () {
-                                editor.focus();
+                                setTimeout(function () {
+                                    editor.textInput.getElement().focus();
+                                }, 10);
                             };
                         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                             subscription.dispose();
-                            values.options.focus = $.noop;
+                            if (values.callbacks)
+                                values.callbacks.focus = $.noop;
                             completers.forEach(function (x) { return x.dispose && x.dispose(); });
                         });
                     }
@@ -13139,9 +13153,16 @@ var DevExpress;
             }
             Utils.floatValueConverter = floatValueConverter;
             function classExists(selector) {
-                var lowerCaseSelector = selector.toLowerCase(), result = false;
-                for (var sheetIndex = 0; sheetIndex < (document.styleSheets || []).length; sheetIndex++) {
-                    var rules = document.styleSheets[sheetIndex]["rules"] ? document.styleSheets[sheetIndex]["rules"] : document.styleSheets[sheetIndex]["cssRules"];
+                var lowerCaseSelector = selector.toLowerCase(), styleSheets = document.styleSheets || [], result = false;
+                for (var sheetIndex = 0; sheetIndex < styleSheets.length; sheetIndex++) {
+                    try {
+                        var rules = styleSheets[sheetIndex]["rules"];
+                        if (!rules)
+                            rules = styleSheets[sheetIndex]["cssRules"];
+                    }
+                    catch (e) {
+                        continue;
+                    }
                     for (var ruleIndex = 0; ruleIndex < (rules || []).length; ruleIndex++) {
                         if (rules[ruleIndex].selectorText && rules[ruleIndex].selectorText.toLowerCase() === lowerCaseSelector) {
                             result = true;
@@ -14653,7 +14674,10 @@ var DevExpress;
                         if (values.forceResize) {
                             values.forceResize({ size: new Designer.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
                         }
-                        if (values.snapHelper && $selectedNodes.length === 1) {
+                        if (!!event.altKey) {
+                            values.snapHelper && values.snapHelper.deactivateSnapLines();
+                        }
+                        else if (values.snapHelper && $selectedNodes.length === 1) {
                             var newAbsolutePosition = getControlNewAbsolutePositionOnResize(values.snapHelper, absolutePosition, ui, { x: dx, y: dy, width: dw, height: dh });
                             values.snapHelper.activateSnapLines(newAbsolutePosition);
                             $element.css({
@@ -14850,7 +14874,7 @@ var DevExpress;
                 if (ko.isObservable(from[name])) {
                     to[name](from[name]());
                 }
-                else {
+                else if (!$.isFunction(from[name])) {
                     copyObservables(from[name], to[name]);
                 }
             }
@@ -16427,7 +16451,7 @@ var DevExpress;
                 this.controlsMap[typeName].info = $.extend(true, [], metadata.info);
             };
             ControlsFactory.prototype._getPropertyInfo = function (info, path, position) {
-                var propertyInfo = info.filter(function (x) { return x.displayName === path[position]; })[0];
+                var propertyInfo = info.filter(function (x) { return x.displayName === path[position] || x.propertyName === path[position] || x.modelName === path[position]; })[0];
                 if (position === path.length - 1) {
                     return propertyInfo || null;
                 }
@@ -16841,7 +16865,7 @@ var DevExpress;
                     write: function (newVal) {
                         if (!!newVal) {
                             var root = !!_this.path() ? _this.path().split('.')[0] : newVal.split('.')[0];
-                            var rootItem = rootITems.filter(function (x) { return x.displayName === root; })[0];
+                            var rootItem = rootITems.filter(function (x) { return x.name === root; })[0];
                             if (!!rootItem) {
                                 member(_this.getMemberByPath(ko.unwrap(rootItem.model), _this.path() ? [_this.path(), newVal].join('.') : newVal));
                             }
@@ -17289,7 +17313,7 @@ var DevExpress;
                 undoEngine().end();
             }), selection = selection || new Designer.SurfaceSelection(), contextActionProviders = [], snapHelper = new Designer.SnapLinesHelper(surface, Designer.SnapLinesHelper.snapTolerance, snapLinesCollector || new Designer.SnapLinesCollector()), controlsHelper = designControlsHelper || new DesignControlsHelper(model, [{
                     added: function (control) { },
-                    deleted: function (control) { control.surface == selection.focused() && selection.focused(findNextSelection(control.surface)); }
+                    deleted: function (control) { control.surface === selection.focused() && selection.focused(findNextSelection(control.surface)); }
                 }]), dragHelperContent = new Designer.DragHelperContent(selection), toolboxItems = Designer.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new InlineTextEdit(selection), editableObject = Designer.CombinedObject.getEditableObject(selection, undoEngine, customMerge).extend({ throttle: 1 }), propertyGrid = new Designer.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors, groupLocalizationIDs: groupLocalizationIDs }, null), popularProperties = new DevExpress.JS.Widgets.ObjectProperties(ko.pureComputed(function () {
                 var popularPropertiesObject = { getInfo: function () { return []; } }, editable = editableObject();
                 if (editable) {
@@ -17987,6 +18011,7 @@ var DevExpress;
                             selectionProvider.focused(val.surface);
                         }
                         else {
+                            selectionProvider.updateSelection(null);
                             editableObject(val);
                         }
                     }
@@ -18775,8 +18800,10 @@ var DevExpress;
                 this._path = ko.observable("");
                 this._value = ko.observable("");
                 this._parentViewport = "";
+                this._itemsProvider = ko.observable(null);
                 this.option("path") && this._path(this.option("path"));
                 this.option("value") && this._value(this.option("value"));
+                this.option("itemsProvider") && this._itemsProvider(this.option("itemsProvider"));
                 this.option("valueChangeEvent", "change");
                 this._parentViewport = this["_$element"].parents(".dx-viewport");
             }
@@ -18812,6 +18839,9 @@ var DevExpress;
                     case "path":
                         this._path(newValue);
                         break;
+                    case "itemsProvider":
+                        this._itemsProvider(newValue);
+                        break;
                     case "displayValue":
                         this["_renderInputValue"]();
                         break;
@@ -18842,13 +18872,20 @@ var DevExpress;
                 });
                 var $scroll = $("<div>").addClass("dx-treelist-wrapper").dxScrollView({ scrollByThumb: true });
                 var scroll = this["_createComponent"]($scroll, "dxScrollView");
-                scroll.content().append('<div data-bind="treelist: $data"></div>');
+                var self = this;
+                scroll.content().append('<div data-bind="treelist: options"></div>');
                 var context = ko.contextFor(this.element()[0]);
-                var childContext = context.createChildContext({
-                    itemsProvider: this.option("itemsProvider"), onItemsVisibilityChanged: function () {
-                        _this._popup._renderPosition();
-                    }, selectedPath: selectedPath, treeListController: this.option("treeListController"), path: this._path
+                var treeListController = this.option("treeListController");
+                var options = ko.computed(function () {
+                    return {
+                        itemsProvider: _this._itemsProvider(), onItemsVisibilityChanged: function () {
+                            if (self._popup) {
+                                self._popup._renderPosition();
+                            }
+                        }, selectedPath: selectedPath, treeListController: treeListController, path: _this._path
+                    };
                 });
+                var childContext = context.createChildContext({ options: options });
                 ko.applyBindings(childContext, scroll.content()[0]);
                 this._popup.content().append($scroll);
             };
