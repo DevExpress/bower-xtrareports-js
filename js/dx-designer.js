@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -16,7 +16,8 @@ var DevExpress;
                 delete legacyObject[propertyName];
                 Object.defineProperty(legacyObject, propertyName, {
                     get: function () { return realObject[propertyName]; },
-                    set: function (newVal) { realObject[propertyName] = newVal; }
+                    set: function (newVal) { realObject[propertyName] = newVal; },
+                    configurable: true
                 });
             }
             Internal._defineProperty = _defineProperty;
@@ -2403,7 +2404,7 @@ var DevExpress;
             })(DevExpress.Analytics.Utils.UndoEngine);
             Utils.UndoEngine = UndoEngine;
             ;
-            Utils.DEBUG = true;
+            Utils.DEBUG = false;
             Utils.NotifyAboutWarning = function () { };
             Utils.propertiesVisitor = DevExpress.Analytics.Utils.propertiesVisitor;
         })(Utils = JS.Utils || (JS.Utils = {}));
@@ -5378,7 +5379,7 @@ var DevExpress;
                 });
                 Object.defineProperty(TreeListItemViewModel.prototype, "actions", {
                     get: function () {
-                        return this._treeListController.getActions ? this._treeListController.getActions(this) : [];
+                        return (this._treeListController && this._treeListController.getActions) ? this._treeListController.getActions(this) : [];
                     },
                     enumerable: true,
                     configurable: true
@@ -6065,21 +6066,21 @@ var DevExpress;
                 var CriteriaSurfaceValidator = (function () {
                     function CriteriaSurfaceValidator() {
                     }
-                    CriteriaSurfaceValidator.customValidate = function (operator, from) {
+                    CriteriaSurfaceValidator.prototype.customValidate = function (operator, from) {
                         return false;
                     };
-                    CriteriaSurfaceValidator.checkLeftPart = function (leftPart) {
-                        return leftPart instanceof Analytics.Criteria.OperandProperty || CriteriaSurfaceValidator.customValidate(leftPart, CriteriaSurfaceValidatorState.Left);
+                    CriteriaSurfaceValidator.prototype.checkLeftPart = function (leftPart) {
+                        return leftPart instanceof Analytics.Criteria.OperandProperty || this.customValidate(leftPart, CriteriaSurfaceValidatorState.Left);
                     };
-                    CriteriaSurfaceValidator._checkRightPart = function (criteriaOperator) {
+                    CriteriaSurfaceValidator.prototype._checkRightPart = function (criteriaOperator) {
                         return criteriaOperator instanceof Analytics.Criteria.OperandProperty
                             || criteriaOperator instanceof Analytics.Criteria.OperandParameter
                             || criteriaOperator instanceof Analytics.Criteria.OperandValue
                             || criteriaOperator instanceof Analytics.Criteria.ConstantValue
                             || (criteriaOperator instanceof Analytics.Criteria.UnaryOperator && this._checkRightPart(criteriaOperator.operand))
-                            || CriteriaSurfaceValidator.customValidate(criteriaOperator, CriteriaSurfaceValidatorState.Right);
+                            || this.customValidate(criteriaOperator, CriteriaSurfaceValidatorState.Right);
                     };
-                    CriteriaSurfaceValidator.checkRightPart = function (rigthPart) {
+                    CriteriaSurfaceValidator.prototype.checkRightPart = function (rigthPart) {
                         if (Array.isArray(rigthPart)) {
                             for (var i = 0; i < rigthPart.length; i++) {
                                 if (!this._checkRightPart(rigthPart[i])) {
@@ -6092,20 +6093,20 @@ var DevExpress;
                             return this._checkRightPart(rigthPart);
                         }
                     };
-                    CriteriaSurfaceValidator.aggregateIsValid = function (criteriaOperator) {
+                    CriteriaSurfaceValidator.prototype.aggregateIsValid = function (criteriaOperator) {
                         return this.checkLeftPart(criteriaOperator.leftPart)
                             && this.validateModel(criteriaOperator.condition)
                             && (!!criteriaOperator.aggregatedExpression ?
                                 (criteriaOperator.aggregatedExpression instanceof Analytics.Criteria.OperandProperty ||
-                                    CriteriaSurfaceValidator.validateModel(criteriaOperator.aggregatedExpression))
+                                    this.validateModel(criteriaOperator.aggregatedExpression))
                                 : true);
                     };
-                    CriteriaSurfaceValidator.commonOperandValid = function (criteriaOperator) {
+                    CriteriaSurfaceValidator.prototype.commonOperandValid = function (criteriaOperator) {
                         return criteriaOperator.leftPart instanceof Analytics.Criteria.AggregateOperand ?
                             this.validateModel(criteriaOperator.leftPart) : this.checkLeftPart(criteriaOperator.leftPart)
                             && this.checkRightPart(criteriaOperator.rightPart);
                     };
-                    CriteriaSurfaceValidator.groupIsValid = function (criteriaOperator) {
+                    CriteriaSurfaceValidator.prototype.groupIsValid = function (criteriaOperator) {
                         for (var i = 0; i < criteriaOperator.operands.length; i++) {
                             if (!this.validateModel(criteriaOperator.operands[i])) {
                                 return false;
@@ -6113,10 +6114,10 @@ var DevExpress;
                         }
                         return true;
                     };
-                    CriteriaSurfaceValidator.unaryIsValid = function (criteriaOperator) {
-                        return criteriaOperator.operand instanceof Analytics.Criteria.OperandProperty || this.validateModel(criteriaOperator.operand) || CriteriaSurfaceValidator.customValidate(criteriaOperator.operand, CriteriaSurfaceValidatorState.Unary);
+                    CriteriaSurfaceValidator.prototype.unaryIsValid = function (criteriaOperator) {
+                        return criteriaOperator.operand instanceof Analytics.Criteria.OperandProperty || this.validateModel(criteriaOperator.operand) || this.customValidate(criteriaOperator.operand, CriteriaSurfaceValidatorState.Unary);
                     };
-                    CriteriaSurfaceValidator.validateModel = function (criteriaOperator) {
+                    CriteriaSurfaceValidator.prototype.validateModel = function (criteriaOperator) {
                         if (criteriaOperator instanceof Analytics.Criteria.AggregateOperand) {
                             return this.aggregateIsValid(criteriaOperator);
                         }
@@ -6203,8 +6204,11 @@ var DevExpress;
                         return reverse ? "Not " + result : result;
                     };
                     FilterEditorSerializer.prototype.serializeBinaryOperator = function (binaryOperator, reverse) {
-                        var separator = reverse ? " Not " : " ";
-                        return this.serialize(binaryOperator.leftOperand) + separator + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
+                        if (binaryOperator.operatorType === Analytics.Criteria.BinaryOperatorType.Like) {
+                            var separator = reverse ? " Not " : " ";
+                            return this.serialize(binaryOperator.leftOperand) + separator + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
+                        }
+                        return (reverse ? "Not " : "") + this.serialize(binaryOperator.leftOperand) + " " + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
                     };
                     FilterEditorSerializer.prototype.serializeUnaryOperator = function (unaryOperator, reverse) {
                         if (unaryOperator.operatorType === Analytics.Criteria.UnaryOperatorType.IsNull) {
@@ -7169,14 +7173,21 @@ var DevExpress;
                     this.canCreateParameters = false;
                     this.canChoiceParameters = true;
                     this.canChoiceProperty = true;
+                    this.criteriaTreeValidator = new Widgets.Internal.CriteriaSurfaceValidator();
                     this.filterEditorOperators = {
                         _common: [
                             { name: "Equals", insertVal: "==", value: Analytics.Criteria.BinaryOperatorType.Equal, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
+                            { name: "Does not equal", hidden: true, reverse: true, value: Analytics.Criteria.BinaryOperatorType.Equal, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
                             { name: "Does not equal", insertVal: "!=", value: Analytics.Criteria.BinaryOperatorType.NotEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
+                            { name: "Equals", reverse: true, hidden: true, value: Analytics.Criteria.BinaryOperatorType.NotEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
                             { name: "Is greater than", insertVal: ">", value: Analytics.Criteria.BinaryOperatorType.Greater, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
+                            { name: "Is less than or equal to", hidden: true, reverse: true, value: Analytics.Criteria.BinaryOperatorType.Greater, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
                             { name: "Is greater than or equal to", insertVal: ">=", value: Analytics.Criteria.BinaryOperatorType.GreaterOrEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
+                            { name: "Is less than", hidden: true, reverse: true, value: Analytics.Criteria.BinaryOperatorType.GreaterOrEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
                             { name: "Is less than", insertVal: "<", value: Analytics.Criteria.BinaryOperatorType.Less, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
+                            { name: "Is greater than or equal to", reverse: true, hidden: true, value: Analytics.Criteria.BinaryOperatorType.Less, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
                             { name: "Is less than or equal to", insertVal: "<=", value: Analytics.Criteria.BinaryOperatorType.LessOrEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseLessOrEqual" },
+                            { name: "Is greater than", reverse: true, hidden: true, value: Analytics.Criteria.BinaryOperatorType.LessOrEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
                             { name: "Is between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: Analytics.Criteria.BetweenOperator, localizationId: "StringId.FilterClauseBetween" },
                             { name: "Is not between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: Analytics.Criteria.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }],
                         string: [],
@@ -7581,7 +7592,7 @@ var DevExpress;
                     });
                     this.isSurfaceValid = ko.computed(function () {
                         try {
-                            return _this.options() && _this.isValid() && Widgets.Internal.CriteriaSurfaceValidator.validateModel(_this.options().helper.serializer.deserialize(_this.value()));
+                            return _this.options() && _this.isValid() && _this.options().helper.criteriaTreeValidator.validateModel(_this.options().helper.serializer.deserialize(_this.value()));
                         }
                         catch (e) {
                             return false;
@@ -10660,7 +10671,7 @@ var DevExpress;
                     if (this.selection.dropTarget) {
                         var dropTarget = this.selection.dropTarget.getControlModel(), dropTargetSurface = dropTarget.getNearestParent(dropTarget).surface;
                         var focusedSurface = this.selection.focused();
-                        var adjustedTarget = this.adjustDropTarget(dropTargetSurface), focusedModel = focusedSurface.getControlModel(), parent = focusedModel.getNearestParent(adjustedTarget.getControlModel()), adjustedTarget = Internal.findSurface(parent), changeParent = adjustedTarget !== focusedSurface.parent;
+                        var adjustedTarget = this.adjustDropTarget(dropTargetSurface), focusedModel = focusedSurface.getControlModel(), parent = focusedModel.getNearestParent(adjustedTarget.getControlModel()), adjustedTarget = parent && Internal.findSurface(parent), changeParent = adjustedTarget !== focusedSurface.parent;
                         if (!adjustedTarget || !adjustedTarget.canDrop()) {
                             return;
                         }
@@ -11039,7 +11050,8 @@ var DevExpress;
                     isContainer: data.isContainer || false,
                     isCopyDeny: data.isCopyDeny || false,
                     isDeleteDeny: data.isDeleteDeny || false,
-                    canDrop: data.canDrop || (function () { return true; })
+                    canDrop: data.canDrop || (function () { return true; }),
+                    isPasteDeny: data.isPasteDeny || !data.isContainer
                 };
             };
             ElementViewModel.prototype._hasModifiedValue = function (name) {
@@ -12059,7 +12071,7 @@ var DevExpress;
                         if (args.event.keyCode === 27) {
                             _this._showInline(false);
                         }
-                        if (args.event.keyCode === 13) {
+                        if (args.event.keyCode === 13 && args.event.ctrlKey) {
                             _controlText(_this.text());
                             _this._showInline(false);
                         }
@@ -12413,11 +12425,15 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
+            Internal._addErrorPrefix = true;
             function _processError(errorThrown, deferred, jqXHR, textStatus, processErrorCallback) {
                 var message = errorThrown;
                 var error = Analytics.Utils.getErrorMessage(jqXHR);
                 if (error && error !== message) {
-                    message += ": " + error;
+                    if (!Internal._addErrorPrefix)
+                        message = error;
+                    else
+                        message += ": " + error;
                 }
                 try {
                     processErrorCallback ? processErrorCallback(message, jqXHR, textStatus) : Analytics.Utils.NotifyAboutWarning(message);
@@ -13282,12 +13298,12 @@ var DevExpress;
             Internal.ActionListsBase = ActionListsBase;
             var ActionLists = (function (_super) {
                 __extends(ActionLists, _super);
-                function ActionLists(surfaceContext, selection, undoEngine, customizeActions, enabled, copyPasteStrategy) {
+                function ActionLists(surfaceContext, selection, undoEngine, customizeActions, enabled, copyPasteStrategy, zoomStep) {
                     var _this = this;
+                    if (zoomStep === void 0) { zoomStep = ko.observable(0.01); }
                     _super.call(this, enabled);
                     this.menuItems = [];
                     var copyPasteHandler = new Internal.CopyPasteHandler(selection, copyPasteStrategy), actions = [];
-                    var zoomStep = ko.observable(0.01);
                     if (selection) {
                         var selectionControlsLocked = ko.computed(function () {
                             return selection.selectedItems.some(function (item) { return item.locked; });
@@ -13503,7 +13519,7 @@ var DevExpress;
                     return pasteTargetSurface !== null
                         && this.hasPasteInfo()
                         && pasteTargetSurface.canDrop()
-                        && pasteTargetSurface.getControlModel().getMetaData().isContainer;
+                        && !pasteTargetSurface.getControlModel().getMetaData().isPasteDeny;
                 };
                 CopyPasteHandler.prototype.copy = function () {
                     if (this.canCopy()) {
@@ -13984,7 +14000,8 @@ var DevExpress;
                                 items.push.apply(items, fields);
                                 _this._afterFieldListCallBack(pathRequest, items);
                                 result.resolve(items);
-                            });
+                            })
+                                .fail(function (error) { return result.reject(error); });
                         }
                         return result.promise();
                     };
@@ -14250,7 +14267,7 @@ var DevExpress;
             }
             Utils.compareObjects = compareObjects;
             Utils.cssTransform = ["-webkit-transform", "-moz-transform", "-ms-transform", "-o-transform", "transform"];
-            Utils.DEBUG = true;
+            Utils.DEBUG = false;
             function getFullPath(path, dataMember) {
                 return path + (dataMember ? "." + dataMember : "");
             }

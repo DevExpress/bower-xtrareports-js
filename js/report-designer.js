@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1571,23 +1571,33 @@ var DevExpress;
                     { value: "DevExpress.DataAccess.Expression", displayValue: "Expression", localizationId: "DataAccessUIStringId.ParametersColumn_Expression" }
                 ]
             };
+            var dsExpressionResultType = {
+                propertyName: "resultType",
+                displayName: "Result Type",
+                modelName: "@ResultType",
+                editor: Analytics.Widgets.editorTemplates.combobox,
+                valuesArray: dsParameterType.valuesArray.filter(function (x) { return x.value !== "DevExpress.DataAccess.Expression"; })
+            };
             var baseDSParamterSerializationsInfo = [
                 { propertyName: "_name", modelName: "@Name" },
                 { propertyName: "_value", modelName: "#text" },
                 Data.parameterValueSerializationsInfo,
-                { propertyName: "itemType", modelName: "@ItemType" },
-                { propertyName: "_resultType", modelName: "@ResultType" }
+                { propertyName: "itemType", modelName: "@ItemType" }
             ];
-            Data.dsParameterSerializationInfo = [dsParameterName, dsParameterType].concat(baseDSParamterSerializationsInfo);
+            Data.dsParameterSerializationInfo = [dsParameterName, dsParameterType, dsExpressionResultType].concat(baseDSParamterSerializationsInfo);
             function storedProcParameterSerializationsInfo(type) {
                 var copyParamType = $.extend(true, {}, dsParameterType);
                 var newValuesArray = [];
                 newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === type; })[0]);
                 newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === "DevExpress.DataAccess.Expression"; })[0]);
                 copyParamType.valuesArray = newValuesArray;
+                var copyResultType = $.extend(true, {}, dsExpressionResultType);
+                copyResultType.valuesArray = newValuesArray.slice(0, 0);
+                copyResultType.disabled = true;
                 return [
                     $.extend({ disabled: true }, dsParameterName),
-                    copyParamType
+                    copyParamType,
+                    copyResultType
                 ].concat(baseDSParamterSerializationsInfo);
             }
             Data.storedProcParameterSerializationsInfo = storedProcParameterSerializationsInfo;
@@ -1661,7 +1671,19 @@ var DevExpress;
                         value: this._value,
                         functions: this._parametersFunctions
                     });
-                    this._disposables.push(this.type.subscribe(function (val) { _this._updateValueInfo(val); }));
+                    this._disposables.push(this.type.subscribe(function (val) {
+                        if (val === "DevExpress.DataAccess.Expression") {
+                            _this.resultType(_this._previousResultType);
+                        }
+                        else {
+                            _this.resultType(null);
+                            _this._previousResultType = val;
+                        }
+                        _this._updateValueInfo(val);
+                    }));
+                    this._previousResultType = (this.type.peek() === "DevExpress.DataAccess.Expression")
+                        ? this.resultType()
+                        : this.type();
                     this.value = ko.pureComputed({
                         read: function () {
                             return _this.type() === "DevExpress.DataAccess.Expression" ? _this._expressionValue() : _this._value();
@@ -1670,11 +1692,6 @@ var DevExpress;
                             _this._value(val);
                         }
                     });
-                    var resultType = this.type.peek();
-                    if (resultType === "DevExpress.DataAccess.Expression")
-                        resultType = this._resultType.peek();
-                    this._resultType = ko.computed(function () { return _this.type() === "DevExpress.DataAccess.Expression" ? resultType : null; });
-                    this._disposables.push(this._resultType);
                     this._updateValueInfo(this.type.peek());
                 }
                 DataSourceParameter.prototype._getTypeValue = function (typeName) {
@@ -1732,6 +1749,11 @@ var DevExpress;
                         return info;
                     }
                     return this._serializationsInfo;
+                };
+                DataSourceParameter.prototype.isPropertyVisible = function (propName) {
+                    if (propName === "resultType")
+                        return this.type() === "DevExpress.DataAccess.Expression";
+                    return true;
                 };
                 DataSourceParameter.typeValues = [
                     new DataSourceParameterTypeValue("System.DateTime", dateDefaultValue(), tryParseDate),
@@ -3375,6 +3397,17 @@ var DevExpress;
                     if (serializer) {
                         helper.serializer = serializer;
                     }
+                    if (!parametersEditingEnabled) {
+                        var oldCheckRightPart = helper.criteriaTreeValidator._checkRightPart;
+                        helper.criteriaTreeValidator._checkRightPart = function (criteriaOperator) {
+                            return !(criteriaOperator instanceof DevExpress.Analytics.Criteria.OperandParameter) && oldCheckRightPart(criteriaOperator);
+                        };
+                    }
+                };
+                QueryViewModel.prototype.isPropertyDisabled = function (name) {
+                    if (name === "skip")
+                        return this.skip() === 0 && !this.sorting().length;
+                    return false;
                 };
                 QueryViewModel.prototype.getInfo = function () {
                     return Elements.querySerializationsInfo;
@@ -3621,6 +3654,8 @@ var DevExpress;
                 { propertyName: "grouping", modelName: "Grouping", array: true },
                 { propertyName: "itemType", modelName: "@ItemType" },
                 { propertyName: "allColumnsInTablesSelected", displayName: "Select All (*)", localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectAll", editor: QueryBuilder.Widgets.editorTemplates.bool },
+                { propertyName: "top", modelName: "@Top", displayName: "Select Top", defaultVal: 0, from: DevExpress.Analytics.Utils.floatFromModel, localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectTop", editor: QueryBuilder.Widgets.editorTemplates.numeric, editorOptions: { format: "#0", min: 0 } },
+                { propertyName: "skip", modelName: "@Skip", displayName: "Offset", defaultVal: 0, from: DevExpress.Analytics.Utils.floatFromModel, localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_Offset", editor: QueryBuilder.Widgets.editorTemplates.numeric, editorOptions: { format: "#0", min: 0 } },
                 { propertyName: "distinct", modelName: "@Distinct", defaultVal: false, from: DevExpress.Analytics.Utils.parseBool, displayName: "Select distinct", localizationId: "ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectDistinct", editor: QueryBuilder.Widgets.editorTemplates.bool }
             ];
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
@@ -3642,6 +3677,7 @@ var DevExpress;
                         zoom: zoom,
                         dpi: ko.observable(100)
                     }, QuerySurface._unitProperties);
+                    this.placeholder = function () { return DevExpress.Analytics.getLocalization('Drop a table or view here to create a query.', 'QueryBuilder_SurfacePlaceholder'); };
                     this.tables = ko.observableArray();
                     this.relations = ko.observableArray();
                     this.allowMultiselect = false;
@@ -4135,7 +4171,7 @@ var DevExpress;
                 init(newValue);
             });
             init(data.querySource());
-            var tablesTop = ko.observable(287);
+            var tablesTop = ko.observable(355);
             designerModel.tabPanel.tabs.length = 0;
             designerModel.tabPanel.tabs.push(new DevExpress.Analytics.TabInfo("Properties", "dxqb-properties-wrapper", {
                 caption: ko.pureComputed(function () {
@@ -4222,7 +4258,7 @@ var DevExpress;
             };
             designerModel.updateSurface = function () {
                 updateSurfaceContentSize_();
-                tablesTop(287);
+                tablesTop(355);
             };
             designerModel.findControl = function (s, e) {
                 var $childs = $(".dxqb-main").children(".dxrd-control");
@@ -4526,6 +4562,7 @@ var DevExpress;
                     this.createParameter = function () {
                         _this.model.parameterName = _this.parameterName();
                         ko.unwrap(_this.fieldListProvider)["createParameter"](_this.parameterName(), _this.fieldsOptions() && _this.fieldsOptions().selected() && _this.fieldsOptions().selected()["dataType"] || "System.String");
+                        _this.helper.onChange();
                     };
                     this._parameterName = ko.observable("");
                     this.isEditable = ko.observable(false);
@@ -4575,6 +4612,9 @@ var DevExpress;
                         if (item) {
                             propertySurface.specifics(item.specifics.toLowerCase());
                             propertySurface.dataType(item.dataType);
+                            var _fieldsOptions = ko.unwrap(propertySurface.fieldsOptions);
+                            if (_fieldsOptions)
+                                _fieldsOptions.selected(item);
                         }
                     }
                 };
@@ -8046,7 +8086,7 @@ if(window["ace"]) {
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -10095,6 +10135,7 @@ var DevExpress;
                 var chartStructure = {
                     itemsProvider: chartStructureProvider,
                     treeListController: chartStructureTreeListController,
+                    expandRootItems: true,
                     selectedPath: chartStructureProvider.selectedPath
                 };
                 chartStructureProvider.selectedPath("Chart");
@@ -10412,7 +10453,7 @@ var DevExpress;
             var stepAreaSeriesViewinfo = [invertedStep3, border, fillStyle, markerOptions, transparency3, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var stackedGroup = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
             var barDistance = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var barWidth = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
             var barDepth = { propertyName: "barDepth", modelName: "@BarDepth", displayName: "Bar Depth", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarDepth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
@@ -10430,21 +10471,21 @@ var DevExpress;
             var sideBySideFullStackedBar3DSeriesViewinfo = [stackedGroup, barDistance, barDistanceFixed, equalBarWidth, barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
             var stackedGroup1 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
             var barDistance1 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed1 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed1 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth1 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
-            var barWidth1 = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.BarSeriesView.BarWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 1 } };
+            var barWidth1 = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.BarSeriesView.BarWidth", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
             var border3 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.BarSeriesView.Border", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: borderInfo, };
             var fillStyle4 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.BarSeriesView.FillStyle", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, from: Chart.FillStyle.from(fillStyleInfo, "RectangleGradientFillOptions"), toJsonObject: Chart.FillStyle.toJson };
             var transparency5 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.BarSeriesView.Transparency", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
             var sideBySideFullStackedBarSeriesViewinfo = [stackedGroup1, barDistance1, barDistanceFixed1, equalBarWidth1, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var stackedGroup2 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
             var barDistance2 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed2 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed2 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth2 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var sideBySideStackedBar3DSeriesViewinfo = [stackedGroup2, barDistance2, barDistanceFixed2, equalBarWidth2, barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
             var stackedGroup3 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.StackedGroup", editor: Chart.editorTemplates.group, defaultVal: null };
             var barDistance3 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed3 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed3 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth3 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var sideBySideStackedBarSeriesViewinfo = [stackedGroup3, barDistance3, barDistanceFixed3, equalBarWidth3, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var lineThickness = { propertyName: "lineThickness", modelName: "@LineThickness", displayName: "Line Thickness", localizationId: "DevExpress.XtraCharts.Line3DSeriesView.LineThickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, editorOptions: { min: 1 } };
@@ -10539,7 +10580,7 @@ var DevExpress;
             var stackedArea3DSeriesViewinfo = [areaWidth, aggregateFunction2, transparency4, color1, Chart.tag,];
             var fullStackedBar3DSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
             var barDistance4 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed4 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed4 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth4 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var sideBySideBar3DSeriesViewinfo = [barDistance4, barDistanceFixed4, equalBarWidth4, barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
             var stackedBar3DSeriesViewinfo = [barWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Chart.tag,];
@@ -10582,7 +10623,7 @@ var DevExpress;
             var overlappedGanttSeriesViewinfo = [linkOptions, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var radarPointSeriesViewinfo = [pointMarkerOptions, aggregateFunction1, shadow1, colorEach, color1, Chart.tag,];
             var barDistance5 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed5 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed5 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth5 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var sideBySideGanttSeriesViewinfo = [barDistance5, barDistanceFixed5, equalBarWidth5, linkOptions, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var areaSeriesViewinfo = [border, fillStyle, markerOptions, transparency3, markerVisibility, enableAntialiasing, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
@@ -10615,11 +10656,11 @@ var DevExpress;
             var pointMarkerOptions1 = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
             var pointSeriesViewinfo = [pointMarkerOptions1, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var barDistance6 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed6 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed6 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth6 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var sideBySideBarSeriesViewinfo = [barDistance6, barDistanceFixed6, equalBarWidth6, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var barDistance7 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistance", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 };
-            var barDistanceFixed7 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1 };
+            var barDistanceFixed7 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistanceFixed", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
             var equalBarWidth7 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.EqualBarWidth", from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true };
             var sideBySideRangeBarSeriesViewinfo = [barDistance7, barDistanceFixed7, equalBarWidth7, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
             var stackedAreaSeriesViewinfo = [border, fillStyle, transparency, enableAntialiasing, shadow, Chart.paneName, Chart.axisXName, Chart.axisYName, aggregateFunction, color1, Chart.tag,];
@@ -11435,8 +11476,29 @@ var DevExpress;
                 },
                 pdfACompatibility,
                 Report.pageRange,
+                Report.rasterizationResolution,
                 { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.DocumentOptions", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "pdfPasswordSecurityOptions", modelName: "PasswordSecurityOptions", displayName: "Pdf Password Security Options", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
+            ];
+            var PrintPreviewOptions = (function () {
+                function PrintPreviewOptions(model, serializer) {
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model);
+                }
+                PrintPreviewOptions.from = function (model, serializer) {
+                    return new PrintPreviewOptions(model || {}, serializer);
+                };
+                PrintPreviewOptions.toJson = function (value, serializer, refs) {
+                    return serializer.serialize(value, printPreviewOptionsSerializationInfo, refs);
+                };
+                PrintPreviewOptions.prototype.getInfo = function () {
+                    return printPreviewOptionsSerializationInfo;
+                };
+                return PrintPreviewOptions;
+            })();
+            Report.PrintPreviewOptions = PrintPreviewOptions;
+            var printPreviewOptionsSerializationInfo = [
+                { propertyName: "defaultFileName", modelName: "@DefaultFileName", displayName: "Default File Name", localizationId: "DevExpress.XtraPrinting.PrintPreviewOptions.DefaultFileName", defaultVal: "Document", editor: DevExpress.JS.Widgets.editorTemplates.text }
             ];
             var RtfExportOptions = (function () {
                 function RtfExportOptions(model, serializer) {
@@ -11603,6 +11665,32 @@ var DevExpress;
                 return XlsxExportOptions;
             })();
             Report.XlsxExportOptions = XlsxExportOptions;
+            var DocxExportDocumentOptions = (function () {
+                function DocxExportDocumentOptions(model, serializer) {
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model);
+                }
+                DocxExportDocumentOptions.from = function (model, serializer) {
+                    return new DocxExportDocumentOptions(model || {}, serializer);
+                };
+                DocxExportDocumentOptions.toJson = function (value, serializer, refs) {
+                    return serializer.serialize(value, docxExportDocumentOptionsSerializationInfo, refs);
+                };
+                DocxExportDocumentOptions.prototype.getInfo = function () {
+                    return docxExportDocumentOptionsSerializationInfo;
+                };
+                return DocxExportDocumentOptions;
+            })();
+            Report.DocxExportDocumentOptions = DocxExportDocumentOptions;
+            var docxExportDocumentOptionsSerializationInfo = [
+                { propertyName: "title", modelName: "@Title", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Title", displayName: "Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "subject", modelName: "@Subject", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "keywords", modelName: "@Keywords", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Keywords", displayName: "Keywords", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "category", modelName: "@Category", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Category", displayName: "Category", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "comments", modelName: "@Comments", localizationId: "DevExpress.XtraPrinitng.DocxDocumentOptions.Comments", displayName: "Comments", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "author", modelName: "@Author", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Author", displayName: "Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+            ];
+            Report.docxDocumentOptions = { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.DocxExportOptions.DocumentOptions", from: DocxExportDocumentOptions.from, toJsonObject: DocxExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var docxExportOptionsSerializationInfo = [
                 Report.docxExportMode,
                 Report.exportWatermarks,
@@ -11614,6 +11702,7 @@ var DevExpress;
                 Report.exportPageBreaks,
                 Report.docxTableLayout,
                 { propertyName: "allowFloatingPictures", modelName: "@AllowFloatingPictures", localizationId: "DevExpress.XtraPrinting.DocxExportOptions.AllowFloatingPictures", displayName: "Allow Floating Pictures", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+                Report.docxDocumentOptions,
             ];
             var DocxExportOptions = (function () {
                 function DocxExportOptions(model, serializer) {
@@ -11709,6 +11798,7 @@ var DevExpress;
                 { propertyName: "mht", modelName: "Mht", displayName: "MHT Export Options", localizationId: "DevExpress.XtraPrinting.MhtExportOptions", from: MhtExportOptions.from, toJsonObject: MhtExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "nativeFormat", modelName: "NativeFormat", displayName: "Native Format Options", localizationId: "DevExpress.XtraPrinting.NativeFormatOptions", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: nativeFormatOptionsSerializationInfo },
                 { propertyName: "pdf", modelName: "Pdf", displayName: "PDF Export Options", localizationId: "DevExpress.XtraPrinting.PdfExportOptions", from: PdfExportOptions.from, toJsonObject: PdfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
+                { propertyName: "printPreview", modelName: "PrintPreview", displayName: "Print Preview Options", localizationId: "DevExpress.XtraPrinting.PrintPreviewOptions", from: PrintPreviewOptions.from, toJsonObject: PrintPreviewOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "rtf", modelName: "Rtf", displayName: "RTF Export Options", localizationId: "DevExpress.XtraPrinting.RtfExportOptions", from: RtfExportOptions.from, toJsonObject: RtfExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "textExportOptions", modelName: "Text", displayName: "Text Export Options", localizationId: "DevExpress.XtraPrinting.TextExportOptions", from: TextExportOptions.from, toJsonObject: TextExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "xls", modelName: "Xls", displayName: "XLS Export Options", localizationId: "DevExpress.XtraPrinting.XlsExportOptions", from: XlsExportOptions.from, toJsonObject: XlsExportOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
@@ -11942,7 +12032,8 @@ var DevExpress;
                 keepRowHeight,
                 Report.rasterizeImages,
                 Report.rasterizationResolution,
-                Report.exportWatermarks
+                Report.exportWatermarks,
+                Report.docxDocumentOptions,
             ];
             var DocxExportOptionsPreview = (function (_super) {
                 __extends(DocxExportOptionsPreview, _super);
@@ -12925,6 +13016,10 @@ var DevExpress;
                     if (parameter.type === "System.DateTime") {
                         info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty', "ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError") }];
                     }
+                    else if (parameter.type === "System.Guid") {
+                        info.editorOptions = info.editorOptions || {};
+                        info.editorOptions.displayCustomValue = false;
+                    }
                     return info;
                 };
                 PreviewParameterHelper.prototype.assignValueStore = function (info, parameter) {
@@ -13346,6 +13441,7 @@ var DevExpress;
             var ReportServerInvokeUri = "/RSWebDocumentViewerApi/Invoke";
             var ReportServerExportUri = "/RSWebDocumentViewerApi/Download";
             Preview.TimeOut = 120000;
+            Preview.PollingDelay = 300;
             Preview.MessageHandler = {
                 processError: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); },
                 processMessage: function (message, showForUser) { showForUser && DevExpress.Designer.ShowMessage(message, DevExpress.Designer.NotifyType.success, 10000); },
@@ -13439,6 +13535,7 @@ var DevExpress;
                     this.editingFieldsHighlighted = ko.observable(false);
                     this.canSwitchToDesigner = true;
                     this.allowURLsWithJSContent = false;
+                    this.zoomStep = ko.observable(0.05);
                     Preview.HandlerUri = handlerUri || Preview.HandlerUri;
                     this.previewHandlersHelper = previewHandlersHelper || new Preview.PreviewHandlersHelper(this);
                     this.requestWrapper = previewRequestWrapper || new Preview.PreviewRequestWrapper(null, callbacks);
@@ -13641,9 +13738,13 @@ var DevExpress;
                         var defaultHandler = function () {
                             if (brickNavigation) {
                                 if (brickNavigation.drillDownKey && _self.reportId && _self._doDrillDown && _self._drillDownState.length > 0) {
+                                    if (_self._startBuildOperationId)
+                                        return;
                                     _self._doDrillDown(brickNavigation.drillDownKey);
                                 }
                                 else if (brickNavigation.sortData && _self.reportId && _self._doSorting && _self._sortingState.length > 0) {
+                                    if (_self._startBuildOperationId)
+                                        return;
                                     _self._doSorting(brickNavigation.sortData, shiftKey, ctrlKey);
                                 }
                                 if (brickNavigation.pageIndex >= 0) {
@@ -13875,7 +13976,12 @@ var DevExpress;
                             if (documentId !== preview._currentDocumentId())
                                 return;
                             if (result && result.requestAgain && !preview._stopBuildRequests[documentId] && !preview._closeDocumentRequests[documentId]) {
-                                doGetBuildStatus(documentId);
+                                var doStatusRequest = function () {
+                                    if (!preview._stopBuildRequests[documentId] && !preview._closeDocumentRequests[documentId]) {
+                                        doGetBuildStatus(documentId);
+                                    }
+                                };
+                                Preview.PollingDelay ? setTimeout(doStatusRequest, Preview.PollingDelay) : doStatusRequest();
                             }
                             else {
                                 try {
@@ -13989,16 +14095,27 @@ var DevExpress;
                     }
                     this.requestWrapper.sendCloseRequest(null, this._currentReportId());
                 };
-                ReportPreview.prototype.goToPage = function (pageIndex, forcePageChanging) {
+                ReportPreview.prototype.goToPage = function (pageIndex, forcePageChanging, throttle) {
+                    var _this = this;
                     if (!forcePageChanging && this.pageIndex.peek() === pageIndex || this.pages.peek().length === 0 || pageIndex < 0 || pageIndex >= this.pages.peek().length) {
                         return;
                     }
-                    this.pages.peek().forEach(function (page) {
-                        var visible = page.pageIndex === pageIndex;
-                        page.active(visible);
-                        page.isClientVisible(visible);
-                    });
+                    if (this._goToPageTimer !== undefined) {
+                        clearTimeout(this._goToPageTimer);
+                    }
                     this.pageIndex(pageIndex);
+                    var updateActivePage = function () {
+                        _this.pages.peek().forEach(function (page) {
+                            var visible = page.pageIndex === _this.pageIndex();
+                            page.active(visible);
+                            page.isClientVisible(visible);
+                        });
+                        _this._goToPageTimer = undefined;
+                    };
+                    if (throttle)
+                        this._goToPageTimer = setTimeout(updateActivePage, throttle);
+                    else
+                        updateActivePage();
                 };
                 ReportPreview.prototype.getSelectedContent = function () {
                     var currentPage = this.pages()[this.pageIndex()];
@@ -14055,6 +14172,9 @@ var DevExpress;
                     var serverError = DevExpress.Designer.getErrorMessage(jqXHR);
                     serverError && (error += ": " + serverError);
                     Preview.MessageHandler.processError(error, showForUser);
+                };
+                ReportPreview.prototype.emptyDocumentCaption = function () {
+                    return DevExpress.Designer.getLocalization("The document does not contain any pages.", "PreviewStringId.Msg_EmptyDocument");
                 };
                 Object.defineProperty(ReportPreview.prototype, "reportId", {
                     get: function () {
@@ -14253,8 +14373,11 @@ var DevExpress;
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
                 }
-                else if (viewerModel.reportUrl) {
-                    previewModel.OpenReport(ko.unwrap(viewerModel.reportUrl));
+                else {
+                    var unwrappedUrl = ko.unwrap(viewerModel.reportUrl);
+                    if (unwrappedUrl) {
+                        previewModel.OpenReport(unwrappedUrl);
+                    }
                 }
                 $.extend(true, DevExpress.Report.Preview.cultureInfo, viewerModel.cultureInfoList);
                 return previewModel;
@@ -14342,7 +14465,6 @@ var DevExpress;
             var PreviewActions = (function () {
                 function PreviewActions(reportPreview) {
                     this.actions = [];
-                    var zoomStep = ko.observable(0.01);
                     var printDisabled = reportPreview.exportDisabled;
                     this.actions.push({
                         id: Preview.ActionId.FirstPage,
@@ -14366,7 +14488,7 @@ var DevExpress;
                         hotKey: { ctrlKey: false, keyCode: 37 },
                         clickAction: function () {
                             if (reportPreview.pageIndex() >= 1) {
-                                reportPreview.goToPage(reportPreview.pageIndex() - 1);
+                                reportPreview.goToPage(reportPreview.pageIndex() - 1, false, 500);
                             }
                         },
                     });
@@ -14374,7 +14496,7 @@ var DevExpress;
                         id: Preview.ActionId.Pagination,
                         text: "Pagination",
                         imageClassName: "dxrd-image-pager",
-                        disabled: ko.observable(false),
+                        disabled: ko.pureComputed(function () { return reportPreview.pages().length === 0 || reportPreview.pageIndex() === -1; }),
                         visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         clickAction: $.noop,
                         selectedItem: ko.pureComputed({
@@ -14454,7 +14576,7 @@ var DevExpress;
                         hotKey: { ctrlKey: false, keyCode: 39 },
                         clickAction: function () {
                             if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
-                                reportPreview.goToPage(reportPreview.pageIndex() + 1);
+                                reportPreview.goToPage(reportPreview.pageIndex() + 1, false, 500);
                             }
                         }
                     });
@@ -14491,12 +14613,12 @@ var DevExpress;
                         imageClassName: "dxrd-image-zoomout",
                         disabled: ko.observable(false),
                         visible: true,
-                        zoomStep: zoomStep,
+                        zoomStep: reportPreview.zoomStep,
                         hotKey: { ctrlKey: false, keyCode: 109 },
                         clickAction: function () {
                             var currentZoom = reportPreview.zoom();
                             var zoomLevel = currentZoom > 0 ? currentZoom : reportPreview._zoom();
-                            reportPreview.zoom(Math.max(zoomLevel - zoomStep(), 0.01));
+                            reportPreview.zoom(Math.max(zoomLevel - reportPreview.zoomStep(), 0.01));
                         },
                         hasSeparator: true
                     });
@@ -14539,12 +14661,12 @@ var DevExpress;
                         imageClassName: "dxrd-image-zoomin",
                         disabled: ko.observable(false),
                         visible: true,
-                        zoomStep: zoomStep,
+                        zoomStep: reportPreview.zoomStep,
                         hotKey: { ctrlKey: false, keyCode: 107 },
                         clickAction: function () {
                             var currentZoom = reportPreview.zoom();
                             var zoomLevel = currentZoom > 0 ? currentZoom : reportPreview._zoom();
-                            reportPreview.zoom(Math.min(zoomLevel + zoomStep(), 10));
+                            reportPreview.zoom(Math.min(zoomLevel + reportPreview.zoomStep(), 10));
                         }
                     });
                     this.actions.push({
@@ -15469,6 +15591,57 @@ var DevExpress;
                 options.callbacks && options.callbacks.customizeActions && options.callbacks.customizeActions(actions);
                 return new Preview.MobileActionList(actions);
             }
+            var ParametersPopupModel = (function () {
+                function ParametersPopupModel(parametersModel, _reportPreview) {
+                    var _this = this;
+                    this.parametersModel = parametersModel;
+                    this._reportPreview = _reportPreview;
+                    this.showIcons = ko.observable(false);
+                    this.visible = parametersModel.popupInfo.visible;
+                    this.model = parametersModel;
+                    this.cancelDisabled = ko.computed(function () {
+                        return _this._reportPreview._currentDocumentId() === null;
+                    });
+                    this.actionButtons = [
+                        { className: "dxrdp-parameters-reset", text: DevExpress.Analytics.getLocalization('Reset', 'ASPxReportsStringId.ParametersPanel_Reset'), action: this._reset, disabled: false },
+                        { className: "dxrdp-parameters-cancel", text: DevExpress.Analytics.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'), action: this._cancel, disabled: this.cancelDisabled },
+                        { className: "dxrdp-parameters-submit", text: DevExpress.Analytics.getLocalization('Submit', 'ASPxReportsStringId.ParametersPanel_Submit'), action: this._submit, disabled: false }
+                    ];
+                    this.actionIcons = [
+                        { className: "dxrdp-parameters-reset dxrdp-image-parameters-reset", action: this._reset, disabled: false },
+                        { className: "dxrdp-parameters-cancel dxrdp-image-parameters-cancel", action: this._cancel, disabled: this.cancelDisabled },
+                        { className: "dxrdp-parameters-submit dxrdp-image-parameters-submit", action: this._submit, disabled: false }
+                    ];
+                }
+                ParametersPopupModel.prototype._submit = function (parametersModel, params) {
+                    var result = params.validationGroup && params.validationGroup.validate && params.validationGroup.validate();
+                    if (!result || result.isValid) {
+                        parametersModel.submit();
+                        parametersModel.popupInfo.visible(false);
+                    }
+                };
+                ParametersPopupModel.prototype._reset = function (parametersModel) {
+                    parametersModel.restore();
+                };
+                ParametersPopupModel.prototype._cancel = function (parametersModel) {
+                    parametersModel.popupInfo.visible(false);
+                };
+                ParametersPopupModel.prototype.initVisibilityIcons = function () {
+                    if (!this._parametersButtonContaner)
+                        return;
+                    var result = this.showIcons();
+                    var nodeTop = this._parametersButtonContaner.offset().top;
+                    this._parametersButtonContaner.find(".dxrdp-parameter-action").each(function (_, el) {
+                        result = nodeTop !== el.getBoundingClientRect().top;
+                    });
+                    this.showIcons(result);
+                };
+                ParametersPopupModel.prototype.cacheElementContent = function (element) {
+                    this._parametersButtonContaner = element;
+                    this.initVisibilityIcons();
+                };
+                return ParametersPopupModel;
+            })();
             function updatePreviewContentSizeMobile(previewWrapperSize, $root) {
                 return function () {
                     var height = $root.outerHeight();
@@ -15566,22 +15739,7 @@ var DevExpress;
                     zoomUpdating: reportPreview.zoomUpdating,
                     brickEventsDisabled: designerModel.brickEventsDisabled
                 };
-                var parametersPopup = {
-                    visible: parametersModel.popupInfo.visible,
-                    model: parametersModel,
-                    submit: function (params) {
-                        var result = params.validationGroup && params.validationGroup.validate && params.validationGroup.validate();
-                        if (!result || result.isValid) {
-                            parametersModel.submit();
-                            parametersModel.popupInfo.visible(false);
-                        }
-                    },
-                    cancelDisabled: ko.computed(function () {
-                        return reportPreview._currentDocumentId() === null;
-                    }),
-                    reset: function () { parametersModel.restore(); },
-                    cancel: function () { parametersModel.popupInfo.visible(false); }
-                };
+                var parametersPopup = new ParametersPopupModel(parametersModel, reportPreview);
                 designerModel.parts = [
                     { id: Preview.MobilePreviewElements.Surface, templateName: Preview.MobilePreviewElements.Surface, model: designerModel.reportPreview },
                     { id: Preview.MobilePreviewElements.Search, templateName: Preview.MobilePreviewElements.Search, model: designerModel.searchModel },
@@ -15593,6 +15751,9 @@ var DevExpress;
                 var $window = $(window);
                 var updateMobilePreviewActionsPosition_ = updateMobilePreviewActionsPosition($actions, $root, $window);
                 $(window).bind("resize", function () {
+                    if (parametersModel.popupInfo.visible()) {
+                        parametersPopup.initVisibilityIcons();
+                    }
                     updatePreviewContentSize_();
                     if (reportPreview.actionsVisible())
                         updateMobilePreviewActionsPosition_(element);
@@ -17165,10 +17326,10 @@ var DevExpress;
                         var requestOptions = self._options.requestOptions;
                         var subscription = null;
                         var applyModel = function () {
-                            self._sender.previewModel = self._createModel(element);
                             if (requestOptions && requestOptions.invokeAction) {
-                                DevExpress.Report.Preview.HandlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
+                                self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                             }
+                            self._sender.previewModel = self._createModel(element);
                             if (self._options.reportUrl) {
                                 if (ko.isSubscribable(self._options.reportUrl)) {
                                     subscription = self._options.reportUrl.subscribe(function (newVal) {
@@ -17243,7 +17404,8 @@ var DevExpress;
                             promise.done(function (result) {
                                 if (result && result.requestAgain) {
                                     _this._preview.updateExportStatus(result.progress);
-                                    doGetExportStatus(operationId);
+                                    var doStatusRequest = function () { doGetExportStatus(operationId); };
+                                    Preview.PollingDelay ? setTimeout(doStatusRequest, Preview.PollingDelay) : doStatusRequest();
                                 }
                                 else {
                                     _this._preview.progressBar.complete();
@@ -18400,8 +18562,8 @@ var DevExpress;
                         var collection = parent["bands"]();
                         var bandOffset = 0;
                         for (var i = 0; i < collection.length; i++) {
-                            var itemRect = collection[i].rect();
-                            bandOffset = bandOffset + (collection[i - 1] && collection[i - 1].rect().height || 0);
+                            var itemRect = collection[i].getUsefulRect();
+                            bandOffset = bandOffset + (collection[i - 1] && collection[i - 1].getUsefulRect().height || 0);
                             var itemAbsoluteRect = this._processBandRtl({
                                 top: itemRect.top + parentAbsoluteProsition.top + bandOffset,
                                 bottom: itemRect.bottom + parentAbsoluteProsition.top + bandOffset,
@@ -18526,13 +18688,17 @@ var DevExpress;
                         return false;
                     }
                     else {
-                        if (!this.value().customizeCategories)
-                            this.value().customizeCategories = function (sender, groups, onClick) {
+                        if (!this.value()["customizeCategories"])
+                            this.value()["customizeCategories"] = function (sender, groups, onClick) {
                                 groups.splice(0, 0, _this._createReportItems(reportExplorerProvider, onClick, sender));
                                 if (_this.values() && _this.values().length > 0) {
                                     groups.splice(2, 0, _this._createValuesTab(onClick));
                                 }
-                                Report.Utils.addVaraiblesToExpressionEditor(groups);
+                                Report.Utils.addVaraiblesToExpressionEditor(groups, _this.value().eventName === "PrintOnPage" ? function (items) {
+                                    items.push({ text: "Arguments.PageIndex", val: "[Arguments.PageIndex]", descriptionStringId: 'ReportStringId.ExpressionEditor_Description_Arguments_PageIndex' });
+                                    items.push({ text: "Arguments.PageCount", val: "[Arguments.PageCount]", descriptionStringId: 'ReportStringId.ExpressionEditor_Description_Arguments_PageCount' });
+                                    return items;
+                                } : undefined);
                             };
                         return true;
                     }
@@ -20188,6 +20354,15 @@ var DevExpress;
                         return _super.prototype.getNearestParent.call(this, target);
                     }
                 };
+                ControlViewModel.prototype.isPropertyDisabled = function (name) {
+                    if (name === "textFitMode") {
+                        return this["canGrow"]() || this["canShrink"]() || this["wordWrap"]();
+                    }
+                    else if (name === "processNullValues") {
+                        return this["Summary"] && ko.unwrap(this["Summary"]["Running"]) !== "None";
+                    }
+                    return _super.prototype.isPropertyDisabled.call(this, name);
+                };
                 ControlViewModel.prototype.isPropertyVisible = function (name) {
                     if (this.multiline && this.multiline()) {
                         if (name === "text")
@@ -20301,17 +20476,16 @@ var DevExpress;
                         return (!control["borders"] || control["borders"]() === "None") ? { "border": "solid 1px Silver" } : _this.cssCalculator.borderCss(_this._context.zoom());
                     });
                     this.isIntersect = ko.pureComputed(function () {
-                        var isThereIntersection = _this.isThereIntersectionWithMargin();
-                        if (!isThereIntersection) {
-                            isThereIntersection = _this.isThereIntersectionWithCrossBandControls();
-                            if (!isThereIntersection) {
-                                isThereIntersection = _this.isThereIntersectionWithControls();
-                            }
-                        }
-                        return isThereIntersection;
+                        return _this.isThereIntersectionWithUsefulArea() ||
+                            _this.isThereIntersectionWithCrossBandControls() ||
+                            _this.isThereIntersectionWithControls();
                     });
                     this.adorntemplate = ko.computed(function () { return _this.getAdornTemplate(); });
                 }
+                ControlSurfaceBase.prototype._isThereIntersectionWithUsefulArea = function (useFullWidth) {
+                    var right = ko.unwrap(this.getRoot().rtl) && this.container() ? (this.container().rect().width - this.rect().left) : this.rect().right;
+                    return right > useFullWidth && Math.abs(right - useFullWidth) > this.delta;
+                };
                 ControlSurfaceBase._appendValue = function (accumulator, value, needToAppend) {
                     if (needToAppend === void 0) { needToAppend = true; }
                     if (needToAppend) {
@@ -20336,9 +20510,15 @@ var DevExpress;
                     return rectWidhtElement > parentRect.width && Math.abs(rectWidhtElement - parentRect.width) > this.delta ||
                         rectHeightElement > parentRect.height && Math.abs(rectHeightElement - parentRect.height) > this.delta;
                 };
-                ControlSurfaceBase.prototype.isThereIntersectionWithMargin = function () {
-                    var root = this.getRoot(), usefulPageWidth = root.pageWidth() - root.margins.left() - root.margins.right(), right = ko.unwrap(this.getRoot().rtl) && this.container() ? (this.container().rect().width - this.rect().left) : this.rect().right;
-                    return right > usefulPageWidth && Math.abs(right - usefulPageWidth) > this.delta;
+                ControlSurfaceBase.prototype.isThereIntersectionWithUsefulArea = function () {
+                    var _container = this.container();
+                    if (_container instanceof DevExpress.Designer.Report.BandSurface && _container["getUsefulRect"] && _container["getUsefulRect"]()) {
+                        return this._isThereIntersectionWithUsefulArea(this.container()["getUsefulRect"]().width);
+                    }
+                    else {
+                        var root = this.getRoot(), usefulPageWidth = root.pageWidth() - root.margins.left() - root.margins.right();
+                        return this._isThereIntersectionWithUsefulArea(usefulPageWidth);
+                    }
                 };
                 ControlSurfaceBase.prototype.isThereIntersectionWithCrossBandControls = function (currentRect) {
                     if (currentRect === void 0) { currentRect = this.absoluteRect(); }
@@ -21937,9 +22117,10 @@ var DevExpress;
             var colors = ['Transparent', 'AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'Black', 'BlanchedAlmond', 'Blue', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Chocolate', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Crimson', 'Cyan', 'DarkBlue', 'DarkCyan', 'DarkGoldenrod', 'DarkGray', 'DarkGreen', 'DarkKhaki', 'DarkMagenta', 'DarkOliveGreen', 'DarkOrange', 'DarkOrchid', 'DarkRed', 'DarkSalmon', 'DarkSeaGreen', 'DarkSlateBlue', 'DarkSlateGray', 'DarkTurquoise', 'DarkViolet', 'DeepPink', 'DeepSkyBlue', 'DimGray', 'DodgerBlue', 'Firebrick', 'FloralWhite', 'ForestGreen', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'Goldenrod', 'Gray', 'Green', 'GreenYellow', 'Honeydew', 'HotPink', 'IndianRed', 'Indigo', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenrodYellow', 'LightGreen', 'LightGray', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'Maroon', 'MediumAquamarine', 'MediumBlue', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSlateBlue', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MidnightBlue', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'Navy', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenrod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Purple', 'Red', 'RosyBrown', 'RoyalBlue', 'SaddleBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Sienna', 'Silver', 'SkyBlue', 'SlateBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen'];
             var WrappedExpressionOptions = (function (_super) {
                 __extends(WrappedExpressionOptions, _super);
-                function WrappedExpressionOptions(options, handlers, fieldListProvider) {
+                function WrappedExpressionOptions(options, handlers, fieldListProvider, eventName) {
                     var _this = this;
                     _super.call(this);
+                    this.eventName = eventName;
                     this.isValid = ko.observable(true);
                     this.expression = ko.observable(null);
                     this.rootItems = [{ name: "Parameters", needPrefix: true }, { name: "ReportItems", needPrefix: false, rootPath: "Root" }];
@@ -22138,7 +22319,7 @@ var DevExpress;
                         removeExpression: function (expression) {
                             expressions.remove(expression);
                         }
-                    }, this._fieldListProvider);
+                    }, this._fieldListProvider, eventName);
                     expressionOptions.expression(this._getExpressionFromArray(propertyName, eventName, expressions));
                     return expressionOptions;
                 };
@@ -23675,17 +23856,28 @@ var DevExpress;
                     });
                     this.getUsefulRect = function () {
                         var usefulWidth = _this.rect().width;
+                        var margins = _this.getControlModel().root["margins"];
                         if (_this["grayAreaWidth"] && _this["grayAreaWidth"]()) {
                             usefulWidth -= _this["grayAreaWidth"]() + _this["columnSpacing"]();
                         }
                         else {
-                            var margins = _this.getControlModel().root["margins"];
-                            var farMarginWidth = margins ? (_this._context.rtl() ? margins.left && margins.left() : margins.right && margins.right()) || 0 : 0;
-                            usefulWidth -= Designer.unitsToPixel(farMarginWidth, _this._context.measureUnit(), _this._context.zoom());
+                            usefulWidth -= _this._getMarginWidth(margins, _this._context.rtl());
                         }
-                        return { top: 0, left: 0, width: usefulWidth, height: _this.rect().height };
+                        if (_this.rtlLayout()) {
+                            var nearMarginWidth = _this._getMarginWidth(margins, _this._context.rtl(), false);
+                            var left = _this.container().rect().width - usefulWidth - nearMarginWidth;
+                            return { top: 0, left: left, right: usefulWidth + nearMarginWidth, bottom: _this.rect().height, width: usefulWidth, height: _this.rect().height };
+                        }
+                        else {
+                            return { top: 0, left: 0, right: usefulWidth, bottom: _this.rect().height, width: usefulWidth, height: _this.rect().height };
+                        }
                     };
                 }
+                BandSurface.prototype._getMarginWidth = function (margins, rtl, isFarMargin) {
+                    if (isFarMargin === void 0) { isFarMargin = true; }
+                    var marginWidht = margins ? (isFarMargin && this._context.rtl() ? margins.left && margins.left() : margins.right && margins.right()) || 0 : 0;
+                    return Designer.unitsToPixel(marginWidht, this._context.measureUnit(), this._context.zoom());
+                };
                 BandSurface.prototype.markerClick = function (selection) {
                     if (selection.expectClick) {
                         selection.expectClick = false;
@@ -23889,7 +24081,7 @@ var DevExpress;
             Report.groupHeaderBandSerializationInfo = [Report.groupFields, Report.groupUnion, Report.sortingSummary, Report.drillDownDetailReportExpanded,
                 Report.drillDownControl, Report.groupHeaderBandScripts].concat(groupBand);
             Report.groupFooterBandSerializationInfo = [Report.groupFooterUnion, Report.printAtBottom, Report.groupBandScripts].concat(groupBand);
-            Report.popularPropertiesReportHeader = ["pageBreak", "keepTogether"], Report.popularPropertiesReportFooter = ["keepTogether", "printAtBottom"], Report.popularPropertiesPageHeader = ["printOn"], Report.popularPropertiesPageFooter = ["printOn"], Report.popularPropertiesGroupHeader = ["groupFields", "groupUnion", "level", "pageBreak", "keepTogether", "repeatEveryPage"], Report.popularPropertiesGroupFooter = ["groupFooterUnion", "pageBreak", "keepTogether", "repeatEveryPage", "printAtBottom"], Report.popularPropertiesDetail = ["sortFields", "pageBreak", "keepTogether", "keepTogetherWithDetailReports"], Report.popularPropertiesDetailReport = ["dataSource", "dataMember", "dataAdapter", "filterString"];
+            Report.popularPropertiesReportHeader = ["pageBreak", "keepTogether"], Report.popularPropertiesReportFooter = ["pageBreak", "keepTogether", "printAtBottom"], Report.popularPropertiesPageHeader = ["printOn"], Report.popularPropertiesPageFooter = ["printOn"], Report.popularPropertiesGroupHeader = ["groupFields", "groupUnion", "level", "pageBreak", "keepTogether", "repeatEveryPage"], Report.popularPropertiesGroupFooter = ["groupFooterUnion", "pageBreak", "keepTogether", "repeatEveryPage", "printAtBottom"], Report.popularPropertiesDetail = ["sortFields", "pageBreak", "keepTogether", "keepTogetherWithDetailReports"], Report.popularPropertiesDetailReport = ["dataSource", "dataMember", "dataAdapter", "filterString"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -24965,8 +25157,8 @@ var DevExpress;
                     { value: "Name", displayValue: "Name", localizationId: "DevExpress.XtraPivotGrid.DataFieldNaming.Name" }
                 ]
             }, rowHeaderWidth = { propertyName: "rowHeaderWidth", modelName: "@RowHeaderWidth", displayName: "Row Header Width", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataField.RowHeaderWidth", defaultVal: 100, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, rowValueLineCount = { propertyName: "rowValueLineCount", modelName: "@RowValueLineCount", displayName: "Row Value Line Count", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsDataFieldEx.RowValueLineCount", defaultVal: 1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, optionsDataFieldInfo = [area, areaIndex, Designer.Pivot.caption, columnValueLineCount, fieldNaming, rowHeaderWidth, rowValueLineCount], optionsDataField = { propertyName: "optionsDataField", modelName: "OptionsDataField", displayName: "Data Field Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsDataField", info: optionsDataFieldInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
-            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, columnHeaderPaddingBottom = { propertyName: "columnHeaderPaddingBottom", modelName: "@ColumnHeaderPaddingBottom", displayName: "Column Header Padding Bottom", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnHeaderPaddingBottom", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnFieldValues = { propertyName: "printColumnFieldValues", modelName: "@PrintColumnFieldValues", displayName: "Print Column FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeadersOnEveryPage = { propertyName: "printRowHeadersOnEveryPage", modelName: "@PrintRowHeadersOnEveryPage", displayName: "Print Row Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowFieldValues = { propertyName: "printRowFieldValues", modelName: "@PrintRowFieldValues", displayName: "Print Row FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, columnHeaderPaddingBottom, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
-                printHeadersOnEveryPage, printHorzLines, printRowFieldValues, printRowHeaders, printRowHeadersOnEveryPage, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
+            var columnFieldValueSeparator = { propertyName: "columnFieldValueSeparator", modelName: "@ColumnFieldValueSeparator", displayName: "Column Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, columnHeaderPaddingBottom = { propertyName: "columnHeaderPaddingBottom", modelName: "@ColumnHeaderPaddingBottom", displayName: "Column Header Padding Bottom", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.ColumnHeaderPaddingBottom", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, filterSeparatorBarPadding = { propertyName: "filterSeparatorBarPadding", modelName: "@FilterSeparatorBarPadding", displayName: "Filter Separator Bar Padding", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.FilterSeparatorBarPadding", defaultVal: -1, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, mergeColumnFieldValues = { propertyName: "mergeColumnFieldValues", modelName: "@MergeColumnFieldValues", displayName: "Merge Column Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, mergeRowFieldValues = { propertyName: "mergeRowFieldValues", modelName: "@MergeRowFieldValues", displayName: "Merge Row Field Values", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.MergeRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnFieldValues = { propertyName: "printColumnFieldValues", modelName: "@PrintColumnFieldValues", displayName: "Print Column FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnHeaders = { propertyName: "printColumnHeaders", modelName: "@PrintColumnHeaders", displayName: "Print Column Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printDataHeaders = { propertyName: "printDataHeaders", modelName: "@PrintDataHeaders", displayName: "Print Data Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintDataHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printFilterHeaders = { propertyName: "printFilterHeaders", modelName: "@PrintFilterHeaders", displayName: "Print Filter Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintFilterHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printHeadersOnEveryPage = { propertyName: "printHeadersOnEveryPage", modelName: "@PrintHeadersOnEveryPage", displayName: "Print Headers on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHeadersOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printColumnAreaOnEveryPage = { propertyName: "printColumnAreaOnEveryPage", modelName: "@PrintColumnAreaOnEveryPage", displayName: "Print Column Area on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintColumnAreaOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowAreaOnEveryPage = { propertyName: "printRowAreaOnEveryPage", modelName: "@PrintRowAreaOnEveryPage", displayName: "Print Row Area on Every Page", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowAreaOnEveryPage", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printHorzLines = { propertyName: "printHorzLines", modelName: "@PrintHorzLines", displayName: "Print Horizontal Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintHorzLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printRowFieldValues = { propertyName: "printRowFieldValues", modelName: "@PrintRowFieldValues", displayName: "Print Row FieldValues", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowFieldValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printRowHeaders = { propertyName: "printRowHeaders", modelName: "@PrintRowHeaders", displayName: "Print Row Headers", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintRowHeaders", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, printUnusedFilterFields = { propertyName: "printUnusedFilterFields", modelName: "@PrintUnusedFilterFields", displayName: "Print Unused Filter Fields", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintUnusedFilterFields", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, printVertLines = { propertyName: "printVertLines", modelName: "@PrintVertLines", displayName: "Print Vertical Lines", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PrintVertLines", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Report.defaultBooleanValuesArray }, rowFieldValueSeparator = { propertyName: "rowFieldValueSeparator", modelName: "@RowFieldValueSeparator", displayName: "Row Field Value Separator", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.RowFieldValueSeparator", defaultVal: 0, editor: DevExpress.JS.Widgets.editorTemplates.numeric }, usePrintAppearance = { propertyName: "usePrintAppearance", modelName: "@UsePrintAppearance", displayName: "Use Print Appearance", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.UsePrintAppearance", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, optionsPrintInfo = [columnFieldValueSeparator, columnHeaderPaddingBottom, filterSeparatorBarPadding, mergeColumnFieldValues, mergeRowFieldValues, printColumnAreaOnEveryPage, printColumnFieldValues, printColumnHeaders, printDataHeaders, printFilterHeaders,
+                printHeadersOnEveryPage, printHorzLines, printRowFieldValues, printRowHeaders, printRowAreaOnEveryPage, printUnusedFilterFields, printVertLines, rowFieldValueSeparator, usePrintAppearance], optionsPrint = { propertyName: "optionsPrint", modelName: "OptionsPrint", displayName: "Print Options", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.OptionsPrint", info: optionsPrintInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var columnTotalsLocation = { propertyName: "columnTotalsLocation", modelName: "@ColumnTotalsLocation", displayName: "Column Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.ColumnTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Near" }, { value: "Far", displayValue: "Far ", localizationId: "DevExpress.XtraPivotGrid.PivotTotalsLocation.Far" }] }, groupFieldsInCustomizationWindow = { propertyName: "groupFieldsInCustomizationWindow", modelName: "@GroupFieldsInCustomizationWindow", displayName: "Group Fields in the Customization Window", localizationId: "DevExpress.XtraPivotGrid.PivotGridOptionsView.GroupFieldsInCustomizationWindow", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, rowTotalsLocation = {
                 propertyName: "rowTotalsLocation", modelName: "@RowTotalsLocation", displayName: "Row Totals Location", localizationId: "DevExpress.XtraPivotGrid.Data.PivotGridOptionsViewBase.RowTotalsLocation", defaultVal: "Far", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
                     { value: "Near", displayValue: "Near", localizationId: "DevExpress.XtraPivotGrid.PivotRowTotalsLocation.Near" },
@@ -25719,7 +25911,7 @@ var DevExpress;
                 TableCellSurface.prototype.checkParent = function (surfaceParent) {
                     return this.parent.parent === surfaceParent;
                 };
-                TableCellSurface.prototype.isThereIntersectionWithMargin = function () {
+                TableCellSurface.prototype.isThereIntersectionWithUsefulArea = function () {
                     return false;
                 };
                 TableCellSurface.prototype.isThereIntersectionWithCrossBandControls = function () {
@@ -26984,7 +27176,7 @@ var DevExpress;
                 Report.anchorVertical, Report.anchorHorizontal, Report.textAlignment, Report.wordWrap, Report.textFormatString, Report.pageInfo, Report.startPageNumber, Report.runningBand, Report.textControlScripts, Report.rtl,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag"]),
             ].concat(Report.sizeLocation, Report.commonControlProperties, Report.fontGroup, Report.navigationGroup);
-            Report.popularPropertiesPageInfo = ["pageInfo", "startPageNumber", "textFormatString", "anchorVertical", "anchorHorizontal"];
+            Report.popularPropertiesPageInfo = ["pageInfo", "startPageNumber", "textFormatString", "runningBand", "anchorVertical"];
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -27151,6 +27343,11 @@ var DevExpress;
                 };
                 CrossBandControlViewModel.prototype.isResettableProperty = function (propertyName) {
                     return _super.prototype.isResettableProperty.call(this, propertyName) && ["startPoint", "endPoint", "startBand", "endBand"].indexOf(propertyName) === -1;
+                };
+                CrossBandControlViewModel.prototype.isPropertyVisible = function (name) {
+                    if (name === "size")
+                        return false;
+                    return _super.prototype.isPropertyVisible.call(this, name);
                 };
                 CrossBandControlViewModel.prototype.getControlContainerName = function () { return "crossBandControls"; };
                 CrossBandControlViewModel.unitProperties = ["width"];
@@ -27685,10 +27882,9 @@ var DevExpress;
                 { propertyName: "fakeBinding", displayName: "Binding", localizationId: "DevExpress.XtraReports.Design.DataBinding.Binding", link: true, editor: { header: "dxrd-dataBinding", editorType: Designer.Widgets.FieldListEditor } }
             ]);
             Report.parameterBindings = { propertyName: "parameterBindings", modelName: "ParameterBindings", displayName: "Parameter Bindings", localizationId: "DevExpress.XtraReports.UI.XRSubreport.ParameterBindings", array: true, editor: DevExpress.JS.Widgets.editorTemplates.commonCollection, addHandler: DevExpress.Designer.Report.ParameterBinding.createNew, template: '#dxrd-commonCollectionItem' };
-            var subreportProperties = Report.commonControlProperties.filter(function (item) { return item !== Report.tag && item !== Report.canPublish; });
             Report.subreportSerializationsInfo = [
-                Report.reportSource, Report.reportSourceUrl, Report.subreportScripts, Report.parameterBindings, Report.bookmarkParent
-            ].concat(Report.sizeLocation, subreportProperties, Report.canGrowShrinkGroup);
+                Report.reportSource, Report.reportSourceUrl, Report.subreportScripts, Report.parameterBindings, Report.bookmarkParent, Report.canShrink
+            ].concat(Report.sizeLocation, Report.baseControlProperties);
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
@@ -27903,7 +28099,7 @@ var DevExpress;
                 TableOfContentsSurface.prototype.isThereIntersectionWithChildCollection = function () {
                     return false;
                 };
-                TableOfContentsSurface.prototype.isThereIntersectionWithMargin = function () {
+                TableOfContentsSurface.prototype.isThereIntersectionWithUsefulArea = function () {
                     return false;
                 };
                 TableOfContentsSurface.prototype.isThereIntersectionWithParentCollection = function () {
@@ -29062,6 +29258,7 @@ var DevExpress;
                 AddDataSource: "dxrd-add-datasource",
                 AddSqlDataSource: "dxrd-add-sql-datasource",
                 AddMultiQuerySqlDataSource: "dxrd-add-multi-query-sql-datasource",
+                ValidateBindings: "dxrd-validate-bindings",
                 Save: "dxrd-save",
                 SaveAs: "dxrd-save-as",
                 Exit: "dxrd-exit",
@@ -29087,10 +29284,8 @@ var DevExpress;
                     Report.segmentWidth, Report.shapeFake, Report.sizing, Report.showPreviewMarginLines, Report.showText, Report.startPageNumber, Report.stretch, Report.barcodeFake,
                     Report.textFitMode, Report.verticalContentSplitting, Report.visible, Report.wordWrap, Report.scriptLanguage,
                     Report.reportExportOptionsSerializationInfo, Report.horizontalContentSplitting,
-                    Report.reportPrintOptions,
                     Report.scriptReferencesString, Report.allScripts, Report.sortingSummary,
                     Report.tocTitle, Report.tocLevelDefault, Report.tocLevels, Report.maxNestingLevel,
-                    Report.rtl, Report.rtlReport, Report.rtlLayout,
                     Report.editOptions, Report.textEditOptions, Report.chekEditOptions, Report.interactiveSorting, Designer.Pivot.sortBySummary,
                     Report.processHiddenCellMode
                 ],
@@ -29111,6 +29306,7 @@ var DevExpress;
                 "Layout": [Report.cellHeight, Report.cellHorizontalSpacing, Report.cellSizeMode, Report.cellVerticalSpacing, Report.cellWidth, Report.startBand, Report.startPoint, Report.endBand, Report.endPoint, Report.height, Report.location, Report.size, Designer.Pivot.minWidth, Report.width],
                 "Navigation": [Report.bookmark, Report.bookmarkParent, Report.bookmarkDuplicateSuppress, Report.target, Report.navigateUrl],
                 "Page Settings": [Report.landscape, Report.rollPaper, Report.pageWidth, Report.pageHeight, Report.paperKind, Report.margins],
+                "Printing": [Report.rtl, Report.rtlReport, Report.rtlLayout, Report.reportPrintOptions,],
                 "Options": Report.pivotGridOptions.concat(Designer.Pivot.options),
                 "KPI": [Designer.Pivot.KPIGraphic],
             };
@@ -29123,6 +29319,7 @@ var DevExpress;
                 "Layout": "DevExpress.XtraReports.UI.MultiColumn.Layout",
                 "Navigation": "ASPxReportsStringId.DocumentViewer_RibbonNavigationGroupText",
                 "Page Settings": "DevExpress.XtraPivotGrid.Data.PivotGridOptionsPrint.PageSettings",
+                "Printing": "ReportStringId.CatPrinting",
                 "Options": "DevExpress.XtraPivotGrid.PivotGridFieldBase.Options"
             };
             Report.formatStringEditorCustomSet = {};
@@ -29313,6 +29510,7 @@ var DevExpress;
                         });
                     }
                     actions.push({
+                        id: Report.ActionId.ValidateBindings,
                         text: "Validate Bindings",
                         displayText: function () { return Designer.getLocalization("Validate Bindings", "ASPxReportsStringId.ReportDesigner_ToolBarItemText_ValidateBindings"); },
                         imageClassName: "dxrd-image-validateBindingMode",
@@ -29846,6 +30044,12 @@ var DevExpress;
                     });
                     reportViewModel(newModel);
                     designerModel.undoEngine && designerModel.undoEngine().clearHistory();
+                    setTimeout(function () {
+                        designerCallbacks && designerCallbacks.reportOpened && designerCallbacks.reportOpened({
+                            report: reportViewModel(),
+                            url: ko.unwrap(data.reportUrl())
+                        });
+                    }, 10);
                 });
                 var navigation = new Report.NavigateByReports(reportViewModel, data.reportUrl, designerCallbacks, data.allowMDI);
                 var undoEngine = ko.computed(function () {
@@ -30001,8 +30205,11 @@ var DevExpress;
                     designerModel.scriptsEditor = new Report.ScriptsEditor(model, designerModel.controlsHelper.allControls);
                     designerModel.scriptsEditor.editorVisible.subscribe(function (newValue) {
                         if (newValue) {
-                            var focusedControl = designerModel.selection.focused().getControlModel();
-                            designerModel.scriptsEditor.selectedControl(!!focusedControl.scripts ? focusedControl : focusedControl.parentModel());
+                            var focusedControl = designerModel.selection.focused();
+                            if (focusedControl && focusedControl.getControlModel) {
+                                focusedControl = focusedControl.getControlModel();
+                                designerModel.scriptsEditor.selectedControl(!!focusedControl.scripts ? focusedControl : focusedControl.parentModel());
+                            }
                             var resizeFunction = function () { return setTimeout(function () {
                                 designerModel.scriptsEditor.editorContainer().resize();
                             }, 1); };
@@ -30095,7 +30302,8 @@ var DevExpress;
                     var isDataSourceWizardVisible = designerModel.dataSourceWizard && designerModel.dataSourceWizard.isVisible();
                     return isDesignMode && !isWizardVisible && !isSqlDataSourceVisible && !isCompleteSqlDataSourceVisible && !isDataSourceWizardVisible;
                 });
-                var actions = new Designer.ActionLists(surface, designerModel.selection, designerModel.undoEngine, customizeDesignerActions(designerModel, designerCallbacks.customizeActions, designerCallbacks.exitDesigner, state, designerCallbacks), designerShortcutsEnabled, Report.reportCopyPasteStrategy);
+                designerModel.zoomStep = ko.observable(0.05);
+                var actions = new Designer.ActionLists(surface, designerModel.selection, designerModel.undoEngine, customizeDesignerActions(designerModel, designerCallbacks.customizeActions, designerCallbacks.exitDesigner, state, designerCallbacks), designerShortcutsEnabled, Report.reportCopyPasteStrategy, designerModel.zoomStep);
                 designerModel.actionStorage = $.extend({}, createActionsStorage(actions.menuItems), createActionsStorage(actions.toolbarItems));
                 designerModel.actionLists = actions;
                 designerModel.fieldDragHandler = new Report.FieldListDragDropHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.snapHelper, designerModel.dragHelperContent, designerModel.fieldListDataSources, designerCallbacks.componentAdded);
@@ -30346,6 +30554,7 @@ var DevExpress;
                     surfaceType: Report.TableSurface,
                     popularProperties: Report.popularPropertiesTable,
                     isContainer: true,
+                    isPasteDeny: true,
                     canDrop: function (dropTarget) { return dropTarget.getControlModel().controlType !== "XRTableRow"; }
                 });
                 Report.controlsFactory.registerControl("XRCharacterComb", {
@@ -30694,6 +30903,7 @@ var DevExpress;
                     surfaceType: Report.TableRowSurface,
                     isContainer: true,
                     isCopyDeny: true,
+                    isPasteDeny: true,
                     canDrop: function (dropTarget) { return dropTarget.getControlModel().controlType === "XRTable"; }
                 });
                 Report.controlsFactory.registerControl("XRTableCell", {
@@ -31606,6 +31816,7 @@ var DevExpress;
                                     new Report.Wizard.SelectDataMemberPage(this, callbacks.fieldListsCallback, callbacks.createSqlDataSourceInfo, hideDataMemberSubItems),
                                     new Report.Wizard.SelectColumnsPage(this, callbacks.fieldListsCallback),
                                     new Report.Wizard.AddGroupingLevelPage(this),
+                                    new Report.Wizard.ChooseSummaryOptionsPage(this),
                                     new Report.Wizard.ChooseReportLayoutPage(this),
                                     new Report.Wizard.ChooseReportStylePage(this)
                                 ];
@@ -33614,6 +33825,8 @@ var DevExpress;
                     };
                 };
                 DisplayNameProvider.prototype._getFieldDisplayName = function (fields, fieldName) {
+                    if (!fields)
+                        return null;
                     var field = Designer.findFirstItemMatchesCondition(fields, function (field) { return field.name === fieldName; });
                     return field ? field.displayName : null;
                 };
@@ -35325,15 +35538,16 @@ var DevExpress;
                         return control.root;
                 }
                 Utils.findFirstParentWithPropertyName = findFirstParentWithPropertyName;
-                function addVaraiblesToExpressionEditor(categories) {
+                function addVaraiblesToExpressionEditor(categories, customizeItems) {
+                    if (customizeItems === void 0) { customizeItems = function (items) { return items; }; }
                     categories.push({
                         displayName: Designer.getLocalization("Variables", "XtraEditorsExpressionEditor.Variables.Text"),
                         content: {
                             isSelected: ko.observable(false),
-                            data: [
+                            data: customizeItems([
                                 { text: "DataSource.CurrentRowIndex", val: "[DataSource.CurrentRowIndex]", descriptionStringId: 'XtraEditorsExpressionEditor.CurrentRowIndex.Description' },
                                 { text: "DataSource.RowCount", val: "[DataSource.RowCount]", descriptionStringId: 'XtraEditorsExpressionEditor.RowCount.Description' }
-                            ],
+                            ]),
                             name: "dx-expressioneditor-collection"
                         }
                     });

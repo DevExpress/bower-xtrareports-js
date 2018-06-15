@@ -2,7 +2,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -728,9 +728,11 @@
 <script type="text/html" id="dx-filtereditor-popup-common">
     <div class="dx-widget" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
         <!-- ko foreach: data -->
+        <!-- ko if: !$data.hidden -->
         <div class="dx-filtereditor-popup-item dx-item dx-list-item">
             <span class="dx-item-content dx-list-item-content" data-bind="text: $data.displayText || $data.name, click: function() { $parent.click($data); } "></span>
         </div>
+        <!-- /ko -->
         <!-- /ko -->
     </div>
 </script>
@@ -1340,7 +1342,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1535,7 +1537,9 @@
                     <div class="dxrd-ghost-containment" style="height:100%;">
                         <div class="dxrd-ghost-container dxqb-ghost-container" data-bind="styleunit: { 'minWidth': pageWidth, 'minHeight': pageHeight }, trackCursor: underCursor">
                             <div class="dxqb-main" data-bind="trackCursor: underCursor, style: { 'z-index' : $parent.dragDropStarted() ? 2 : null }">
-
+                                <!-- ko if: tables().length === 0-->
+                                <div class="dxqb-placeholder" data-bind="text: placeholder()"></div>
+                                <!-- /ko -->
                                 <!-- ko foreach: relations -->
                                 <!-- ko foreach: conditions -->
                                 <!-- ko if: !isSelected()-->
@@ -2368,7 +2372,7 @@
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2381,11 +2385,9 @@
                 <span data-bind="text: rightPanelHeader()"></span>
             </div>
             <!-- ko if: chartStructure -->
-            <!-- ko with: chartStructure-->
             <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false, bounceEnabled: false, useNative: false, scrollByThumb: true }">
-                <div class="dxcd-chart-structure" data-bind="treelist: { itemsProvider: itemsProvider, selectedPath: selectedPath, treeListController: treeListController }"></div>
+                <div class="dxcd-chart-structure" data-bind="treelist: chartStructure"></div>
             </div>
-            <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
@@ -2572,7 +2574,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2790,10 +2792,11 @@
                 <div data-bind="dxPropertyGrid: { target: ko.observable(model) }"></div>
             </div>
         </div>
-        <div class="dxrdp-parameters-buttons">
-            <div class="dxrdp-parameter-action dxrdp-parameters-reset" data-bind="dxButton: { text: $root.getLocalization('Reset', 'ASPxReportsStringId.ParametersPanel_Reset'), onClick: reset }"></div>
-            <div class="dxrdp-parameter-action dxrdp-parameters-cancel" data-bind="dxButton: { text: $root.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'), disabled: cancelDisabled, onClick: cancel } "></div>
-            <div class="dxrdp-parameter-action dxrdp-parameters-submit" data-bind="dxButton: { text: $root.getLocalization('Submit', 'ASPxReportsStringId.ParametersPanel_Submit'), onClick: submit }"></div>
+        <div class="dxrdp-parameters-buttons text-buttons" data-bind="foreach: { data: $data.actionButtons }, cacheElement: { action: function(element) { $data.cacheElementContent(element); } }">
+            <div class="dxrdp-parameter-action" data-bind="dxButton: { text: text, onClick: function(params){ $data.action($parent.parametersModel, params) }, disabled: disabled }, css: className"></div>
+        </div>
+        <div class="dxrdp-parameters-buttons" data-bind="visible: showIcons, foreach: { data: $data.actionIcons }">
+            <div class="dxrdp-parameter-icon" data-bind="dxButton: { onClick: function(params){ $data.action($parent.parametersModel, params)}, disabled: disabled }, css: className"></div>
         </div>
     </div>
 </script>
@@ -3032,7 +3035,8 @@
         <!-- ko template: 'dxrd-preview-progress-bar'-->
         <!-- /ko -->
         <!-- /ko -->
-        <div class="dxrd-preview-surface" data-bind="styleunit: { width: previewSize() }, visible: !showMultipagePreview()">
+        <div class="dxrd-preview-surface" data-bind="styleunit: { width: previewSize() }">
+            <!-- ko if: !showMultipagePreview() -->
             <div class="dxrd-report-preview-holder">
                 <!-- ko with: currentPage-->
                 <!-- ko if: pageLoading() || (!pageLoading() && displayImageSrc()) -->
@@ -3043,8 +3047,8 @@
                 <!-- /ko -->
                 <!-- /ko -->
             </div>
-        </div>
-        <div class="dxrd-preview-surface" data-bind="styleunit: { 'width': previewSize() }, visible: showMultipagePreview()">
+            <!-- /ko -->
+            <!-- ko if: showMultipagePreview() -->
             <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">
                 <!-- ko foreach: pages -->
                 <!-- ko lazy: { if: pageLoading() || (!pageLoading() && displayImageSrc()) } -->
@@ -3055,6 +3059,12 @@
                 <!-- /ko -->
                 <!-- /ko -->
             </div>
+            <!-- /ko -->
+            <!-- ko if: !currentPage() -->
+            <div class="dxrd-report-preview-placeholder">
+                <div data-bind="text: emptyDocumentCaption()"></div>
+            </div>
+            <!-- /ko -->
         </div>
     </div>
     <div id="clipboard-container" style="position:absolute;top:-100px;"><textarea id="clipboard"></textarea></div>
@@ -3063,7 +3073,7 @@
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

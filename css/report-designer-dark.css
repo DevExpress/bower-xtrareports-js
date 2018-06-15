@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3037,7 +3037,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3181,7 +3181,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.dark.css)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-14
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3526,6 +3526,18 @@
   top: 0;
   width: 100%;
   height: 100%;
+}
+.dx-querybuilder .dxrd-designer-wrapper .dxrd-surface-wrapper .dxqb-main .dxqb-placeholder {
+  position: relative;
+  top: 50%;
+  width: 100%;
+  transform: translateY(-50%);
+  text-align: center;
+  overflow: hidden;
+  margin: 20px;
+  font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
+  color: #808080;
+  font-size: 24px;
 }
 .dx-querybuilder .dxrd-designer-wrapper .dxrd-surface-wrapper .dxqb-main .dxd-track-cursor {
   z-index: 1;
@@ -4253,7 +4265,7 @@
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-dark.css)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4728,7 +4740,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5161,6 +5173,20 @@
   border: 1px solid rgba(42, 125, 243, 0.7);
   box-shadow: 0 2px 8px rgba(42, 125, 243, 0.2);
 }
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrd-preview-surface .dxrd-report-preview-placeholder {
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  overflow: hidden;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrd-preview-surface .dxrd-report-preview-placeholder div {
+  margin: 20px;
+  font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, san-serif;
+  color: #808080;
+  font-size: 24px;
+}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrd-report-preview-brick {
   position: absolute;
 }
@@ -5276,6 +5302,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  line-height: normal;
   resize: none;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-check-container {
@@ -5392,6 +5419,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  line-height: normal;
   resize: none;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-focused {
@@ -5591,6 +5619,19 @@
   padding: 0 40px;
   position: absolute;
   bottom: 0;
+}
+.dxrd-menu-parameters-popup .dx-popup-content .dxrdp-parameters-mobile .dxrdp-parameters-buttons .dxrdp-parameter-icon {
+  background-color: transparent;
+  border: none;
+  display: inline-block;
+  padding: 20px;
+}
+.dxrd-menu-parameters-popup .dx-popup-content .dxrdp-parameters-mobile .dxrdp-parameters-buttons .dxrdp-parameter-icon.dxrdp-parameters-cancel {
+  margin-left: 25px;
+}
+.dxrd-menu-parameters-popup .dx-popup-content .dxrdp-parameters-mobile .dxrdp-parameters-buttons .dxrdp-parameter-icon.dxrdp-parameters-submit {
+  float: right;
+  margin-top: 13px;
 }
 .dxrd-menu-parameters-popup .dx-popup-content .dxrdp-parameters-mobile .dxrdp-parameters-buttons .dxrdp-parameter-action {
   background: transparent;
@@ -5796,12 +5837,24 @@
   background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%23ffffff%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M2.6%2021.4c.8.8%202%20.8%202.8%200l4.6-4.5c1.1.7%202.5%201.1%204%201.1%204.4%200%208-3.6%208-8s-3.6-8-8-8-8%203.6-8%208c0%201.5.4%202.9%201.1%204.1l-4.6%204.6c-.7.7-.7%201.9.1%202.7zM10%2010c0-2.2%201.8-4%204-4s4%201.8%204%204-1.8%204-4%204-4-1.8-4-4z%22%2F%3E%3C%2Fsvg%3E');
   background-repeat: no-repeat;
 }
+.dxrdp-parameters-mobile .dxrdp-image-parameters-cancel {
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Cancel%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cstyle%3E.White%7Bfill%3A%23FFFFFF%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22White%22%20d%3D%22M58%2012l-6-6-20%2020L12%206l-6%206%2020%2020L6%2052l6%206%2020-20%2020%2020%206-6-20-20z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+}
+.dxrdp-parameters-mobile .dxrdp-image-parameters-submit {
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Submit%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cstyle%3E.White%7Bfill%3A%23FFFFFF%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22White%22%20d%3D%22M58%208L22%2044%206%2028l-6%206%2022%2022%2042-42z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+}
+.dxrdp-parameters-mobile .dxrdp-image-parameters-reset {
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Reset%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cstyle%3E.White%7Bfill%3A%23FFFFFF%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22White%22%20d%3D%22M32%204c-7.7%200-14.7%203.1-19.8%208.2L4%204v22h22l-8.1-8.1C21.5%2014.2%2026.5%2012%2032%2012c11%200%2020%209%2020%2020s-9%2020-20%2020-20-9-20-20H4c0%2015.5%2012.5%2028%2028%2028s28-12.5%2028-28S47.5%204%2032%204z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+}
 /*@import 'mobile/widgets/circlemenu.less';*/
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-dark.css)
 * Version: 18.1.3
-* Build date: 2018-05-17
+* Build date: 2018-06-15
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -6753,7 +6806,7 @@
 }
 .dx-image-fieldlist-component {
   background-repeat: no-repeat;
-  background-image: url(../../images/dark/fieldlist/datasource_hover.svg);
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%23ffffff%3B%7D%3C%2Fstyle%3E%3Cellipse%20class%3D%22st0%22%20cx%3D%2211%22%20cy%3D%224%22%20rx%3D%227%22%20ry%3D%222%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M11%2010c-3.9%200-7-.9-7-2v12c0%201.1%203.1%202%207%202s7-.9%207-2V8c0%201.1-3.1%202-7%202z%22%2F%3E%3C%2Fsvg%3E');
 }
 .dx-image-fieldlist-components {
   background-repeat: no-repeat;
