@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.3
-* Build date: 2018-06-14
+* Version: 18.1.4
+* Build date: 2018-06-20
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8085,8 +8085,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.3
-* Build date: 2018-06-15
+* Version: 18.1.4
+* Build date: 2018-06-21
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -24939,6 +24939,14 @@ var DevExpress;
             Pivot.appearancesInfo = [cellAppearance, totalCellAppearance, customTotalCellAppearance, grandTotalCellAppearance, fieldHeaderAppearance, fieldValueAppearance, fieldValueGrandTotalAppearance, fieldValueTotalAppearance];
             var appearances = { propertyName: "appearances", modelName: "Appearance", displayName: "Appearance", localizationId: "DevExpress.XtraPivotGrid.PivotGridField.Appearance", info: Pivot.appearancesInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var allowDrag = { propertyName: "allowDrag", modelName: "@AllowDrag", displayName: "Allow Drag", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowDrag", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowDragInCustomizationForm = { propertyName: "@allowDragInCustomizationForm", modelName: "AllowDragInCustomizationForm", displayName: "Allow Drag In Customization Form", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray, localizationId: 'DevExpress.XtraPivotGrid.PivotGridOptionsCustomization.AllowDragInCustomizationForm' }, allowExpand = { propertyName: "allowExpand", modelName: "@AllowExpand", displayName: "Allow Expand", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowExpand", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowFilter = { propertyName: "allowFilter", modelName: "@AllowFilter", displayName: "Allow Filter", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowFilter", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowFilterBySummary = { propertyName: "allowFilterBySummary", modelName: "@AllowFilterBySummary", displayName: "Allow Filter By Summary", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowFilterBySummary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowRunTimeSummaryChange = { propertyName: "allowRunTimeSummaryChange", modelName: "@AllowRunTimeSummaryChange", displayName: "Allow Run Time Summary Change", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowRunTimeSummaryChange", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, allowSort = { propertyName: "allowSort", modelName: "@AllowSort", displayName: "Allow Sort", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowSort", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, allowSortBySummary = { propertyName: "allowSortBySummary", modelName: "@AllowSortBySummary", displayName: "Allow Sort By Summary", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.AllowSortBySummary", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: Designer.Report.defaultBooleanValuesArray }, groupFilterMode = { propertyName: "groupFilterMode", modelName: "@GroupFilterMode", displayName: "Group Filter Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.GroupFilterMode", defaultVal: null, editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "List", displayValue: "List", localizationId: "DevExpress.XtraPivotGrid.PivotGroupFilterMode.List" }, { value: "Tree", displayValue: "Tree", localizationId: "DevExpress.XtraPivotGrid.PivotGroupFilterMode.Tree" }] }, hideEmptyVariationItems = { propertyName: "hideEmptyVariationItems", modelName: "@HideEmptyVariationItems", displayName: "Hide Empty Variation Items", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.HideEmptyVariationItems", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showCustomTotals = { propertyName: "showCustomTotals", modelName: "@ShowCustomTotals", displayName: "Show Custom Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowCustomTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showGrandTotal = { propertyName: "showGrandTotal", modelName: "@ShowGrandTotal", displayName: "Show Grand Total", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowGrandTotal", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showSummaryTypeName = { propertyName: "showSummaryTypeName", modelName: "@ShowSummaryTypeName", displayName: "Show Summary Type Name", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowSummaryTypeName", defaultVal: false, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showTotals = { propertyName: "showTotals", modelName: "@ShowTotals", displayName: "Show Totals", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowTotals", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, showValues = { propertyName: "showValues", modelName: "@ShowValues", displayName: "Show Values", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldOptions.ShowValues", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool };
+            Pivot.unboundExpressionMode = {
+                propertyName: "unboundExpressionMode", modelName: "@UnboundExpressionMode", displayName: "Unbound Expression Mode", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.UnboundExpressionMode", defaultVal: "Default", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "UseSummaryValues", displayValue: "Use Summary Values", localizationId: "DevExpress.XtraPivotGrid.UnboundExpressionMode.UseSummaryValues" },
+                    { value: "DataSource", displayValue: "Data Source", localizationId: "DevExpress.XtraPivotGrid.UnboundExpressionMode.DataSource" },
+                    { value: "UseAggregateFunctions", displayValue: "Use Aggregate Functions", localizationId: "DevExpress.XtraPivotGrid.UnboundExpressionMode.UseAggregateFunctions" },
+                    { value: "Default", displayValue: "Default", localizationId: "DevExpress.XtraPivotGrid.UnboundExpressionMode.Default" }
+                ]
+            };
             var optionsInfo = [allowDrag, allowDragInCustomizationForm, allowExpand, allowFilter, allowFilterBySummary, allowRunTimeSummaryChange, allowSort, allowSortBySummary, groupFilterMode,
                 hideEmptyVariationItems, showCustomTotals, showGrandTotal, showSummaryTypeName, showTotals, showValues];
             Pivot.options = { propertyName: "options", modelName: "Options", displayName: "Options", localizationId: "DevExpress.XtraPivotGrid.PivotGridFieldBase.Options", info: optionsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
@@ -24953,7 +24961,7 @@ var DevExpress;
                 Pivot.index, Pivot.KPIGraphic, Pivot.minWidth, Pivot.width, Pivot.rowValueLineCount, Pivot.runningTotal,
                 Pivot.showNewValues, Pivot.sortMode, Pivot.sortOrder, Pivot.summaryDisplayType,
                 Pivot.topValueType, Pivot.totalCellFormat, Pivot.totalValueFormat, Pivot.totalsVisibility,
-                Pivot.unboundExpression, Pivot.unboundFieldName, Pivot.unboundType, Pivot.useNativeFormat,
+                Pivot.unboundExpression, Pivot.unboundExpressionMode, Pivot.unboundFieldName, Pivot.unboundType, Pivot.useNativeFormat,
                 Pivot.valueFormat, Pivot.options, Pivot.sortBySummary
             ].concat(Designer.Report.baseControlProperties), Pivot.popularPropertiesPivotGridField = ["area", "areaIndexEditable", "fieldName", "caption", "groupInterval", "summaryType", "summaryDisplayType", "unboundType", "unboundExpression"];
             Pivot.pivotGridFieldsSerializable = { displayName: "Fields", localizationId: "DevExpress.XtraReports.UI.XRPivotGrid.Fields", propertyName: "fields", modelName: "Fields", array: true, editor: Designer.Report.editorTemplates.pivotGridFields, template: "#dxrd-collectionItemWithAccordion", };
@@ -29296,7 +29304,7 @@ var DevExpress;
                     Report.image, Report.imageUrl, Report.tickmarkCount, Report.maximum, Report.minimum, Report.nullValueText, Report.prefilter,
                     Designer.Pivot.runningTotal, Report.sortFields, Report.summary, Designer.Pivot.showNewValues, Designer.Pivot.sortMode, Designer.Pivot.sortOrder, Designer.Pivot.summaryDisplayType, Designer.Pivot.summaryType,
                     Report.targetValue, Report.tag, Report.text, Report.textArea, Report.rtf, Report.textRtf, Report.serializableRtfString, Designer.Pivot.topValueCount, Designer.Pivot.topValueShowOthers, Designer.Pivot.topValueType,
-                    Designer.Pivot.unboundExpression, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat,
+                    Designer.Pivot.unboundExpression, Designer.Pivot.unboundExpressionMode, Designer.Pivot.unboundFieldName, Designer.Pivot.unboundType, Designer.Pivot.useNativeFormat,
                     Report.xlsxFormatString,
                     Designer.Pivot.pivotGridFieldsSerializable,
                     Report.valueMember, Report.valueRange,
@@ -30328,6 +30336,23 @@ var DevExpress;
                 designerModel.parts.push({ id: Report.ReportDesignerElements.NavigationPanel, templateName: Report.ReportDesignerElements.NavigationPanel, model: designerModel.navigateByReports }, { id: null, templateName: Report.ReportDesignerElements.ReportDialog, model: designerModel.saveReportDialog }, { id: null, templateName: Report.ReportDesignerElements.ReportDialog, model: designerModel.saveReportDialogLight }, { id: null, templateName: Report.ReportDesignerElements.ReportDialog, model: designerModel.openReportDialog }, { id: null, templateName: Report.ReportDesignerElements.ChartDialog, model: chartDesignerOptions }, { id: null, templateName: Report.ReportDesignerElements.ReportConverterDialog, model: reportConverter });
                 designerCallbacks.customizeParts && designerCallbacks.customizeParts(designerModel.parts);
                 DevExpress.Designer.appendStaticContextToRootViewModel(designerModel);
+                designerModel.openReport = function (url) {
+                    if ((function (args) { return (designerCallbacks && designerCallbacks.reportOpening && designerCallbacks.reportOpening(args)) || args; })({ url: url, cancel: false }).cancel)
+                        return;
+                    Report.ReportStorageWeb.getData(url).done(function (result) {
+                        if (result) {
+                            var model = new DevExpress.Designer.Report.ReportViewModel(JSON.parse(result.reportLayout));
+                            model.dataSourceRefs = result.dataSourceRefInfo;
+                            navigation.addTab(ko.observable(model), ko.observable(url));
+                            setTimeout(function () {
+                                designerCallbacks && designerCallbacks.reportOpened && designerCallbacks.reportOpened({
+                                    report: model,
+                                    url: url
+                                });
+                            }, 10);
+                        }
+                    });
+                };
                 if (applyBindings) {
                     designerCallbacks.beforeRender && designerCallbacks.beforeRender(designerModel);
                     $(element).children().remove();
@@ -31022,14 +31047,7 @@ var DevExpress;
                     return DevExpress.Designer.Report.ReportStorageWeb.getUrls();
                 };
                 JSReportDesigner.prototype.OpenReport = function (url) {
-                    var navigateByReports = this.designerModel.navigateByReports;
-                    this.ReportStorageGetData(url).done(function (result) {
-                        if (result) {
-                            var model = new DevExpress.Designer.Report.ReportViewModel(JSON.parse(result.reportLayout));
-                            model.dataSourceRefs = result.dataSourceRefInfo;
-                            navigateByReports.addTab(ko.observable(model), ko.observable(url), "dx-icon-close");
-                        }
-                    });
+                    this.designerModel.openReport(url);
                 };
                 JSReportDesigner.prototype.ShowPreview = function () {
                     var reportPreview = this.designerModel.reportPreviewModel.reportPreview;
@@ -31101,6 +31119,9 @@ var DevExpress;
                         result.viewerHandlerUri = self._getServerActionUrl(requestOptions.host, result.viewerHandlerUri);
                         result.queryBuilderHandlerUri = self._getServerActionUrl(requestOptions.host, result.queryBuilderHandlerUri);
                         self._initializationData(result);
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        if (errorThrown)
+                            throw errorThrown;
                     });
                 };
                 JSReportDesignerBinding.prototype.applyBindings = function (element) {

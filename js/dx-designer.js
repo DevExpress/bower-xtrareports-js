@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 18.1.3
-* Build date: 2018-06-14
+* Version: 18.1.4
+* Build date: 2018-06-20
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3477,12 +3477,17 @@ var DevExpress;
                             completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(CodeCompletor._cleanupFields(fields), token, ignorePrefix ? null : parentPrefix && parentPrefix + "."));
                         });
                         var $deferreds = [$fields];
+                        var rootPathRequests = [];
                         if (!parentPrefix) {
                             _this._rootItems.forEach(function (item) {
-                                $deferreds.push(ko.unwrap(_this._fieldListProvider).getItems(new Analytics.Utils.PathRequest(item.rootPath || item.name))
-                                    .done(function (fields) {
-                                    completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(CodeCompletor._cleanupFields(fields), token, item.needPrefix ? item.name + "." : ""));
-                                }));
+                                var path = item.rootPath || item.name;
+                                if (rootPathRequests.indexOf(path) === -1) {
+                                    rootPathRequests.push(path);
+                                    $deferreds.push(ko.unwrap(_this._fieldListProvider).getItems(new Analytics.Utils.PathRequest(item.rootPath || item.name))
+                                        .done(function (fields) {
+                                        completions.push.apply(completions, _this._convertDataMemberInfoToCompletions(CodeCompletor._cleanupFields(fields), token, item.needPrefix ? item.name + "." : ""));
+                                    }));
+                                }
                             });
                         }
                         $.when($deferreds).always(function () { $deferred.resolve(completions); });
@@ -11741,10 +11746,15 @@ var DevExpress;
                     _super.call(this, info, level, parentDisabled, textToSearch);
                     this.displayValue = ko.pureComputed({
                         read: function () {
-                            if (_this.value() && _this.value().toLowerCase() === "transparent") {
+                            var value = ko.unwrap(_this.value);
+                            if (value && value.toLowerCase() === "transparent") {
                                 return "rgba(0,0,0,0)";
                             }
-                            return _this.value() && _this.value().indexOf("rgba") !== -1 ? _this.value() : "rgba(0,0,0,1)";
+                            if ((/^rgba\s*\((\s*[a-f\d]+\s*,){3}\s*[a-f\d]+\s*\)$/i).test(value))
+                                return value;
+                            var div = document.createElement("div");
+                            div.style.backgroundColor = value;
+                            return div.style.backgroundColor || "rgba(0,0,0,1)";
                         },
                         write: function (val) {
                             _this.value(val);
