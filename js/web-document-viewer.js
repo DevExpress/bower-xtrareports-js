@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -757,6 +757,7 @@ var DevExpress;
                 },
                 pdfACompatibility,
                 Report.pageRange,
+                Report.rasterizationResolution,
                 { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.PdfExportOptions.DocumentOptions", from: PdfExportDocumentOptions.from, toJsonObject: PdfExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor },
                 { propertyName: "pdfPasswordSecurityOptions", modelName: "PasswordSecurityOptions", displayName: "Pdf Password Security Options", localizationId: "DevExpress.XtraPrinting.PdfPasswordSecurityOptions", from: PdfPasswordSecurityOptions.from, toJsonObject: PdfPasswordSecurityOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor }
             ];
@@ -925,6 +926,32 @@ var DevExpress;
                 return XlsxExportOptions;
             })();
             Report.XlsxExportOptions = XlsxExportOptions;
+            var DocxExportDocumentOptions = (function () {
+                function DocxExportDocumentOptions(model, serializer) {
+                    serializer = serializer || new DevExpress.JS.Utils.ModelSerializer();
+                    serializer.deserialize(this, model);
+                }
+                DocxExportDocumentOptions.from = function (model, serializer) {
+                    return new DocxExportDocumentOptions(model || {}, serializer);
+                };
+                DocxExportDocumentOptions.toJson = function (value, serializer, refs) {
+                    return serializer.serialize(value, docxExportDocumentOptionsSerializationInfo, refs);
+                };
+                DocxExportDocumentOptions.prototype.getInfo = function () {
+                    return docxExportDocumentOptionsSerializationInfo;
+                };
+                return DocxExportDocumentOptions;
+            })();
+            Report.DocxExportDocumentOptions = DocxExportDocumentOptions;
+            var docxExportDocumentOptionsSerializationInfo = [
+                { propertyName: "title", modelName: "@Title", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Title", displayName: "Title", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "subject", modelName: "@Subject", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Subject", displayName: "Subject", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "keywords", modelName: "@Keywords", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Keywords", displayName: "Keywords", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "category", modelName: "@Category", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Category", displayName: "Category", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "comments", modelName: "@Comments", localizationId: "DevExpress.XtraPrinitng.DocxDocumentOptions.Comments", displayName: "Comments", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+                { propertyName: "author", modelName: "@Author", localizationId: "DevExpress.XtraPrinting.DocxDocumentOptions.Author", displayName: "Author", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
+            ];
+            Report.docxDocumentOptions = { propertyName: "documentOptions", modelName: "DocumentOptions", displayName: "Document Options", localizationId: "DevExpress.XtraPrinting.DocxExportOptions.DocumentOptions", from: DocxExportDocumentOptions.from, toJsonObject: DocxExportDocumentOptions.toJson, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor };
             var docxExportOptionsSerializationInfo = [
                 Report.docxExportMode,
                 Report.exportWatermarks,
@@ -936,6 +963,7 @@ var DevExpress;
                 Report.exportPageBreaks,
                 Report.docxTableLayout,
                 { propertyName: "allowFloatingPictures", modelName: "@AllowFloatingPictures", localizationId: "DevExpress.XtraPrinting.DocxExportOptions.AllowFloatingPictures", displayName: "Allow Floating Pictures", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, defaultVal: false },
+                Report.docxDocumentOptions,
             ];
             var DocxExportOptions = (function () {
                 function DocxExportOptions(model, serializer) {
@@ -1264,7 +1292,8 @@ var DevExpress;
                 keepRowHeight,
                 Report.rasterizeImages,
                 Report.rasterizationResolution,
-                Report.exportWatermarks
+                Report.exportWatermarks,
+                Report.docxDocumentOptions,
             ];
             var DocxExportOptionsPreview = (function (_super) {
                 __extends(DocxExportOptionsPreview, _super);
@@ -2959,9 +2988,13 @@ var DevExpress;
                         var defaultHandler = function () {
                             if (brickNavigation) {
                                 if (brickNavigation.drillDownKey && _self.reportId && _self._doDrillDown && _self._drillDownState.length > 0) {
+                                    if (_self._startBuildOperationId)
+                                        return;
                                     _self._doDrillDown(brickNavigation.drillDownKey);
                                 }
                                 else if (brickNavigation.sortData && _self.reportId && _self._doSorting && _self._sortingState.length > 0) {
+                                    if (_self._startBuildOperationId)
+                                        return;
                                     _self._doSorting(brickNavigation.sortData, shiftKey, ctrlKey);
                                 }
                                 if (brickNavigation.pageIndex >= 0) {
@@ -3376,6 +3409,7 @@ var DevExpress;
                 return function () {
                     var $root = $(root);
                     var rightAreaWidth = $root.find(".dxrd-preview .dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
+                    rightAreaWidth = isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
                     var surfaceWidth = $root.find(".dxrd-preview").width() - (rightAreaWidth + 5);
                     var cssStyleData = rtl ? { 'right': '', 'left': rightAreaWidth } : { 'right': rightAreaWidth, 'left': '' };
                     cssStyleData['width'] = surfaceWidth;
@@ -3527,6 +3561,12 @@ var DevExpress;
                 var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent);
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
+                }
+                else {
+                    var unwrappedUrl = ko.unwrap(viewerModel.reportUrl);
+                    if (unwrappedUrl) {
+                        previewModel.OpenReport(unwrappedUrl);
+                    }
                 }
                 $.extend(true, DevExpress.Report.Preview.cultureInfo, viewerModel.cultureInfoList);
                 return previewModel;
@@ -6065,12 +6105,16 @@ var DevExpress;
                 var self = this;
                 var deferred = $.Deferred();
                 var requestOptions = this._options.requestOptions;
-                if (!!requestOptions.getLocalizationAction) {
+                if (requestOptions.getLocalizationAction) {
                     var actionUrl = this._getServerActionUrl(requestOptions.host, requestOptions.getLocalizationAction);
                     $.getJSON(actionUrl)
                         .fail(function (jqXHR, textStatus, errorThrown) {
-                        alert(textStatus + ": " + errorThrown.message);
-                        deferred.reject();
+                        try {
+                            DevExpress.Designer._processError(errorThrown.message, $.Deferred(), jqXHR, textStatus);
+                        }
+                        finally {
+                            deferred.reject();
+                        }
                     }).done(function (localization) {
                         deferred.resolve(localization);
                     });
@@ -6419,29 +6463,34 @@ var DevExpress;
                             return;
                         }
                         var requestOptions = self._options.requestOptions;
-                        if (!!requestOptions) {
+                        var subscription = null;
+                        var applyModel = function () {
+                            if (requestOptions && requestOptions.invokeAction) {
+                                self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
+                            }
+                            self._sender.previewModel = self._createModel(element);
+                            if (self._options.reportUrl) {
+                                if (ko.isSubscribable(self._options.reportUrl)) {
+                                    subscription = self._options.reportUrl.subscribe(function (newVal) {
+                                        self._sender.OpenReport(newVal);
+                                    });
+                                }
+                            }
+                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                                subscription && subscription.dispose();
+                            });
+                            self._applyBindings(self._sender.previewModel, _$element);
+                        };
+                        if (requestOptions) {
                             self._getLocalizationRequest().done(function (localization) {
                                 localization && DevExpress.JS.Localization.addCultureInfo(localization);
+                            }).always(function () {
+                                applyModel();
                             });
-                            DevExpress.Report.Preview.HandlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                         }
-                        self._sender.previewModel = (self._createModel(element));
-                        ;
-                        var subscription = null;
-                        if (!!self._options.reportUrl) {
-                            if (ko.isSubscribable(self._options.reportUrl)) {
-                                subscription = self._options.reportUrl.subscribe(function (newVal) {
-                                    self._sender.OpenReport(newVal);
-                                });
-                            }
-                            if (!self._options.reportId) {
-                                self._sender.OpenReport(ko.unwrap(self._options.reportUrl));
-                            }
+                        else {
+                            applyModel();
                         }
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                            subscription && subscription.dispose();
-                        });
-                        self._applyBindings(self._sender.previewModel, _$element);
                     });
                 };
                 return JSReportViewerBinding;

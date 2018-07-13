@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 17.2.8
-* Build date: 2018-05-06
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -487,9 +487,11 @@
 <script type="text/html" id="dx-filtereditor-popup-common">
     <div class="dx-widget" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
         <!-- ko foreach: data -->
+        <!-- ko if: !$data.hidden -->
         <div class="dx-filtereditor-popup-item dx-item dx-list-item">
             <span class="dx-item-content dx-list-item-content" data-bind="text: $data.displayText || $data.name, click: function() { $parent.click($data); } "></span>
         </div>
+        <!-- /ko -->
         <!-- /ko -->
     </div>
 </script>
@@ -997,7 +999,7 @@
                             closeOnOutsideClick: true,
                             shading: false,
                             focusStateEnabled: false,
-                            visible: appMenuVisible()}">
+                            visible: appMenuVisible }">
             <div class="dxrd-menu-break"></div>
             <!-- ko foreach: actionLists.menuItems -->
             <div class="dxrd-menu-item" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled }, visible: visible">
@@ -1378,8 +1380,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 17.2.8
-* Build date: 2018-05-06
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1599,7 +1601,7 @@
 </script>
 
 <script type="text/html" id="dx-masterdetail-editor-setColumn">
-    <div class="criteria-operator-text clickable criteria-operator-item-field" data-bind="text: target.column() || '<Select a column>' , dxAction: showPopup, css: { 'selected': target.isSelected, 'default': !target.column() }"></div>
+    <div class="criteria-operator-text clickable criteria-operator-item-field" data-bind="text: target.column() || target.selectColumnText(), dxAction: showPopup, css: { 'selected': target.isSelected, 'default': !target.column() }"></div>
 </script>
 
 <script type="text/html" id="dx-masterDetail-editor-keyColumn">
@@ -1754,7 +1756,7 @@
             <div class="dxqb-tableFields-wrapper">
                 <!-- ko ifnot: $data.isInitialized() -->
                 <div class="dxqb-table-loading">
-                    <div class="dxqb-table-loading-text">Loading...</div>
+                    <div class="dxqb-table-loading-text" data-bind="text: $root.columnsLoadingMsg()" ></div>
                 </div>
                 <!-- /ko -->
                 <!-- ko if: $data.isInitialized() -->
@@ -2392,8 +2394,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2596,8 +2598,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3095,8 +3097,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

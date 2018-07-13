@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.2.8
-* Build date: 2018-05-06
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -10074,7 +10074,7 @@ var DevExpress;
                 });
                 Object.defineProperty(TreeListItemViewModel.prototype, "actions", {
                     get: function () {
-                        return this._treeListController.getActions ? this._treeListController.getActions(this) : [];
+                        return (this._treeListController && this._treeListController.getActions) ? this._treeListController.getActions(this) : [];
                     },
                     enumerable: true,
                     configurable: true
@@ -10239,14 +10239,21 @@ var DevExpress;
                     this.canCreateParameters = false;
                     this.canChoiceParameters = true;
                     this.canChoiceProperty = true;
+                    this.criteriaTreeValidator = new CriteriaSurfaceValidator();
                     this.filterEditorOperators = {
                         _common: [
                             { name: "Equals", insertVal: "==", value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
+                            { name: "Does not equal", hidden: true, reverse: true, value: JS.Data.BinaryOperatorType.Equal, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
                             { name: "Does not equal", insertVal: "!=", value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseDoesNotEqual" },
+                            { name: "Equals", reverse: true, hidden: true, value: JS.Data.BinaryOperatorType.NotEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseEquals" },
                             { name: "Is greater than", insertVal: ">", value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
+                            { name: "Is less than or equal to", hidden: true, reverse: true, value: JS.Data.BinaryOperatorType.Greater, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
                             { name: "Is greater than or equal to", insertVal: ">=", value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
+                            { name: "Is less than", hidden: true, reverse: true, value: JS.Data.BinaryOperatorType.GreaterOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
                             { name: "Is less than", insertVal: "<", value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLess" },
+                            { name: "Is greater than or equal to", reverse: true, hidden: true, value: JS.Data.BinaryOperatorType.Less, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreaterOrEqual" },
                             { name: "Is less than or equal to", insertVal: "<=", value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseLessOrEqual" },
+                            { name: "Is greater than", reverse: true, hidden: true, value: JS.Data.BinaryOperatorType.LessOrEqual, type: JS.Data.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
                             { name: "Is between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: JS.Data.BetweenOperator, localizationId: "StringId.FilterClauseBetween" },
                             { name: "Is not between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: JS.Data.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }],
                         string: [],
@@ -10533,8 +10540,11 @@ var DevExpress;
                     return reverse ? "Not " + result : result;
                 };
                 FilterEditorSerializer.prototype.serializeBinaryOperator = function (binaryOperator, reverse) {
-                    var separator = reverse ? " Not " : " ";
-                    return this.serialize(binaryOperator.leftOperand) + separator + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
+                    if (binaryOperator.operatorType === JS.Data.BinaryOperatorType.Like) {
+                        var separator = reverse ? " Not " : " ";
+                        return this.serialize(binaryOperator.leftOperand) + separator + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
+                    }
+                    return (reverse ? "Not " : "") + this.serialize(binaryOperator.leftOperand) + " " + (this.operatorTokens[binaryOperator.displayType] || binaryOperator.displayType) + ' ' + this.serialize(binaryOperator.rightOperand);
                 };
                 FilterEditorSerializer.prototype.serializeUnaryOperator = function (unaryOperator, reverse) {
                     if (unaryOperator.operatorType === JS.Data.UnaryOperatorType.IsNull) {
@@ -10743,7 +10753,7 @@ var DevExpress;
                     });
                     this.isSurfaceValid = ko.computed(function () {
                         try {
-                            return _this.options() && _this.isValid() && CriteriaSurfaceValidator.validateModel(_this.options().helper.serializer.deserialize(_this.value()));
+                            return _this.options() && _this.isValid() && _this.options().helper.criteriaTreeValidator.validateModel(_this.options().helper.serializer.deserialize(_this.value()));
                         }
                         catch (e) {
                             return false;
@@ -10933,21 +10943,21 @@ var DevExpress;
             var CriteriaSurfaceValidator = (function () {
                 function CriteriaSurfaceValidator() {
                 }
-                CriteriaSurfaceValidator.customValidate = function (operator, from) {
+                CriteriaSurfaceValidator.prototype.customValidate = function (operator, from) {
                     return false;
                 };
-                CriteriaSurfaceValidator.checkLeftPart = function (leftPart) {
-                    return leftPart instanceof JS.Data.OperandProperty || CriteriaSurfaceValidator.customValidate(leftPart, CriteriaSurfaceValidatorState.Left);
+                CriteriaSurfaceValidator.prototype.checkLeftPart = function (leftPart) {
+                    return leftPart instanceof JS.Data.OperandProperty || this.customValidate(leftPart, CriteriaSurfaceValidatorState.Left);
                 };
-                CriteriaSurfaceValidator._checkRightPart = function (criteriaOperator) {
+                CriteriaSurfaceValidator.prototype._checkRightPart = function (criteriaOperator) {
                     return criteriaOperator instanceof JS.Data.OperandProperty
                         || criteriaOperator instanceof JS.Data.OperandParameter
                         || criteriaOperator instanceof JS.Data.OperandValue
                         || criteriaOperator instanceof JS.Data.ConstantValue
                         || (criteriaOperator instanceof JS.Data.UnaryOperator && this._checkRightPart(criteriaOperator.operand))
-                        || CriteriaSurfaceValidator.customValidate(criteriaOperator, CriteriaSurfaceValidatorState.Right);
+                        || this.customValidate(criteriaOperator, CriteriaSurfaceValidatorState.Right);
                 };
-                CriteriaSurfaceValidator.checkRightPart = function (rigthPart) {
+                CriteriaSurfaceValidator.prototype.checkRightPart = function (rigthPart) {
                     if (Array.isArray(rigthPart)) {
                         for (var i = 0; i < rigthPart.length; i++) {
                             if (!this._checkRightPart(rigthPart[i])) {
@@ -10960,20 +10970,20 @@ var DevExpress;
                         return this._checkRightPart(rigthPart);
                     }
                 };
-                CriteriaSurfaceValidator.aggregateIsValid = function (criteriaOperator) {
+                CriteriaSurfaceValidator.prototype.aggregateIsValid = function (criteriaOperator) {
                     return this.checkLeftPart(criteriaOperator.leftPart)
                         && this.validateModel(criteriaOperator.condition)
                         && (!!criteriaOperator.aggregatedExpression ?
                             (criteriaOperator.aggregatedExpression instanceof JS.Data.OperandProperty ||
-                                CriteriaSurfaceValidator.validateModel(criteriaOperator.aggregatedExpression))
+                                this.validateModel(criteriaOperator.aggregatedExpression))
                             : true);
                 };
-                CriteriaSurfaceValidator.commonOperandValid = function (criteriaOperator) {
+                CriteriaSurfaceValidator.prototype.commonOperandValid = function (criteriaOperator) {
                     return criteriaOperator.leftPart instanceof JS.Data.AggregateOperand ?
                         this.validateModel(criteriaOperator.leftPart) : this.checkLeftPart(criteriaOperator.leftPart)
                         && this.checkRightPart(criteriaOperator.rightPart);
                 };
-                CriteriaSurfaceValidator.groupIsValid = function (criteriaOperator) {
+                CriteriaSurfaceValidator.prototype.groupIsValid = function (criteriaOperator) {
                     for (var i = 0; i < criteriaOperator.operands.length; i++) {
                         if (!this.validateModel(criteriaOperator.operands[i])) {
                             return false;
@@ -10981,10 +10991,10 @@ var DevExpress;
                     }
                     return true;
                 };
-                CriteriaSurfaceValidator.unaryIsValid = function (criteriaOperator) {
-                    return criteriaOperator.operand instanceof JS.Data.OperandProperty || this.validateModel(criteriaOperator.operand) || CriteriaSurfaceValidator.customValidate(criteriaOperator.operand, CriteriaSurfaceValidatorState.Unary);
+                CriteriaSurfaceValidator.prototype.unaryIsValid = function (criteriaOperator) {
+                    return criteriaOperator.operand instanceof JS.Data.OperandProperty || this.validateModel(criteriaOperator.operand) || this.customValidate(criteriaOperator.operand, CriteriaSurfaceValidatorState.Unary);
                 };
-                CriteriaSurfaceValidator.validateModel = function (criteriaOperator) {
+                CriteriaSurfaceValidator.prototype.validateModel = function (criteriaOperator) {
                     if (criteriaOperator instanceof JS.Data.AggregateOperand) {
                         return this.aggregateIsValid(criteriaOperator);
                     }
@@ -16339,7 +16349,7 @@ var DevExpress;
                     var names = _this.allControls().map(function (item) { return ko.unwrap(item.name); });
                     if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
                         var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
-                        var newName = getUniqueNameForNamedObjectsArray(_this.allControls(), controlType, names);
+                        var newName = getUniqueNameForNamedObjectsArray(_this.allControls(), controlType.split('.').pop(), names);
                         value.name(newName);
                         if (_this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
                             value["text"](value.name());

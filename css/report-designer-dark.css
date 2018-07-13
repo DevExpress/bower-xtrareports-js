@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 17.2.8
-* Build date: 2018-05-06
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3024,8 +3024,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 17.2.8
-* Build date: 2018-05-06
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3168,8 +3168,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.dark.css)
-* Version: 17.2.8
-* Build date: 2018-05-06
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4222,8 +4222,8 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-dark.css)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4697,8 +4697,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5246,6 +5246,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  line-height: normal;
   resize: none;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-check-container {
@@ -5362,6 +5363,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  line-height: normal;
   resize: none;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-focused {
@@ -5770,8 +5772,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-dark.css)
-* Version: 17.2.8
-* Build date: 2018-05-07
+* Version: 17.2.9
+* Build date: 2018-07-09
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
