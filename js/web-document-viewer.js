@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 18.1.4
-* Build date: 2018-06-21
+* Version: 18.1.5
+* Build date: 2018-07-30
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1489,7 +1489,7 @@ var DevExpress;
                     this.imageSrc.subscribe(function (newVal) {
                         var documentId = _this.documentId.peek();
                         var ignoreError = preview._closeDocumentRequests && (function () { return preview._closeDocumentRequests[documentId]; });
-                        var zoom = _this.zoom();
+                        var zoom = _this.maxZoom ? Math.min(_this.maxZoom, _this.zoom()) : _this.zoom();
                         timeout && clearTimeout(timeout);
                         timeout = setTimeout(function () {
                             Preview.PreviewRequestWrapper.getPage(newVal, ignoreError).done(function (response) {
@@ -2965,6 +2965,19 @@ var DevExpress;
                     this.closeReport();
                     this.originalParametersInfo(null);
                 };
+                ReportPreview.prototype._initExportWindow = function () {
+                    var message = DevExpress.Designer.getLocalization("Do not close this tab to get the resulting file.", "ASPxReportsStringId.WebDocumentViewer_AsyncExportCloseWarning");
+                    var div = this._window.document.createElement("div");
+                    div.style["text-align"] = "center";
+                    div.innerText = message;
+                    div.style.position = "absolute";
+                    div.style.left = "0";
+                    div.style.top = "0";
+                    div.style.right = "0";
+                    div.style.fontSize = "20px";
+                    this._window.document.title = DevExpress.Designer.getLocalization("Exporting...", "ASPxReportsStringId.WebDocumentViewer_AsyncExportTabTitle");
+                    this._window.document.body.appendChild(div);
+                };
                 ReportPreview.prototype._export = function (args, actionUri, inlineResult, printable) {
                     var _this = this;
                     if (printable === void 0) { printable = false; }
@@ -2972,6 +2985,10 @@ var DevExpress;
                     if (this._editingFields().length > 0 || Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
                         this._window = window.open();
+                        this._window.onunload = function () {
+                            _this.progressBar.stop();
+                        };
+                        this._initExportWindow();
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'));
                         this.progressBar.startProgress(function () { _this._currentOperationId(null); });
@@ -2989,7 +3006,7 @@ var DevExpress;
                     if (target === void 0) { target = "_blank"; }
                     if (useIFrame === void 0) { useIFrame = false; }
                     var newWindow = window.open(url, target);
-                    target === "_blank" && newWindow && (newWindow.opener = null);
+                    target === "_blank" && newWindow && (newWindow.opener = newWindow);
                     return newWindow;
                 };
                 ReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
@@ -2998,7 +3015,10 @@ var DevExpress;
                         _self.goToPage(cyclePageIndex, true);
                         if (!brick)
                             return;
-                        _self.pages()[cyclePageIndex].selectBrick("");
+                        var page = _self.pages()[cyclePageIndex];
+                        if (!page)
+                            return;
+                        page.selectBrick("");
                         var shiftKey = !!(e && e.shiftKey);
                         var ctrlKey = !!(e && e.ctrlKey);
                         var brickNavigation = brick && brick.navigation;
@@ -3121,6 +3141,7 @@ var DevExpress;
                     this._currentDocumentId(null);
                     this._currentReportId(null);
                     this._currentReportUrl(null);
+                    this.originalParametersInfo(null);
                 };
                 ReportPreview.prototype.startBuild = function () {
                     this._initialize();
@@ -3145,6 +3166,7 @@ var DevExpress;
                             this._window.document.body.appendChild(div);
                         }
                         div.innerText = DevExpress.Designer.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument') + " " + progress + "%";
+                        this._window.document.title = DevExpress.Designer.getLocalization("Exporting...", "ASPxReportsStringId.WebDocumentViewer_AsyncExportTabTitle") + progress + "%";
                     }
                 };
                 ReportPreview.prototype.customDocumentOperation = function (customData, hideMessageFromUser) {
@@ -3261,6 +3283,10 @@ var DevExpress;
                                     if (!result.completed) {
                                         return;
                                     }
+                                    else if (result.pageCount < preview.pages().length) {
+                                        preview.pageIndex(Math.min(result.pageCount - 1, preview.pageIndex()));
+                                        preview.pages.splice(result.pageCount, preview.pages().length);
+                                    }
                                     preview.getDocumentData(documentId);
                                 }
                                 finally {
@@ -3370,19 +3396,19 @@ var DevExpress;
                     if (this._goToPageTimer !== undefined) {
                         clearTimeout(this._goToPageTimer);
                     }
-                    this.pageIndex(pageIndex);
-                    var updateActivePage = function () {
+                    var updateActivePage = function (activePageIndex) {
                         _this.pages.peek().forEach(function (page) {
-                            var visible = page.pageIndex === _this.pageIndex();
+                            var visible = page.pageIndex === activePageIndex;
                             page.active(visible);
                             page.isClientVisible(visible);
                         });
                         _this._goToPageTimer = undefined;
                     };
                     if (throttle)
-                        this._goToPageTimer = setTimeout(updateActivePage, throttle);
+                        this._goToPageTimer = setTimeout(function () { return updateActivePage(_this.pageIndex()); }, throttle);
                     else
-                        updateActivePage();
+                        updateActivePage(pageIndex);
+                    this.pageIndex(pageIndex);
                 };
                 ReportPreview.prototype.getSelectedContent = function () {
                     var currentPage = this.pages()[this.pageIndex()];
@@ -3441,7 +3467,17 @@ var DevExpress;
                     Preview.MessageHandler.processError(error, showForUser);
                 };
                 ReportPreview.prototype.emptyDocumentCaption = function () {
-                    return DevExpress.Designer.getLocalization("The document does not contain any pages.", "PreviewStringId.Msg_EmptyDocument");
+                    var parametersInfo = this.originalParametersInfo();
+                    var parametersExist = parametersInfo && parametersInfo.parameters.length > 0;
+                    if (this.documentBuilding()) {
+                        return DevExpress.Designer.getLocalization("Creating the document...", "PreviewStringId.Msg_CreatingDocument");
+                    }
+                    else if (parametersExist && !this.documentId) {
+                        return DevExpress.Designer.getLocalization("Waiting for parameter values...", "PreviewStringId.Msg_WaitingForParameterValues");
+                    }
+                    else if (this.documentId) {
+                        return DevExpress.Designer.getLocalization("The document does not contain any pages.", "PreviewStringId.Msg_EmptyDocument");
+                    }
                 };
                 Object.defineProperty(ReportPreview.prototype, "reportId", {
                     get: function () {
@@ -3471,6 +3507,7 @@ var DevExpress;
                 return function () {
                     var $root = $(root);
                     var rightAreaWidth = $root.find(".dxrd-preview .dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
+                    rightAreaWidth = isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
                     var surfaceWidth = $root.find(".dxrd-preview").width() - (rightAreaWidth + 5);
                     var cssStyleData = rtl ? { 'right': '', 'left': rightAreaWidth } : { 'right': rightAreaWidth, 'left': '' };
                     cssStyleData['width'] = surfaceWidth;
@@ -5106,6 +5143,7 @@ var DevExpress;
                 function MobilePreviewPage(preview, pageIndex, processClick, loading) {
                     var _this = this;
                     _super.call(this, preview, pageIndex, processClick, loading);
+                    this.maxZoom = 1;
                     this.selectBrick = function (path, ctrlKey) {
                         var currentBrick = _this.brick();
                         !ctrlKey && _this.resetBrickRecusive(currentBrick);
@@ -5215,11 +5253,15 @@ var DevExpress;
                     if (this.autoFitBy() === Preview.ZoomAutoBy.None && e.removedItems && e.removedItems[0].blocks().length === 1 && e.addedItems && e.addedItems[0].blocks().length === 1)
                         this.autoFitBy(Preview.ZoomAutoBy.PageWidth);
                 };
+                MobileReportPreview.prototype.goToPage = function (pageIndex, forcePage) {
+                    _super.prototype.goToPage.call(this, pageIndex, forcePage);
+                };
                 MobileReportPreview.prototype.getScrollViewOptions = function () {
                     var _this = this;
                     var options = {
                         onUpdated: function (e) { _this.setScrollReached(e); },
                         direction: 'both',
+                        pushBackValue: 0,
                         bounceEnabled: false
                     };
                     return options;
@@ -5789,9 +5831,11 @@ var DevExpress;
                         _this.blockItems = [];
                         var $items = _this["_getAvailableItems"]();
                         for (var i = 0; i < $items.length; i++) {
+                            var left = parseFloat($items[i]["style"].left);
+                            left = isNaN(left) ? 0 : left;
                             _this.blockItems.push({
                                 element: $($items[i]),
-                                left: parseFloat($items[i]["style"].left)
+                                left: left
                             });
                         }
                     };
@@ -6190,12 +6234,17 @@ var DevExpress;
         })();
         Report.RequestHelper = RequestHelper;
         var JSDesignerBindingCommon = (function () {
-            function JSDesignerBindingCommon(_options) {
+            function JSDesignerBindingCommon(_options, _customEventRaiser) {
                 this._options = _options;
+                this._customEventRaiser = _customEventRaiser;
                 this._templateHtml = $('#dxrd-designer').text();
             }
             JSDesignerBindingCommon.prototype._fireEvent = function (eventName, args) {
-                this._options.callbacks && this._options.callbacks[eventName] && this._options.callbacks[eventName](this._sender, args);
+                if (this._customEventRaiser) {
+                    this._customEventRaiser(eventName, args);
+                    return;
+                }
+                this._options.callbacks && this._options.callbacks[eventName] && this._options.callbacks[eventName](this.sender, args);
             };
             JSDesignerBindingCommon.prototype._getServerActionUrl = function (host, uri) {
                 return RequestHelper.generateUri(host, uri);
@@ -6553,7 +6602,7 @@ var DevExpress;
                 function JSReportViewerBinding(_options) {
                     _super.call(this, _options);
                     _options.viewerModel = ko.isWriteableObservable(_options.viewerModel) ? _options.viewerModel : ko.observable(null);
-                    this._sender = new JSReportViewer(_options.viewerModel);
+                    this.sender = new JSReportViewer(_options.viewerModel);
                 }
                 JSReportViewerBinding.prototype._initializeEvents = function () {
                     var _this = this;
@@ -6596,18 +6645,18 @@ var DevExpress;
                             if (requestOptions && requestOptions.invokeAction) {
                                 self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                             }
-                            self._sender.previewModel = self._createModel(element);
+                            self.sender.previewModel = self._createModel(element);
                             if (self._options.reportUrl) {
                                 if (ko.isSubscribable(self._options.reportUrl)) {
                                     subscription = self._options.reportUrl.subscribe(function (newVal) {
-                                        self._sender.OpenReport(newVal);
+                                        self.sender.OpenReport(newVal);
                                     });
                                 }
                             }
                             ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                                 subscription && subscription.dispose();
                             });
-                            self._applyBindings(self._sender.previewModel, _$element);
+                            self._applyBindings(self.sender.previewModel, _$element);
                         };
                         if (requestOptions) {
                             self._getLocalizationRequest().done(function (localization) {

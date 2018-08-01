@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 18.1.4
-* Build date: 2018-06-20
+* Version: 18.1.5
+* Build date: 2018-07-30
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1511,6 +1511,9 @@ var DevExpress;
                         var fr = new FileReader();
                         if (this.option("readMode") !== "text") {
                             fr.onload = function (args) {
+                                if (_this.option("useFormat")) {
+                                    _this.option("format", _this._filesinput[0].files[0].name.split('.').pop());
+                                }
                                 var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
                                 _this.option("value", encodedContent);
                                 _this._filesinput.val("");
@@ -2825,27 +2828,36 @@ var DevExpress;
                             }
                         };
                         session.setMode(languageMode);
-                        if (additionalOptions && additionalOptions.onChange) {
-                            var timer = null;
-                            session.on("change", function (e) {
-                                if (timer !== null)
-                                    clearTimeout(timer);
-                                timer = setTimeout(function () {
-                                    text() !== session.getValue() && additionalOptions.onChange(session);
-                                }, additionalOptions && additionalOptions.changeTimeout || 1000);
-                            });
+                        var onBlur = function () { editor.completer && editor.completer.popup.hide(); }, onChange, onFocus;
+                        if (additionalOptions) {
+                            if (additionalOptions.onChange) {
+                                var timer = null;
+                                onChange = function (e) {
+                                    if (timer !== null)
+                                        clearTimeout(timer);
+                                    timer = setTimeout(function () {
+                                        text() !== session.getValue() && additionalOptions.onChange(session);
+                                    }, additionalOptions && additionalOptions.changeTimeout || 1000);
+                                };
+                                session.on("change", onChange);
+                            }
+                            if (additionalOptions.overrideEditorFocus) {
+                                editor.focus = function (a, e) {
+                                    editor.textInput.getElement().focus();
+                                };
+                            }
+                            if (additionalOptions.onFocus) {
+                                onFocus = function () { additionalOptions.onFocus(session); };
+                                editor.on("focus", onFocus);
+                            }
+                            if (additionalOptions.onBlur) {
+                                onBlur = function () {
+                                    editor.completer && editor.completer.popup.hide();
+                                    return additionalOptions.onBlur(session);
+                                };
+                            }
                         }
-                        if (additionalOptions && additionalOptions.overrideEditorFocus) {
-                            editor.focus = function (a, e) {
-                                editor.textInput.getElement().focus();
-                            };
-                        }
-                        if (additionalOptions && additionalOptions.onFocus) {
-                            editor.onFocus = function (_) { return additionalOptions.onFocus(session); };
-                        }
-                        if (additionalOptions && additionalOptions.onBlur) {
-                            editor.onBlur = function (_) { return additionalOptions.onBlur(session); };
-                        }
+                        editor.on("blur", onBlur);
                         var completers = viewModel.languageHelper.createCompleters(editor, bindingContext, viewModel);
                         langTools.setCompleters(completers);
                         editor.setOptions(values.options);
@@ -2883,6 +2895,9 @@ var DevExpress;
                             if (values.callbacks)
                                 values.callbacks.focus = $.noop;
                             completers.forEach(function (x) { return x.dispose && x.dispose(); });
+                            onBlur && editor.off("blur", onBlur);
+                            onFocus && editor.off("focus", onFocus);
+                            onChange && session.off("change", onChange);
                         });
                     }
                     if (ko.isObservable(editorContainer)) {
@@ -11367,7 +11382,7 @@ var DevExpress;
                         var names = _this.allControls().map(function (item) { return ko.unwrap(item.name); });
                         if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
                             var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
-                            var newName = Internal.getUniqueNameForNamedObjectsArray(_this.allControls(), controlType, names);
+                            var newName = Internal.getUniqueNameForNamedObjectsArray(_this.allControls(), controlType.split('.').pop(), names);
                             value.name(newName);
                             if (_this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
                                 value["text"](value.name());

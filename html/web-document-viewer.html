@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.4
-* Build date: 2018-06-18
+* Version: 18.1.5
+* Build date: 2018-07-30
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -38,7 +38,7 @@
 </script>
 
 <script type="text/html" id="dx-combobox-editable">
-    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', editEnabled: true, disabled: disabled, placeholder: $root.dx.JS.Localization.selectPlaceholder() })"></div>
+    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', editEnabled: true, disabled: disabled, placeholder: $root.dx.Analytics.Localization.selectPlaceholder() })"></div>
 </script>
 
 <script type="text/html" id="dx-combobox-undo">
@@ -1112,7 +1112,7 @@
                             closeOnOutsideClick: true,
                             shading: false,
                             focusStateEnabled: false,
-                            visible: appMenuVisible()}">
+                            visible: appMenuVisible }">
             <div class="dxrd-menu-break"></div>
             <!-- ko foreach: actionLists.menuItems -->
             <div class="dxrd-menu-item" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled }, visible: visible">
@@ -1341,8 +1341,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.4
-* Build date: 2018-06-18
+* Version: 18.1.5
+* Build date: 2018-07-30
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1754,7 +1754,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems, placeholder: $root.dx.JS.Localization.selectPlaceholder() })">
+    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems, placeholder: $root.dx.Analytics.Localization.selectPlaceholder() })">
     </div>
     <!-- /ko -->
 </script>

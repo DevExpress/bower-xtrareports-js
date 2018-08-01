@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.4
-* Build date: 2018-06-20
+* Version: 18.1.5
+* Build date: 2018-07-30
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1082,7 +1082,7 @@ var DevExpress;
                         isVerticalLine: isVerticalLine,
                         resizeHandler: resizeHandler,
                         resizeStopped: function () {
-                            _self._control.routePoints.notifySubscribers();
+                            _self._control.routePoints.notifySubscribers(_self._control.routePoints());
                         },
                         isLocked: ko.observable(isLocked)
                     };
@@ -1574,6 +1574,7 @@ var DevExpress;
             var dsExpressionResultType = {
                 propertyName: "resultType",
                 displayName: "Result Type",
+                localizationId: "DataAccessWebStringId.QueryBuilder_ResultType",
                 modelName: "@ResultType",
                 editor: Analytics.Widgets.editorTemplates.combobox,
                 valuesArray: dsParameterType.valuesArray.filter(function (x) { return x.value !== "DevExpress.DataAccess.Expression"; })
@@ -3326,12 +3327,16 @@ var DevExpress;
                                 withoutAggregate.filter(function (x) { return x.selected() && !x.groupBy.peek(); }).forEach(function (x) { return x.groupBy(true); });
                             }
                             else {
-                                allColumns.filter(function (x) { return x.groupBy.peek(); }).forEach(function (x) { return x.groupBy(false); });
+                                if (!allColumns.every(function (x) { return !x.selected.peek() || x.groupBy.peek(); })) {
+                                    allColumns.forEach(function (x) { if (x.groupBy.peek()) {
+                                        x.groupBy(false);
+                                    } });
+                                }
                             }
                             inProcess = false;
                         }
                     }));
-                    this.groupFilterString = new DevExpress.Analytics.Widgets.FilterStringOptions(this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.Widgets.isAggregatedExpression) && (_this.groupFilterString && _this.groupFilterString.value().length === 0); }));
+                    this.groupFilterString = new DevExpress.Analytics.Widgets.FilterStringOptions(this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.Widgets.isAggregatedExpression) && (_this.groupFilterString && (_this.groupFilterString.value() || '').length === 0); }));
                     this._initializeFilterStringHelper(this.groupFilterString.helper, this.parameters, parametersEditingEnabled, new QueryBuilder.Widgets.GroupFilterEditorSerializer(this.columns));
                     var _pageWidth = ko.observable(0);
                     this.pageWidth = ko.pureComputed({
@@ -3677,7 +3682,7 @@ var DevExpress;
                         zoom: zoom,
                         dpi: ko.observable(100)
                     }, QuerySurface._unitProperties);
-                    this.placeholder = function () { return DevExpress.Analytics.getLocalization('Drop a table or view here to create a query.', 'QueryBuilder_SurfacePlaceholder'); };
+                    this.placeholder = function () { return DevExpress.Analytics.getLocalization('Drop a table or view here to create a query.', 'ASPxReportsStringId.QueryBuilder_SurfacePlaceholder'); };
                     this.tables = ko.observableArray();
                     this.relations = ko.observableArray();
                     this.allowMultiselect = false;
@@ -4156,6 +4161,7 @@ var DevExpress;
             designerModel.columnDragHandler = new QueryBuilder.Internal.ColumnDragHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.snapHelper, designerModel.dragHelperContent);
             designerModel.connectionPointDragHandler = designerModel.columnDragHandler;
             designerModel.resizeHandler["handles"] = "e, w";
+            designerModel.columnsLoadingMsg = function () { return DevExpress.Analytics.getLocalization("Loading...", "DataAccessWebStringId.QueryBuilder_ColumnsLoading"); };
             var searchName = ko.observable("");
             designerModel.searchName = searchName;
             var init = function (querySource) {
@@ -4451,34 +4457,34 @@ var DevExpress;
                 RequestWrapper.getDbSchema = function (connection, table) {
                     var serializer = new DevExpress.Analytics.Utils.ModelSerializer();
                     var requestJson = JSON.stringify({
-                        connectionJSON: RequestWrapper.getConnectionJSON(connection),
+                        connectionJSON: DevExpress.QueryBuilder.Utils.RequestWrapper.getConnectionJSON(connection),
                         tableName: table && table.name,
                         isView: table && table.isView
                     });
-                    return RequestWrapper.sendRequest("getDBSchema", encodeURIComponent(requestJson));
+                    return DevExpress.QueryBuilder.Utils.RequestWrapper.sendRequest("getDBSchema", encodeURIComponent(requestJson));
                 };
                 RequestWrapper.getDbStoredProcedures = function (connection) {
                     var serializer = new DevExpress.Analytics.Utils.ModelSerializer();
                     var requestJson = JSON.stringify({
-                        connectionJSON: RequestWrapper.getConnectionJSON(connection)
+                        connectionJSON: DevExpress.QueryBuilder.Utils.RequestWrapper.getConnectionJSON(connection)
                     });
-                    return RequestWrapper.sendRequest("getDBStoredProcedures", encodeURIComponent(requestJson));
+                    return DevExpress.QueryBuilder.Utils.RequestWrapper.sendRequest("getDBStoredProcedures", encodeURIComponent(requestJson));
                 };
                 RequestWrapper.getSelectStatement = function (connection, queryJSON) {
                     var serializer = new DevExpress.Analytics.Utils.ModelSerializer();
                     var requestJson = JSON.stringify({
-                        connectionJSON: RequestWrapper.getConnectionJSON(connection),
+                        connectionJSON: DevExpress.QueryBuilder.Utils.RequestWrapper.getConnectionJSON(connection),
                         sqlQueryJSON: queryJSON
                     });
-                    return RequestWrapper.sendRequest("getSelectStatement", encodeURIComponent(requestJson));
+                    return DevExpress.QueryBuilder.Utils.RequestWrapper.sendRequest("getSelectStatement", encodeURIComponent(requestJson));
                 };
                 RequestWrapper.getDataPreview = function (connection, queryJSON) {
                     var serializer = new DevExpress.Analytics.Utils.ModelSerializer();
                     var requestJson = JSON.stringify({
-                        connectionJSON: RequestWrapper.getConnectionJSON(connection),
+                        connectionJSON: DevExpress.QueryBuilder.Utils.RequestWrapper.getConnectionJSON(connection),
                         sqlQueryJSON: queryJSON
                     });
-                    return RequestWrapper.sendRequest("getDataPreview", encodeURIComponent(requestJson));
+                    return DevExpress.QueryBuilder.Utils.RequestWrapper.sendRequest("getDataPreview", encodeURIComponent(requestJson));
                 };
                 RequestWrapper.getConnectionJSON = function (connection) {
                     var serializer = new DevExpress.Analytics.Utils.ModelSerializer();
@@ -4494,7 +4500,7 @@ var DevExpress;
                         queryName: queryName,
                         relationsEditing: relationsEditing
                     });
-                    return RequestWrapper.sendRequest("rebuildResultSchema", encodeURIComponent(requestJson));
+                    return DevExpress.QueryBuilder.Utils.RequestWrapper.sendRequest("rebuildResultSchema", encodeURIComponent(requestJson));
                 };
                 return RequestWrapper;
             })();
@@ -4726,6 +4732,8 @@ var DevExpress;
             var KeyColumnSurface = (function () {
                 function KeyColumnSurface(column, queryName) {
                     var _this = this;
+                    this.isSelected = ko.observable(false);
+                    this.selectColumnText = function () { return DevExpress.Analytics.getLocalization("DataAccessUIStringId.JoinEditorEmptyColumnText", "<Select a Column>"); };
                     this.column = column;
                     this.queryName = queryName;
                     this.setColumn = function (resultColumn) {
@@ -4820,6 +4828,9 @@ var DevExpress;
                 function MasterDetailEditorPopupManager(target, popupService, action, popupItems) {
                     var _this = this;
                     this.showPopup = function (args) {
+                        if (_this._popupService["subscription"]) {
+                            _this._popupService["subscription"].dispose();
+                        }
                         _this._popupService.title("");
                         _this._updateActions(_this.target);
                         _this._popupService.target(args.element);
@@ -4832,6 +4843,9 @@ var DevExpress;
                 }
                 MasterDetailEditorPopupManager.prototype._updateActions = function (viewModel) {
                     var _this = this;
+                    this._popupService["subscription"] = this._popupService.visible.subscribe(function (newVal) {
+                        _this.target.isSelected && _this.target.isSelected(newVal);
+                    });
                     this._popupService.data({
                         data: this._popupItems,
                         template: "dx-filtereditor-popup-common",
@@ -5287,8 +5301,10 @@ var DevExpress;
                 };
                 MultiQueryConfigurePage.prototype.setTableQuery = function (query, isInProcess) {
                     var _this = this;
-                    return this._sqlTextProvider.getQuerySqlText(query, isInProcess)
-                        .done(function () { return _this._setQueryCore(query); });
+                    isInProcess && isInProcess(true);
+                    return this._sqlTextProvider.getQuerySqlText(query)
+                        .done(function () { return _this._setQueryCore(query); })
+                        .always(function () { isInProcess && isInProcess(false); });
                 };
                 MultiQueryConfigurePage.prototype.setCustomSqlQuery = function (query) {
                     this._setQueryCore(query);
@@ -6402,15 +6418,13 @@ var DevExpress;
                         this._selectStatementCallback = _selectStatementCallback;
                         this._connection = _connection;
                     }
-                    SelectQuerySqlTextProvider.prototype.getQuerySqlText = function (newQuery, isInProcess) {
-                        isInProcess && isInProcess(true);
+                    SelectQuerySqlTextProvider.prototype.getQuerySqlText = function (newQuery) {
                         var queryJSON = JSON.stringify({ "Query": new DevExpress.Analytics.Utils.ModelSerializer().serialize(newQuery) });
                         return this._selectStatementCallback(this._connection(), queryJSON)
                             .fail(function (data) {
                             var error = Analytics.Utils.getErrorMessage(data);
                             Analytics.Utils.ShowMessage("Unable to build a SQL string" + (error ? ": " + error : "."));
-                        })
-                            .always(function () { isInProcess && isInProcess(false); });
+                        });
                     };
                     return SelectQuerySqlTextProvider;
                 })();
@@ -6438,7 +6452,7 @@ var DevExpress;
                         });
                         this.template = "dxrd-select-control";
                         this.aceOptions = DevExpress.QueryBuilder.Widgets.createDefaultSQLAceOptions();
-                        this.additionalOptions = DevExpress.QueryBuilder.Widgets.createDefaultSQLAdditionalOptions(function (newVal) { _this.sqlString(newVal); });
+                        this.additionalOptions = DevExpress.QueryBuilder.Widgets.createDefaultSQLAdditionalOptions(function (newVal) { _this.sqlString().replace("\r\n", "\n").replace("\r", "\n") === newVal || _this.sqlString(newVal); });
                         this.aceAvailable = DevExpress.Analytics.Widgets.aceAvailable;
                         this.languageHelper = DevExpress.QueryBuilder.Widgets.createDefaultSQLLanguageHelper();
                         this.caption = function () { return DevExpress.Analytics.getLocalization("SQL string:", "DataAccessUIStringId.QueryControl_SqlString"); };
@@ -6471,11 +6485,13 @@ var DevExpress;
                     SelectStatementQueryControl.prototype.setQuery = function (query, isInProcess) {
                         var _this = this;
                         if (this._query() !== query && query.type() === Analytics.Data.Utils.SqlQueryType.tableQuery) {
-                            return this._sqlTextProvider.getQuerySqlText(query, isInProcess)
+                            isInProcess && isInProcess(true);
+                            return this._sqlTextProvider.getQuerySqlText(query)
                                 .done(function (response) {
                                 _this._tableQueryString(response.sqlSelectStatement);
                                 _this._query(query);
-                            });
+                            })
+                                .always(function () { isInProcess && isInProcess(false); });
                         }
                         else {
                             this._query(query);
@@ -8085,8 +8101,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.4
-* Build date: 2018-06-21
+* Version: 18.1.5
+* Build date: 2018-07-30
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -9243,7 +9259,7 @@ var DevExpress;
                         }
                         _this.updateByView(newView);
                     }));
-                    this.valueDataMembers = ko.observable(new (viewTypesDataMembers[this.view().typeName] || CommonValueDataMembers)(this.valueDataMembers.toString(), this.valueScaleType));
+                    this.valueDataMembers = ko.observable(new (viewTypesDataMembers[this.view().typeName] || CommonValueDataMembers)(model["@ValueDataMembersSerializable"] || "", this.valueScaleType));
                     this.dataFilters = DevExpress.JS.Utils.deserializeArray(model.DataFilters, function (item) { return new Chart.DefaultDataFilterModel(item, serializer); });
                     this._disposables.push(ko.computed(function () {
                         _this.dataFilters().forEach(function (dataFilter) {
@@ -12222,7 +12238,7 @@ var DevExpress;
                     this.imageSrc.subscribe(function (newVal) {
                         var documentId = _this.documentId.peek();
                         var ignoreError = preview._closeDocumentRequests && (function () { return preview._closeDocumentRequests[documentId]; });
-                        var zoom = _this.zoom();
+                        var zoom = _this.maxZoom ? Math.min(_this.maxZoom, _this.zoom()) : _this.zoom();
                         timeout && clearTimeout(timeout);
                         timeout = setTimeout(function () {
                             Preview.PreviewRequestWrapper.getPage(newVal, ignoreError).done(function (response) {
@@ -13698,6 +13714,19 @@ var DevExpress;
                     this.closeReport();
                     this.originalParametersInfo(null);
                 };
+                ReportPreview.prototype._initExportWindow = function () {
+                    var message = DevExpress.Designer.getLocalization("Do not close this tab to get the resulting file.", "ASPxReportsStringId.WebDocumentViewer_AsyncExportCloseWarning");
+                    var div = this._window.document.createElement("div");
+                    div.style["text-align"] = "center";
+                    div.innerText = message;
+                    div.style.position = "absolute";
+                    div.style.left = "0";
+                    div.style.top = "0";
+                    div.style.right = "0";
+                    div.style.fontSize = "20px";
+                    this._window.document.title = DevExpress.Designer.getLocalization("Exporting...", "ASPxReportsStringId.WebDocumentViewer_AsyncExportTabTitle");
+                    this._window.document.body.appendChild(div);
+                };
                 ReportPreview.prototype._export = function (args, actionUri, inlineResult, printable) {
                     var _this = this;
                     if (printable === void 0) { printable = false; }
@@ -13705,6 +13734,10 @@ var DevExpress;
                     if (this._editingFields().length > 0 || Preview.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
                         var self = this;
                         this._window = window.open();
+                        this._window.onunload = function () {
+                            _this.progressBar.stop();
+                        };
+                        this._initExportWindow();
                         this.progressBar.text(DevExpress.Designer.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument'));
                         this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'));
                         this.progressBar.startProgress(function () { _this._currentOperationId(null); });
@@ -13722,7 +13755,7 @@ var DevExpress;
                     if (target === void 0) { target = "_blank"; }
                     if (useIFrame === void 0) { useIFrame = false; }
                     var newWindow = window.open(url, target);
-                    target === "_blank" && newWindow && (newWindow.opener = null);
+                    target === "_blank" && newWindow && (newWindow.opener = newWindow);
                     return newWindow;
                 };
                 ReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
@@ -13731,7 +13764,10 @@ var DevExpress;
                         _self.goToPage(cyclePageIndex, true);
                         if (!brick)
                             return;
-                        _self.pages()[cyclePageIndex].selectBrick("");
+                        var page = _self.pages()[cyclePageIndex];
+                        if (!page)
+                            return;
+                        page.selectBrick("");
                         var shiftKey = !!(e && e.shiftKey);
                         var ctrlKey = !!(e && e.ctrlKey);
                         var brickNavigation = brick && brick.navigation;
@@ -13854,6 +13890,7 @@ var DevExpress;
                     this._currentDocumentId(null);
                     this._currentReportId(null);
                     this._currentReportUrl(null);
+                    this.originalParametersInfo(null);
                 };
                 ReportPreview.prototype.startBuild = function () {
                     this._initialize();
@@ -13878,6 +13915,7 @@ var DevExpress;
                             this._window.document.body.appendChild(div);
                         }
                         div.innerText = DevExpress.Designer.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument') + " " + progress + "%";
+                        this._window.document.title = DevExpress.Designer.getLocalization("Exporting...", "ASPxReportsStringId.WebDocumentViewer_AsyncExportTabTitle") + progress + "%";
                     }
                 };
                 ReportPreview.prototype.customDocumentOperation = function (customData, hideMessageFromUser) {
@@ -13994,6 +14032,10 @@ var DevExpress;
                                     if (!result.completed) {
                                         return;
                                     }
+                                    else if (result.pageCount < preview.pages().length) {
+                                        preview.pageIndex(Math.min(result.pageCount - 1, preview.pageIndex()));
+                                        preview.pages.splice(result.pageCount, preview.pages().length);
+                                    }
                                     preview.getDocumentData(documentId);
                                 }
                                 finally {
@@ -14103,19 +14145,19 @@ var DevExpress;
                     if (this._goToPageTimer !== undefined) {
                         clearTimeout(this._goToPageTimer);
                     }
-                    this.pageIndex(pageIndex);
-                    var updateActivePage = function () {
+                    var updateActivePage = function (activePageIndex) {
                         _this.pages.peek().forEach(function (page) {
-                            var visible = page.pageIndex === _this.pageIndex();
+                            var visible = page.pageIndex === activePageIndex;
                             page.active(visible);
                             page.isClientVisible(visible);
                         });
                         _this._goToPageTimer = undefined;
                     };
                     if (throttle)
-                        this._goToPageTimer = setTimeout(updateActivePage, throttle);
+                        this._goToPageTimer = setTimeout(function () { return updateActivePage(_this.pageIndex()); }, throttle);
                     else
-                        updateActivePage();
+                        updateActivePage(pageIndex);
+                    this.pageIndex(pageIndex);
                 };
                 ReportPreview.prototype.getSelectedContent = function () {
                     var currentPage = this.pages()[this.pageIndex()];
@@ -14174,7 +14216,17 @@ var DevExpress;
                     Preview.MessageHandler.processError(error, showForUser);
                 };
                 ReportPreview.prototype.emptyDocumentCaption = function () {
-                    return DevExpress.Designer.getLocalization("The document does not contain any pages.", "PreviewStringId.Msg_EmptyDocument");
+                    var parametersInfo = this.originalParametersInfo();
+                    var parametersExist = parametersInfo && parametersInfo.parameters.length > 0;
+                    if (this.documentBuilding()) {
+                        return DevExpress.Designer.getLocalization("Creating the document...", "PreviewStringId.Msg_CreatingDocument");
+                    }
+                    else if (parametersExist && !this.documentId) {
+                        return DevExpress.Designer.getLocalization("Waiting for parameter values...", "PreviewStringId.Msg_WaitingForParameterValues");
+                    }
+                    else if (this.documentId) {
+                        return DevExpress.Designer.getLocalization("The document does not contain any pages.", "PreviewStringId.Msg_EmptyDocument");
+                    }
                 };
                 Object.defineProperty(ReportPreview.prototype, "reportId", {
                     get: function () {
@@ -14204,6 +14256,7 @@ var DevExpress;
                 return function () {
                     var $root = $(root);
                     var rightAreaWidth = $root.find(".dxrd-preview .dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
+                    rightAreaWidth = isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
                     var surfaceWidth = $root.find(".dxrd-preview").width() - (rightAreaWidth + 5);
                     var cssStyleData = rtl ? { 'right': '', 'left': rightAreaWidth } : { 'right': rightAreaWidth, 'left': '' };
                     cssStyleData['width'] = surfaceWidth;
@@ -15839,6 +15892,7 @@ var DevExpress;
                 function MobilePreviewPage(preview, pageIndex, processClick, loading) {
                     var _this = this;
                     _super.call(this, preview, pageIndex, processClick, loading);
+                    this.maxZoom = 1;
                     this.selectBrick = function (path, ctrlKey) {
                         var currentBrick = _this.brick();
                         !ctrlKey && _this.resetBrickRecusive(currentBrick);
@@ -15948,11 +16002,15 @@ var DevExpress;
                     if (this.autoFitBy() === Preview.ZoomAutoBy.None && e.removedItems && e.removedItems[0].blocks().length === 1 && e.addedItems && e.addedItems[0].blocks().length === 1)
                         this.autoFitBy(Preview.ZoomAutoBy.PageWidth);
                 };
+                MobileReportPreview.prototype.goToPage = function (pageIndex, forcePage) {
+                    _super.prototype.goToPage.call(this, pageIndex, forcePage);
+                };
                 MobileReportPreview.prototype.getScrollViewOptions = function () {
                     var _this = this;
                     var options = {
                         onUpdated: function (e) { _this.setScrollReached(e); },
                         direction: 'both',
+                        pushBackValue: 0,
                         bounceEnabled: false
                     };
                     return options;
@@ -16522,9 +16580,11 @@ var DevExpress;
                         _this.blockItems = [];
                         var $items = _this["_getAvailableItems"]();
                         for (var i = 0; i < $items.length; i++) {
+                            var left = parseFloat($items[i]["style"].left);
+                            left = isNaN(left) ? 0 : left;
                             _this.blockItems.push({
                                 element: $($items[i]),
-                                left: parseFloat($items[i]["style"].left)
+                                left: left
                             });
                         }
                     };
@@ -16923,12 +16983,17 @@ var DevExpress;
         })();
         Report.RequestHelper = RequestHelper;
         var JSDesignerBindingCommon = (function () {
-            function JSDesignerBindingCommon(_options) {
+            function JSDesignerBindingCommon(_options, _customEventRaiser) {
                 this._options = _options;
+                this._customEventRaiser = _customEventRaiser;
                 this._templateHtml = $('#dxrd-designer').text();
             }
             JSDesignerBindingCommon.prototype._fireEvent = function (eventName, args) {
-                this._options.callbacks && this._options.callbacks[eventName] && this._options.callbacks[eventName](this._sender, args);
+                if (this._customEventRaiser) {
+                    this._customEventRaiser(eventName, args);
+                    return;
+                }
+                this._options.callbacks && this._options.callbacks[eventName] && this._options.callbacks[eventName](this.sender, args);
             };
             JSDesignerBindingCommon.prototype._getServerActionUrl = function (host, uri) {
                 return RequestHelper.generateUri(host, uri);
@@ -17286,7 +17351,7 @@ var DevExpress;
                 function JSReportViewerBinding(_options) {
                     _super.call(this, _options);
                     _options.viewerModel = ko.isWriteableObservable(_options.viewerModel) ? _options.viewerModel : ko.observable(null);
-                    this._sender = new JSReportViewer(_options.viewerModel);
+                    this.sender = new JSReportViewer(_options.viewerModel);
                 }
                 JSReportViewerBinding.prototype._initializeEvents = function () {
                     var _this = this;
@@ -17329,18 +17394,18 @@ var DevExpress;
                             if (requestOptions && requestOptions.invokeAction) {
                                 self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                             }
-                            self._sender.previewModel = self._createModel(element);
+                            self.sender.previewModel = self._createModel(element);
                             if (self._options.reportUrl) {
                                 if (ko.isSubscribable(self._options.reportUrl)) {
                                     subscription = self._options.reportUrl.subscribe(function (newVal) {
-                                        self._sender.OpenReport(newVal);
+                                        self.sender.OpenReport(newVal);
                                     });
                                 }
                             }
                             ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                                 subscription && subscription.dispose();
                             });
-                            self._applyBindings(self._sender.previewModel, _$element);
+                            self._applyBindings(self.sender.previewModel, _$element);
                         };
                         if (requestOptions) {
                             self._getLocalizationRequest().done(function (localization) {
@@ -18143,7 +18208,12 @@ var DevExpress;
         var Report;
         (function (Report) {
             function getFirstSurfaceParentByType(target, type) {
-                return target instanceof type ? target : getFirstSurfaceParentByType(target.parent, type);
+                try {
+                    return target instanceof type ? target : getFirstSurfaceParentByType(target.parent, type);
+                }
+                catch (e) {
+                    throw Error(e.name + ":" + e.message + "\n Details: target: " + target.getControlModel().controlType);
+                }
             }
             ;
             function getExpressionPath(container, path) {
@@ -18438,9 +18508,17 @@ var DevExpress;
                 FieldListDragDropHandler.prototype.doStopDrag = function (ui, draggable) {
                     var _this = this;
                     if (this.selection.dropTarget) {
-                        var position = this._getAbsoluteSurfacePosition(ui);
-                        this.selection.dropTarget.underCursor().x = position.left - this.selection.dropTarget["absolutePosition"].x();
-                        this.selection.dropTarget.underCursor().y = position.top - this.selection.dropTarget["absolutePosition"].y();
+                        try {
+                            var position = this._getAbsoluteSurfacePosition(ui);
+                            this.selection.dropTarget.underCursor().x = position.left - this.selection.dropTarget["absolutePosition"].x();
+                            this.selection.dropTarget.underCursor().y = position.top - this.selection.dropTarget["absolutePosition"].y();
+                        }
+                        catch (e) {
+                            throw Error(e.name + ":" + e.message + "\n" + "details: " + JSON.stringify({
+                                draggable: draggable.data.isList ? "List" : draggable.data.specifics,
+                                target: this.selection.dropTarget.getControlModel().controlType
+                            }));
+                        }
                         var item = draggable;
                         var key = item.data.isList ? "List" : item.data.specifics;
                         if (this.surface().isFit(this.selection.dropTarget)) {
@@ -18615,6 +18693,31 @@ var DevExpress;
                 return LinesEditor;
             })(DevExpress.JS.Widgets.Editor);
             Report.LinesEditor = LinesEditor;
+            var RichTextFileEditor = (function (_super) {
+                __extends(RichTextFileEditor, _super);
+                function RichTextFileEditor(info, level, parentDisabled, textToSearch) {
+                    var _this = this;
+                    _super.call(this, info, level, parentDisabled, textToSearch);
+                    this.format = ko.observable("");
+                    this.format.subscribe(function (newVal) {
+                        _this._model().format(_this._toStreamType(newVal));
+                    });
+                }
+                RichTextFileEditor.prototype._toStreamType = function (extension) {
+                    switch (extension.toLowerCase()) {
+                        case "txt":
+                            return Report.XRRichTextStreamType.PlainText;
+                        case "htm":
+                        case "html":
+                            return Report.XRRichTextStreamType.HtmlText;
+                        case "docx":
+                            return Report.XRRichTextStreamType.XmlText;
+                    }
+                    return Report.XRRichTextStreamType.RtfText;
+                };
+                return RichTextFileEditor;
+            })(DevExpress.JS.Widgets.Editor);
+            Report.RichTextFileEditor = RichTextFileEditor;
             var GaugeStyleEditor = (function (_super) {
                 __extends(GaugeStyleEditor, _super);
                 function GaugeStyleEditor(info, level, parentDisabled, textToSearch) {
@@ -19308,7 +19411,8 @@ var DevExpress;
                 componentName: { header: "dxrd-component-name", editorType: Report.ComponentNameEditor },
                 numericUndo: { header: "dx-numeric-undo", editorType: Report.UndoEditor },
                 pivotCriteria: { header: "dxrd-pivotcriteria", editorType: Report.PivotGridCriteriaEditor },
-                fieldsCombobox: { header: "dxrd-fields-combobox", editorType: Report.FieldsComboboxEditor }
+                fieldsCombobox: { header: "dxrd-fields-combobox", editorType: Report.FieldsComboboxEditor },
+                richTextLoad: { header: "dxrd-richtext-loadfile", editorType: Report.RichTextFileEditor }
             };
             Report.textAlignmentValues = [
                 { value: "TopLeft", displayValue: "Top Left", localizationId: "DevExpress.XtraPrinting.TextAlignment.TopLeft" },
@@ -19730,7 +19834,7 @@ var DevExpress;
                 { propertyName: "controls", modelName: "Controls", array: true },
                 Report.rtl
             ].concat(Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
-            Report.rtf = { propertyName: "_rtf", defaultVal: "", displayName: "RTF", editor: DevExpress.JS.Widgets.editorTemplates.stringArray, localizationId: 'ASPxReportsStringId.ExportName_rtf' }, Report.textRtf = { propertyName: "textRtf", defaultVal: "", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRRichTextBase.RtfText", editor: DevExpress.JS.Widgets.editorTemplates.stringArray }, Report.serializableRtfString = { propertyName: "_serializableRtfString", modelName: "@SerializableRtfString", displayName: "Load file", localizationId: "DevExpress.XtraReports.UI.XRRichText.SerializableRtfString", editor: DevExpress.JS.Widgets.editorTemplates.file };
+            Report.rtf = { propertyName: "_rtf", defaultVal: "", displayName: "RTF", editor: DevExpress.JS.Widgets.editorTemplates.stringArray, localizationId: 'ASPxReportsStringId.ExportName_rtf' }, Report.textRtf = { propertyName: "textRtf", defaultVal: "", displayName: "Text", localizationId: "DevExpress.XtraReports.UI.XRRichTextBase.RtfText", editor: DevExpress.JS.Widgets.editorTemplates.stringArray }, Report.serializableRtfString = { propertyName: "_serializableRtfString", modelName: "@SerializableRtfString", displayName: "Load file", localizationId: "DevExpress.XtraReports.UI.XRRichText.SerializableRtfString", editor: Report.editorTemplates.richTextLoad };
             Report.richTextSerializationsInfo = [
                 Report.serializableRtfString,
                 Report.rtf, Report.textRtf,
@@ -20085,7 +20189,9 @@ var DevExpress;
                         return;
                     var expressionInfos = this.getInfo().filter(function (info) { return "expressionName" in info; });
                     expressionInfos.forEach(function (info) {
-                        _this[info.propertyName] = _this.expressionObj().getExpression(info["expressionName"], "BeforePrint");
+                        var expression = _this.expressionObj().getExpression(info["expressionName"], "BeforePrint");
+                        if (expression)
+                            _this[info.propertyName] = expression;
                     });
                 };
                 ReportElementViewModel.prototype.initBindings = function () {
@@ -22146,11 +22252,27 @@ var DevExpress;
                     }));
                     this.path = options.path;
                     this.functions = options.functions;
+                    var specificRootItems = {
+                        "DataSource": function (path) {
+                            return path === "DataSource" && ["CurrentRowIndex", "RowCount"].map(function (name) { return Report.Utils.createIDataMemberInfoByName(name, "integer"); });
+                        }
+                    };
+                    if (this.eventName === "PrintOnPage") {
+                        this.rootItems.push({ name: "Arguments", needPrefix: false, rootPath: "Root" });
+                        specificRootItems["Arguments"] = function (path) {
+                            return path === "Arguments" && ["PageIndex", "PageCount"].map(function (name) { return Report.Utils.createIDataMemberInfoByName(name, "integer"); });
+                        };
+                    }
                     ko.computed(function () {
                         var unwrappedfieldListProvider = ko.unwrap(fieldListProvider);
                         if (_this.value() && unwrappedfieldListProvider) {
                             DevExpress.Analytics.Utils.validateExpression({
-                                fieldListProvider: unwrappedfieldListProvider,
+                                fieldListProvider: {
+                                    getItemByPath: function (path) {
+                                        return unwrappedfieldListProvider.getItemByPath(path, specificRootItems);
+                                    },
+                                    getItems: function () { return void 0; }
+                                },
                                 expression: _this.value(),
                                 path: _this.path(),
                                 rootItems: ["ReportItems", "Parameters"]
@@ -22172,6 +22294,7 @@ var DevExpress;
                     this._valuesDictionary = {
                         ForeColor: colors,
                         BackColor: colors,
+                        FillColor: colors,
                         BorderColor: colors,
                         Borders: ["Left", "Right", "Top", "Bottom", "All"],
                         BorderDashStyle: Report.borderDashStyleValues,
@@ -22219,7 +22342,8 @@ var DevExpress;
                         PrintOnPage: "DevExpress.XtraReports.UI.XRControlEvents.OnPrintOnPage",
                         BeforePrint: "DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint",
                         Minimum: "DevExpress.XtraReports.UI.XRGauge.Minimum",
-                        Maximum: "DevExpress.XtraReports.UI.XRGauge.Maximum"
+                        Maximum: "DevExpress.XtraReports.UI.XRGauge.Maximum",
+                        FillColor: "DevExpress.XtraReports.UI.XRShape.FillColor"
                     };
                     this._expressionsInfo = {};
                     this._expressionsSerializationInfoCache = {};
@@ -22463,24 +22587,28 @@ var DevExpress;
             var ReportItemsProvider = (function () {
                 function ReportItemsProvider(allControls, fieldListProvider) {
                     var _this = this;
-                    this._rootReportName = "ReportItems";
-                    this.getItems = function (path) {
-                        if (path.path.indexOf(_this._rootReportName) === 0 || path.fullPath.indexOf(_this._rootReportName) === 0) {
+                    this._rootItems = {
+                        "ReportItems": function (path, allControls) {
+                            return _this.getReportElementsByPath(allControls, path.split('.'));
+                        }
+                    };
+                    this.getItems = function (path, rootItems) {
+                        var rootItems = $.extend({}, _this._rootItems, rootItems);
+                        var getItemsFunc = undefined;
+                        Object.keys(rootItems).some(function (currentName) {
+                            var rootItem = { propertyName: currentName, getItems: rootItems[currentName] };
+                            getItemsFunc = _this._tryGenerateGetItemsFunc(rootItem, path.path) || _this._tryGenerateGetItemsFunc(rootItem, path.fullPath);
+                            return !!getItemsFunc;
+                        });
+                        if (getItemsFunc) {
                             var $deferred = $.Deferred();
-                            var currentPath = path.path.indexOf(_this._rootReportName) === 0 ? path.path : path.fullPath;
-                            var items = _this.getReportElementsByPath(allControls(), currentPath.split('.'));
+                            var items = getItemsFunc(allControls());
                             items && $deferred.resolve(items) || $deferred.reject();
                             return $deferred.promise();
                         }
                         else if (path.fullPath === "Root") {
                             var $deferred = $.Deferred();
-                            var result = [];
-                            result.push({
-                                displayName: _this._rootReportName,
-                                name: _this._rootReportName,
-                                specifics: "list",
-                                isList: true
-                            });
+                            var result = Object.keys(rootItems).map(function (name) { return Report.Utils.createIDataMemberInfoByName(name); });
                             $deferred.resolve(result);
                             return $deferred.promise();
                         }
@@ -22488,11 +22616,11 @@ var DevExpress;
                             return fieldListProvider.getItems(path);
                         }
                     };
-                    this.getItemByPath = function (pathRequest) {
+                    this.getItemByPath = function (pathRequest, rootItems) {
                         var $deferred = $.Deferred();
                         var parts = pathRequest.fullPath.split('.');
                         var propertyName = parts.pop();
-                        _this.getItems(new DevExpress.JS.Widgets.PathRequest(parts.join('.'))).done(function (items) {
+                        _this.getItems(new DevExpress.JS.Widgets.PathRequest(parts.join('.')), rootItems).done(function (items) {
                             var item = items.filter(function (x) { return x.name === propertyName; })[0];
                             !!item ? $deferred.resolve(item) : $deferred.reject();
                         }).fail(function () { return $deferred.reject(); });
@@ -22509,16 +22637,16 @@ var DevExpress;
                 ReportItemsProvider.prototype._getProperties = function (targetInfo, propertyName) {
                     return targetInfo.filter(function (x) { return x.modelName === '@' + propertyName || x.modelName === propertyName; })[0];
                 };
+                ReportItemsProvider.prototype._tryGenerateGetItemsFunc = function (rootItem, path) {
+                    if (path.indexOf(rootItem.propertyName) === 0) {
+                        return function (allControls) { return rootItem.getItems(path, allControls); };
+                    }
+                };
                 ReportItemsProvider.prototype.getReportElementsByPath = function (allControls, path) {
                     if (path.length === 1) {
                         return allControls.map(function (x) {
                             var name = x instanceof Report.ReportViewModel ? 'Report' : x.name();
-                            return {
-                                displayName: name,
-                                name: name,
-                                specifics: "list",
-                                isList: true
-                            };
+                            return Report.Utils.createIDataMemberInfoByName(name);
                         });
                     }
                     path = path.slice(1);
@@ -22535,12 +22663,7 @@ var DevExpress;
                     if (info) {
                         return info.filter(function (x) { return !!x.modelName && !x.array; }).map(function (x) {
                             var name = x.modelName.indexOf('@') === 0 ? x.modelName.slice(1) : x.modelName;
-                            return {
-                                displayName: name,
-                                name: name,
-                                specifics: x.info ? "list" : "string",
-                                isList: !!x.info
-                            };
+                            return Report.Utils.createIDataMemberInfoByName(name, x.info ? "list" : "string");
                         });
                     }
                     else {
@@ -22674,8 +22797,8 @@ var DevExpress;
                     this._disposables.push(this.paperKind.subscribe(function (newVal) {
                         if (newVal !== "Custom") {
                             var size = Designer.papperKindMapper[newVal];
-                            _this.pageHeight(Math.round(size.height * (_this._innerDpi.peek() / 100) * 100) / 100);
-                            _this.pageWidth(Math.round(size.width * (_this._innerDpi.peek() / 100) * 100) / 100);
+                            _this.pageHeight(Math.round((_this.landscape() ? size.width : size.height) * (_this._innerDpi.peek() / 100) * 100) / 100);
+                            _this.pageWidth(Math.round((_this.landscape() ? size.height : size.width) * (_this._innerDpi.peek() / 100) * 100) / 100);
                         }
                     }));
                     var filterString = new DevExpress.JS.Widgets.FilterStringOptions(this["_filterString"], ko.pureComputed(function () {
@@ -27873,13 +27996,9 @@ var DevExpress;
                     this.selectiontemplate = "dxrd-subreport-selection";
                     this.displayText = function () { return control.name(); };
                 }
-                SubreportSurface.prototype.isThereIntersectionWithCrossBandControls = function () { return false; };
-                SubreportSurface.prototype.isThereIntersectionWithControls = function () { return false; };
-                Object.defineProperty(SubreportSurface.prototype, "isIntersectionDeny", {
-                    get: function () { return true; },
-                    enumerable: true,
-                    configurable: true
-                });
+                SubreportSurface.prototype.getAdornTemplate = function () {
+                    return this.isIntersect() ? "dxrd-intersect" : "";
+                };
                 return SubreportSurface;
             })(Report.ControlSurface);
             Report.SubreportSurface = SubreportSurface;
@@ -29058,50 +29177,50 @@ var DevExpress;
                     this._expressionWrapper = new Report.ExpressionWrapper(bindingMode, this.fieldListProvider);
                 }
                 ControlsFactory.prototype._registerCommonExpressions = function (controlType) {
-                    this.setPropertyDescription(controlType, "Text", this._beforePrintPrintOnPage);
-                    this.setPropertyDescription(controlType, "Visible", this._beforePrintPrintOnPage);
-                    this.setPropertyDescription(controlType, "NavigateUrl", this._beforePrint);
-                    this.setPropertyDescription(controlType, "Bookmark", this._beforePrint);
-                    this.setPropertyDescription(controlType, "Tag", this._beforePrint);
-                    this.setPropertyDescription(controlType, "LeftF", this._beforePrint, "Layout");
-                    this.setPropertyDescription(controlType, "TopF", this._beforePrint, "Layout");
-                    this.setPropertyDescription(controlType, "WidthF", this._beforePrint, "Layout");
-                    this.setPropertyDescription(controlType, "HeightF", this._beforePrint, "Layout");
-                    this.setPropertyDescription(controlType, "StyleName", this._beforePrint);
-                    this.setPropertyDescription(controlType, "ForeColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "BackColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "BorderColor", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "Borders", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "BorderWidth", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "BorderDashStyle", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "TextAlignment", this._beforePrintPrintOnPage, "Appearance");
-                    this.setPropertyDescription(controlType, "Font", this._beforePrintPrintOnPage, "Appearance", ["Name", "Size", "Italic", "Strikeout", "Bold", "Underline"]);
-                    this.setPropertyDescription(controlType, "Padding", this._beforePrintPrintOnPage, "Appearance", ["Left", "Right", "Top", "Bottom"]);
+                    this.setExpressionBinding(controlType, "Text", this._beforePrintPrintOnPage);
+                    this.setExpressionBinding(controlType, "Visible", this._beforePrintPrintOnPage);
+                    this.setExpressionBinding(controlType, "NavigateUrl", this._beforePrint);
+                    this.setExpressionBinding(controlType, "Bookmark", this._beforePrint);
+                    this.setExpressionBinding(controlType, "Tag", this._beforePrint);
+                    this.setExpressionBinding(controlType, "LeftF", this._beforePrint, "Layout");
+                    this.setExpressionBinding(controlType, "TopF", this._beforePrint, "Layout");
+                    this.setExpressionBinding(controlType, "WidthF", this._beforePrint, "Layout");
+                    this.setExpressionBinding(controlType, "HeightF", this._beforePrint, "Layout");
+                    this.setExpressionBinding(controlType, "StyleName", this._beforePrint);
+                    this.setExpressionBinding(controlType, "ForeColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "BackColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "BorderColor", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "Borders", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "BorderWidth", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "BorderDashStyle", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "TextAlignment", this._beforePrintPrintOnPage, "Appearance");
+                    this.setExpressionBinding(controlType, "Font", this._beforePrintPrintOnPage, "Appearance", ["Name", "Size", "Italic", "Strikeout", "Bold", "Underline"]);
+                    this.setExpressionBinding(controlType, "Padding", this._beforePrintPrintOnPage, "Appearance", ["Left", "Right", "Top", "Bottom"]);
                 };
                 ControlsFactory.prototype._registerExtensions = function (controlType, metadata) {
                     var parentType = metadata && metadata.parentType || controlType;
                     this._registerCommonExpressions(controlType);
                     switch (parentType) {
                         case "XRCheckBox":
-                            this.setPropertyDescription(controlType, "CheckState", this._beforePrintPrintOnPage);
+                            this.setExpressionBinding(controlType, "CheckState", this._beforePrintPrintOnPage);
                             break;
                         case "XRPictureBox":
-                            this.setPropertyDescription(controlType, "Image", this._beforePrintPrintOnPage);
-                            this.setPropertyDescription(controlType, "ImageUrl", this._beforePrintPrintOnPage);
-                            this.hidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
+                            this.setExpressionBinding(controlType, "Image", this._beforePrintPrintOnPage);
+                            this.setExpressionBinding(controlType, "ImageUrl", this._beforePrintPrintOnPage);
+                            this.hideExpressionBindings(controlType, "Font", "ForeColor", "Text", "TextAlignment");
                             break;
                         case "XRBarCode":
-                            this.setPropertyDescription(controlType, "BinaryData", this._beforePrint);
+                            this.setExpressionBinding(controlType, "BinaryData", this._beforePrint);
                             break;
                         case "XRGauge":
-                            this.hidePropertyDescriptions(controlType, "Text", "TextAlignment", "Font", "ForeColor");
-                            this.setPropertyDescription(controlType, "TargetValue", this._beforePrint);
-                            this.setPropertyDescription(controlType, "ActualValue", this._beforePrint);
-                            this.setPropertyDescription(controlType, "Minimum", this._beforePrint);
-                            this.setPropertyDescription(controlType, "Maximum", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "Text", "TextAlignment", "Font", "ForeColor");
+                            this.setExpressionBinding(controlType, "TargetValue", this._beforePrint);
+                            this.setExpressionBinding(controlType, "ActualValue", this._beforePrint);
+                            this.setExpressionBinding(controlType, "Minimum", this._beforePrint);
+                            this.setExpressionBinding(controlType, "Maximum", this._beforePrint);
                             break;
                         case "XRCharacterComb":
-                            this.hidePropertyDescriptions(controlType, "Padding");
+                            this.hideExpressionBindings(controlType, "Padding");
                             break;
                         case "TopMarginBand":
                         case "BottomMarginBand":
@@ -29113,72 +29232,73 @@ var DevExpress;
                         case "PageHeaderBand":
                         case "ReportHeaderBand":
                         case "ReportFooterBand":
-                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "WidthF", "LeftF", "TopF");
-                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "Bookmark", "NavigateUrl", "Text", "WidthF", "LeftF", "TopF");
+                            this.setExpressionBinding(controlType, "Visible", this._beforePrint);
                             break;
                         case "XRSubreport":
-                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Padding", "StyleName");
-                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "BorderWidth", "BorderDashStyle", "Borders", "Font", "ForeColor", "TextAlignment", "Tag", "Text", "NavigateUrl");
+                            this.setExpressionBinding(controlType, "Visible", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "Bookmark", "NavigateUrl", "Padding", "StyleName");
+                            this.hideExpressionBindings(controlType, "BackColor", "BorderColor", "BorderWidth", "BorderDashStyle", "Borders", "Font", "ForeColor", "TextAlignment", "Tag", "Text", "NavigateUrl");
                             break;
                         case "XRCrossBandBox":
-                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
-                            this.hidePropertyDescriptions(controlType, "ForeColor", "Visible");
+                            this.hideExpressionBindings(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
+                            this.hideExpressionBindings(controlType, "ForeColor", "Visible");
                             break;
                         case "XRCrossBandLine":
-                            this.hidePropertyDescriptions(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
-                            this.hidePropertyDescriptions(controlType, "BorderColor", "BorderDashStyle", "Borders", "BorderWidth", "Visible");
+                            this.hideExpressionBindings(controlType, "Bookmark", "NavigateUrl", "Text", "BackColor", "Font", "Padding", "TextAlignment");
+                            this.hideExpressionBindings(controlType, "BorderColor", "BorderDashStyle", "Borders", "BorderWidth", "Visible");
                             break;
                         case "XRChart":
-                            this.hidePropertyDescriptions(controlType, "Text", "Font", "ForeColor", "TextAlignment");
+                            this.hideExpressionBindings(controlType, "Text", "Font", "ForeColor", "TextAlignment");
                             break;
                         case "XRLine":
-                            this.hidePropertyDescriptions(controlType, "Font", "Text", "TextAlignment", "NavigateUrl", "Bookmark");
+                            this.hideExpressionBindings(controlType, "Font", "Text", "TextAlignment", "NavigateUrl", "Bookmark");
                             break;
                         case "XRPivotGrid":
-                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Text", "NavigateUrl", "StyleName");
+                            this.setExpressionBinding(controlType, "Visible", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Text", "NavigateUrl", "StyleName");
                             break;
                         case "XRPageBreak":
-                            this.setPropertyDescription(controlType, "Visible", this._beforePrint);
-                            this.hidePropertyDescriptions(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Tag", "Text", "NavigateUrl", "LeftF", "WidthF", "HeightF", "Bookmark", "StyleName");
+                            this.setExpressionBinding(controlType, "Visible", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "BackColor", "BorderColor", "Borders", "BorderDashStyle", "BorderWidth", "Font", "ForeColor", "Padding", "TextAlignment", "Tag", "Text", "NavigateUrl", "LeftF", "WidthF", "HeightF", "Bookmark", "StyleName");
                             break;
                         case "XRPageInfo":
-                            this.hidePropertyDescriptions(controlType, "Text");
+                            this.hideExpressionBindings(controlType, "Text");
                             break;
                         case "XRPanel":
-                            this.hidePropertyDescriptions(controlType, "Font", "ForeColor", "Text", "TextAlignment");
+                            this.hideExpressionBindings(controlType, "Font", "ForeColor", "Text", "TextAlignment");
                             break;
                         case "XRRichText":
-                            this.hidePropertyDescriptions(controlType, "Text");
-                            this.setPropertyDescription(controlType, "Rtf", this._beforePrint);
-                            this.setPropertyDescription(controlType, "Html", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "Text");
+                            this.setExpressionBinding(controlType, "Rtf", this._beforePrint);
+                            this.setExpressionBinding(controlType, "Html", this._beforePrint);
                             break;
                         case "XRShape":
-                            this.hidePropertyDescriptions(controlType, "Font", "TextAlignment", "Text");
+                            this.hideExpressionBindings(controlType, "Font", "TextAlignment", "Text");
+                            this.setExpressionBinding(controlType, "FillColor", this._beforePrint, "Appearance");
                             break;
                         case "XRSparkline":
-                            this.hidePropertyDescriptions(controlType, "Text", "Font", "TextAlignment", "ForeColor");
+                            this.hideExpressionBindings(controlType, "Text", "Font", "TextAlignment", "ForeColor");
                             break;
                         case "XRTableOfContents":
-                            this.hidePropertyDescriptions(controlType, "NavigateUrl", "Text", "TextAlignment", "Bookmark", "Font", "LeftF", "WidthF");
+                            this.hideExpressionBindings(controlType, "NavigateUrl", "Text", "TextAlignment", "Bookmark", "Font", "LeftF", "WidthF");
                             break;
                         case "XRTableRow":
-                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "Text", "NavigateUrl", "Bookmark");
+                            this.hideExpressionBindings(controlType, "LeftF", "TopF", "WidthF", "Text", "NavigateUrl", "Bookmark");
                             break;
                         case "XRTableCell":
-                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "HeightF");
+                            this.hideExpressionBindings(controlType, "LeftF", "TopF", "HeightF");
                             break;
                         case "XRTable":
-                            this.hidePropertyDescriptions(controlType, "Text", "NavigateUrl");
+                            this.hideExpressionBindings(controlType, "Text", "NavigateUrl");
                             break;
                         case "XRZipCode":
-                            this.hidePropertyDescriptions(controlType, "Font", "TextAlignment");
+                            this.hideExpressionBindings(controlType, "Font", "TextAlignment");
                             break;
                         case "DevExpress.XtraReports.UI.XtraReport":
-                            this.hidePropertyDescriptions(controlType, "StyleName", "Text", "NavigateUrl");
-                            this.setPropertyDescription(controlType, "Bookmark", this._beforePrint);
-                            this.hidePropertyDescriptions(controlType, "LeftF", "TopF", "WidthF", "HeightF");
+                            this.hideExpressionBindings(controlType, "StyleName", "Text", "NavigateUrl");
+                            this.setExpressionBinding(controlType, "Bookmark", this._beforePrint);
+                            this.hideExpressionBindings(controlType, "LeftF", "TopF", "WidthF", "HeightF");
                             break;
                     }
                 };
@@ -29189,19 +29309,29 @@ var DevExpress;
                 ControlsFactory.prototype._createExpressionObject = function (typeName, expressions, path, summaryRunning) {
                     return this._expressionWrapper.createExpressionsObject(typeName, expressions, path, summaryRunning);
                 };
-                ControlsFactory.prototype.setPropertyDescription = function (controlType, propertyName, events, group, objectProperties) {
+                ControlsFactory.prototype.setExpressionBinding = function (controlType, propertyName, events, group, objectProperties) {
                     this._expressionWrapper.setPropertyDescription(controlType, propertyName, events, objectProperties, group);
+                };
+                ControlsFactory.prototype.setPropertyDescription = function (controlType, propertyName, events, group, objectProperties) {
+                    return this.setExpressionBinding(controlType, propertyName, events, group, objectProperties);
                 };
                 ControlsFactory.prototype.setLocalizationIdForExpression = function (propertyName, localizationId) {
                     this._expressionWrapper.setLocalizationId(propertyName, localizationId);
                 };
-                ControlsFactory.prototype.hidePropertyDescriptions = function (type) {
+                ControlsFactory.prototype.hideExpressionBindings = function (type) {
                     var propertyNames = [];
                     for (var _i = 1; _i < arguments.length; _i++) {
                         propertyNames[_i - 1] = arguments[_i];
                     }
                     (_a = this._expressionWrapper).hidePropertyDescriptions.apply(_a, [type].concat(propertyNames));
                     var _a;
+                };
+                ControlsFactory.prototype.hidePropertyDescriptions = function (type) {
+                    var propertyNames = [];
+                    for (var _i = 1; _i < arguments.length; _i++) {
+                        propertyNames[_i - 1] = arguments[_i];
+                    }
+                    return this.hideExpressionBindings.apply(this, [type].concat(propertyNames));
                 };
                 ControlsFactory.prototype.inheritControl = function (parentType, extendedOptions) {
                     var parentInfo = this.getControlInfo(parentType);
@@ -29213,6 +29343,10 @@ var DevExpress;
                         info: newInfo,
                         popularProperties: newPopularProperties
                     });
+                };
+                ControlsFactory.prototype.createPopularBindingInfo = function (options, isExpression) {
+                    if (isExpression === void 0) { isExpression = true; }
+                    return DevExpress.Designer.Report.createPopularBindingInfo(options, isExpression);
                 };
                 return ControlsFactory;
             })(Designer.ControlsFactory);
@@ -30353,6 +30487,11 @@ var DevExpress;
                         }
                     });
                 };
+                designerModel.getTabs = function () { return navigation.tabs(); };
+                designerModel.closeTab = function (tab, force) {
+                    if (force === void 0) { force = false; }
+                    return navigation.removeTab(tab, force);
+                };
                 if (applyBindings) {
                     designerCallbacks.beforeRender && designerCallbacks.beforeRender(designerModel);
                     $(element).children().remove();
@@ -31033,6 +31172,13 @@ var DevExpress;
                     var navigateByReports = this.designerModel.navigateByReports;
                     return this.ReportStorageSetData(navigateByReports.currentTab().report().serialize(), navigateByReports.currentTab().url());
                 };
+                JSReportDesigner.prototype.GetTabs = function () {
+                    return this.designerModel.getTabs();
+                };
+                JSReportDesigner.prototype.CloseTab = function (tab, force) {
+                    if (force === void 0) { force = false; }
+                    this.designerModel.closeTab(tab, force);
+                };
                 JSReportDesigner.prototype.CloseCurrentTab = function () {
                     this.designerModel.navigateByReports.removeTab(this.designerModel.navigateByReports.currentTab());
                 };
@@ -31067,13 +31213,13 @@ var DevExpress;
                     Report.limitation = _options.limitation;
                     Designer.Chart["limitation"] = Report.limitation;
                     _options.designerModel = ko.isWriteableObservable(_options.designerModel) ? _options.designerModel : ko.observable(null);
-                    this._sender = new JSReportDesigner(_options.designerModel);
+                    this.sender = new JSReportDesigner(_options.designerModel);
                     this._initializationData = ko.isObservable(_options.initializationData)
                         ? _options.initializationData
                         : ko.observable(_options.initializationData);
                 }
                 JSReportDesignerBinding.prototype._applyBindings = function (model, $element) {
-                    this._sender.designerModel = model;
+                    this.sender.designerModel = model;
                     var childTemplate = !model ? $("<div>") : this._templateHtml;
                     $element.children().remove();
                     var child = $element.append(childTemplate).children()[0];
@@ -34482,16 +34628,6 @@ var DevExpress;
                     });
                     return removingDeferred.promise();
                 };
-                NavigateByReports.prototype._createIsDirtyFlag = function (undoEngine) {
-                    return ko.pureComputed({
-                        read: function () {
-                            return undoEngine.isDirty();
-                        },
-                        write: function (newValue) {
-                            undoEngine.isDirty(newValue);
-                        }
-                    });
-                };
                 NavigateByReports.prototype._closeTab = function (deletedTab) {
                     var closingDeferred = $.Deferred();
                     deletedTab.close = closingDeferred;
@@ -34534,7 +34670,12 @@ var DevExpress;
                         textSubscription: displayName.subscribe(function () { _this.checkHeight(); }),
                         undoEngine: undo,
                         url: url,
-                        isDirty: this._createIsDirtyFlag(undo)
+                        isDirty: undo.isDirty,
+                        isModified: undo.isDirty,
+                        resetIsModified: function () {
+                            undo.isDirty(false);
+                            undo.clearHistory();
+                        }
                     };
                     if (!displayName()) {
                         newTab.report().name(Designer.getUniqueName(this.tabs().map(function (tab) { return tab.displayName(); }), "Report"));
@@ -34547,8 +34688,11 @@ var DevExpress;
                 NavigateByReports.prototype.init = function (designerModel) {
                     this._isReportLoading = designerModel.isLoading;
                 };
-                NavigateByReports.prototype.removeTab = function (tab) {
+                NavigateByReports.prototype.removeTab = function (tab, force) {
                     var _this = this;
+                    if (force === void 0) { force = false; }
+                    if (force)
+                        return this._removeTab(tab);
                     this._closeTab(tab).done(function () {
                         _this._removeTab(tab);
                     });
@@ -34998,6 +35142,7 @@ var DevExpress;
                         scale: surface._context.zoom(),
                         text: surface._control["textRtf"]().replace(/\n/g, "\r\n"),
                         rtf: surface._control["_rtf"]().replace(/\n/g, "\r\n"),
+                        format: surface._control["format"](),
                         base64rtf: surface._control["_serializableRtfString"](),
                         propertyName: propertyName
                     })));
@@ -35110,11 +35255,19 @@ var DevExpress;
     (function (Designer) {
         var Report;
         (function (Report) {
+            (function (XRRichTextStreamType) {
+                XRRichTextStreamType[XRRichTextStreamType["RtfText"] = 0] = "RtfText";
+                XRRichTextStreamType[XRRichTextStreamType["PlainText"] = 1] = "PlainText";
+                XRRichTextStreamType[XRRichTextStreamType["HtmlText"] = 2] = "HtmlText";
+                XRRichTextStreamType[XRRichTextStreamType["XmlText"] = 3] = "XmlText";
+            })(Report.XRRichTextStreamType || (Report.XRRichTextStreamType = {}));
+            var XRRichTextStreamType = Report.XRRichTextStreamType;
             var XRRichViewModel = (function (_super) {
                 __extends(XRRichViewModel, _super);
                 function XRRichViewModel(model, parent, serializer) {
                     var _this = this;
                     _super.call(this, model, parent, serializer);
+                    this.format = ko.observable(XRRichTextStreamType.RtfText);
                     this.textRtf = ko.observable("");
                     this._rtf = ko.observable("");
                     var nameSubscribe = ko.computed(function () {
@@ -35224,6 +35377,7 @@ var DevExpress;
             var OpenReportDialogModelBase = (function () {
                 function OpenReportDialogModelBase(popup, urls) {
                     var _this = this;
+                    this.noDataText = DevExpress.Analytics.Localization.noDataText();
                     this.urls = urls;
                     this.reportUrl = ko.observable("");
                     var self = this;
@@ -35293,6 +35447,7 @@ var DevExpress;
             Report.SaveReportDialogModelBase = SaveReportDialogModelBase;
             var SaveAsReportDialogModelBase = (function () {
                 function SaveAsReportDialogModelBase(popup, urls) {
+                    this.noDataText = DevExpress.Analytics.Localization.noDataText();
                     this.urls = urls;
                     this.reportUrl = ko.observable("");
                     this.reportName = ko.observable("");
@@ -35376,7 +35531,7 @@ var DevExpress;
                             var args = { report: self.tab().report(), url: url, cancel: false };
                             self.onSaving(args);
                             if (args.cancel) {
-                                self.tab().close.reject();
+                                self.tab().close && self.tab().close.reject();
                                 return;
                             }
                             Report.ReportStorageWeb.setData(self.tab().report().serialize(), url)
@@ -35395,7 +35550,7 @@ var DevExpress;
                     }
                     else {
                         self.tab().report().save();
-                        self.tab().close.resolve();
+                        self.tab().close && self.tab().close.resolve();
                     }
                 };
                 SaveReportDialogLight.prototype.notSave = function () {
@@ -35404,7 +35559,7 @@ var DevExpress;
                     this.visible(false);
                 };
                 SaveReportDialogLight.prototype.cancel = function () {
-                    this.tab().close.reject();
+                    this.tab().close && this.tab().close.reject();
                     _super.prototype.cancel.call(this);
                 };
                 return SaveReportDialogLight;
@@ -35434,7 +35589,7 @@ var DevExpress;
                         var args = { report: self.tab().report(), url: url, cancel: false };
                         self.onSaving(args);
                         if (args.cancel) {
-                            self.tab().close.reject();
+                            self.tab().close && self.tab().close.reject();
                             return;
                         }
                         Report.ReportStorageWeb.setNewData(data, url)
@@ -35455,7 +35610,7 @@ var DevExpress;
                             self.tab().close.resolve();
                         }
                         else {
-                            self.tab().close.reject();
+                            self.tab().close && self.tab().close.reject();
                         }
                     }
                 };
@@ -35574,6 +35729,16 @@ var DevExpress;
                     });
                 }
                 Utils.addVaraiblesToExpressionEditor = addVaraiblesToExpressionEditor;
+                function createIDataMemberInfoByName(name, specifics) {
+                    if (specifics === void 0) { specifics = "list"; }
+                    return {
+                        displayName: name,
+                        name: name,
+                        specifics: specifics,
+                        isList: specifics === "list" ? true : false
+                    };
+                }
+                Utils.createIDataMemberInfoByName = createIDataMemberInfoByName;
             })(Utils = Report.Utils || (Report.Utils = {}));
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
