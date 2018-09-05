@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -968,7 +968,7 @@ var DevExpress;
             ko.virtualElements.allowedBindings["lazy"] = true;
             ko.bindingHandlers['lazy'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var resolver = Analytics.Internal.globalResolver;
+                    var resolver = DevExpress.Analytics.Internal.globalResolver;
                     var parsedBindings = valueAccessor();
                     if (parsedBindings.innerBindings) {
                         resolver = parsedBindings.resolver;
@@ -2545,7 +2545,7 @@ var DevExpress;
                         return true;
                         var _a, _b, _c, _d;
                     };
-                    ValueEditorHelper._checkFinalValue = function (e, validate, defaultVal) {
+                    ValueEditorHelper.validateWidgetValue = function (e, validate, defaultVal) {
                         var currentValue = e.component.option("value");
                         if (!validate(currentValue)) {
                             e.component.option("value", defaultVal);
@@ -2563,7 +2563,7 @@ var DevExpress;
                         if (extendOptions === void 0) { extendOptions = {}; }
                         var options = {
                             onFocusIn: function (e) {
-                                ValueEditorHelper._checkFinalValue(e, validate, defaultVal);
+                                ValueEditorHelper.validateWidgetValue(e, validate, defaultVal);
                                 ValueEditorHelper._invokeStandardHandler(extendOptions, "onFocusIn", e);
                             },
                             onKeyPress: function (e) {
@@ -2571,12 +2571,12 @@ var DevExpress;
                                 if (!char)
                                     return;
                                 var $input = $(e.element).find("input").eq(0);
-                                var caretPosition = ValueEditorHelper._getCaretPosition($input.get(0)).start;
+                                var caretPosition = ValueEditorHelper._getCaretPosition($input.get(0));
                                 var currentValue = $input.val();
-                                if (caretPosition < 0) {
+                                if (caretPosition.start < 0) {
                                     caretPosition = currentValue ? currentValue.length : 0;
                                 }
-                                var result = [currentValue.slice(0, caretPosition), char, currentValue.slice(caretPosition)].join("");
+                                var result = [currentValue.slice(0, caretPosition.start), char, currentValue.slice(caretPosition.end)].join("");
                                 if (!regExpEditing.test(result))
                                     e.event.preventDefault();
                                 $input = null;
@@ -2603,7 +2603,7 @@ var DevExpress;
                             },
                             onValueChanged: function (e) {
                                 if (e.value !== defaultVal)
-                                    _this._checkFinalValue(e, validate, e.previousValue);
+                                    _this.validateWidgetValue(e, validate, e.previousValue);
                                 ValueEditorHelper._invokeStandardHandler(extendOptions, "onValueChanged", e);
                             }
                         };
@@ -2801,10 +2801,12 @@ var DevExpress;
             Widgets.aceAvailable = !!Widgets.ace;
             ko.bindingHandlers["dxAceEditor"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var values = valueAccessor(), text = values.value, editorContainer = values.editorContainer, editor, _setEditorText = function (editorInstance, text) {
+                    var values = valueAccessor(), text = values.value, editorContainer = values.editorContainer, editor, shouldProcessOnChangeEvent = true, _setEditorText = function (editorInstance, text) {
+                        shouldProcessOnChangeEvent = false;
                         editorInstance.getSession().setValue((text && text.toString()) || "");
                         editorInstance.clearSelection();
                         editorInstance.getSession().getUndoManager().reset();
+                        shouldProcessOnChangeEvent = true;
                     };
                     if (Widgets.ace) {
                         var showGutter = values.options.showGutter != undefined ? values.options.showGutter : true;
@@ -2828,16 +2830,18 @@ var DevExpress;
                             }
                         };
                         session.setMode(languageMode);
-                        var onBlur = function () { editor.completer && editor.completer.popup.hide(); }, onChange, onFocus;
+                        var onBlur = function () { editor.completer && editor.completer.popup && editor.completer.popup.hide(); }, onChange, onFocus;
                         if (additionalOptions) {
                             if (additionalOptions.onChange) {
                                 var timer = null;
                                 onChange = function (e) {
                                     if (timer !== null)
                                         clearTimeout(timer);
-                                    timer = setTimeout(function () {
-                                        text() !== session.getValue() && additionalOptions.onChange(session);
-                                    }, additionalOptions && additionalOptions.changeTimeout || 1000);
+                                    if (shouldProcessOnChangeEvent) {
+                                        timer = setTimeout(function () {
+                                            text() !== session.getValue() && additionalOptions.onChange(session);
+                                        }, additionalOptions && additionalOptions.changeTimeout || 1000);
+                                    }
                                 };
                                 session.on("change", onChange);
                             }
@@ -2852,7 +2856,7 @@ var DevExpress;
                             }
                             if (additionalOptions.onBlur) {
                                 onBlur = function () {
-                                    editor.completer && editor.completer.popup.hide();
+                                    editor.completer && editor.completer.popup && editor.completer.popup.hide();
                                     return additionalOptions.onBlur(session);
                                 };
                             }
@@ -5455,6 +5459,9 @@ var DevExpress;
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this, options, path, onItemsVisibilityChanged, rtl);
+                    this.resolver.done(function () {
+                        onItemsVisibilityChanged();
+                    });
                     this._disposables.push(options.selectedPath.subscribe(function (newPath) {
                         _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
                     }));
@@ -10116,6 +10123,8 @@ var DevExpress;
                     if (underCursor.x < targetWidth) {
                         dropTargetSurface.getControlModel().addChild(control);
                         var controlSurface = Internal.findSurface(control);
+                        if (!controlSurface)
+                            return;
                         var width = size.width(), height = size.height();
                         var left = (underCursor.x + width > targetWidth) ? (targetWidth - width - 1) : underCursor.x;
                         controlSurface.rect({ left: left, top: Math.max(underCursor.y, 0), width: width, height: height });
@@ -10394,13 +10403,19 @@ var DevExpress;
         };
         ko.bindingHandlers["resizable"] = {
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var values = valueAccessor(), $element = $(element), $parent = $element.closest(".dx-designer"), $selectedNodes = null, absolutePosition = null, options = $.extend({
+                var values = valueAccessor(), $element = $(element), $parent = $element.closest(".dx-designer"), currentDirection = null, $selectedNodes = null, resizableDirections = { "north": "n", "east": "e", "south": "s", "west": "w" }, absolutePosition = null, options = $.extend({
                     handles: values.handles || "all", ghost: false,
                     stop: function (event, ui) {
                         $selectedNodes.each(function (_, el) {
                             var control = ko.dataFor(el), surface = ko.contextFor(el).$root.surface(), $el = $(el);
                             var rect = control.rect();
-                            control.rect(Analytics.Internal.getControlRect($el, control, surface));
+                            var newRect = Analytics.Internal.getControlRect($el, control, surface);
+                            control.rect({
+                                top: currentDirection.indexOf(resizableDirections.north) !== -1 ? newRect.top : rect.top,
+                                left: currentDirection.indexOf(resizableDirections.west) !== -1 ? newRect.left : rect.left,
+                                width: currentDirection.indexOf(resizableDirections.east) !== -1 || currentDirection.indexOf(resizableDirections.west) !== -1 ? newRect.width : rect.width,
+                                height: currentDirection.indexOf(resizableDirections.south) !== -1 || currentDirection.indexOf(resizableDirections.north) !== -1 ? newRect.height : rect.height,
+                            });
                             if (JSON.stringify(rect) === JSON.stringify(control.rect())) {
                                 $el.css({
                                     left: rect.left,
@@ -10412,13 +10427,19 @@ var DevExpress;
                             $el.removeData("originalPosition");
                             $el.removeData("originalSize");
                         });
+                        currentDirection = null;
                         values.stopped();
                         values.started = false;
                         if (values.snapHelper) {
                             values.snapHelper.deactivateSnapLines();
                         }
                     },
-                    start: function () {
+                    start: function (event) {
+                        var currentClassList = event.originalEvent.target.classList;
+                        for (var i = 0; i < currentClassList.length; i++) {
+                            if (currentClassList[i] !== "ui-resizable-handle" && currentClassList[i].indexOf("ui-resizable-") === 0)
+                                currentDirection = currentClassList[i].slice("ui-resizable-".length, currentClassList[i].length);
+                        }
                         values.started = true;
                         values.starting();
                         $selectedNodes = values.$selectedNodes || $(".dxrd-viewport > .dxrd-focused, .dxrd-selected").filter(":visible");
@@ -12056,6 +12077,17 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
+            function processTextEditorHotKeys(event, delegates) {
+                if (!event || !delegates)
+                    return;
+                if (event.keyCode === 27 && !!delegates["esc"]) {
+                    delegates["esc"]();
+                }
+                if (event.keyCode === 13 && event.ctrlKey && !!delegates["ctrlEnter"]) {
+                    delegates["ctrlEnter"]();
+                }
+            }
+            Internal.processTextEditorHotKeys = processTextEditorHotKeys;
             var InlineTextEdit = (function (_super) {
                 __extends(InlineTextEdit, _super);
                 function InlineTextEdit(selection) {
@@ -12093,13 +12125,13 @@ var DevExpress;
                         }
                     };
                     this.keypressAction = function (args) {
-                        if (args.event.keyCode === 27) {
-                            _this._showInline(false);
-                        }
-                        if (args.event.keyCode === 13 && args.event.ctrlKey) {
-                            _controlText(_this.text());
-                            _this._showInline(false);
-                        }
+                        processTextEditorHotKeys(args.event, {
+                            esc: function () { _this._showInline(false); },
+                            ctrlEnter: function () {
+                                _controlText(_this.text());
+                                _this._showInline(false);
+                            }
+                        });
                     };
                 }
                 return InlineTextEdit;
@@ -13235,7 +13267,7 @@ var DevExpress;
                 };
                 SnapLinesHelper.prototype.snapPosition = function (position, horizontal) {
                     var line = this._findClosestSnapLine(position, horizontal ? this.horizontalSnapLines : this.verticalSnapLines);
-                    return (line && Math.abs(line.distance) <= this._snapTolerance) ? (position - line.distance) : position;
+                    return (line && Math.abs(line.distance) <= this._snapTolerance) ? line.snapLine.position : position;
                 };
                 SnapLinesHelper.snapTolerance = 10;
                 return SnapLinesHelper;
@@ -14581,12 +14613,13 @@ var DevExpress;
         (function (Widgets) {
             var dxFieldListPicker = (function (_super) {
                 __extends(dxFieldListPicker, _super);
-                function dxFieldListPicker(element, options) {
-                    _super.call(this, element, $.extend(options, { showClearButton: true }));
+                function dxFieldListPicker($element, options) {
+                    _super.call(this, $element, $.extend(options, { showClearButton: true }));
                     this._path = ko.observable("");
                     this._value = ko.observable("");
-                    this._parentViewport = "";
+                    this._parentViewport = null;
                     this._itemsProvider = ko.observable(null);
+                    this._defaultPosition = null;
                     this.option("path") && this._path(this.option("path"));
                     this.option("value") && this._value(this.option("value"));
                     this.option("itemsProvider") && this._itemsProvider(this.option("itemsProvider"));
@@ -14599,6 +14632,14 @@ var DevExpress;
                         var popupContent = this._popup.content() && this._popup.content()[0];
                         popupContent.style.maxHeight = 'none';
                         popupContent.style.height = 'auto';
+                        var elementBottom = this["_$element"][0].getBoundingClientRect();
+                        var viewportBottom = this._parentViewport[0].getBoundingClientRect().bottom;
+                        if (elementBottom + 200 > viewportBottom) {
+                            this._popup.option("position", $.extend(true, {}, this._defaultPosition, { my: "left bottom", at: "left top" }));
+                        }
+                        else {
+                            this._popup.option("position", this._defaultPosition);
+                        }
                         this._popup._renderPosition();
                     }
                 };
@@ -14606,7 +14647,9 @@ var DevExpress;
                 dxFieldListPicker.prototype._hideOnBlur = function () { return false; };
                 dxFieldListPicker.prototype._popupConfig = function () {
                     var dxPolymorphWidget = this._options.integrationOptions.templates["dx-polymorph-widget"];
-                    return $.extend(_super.prototype._popupConfig.call(this), {
+                    var popuConfig = _super.prototype._popupConfig.call(this);
+                    this._defaultPosition = popuConfig.position;
+                    return $.extend(popuConfig, {
                         container: this._parentViewport,
                         contentTemplate: dxPolymorphWidget && dxPolymorphWidget._template,
                         closeOnOutsideClick: true

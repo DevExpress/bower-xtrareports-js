@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1341,8 +1341,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2371,8 +2371,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2573,8 +2573,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2603,7 +2603,7 @@
 </script>
 
 <script type="text/html" id="dxrp-editing-field-text">
-    <textarea class="dxrp-editing-field-text" data-bind="value: value, style: textStyle(), event: { blur: hideEditor }"></textarea>
+    <textarea class="dxrp-editing-field-text" data-bind="value: value, valueUpdate: 'keypress', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>
 </script>
 
 <script type="text/html" id="dxrp-editing-field-mask">
@@ -2650,7 +2650,7 @@
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: active() && !field.readOnly() -->
-        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field.editValue, style: textStyle(), event: { blur: hideEditor }"></textarea>
+        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: 'keypress', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>
         <!--/ko-->
     </div>
 </script>
@@ -3048,7 +3048,7 @@
                 <!-- /ko -->
             </div>
             <!-- /ko -->
-            <!-- ko if: showMultipagePreview() -->
+            <!-- ko if: showMultipagePreview() && !!currentPage() -->
             <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">
                 <!-- ko foreach: pages -->
                 <!-- ko lazy: { if: pageLoading() || (!pageLoading() && displayImageSrc()) } -->
@@ -3072,8 +3072,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3153,7 +3153,7 @@
     }, stopped: function() { 
         $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false; 
     }, handles: 's', disabled: !canResize(), forceResize: resizeTheBand, zoom: $root.surface().zoom, minimumHeight: heightFromControls() || 1 }">
-        <div data-bind="ruler: { 'zoom': zoom, 'lenght': height, 'units': $parent.measureUnit, 'direction': 'vertical', flip: $root.dx['config']()['rtlEnabled'] }"></div>
+        <div data-bind="ruler: { 'zoom': zoom, 'length': height, 'units': $parent.measureUnit, 'direction': 'vertical', flip: $root.dx['config']()['rtlEnabled'] }"></div>
     </div>
     <!-- /ko -->
     <div class="dxrd-band-marker" data-bind="css: markerClass, styleunit: { 'height': height(), 'width': markerWidth }, click: function(_, e) { markerClick($root.selection); e.stopPropagation(); }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting(); $root.selection.initialize($data); }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false; }, handles: 's', disabled: collapsed() || !hasOwnRuler() || locked, forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight() }">
@@ -3800,19 +3800,20 @@
     <div class="dxrd-content-panel-wrapper">
         <div class="dxrd-content-panel" data-bind="styleunit: $root.dx['config']()['rtlEnabled'] ?  {marginRight: maxMarkerWidth()} : { marginLeft: maxMarkerWidth() } ">
             <div class="dxrd-hruler-wrapper">
-                <div class="dxrd-hruler" data-bind="styleunit: { left: leftMarginOffset,'width': margins.left }, resizable: leftMarginResizeOptions($root.undoEngine, $element)">
-                    <div data-bind="ruler: { 'zoom': zoom, 'lenght': margins.left, 'units': measureUnit, flip: ko.computed(function(){ return !rtl(); }) }"></div>
+                <div class="dxrd-hruler" data-bind="styleunit: { left: leftMarginOffset,'width': margins.left }">
+                    <div data-bind="ruler: { 'zoom': zoom, 'length': margins.left, 'units': measureUnit, flip: ko.computed(function(){ return !rtl(); }) }"></div>
                     <div class="dxrd-ruler-shadow" data-bind="styleunit: { left: 0, 'width': margins.left }"></div>
                 </div>
-                <div class="dxrd-hruler" data-bind="styleunit: { 'width': (pageWidth() - margins.left()), left: ghosContainerOffset }">
-                    <div data-bind="ruler: { 'zoom': zoom, 'lenght': function() { return pageWidth() - margins.left();}, 'units': measureUnit, flip: rtl }"></div>
-                    <div class="dxrd-ruler-shadow" data-bind="styleunit: { left: rightMarginOffset, width: margins.right }, resizable: rigthMarginResizeOptions($root.undoEngine, $element)"></div>
+                <div class="dxrd-hruler" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin, left: ghostContainerOffset }">
+                    <div class="dxrd-margin-resizable" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }, resizable: leftMarginResizeOptions($root.undoEngine, $element)"></div>
+                    <div data-bind="ruler: { 'zoom': zoom, 'length': pageWidthWithoutLeftMargin, 'units': measureUnit, flip: rtl }"></div>
+                    <div class="dxrd-ruler-shadow" data-bind="styleunit: { left: rightMarginOffset, width: margins.right }, resizable: rightMarginResizeOptions($root.undoEngine, $element)"></div>
                 </div>
                 <div class="dxrd-vscroller-space" data-bind="styleunit: { 'left': pageWidth() }"></div>
             </div>
             <div class="dxrd-viewport" data-bind="styleunit: { minWidth: Math.min(pageWidth(), $root.surfaceSize()) - maxMarkerWidth(), maxWidth: pageWidth(),  maxHeight: effectiveHeight }, event: { scroll: function() { $root.onViewPortScroll($element) } }">
                 <div data-bind="selectable: { selection: $root.selection, zoom: zoom }">
-                    <div class="dxrd-leftMargin-resizable" data-bind="styleunit: { left: leftMarginOffset, width: margins.left() }, resizable: leftMarginResizeOptions($root.undoEngine, $element)">
+                    <div class="dxrd-leftMargin" data-bind="styleunit: { left: leftMarginOffset, width: margins.left() }">
                         <div class="dxrd-selection" style="position:absolute">
                             <!-- ko foreach: bands -->
                             <!-- ko template: { name: 'dxrd-band-coordinate-grid-selection', data: { surface: $data, width: $parent.margins.left } } -->
@@ -3826,24 +3827,25 @@
                             <!-- /ko -->
                         </div>
                     </div>
-                    <div class="dxrd-ghost-containment" data-bind="styleunit: { left: ghosContainerOffset }">
-                        <div class="dxrd-ghost-container" data-bind="styleunit: { 'width': (pageWidth() - margins.left()) }, trackCursor: underCursor">
-
-                            <div class="dxrd-bands-content dxrd-selection" data-bind="styleunit: { 'width': (pageWidth() - margins.left()) }" style="height:100%; overflow:hidden; position:absolute">
-                                <!-- ko foreach: bands -->
-                                <!-- ko template: { name: 'dxrd-band-selection' } -->
-                                <!-- /ko -->
-                                <!-- /ko -->
-                                <!-- ko foreach: crossBandControls -->
-                                <!-- ko if: visible -->
-                                <div class="dxrd-cross-band" data-bind="visible: isSelected() && !$root.dx.Designer.DragDropHandler.started(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+                    <div class="dxrd-ghost-containment" data-bind="styleunit: { left: ghostContainerOffset }">
+                        <div class="dxrd-ghost-container" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }, trackCursor: underCursor ">
+                            <div class="dxrd-bands-content dxrd-selection" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }">
+                                <div class="dxrd-bands-content-offset">
+                                    <div class="dxrd-leftMargin-resizable" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }, resizable: leftMarginResizeOptions($root.undoEngine, $element)"></div>
+                                    <!-- ko foreach: bands -->
+                                    <!-- ko template: { name: 'dxrd-band-selection' } -->
+                                    <!-- /ko -->
+                                    <!-- /ko -->
+                                    <!-- ko foreach: crossBandControls -->
+                                    <!-- ko if: visible -->
+                                    <div class="dxrd-cross-band" data-bind="visible: isSelected() && !$root.dx.Designer.DragDropHandler.started(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+                                    </div>
+                                    <!-- /ko -->
+                                    <!-- /ko -->
+                                    <div class="dxrd-rightMargin-resizable" data-bind="styleunit: { left: rightMarginResizableOffset }, resizable: rightMarginResizeOptions($root.undoEngine, $element)"></div>
                                 </div>
-                                <!-- /ko -->
-                                <!-- /ko -->
                             </div>
-
                             <div class="dxrd-bands-content dxrd-main">
-                                <div class="dxrd-rightMargin-resizable" data-bind="styleunit: { left: rightMarginOffset, width: margins.right }, resizable: rigthMarginResizeOptions($root.undoEngine, $element)"></div>
                                 <!-- ko foreach: bands -->
                                 <!-- ko template: { name: 'dxrd-band' } -->
                                 <!-- /ko -->

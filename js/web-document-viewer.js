@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4159,12 +4159,34 @@ var DevExpress;
                 }, "dxrp-editing-field-datetime");
                 EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, /^[a-zA-Z]*$/, "");
             };
-            EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template) {
+            EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template, validate, defaultVal) {
+                if (defaultVal === void 0) { defaultVal = ""; }
+                var initValue;
+                var extendOptions = {
+                    onInitialized: function (e) {
+                        if (validate) {
+                            DevExpress.JS.Widgets.ValueEditorHelper.validateWidgetValue(e, validate, defaultVal);
+                        }
+                        initValue = e.component.option("value");
+                    },
+                    onKeyUp: function (e) {
+                        var editor = e.component;
+                        DevExpress.Analytics.Internal.processTextEditorHotKeys(e.event, {
+                            esc: function () {
+                                editor.blur();
+                                editor.option("value", initValue);
+                            },
+                            ctrlEnter: function () {
+                                editor.blur();
+                            }
+                        });
+                    }
+                };
                 EditingFieldExtensions.instance()._editors[name] = {
                     name: name,
                     displayName: displayName,
                     category: category,
-                    options: options,
+                    options: $.extend({}, options, extendOptions),
                     template: template
                 };
             };
@@ -4172,7 +4194,8 @@ var DevExpress;
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
             };
             EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExpEditing, regExpFinal, defaultVal) {
-                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, function (val) { return regExpFinal.test(val); }, defaultVal));
+                var validate = function (val) { return regExpFinal.test(val); };
+                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, validate, defaultVal), null, validate, defaultVal);
             };
             EditingFieldExtensions.unregisterEditor = function (editorID) {
                 delete EditingFieldExtensions.instance()._editors[editorID];
@@ -4262,9 +4285,28 @@ var DevExpress;
             var CheckState = Preview.CheckState;
             ;
             Preview.editablePreviewEnabled = ko.observable(true);
-            var TextEditingFieldViewModel = (function () {
+            var TextEditingFieldViewModelBase = (function () {
+                function TextEditingFieldViewModelBase() {
+                }
+                TextEditingFieldViewModelBase.prototype.keypressAction = function (data, event) {
+                    var _this = this;
+                    DevExpress.Analytics.Internal.processTextEditorHotKeys(event, {
+                        esc: function () {
+                            _this.hideEditor(false);
+                        },
+                        ctrlEnter: function () {
+                            _this.hideEditor(true);
+                        }
+                    });
+                };
+                return TextEditingFieldViewModelBase;
+            })();
+            Preview.TextEditingFieldViewModelBase = TextEditingFieldViewModelBase;
+            var TextEditingFieldViewModel = (function (_super) {
+                __extends(TextEditingFieldViewModel, _super);
                 function TextEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
                     var _this = this;
+                    _super.call(this);
                     this.template = "dxrp-editing-field-container";
                     this.htmlValue = function () { return _this.field.htmlValue(); };
                     this.wordWrap = true;
@@ -4293,15 +4335,20 @@ var DevExpress;
                     if (brickStyle.wordWrap != undefined) {
                         this.wordWrap = brickStyle.wordWrap;
                     }
-                    this.hideEditor = function () {
-                        _this.active(false);
+                    this.hideEditor = function (shouldCommit) {
                         setTimeout(function () {
-                            if (!!editorOptions.onHideEditor) {
-                                editorOptions.onHideEditor(field);
+                            if (shouldCommit) {
+                                if (!!editorOptions.onHideEditor) {
+                                    editorOptions.onHideEditor(field);
+                                }
+                                else {
+                                    field.editValue(field._editorValue());
+                                }
                             }
                             else {
-                                field.editValue(field._editorValue());
+                                field._editorValue(field.editValue());
                             }
+                            _this.active(false);
                         }, 1);
                     };
                     var editor = DevExpress.Report.EditingFieldExtensions.instance().editor(field.editorName());
@@ -4309,6 +4356,7 @@ var DevExpress;
                     this.data = {
                         value: field._editorValue,
                         hideEditor: this.hideEditor,
+                        keypressAction: this.keypressAction,
                         textStyle: this.textStyle,
                         options: editorOptions
                     };
@@ -4318,7 +4366,7 @@ var DevExpress;
                         this.data.options = $.extend(true, {}, editorOptions, {
                             value: field._editorValue,
                             onFocusOut: function (e) {
-                                self.hideEditor();
+                                self.hideEditor(true);
                             }
                         });
                     }
@@ -4366,7 +4414,7 @@ var DevExpress;
                     }
                 };
                 return TextEditingFieldViewModel;
-            })();
+            })(TextEditingFieldViewModelBase);
             Preview.TextEditingFieldViewModel = TextEditingFieldViewModel;
             ko.bindingHandlers["childStyle"] = {
                 init: function (element, valueAccessor) {
@@ -4453,9 +4501,11 @@ var DevExpress;
                 return CheckEditingFieldViewModel;
             })();
             Preview.CheckEditingFieldViewModel = CheckEditingFieldViewModel;
-            var CharacterCombEditingFieldViewModel = (function () {
+            var CharacterCombEditingFieldViewModel = (function (_super) {
+                __extends(CharacterCombEditingFieldViewModel, _super);
                 function CharacterCombEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
                     var _this = this;
+                    _super.call(this);
                     this.field = field;
                     this.template = "dxrp-character-comb-editing-field";
                     this.active = ko.observable(false);
@@ -4472,6 +4522,17 @@ var DevExpress;
                         verticalPadding += style["borderWidth"]();
                     }
                     this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
+                    this.hideEditor = function (shouldCommit) {
+                        setTimeout(function () {
+                            if (shouldCommit) {
+                                field.editValue(field._editorValue());
+                            }
+                            else {
+                                field._editorValue(field.editValue());
+                            }
+                            _this.active(false);
+                        });
+                    };
                     this.containerStyle = ko.pureComputed(function () {
                         return $.extend({
                             width: bounds.width + "px",
@@ -4526,12 +4587,6 @@ var DevExpress;
                         $(e && e.currentTarget).find(":focusable").eq(0).focus();
                     }
                 };
-                CharacterCombEditingFieldViewModel.prototype.hideEditor = function () {
-                    var _this = this;
-                    setTimeout(function () {
-                        _this.active(false);
-                    });
-                };
                 CharacterCombEditingFieldViewModel.setText = function (cells, textAlignment, rtl, text, rowsCount, colsCount) {
                     for (var j = 0; j < cells.length; j++) {
                         cells[j].text = "";
@@ -4572,7 +4627,7 @@ var DevExpress;
                     }
                 };
                 return CharacterCombEditingFieldViewModel;
-            })();
+            })(TextEditingFieldViewModelBase);
             Preview.CharacterCombEditingFieldViewModel = CharacterCombEditingFieldViewModel;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
@@ -6726,6 +6781,7 @@ var DevExpress;
                                 else {
                                     _this._preview.progressBar.complete();
                                     if (!result.requestAgain && result.completed) {
+                                        _this._preview.updateExportStatus(result.progress);
                                         _this._preview.getExportResult(operationId, inlineResult, result.token, printable);
                                     }
                                     if (result.error) {

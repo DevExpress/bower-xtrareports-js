@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3036,8 +3036,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3180,8 +3180,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.dark.css)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4264,8 +4264,8 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-dark.css)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4739,8 +4739,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5853,8 +5853,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-dark.css)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8114,6 +8114,16 @@
   left: 375px;
   right: 64px;
 }
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-margin-resizable {
+  position: absolute;
+  z-index: 0;
+  height: 100%;
+  width: 100%;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-margin-resizable .ui-resizable-w,
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-margin-resizable .ui-resizable-e {
+  width: 5px;
+}
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface {
   height: 100%;
   display: inline-block;
@@ -8237,6 +8247,10 @@
   height: 1px;
   position: absolute;
 }
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-hruler-wrapper .dxrd-margin-resizable .ui-resizable-w,
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-hruler-wrapper .dxrd-margin-resizable .ui-resizable-e {
+  width: 10px;
+}
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport {
   height: inherit;
   width: inherit;
@@ -8247,12 +8261,20 @@
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-leftMargin-resizable {
   position: absolute;
+  z-index: 0;
+  height: 100%;
+  width: 100%;
+  left: 0;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-leftMargin-resizable .ui-resizable-w,
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-leftMargin-resizable .ui-resizable-e {
   width: 5px;
 }
-.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-leftMargin-resizable .dxrd-flip {
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-leftMargin {
+  position: absolute;
+  z-index: 0;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-leftMargin .dxrd-flip {
   -moz-transform: scaleX(-1);
   -o-transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
@@ -8264,10 +8286,22 @@
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container {
   position: absolute;
 }
-.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container .dxrd-rightMargin-resizable {
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container .dxrd-bands-content.dxrd-selection {
   height: 100%;
   position: absolute;
-  top: 0;
+  overflow: hidden;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container .dxrd-bands-content.dxrd-selection .dxrd-bands-content-offset {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container .dxrd-rightMargin-resizable {
+  position: absolute;
+  z-index: 0;
+  height: 100%;
+  width: 100%;
+  width: 0;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container .dxrd-rightMargin-resizable .ui-resizable-w,
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-ghost-containment .dxrd-ghost-container .dxrd-rightMargin-resizable .ui-resizable-e {
@@ -8803,6 +8837,18 @@
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface:not(.dxrd-surface-rtl) .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-control.dxrd-control-rtl .dxrd-pivot-content {
   direction: ltr;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface:not(.dxrd-surface-rtl) .dxrd-bands-content.dxrd-selection {
+  left: -8px;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface:not(.dxrd-surface-rtl) .dxrd-bands-content.dxrd-selection .dxrd-bands-content-offset {
+  left: 8px;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface-rtl .dxrd-bands-content.dxrd-selection {
+  right: -8px;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface-rtl .dxrd-bands-content.dxrd-selection .dxrd-bands-content-offset {
+  right: 8px;
 }
 .dxrd-designer-wrapper.dx-rtl .dxrd-surface-wrapper .dxrd-surface .dxrd-bands-panel-wrapper {
   margin-right: -100%;

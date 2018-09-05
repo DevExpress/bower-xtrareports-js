@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1655,11 +1655,7 @@ var DevExpress;
                     _super.call(this);
                     this._serializationsInfo = _serializationsInfo;
                     this._valueInfo = ko.observable(Data.parameterValueSerializationsInfo);
-                    this._parametersFunctions = (function (addins) { return Analytics.Widgets.Internal.insertInFunctionDisplay(addins); })({
-                        "String": {
-                            "CreateTable": [{ paramCount: 1, text: "CreateTable(, )", displayName: "CreateTable(Column1, ..., ColumnN)", descriptionStringId: "ExpressionEditorStringId.Function_CreateTable" }]
-                        }
-                    });
+                    this._parametersFunctions = DevExpress.QueryBuilder.Widgets.expressionFunctions;
                     this.isValid = ko.observable(true);
                     serializer = serializer || new DevExpress.Analytics.Utils.ModelSerializer();
                     serializer.deserialize(this, $.extend(model, { "@ItemType": "Parameter" }));
@@ -2322,7 +2318,7 @@ var DevExpress;
         var Data;
         (function (Data) {
             var sqlDataSourceSerializationInfo = [
-                { propertyName: "name", modelName: "Name" },
+                { propertyName: "name", modelName: "@Name" },
                 { propertyName: "connection", modelName: "Connection", from: Data.SqlDataConnection.from, toJsonObject: Data.SqlDataConnection.toJson },
                 { propertyName: "queries", modelName: "Queries", array: true },
                 { propertyName: "relations", modelName: "Relations", array: true },
@@ -2336,6 +2332,13 @@ var DevExpress;
                     _super.call(this);
                     serializer = serializer || new Analytics.Utils.ModelSerializer();
                     serializer.deserialize(this, $.extend(model, { "@ItemType": "SqlDataSource" }));
+                    var deprecateName = this["_model"]["Name"];
+                    if (deprecateName) {
+                        if (!this.name()) {
+                            this.name(deprecateName);
+                        }
+                        delete this["_model"]["Name"];
+                    }
                     this.queries = DevExpress.Analytics.Utils.deserializeArray(model["Queries"], function (item) {
                         if (item["@Type"] === Data.Utils.SqlQueryType.customSqlQuery) {
                             return new Data.CustomSqlQuery(item, _this, serializer);
@@ -2970,6 +2973,7 @@ var DevExpress;
                             }
                             else {
                                 QueryBuilder.Utils.ColumnExpressionCollectionHelper.remove(query.columns, parent.actualName(), _this.name());
+                                _this.groupBy(false);
                             }
                         }
                     });
@@ -6452,7 +6456,7 @@ var DevExpress;
                         });
                         this.template = "dxrd-select-control";
                         this.aceOptions = DevExpress.QueryBuilder.Widgets.createDefaultSQLAceOptions();
-                        this.additionalOptions = DevExpress.QueryBuilder.Widgets.createDefaultSQLAdditionalOptions(function (newVal) { _this.sqlString().replace("\r\n", "\n").replace("\r", "\n") === newVal || _this.sqlString(newVal); });
+                        this.additionalOptions = DevExpress.QueryBuilder.Widgets.createDefaultSQLAdditionalOptions(function (newVal) { _this.sqlString(newVal); });
                         this.aceAvailable = DevExpress.Analytics.Widgets.aceAvailable;
                         this.languageHelper = DevExpress.QueryBuilder.Widgets.createDefaultSQLLanguageHelper();
                         this.caption = function () { return DevExpress.Analytics.getLocalization("SQL string:", "DataAccessUIStringId.QueryControl_SqlString"); };
@@ -7819,6 +7823,20 @@ var DevExpress;
         })(Report = Designer.Report || (Designer.Report = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var QueryBuilder;
+    (function (QueryBuilder) {
+        var Widgets;
+        (function (Widgets) {
+            Widgets.expressionFunctions = (function (addins) { return DevExpress.Analytics.Widgets.Internal.insertInFunctionDisplay(addins); })({
+                "String": {
+                    "CreateTable": [{ paramCount: 1, text: "CreateTable(, )", displayName: "CreateTable(Column1, ..., ColumnN)", descriptionStringId: "ExpressionEditorStringId.Function_CreateTable" }]
+                }
+            });
+        })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
+    })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
+})(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-query-builder-core.js.map
 if(window["ace"]) {
     var _define = window["ace"].define || define;
@@ -8101,8 +8119,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8600,7 +8618,7 @@ var DevExpress;
                 editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Empty", displayValue: "Empty", localizationId: 'DevExpress.XtraPivotGrid.PivotGridAppearances.Empty' }, { value: "Solid", displayValue: "Solid", localizationId: 'DevExpress.XtraCharts.FillMode3D.Solid' }, { value: "Gradient", displayValue: "Gradient", localizationId: 'DevExpress.XtraCharts.FillMode3D.Gradient' }, { value: "Hatch", displayValue: "Hatch", localizationId: 'DevExpress.XtraCharts.FillMode.Hatch' }],
                 localizationId: 'DevExpress.XtraCharts.FillStyle3D.FillMode' }, fillStyle2D = [fillMode];
             Chart.rectangleFillStyleSerializationsInfo = [].concat(fillStyle2D), Chart.interlacedFillStyle = { propertyName: "InterlacedFillStyle", modelName: "InterlacedFillStyle", displayName: "Interlaced Fill Style", info: Chart.rectangleFillStyleSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, localizationId: 'DevExpress.XtraCharts.RadarAxis.InterlacedFillStyle' };
-            var crossAxis = { propertyName: "crossAxis", modelName: "@CrossAxis", displayName: "Cross Axis", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.TickmarksBase.CrossAxis' }, minorThickness = { propertyName: "minorThickness", modelName: "@MinorThickness", displayName: "Minor Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, localizationId: 'DevExpress.XtraCharts.TickmarksBase.MinorThickness' }, minorLenght = { propertyName: "minorLength", modelName: "@MinorLength", displayName: "Minor Length", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2, localizationId: 'DevExpress.XtraCharts.TickmarksBase.MinorLength' }, lenghtinfo = { propertyName: "lenght", modelName: "@Length", displayName: "Length", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, localizationId: 'DevExpress.XtraCharts.TickmarksBase.Length' }, tickmarksMinorVisible = { propertyName: "minorVisible", modelName: "@MinorVisible", displayName: "Minor Visible", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.TickmarksBase.MinorVisible' }, tickmarksBaseSerializationsInfo = [Chart.visible, tickmarksMinorVisible, crossAxis, Chart.thickness, minorThickness, lenghtinfo, minorLenght], tickmarksSerializationsInfo = [].concat(tickmarksBaseSerializationsInfo);
+            var crossAxis = { propertyName: "crossAxis", modelName: "@CrossAxis", displayName: "Cross Axis", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.TickmarksBase.CrossAxis' }, minorThickness = { propertyName: "minorThickness", modelName: "@MinorThickness", displayName: "Minor Thickness", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 1, localizationId: 'DevExpress.XtraCharts.TickmarksBase.MinorThickness' }, minorLength = { propertyName: "minorLength", modelName: "@MinorLength", displayName: "Minor Length", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 2, localizationId: 'DevExpress.XtraCharts.TickmarksBase.MinorLength' }, lengthinfo = { propertyName: "length", modelName: "@Length", displayName: "Length", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 5, localizationId: 'DevExpress.XtraCharts.TickmarksBase.Length' }, tickmarksMinorVisible = { propertyName: "minorVisible", modelName: "@MinorVisible", displayName: "Minor Visible", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.TickmarksBase.MinorVisible' }, tickmarksBaseSerializationsInfo = [Chart.visible, tickmarksMinorVisible, crossAxis, Chart.thickness, minorThickness, lengthinfo, minorLength], tickmarksSerializationsInfo = [].concat(tickmarksBaseSerializationsInfo);
             Chart.tickmarks = { propertyName: "tickmarks", modelName: "Tickmarks", displayName: "Tickmarks", editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, info: tickmarksSerializationsInfo, localizationId: 'DevExpress.XtraCharts.RadarAxisY.Tickmarks' };
             Chart.axisAlignment = {
                 propertyName: "axisAlignment", modelName: "@Alignment",
@@ -8666,7 +8684,21 @@ var DevExpress;
         (function (Chart) {
             Chart.dimension = { propertyName: "dimension", modelName: "@Dimension", displayName: "Dimension", editor: DevExpress.JS.Widgets.editorTemplates.numeric, localizationId: 'DevExpress.XtraCharts.SimpleDiagram3D.Dimension' }, Chart.equalPieSize = { propertyName: "equalPieSize", modelName: "@EqualPieSize", displayName: "EqualPieSize", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Chart.typeNameNotShowDiagram = { propertyName: "typeNameSerializable", modelName: "@TypeNameSerializable" };
             Chart.secondaryAxesX = { propertyName: "secondaryAxesX", modelName: "SecondaryAxesX", displayName: "Secondary Axes X", array: true, editor: Chart.editorTemplates.collection, localizationId: 'DevExpress.XtraCharts.XYDiagram.SecondaryAxesX' }, Chart.secondaryAxesY = { propertyName: "secondaryAxesY", modelName: "SecondaryAxesY", displayName: "Secondary Axes Y", array: true, editor: Chart.editorTemplates.collection, localizationId: 'DevExpress.XtraCharts.XYDiagram.SecondaryAxesY' }, Chart.panes = { propertyName: "panes", modelName: "Panes", displayName: "Additional Panes", array: true, editor: Chart.editorTemplates.collection, localizationId: 'ChartDesignerStringIDs.TreeAdditionalPanelCollection' };
-            Chart.diagramSerializationsInfo = [Chart.typeNameNotShowDiagram], Chart.radarSerializationsInfo = [Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.polarSerializationsInfo = [Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.simple3DSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.funnel3DSerializationsInfo = [].concat(Chart.simple3DSerializationsInfo), Chart.simpleSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.XY2DSerializationsInfo = [Chart.defaultPane, Chart.panes, Chart.axisX, Chart.axisY, Chart.secondaryAxesX, Chart.secondaryAxesY, Chart.margin, Chart.enableAxisXScrolling, Chart.enableAxisXZooming, Chart.enableAxisYScrolling, Chart.enableAxisYZooming, Chart.typeNameNotShowDiagram], Chart.XYSerializationsInfo = [Chart.rotated].concat(Chart.XY2DSerializationsInfo), Chart.XY3DSerializationsInfo = [Chart.axisX3D, Chart.axisY3D, Chart.backColor, Chart.typeNameNotShowDiagram], Chart.GanttDiagramSerializationsInfo = [].concat(Chart.XY2DSerializationsInfo);
+            Chart.drawingStyle = {
+                propertyName: "drawingStyle", modelName: "@DrawingStyle", displayName: "Drawing Style", localizationId: "DevExpress.XtraCharts.RadarDiagram.DrawingStyle", defaultVal: "Counterclockwise",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Counterclockwise", displayValue: "Counterclockwise", localizationId: "DevExpress.XtraCharts.RadarDiagramRotationDirection.Counterclockwise" },
+                    { value: "Clockwise", displayValue: "Clockwise", localizationId: "DevExpress.XtraCharts.RadarDiagramRotationDirection.Clockwise" }
+                ]
+            }, Chart.startAngleInDegrees = {
+                propertyName: "startAngleInDegrees", modelName: "@StartAngleInDegrees", displayName: "Start Angle in Degrees", localizationId: "DevExpress.XtraCharts.RadarDiagram.StartAngleInDegrees", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 }, Chart.rotationDirection = {
+                propertyName: "rotationDirection", modelName: "@RotationDirection", displayName: "Rotation Direction", localizationId: "DevExpress.XtraCharts.RadarDiagram.RotationDirection", defaultVal: "Circle",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Circle", displayValue: "Circle", localizationId: "DevExpress.XtraCharts.RadarDiagramDrawingStyle.Circle" },
+                    { value: "Polygon", displayValue: "Polygon", localizationId: "DevExpress.XtraCharts.RadarDiagramDrawingStyle.Polygon" }
+                ]
+            };
+            Chart.diagramSerializationsInfo = [Chart.typeNameNotShowDiagram], Chart.radarSerializationsInfo = [Chart.drawingStyle, Chart.startAngleInDegrees, Chart.rotationDirection, Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.polarSerializationsInfo = [Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.simple3DSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.funnel3DSerializationsInfo = [].concat(Chart.simple3DSerializationsInfo), Chart.simpleSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.XY2DSerializationsInfo = [Chart.defaultPane, Chart.panes, Chart.axisX, Chart.axisY, Chart.secondaryAxesX, Chart.secondaryAxesY, Chart.margin, Chart.enableAxisXScrolling, Chart.enableAxisXZooming, Chart.enableAxisYScrolling, Chart.enableAxisYZooming, Chart.typeNameNotShowDiagram], Chart.XYSerializationsInfo = [Chart.rotated].concat(Chart.XY2DSerializationsInfo), Chart.XY3DSerializationsInfo = [Chart.axisX3D, Chart.axisY3D, Chart.backColor, Chart.typeNameNotShowDiagram], Chart.GanttDiagramSerializationsInfo = [].concat(Chart.XY2DSerializationsInfo);
             var XYObject = { info: Chart.XYSerializationsInfo, type: "XYDiagram" }, XY2DObject = { info: Chart.XY2DSerializationsInfo, type: "SwiftPlotDiagram" }, XY3DObject = { info: Chart.XY3DSerializationsInfo, type: "XYDiagram3D" }, radarObject = { info: Chart.radarSerializationsInfo, type: "RadarDiagram" }, polarObject = { info: Chart.polarSerializationsInfo, type: "PolarDiagram" }, simpleObject = { info: Chart.simpleSerializationsInfo, type: "SimpleDiagram" }, simple3DObject = { info: Chart.simple3DSerializationsInfo, type: "SimpleDiagram3D" }, funnel3DObject = { info: Chart.funnel3DSerializationsInfo, type: "FunnelDiagram" }, gantObject = { info: Chart.GanttDiagramSerializationsInfo, type: "GanttDiagram" };
             Chart.diagramMapper = {
                 "SideBySideBarSeriesView": XYObject,
@@ -14908,12 +14940,34 @@ var DevExpress;
                 }, "dxrp-editing-field-datetime");
                 EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, /^[a-zA-Z]*$/, "");
             };
-            EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template) {
+            EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template, validate, defaultVal) {
+                if (defaultVal === void 0) { defaultVal = ""; }
+                var initValue;
+                var extendOptions = {
+                    onInitialized: function (e) {
+                        if (validate) {
+                            DevExpress.JS.Widgets.ValueEditorHelper.validateWidgetValue(e, validate, defaultVal);
+                        }
+                        initValue = e.component.option("value");
+                    },
+                    onKeyUp: function (e) {
+                        var editor = e.component;
+                        DevExpress.Analytics.Internal.processTextEditorHotKeys(e.event, {
+                            esc: function () {
+                                editor.blur();
+                                editor.option("value", initValue);
+                            },
+                            ctrlEnter: function () {
+                                editor.blur();
+                            }
+                        });
+                    }
+                };
                 EditingFieldExtensions.instance()._editors[name] = {
                     name: name,
                     displayName: displayName,
                     category: category,
-                    options: options,
+                    options: $.extend({}, options, extendOptions),
                     template: template
                 };
             };
@@ -14921,7 +14975,8 @@ var DevExpress;
                 EditingFieldExtensions.registerEditor(editorID, displayName, category, { mask: mask });
             };
             EditingFieldExtensions.registerRegExpEditor = function (editorID, displayName, category, regExpEditing, regExpFinal, defaultVal) {
-                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, function (val) { return regExpFinal.test(val); }, defaultVal));
+                var validate = function (val) { return regExpFinal.test(val); };
+                EditingFieldExtensions.registerEditor(editorID, displayName, category, DevExpress.JS.Widgets.ValueEditorHelper.getValueEditorOptions(regExpEditing, validate, defaultVal), null, validate, defaultVal);
             };
             EditingFieldExtensions.unregisterEditor = function (editorID) {
                 delete EditingFieldExtensions.instance()._editors[editorID];
@@ -15011,9 +15066,28 @@ var DevExpress;
             var CheckState = Preview.CheckState;
             ;
             Preview.editablePreviewEnabled = ko.observable(true);
-            var TextEditingFieldViewModel = (function () {
+            var TextEditingFieldViewModelBase = (function () {
+                function TextEditingFieldViewModelBase() {
+                }
+                TextEditingFieldViewModelBase.prototype.keypressAction = function (data, event) {
+                    var _this = this;
+                    DevExpress.Analytics.Internal.processTextEditorHotKeys(event, {
+                        esc: function () {
+                            _this.hideEditor(false);
+                        },
+                        ctrlEnter: function () {
+                            _this.hideEditor(true);
+                        }
+                    });
+                };
+                return TextEditingFieldViewModelBase;
+            })();
+            Preview.TextEditingFieldViewModelBase = TextEditingFieldViewModelBase;
+            var TextEditingFieldViewModel = (function (_super) {
+                __extends(TextEditingFieldViewModel, _super);
                 function TextEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
                     var _this = this;
+                    _super.call(this);
                     this.template = "dxrp-editing-field-container";
                     this.htmlValue = function () { return _this.field.htmlValue(); };
                     this.wordWrap = true;
@@ -15042,15 +15116,20 @@ var DevExpress;
                     if (brickStyle.wordWrap != undefined) {
                         this.wordWrap = brickStyle.wordWrap;
                     }
-                    this.hideEditor = function () {
-                        _this.active(false);
+                    this.hideEditor = function (shouldCommit) {
                         setTimeout(function () {
-                            if (!!editorOptions.onHideEditor) {
-                                editorOptions.onHideEditor(field);
+                            if (shouldCommit) {
+                                if (!!editorOptions.onHideEditor) {
+                                    editorOptions.onHideEditor(field);
+                                }
+                                else {
+                                    field.editValue(field._editorValue());
+                                }
                             }
                             else {
-                                field.editValue(field._editorValue());
+                                field._editorValue(field.editValue());
                             }
+                            _this.active(false);
                         }, 1);
                     };
                     var editor = DevExpress.Report.EditingFieldExtensions.instance().editor(field.editorName());
@@ -15058,6 +15137,7 @@ var DevExpress;
                     this.data = {
                         value: field._editorValue,
                         hideEditor: this.hideEditor,
+                        keypressAction: this.keypressAction,
                         textStyle: this.textStyle,
                         options: editorOptions
                     };
@@ -15067,7 +15147,7 @@ var DevExpress;
                         this.data.options = $.extend(true, {}, editorOptions, {
                             value: field._editorValue,
                             onFocusOut: function (e) {
-                                self.hideEditor();
+                                self.hideEditor(true);
                             }
                         });
                     }
@@ -15115,7 +15195,7 @@ var DevExpress;
                     }
                 };
                 return TextEditingFieldViewModel;
-            })();
+            })(TextEditingFieldViewModelBase);
             Preview.TextEditingFieldViewModel = TextEditingFieldViewModel;
             ko.bindingHandlers["childStyle"] = {
                 init: function (element, valueAccessor) {
@@ -15202,9 +15282,11 @@ var DevExpress;
                 return CheckEditingFieldViewModel;
             })();
             Preview.CheckEditingFieldViewModel = CheckEditingFieldViewModel;
-            var CharacterCombEditingFieldViewModel = (function () {
+            var CharacterCombEditingFieldViewModel = (function (_super) {
+                __extends(CharacterCombEditingFieldViewModel, _super);
                 function CharacterCombEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
                     var _this = this;
+                    _super.call(this);
                     this.field = field;
                     this.template = "dxrp-character-comb-editing-field";
                     this.active = ko.observable(false);
@@ -15221,6 +15303,17 @@ var DevExpress;
                         verticalPadding += style["borderWidth"]();
                     }
                     this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
+                    this.hideEditor = function (shouldCommit) {
+                        setTimeout(function () {
+                            if (shouldCommit) {
+                                field.editValue(field._editorValue());
+                            }
+                            else {
+                                field._editorValue(field.editValue());
+                            }
+                            _this.active(false);
+                        });
+                    };
                     this.containerStyle = ko.pureComputed(function () {
                         return $.extend({
                             width: bounds.width + "px",
@@ -15275,12 +15368,6 @@ var DevExpress;
                         $(e && e.currentTarget).find(":focusable").eq(0).focus();
                     }
                 };
-                CharacterCombEditingFieldViewModel.prototype.hideEditor = function () {
-                    var _this = this;
-                    setTimeout(function () {
-                        _this.active(false);
-                    });
-                };
                 CharacterCombEditingFieldViewModel.setText = function (cells, textAlignment, rtl, text, rowsCount, colsCount) {
                     for (var j = 0; j < cells.length; j++) {
                         cells[j].text = "";
@@ -15321,7 +15408,7 @@ var DevExpress;
                     }
                 };
                 return CharacterCombEditingFieldViewModel;
-            })();
+            })(TextEditingFieldViewModelBase);
             Preview.CharacterCombEditingFieldViewModel = CharacterCombEditingFieldViewModel;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
@@ -17475,6 +17562,7 @@ var DevExpress;
                                 else {
                                     _this._preview.progressBar.complete();
                                     if (!result.requestAgain && result.completed) {
+                                        _this._preview.updateExportStatus(result.progress);
                                         _this._preview.getExportResult(operationId, inlineResult, result.token, printable);
                                     }
                                     if (result.error) {
@@ -17877,7 +17965,7 @@ var DevExpress;
                     _this.defaultGridLinesCoordinate({ x: 4, x1: "80%", x2: "100%", majorX1: "70%", majorX2: "100%" });
                     var flip = !!ko.unwrap(options.flip);
                     if (options.direction === "vertical") {
-                        _this.height(options.lenght() + 0.5);
+                        _this.height(options.length() + 0.5);
                         _this.width(20);
                         if (flip) {
                             flip = false;
@@ -17885,11 +17973,11 @@ var DevExpress;
                         }
                     }
                     else {
-                        _this.width(options.lenght() + 0.5);
+                        _this.width(options.length() + 0.5);
                         _this.height(20);
                     }
-                    _this._initGrid(options.lenght(), gridSize, _this.gridLines, flip);
-                    _this._initGrid(options.lenght(), 4 * gridSize, _this.majorGridLines, flip);
+                    _this._initGrid(options.length(), gridSize, _this.gridLines, flip);
+                    _this._initGrid(options.length(), 4 * gridSize, _this.majorGridLines, flip);
                 }));
                 this.disable = options.disable;
             }
@@ -17923,7 +18011,7 @@ var DevExpress;
             init: function (element, valueAccessor) {
                 $(element).children().remove();
                 var values = valueAccessor(), options_ = $.extend({}, ko.unwrap(values), {}), zoom = options_.zoom, options = {
-                    lenght: options_.lenght,
+                    length: options_.length,
                     units: options_.units,
                     direction: options_.direction || "",
                     zoom: zoom,
@@ -18375,6 +18463,8 @@ var DevExpress;
                     },
                     size: getUsefulReportWidth,
                     adjustDropTarget: function (dropTarget) {
+                        if (dropTarget instanceof Report.ReportSurface)
+                            return dropTarget;
                         var targetSurface = getFirstSurfaceParentByType(dropTarget, Report.BandSurface);
                         targetSurface.underCursor().x = 0;
                         return targetSurface;
@@ -18387,6 +18477,8 @@ var DevExpress;
                     },
                     size: getUsefulReportWidth,
                     adjustDropTarget: function (dropTarget) {
+                        if (dropTarget instanceof Report.ReportSurface)
+                            return dropTarget;
                         var targetSurface = getFirstSurfaceParentByType(dropTarget, Report.BandSurface);
                         targetSurface.underCursor().x = 0;
                         return targetSurface;
@@ -18508,6 +18600,8 @@ var DevExpress;
                 FieldListDragDropHandler.prototype.doStopDrag = function (ui, draggable) {
                     var _this = this;
                     if (this.selection.dropTarget) {
+                        if (this.selection.dropTarget instanceof Report.ReportSurface)
+                            return;
                         try {
                             var position = this._getAbsoluteSurfacePosition(ui);
                             this.selection.dropTarget.underCursor().x = position.left - this.selection.dropTarget["absolutePosition"].x();
@@ -21200,10 +21294,7 @@ var DevExpress;
                     return false;
                 };
                 CalculatedFieldsSource.prototype.afterItemsFilled = function (request, items) {
-                    if (items.every(function (i) { return i instanceof CalculatedField; }) && request.fullPath.split('.').length > 1) {
-                        items.splice(0, items.length);
-                    }
-                    else if (request.fullPath) {
+                    if (request.fullPath) {
                         this._ordinaryFieldsInfo[request.fullPath] = items;
                         items.sort(function (a, b) {
                             var aIsList = Report.FieldListController.isList(a) ? 1 : 0;
@@ -22301,49 +22392,49 @@ var DevExpress;
                         TextAlignment: Report.textAlignmentValues,
                         Name: Object.keys(ko.unwrap(DevExpress.JS.Widgets.availableFonts))
                     };
-                    this._localizationIdDictionary = {
-                        Text: "DevExpress.XtraReports.UI.XRControl.Text",
-                        Visible: "DevExpress.XtraReports.UI.XRControl.Visible",
-                        NavigateUrl: "DevExpress.XtraReports.UI.XRControl.NavigateUrl",
-                        Bookmark: "DevExpress.XtraReports.UI.XRControl.Bookmark",
-                        Tag: "DevExpress.XtraReports.UI.XRControl.Tag",
-                        LeftF: "DevExpress.XtraReports.UI.XRControl.Left",
-                        TopF: "DevExpress.XtraReports.UI.XRControl.Top",
-                        WidthF: "DevExpress.XtraReports.UI.XRControl.Width",
-                        HeightF: "DevExpress.XtraReports.UI.XRControl.Height",
-                        StyleName: "DevExpress.XtraReports.UI.XRControl.StyleName",
-                        ForeColor: "DevExpress.XtraReports.UI.XRControl.ForeColor",
-                        BackColor: "DevExpress.XtraReports.UI.XRControl.BackColor",
-                        BorderColor: "DevExpress.XtraReports.UI.XRControl.BorderColor",
-                        Borders: "DevExpress.XtraReports.UI.XRControl.Borders",
-                        BorderWidth: "DevExpress.XtraReports.UI.XRControl.BorderWidth",
-                        BorderDashStyle: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle",
-                        TextAlignment: "DevExpress.XtraReports.UI.XRControl.TextAlignment",
-                        Font: "DevExpress.XtraReports.UI.XRControl.Font",
-                        Padding: "DevExpress.XtraReports.UI.XRControl.Padding",
-                        Appearance: "ReportStringId.CatAppearance",
-                        Layout: "ReportStringId.CatLayout",
-                        Name: "ReportStringId.UD_TTip_FormatFontName",
-                        Size: "System.Drawing.Font.Size",
-                        Italic: "System.Drawing.Font.Italic",
-                        Strikeout: "System.Drawing.Font.Strikeout",
-                        Bold: "System.Drawing.Font.Bold",
-                        Underline: "System.Drawing.Font.Underline",
-                        Left: "DevExpress.XtraPrinting.PaddingInfo.Left",
-                        Right: "DevExpress.XtraPrinting.PaddingInfo.Right",
-                        Top: "DevExpress.XtraPrinting.PaddingInfo.Top",
-                        Bottom: "DevExpress.XtraPrinting.PaddingInfo.Bottom",
-                        CheckState: "DevExpress.XtraReports.UI.XRCheckBox.CheckState",
-                        Image: "DevExpress.XtraReports.UI.XRPictureBox.Image",
-                        ImageUrl: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl",
-                        BinaryData: "DevExpress.XtraReports.UI.XRBarCode.BinaryData",
-                        TargetValue: "DevExpress.XtraReports.UI.XRGauge.TargetValue",
-                        ActualValue: "DevExpress.XtraReports.UI.XRGauge.ActualValue",
-                        PrintOnPage: "DevExpress.XtraReports.UI.XRControlEvents.OnPrintOnPage",
-                        BeforePrint: "DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint",
-                        Minimum: "DevExpress.XtraReports.UI.XRGauge.Minimum",
-                        Maximum: "DevExpress.XtraReports.UI.XRGauge.Maximum",
-                        FillColor: "DevExpress.XtraReports.UI.XRShape.FillColor"
+                    this._displayNameDictionary = {
+                        Text: { localizationId: "DevExpress.XtraReports.UI.XRControl.Text", displayName: "Text" },
+                        Visible: { localizationId: "DevExpress.XtraReports.UI.XRControl.Visible", displayName: "Visible" },
+                        NavigateUrl: { localizationId: "DevExpress.XtraReports.UI.XRControl.NavigateUrl", displayName: "Navigate Url" },
+                        Bookmark: { localizationId: "DevExpress.XtraReports.UI.XRControl.Bookmark", displayName: "Bookmark" },
+                        Tag: { localizationId: "DevExpress.XtraReports.UI.XRControl.Tag", displayName: "Tag" },
+                        LeftF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Left", displayName: "Left" },
+                        TopF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Top", displayName: "Top" },
+                        WidthF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Width", displayName: "Width" },
+                        HeightF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Height", displayName: "Height" },
+                        StyleName: { localizationId: "DevExpress.XtraReports.UI.XRControl.StyleName", displayName: "Style Name" },
+                        ForeColor: { localizationId: "DevExpress.XtraReports.UI.XRControl.ForeColor", displayName: "Foreground Color" },
+                        BackColor: { localizationId: "DevExpress.XtraReports.UI.XRControl.BackColor", displayName: "Background Color" },
+                        BorderColor: { localizationId: "DevExpress.XtraReports.UI.XRControl.BorderColor", displayName: "Border Color" },
+                        Borders: { localizationId: "DevExpress.XtraReports.UI.XRControl.Borders", displayName: "Borders" },
+                        BorderWidth: { localizationId: "DevExpress.XtraReports.UI.XRControl.BorderWidth", displayName: "Border Width" },
+                        BorderDashStyle: { localizationId: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle", displayName: "Border Dash Style" },
+                        TextAlignment: { localizationId: "DevExpress.XtraReports.UI.XRControl.TextAlignment", displayName: "Text Alignment" },
+                        Font: { localizationId: "DevExpress.XtraReports.UI.XRControl.Font", displayName: "Font" },
+                        Padding: { localizationId: "DevExpress.XtraReports.UI.XRControl.Padding", displayName: "Padding" },
+                        Appearance: { localizationId: "ReportStringId.CatAppearance", displayName: "Appearance" },
+                        Layout: { localizationId: "ReportStringId.CatLayout", displayName: "Layout" },
+                        Name: { localizationId: "ReportStringId.UD_TTip_FormatFontName", displayName: "Name" },
+                        Size: { localizationId: "System.Drawing.Font.Size", displayName: "Size" },
+                        Italic: { localizationId: "System.Drawing.Font.Italic", displayName: "Italic" },
+                        Strikeout: { localizationId: "System.Drawing.Font.Strikeout", displayName: "Strikeout" },
+                        Bold: { localizationId: "System.Drawing.Font.Bold", displayName: "Bold" },
+                        Underline: { localizationId: "System.Drawing.Font.Underline", displayName: "Underline" },
+                        Left: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Left", displayName: "Left" },
+                        Right: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Right", displayName: "Right" },
+                        Top: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Top", displayName: "Top" },
+                        Bottom: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Bottom", displayName: "Bottom" },
+                        CheckState: { localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState", displayName: "Check State" },
+                        Image: { localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image", displayName: "Image" },
+                        ImageUrl: { localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl", displayName: "Image Url" },
+                        BinaryData: { localizationId: "DevExpress.XtraReports.UI.XRBarCode.BinaryData", displayName: "Binary Data" },
+                        TargetValue: { localizationId: "DevExpress.XtraReports.UI.XRGauge.TargetValue", displayName: "Target Value" },
+                        ActualValue: { localizationId: "DevExpress.XtraReports.UI.XRGauge.ActualValue", displayName: "Actual Value" },
+                        PrintOnPage: { localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnPrintOnPage", displayName: "PrintOnPage" },
+                        BeforePrint: { localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint", displayName: "BeforePrint" },
+                        Minimum: { localizationId: "DevExpress.XtraReports.UI.XRGauge.Minimum", displayName: "Minimum" },
+                        Maximum: { localizationId: "DevExpress.XtraReports.UI.XRGauge.Maximum", displayName: "Maximum" },
+                        FillColor: { localizationId: "DevExpress.XtraReports.UI.XRShape.FillColor", displayName: "Fill Color" }
                     };
                     this._expressionsInfo = {};
                     this._expressionsSerializationInfoCache = {};
@@ -22363,8 +22454,10 @@ var DevExpress;
                         displayName: propertyName,
                         editor: Report.editorTemplates.reportexpression
                     };
-                    if (this._localizationIdDictionary[propertyName])
-                        result.localizationId = this._localizationIdDictionary[propertyName];
+                    if (this._displayNameDictionary[propertyName]) {
+                        result.localizationId = this._displayNameDictionary[propertyName].localizationId;
+                        result.displayName = this._displayNameDictionary[propertyName].displayName;
+                    }
                     if (this._valuesDictionary[propertyName]) {
                         result.valuesArray = this._valuesDictionary[propertyName];
                     }
@@ -22575,8 +22668,11 @@ var DevExpress;
                     var object = ko.observable(result.stateObj);
                     return object;
                 };
-                ExpressionWrapper.prototype.setLocalizationId = function (propertyName, localizationId) {
-                    this._localizationIdDictionary[propertyName] = localizationId;
+                ExpressionWrapper.prototype.setLocalizationId = function (propertyName, localizationId, displayName) {
+                    this._displayNameDictionary[propertyName] = {
+                        localizationId: localizationId,
+                        displayName: displayName || propertyName
+                    };
                 };
                 ExpressionWrapper.prototype.setValues = function (propertyName, values) {
                     this._valuesDictionary[propertyName] = values;
@@ -22617,15 +22713,7 @@ var DevExpress;
                         }
                     };
                     this.getItemByPath = function (pathRequest, rootItems) {
-                        var $deferred = $.Deferred();
-                        var parts = pathRequest.fullPath.split('.');
-                        var propertyName = parts.pop();
-                        _this.getItems(new DevExpress.JS.Widgets.PathRequest(parts.join('.')), rootItems).done(function (items) {
-                            var item = items.filter(function (x) { return x.name === propertyName; })[0];
-                            !!item ? $deferred.resolve(item) : $deferred.reject();
-                        }).fail(function () { return $deferred.reject(); });
-                        return $deferred.promise();
-                        ;
+                        return _this._getItemByPath(pathRequest, rootItems, true);
                     };
                 }
                 ReportItemsProvider.prototype._getControlByName = function (allControls, name) {
@@ -22669,6 +22757,27 @@ var DevExpress;
                     else {
                         return null;
                     }
+                };
+                ReportItemsProvider.prototype._getItemByPath = function (pathRequest, rootItems, askParents) {
+                    var _this = this;
+                    var $deferred = $.Deferred();
+                    var parts = pathRequest.fullPath.split('.');
+                    var propertyName = parts.pop();
+                    var parentPathRequest = new DevExpress.JS.Widgets.PathRequest(parts.join('.'));
+                    this.getItems(parentPathRequest, rootItems).done(function (items) {
+                        var item = items.filter(function (x) { return x.name === propertyName; })[0];
+                        if (item) {
+                            if (askParents && parts.length > 1)
+                                _this._getItemByPath(parentPathRequest, rootItems, false)
+                                    .done(function () { return $deferred.resolve(item); })
+                                    .fail(function () { return $deferred.reject(); });
+                            else
+                                $deferred.resolve(item);
+                        }
+                        else
+                            $deferred.reject();
+                    }).fail(function () { return $deferred.reject(); });
+                    return $deferred.promise();
                 };
                 return ReportItemsProvider;
             })();
@@ -22995,27 +23104,19 @@ var DevExpress;
                         return minHeight + 20;
                     });
                     Designer.createObservableArrayMapCollection(report.crossBandControls, this.crossBandControls, this._createSurface);
-                    this.rightMarginOffset = ko.pureComputed(function () {
-                        return _this.rtl() ? 0 : _this.pageWidth() - _this.margins.left() - _this.margins.right();
-                    });
-                    this.leftMarginOffset = ko.pureComputed(function () {
-                        return _this.rtl() ? _this.pageWidth() - _this.margins.left() : 0;
-                    });
-                    this.ghosContainerOffset = ko.pureComputed(function () {
+                    this.ghostContainerOffset = ko.pureComputed(function () {
                         return _this.rtl() ? 0 : _this.margins.left();
                     });
-                    this.leftMarginResizeOptions = new SurfaceMarginResizeOptions(this.rtl, this.pageWidth, {
-                        handle: "e",
-                        margin: this.margins.left,
-                        oppositeMargin: this.margins.right,
-                        marginOffset: this.leftMarginOffset
-                    }).getOptions;
-                    this.rigthMarginResizeOptions = new SurfaceMarginResizeOptions(this.rtl, this.pageWidth, {
-                        handle: "w",
-                        margin: this.margins.right,
-                        oppositeMargin: this.margins.left,
-                        marginOffset: this.rightMarginOffset
-                    }).getOptions;
+                    var marginOptions = new SurfaceMarginResizeOptions(this.margins, this.rtl, this.pageWidth);
+                    this._disposables.push(marginOptions);
+                    this.rightMarginOffset = marginOptions.rightMarginOffset;
+                    this.leftMarginOffset = marginOptions.leftMarginOffset;
+                    this.rightMarginResizableOffset = marginOptions.rightMarginResizableOffset;
+                    this.leftMarginResizeOptions = marginOptions.leftMarginOptions;
+                    this.rightMarginResizeOptions = marginOptions.rightMarginOptions;
+                    this._disposables.push(this.pageWidthWithoutLeftMargin = ko.computed(function () {
+                        return _this.pageWidth() - _this.margins.left();
+                    }));
                 }
                 ReportSurface.prototype._createMargin = function (side, oppositeSide) {
                     var _this = this;
@@ -23073,44 +23174,89 @@ var DevExpress;
                 return ReportSurface;
             })(Designer.SurfaceElementArea);
             Report.ReportSurface = ReportSurface;
-            var SurfaceMarginResizeOptions = (function () {
-                function SurfaceMarginResizeOptions(rtl, pageWidth, params) {
-                    var oppositeHandle = params.handle === "w" ? "e" : "w";
+            var SurfaceMarginResizeOptions = (function (_super) {
+                __extends(SurfaceMarginResizeOptions, _super);
+                function SurfaceMarginResizeOptions(margins, rtl, pageWidth) {
+                    var _this = this;
+                    _super.call(this);
+                    this.rtl = rtl;
+                    this.handle = "w";
+                    this.oppositeHandle = "e";
                     var elements = [];
-                    rtl.subscribe(function (value) {
+                    this._disposables.push(rtl.subscribe(function (value) {
                         $(elements).find(".ui-resizable-e, .ui-resizable-w")
-                            .removeClass("ui-resizable-" + (value ? params.handle : oppositeHandle))
-                            .addClass("ui-resizable-" + (value ? oppositeHandle : params.handle));
-                    });
-                    var options = null;
-                    this.getOptions = function (undoEngine, element) {
-                        if (!options) {
-                            options = ko.computed(function () {
-                                return {
-                                    handles: rtl.peek() ? oppositeHandle : params.handle,
-                                    minWidth: 0,
-                                    start: function (e, ui) {
-                                        $(ui.element).resizable("option", "maxWidth", pageWidth.peek() - params.oppositeMargin.peek() - 1);
-                                        undoEngine().start();
-                                    },
-                                    resize: function (e, ui) {
-                                        params.margin(Math.max(0, ui.size.width));
-                                        $(ui.element).css({ left: params.marginOffset.peek(), width: params.margin.peek() });
-                                    },
-                                    stop: function (e, ui) {
-                                        undoEngine().end();
-                                    }
-                                };
+                            .removeClass("ui-resizable-" + (value ? _this.handle : _this.oppositeHandle))
+                            .addClass("ui-resizable-" + (value ? _this.oppositeHandle : _this.handle));
+                    }));
+                    var rightOptions = null;
+                    var leftOptions = null;
+                    this._disposables.push(this.rightMarginOffset = ko.pureComputed(function () {
+                        return rtl() ? 0 : pageWidth() - margins.left() - margins.right();
+                    }));
+                    this._disposables.push(this.leftMarginOffset = ko.pureComputed(function () {
+                        return rtl() ? pageWidth() - margins.left() : 0;
+                    }));
+                    this._disposables.push(this.rightMarginResizableOffset = ko.pureComputed(function () {
+                        return rtl() ? margins.right() : _this.rightMarginOffset();
+                    }));
+                    this.rightMarginOptions = function (undoEngine, element) {
+                        if (!rightOptions) {
+                            var margin = margins.right();
+                            rightOptions = _this._createOptions(undoEngine, function (ui) {
+                                margin = margins.right();
+                                $(ui.element).resizable("option", "minWidth", 0);
+                                $(ui.element).resizable("option", "maxWidth", pageWidth() - margins.left() - 1);
+                            }, function (ui) {
+                                margins.right(Math.max(0, ui.size.width - ui.originalSize.width + margin));
+                                if (!ui.element.hasClass("dxrd-ruler-shadow")) {
+                                    $(ui.element).css({ left: _this.rightMarginResizableOffset(), width: 0 });
+                                }
+                                else {
+                                    $(ui.element).css({ left: _this.rightMarginOffset() });
+                                }
                             });
+                            _this._disposables.push(rightOptions);
                         }
                         elements.push(element);
-                        return options;
+                        return rightOptions;
+                    };
+                    this.leftMarginOptions = function (undoEngine, element) {
+                        if (!leftOptions) {
+                            leftOptions = _this._createOptions(undoEngine, function (ui) {
+                                $(ui.element).resizable("option", "minWidth", margins.right() - 1);
+                                $(ui.element).resizable("option", "maxWidth", pageWidth() - 1);
+                            }, function (ui) {
+                                margins.left(pageWidth() - Math.max(0, ui.size.width));
+                                $(ui.element).css({ left: 0, width: (pageWidth() - margins.left()) });
+                            });
+                            _this._disposables.push(leftOptions);
+                        }
+                        elements.push(element);
+                        return leftOptions;
                     };
                 }
+                SurfaceMarginResizeOptions.prototype._createOptions = function (undoEngine, startDelegate, resizeDelegate) {
+                    var _this = this;
+                    return ko.computed(function () {
+                        return {
+                            handles: _this.rtl() ? _this.oppositeHandle : _this.handle,
+                            start: function (e, ui) {
+                                startDelegate(ui);
+                                undoEngine().start();
+                            },
+                            resize: function (e, ui) {
+                                resizeDelegate(ui);
+                            },
+                            stop: function (e, ui) {
+                                undoEngine().end();
+                            }
+                        };
+                    });
+                };
                 return SurfaceMarginResizeOptions;
-            })();
+            })(Designer.Disposable);
             var ReportActions = (function () {
-                function ReportActions() {
+                function ReportActions(onComponentAdded) {
                     var _this = this;
                     this._contextModel = ko.observable();
                     this._targetModel = ko.pureComputed(function () {
@@ -23224,6 +23370,7 @@ var DevExpress;
                             clickAction: function () { _this._addBand("SubBand"); },
                         }
                     ];
+                    this.onComponentAdded = function (e) { onComponentAdded && onComponentAdded(e); };
                 }
                 ReportActions.prototype._canAddBand = function (bandType) {
                     if (!this._targetModel()) {
@@ -23248,7 +23395,8 @@ var DevExpress;
                             model = this._contextModel();
                         }
                         var height = model.root["dpi"]();
-                        model.createChild({ "@ControlType": bandType, "@HeightF": height });
+                        var control = model.createChild({ "@ControlType": bandType, "@HeightF": height });
+                        this.onComponentAdded({ parent: model, model: control });
                     }
                 };
                 ReportActions.prototype.getActions = function (context) {
@@ -25548,7 +25696,7 @@ var DevExpress;
                         this.size.height(this.size.height() + deltaHeight);
                     }
                 };
-                TableControlViewModel.prototype.addChild = function (control, position) {
+                TableControlViewModel.prototype.addChild = function (control, position, onComponentAdded) {
                     if (control instanceof TableRowViewModel) {
                         if (this.rows().indexOf(control) === -1) {
                             control.parentModel(this);
@@ -25558,13 +25706,15 @@ var DevExpress;
                             else {
                                 this.rows.push(control);
                             }
+                            if ($.isFunction(onComponentAdded))
+                                onComponentAdded({ parent: this, model: control });
                         }
                     }
                     else {
                         throw new Error("Trying to add non a row to the table.");
                     }
                 };
-                TableControlViewModel.prototype.insertRow = function (selectedRow, isRowAbove) {
+                TableControlViewModel.prototype.insertRow = function (selectedRow, isRowAbove, onComponentAdded) {
                     var selectedRowHeight = selectedRow.height(), newRow = new TableRowViewModel({
                         "@ControlType": "XRTableRow",
                         "@Weight": selectedRow.weight(),
@@ -25573,7 +25723,7 @@ var DevExpress;
                     selectedRow.cells().forEach(function (cell) {
                         newRow.createChild({ "@ControlType": "XRTableCell", "@Weight": cell.weight(), "@Padding": "2,2,0,0,100", "@Multiline": "true" });
                     });
-                    this.addChild(newRow, indexSelectedRow + (isRowAbove ? 0 : 1));
+                    this.addChild(newRow, indexSelectedRow + (isRowAbove ? 0 : 1), onComponentAdded);
                     this.size.height(this.size.height() + selectedRowHeight);
                 };
                 TableControlViewModel.prototype.removeChild = function (selectedRow) {
@@ -25586,10 +25736,10 @@ var DevExpress;
                         this.parentModel().removeChild(this);
                     }
                 };
-                TableControlViewModel.prototype.insertColumn = function (selectedCell, isRight) {
+                TableControlViewModel.prototype.insertColumn = function (selectedCell, isRight, onComponentAdded) {
                     var selectedCellX = selectedCell.surface.rect().left, selectedCellRight = selectedCell.surface.rect().left + selectedCell.surface.rect().width, adjacentCells = this._getAdjacentCells(function (cell) { return isRight ? ((cell.surface.rect().left + cell.surface.rect().width) === selectedCellRight) : (cell.surface.rect().left === selectedCellX); });
                     adjacentCells.forEach(function (cell) {
-                        cell.parentModel().insertCellCopy(cell, isRight);
+                        cell.parentModel().insertCellCopy(cell, isRight, onComponentAdded);
                     });
                 };
                 return TableControlViewModel;
@@ -25673,7 +25823,7 @@ var DevExpress;
                         table.size.width(table.size.width() + deltaWidth);
                     }
                 };
-                TableRowViewModel.prototype.addChild = function (control, position) {
+                TableRowViewModel.prototype.addChild = function (control, position, onComponentAdded) {
                     if (control instanceof TableCellViewModel) {
                         if (this.cells().indexOf(control) === -1) {
                             control.parentModel(this);
@@ -25683,15 +25833,17 @@ var DevExpress;
                             else {
                                 this.cells.push(control);
                             }
+                            if ($.isFunction(onComponentAdded))
+                                onComponentAdded({ parent: this, model: control });
                         }
                     }
                     else {
                         throw new Error("Trying to add non a cell to the table row.");
                     }
                 };
-                TableRowViewModel.prototype.insertCellCopy = function (selectedCell, isRight) {
+                TableRowViewModel.prototype.insertCellCopy = function (selectedCell, isRight, onComponentAdded) {
                     var newCellWeight = selectedCell.weight() / 2, newCell = new TableCellViewModel({ "@ControlType": "XRTableCell", "@Weight": newCellWeight, "@Padding": selectedCell.padding(), "@Multiline": "true" }, this), indexSelectedCell = this.cells.indexOf(selectedCell);
-                    this.addChild(newCell, indexSelectedCell + (isRight ? 1 : 0));
+                    this.addChild(newCell, indexSelectedCell + (isRight ? 1 : 0), onComponentAdded);
                     if (newCell["text"]) {
                         newCell["text"](newCell.name());
                     }
@@ -26082,7 +26234,7 @@ var DevExpress;
             Report.TableCellSurface = TableCellSurface;
             var TableRowActions = (function (_super) {
                 __extends(TableRowActions, _super);
-                function TableRowActions(selection) {
+                function TableRowActions(selection, onComponentAdded) {
                     var _this = this;
                     _super.call(this);
                     this.selection = selection;
@@ -26104,6 +26256,7 @@ var DevExpress;
                             clickAction: function () { _this.deleteRow(); },
                         }
                     ]);
+                    this.onComponentAdded = function (e) { onComponentAdded && onComponentAdded(e); };
                 }
                 Object.defineProperty(TableRowActions.prototype, "_row", {
                     get: function () {
@@ -26120,10 +26273,10 @@ var DevExpress;
                     configurable: true
                 });
                 TableRowActions.prototype.insertRowAbove = function () {
-                    this._table.insertRow(this._row, true);
+                    this._table.insertRow(this._row, true, this.onComponentAdded);
                 };
                 TableRowActions.prototype.insertRowBelow = function () {
-                    this._table.insertRow(this._row, false);
+                    this._table.insertRow(this._row, false, this.onComponentAdded);
                 };
                 TableRowActions.prototype.deleteRow = function () {
                     Designer.deleteSelection(this.selection);
@@ -26136,7 +26289,7 @@ var DevExpress;
             Report.TableRowActions = TableRowActions;
             var TableCellActions = (function (_super) {
                 __extends(TableCellActions, _super);
-                function TableCellActions(selection) {
+                function TableCellActions(selection, onComponentAdded) {
                     var _this = this;
                     _super.call(this, selection);
                     _super.prototype.initActions.call(this, [
@@ -26182,6 +26335,7 @@ var DevExpress;
                             clickAction: function () { _this.deleteColumn(); },
                         }
                     ]);
+                    this.onComponentAdded = function (e) { onComponentAdded && onComponentAdded(e); };
                 }
                 Object.defineProperty(TableCellActions.prototype, "_cell", {
                     get: function () {
@@ -26213,7 +26367,7 @@ var DevExpress;
                     configurable: true
                 });
                 TableCellActions.prototype.insertCell = function () {
-                    this._row.insertCellCopy(this._cell, false);
+                    this._row.insertCellCopy(this._cell, false, this.onComponentAdded);
                 };
                 TableCellActions.prototype.deleteCell = function () {
                     Designer.deleteSelection(this.selection);
@@ -26223,7 +26377,7 @@ var DevExpress;
                     Designer.deleteSelection(this.selection);
                 };
                 TableCellActions.prototype.insertColumn = function (isRight) {
-                    this._table.insertColumn(this._cell, isRight);
+                    this._table.insertColumn(this._cell, isRight, this.onComponentAdded);
                 };
                 TableCellActions.prototype.deleteColumn = function () {
                     this._cellSurface.selectColumn(this.selection);
@@ -29480,12 +29634,19 @@ var DevExpress;
                     return allControls;
                 }).extend({ throttle: 1 });
             }
-            Report.reportCopyPasteStrategy = {
+            Report.reportCopyPasteStrategy = function (componentAdded) { return ({
                 createChild: function (pasteTarget, info) {
+                    var control = null;
+                    var parent = pasteTarget;
                     if (info["@ControlType"] === "XRCrossBandBox" || info["@ControlType"] === "XRCrossBandLine") {
-                        return pasteTarget.root.createChild(info);
+                        parent = pasteTarget.root;
+                        control = parent.createChild(info);
                     }
-                    return Designer.copyPasteStrategy.createChild(pasteTarget, info);
+                    else {
+                        control = Designer.copyPasteStrategy.createChild(parent, info);
+                    }
+                    componentAdded && componentAdded({ parent: parent, model: control });
+                    return control;
                 },
                 calculateDelta: function (selection, pasteTargetSurface, minPoint) {
                     var result = Designer.copyPasteStrategy.calculateDelta(selection, pasteTargetSurface, minPoint);
@@ -29494,7 +29655,7 @@ var DevExpress;
                     }
                     return result;
                 }
-            };
+            }); };
             function correctModel(model) {
                 if (Array.isArray(model)) {
                     for (var i = 0; i < model.length; i++) {
@@ -29853,7 +30014,7 @@ var DevExpress;
                         this.LabelProductId = reportWizardModel.labelDetails.productId;
                         this.LabelProductDetailId = reportWizardModel.labelDetails.id;
                     }
-                    else if (reportWizardModel.reportType === DevExpress.Designer.Report.Wizard.ReportType.Datatbound) {
+                    else if (reportWizardModel.reportType === DevExpress.Designer.Report.Wizard.ReportType.Databound) {
                         this.AdjustFieldWidth = reportWizardModel.fitFieldsToPage;
                         if (reportWizardModel.fields().length) {
                             this.Columns = reportWizardModel.fields().map(function (value) { return value.name; });
@@ -30292,7 +30453,7 @@ var DevExpress;
                     init(newModel);
                 });
                 designerModel.navigateByReports = navigation;
-                designerModel.contextActionProviders.push(new ReportElementActions(surface, designerModel.selection), new Report.ElementsGroupActions(surface, designerModel.selection), new Report.ReportActions(), new Report.TableRowActions(designerModel.selection), new Report.TableCellActions(designerModel.selection), new Report.TextElementAction(designerModel.selection), new Report.TableCellGroupActions(designerModel.selection), new Report.PivotGridActions());
+                designerModel.contextActionProviders.push(new ReportElementActions(surface, designerModel.selection), new Report.ElementsGroupActions(surface, designerModel.selection), new Report.ReportActions(designerCallbacks.componentAdded), new Report.TableRowActions(designerModel.selection, designerCallbacks.componentAdded), new Report.TableCellActions(designerModel.selection, designerCallbacks.componentAdded), new Report.TextElementAction(designerModel.selection), new Report.TableCellGroupActions(designerModel.selection), new Report.PivotGridActions());
                 designerModel.calculatedFieldsSource = calculatedFieldsSource;
                 designerModel.parameters = parameters;
                 var popoverVisible = ko.observable(false), fieldListModel = {
@@ -30445,7 +30606,7 @@ var DevExpress;
                     return isDesignMode && !isWizardVisible && !isSqlDataSourceVisible && !isCompleteSqlDataSourceVisible && !isDataSourceWizardVisible;
                 });
                 designerModel.zoomStep = ko.observable(0.05);
-                var actions = new Designer.ActionLists(surface, designerModel.selection, designerModel.undoEngine, customizeDesignerActions(designerModel, designerCallbacks.customizeActions, designerCallbacks.exitDesigner, state, designerCallbacks), designerShortcutsEnabled, Report.reportCopyPasteStrategy, designerModel.zoomStep);
+                var actions = new Designer.ActionLists(surface, designerModel.selection, designerModel.undoEngine, customizeDesignerActions(designerModel, designerCallbacks.customizeActions, designerCallbacks.exitDesigner, state, designerCallbacks), designerShortcutsEnabled, Report.reportCopyPasteStrategy(designerCallbacks.componentAdded), designerModel.zoomStep);
                 designerModel.actionStorage = $.extend({}, createActionsStorage(actions.menuItems), createActionsStorage(actions.toolbarItems));
                 designerModel.actionLists = actions;
                 designerModel.fieldDragHandler = new Report.FieldListDragDropHandler(surface, designerModel.selection, designerModel.undoEngine, designerModel.snapHelper, designerModel.dragHelperContent, designerModel.fieldListDataSources, designerCallbacks.componentAdded);
@@ -31253,19 +31414,29 @@ var DevExpress;
                 JSReportDesignerBinding.prototype._getDesignerModelRequest = function (reportUrl) {
                     var self = this;
                     var requestOptions = this._options.requestOptions;
+                    self._callbacks = this._initializeCallbacks();
                     var getDesignerModelActionUrl = this._getServerActionUrl(requestOptions.host, requestOptions.getDesignerModelAction);
+                    var onError = function (data, textStatus, jqXHR, getRequestDetails) {
+                        if (!self._callbacks || !self._callbacks.designer || !self._callbacks.designer.onServerError)
+                            return;
+                        self._callbacks.designer.onServerError({ jqXHR: jqXHR, textStatus: textStatus, data: data, getRequestDetails: getRequestDetails });
+                    };
                     DevExpress.Analytics.Utils.ajaxSetup.sendRequest({
                         url: getDesignerModelActionUrl,
                         type: "POST",
                         data: {
                             reportUrl: reportUrl
                         }
-                    }).done(function (result) {
+                    }).done(function (result, textStatus, jqXHR) {
+                        if (result.error) {
+                            return onError(result, textStatus, jqXHR, function () { return ({ url: getDesignerModelActionUrl, data: { reportUrl: reportUrl } }); });
+                        }
                         result.handlerUri = self._getServerActionUrl(requestOptions.host, result.handlerUri);
                         result.viewerHandlerUri = self._getServerActionUrl(requestOptions.host, result.viewerHandlerUri);
                         result.queryBuilderHandlerUri = self._getServerActionUrl(requestOptions.host, result.queryBuilderHandlerUri);
                         self._initializationData(result);
                     }).fail(function (jqXHR, textStatus, errorThrown) {
+                        onError({ error: errorThrown }, textStatus, jqXHR, function () { return ({ url: getDesignerModelActionUrl, data: { reportUrl: reportUrl } }); });
                         if (errorThrown)
                             throw errorThrown;
                     });
@@ -32053,7 +32224,7 @@ var DevExpress;
                         this._dataSource = null;
                         this._groups = [];
                         this._reportTree = [];
-                        this.reportType = Wizard.ReportType.Datatbound;
+                        this.reportType = Wizard.ReportType.Databound;
                         this.dataMemberPath = ko.observable(null);
                         this.dataMember = ko.observable(null);
                         this.fields = ko.observableArray([]);
@@ -32384,10 +32555,11 @@ var DevExpress;
             (function (Wizard) {
                 (function (ReportType) {
                     ReportType[ReportType["Empty"] = 2] = "Empty";
-                    ReportType[ReportType["Datatbound"] = 0] = "Datatbound";
+                    ReportType[ReportType["Databound"] = 0] = "Databound";
                     ReportType[ReportType["Label"] = 1] = "Label";
                 })(Wizard.ReportType || (Wizard.ReportType = {}));
                 var ReportType = Wizard.ReportType;
+                ReportType["Datatbound"] = 0;
                 var ReportTypeItem = (function () {
                     function ReportTypeItem(textDefault, textID, imageClassName, reportType) {
                         this.imageClassName = imageClassName;
@@ -32419,13 +32591,13 @@ var DevExpress;
                         });
                         this.reportTypeItems = [
                             new ReportTypeItem("Empty Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_EmptyReport", "emptyReport", ReportType.Empty),
-                            new ReportTypeItem("Data-bound Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_DataBoundReport", "databoundReport", ReportType.Datatbound),
+                            new ReportTypeItem("Data-bound Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_DataBoundReport", "databoundReport", ReportType.Databound),
                             new ReportTypeItem("Label Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_LabelReport", "labelReport", ReportType.Label)
                         ];
                         this.actionPrevious.isVisible(false);
                     }
                     ChooseReportTypePage.prototype._begin = function (data) {
-                        var reportType = data.reportType || ReportType.Datatbound;
+                        var reportType = data.reportType || ReportType.Databound;
                         this.selectedItem(Designer.findFirstItemMatchesCondition(this.reportTypeItems, function (item) { return item.reportType === reportType; }));
                     };
                     ChooseReportTypePage.prototype.commit = function (data) {

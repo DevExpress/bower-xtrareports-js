@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1341,8 +1341,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.5
-* Build date: 2018-07-30
+* Version: 18.1.6
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1371,7 +1371,7 @@
 </script>
 
 <script type="text/html" id="dxrp-editing-field-text">
-    <textarea class="dxrp-editing-field-text" data-bind="value: value, style: textStyle(), event: { blur: hideEditor }"></textarea>
+    <textarea class="dxrp-editing-field-text" data-bind="value: value, valueUpdate: 'keypress', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>
 </script>
 
 <script type="text/html" id="dxrp-editing-field-mask">
@@ -1418,7 +1418,7 @@
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: active() && !field.readOnly() -->
-        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field.editValue, style: textStyle(), event: { blur: hideEditor }"></textarea>
+        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: 'keypress', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>
         <!--/ko-->
     </div>
 </script>
@@ -1816,7 +1816,7 @@
                 <!-- /ko -->
             </div>
             <!-- /ko -->
-            <!-- ko if: showMultipagePreview() -->
+            <!-- ko if: showMultipagePreview() && !!currentPage() -->
             <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">
                 <!-- ko foreach: pages -->
                 <!-- ko lazy: { if: pageLoading() || (!pageLoading() && displayImageSrc()) } -->
