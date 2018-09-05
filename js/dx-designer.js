@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 17.2.9
-* Build date: 2018-07-09
+* Version: 17.2.10
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -12647,22 +12647,31 @@ var DevExpress;
                             }
                         };
                         session.setMode(languageMode);
-                        if (additionalOptions && additionalOptions.onChange) {
-                            var timer = null;
-                            session.on("change", function (e) {
-                                if (timer !== null)
-                                    clearTimeout(timer);
-                                timer = setTimeout(function () {
-                                    additionalOptions.onChange(session);
-                                }, additionalOptions && additionalOptions.validationTimeout || 1000);
-                            });
+                        var onBlur = function () { editor.completer && editor.completer.popup.hide(); }, onChange, onFocus;
+                        if (additionalOptions) {
+                            if (additionalOptions.onChange) {
+                                var timer = null;
+                                onChange = function (e) {
+                                    if (timer !== null)
+                                        clearTimeout(timer);
+                                    timer = setTimeout(function () {
+                                        additionalOptions.onChange(session);
+                                    }, additionalOptions && additionalOptions.validationTimeout || 1000);
+                                };
+                                session.on("change", onChange);
+                            }
+                            if (additionalOptions.onFocus) {
+                                onFocus = function () { additionalOptions.onFocus(session); };
+                                editor.on("focus", onFocus);
+                            }
+                            if (additionalOptions.onBlur) {
+                                onBlur = function () {
+                                    editor.completer && editor.completer.popup.hide();
+                                    return additionalOptions.onBlur(session);
+                                };
+                            }
                         }
-                        if (additionalOptions && additionalOptions.onFocus) {
-                            editor.onFocus = function (_) { return additionalOptions.onFocus(); };
-                        }
-                        if (additionalOptions && additionalOptions.onBlur) {
-                            editor.onBlur = function (_) { return additionalOptions.onBlur(); };
-                        }
+                        editor.on("blur", onBlur);
                         var completers = viewModel.languageHelper.createCompleters(editor, bindingContext, viewModel);
                         langTools.setCompleters(completers);
                         editor.setOptions(values.options);
@@ -12695,6 +12704,9 @@ var DevExpress;
                             if (values.callbacks)
                                 values.callbacks.focus = $.noop;
                             completers.forEach(function (x) { return x.dispose && x.dispose(); });
+                            onBlur && editor.off("blur", onBlur);
+                            onFocus && editor.off("focus", onFocus);
+                            onChange && session.off("change", onChange);
                         });
                     }
                     if (ko.isObservable(editorContainer)) {

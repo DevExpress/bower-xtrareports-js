@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 17.2.9
-* Build date: 2018-07-09
+* Version: 17.2.10
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2972,7 +2972,7 @@ var DevExpress;
                 ReportPreview.prototype._safelyRunWindowOpen = function (url, target) {
                     if (target === void 0) { target = "_blank"; }
                     var newWindow = window.open(url, target);
-                    target === "_blank" && newWindow && (newWindow.opener = null);
+                    target === "_blank" && newWindow && (newWindow.opener = newWindow);
                     return newWindow;
                 };
                 ReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
@@ -5101,6 +5101,7 @@ var DevExpress;
                     var options = {
                         onUpdated: function (e) { _this.setScrollReached(e); },
                         direction: 'both',
+                        pushBackValue: 0,
                         bounceEnabled: false
                     };
                     return options;

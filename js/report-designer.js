@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 17.2.9
-* Build date: 2018-07-09
+* Version: 17.2.10
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1887,7 +1887,7 @@ var DevExpress;
                             inProcess = false;
                         }
                     }));
-                    this.groupFilterString = new DevExpress.JS.Widgets.FilterStringOptions(this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.isAggregatedExpression) && (_this.groupFilterString && _this.groupFilterString.value().length === 0); }));
+                    this.groupFilterString = new DevExpress.JS.Widgets.FilterStringOptions(this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.isAggregatedExpression) && (_this.groupFilterString && (_this.groupFilterString.value() || '').length === 0); }));
                     this._initializeFilterStringHelper(this.groupFilterString.helper, this.parameters, parametersEditingEnabled, new QueryBuilder.GroupFilterEditorSerializer(this.columns));
                     var _pageWidth = ko.observable(0);
                     this.pageWidth = ko.pureComputed({
@@ -3179,15 +3179,13 @@ var DevExpress;
                         this._selectStatementCallback = _selectStatementCallback;
                         this._connection = _connection;
                     }
-                    SelectQuerySqlTextProvider.prototype.getQuerySqlText = function (newQuery, isInProcess) {
-                        isInProcess && isInProcess(true);
+                    SelectQuerySqlTextProvider.prototype.getQuerySqlText = function (newQuery) {
                         var queryJSON = JSON.stringify({ "Query": new DevExpress.JS.Utils.ModelSerializer().serialize(newQuery) });
                         return this._selectStatementCallback(this._connection(), queryJSON)
                             .fail(function (data) {
                             var error = Designer.getErrorMessage(data);
                             Designer.ShowMessage("Unable to build a SQL string" + (error ? ": " + error : "."));
-                        })
-                            .always(function () { isInProcess && isInProcess(false); });
+                        });
                     };
                     return SelectQuerySqlTextProvider;
                 })();
@@ -3397,11 +3395,13 @@ var DevExpress;
                     SelectStatementQueryControl.prototype.setQuery = function (query, isInProcess) {
                         var _this = this;
                         if (this._query() !== query && query.type() === DevExpress.Data.SqlQueryType.tableQuery) {
-                            return this._sqlTextProvider.getQuerySqlText(query, isInProcess)
+                            isInProcess && isInProcess(true);
+                            return this._sqlTextProvider.getQuerySqlText(query)
                                 .done(function (response) {
                                 _this._tableQueryString(response.sqlSelectStatement);
                                 _this._query(query);
-                            });
+                            })
+                                .always(function () { isInProcess && isInProcess(false); });
                         }
                         else {
                             this._query(query);
@@ -5425,8 +5425,10 @@ var DevExpress;
                     };
                     MultiQueryConfigurePage.prototype.setTableQuery = function (query, isInProcess) {
                         var _this = this;
-                        return this._sqlTextProvider.getQuerySqlText(query, isInProcess)
-                            .done(function () { return _this._setQueryCore(query); });
+                        isInProcess && isInProcess(true);
+                        return this._sqlTextProvider.getQuerySqlText(query)
+                            .done(function () { return _this._setQueryCore(query); })
+                            .always(function () { isInProcess && isInProcess(false); });
                     };
                     MultiQueryConfigurePage.prototype.setCustomSqlQuery = function (query) {
                         this._setQueryCore(query);
@@ -6124,8 +6126,8 @@ var DevExpress;
 //# sourceMappingURL=dx-query-builder-core.js.map
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 17.2.9
-* Build date: 2018-07-09
+* Version: 17.2.10
+* Build date: 2018-09-03
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -6773,7 +6775,21 @@ var DevExpress;
         (function (Chart) {
             Chart.dimension = { propertyName: "dimension", modelName: "@Dimension", displayName: "Dimension", editor: DevExpress.JS.Widgets.editorTemplates.numeric }, Chart.equalPieSize = { propertyName: "equalPieSize", modelName: "@EqualPieSize", displayName: "EqualPieSize", editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool }, Chart.typeNameNotShowDiagram = { propertyName: "typeNameSerializable", modelName: "@TypeNameSerializable" };
             Chart.secondaryAxesX = { propertyName: "secondaryAxesX", modelName: "SecondaryAxesX", displayName: "Secondary Axes X", array: true, editor: Chart.editorTemplates.collection }, Chart.secondaryAxesY = { propertyName: "secondaryAxesY", modelName: "SecondaryAxesY", displayName: "Secondary Axes Y", array: true, editor: Chart.editorTemplates.collection }, Chart.panes = { propertyName: "panes", modelName: "Panes", displayName: "Additional Panes", array: true, editor: Chart.editorTemplates.collection };
-            Chart.diagramSerializationsInfo = [Chart.typeNameNotShowDiagram], Chart.radarSerializationsInfo = [Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.polarSerializationsInfo = [Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.simple3DSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.funnel3DSerializationsInfo = [].concat(Chart.simple3DSerializationsInfo), Chart.simpleSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.XY2DSerializationsInfo = [Chart.defaultPane, Chart.panes, Chart.axisX, Chart.axisY, Chart.secondaryAxesX, Chart.secondaryAxesY, Chart.margin, Chart.enableAxisXScrolling, Chart.enableAxisXZooming, Chart.enableAxisYScrolling, Chart.enableAxisYZooming, Chart.typeNameNotShowDiagram], Chart.XYSerializationsInfo = [Chart.rotated].concat(Chart.XY2DSerializationsInfo), Chart.XY3DSerializationsInfo = [Chart.axisX3D, Chart.axisY3D, Chart.backColor, Chart.typeNameNotShowDiagram], Chart.GanttDiagramSerializationsInfo = [].concat(Chart.XY2DSerializationsInfo);
+            Chart.drawingStyle = {
+                propertyName: "drawingStyle", modelName: "@DrawingStyle", displayName: "Drawing Style", localizationId: "DevExpress.XtraCharts.RadarDiagram.DrawingStyle", defaultVal: "Counterclockwise",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Counterclockwise", displayValue: "Counterclockwise", localizationId: "DevExpress.XtraCharts.RadarDiagramRotationDirection.Counterclockwise" },
+                    { value: "Clockwise", displayValue: "Clockwise", localizationId: "DevExpress.XtraCharts.RadarDiagramRotationDirection.Clockwise" }
+                ]
+            }, Chart.startAngleInDegrees = {
+                propertyName: "startAngleInDegrees", modelName: "@StartAngleInDegrees", displayName: "Start Angle in Degrees", localizationId: "DevExpress.XtraCharts.RadarDiagram.StartAngleInDegrees", editor: DevExpress.JS.Widgets.editorTemplates.numeric, defaultVal: 0 }, Chart.rotationDirection = {
+                propertyName: "rotationDirection", modelName: "@RotationDirection", displayName: "Rotation Direction", localizationId: "DevExpress.XtraCharts.RadarDiagram.RotationDirection", defaultVal: "Circle",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: [
+                    { value: "Circle", displayValue: "Circle", localizationId: "DevExpress.XtraCharts.RadarDiagramDrawingStyle.Circle" },
+                    { value: "Polygon", displayValue: "Polygon", localizationId: "DevExpress.XtraCharts.RadarDiagramDrawingStyle.Polygon" }
+                ]
+            };
+            Chart.diagramSerializationsInfo = [Chart.typeNameNotShowDiagram], Chart.radarSerializationsInfo = [Chart.drawingStyle, Chart.startAngleInDegrees, Chart.rotationDirection, Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.polarSerializationsInfo = [Chart.radarAxisX, Chart.radarAxisY, Chart.margin, Chart.backColor].concat(Chart.diagramSerializationsInfo), Chart.simple3DSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.funnel3DSerializationsInfo = [].concat(Chart.simple3DSerializationsInfo), Chart.simpleSerializationsInfo = [Chart.dimension, Chart.margin, Chart.equalPieSize].concat(Chart.diagramSerializationsInfo), Chart.XY2DSerializationsInfo = [Chart.defaultPane, Chart.panes, Chart.axisX, Chart.axisY, Chart.secondaryAxesX, Chart.secondaryAxesY, Chart.margin, Chart.enableAxisXScrolling, Chart.enableAxisXZooming, Chart.enableAxisYScrolling, Chart.enableAxisYZooming, Chart.typeNameNotShowDiagram], Chart.XYSerializationsInfo = [Chart.rotated].concat(Chart.XY2DSerializationsInfo), Chart.XY3DSerializationsInfo = [Chart.axisX3D, Chart.axisY3D, Chart.backColor, Chart.typeNameNotShowDiagram], Chart.GanttDiagramSerializationsInfo = [].concat(Chart.XY2DSerializationsInfo);
             var XYObject = { info: Chart.XYSerializationsInfo, type: "XYDiagram" }, XY2DObject = { info: Chart.XY2DSerializationsInfo, type: "SwiftPlotDiagram" }, XY3DObject = { info: Chart.XY3DSerializationsInfo, type: "XYDiagram3D" }, radarObject = { info: Chart.radarSerializationsInfo, type: "RadarDiagram" }, polarObject = { info: Chart.polarSerializationsInfo, type: "PolarDiagram" }, simpleObject = { info: Chart.simpleSerializationsInfo, type: "SimpleDiagram" }, simple3DObject = { info: Chart.simple3DSerializationsInfo, type: "SimpleDiagram3D" }, funnel3DObject = { info: Chart.funnel3DSerializationsInfo, type: "FunnelDiagram" }, gantObject = { info: Chart.GanttDiagramSerializationsInfo, type: "GanttDiagram" };
             Chart.diagramMapper = {
                 "SideBySideBarSeriesView": XYObject,
@@ -12195,7 +12211,7 @@ var DevExpress;
                 ReportPreview.prototype._safelyRunWindowOpen = function (url, target) {
                     if (target === void 0) { target = "_blank"; }
                     var newWindow = window.open(url, target);
-                    target === "_blank" && newWindow && (newWindow.opener = null);
+                    target === "_blank" && newWindow && (newWindow.opener = newWindow);
                     return newWindow;
                 };
                 ReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
@@ -14324,6 +14340,7 @@ var DevExpress;
                     var options = {
                         onUpdated: function (e) { _this.setScrollReached(e); },
                         direction: 'both',
+                        pushBackValue: 0,
                         bounceEnabled: false
                     };
                     return options;
@@ -18330,7 +18347,9 @@ var DevExpress;
                         return;
                     var expressionInfos = this.getInfo().filter(function (info) { return "expressionName" in info; });
                     expressionInfos.forEach(function (info) {
-                        _this[info.propertyName] = _this.expressionObj().getExpression(info["expressionName"], "BeforePrint");
+                        var expression = _this.expressionObj().getExpression(info["expressionName"], "BeforePrint");
+                        if (expression)
+                            _this[info.propertyName] = expression;
                     });
                 };
                 ReportElementViewModel.prototype.initBindings = function () {
@@ -20197,48 +20216,48 @@ var DevExpress;
                         TextAlignment: Report.textAlignmentValues,
                         Name: Object.keys(ko.unwrap(DevExpress.JS.Widgets.availableFonts))
                     };
-                    this._localizationIdDictionary = {
-                        Text: "DevExpress.XtraReports.UI.XRControl.Text",
-                        Visible: "DevExpress.XtraReports.UI.XRControl.Visible",
-                        NavigateUrl: "DevExpress.XtraReports.UI.XRControl.NavigateUrl",
-                        Bookmark: "DevExpress.XtraReports.UI.XRControl.Bookmark",
-                        Tag: "DevExpress.XtraReports.UI.XRControl.Tag",
-                        LeftF: "DevExpress.XtraReports.UI.XRControl.Left",
-                        TopF: "DevExpress.XtraReports.UI.XRControl.Top",
-                        WidthF: "DevExpress.XtraReports.UI.XRControl.Width",
-                        HeightF: "DevExpress.XtraReports.UI.XRControl.Height",
-                        StyleName: "DevExpress.XtraReports.UI.XRControl.StyleName",
-                        ForeColor: "DevExpress.XtraReports.UI.XRControl.ForeColor",
-                        BackColor: "DevExpress.XtraReports.UI.XRControl.BackColor",
-                        BorderColor: "DevExpress.XtraReports.UI.XRControl.BorderColor",
-                        Borders: "DevExpress.XtraReports.UI.XRControl.Borders",
-                        BorderWidth: "DevExpress.XtraReports.UI.XRControl.BorderWidth",
-                        BorderDashStyle: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle",
-                        TextAlignment: "DevExpress.XtraReports.UI.XRControl.TextAlignment",
-                        Font: "DevExpress.XtraReports.UI.XRControl.Font",
-                        Padding: "DevExpress.XtraReports.UI.XRControl.Padding",
-                        Appearance: "ReportStringId.CatAppearance",
-                        Layout: "ReportStringId.CatLayout",
-                        Name: "ReportStringId.UD_TTip_FormatFontName",
-                        Size: "System.Drawing.Font.Size",
-                        Italic: "System.Drawing.Font.Italic",
-                        Strikeout: "System.Drawing.Font.Strikeout",
-                        Bold: "System.Drawing.Font.Bold",
-                        Underline: "System.Drawing.Font.Underline",
-                        Left: "DevExpress.XtraPrinting.PaddingInfo.Left",
-                        Right: "DevExpress.XtraPrinting.PaddingInfo.Right",
-                        Top: "DevExpress.XtraPrinting.PaddingInfo.Top",
-                        Bottom: "DevExpress.XtraPrinting.PaddingInfo.Bottom",
-                        CheckState: "DevExpress.XtraReports.UI.XRCheckBox.CheckState",
-                        Image: "DevExpress.XtraReports.UI.XRPictureBox.Image",
-                        ImageUrl: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl",
-                        BinaryData: "DevExpress.XtraReports.UI.XRBarCode.BinaryData",
-                        TargetValue: "DevExpress.XtraReports.UI.XRGauge.TargetValue",
-                        ActualValue: "DevExpress.XtraReports.UI.XRGauge.ActualValue",
-                        PrintOnPage: "DevExpress.XtraReports.UI.XRControlEvents.OnPrintOnPage",
-                        BeforePrint: "DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint",
-                        Minimum: "DevExpress.XtraReports.UI.XRGauge.Minimum",
-                        Maximum: "DevExpress.XtraReports.UI.XRGauge.Maximum"
+                    this._displayNameDictionary = {
+                        Text: { localizationId: "DevExpress.XtraReports.UI.XRControl.Text", displayName: "Text" },
+                        Visible: { localizationId: "DevExpress.XtraReports.UI.XRControl.Visible", displayName: "Visible" },
+                        NavigateUrl: { localizationId: "DevExpress.XtraReports.UI.XRControl.NavigateUrl", displayName: "Navigate Url" },
+                        Bookmark: { localizationId: "DevExpress.XtraReports.UI.XRControl.Bookmark", displayName: "Bookmark" },
+                        Tag: { localizationId: "DevExpress.XtraReports.UI.XRControl.Tag", displayName: "Tag" },
+                        LeftF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Left", displayName: "Left" },
+                        TopF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Top", displayName: "Top" },
+                        WidthF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Width", displayName: "Width" },
+                        HeightF: { localizationId: "DevExpress.XtraReports.UI.XRControl.Height", displayName: "Height" },
+                        StyleName: { localizationId: "DevExpress.XtraReports.UI.XRControl.StyleName", displayName: "Style Name" },
+                        ForeColor: { localizationId: "DevExpress.XtraReports.UI.XRControl.ForeColor", displayName: "Foreground Color" },
+                        BackColor: { localizationId: "DevExpress.XtraReports.UI.XRControl.BackColor", displayName: "Background Color" },
+                        BorderColor: { localizationId: "DevExpress.XtraReports.UI.XRControl.BorderColor", displayName: "Border Color" },
+                        Borders: { localizationId: "DevExpress.XtraReports.UI.XRControl.Borders", displayName: "Borders" },
+                        BorderWidth: { localizationId: "DevExpress.XtraReports.UI.XRControl.BorderWidth", displayName: "Border Width" },
+                        BorderDashStyle: { localizationId: "DevExpress.XtraReports.UI.XRControl.BorderDashStyle", displayName: "Border Dash Style" },
+                        TextAlignment: { localizationId: "DevExpress.XtraReports.UI.XRControl.TextAlignment", displayName: "Text Alignment" },
+                        Font: { localizationId: "DevExpress.XtraReports.UI.XRControl.Font", displayName: "Font" },
+                        Padding: { localizationId: "DevExpress.XtraReports.UI.XRControl.Padding", displayName: "Padding" },
+                        Appearance: { localizationId: "ReportStringId.CatAppearance", displayName: "Appearance" },
+                        Layout: { localizationId: "ReportStringId.CatLayout", displayName: "Layout" },
+                        Name: { localizationId: "ReportStringId.UD_TTip_FormatFontName", displayName: "Name" },
+                        Size: { localizationId: "System.Drawing.Font.Size", displayName: "Size" },
+                        Italic: { localizationId: "System.Drawing.Font.Italic", displayName: "Italic" },
+                        Strikeout: { localizationId: "System.Drawing.Font.Strikeout", displayName: "Strikeout" },
+                        Bold: { localizationId: "System.Drawing.Font.Bold", displayName: "Bold" },
+                        Underline: { localizationId: "System.Drawing.Font.Underline", displayName: "Underline" },
+                        Left: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Left", displayName: "Left" },
+                        Right: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Right", displayName: "Right" },
+                        Top: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Top", displayName: "Top" },
+                        Bottom: { localizationId: "DevExpress.XtraPrinting.PaddingInfo.Bottom", displayName: "Bottom" },
+                        CheckState: { localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState", displayName: "Check State" },
+                        Image: { localizationId: "DevExpress.XtraReports.UI.XRPictureBox.Image", displayName: "Image" },
+                        ImageUrl: { localizationId: "DevExpress.XtraReports.UI.XRPictureBox.ImageUrl", displayName: "Image Url" },
+                        BinaryData: { localizationId: "DevExpress.XtraReports.UI.XRBarCode.BinaryData", displayName: "Binary Data" },
+                        TargetValue: { localizationId: "DevExpress.XtraReports.UI.XRGauge.TargetValue", displayName: "Target Value" },
+                        ActualValue: { localizationId: "DevExpress.XtraReports.UI.XRGauge.ActualValue", displayName: "Actual Value" },
+                        PrintOnPage: { localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnPrintOnPage", displayName: "PrintOnPage" },
+                        BeforePrint: { localizationId: "DevExpress.XtraReports.UI.XRControlEvents.OnBeforePrint", displayName: "BeforePrint" },
+                        Minimum: { localizationId: "DevExpress.XtraReports.UI.XRGauge.Minimum", displayName: "Minimum" },
+                        Maximum: { localizationId: "DevExpress.XtraReports.UI.XRGauge.Maximum", displayName: "Maximum" }
                     };
                     this._expressionsInfo = {};
                     this._expressionsSerializationInfoCache = {};
@@ -20258,8 +20277,10 @@ var DevExpress;
                         displayName: propertyName,
                         editor: Report.editorTemplates.reportexpression
                     };
-                    if (this._localizationIdDictionary[propertyName])
-                        result.localizationId = this._localizationIdDictionary[propertyName];
+                    if (this._displayNameDictionary[propertyName]) {
+                        result.localizationId = this._displayNameDictionary[propertyName].localizationId;
+                        result.displayName = this._displayNameDictionary[propertyName].displayName;
+                    }
                     if (this._valuesDictionary[propertyName]) {
                         result.valuesArray = this._valuesDictionary[propertyName];
                     }
@@ -20451,8 +20472,11 @@ var DevExpress;
                     var object = ko.observable(result.stateObj);
                     return object;
                 };
-                ExpressionWrapper.prototype.setLocalizationId = function (propertyName, localizationId) {
-                    this._localizationIdDictionary[propertyName] = localizationId;
+                ExpressionWrapper.prototype.setLocalizationId = function (propertyName, localizationId, displayName) {
+                    this._displayNameDictionary[propertyName] = {
+                        localizationId: localizationId,
+                        displayName: displayName || propertyName
+                    };
                 };
                 ExpressionWrapper.prototype.setValues = function (propertyName, values) {
                     this._valuesDictionary[propertyName] = values;
@@ -20660,8 +20684,8 @@ var DevExpress;
                     this._disposables.push(this.paperKind.subscribe(function (newVal) {
                         if (newVal !== "Custom") {
                             var size = Designer.papperKindMapper[newVal];
-                            _this.pageHeight(Math.round(size.height * (_this._innerDpi.peek() / 100) * 100) / 100);
-                            _this.pageWidth(Math.round(size.width * (_this._innerDpi.peek() / 100) * 100) / 100);
+                            _this.pageHeight(Math.round((_this.landscape() ? size.width : size.height) * (_this._innerDpi.peek() / 100) * 100) / 100);
+                            _this.pageWidth(Math.round((_this.landscape() ? size.height : size.width) * (_this._innerDpi.peek() / 100) * 100) / 100);
                         }
                     }));
                     var filterString = new DevExpress.JS.Widgets.FilterStringOptions(this["_filterString"], ko.pureComputed(function () {
@@ -25614,13 +25638,9 @@ var DevExpress;
                     this.selectiontemplate = "dxrd-subreport-selection";
                     this.displayText = function () { return control.name(); };
                 }
-                SubreportSurface.prototype.isThereIntersectionWithCrossBandControls = function () { return false; };
-                SubreportSurface.prototype.isThereIntersectionWithControls = function () { return false; };
-                Object.defineProperty(SubreportSurface.prototype, "isIntersectionDeny", {
-                    get: function () { return true; },
-                    enumerable: true,
-                    configurable: true
-                });
+                SubreportSurface.prototype.getAdornTemplate = function () {
+                    return this.isIntersect() ? "dxrd-intersect" : "";
+                };
                 return SubreportSurface;
             })(Report.ControlSurface);
             Report.SubreportSurface = SubreportSurface;
