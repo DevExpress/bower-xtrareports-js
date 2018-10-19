@@ -1,7 +1,7 @@
 /**
-* DevExpress HTML/JS Analytics Core (dx-designer.js)
-* Version: 18.1.6
-* Build date: 2018-09-03
+* DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
+* Version: 18.2.1-pre-18207
+* Build date: 2018-10-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -30,6 +30,42 @@ var DevExpress;
     (function (Analytics) {
         var Utils;
         (function (Utils) {
+            var Disposable = (function () {
+                function Disposable() {
+                    this._disposables = [];
+                    this.isDisposing = false;
+                }
+                Disposable.prototype.disposeObservableArray = function (array) {
+                    if (array) {
+                        array().forEach(function (item) { item.dispose && item.dispose(); });
+                    }
+                };
+                Disposable.prototype.resetObservableArray = function (array) {
+                    if (array)
+                        array([]);
+                };
+                Disposable.prototype.disposeArray = function (array) {
+                    if (array) {
+                        array.forEach(function (item) { item.dispose && item.dispose(); });
+                        array.splice(0, array.length);
+                    }
+                };
+                Disposable.prototype.dispose = function () {
+                    if (!this.isDisposing) {
+                        this.isDisposing = true;
+                        this._disposables.reverse().forEach(function (x) { return x && x.dispose && x.dispose(); });
+                        this._disposables = [];
+                    }
+                };
+                Disposable.prototype.removeProperties = function () {
+                    var _this = this;
+                    Object.keys(this).forEach(function (propertyName) {
+                        delete _this[propertyName];
+                    });
+                };
+                return Disposable;
+            })();
+            Utils.Disposable = Disposable;
             function deserializeArray(model, creator) {
                 var result = [];
                 getPropertyValues(model).forEach(function (item) {
@@ -295,6 +331,8 @@ var DevExpress;
                         return {};
                     serializationsInfo.forEach(function (modelPropertyInfo) {
                         var propertyName = modelPropertyInfo.propertyName, value = ko.unwrap(viewModel["_" + propertyName] || viewModel[propertyName]), defaultVal = modelPropertyInfo.defaultVal;
+                        if (modelPropertyInfo.beforeSerialize)
+                            value = modelPropertyInfo.beforeSerialize(value);
                         if (!!modelPropertyInfo.from) {
                             defaultVal = ko.unwrap(modelPropertyInfo.from(defaultVal, _this));
                         }
@@ -592,6 +630,11 @@ var DevExpress;
 /// <reference path="editorsInfo.ts" />
 /// <reference path="../utils.ts" />
 ///<reference path="../Localization/localization.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -599,31 +642,34 @@ var DevExpress;
         var Widgets;
         (function (Widgets) {
             Widgets.propertiesGridEditorsPaddingLeft = 19;
-            var Editor = (function () {
+            var Editor = (function (_super) {
+                __extends(Editor, _super);
                 function Editor(modelPropertyInfo, level, parentDisabled, textToSearch) {
                     var _this = this;
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
                     if (textToSearch === void 0) { textToSearch = undefined; }
+                    _super.call(this);
                     this._model = ko.observable();
                     this.isVisibleByContent = ko.observable(true);
                     this.isSearchedProperty = ko.observable(true);
                     this.isParentSearched = ko.observable(false);
                     this.rtl = DevExpress["config"]()["rtlEnabled"];
+                    this._cachedValue = undefined;
                     this.isEditorSelected = ko.observable(false);
                     this.isPropertyModified = ko.computed(function () {
                         return _this._model() && _this._model().isPropertyModified && _this._model().isPropertyModified(_this.name);
                     });
                     this.collapsed = ko.observable(true);
                     this.info = ko.observable(modelPropertyInfo);
-                    this.displayName = ko.computed(function () {
+                    this._disposables.push(this.displayName = ko.computed(function () {
                         var info = _this.info();
                         return info && DevExpress.Analytics.getLocalization(info.displayName, info["localizationId"]);
-                    });
+                    }));
                     if (textToSearch) {
                         this.textToSearch = textToSearch;
-                        this.isSearchedProperty = ko.computed(function () {
+                        this._disposables.push(this.isSearchedProperty = ko.computed(function () {
                             return _this.isParentSearched() || !!Analytics.Utils.findMatchesInString(_this.displayName(), textToSearch());
-                        });
+                        }));
                     }
                     this.padding = this._setPadding(this.rtl ? "right" : "left", level * Widgets.propertiesGridEditorsPaddingLeft);
                     var defaultValue = ko.observable(null), propertyName = modelPropertyInfo.propertyName;
@@ -637,7 +683,7 @@ var DevExpress;
                     if (modelPropertyInfo.array) {
                         defaultValue = ko.observableArray();
                     }
-                    this.values = ko.computed(function () {
+                    this._disposables.push(this.values = ko.computed(function () {
                         var _values = _this.info().valueStore || _this.info().valuesArray;
                         if (_values) {
                             return _values;
@@ -648,7 +694,7 @@ var DevExpress;
                                 return { value: value, displayValue: displayValue };
                             });
                         }
-                    });
+                    }));
                     this.level = level;
                     this._init(modelPropertyInfo.editor, defaultValue, propertyName);
                     var calculateAccessibleByPropertyInfo = function (model, propertyInfo, defaultValue) {
@@ -664,25 +710,31 @@ var DevExpress;
                         }
                         return result;
                     };
-                    this.disabled = ko.computed(function () {
+                    this._disposables.push(this.disabled = ko.computed(function () {
                         var model = _this._model(), result = parentDisabled() || model && (model.isPropertyDisabled && model.isPropertyDisabled(_this.name));
                         if (!result) {
                             result = calculateAccessibleByPropertyInfo(model, _this.info().disabled, false);
                         }
                         return result;
-                    });
-                    this.visible = ko.computed(function () {
+                    }));
+                    this._disposables.push(this.visible = ko.computed(function () {
                         var model = _this._model(), result = _this.isSearchedProperty() && ((model && model.isPropertyVisible) ? model.isPropertyVisible(_this.name) : _this.isVisibleByContent());
                         if (result) {
                             result = calculateAccessibleByPropertyInfo(model, _this.info().visible, true);
                         }
                         return result;
-                    });
+                    }));
+                    this._disposables.push(this.isPropertyModified);
                 }
                 Editor.prototype._setPadding = function (position, value) {
                     var obj = {};
                     obj["padding-" + position] = value;
                     return obj;
+                };
+                Editor.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._cachedValue = null;
+                    this._model(null);
                 };
                 Editor.prototype._init = function (editorTemplate, value, name) {
                     var _this = this;
@@ -690,22 +742,22 @@ var DevExpress;
                     this.templateName = editorTemplate.header;
                     this.contentTemplateName = editorTemplate.content;
                     this.defaultValue = editorTemplate === Widgets.editorTemplates.color ? "transparent" : null;
-                    var cachedValue = undefined;
-                    this.value = ko.computed({
+                    this._cachedValue = undefined;
+                    this._disposables.push(this.value = ko.computed({
                         read: function () {
                             var model = _this._model();
-                            if (!model && cachedValue) {
-                                return cachedValue;
+                            if (!model && _this._cachedValue) {
+                                return _this._cachedValue;
                             }
                             var modelValue = model && model[name] !== undefined ? model[name] : value;
                             if (ko.isObservable(modelValue) && !modelValue["push"]) {
                                 var hasValueInModel = modelValue() !== undefined && modelValue() !== null;
-                                cachedValue = hasValueInModel ? modelValue() : _this.defaultValue;
-                                return cachedValue;
+                                _this._cachedValue = hasValueInModel ? modelValue() : _this.defaultValue;
+                                return _this._cachedValue;
                             }
                             else {
-                                cachedValue = modelValue;
-                                return cachedValue;
+                                _this._cachedValue = modelValue;
+                                return _this._cachedValue;
                             }
                         },
                         write: function (val) {
@@ -724,7 +776,7 @@ var DevExpress;
                                 model[name] = val;
                             }
                         }
-                    });
+                    }));
                     this.name = name;
                     this.editorTemplate = editorTemplate && editorTemplate.custom || 'dx-property-editor';
                 };
@@ -778,7 +830,7 @@ var DevExpress;
                     configurable: true
                 });
                 return Editor;
-            })();
+            })(Analytics.Utils.Disposable);
             Widgets.Editor = Editor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -791,12 +843,14 @@ var DevExpress;
     (function (Analytics) {
         var Widgets;
         (function (Widgets) {
-            var ObjectProperties = (function () {
+            var ObjectProperties = (function (_super) {
+                __extends(ObjectProperties, _super);
                 function ObjectProperties(target, editorsInfo, level, parentDisabled, recreateEditors, textToSearch) {
                     var _this = this;
                     if (level === void 0) { level = 0; }
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
                     if (recreateEditors === void 0) { recreateEditors = false; }
+                    _super.call(this);
                     this._targetSubscription = null;
                     this._infoSubscription = null;
                     this._getInfoComputed = null;
@@ -806,9 +860,9 @@ var DevExpress;
                     this.level = level;
                     this._parentDisabled = parentDisabled;
                     this._textToSearch = textToSearch;
-                    this.visible = ko.computed(function () {
+                    this._disposables.push(this.visible = ko.computed(function () {
                         return _this._editors().some(function (editor) { return editor.visible(); });
-                    });
+                    }));
                     this._targetSubscription = target.subscribe(function (newVal) {
                         _this._infoSubscription && _this._infoSubscription.dispose();
                         _this._getInfoComputed && _this._getInfoComputed.dispose();
@@ -825,12 +879,19 @@ var DevExpress;
                 };
                 ObjectProperties.prototype._cleanEditorsSubscriptions = function () {
                     this._editors().forEach(function (editor) {
+                        editor.dispose();
                         for (var name in editor) {
                             if (ko.isComputed(editor[name])) {
                                 editor[name].dispose();
                             }
                         }
                     });
+                };
+                ObjectProperties.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.disposeObservableArray(this._editors);
+                    this.resetObservableArray(this._editors);
+                    this.cleanSubscriptions();
                 };
                 ObjectProperties.prototype.cleanSubscriptions = function () {
                     this._infoSubscription && this._infoSubscription.dispose();
@@ -868,16 +929,20 @@ var DevExpress;
                 };
                 ObjectProperties.prototype._update = function (target, editorsInfo, recreateEditors) {
                     var _this = this;
-                    if (recreateEditors)
-                        this._editors([]);
+                    if (recreateEditors) {
+                        this._cleanEditorsSubscriptions();
+                        this.resetObservableArray(this._editors);
+                    }
                     var infoSubscription = null;
                     this._getInfoComputed = ko.computed(function () {
                         return (editorsInfo && editorsInfo.editors && ko.unwrap(editorsInfo.editors))
                             || (target && target["getInfo"] && target["getInfo"]());
                     });
                     this._infoSubscription = this._getInfoComputed.subscribe(function (newInfo) {
-                        if (recreateEditors)
-                            _this._editors([]);
+                        if (recreateEditors) {
+                            _this._cleanEditorsSubscriptions();
+                            _this.resetObservableArray(_this._editors);
+                        }
                         _this._createEditors(newInfo);
                         _this.update(target);
                     });
@@ -888,7 +953,7 @@ var DevExpress;
                     return this._editors();
                 };
                 return ObjectProperties;
-            })();
+            })(Analytics.Utils.Disposable);
             Widgets.ObjectProperties = ObjectProperties;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -955,12 +1020,12 @@ var DevExpress;
             ko.bindingHandlers['dxPropertyGrid'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     $(element).children().remove();
-                    var templateHtml = $('#dx-propertieseditor').text(), $element = $(element).append(templateHtml);
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-propertieseditor'), $element = $(element).append(templateHtml);
                     var value = valueAccessor();
                     var model = new Widgets.ObjectProperties(value.target, value.editorsInfo, value.level, value.parentDisabled, value.recreateEditors, value.textToSearch);
                     ko.applyBindings(bindingContext.createChildContext(model), $element.children()[0]);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        model.cleanSubscriptions();
+                        model.dispose();
                     });
                     return { controlsDescendantBindings: true };
                 }
@@ -968,7 +1033,7 @@ var DevExpress;
             ko.virtualElements.allowedBindings["lazy"] = true;
             ko.bindingHandlers['lazy'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var resolver = DevExpress.Analytics.Internal.globalResolver;
+                    var resolver = Analytics.Internal.globalResolver;
                     var parsedBindings = valueAccessor();
                     if (parsedBindings.innerBindings) {
                         resolver = parsedBindings.resolver;
@@ -1126,9 +1191,11 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
-            var EditorAddOn = (function () {
+            var EditorAddOn = (function (_super) {
+                __extends(EditorAddOn, _super);
                 function EditorAddOn(editor, popupService) {
                     var _this = this;
+                    _super.call(this);
                     this.showPopup = function (args) {
                         _this._popupService.title(_this._editor.displayName());
                         _this._updateActions(_this._editor._model());
@@ -1138,16 +1205,16 @@ var DevExpress;
                     this.templateName = "dx-editor-addons";
                     this._editor = editor;
                     this._popupService = popupService;
-                    this.visible = ko["pureComputed"](function () {
+                    this._disposables.push(this.visible = ko["pureComputed"](function () {
                         if (editor.disabled()) {
                             return false;
                         }
                         var actions = editor._model() && editor._model().actions;
                         return actions && actions.length > 0 && actions.some(function (x) { return x.visible(editor.name); });
-                    });
-                    this.editorMenuButtonCss = ko["pureComputed"](function () {
+                    }));
+                    this._disposables.push(this.editorMenuButtonCss = ko["pureComputed"](function () {
                         return editor._model() && editor._model()["getActionClassName"] && editor._model()["getActionClassName"](editor.name) || "";
-                    });
+                    }));
                 }
                 EditorAddOn.prototype._updateActions = function (viewModel) {
                     var _this = this;
@@ -1168,38 +1235,42 @@ var DevExpress;
                     }
                 };
                 return EditorAddOn;
-            })();
+            })(Analytics.Utils.Disposable);
             Internal.EditorAddOn = EditorAddOn;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
 /// <reference path="editor.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
         var Widgets;
         (function (Widgets) {
-            function validateGuid(guid) {
-                return guid && (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(guid)
+            function RegexGuid(guid) {
+                return (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(guid)
                     || /^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$/.test(guid)
                     || /^\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$/.test(guid)
                     || /^[0-9a-fA-F]{32}$/.test(guid));
             }
+            function validateGuid(guid) {
+                return guid && RegexGuid(guid);
+            }
             Widgets.validateGuid = validateGuid;
-            Widgets.guidValidationRules = [{ type: "custom", validationCallback: function (options) { return validateGuid(options.value); }, message: DevExpress.Analytics.getLocalization('Guid is required and should have a valid format.', 'ASPxReportsStringId.ReportDesigner_GuidIsRequired_Error') }];
+            function validateNullableGuid(guid) {
+                return !guid || RegexGuid(guid);
+            }
+            Widgets.validateNullableGuid = validateNullableGuid;
+            var guidValidationMessage = DevExpress.Analytics.getLocalization('Guid is required and should have a valid format.', 'ASPxReportsStringId.ReportDesigner_GuidIsRequired_Error');
+            Widgets.guidValidationRules = [{ type: "custom", validationCallback: function (options) { return validateNullableGuid(options.value); }, message: guidValidationMessage }];
+            Widgets.guidRequiredValidationRules = [{ type: 'required', message: guidValidationMessage }];
             var GuidEditor = (function (_super) {
                 __extends(GuidEditor, _super);
                 function GuidEditor() {
                     _super.apply(this, arguments);
                 }
                 GuidEditor.prototype.getValidationRules = function () {
-                    return (_super.prototype.getValidationRules.call(this) || []).concat(Widgets.guidValidationRules);
+                    return (_super.prototype.getValidationRules.call(this) || []).concat(Widgets.guidValidationRules).concat(this.editorOptions.isNullable ? [] : Widgets.guidRequiredValidationRules);
                 };
                 return GuidEditor;
             })(Widgets.Editor);
@@ -1223,28 +1294,30 @@ var DevExpress;
                     _super.call(this, info, level, parentDisabled, textToSearch);
                     this.editorCreated = ko.observable(false);
                     this.viewmodel = this.createObjectProperties();
+                    this._disposables.push(this.viewmodel);
                     var subscription = this.collapsed.subscribe(function (newVal) {
                         if (!newVal) {
                             subscription.dispose();
                             _this.editorCreated(true);
                         }
                     });
+                    this._disposables.push(subscription);
                     if (textToSearch) {
-                        this.visibleByName = ko.computed(function () {
+                        this._disposables.push(this.visibleByName = ko.computed(function () {
                             var visible = !!Analytics.Utils.findMatchesInString(_this.displayName(), textToSearch());
                             if (!$.isEmptyObject(_this.viewmodel)) {
                                 _this.viewmodel._editors().forEach(function (editor) { return editor.isParentSearched(visible); });
                             }
                             return visible;
-                        });
+                        }));
                         this.isSearchedProperty["dispose"] && this.isSearchedProperty["dispose"]();
-                        this.isSearchedProperty = ko.computed(function () {
+                        this._disposables.push(this.isSearchedProperty = ko.computed(function () {
                             if (_this.visibleByName())
                                 return true;
                             var visibleByEditors = _this.viewmodel.visible();
                             visibleByEditors && _this.collapsed(false);
                             return visibleByEditors;
-                        });
+                        }));
                     }
                 }
                 PropertyGridEditor.prototype.createObjectProperties = function () {
@@ -1305,6 +1378,7 @@ var DevExpress;
                     this.collapsed = ko.observable(options.collapsed !== false);
                     var addHandler = options.addHandler || options.info && options.info() && options.info()["addHandler"];
                     var hideButtons = options.hideButtons || options.info && options.info() && options.info()["hideButtons"];
+                    this._textEmptyArray = options.textEmptyArray || { text: 'To create an item click the Add button.', localizationId: 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParametersEmpty' };
                     this.displayPropertyName = options.info && options.info() && options.info()["displayPropertyName"] || options.displayName;
                     this.showButtons = ko.computed(function () {
                         return !ko.unwrap(hideButtons) && !_this.collapsed();
@@ -1386,7 +1460,7 @@ var DevExpress;
                     return DevExpress.Analytics.getLocalization(this.buttonMap[key].text, this.buttonMap[key].localizationId);
                 };
                 CollectionEditorViewModel.prototype.getDisplayTextEmptyArray = function () {
-                    return DevExpress.Analytics.getLocalization('To create an item click the Add button.', 'ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParametersEmpty');
+                    return DevExpress.Analytics.getLocalization(this._textEmptyArray.text, this._textEmptyArray.localizationId);
                 };
                 CollectionEditorViewModel.prototype.createCollectionItemWrapper = function (grandfather, index) {
                     return new CollectionItemWrapper(grandfather, this.values, index, this.displayPropertyName);
@@ -1406,9 +1480,9 @@ var DevExpress;
         (function (Widgets) {
             ko.bindingHandlers['dxCollectionEditor'] = {
                 init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                    var values = valueAccessor(), gridViewModel = new Widgets.CollectionEditorViewModel(values, viewModel.disabled), templateHtml = $(values.editorTemplate || '#dx-collectioneditor').text(), $templateHtml = $(templateHtml), itemTemplateName = values.info && values.info() && values.info()["template"] || values.template;
+                    var values = valueAccessor(), gridViewModel = new Widgets.CollectionEditorViewModel(values, viewModel.disabled), templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate(values.editorTemplate || '#dx-collectioneditor'), $templateHtml = $(templateHtml), itemTemplateName = values.info && values.info() && values.info()["template"] || values.template;
                     if (itemTemplateName) {
-                        var itemTemplateHtml = $(itemTemplateName).text();
+                        var itemTemplateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate(itemTemplateName);
                         $templateHtml.find(".dx-collection-item").append($(itemTemplateHtml));
                     }
                     else {
@@ -1430,7 +1504,7 @@ var DevExpress;
     (function (Analytics) {
         var Widgets;
         (function (Widgets) {
-            var editor_prefix = "dx-ellipsiseditor", EDITOR_CLASS = editor_prefix + " dx-dropdowneditor", EDITOR_BUTTON_CLASS = editor_prefix + "-button dx-widget dx-button-normal dx-dropdowneditor-button dx-ellipsis-button", EDITOR_BUTTON_ICON = editor_prefix + "-icon dx-ellipsis-image dx-dropdowneditor-icon";
+            var editor_prefix = "dx-ellipsiseditor", EDITOR_CLASS = editor_prefix + " dx-dropdowneditor", EDITOR_BUTTON_CLASS = editor_prefix + "-button dx-widget dx-button-normal dx-dropdowneditor-button dx-ellipsis-button", EDITOR_BUTTON_ICON_CLASS = editor_prefix + "-icon dx-ellipsis-image dx-dropdowneditor-icon", EDITOR_BUTTON_ICON_TEMPLATE = "dxrd-svg-ellipsis";
             var dxEllipsisEditor = (function (_super) {
                 __extends(dxEllipsisEditor, _super);
                 function dxEllipsisEditor(element, options) {
@@ -1439,6 +1513,7 @@ var DevExpress;
                 dxEllipsisEditor.prototype._init = function () {
                     _super.prototype._init.call(this);
                     this.element().addClass(EDITOR_CLASS);
+                    this._koContext = ko.contextFor(this.element()[0]);
                 };
                 dxEllipsisEditor.prototype._render = function () {
                     _super.prototype._render.call(this);
@@ -1447,7 +1522,8 @@ var DevExpress;
                 dxEllipsisEditor.prototype._renderButton = function () {
                     this._button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
                     this._attachButtonEvents();
-                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON).height("100%").appendTo(this._button);
+                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS).height("100%").append(ko.utils.parseHtmlFragment(Analytics.Widgets.Internal.SvgTemplatesEngine.templates[EDITOR_BUTTON_ICON_TEMPLATE])).appendTo(this._button);
+                    ko.applyBindingsToDescendants(this._koContext, this._buttonIcon[0]);
                     var buttonsContainer = _super.prototype._buttonsContainer.call(this);
                     this._button.prependTo(buttonsContainer);
                 };
@@ -1588,9 +1664,11 @@ var DevExpress;
                 { value: "doc", displayValue: "Document", localizationId: "PreviewStringId.ReportDesigner_FontOptions_Unit_Document" },
                 { value: "mm", displayValue: "Millimetr", localizationId: "ASPxReportsStringId.ReportDesigner_Wizard_Millimeter" }
             ];
-            var FontModel = (function () {
+            var FontModel = (function (_super) {
+                __extends(FontModel, _super);
                 function FontModel(value) {
                     var _this = this;
+                    _super.call(this);
                     this.family = ko.observable("Times New Roman");
                     this.unit = ko.observable("pt");
                     this.isUpdateModel = false;
@@ -1602,18 +1680,18 @@ var DevExpress;
                         underline: ko.observable(false)
                     };
                     this.updateModel(value());
-                    value.subscribe(function (newVal) {
+                    this._disposables.push(value.subscribe(function (newVal) {
                         _this.isUpdateModel = true;
                         _this.updateModel(newVal);
                         _this.isUpdateModel = false;
-                    });
-                    this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.family.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.size.subscribe(function (newVal) { return _this.updateValue(value); });
-                    this.unit.subscribe(function (newVal) { return _this.updateValue(value); });
+                    }));
+                    this._disposables.push(this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    this._disposables.push(this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    this._disposables.push(this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    this._disposables.push(this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    this._disposables.push(this.family.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    this._disposables.push(this.size.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    this._disposables.push(this.unit.subscribe(function (newVal) { return _this.updateValue(value); }));
                 }
                 FontModel.prototype.updateModel = function (value) {
                     if (value) {
@@ -1649,7 +1727,7 @@ var DevExpress;
                     }
                 };
                 return FontModel;
-            })();
+            })(Analytics.Utils.Disposable);
             Widgets.FontModel = FontModel;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1700,6 +1778,7 @@ var DevExpress;
                 }
                 FontEditor.prototype.createObjectProperties = function () {
                     var model = new Widgets.FontModel(this.value);
+                    this._disposables.push(model);
                     return new Widgets.ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, this.level + 1, this.disabled, undefined, this.textToSearch);
                 };
                 return FontEditor;
@@ -1948,6 +2027,223 @@ var DevExpress;
         }
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Widgets;
+        (function (Widgets) {
+            var Internal;
+            (function (Internal) {
+                Internal.extendedTemplates = function (templates) {
+                    if (templates === void 0) { templates = Widgets.Internal.SvgTemplatesEngine.templates; }
+                    return ({
+                        'dxrd-svg-fieldlist-list': templates['dxrd-svg-fieldlist-table'],
+                        'dxrd-svg-fieldlist-default': templates['dxrd-svg-fieldlist-column']
+                    });
+                };
+            })(Internal = Widgets.Internal || (Widgets.Internal = {}));
+        })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Widgets;
+        (function (Widgets) {
+            var Internal;
+            (function (Internal) {
+                Internal.availableTemplates = {
+                    'dxrd-svg-collapsed': '<svg data-bind="xlink" viewBox="0 0 9 9"><path class="dxd-icon-fill" d="M2 2l5 3-5 3z"/></svg>',
+                    'dxrd-svg-ellipsis': '<svg data-bind="xlink" viewBox="-467 277 16 16"><path class="dxd-icon-fill" d="M-464 284h2v2h-2zM-460 284h2v2h-2zM-456 284h2v2h-2z"/></svg>',
+                    'dxrd-svg-expressioneditor-addition': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 10h-6V4h-4v6H4v4h6v6h4v-6h6z"/></svg>',
+                    'dxrd-svg-expressioneditor-and': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M15 4c-1.1 0-2.1.2-3 .7-.9-.5-1.9-.7-3-.7-3.9 0-7 3.1-7 7s3.1 7 7 7c1.1 0 2.1-.2 3-.7.9.4 1.9.7 3 .7 3.9 0 7-3.1 7-7s-3.1-7-7-7zm-1 7c0 1.6-.8 3.1-2 4-1.2-.9-2-2.3-2-4s.8-3.1 2-4c1.2.9 2 2.4 2 4zM4 11c0-2.8 2.2-5 5-5 .3 0 .7 0 1 .1-1.2 1.3-2 3-2 4.9s.8 3.6 2 4.9c-.3.1-.7.1-1 .1-2.8 0-5-2.2-5-5zm11 5c-.3 0-.7 0-1-.1 1.2-1.3 2-3 2-4.9s-.8-3.6-2-4.9c.3-.1.7-.1 1-.1 2.8 0 5 2.2 5 5s-2.2 5-5 5z"/><path class="dxd-icon-fill dxd-opacity-60" d="M14 11c0 1.6-.8 3.1-2 4-1.2-.9-2-2.3-2-4s.8-3.1 2-4c1.2.9 2 2.4 2 4z"/></svg>',
+                    'dxrd-svg-expressioneditor-division': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 10h20v4H2z"/><circle class="dxd-icon-fill" cx="12" cy="6" r="2"/><circle class="dxd-icon-fill" cx="12" cy="18" r="2"/></svg>',
+                    'dxrd-svg-expressioneditor-edit': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 8l-6 6-6-6z"/></svg>',
+                    'dxrd-svg-expressioneditor-equal': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 6h16v4H4zM4 12h16v4H4z"/></svg>',
+                    'dxrd-svg-expressioneditor-greater': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 4v2l10 6-10 6v2l14-8z"/></svg>',
+                    'dxrd-svg-expressioneditor-greater_or_equal': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 2v2l10 6-10 6v2l14-8zM4 22l14-8v-2L4 20z"/></svg>',
+                    'dxrd-svg-expressioneditor-less': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 4v2L8 12l10 6v2L4 12z"/></svg>',
+                    'dxrd-svg-expressioneditor-less_or_equal': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 2v2L8 10l10 6v2L4 10zM18 22L4 14v-2l14 8z"/></svg>',
+                    'dxrd-svg-expressioneditor-modulus': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 4L2 20h4L20 4zM16 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM6 12c2.2 0 4-1.8 4-4S8.2 4 6 4 2 5.8 2 8s1.8 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>',
+                    'dxrd-svg-expressioneditor-multiplication': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 6l-2-2-5 5-5-5-2 2 5 5-5 5 2 2 5-5 5 5 2-2-5-5z"/></svg>',
+                    'dxrd-svg-expressioneditor-not': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M15 4c-1.1 0-2.1.2-3 .7-.9-.5-1.9-.7-3-.7-3.9 0-7 3.1-7 7s3.1 7 7 7c1.1 0 2.1-.2 3-.7.9.4 1.9.7 3 .7 3.9 0 7-3.1 7-7s-3.1-7-7-7zm-1 7c0 1.6-.8 3.1-2 4-1.2-.9-2-2.3-2-4s.8-3.1 2-4c1.2.9 2 2.4 2 4zM4 11c0-2.8 2.2-5 5-5 .3 0 .7 0 1 .1-1.2 1.3-2 3-2 4.9s.8 3.6 2 4.9c-.3.1-.7.1-1 .1-2.8 0-5-2.2-5-5zm11 5c-.3 0-.7 0-1-.1 1.2-1.3 2-3 2-4.9s-.8-3.6-2-4.9c.3-.1.7-.1 1-.1 2.8 0 5 2.2 5 5s-2.2 5-5 5z"/><path class="dxd-icon-fill dxd-opacity-60" d="M4 11c0-2.8 2.2-5 5-5 .3 0 .7 0 1 .1-1.2 1.3-2 3-2 4.9s.8 3.6 2 4.9c-.3.1-.7.1-1 .1-2.8 0-5-2.2-5-5z"/></svg>',
+                    'dxrd-svg-expressioneditor-not_equal': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 0h-2l-3.8 6H4v4h7.6l-1.2 2H4v4h3.8L4 22h2l3.8-6H20v-4h-7.6l1.2-2H20V6h-3.8z"/></svg>',
+                    'dxrd-svg-expressioneditor-or': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M14 11c0 1.6-.8 3.1-2 4-1.2-.9-2-2.3-2-4s.8-3.1 2-4c1.2.9 2 2.4 2 4z"/><path class="dxd-icon-fill" d="M15 4c-1.1 0-2.1.2-3 .7-.9-.5-1.9-.7-3-.7-3.9 0-7 3.1-7 7s3.1 7 7 7c1.1 0 2.1-.2 3-.7.9.4 1.9.7 3 .7 3.9 0 7-3.1 7-7s-3.1-7-7-7zm-1 7c0 1.6-.8 3.1-2 4-1.2-.9-2-2.3-2-4s.8-3.1 2-4c1.2.9 2 2.4 2 4zM4 11c0-2.8 2.2-5 5-5 .3 0 .7 0 1 .1-1.2 1.3-2 3-2 4.9s.8 3.6 2 4.9c-.3.1-.7.1-1 .1-2.8 0-5-2.2-5-5zm11 5c-.3 0-.7 0-1-.1 1.2-1.3 2-3 2-4.9s-.8-3.6-2-4.9c.3-.1.7-.1 1-.1 2.8 0 5 2.2 5 5s-2.2 5-5 5z"/><path class="dxd-icon-fill dxd-opacity-60" d="M4 11c0-2.8 2.2-5 5-5 .3 0 .7 0 1 .1-1.2 1.3-2 3-2 4.9s.8 3.6 2 4.9c-.3.1-.7.1-1 .1-2.8 0-5-2.2-5-5zM15 16c-.3 0-.7 0-1-.1 1.2-1.3 2-3 2-4.9s-.8-3.6-2-4.9c.3-.1.7-.1 1-.1 2.8 0 5 2.2 5 5s-2.2 5-5 5z"/></svg>',
+                    'dxrd-svg-expressioneditor-parenthesis': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 11c0 3.8 1.8 7.1 4 9h2c-2.2-1.9-4-5.2-4-9s1.8-7.1 4-9H6c-2.2 1.9-4 5.2-4 9zM16 2h-2c2.2 1.8 4 5.2 4 9s-1.8 7.2-4 9h2c2.2-1.8 4-5.2 4-9s-1.8-7.2-4-9z"/><path class="dxd-icon-fill" d="M6 10h2v2H6zM10 10h2v2h-2zM14 10h2v2h-2z"/></svg>',
+                    'dxrd-svg-expressioneditor-subtraction': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 10h16v4H4z"/></svg>',
+                    'dxrd-svg-fieldlist-array': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 6v2h-2v2h2v8h2V6zM4 8H2v2h2v8h2V6H4zM8 18h6V6H8v12zm2-10h2v8h-2V8z"/></svg>',
+                    'dxrd-svg-fieldlist-bitearray': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 6v2h-2v2h2v8h2V6zM4 8H2v2h2v8h2V6H4zM8 18h6V6H8v12zm2-10h2v8h-2V8z"/></svg>',
+                    'dxrd-svg-fieldlist-bool': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 10v4l6 6 10-10V6L10 16z"/></svg>',
+                    'dxrd-svg-fieldlist-booleanfield': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 10v4l6 6 10-10V6L10 16z"/></svg>',
+                    'dxrd-svg-fieldlist-column': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h22v4H0zM6 6h4v16H6zM12 12h4v4h-4zM12 18h4v4h-4zM18 6h4v4h-4zM0 12h4v4H0zM18 18h4v4h-4zM12 6h4v4h-4zM0 18h4v4H0zM0 6h4v4H0zM18 12h4v4h-4z"/></svg>',
+                    'dxrd-svg-fieldlist-datasource': '<svg data-bind="xlink" viewBox="0 0 24 24"><ellipse class="dxd-icon-fill dxd-opacity-80" cx="11" cy="4" rx="7" ry="2"/><path class="dxd-icon-fill dxd-opacity-80" d="M11 10c-3.9 0-7-.9-7-2v12c0 1.1 3.1 2 7 2s7-.9 7-2V8c0 1.1-3.1 2-7 2z"/></svg>',
+                    'dxrd-svg-fieldlist-date': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M11 0C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11S17.1 0 11 0zm6 12h-6c-.5 0-1-.5-1-1V5c0-.5.5-1 1-1s1 .5 1 1v5h5c.5 0 1 .5 1 1s-.5 1-1 1z"/></svg>',
+                    'dxrd-svg-fieldlist-datetimefield': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M11 0C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11S17.1 0 11 0zm6 12h-6c-.5 0-1-.5-1-1V5c0-.5.5-1 1-1s1 .5 1 1v5h5c.5 0 1 .5 1 1s-.5 1-1 1z"/></svg>',
+                    'dxrd-svg-fieldlist-doublefield': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 6H4v2h2v10h2V4H6zM10 16h2v2h-2zM20 12V4h-6v2h4v4h-4v8h6v-2h-4v-4z"/></svg>',
+                    'dxrd-svg-fieldlist-enum': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M13 12H1c-.5 0-1 .5-1 1v8c0 .5.5 1 1 1h12c.5 0 1-.5 1-1v-8c0-.5-.5-1-1-1zm-1 8H2v-2h10v2zm0-4H2v-2h10v2zM23 4H11c-.5 0-1 .5-1 1v5h12v2h-6v2h7c.5 0 1-.5 1-1V5c0-.5-.5-1-1-1zm-1 4H12V6h10v2z"/></svg>',
+                    'dxrd-svg-fieldlist-float': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 6H4v2h2v10h2V4H6zM10 16h2v2h-2zM20 12V4h-6v2h4v4h-4v8h6v-2h-4v-4z"/></svg>',
+                    'dxrd-svg-fieldlist-guid': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M10 10v10h8V2h-2v8h-6zm2 2h4v6h-4v-6zM6 10h2v10H6zM6 6h2v2H6z"/></svg>',
+                    'dxrd-svg-fieldlist-integer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 8H2v2h2v8h2V6H4zM8 6v2h4v2H8v8h6v-2h-4v-4h4V6h-2zM16 6v2h4v2h-2v2h2v4h-4v2h6V6z"/></svg>',
+                    'dxrd-svg-fieldlist-integerfield': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 8H2v2h2v8h2V6H4zM8 6v2h4v2H8v8h6v-2h-4v-4h4V6h-2zM16 6v2h4v2h-2v2h2v4h-4v2h6V6z"/></svg>',
+                    'dxrd-svg-fieldlist-listsource': '<svg data-bind="xlink" viewBox="0 0 24 24"><ellipse class="dxd-icon-fill dxd-opacity-80" cx="11" cy="4" rx="7" ry="2"/><path class="dxd-icon-fill dxd-opacity-80" d="M11 10c-3.9 0-7-.9-7-2v12c0 1.1 3.1 2 7 2s7-.9 7-2V8c0 1.1-3.1 2-7 2z"/></svg>',
+                    'dxrd-svg-fieldlist-none': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm16 14l-2 2-3-3-3 3-2-2 3-3-3-3 2-2 3 3 3-3 2 2-3 3 3 3z"/></svg>',
+                    'dxrd-svg-fieldlist-parameters': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M12 4h4v8h-4zM8 18h4v4H8zM8 12h4v4H8zM8 0h4v4H8zM4 4h4v4H4z"/></svg>',
+                    'dxrd-svg-fieldlist-string': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 8h4v4H2v8h8V6H4v2zm4 10H4v-4h4v4zM14 10V2h-2v18h8V10h-6zm4 8h-4v-6h4v6z"/></svg>',
+                    'dxrd-svg-fieldlist-stringfield': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 8h4v4H2v8h8V6H4v2zm4 10H4v-4h4v4zM14 10V2h-2v18h8V10h-6zm4 8h-4v-6h4v6z"/></svg>',
+                    'dxrd-svg-fieldlist-table': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h22v4H0zM12 12h4v4h-4zM12 18h4v4h-4zM18 6h4v4h-4zM0 12h4v4H0zM18 18h4v4h-4zM12 6h4v4h-4zM6 12h4v4H6zM6 18h4v4H6zM6 6h4v4H6zM0 18h4v4H0zM0 6h4v4H0zM18 12h4v4h-4z"/></svg>',
+                    'dxrd-svg-fieldlist-view': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 6h4v4H0zM6 6h4v4H6zM12 6h4v4h-4zM18 6h4v4h-4zM0 12h4v4H0zM6 12h4v4H6zM0 18h4v4H0zM6 18h4v4H6zM0 0h22v4H0zM23.7 22.3l-2.5-2.5c.5-.8.8-1.8.8-2.8 0-2.8-2.2-5-5-5s-5 2.2-5 5 2.2 5 5 5c1 0 2-.3 2.8-.8l2.5 2.5c.4.4 1 .4 1.4 0 .4-.4.4-1 0-1.4zM17 20c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z"/></svg>',
+                    'dxrd-svg-filtereditor-add': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-filter-editor-add-icon-fill-color" d="M20 10h-6V4h-4v6H4v4h6v6h4v-6h6z"/></svg>',
+                    'dxrd-svg-filtereditor-edit': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 8l-6 6-6-6z"/></svg>',
+                    'dxrd-svg-filtereditor-remove': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-filter-editor-remove-icon-fill-color" d="M18 6l-2-2-5 5-5-5-2 2 5 5-5 5 2 2 5-5 5 5 2-2-5-5z"/></svg>',
+                    'dxrd-svg-fontstyle-bold': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M14.4 10.8c1.1.3 1.9.7 2.5 1.3.8.8 1.1 1.8 1.1 3 0 .9-.2 1.8-.7 2.6-.5.8-1.2 1.4-2 1.8-.9.4-2.2.6-4 .6H4v-.5h.4c.7 0 1.1-.2 1.4-.7.2-.5.2-2 .2-3V6c0-1.1 0-2.6-.3-2.9-.3-.4-.7-.6-1.3-.6H4V2h6.6c1.3 0 2.3.1 3.1.3 1.2.3 2.1.9 2.7 1.7s.9 1.7.9 2.8c0 .9-.2 1.7-.7 2.4-.5.7-1.2 1.3-2.2 1.6zM8 10H10.6c1.1 0 2 0 2.6-.3.6-.3.9-.6 1.2-1.2.3-.6.5-1.2.5-1.9 0-1.1-.4-2-1.1-2.7S11.4 3 10 3H8v7zm0 8.9h3c1.4 0 2.5-.3 3.2-1s1.1-1.6 1.1-2.7c0-.7-.2-1.4-.5-2-.3-.6-.9-1.2-1.6-1.5-.8-.4-1.5-.7-2.7-.7H8v7.9z"/></svg>',
+                    'dxrd-svg-fontstyle-italic': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M14 21.5l-.2.5H6l.2-.5c.8 0 1.3-.1 1.6-.2.4-.2.7-.4.9-.7.3-.5.5-1.3.8-2.5l2.4-12c.3-1.3.3-1.8.3-2.3 0-.3-.1-.5-.2-.6s-.3-.3-.6-.4c-.3-.1-.7-.1-1.5-.1l.3-.7H18l-.2.5c-.6 0-1.4.1-1.7.2-.4.2-.8.5-1 .8-.1.5-.5 1-.8 2.5L12 18.1c-.2 1.3-.3 1.7-.3 2.1 0 .2.1.5.2.6.1.2.3.3.6.4s.7.2 1.5.3z"/></svg>',
+                    'dxrd-svg-fontstyle-strikeout': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 12h-5.3c-.7-.4-1.7-.9-2.9-1.5-2.4-1.2-3.9-2.1-4.6-2.8-.4-.5-.7-1-.7-1.6 0-.8.3-1.4 1-2.1.6-.4.8-.7 2.1-.9.9-.1 1.9.2 2.8.7.9.4 1.6 1 2.1 1.8s.8 1.4 1 2.4h.5V2h-.5c-.1.4-.2.7-.4.9-.2.1-.4.2-.7.2-.2 0-.6-.1-1.2-.4-1.3-.5-2.5-.7-3.6-.7-1.8 0-3 .8-3.9 1.5C4.5 4.4 4 5.7 4 7c0 .8.2 1.5.6 2.2s1 1.3 1.7 1.8c.4.3.9.6 1.6 1H2v2h9.7c.9.5 1.5.8 1.8 1 .6.4 1 .9 1.3 1.3s.4 1 .4 1.4c0 .8-.4 1.6-1.1 2.2-.8.6-1.8.9-3.1.9-1.1 0-2.1-.2-3.1-.7-.9-.5-1.8-1-2.3-1.7-.2-.2-.8-1.4-1-2.4H4v6h.6c.1-.4.2-.7.3-.9.2-.1.4-.2.6-.2.3 0 1.1.1 2.1.4s1.7.5 2 .5c.5.1 1.1.1 1.7.1 1.9 0 3.5-.5 4.8-1.6 1.2-1 1.9-2.3 1.9-3.7 0-.8-.2-1.5-.6-2.2-.1-.2-.2-.2-.3-.4H20v-2z"/></svg>',
+                    'dxrd-svg-fontstyle-underline': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M14 0v1h.9c.4 0 .7.1.8.2.3.4.3 1.2.3 2.3V12c0 .8 0 1.7-.1 2.6-.1 1-.5 1.8-1 2.3-1 .9-3 1.1-3.7 1.1-.7 0-2.9-.2-3.9-1.1-.7-.7-.9-1.3-1.1-2.2-.2-1.1-.2-2-.2-2.7V3.5c0-1.1 0-2 .3-2.2.2-.2.6-.3 1.1-.3H8V0H2v1h.9c.7 0 .9.1 1 .2.1.2.1 1.1.1 2.3v7.6c0 2.4.2 4 .5 4.8.5 1.2 1.3 2.3 2.4 3C8.7 20 9.9 20 11 20c1.4 0 2.6-.1 4.1-1.1 1.1-.8 1.9-1.7 2.3-3 .3-.9.4-2.5.4-4.8V3.5c0-1.2 0-1.9.3-2.2.3-.3.5-.3 1.3-.3h.6V0h-6zM2 22h18v2H2z"/></svg>',
+                    'dxrd-svg-menu-menu': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2h20v4H2zM2 10h20v4H2zM2 18h20v4H2z"/></svg>',
+                    'dxrd-svg-menu-open': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 8L2 20h18l2-12z"/><path class="dxd-icon-fill" d="M20 6V4H6V2H0v18L2 6z"/></svg>',
+                    'dxrd-svg-menu-save': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 0h6v6h-6z"/><path class="dxd-icon-fill" d="M18 0v8H4V0H2L0 2v20h22V0h-4zm0 18H4v-6h14v6z"/></svg>',
+                    'dxrd-svg-operations-add': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 10h-8V2h-4v8H2v4h8v8h4v-8h8z"/></svg>',
+                    'dxrd-svg-operations-add_calcfield': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 8V0H0v16h10c0-4.4 3.6-8 8-8zM8 4H6v2h2v2H6v6H2v-2h2V8H2V6h2V2h4v2z"/><path class="dxd-icon-fill" d="M18 10c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm3 7h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2z"/></svg>',
+                    'dxrd-svg-operations-add_datasource': '<svg data-bind="xlink" viewBox="0 0 24 24"><ellipse class="dxd-icon-fill" cx="8" cy="2" rx="6" ry="2"/><path class="dxd-icon-fill" d="M16 10c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm3 7h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2zM8 13c-3.1 0-6-.9-6-2v5c0 1.1 2.9 2 6 2h.3c-.2-.6-.3-1.3-.3-2 0-1.1.2-2.1.6-3H8zM14 8.3V4c0 1.1-2.9 2-6 2s-6-.9-6-2v5c0 1.1 2.9 2 6 2 .6 0 1.3 0 1.9-.1 1-1.3 2.5-2.2 4.1-2.6z"/></svg>',
+                    'dxrd-svg-operations-add_query': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 6h4v4H0zM6 6h4v4H6zM12 6h4v4h-4zM18 6h4v4h-4zM0 12h4v4H0zM6 12h4v4H6zM0 18h4v4H0zM6 18h4v4H6zM0 0h22v4H0zM18 12c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm3 7h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2z"/></svg>',
+                    'dxrd-svg-operations-ascending': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 0L6 6h4v16h4V6h4z"/></svg>',
+                    'dxrd-svg-operations-descending': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 22l6-6h-4V0h-4v16H6z"/></svg>',
+                    'dxrd-svg-operations-edit': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 22h4l-4-4zM4 16l4 4 8-8-4-4zM16 4l-2 2 4 4 2-2z"/></svg>',
+                    'dxrd-svg-operations-movedown': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M6 10l6 6 6-6V6l-6 6-6-6z"/></svg>',
+                    'dxrd-svg-operations-moveleft': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 6l-6 6 6 6h4l-6-6 6-6z"/></svg>',
+                    'dxrd-svg-operations-moveleft_all': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 6H8l-6 6 6 6h4l-6-6z"/><path class="dxd-icon-fill" d="M20 6h-4l-6 6 6 6h4l-6-6z"/></svg>',
+                    'dxrd-svg-operations-moveright': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 18l6-6-6-6H6l6 6-6 6z"/></svg>',
+                    'dxrd-svg-operations-moveright_all': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 18h4l6-6-6-6h-4l6 6z"/><path class="dxd-icon-fill" d="M2 18h4l6-6-6-6H2l6 6z"/></svg>',
+                    'dxrd-svg-operations-moveup': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 12l-6-6-6 6v4l6-6 6 6z"/></svg>',
+                    'dxrd-svg-operations-recycle_bin': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M6 19c0 .5.5 1 1 1h10c.5 0 1-.5 1-1V8H6v11zM19 4h-5V3c0-.5-.5-1-1-1h-2c-.5 0-1 .5-1 1v1H5c-.6 0-1 .4-1 1v1h16V5c0-.6-.4-1-1-1z"/></svg>',
+                    'dxrd-svg-operations-remove': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 10h14v4H4z"/></svg>',
+                    'dxrd-svg-operations-unsorted': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 20l6-6V6H2l5-6 5 6H8v6l6-6V0h2v4l4-4 2 2-6 6v8h4l-5 6-5-6h4v-6l-6 6v6H6v-4l-4 4z"/></svg>',
+                    'dxrd-svg-properties-borders-all': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm20 20H2V2h18v18z"/></svg>',
+                    'dxrd-svg-properties-borders-bottom': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 12h2v4H0zM12 0h4v2h-4zM0 6h2v4H0zM18 2h2v2h2V0h-4zM6 0h4v2H6zM20 18v2H2v-2H0v4h22v-4zM2 4V2h2V0H0v4zM20 6h2v4h-2zM20 12h2v4h-2z"/></svg>',
+                    'dxrd-svg-properties-borders-left': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 0h4v2H6zM20 12h2v4h-2zM12 0h4v2h-4zM20 18v2h-2v2h4v-4zM20 6h2v4h-2zM4 20H2V2h2V0H0v22h4zM18 2h2v2h2V0h-4zM12 20h4v2h-4zM6 20h4v2H6z"/></svg>',
+                    'dxrd-svg-properties-borders-none': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 0h4v2H6zM20 12h2v4h-2zM12 0h4v2h-4zM20 18v2h-2v2h4v-4zM20 6h2v4h-2zM18 2h2v2h2V0h-4zM12 20h4v2h-4zM6 20h4v2H6zM0 6h2v4H0zM2 4V2h2V0H0v4zM2 18H0v4h4v-2H2zM0 12h2v4H0z"/></svg>',
+                    'dxrd-svg-properties-borders-right': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M12 20h4v2h-4zM0 6h2v4H0zM6 20h4v2H6zM2 4V2h2V0H0v4zM0 12h2v4H0zM18 2h2v18h-2v2h4V0h-4zM4 20H2v-2H0v4h4zM6 0h4v2H6zM12 0h4v2h-4z"/></svg>',
+                    'dxrd-svg-properties-borders-top': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 6h2v4h-2zM6 20h4v2H6zM20 12h2v4h-2zM4 20H2v-2H0v4h4zM12 20h4v2h-4zM2 4V2h18v2h2V0H0v4zM20 18v2h-2v2h4v-4zM0 12h2v4H0zM0 6h2v4H0z"/></svg>',
+                    'dxrd-svg-properties-search': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2.6 21.4c.8.8 2 .8 2.8 0l4.6-4.6c1.2.7 2.6 1.1 4.1 1.1 4.4 0 8-3.6 8-8s-3.6-8-8-8-8 3.6-8 8c0 1.5.4 2.9 1.1 4.1l-4.6 4.6c-.8.8-.8 2 0 2.8zM10 10.1c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.9-4-4z"/></svg>',
+                    'dxrd-svg-properties-sortingbyalphabet': '<svg data-bind="xlink" viewBox="0 0 16 16"><path class="dxd-icon-fill" d="M3.2 0L1 7h1.6L3 5.3h2L5.4 7H7L4.9 0H3.2zm0 4.2L3.8 2c0-.1.1-.4.2-.8v.1c0 .3.1.6.1.7l.5 2.2H3.2zM1 10h4l-4 5v1h6v-1H3l4-5V9H1zM13 12V0h-2v12H8l4 4 4-4z"/></svg>',
+                    'dxrd-svg-properties-sortingbygroups': '<svg data-bind="xlink" viewBox="0 0 16 16"><path class="dxd-icon-fill" d="M1 7h7V0H1v7zm1-6h5v5H2V1zM9 1h6v1H9zM9 3h6v1H9zM9 5h6v1H9zM9 10h6v1H9zM9 12h6v1H9zM9 14h6v1H9z"/><path class="dxd-icon-fill" d="M5 2H4v1H3v1h1v1h1V4h1V3H5zM1 16h7V9H1v7zm1-6h5v5H2v-5z"/><path class="dxd-icon-fill" d="M5 11H4v1H3v1h1v1h1v-1h1v-1H5z"/></svg>',
+                    'dxrd-svg-queryBuilder-aggregate': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M21 0H3v4l8 8-8 8v4h18v-4H7l8-8-8-8h14z"/></svg>',
+                    'dxrd-svg-queryBuilder-data_preview': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M21.7 20.3l-2.5-2.5c.5-.8.8-1.8.8-2.8 0-2.8-2.2-5-5-5s-5 2.2-5 5 2.2 5 5 5c1 0 2-.3 2.8-.8l2.5 2.5c.4.4 1 .4 1.4 0 .4-.4.4-1 0-1.4zM15 18c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z"/><ellipse class="dxd-icon-fill" cx="8" cy="2" rx="6" ry="2"/><path class="dxd-icon-fill" d="M8.7 13s-.1 0 0 0c-.1 0-.1 0 0 0H7.3C4.4 12.8 2 12 2 11v5c0 1 2.6 1.9 5.4 2H9c-.4-.9-.7-1.9-.7-2.9.1-.8.2-1.5.4-2.1zM14 8.2V4c0 1.1-2.9 2-6 2s-6-.9-6-2v5c0 1.1 2.9 2 6 2 .6 0 1.2 0 1.7-.1 1-1.4 2.5-2.4 4.3-2.7z"/></svg>',
+                    'dxrd-svg-queryBuilder-group_by': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 4h14v6H2zM8 14h14v6H8z"/></svg>',
+                    'dxrd-svg-queryBuilder-select_statment': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 4l-4-4v4zM21.7 22.3l-4.5-4.5c.5-.8.8-1.8.8-2.8 0-2.8-2.2-5-5-5s-5 2.2-5 5 2.2 5 5 5c1 0 2-.3 2.8-.8l4.5 4.5c.4.4 1 .4 1.4 0s.4-1 0-1.4zM13.1 18c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.4 3-3 3z"/><path class="dxd-icon-fill" d="M13 8c2 0 3.7.8 5 2.1V6h-6V0H0v20h8.1C6.8 18.7 6 17 6 15c0-3.9 3.1-7 7-7z"/></svg>',
+                    'dxrd-svg-queryBuilder-sorting_asc': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 0H4v14H2l4 8 4-8H8zM14 14h6l-6 6v2h8v-2h-6l6-6v-2h-8zM19.4 0L14 10h2l.9-2H20v2h2V0h-2.6zm.6 6h-1.9L20 2v4z"/></svg>',
+                    'dxrd-svg-queryBuilder-sorting_desc': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 0H4v14H2l4 8 4-8H8zM22 0h-8v2h6l-6 6v2h8V8h-6l6-6zM14 22h2l.9-2H20v2h2V12h-2.6L14 22zm6-4h-1.9l1.9-4v4z"/></svg>',
+                    'dxrd-svg-tabs-properties': '<svg data-bind="xlink" viewBox="0 0 24 24"><circle class="dxd-icon-fill" cx="12" cy="12" r="2"/><path class="dxd-icon-fill" d="M20 10h-.3c-.2-.7-.5-1.4-.9-2.1l.2-.2c.8-.8.8-2.1 0-2.8-.8-.8-2.1-.8-2.8 0l-.2.2c-.6-.4-1.3-.7-2.1-.9V4c0-1.1-.9-2-2-2S10 2.9 10 4v.3c-.7.2-1.4.4-2.1.8l-.1-.2c-.8-.7-2.1-.7-2.9 0-.7.8-.7 2.1 0 2.9l.2.2c-.4.6-.6 1.3-.8 2H4c-1.1 0-2 .9-2 2s.9 2 2 2h.3c.2.7.5 1.4.9 2.1l-.2.2c-.8.8-.8 2.1 0 2.8.8.8 2.1.8 2.8 0l.2-.2c.6.4 1.3.7 2.1.9v.2c0 1.1.9 2 2 2s2-.9 2-2v-.3c.7-.2 1.4-.5 2.1-.9l.2.2c.8.8 2.1.8 2.8 0 .8-.8.8-2.1 0-2.8L19 16c.4-.6.7-1.3.9-2.1h.1c1.1 0 2-.9 2-2 0-1-.9-1.9-2-1.9zm-8 6c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/></svg>',
+                    'dxrd-svg-toolbar-copy': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 10h4l-4-4z"/><path class="dxd-icon-fill" d="M8 6H0v18h14V12H8zM18 0v4h4z"/><path class="dxd-icon-fill" d="M16 0H8v4h2l6 6v8h6V6h-6z"/></svg>',
+                    'dxrd-svg-toolbar-cut': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M17.9 14c-.6 0-1.2.1-1.7.4L14 12l6-6V2l-8 8-8-8v4l6 6 2-2 2 2-2 2-2-2-2.3 2.4c-.6-.2-1.1-.4-1.7-.4-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4c0-.6-.1-1.1-.3-1.6L12 14l2.3 2.4c-.2.5-.3 1-.3 1.6 0 2.2 1.8 4 4 4s4-1.8 4-4c-.1-2.2-1.9-4-4.1-4zM6 20c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm11.9 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>',
+                    'dxrd-svg-toolbar-delete': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 4l-2-2-7 7-7-7-2 2 7 7-7 7 2 2 7-7 7 7 2-2-7-7z"/></svg>',
+                    'dxrd-svg-toolbar-paste': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 2V0H6v2H4v2h6V2zM16 16v-6h-6v14h12v-8z"/><path class="dxd-icon-fill" d="M22 14h-4v-4zM8 8h6V2h-2v4H2V2H0v16h8z"/></svg>',
+                    'dxrd-svg-toolbar-redo': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 9L14 2v4h-1.2C6 6 0 12.2 0 19v3c1.6-5.9 7-10 12.8-10H14v4.1L24 9z"/></svg>',
+                    'dxrd-svg-toolbar-undo': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 9l10-7v4h1.2C18 6 24 12.2 24 19v3c-1.6-5.9-7-10-12.8-10H10v4.1L0 9z"/></svg>',
+                    'dxrd-svg-toolbar-validate': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 6L8 20l-6-6v-4l6 6L22 2v4z"/></svg>',
+                    'dxrd-svg-toolbar-zoomin': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 10h-8V2h-4v8H2v4h8v8h4v-8h8z"/></svg>',
+                    'dxrd-svg-toolbar-zoomout': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 10h20v4H2z"/></svg>',
+                };
+            })(Internal = Widgets.Internal || (Widgets.Internal = {}));
+        })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
+/// <reference path="extendedSvgTemplates.ts" />
+/// <reference path="svgTemplates.ts" />
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Widgets;
+        (function (Widgets) {
+            var Internal;
+            (function (Internal) {
+                var SvgTemplateSource = (function () {
+                    function SvgTemplateSource(template, _data, _templates) {
+                        this._data = _data;
+                        this._templates = _templates;
+                        this.templateName = template;
+                    }
+                    SvgTemplateSource.prototype.data = function (key, value) {
+                        this._data[this.templateName] = this._data[this.templateName] || {};
+                        if (arguments.length === 1) {
+                            return this._data[this.templateName][key];
+                        }
+                        this._data[this.templateName][key] = value;
+                    };
+                    SvgTemplateSource.prototype.text = function (value) {
+                        if (arguments.length === 0) {
+                            var template = this._templates[this.templateName];
+                            if (!template)
+                                throw new Error("Cannot find template with ID " + this.templateName);
+                            return template;
+                        }
+                        this._templates[this.templateName] = value;
+                    };
+                    return SvgTemplateSource;
+                })();
+                var SvgTemplatesEngine = (function () {
+                    function SvgTemplatesEngine() {
+                        var _this = this;
+                        this._hasTemplate = function (name) { return _this._templates.hasOwnProperty(name); };
+                        this.makeTemplateSource = function (template, doc) {
+                            var elem;
+                            if (typeof template === "string") {
+                                elem = (doc || document).getElementById(template);
+                                if (elem) {
+                                    return new ko.templateSources.domElement(elem);
+                                }
+                                return new ko.templateSources["svgTemplateSource"](template, _this._data, _this._templates);
+                            }
+                            else if (template && (template.nodeType == 1) || (template.nodeType == 8)) {
+                                return new ko.templateSources.anonymousTemplate(template);
+                            }
+                            else
+                                throw new Error("Unknown template type: " + template);
+                        };
+                        this._engine = new ko.nativeTemplateEngine();
+                        this._data = {};
+                        this._templates = {};
+                        ko.templateSources["svgTemplateSource"] = SvgTemplateSource;
+                        this._engine["makeTemplateSource"] = this.makeTemplateSource;
+                        ko.setTemplateEngine(this._engine);
+                    }
+                    Object.defineProperty(SvgTemplatesEngine, "Instance", {
+                        get: function () {
+                            return this._instance || (this._instance = new this());
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
+                    Object.defineProperty(SvgTemplatesEngine, "templates", {
+                        get: function () {
+                            return SvgTemplatesEngine.Instance._templates;
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
+                    SvgTemplatesEngine.addTemplates = function (templates) {
+                        ko.utils.extend(SvgTemplatesEngine.templates, templates);
+                    };
+                    SvgTemplatesEngine.getExistingTemplate = function (name) {
+                        return SvgTemplatesEngine.Instance._hasTemplate(name) ? name : undefined;
+                    };
+                    return SvgTemplatesEngine;
+                })();
+                Internal.SvgTemplatesEngine = SvgTemplatesEngine;
+                function getTemplate(id) {
+                    var id = id[0] === '#' ? id.substr(1) : id;
+                    return $('#' + id).text() || DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.templates[id];
+                }
+                Internal.getTemplate = getTemplate;
+                SvgTemplatesEngine.addTemplates(Widgets.Internal.availableTemplates);
+                SvgTemplatesEngine.addTemplates(Widgets.Internal.extendedTemplates());
+            })(Internal = Widgets.Internal || (Widgets.Internal = {}));
+        })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-ko-propertygrid.js.map
 var DevExpress;
 (function (DevExpress) {
@@ -1986,6 +2282,11 @@ var DevExpress;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
 /// <reference path="utils.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1996,11 +2297,12 @@ var DevExpress;
                 return model.isModelReady ? model.isModelReady() : true;
             }
             Utils.checkModelReady = checkModelReady;
-            var UndoEngine = (function () {
+            var UndoEngine = (function (_super) {
+                __extends(UndoEngine, _super);
                 function UndoEngine(target, ignoredProperties, getInfoMethodName) {
                     var _this = this;
                     if (ignoredProperties === void 0) { ignoredProperties = ["surface"]; }
-                    this._disposeUndoEngineSubscriptionsName = "___dispose___UndoEngine___Subscriptions___";
+                    _super.call(this);
                     this._groupObservers = [];
                     this._getInfoMethodName = null;
                     this._groupPosition = -1;
@@ -2043,6 +2345,9 @@ var DevExpress;
                         }
                     }
                 }
+                UndoEngine.tryGetUndoEngine = function (object) {
+                    return object[UndoEngine._disposeUndoEngineSubscriptionsName] && object[UndoEngine._disposeUndoEngineSubscriptionsName].instance;
+                };
                 Object.defineProperty(UndoEngine.prototype, "_modelReady", {
                     get: function () {
                         return checkModelReady(this._model);
@@ -2050,13 +2355,37 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                UndoEngine.prototype._disposeObserver = function (record) {
+                    if (record.propertyChanged) {
+                        var value = record.propertyChanged.val;
+                        if (value && !value[UndoEngine._disposeUndoEngineSubscriptionsName]) {
+                            value.dispose && value.dispose();
+                        }
+                    }
+                    else if (record.arrayChanges) {
+                        record.arrayChanges.forEach(function (change) {
+                            var value = change.value;
+                            if (value && !value[UndoEngine._disposeUndoEngineSubscriptionsName])
+                                value.dispose && value.dispose();
+                        });
+                    }
+                };
                 UndoEngine.prototype.properyChanged = function (undoRecord) {
+                    var _this = this;
                     if (this._inUndoRedo) {
                         return;
                     }
                     var currentPosition = this._position + 1;
                     if (currentPosition < this._observers.length) {
-                        this._observers = this._observers.splice(0, currentPosition);
+                        var removedItems = this._observers.splice(currentPosition, this._observers.length);
+                        removedItems.forEach(function (changeSet) {
+                            if (Array.isArray(changeSet)) {
+                                changeSet.reverse().forEach(function (item) { return _this._disposeObserver(item); });
+                            }
+                            else {
+                                _this._disposeObserver(changeSet);
+                            }
+                        });
                     }
                     this._observers.push(undoRecord);
                     this.isDirty(true);
@@ -2152,18 +2481,18 @@ var DevExpress;
                     if (val && typeof val === "object") {
                         var objectInfo = info || (val[this._getInfoMethodName] && val[this._getInfoMethodName]());
                         if (!!objectInfo) {
-                            if (val[this._disposeUndoEngineSubscriptionsName]) {
-                                val[this._disposeUndoEngineSubscriptionsName].inc++;
+                            if (val[UndoEngine._disposeUndoEngineSubscriptionsName]) {
+                                val[UndoEngine._disposeUndoEngineSubscriptionsName].inc++;
                             }
                             else {
-                                val[this._disposeUndoEngineSubscriptionsName] = { inc: 1 };
+                                val[UndoEngine._disposeUndoEngineSubscriptionsName] = { inc: 1, instance: this };
                                 subscriptions = this.subscribe(val, objectInfo);
-                                val[this._disposeUndoEngineSubscriptionsName]["func"] = function () {
-                                    val[_this._disposeUndoEngineSubscriptionsName].inc--;
+                                val[UndoEngine._disposeUndoEngineSubscriptionsName]["func"] = function () {
+                                    val[UndoEngine._disposeUndoEngineSubscriptionsName].inc--;
                                     _this._disposeChilds(val, objectInfo);
-                                    if (val[_this._disposeUndoEngineSubscriptionsName].inc === 0) {
+                                    if (val[UndoEngine._disposeUndoEngineSubscriptionsName].inc === 0) {
                                         _this._cleanSubscribtions(subscriptions);
-                                        delete val[_this._disposeUndoEngineSubscriptionsName];
+                                        delete val[UndoEngine._disposeUndoEngineSubscriptionsName];
                                     }
                                 };
                             }
@@ -2175,11 +2504,11 @@ var DevExpress;
                     if (val) {
                         if (Array.isArray(val)) {
                             for (var i = 0; i < val.length; i++) {
-                                val[i][this._disposeUndoEngineSubscriptionsName] && val[i][this._disposeUndoEngineSubscriptionsName].func();
+                                val[i][UndoEngine._disposeUndoEngineSubscriptionsName] && val[i][UndoEngine._disposeUndoEngineSubscriptionsName].func();
                             }
                         }
                         else {
-                            val[this._disposeUndoEngineSubscriptionsName] && val[this._disposeUndoEngineSubscriptionsName].func();
+                            val[UndoEngine._disposeUndoEngineSubscriptionsName] && val[UndoEngine._disposeUndoEngineSubscriptionsName].func();
                         }
                     }
                 };
@@ -2284,8 +2613,11 @@ var DevExpress;
                     this._subscriptions = [];
                     this._visited = [];
                 };
+                UndoEngine.prototype.dispose = function () {
+                    this.removeTargetSubscription();
+                };
                 UndoEngine.prototype.removeTargetSubscription = function () {
-                    this._targetSubscription.dispose();
+                    this._targetSubscription && this._targetSubscription.dispose();
                     this.reset();
                 };
                 UndoEngine.prototype.undoAll = function () {
@@ -2366,30 +2698,35 @@ var DevExpress;
                     this._position = -1;
                 };
                 UndoEngine.prototype.end = function () {
+                    var _this = this;
                     this.isIngroup--;
                     if (this.isIngroup !== -1) {
                         return;
                     }
                     if (this._observers.length > 0) {
                         this._position = this._groupPosition + 1;
-                        this._groupObservers.splice(this._position, this._groupObservers.length - this._position, this._observers);
+                        var removedItems = this._groupObservers.splice(this._position, this._groupObservers.length - this._position, this._observers);
+                        removedItems.forEach(function (changeSet) {
+                            if (Array.isArray(changeSet)) {
+                                changeSet.reverse().forEach(function (item) { return _this._disposeObserver(item); });
+                            }
+                            else {
+                                _this._disposeObserver(changeSet);
+                            }
+                        });
                     }
                     else {
                         this._position = this._groupPosition;
                     }
                     this._observers = this._groupObservers;
                 };
+                UndoEngine._disposeUndoEngineSubscriptionsName = "___dispose___UndoEngine___Subscriptions___";
                 return UndoEngine;
-            })();
+            })(Utils.Disposable);
             Utils.UndoEngine = UndoEngine;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 /// <reference path="utils.ts" />
 /// <reference path="undoengine.ts" />
 var DevExpress;
@@ -2695,21 +3032,6 @@ var DevExpress;
     (function (Analytics) {
         var Utils;
         (function (Utils) {
-            var Disposable = (function () {
-                function Disposable() {
-                    this._disposables = [];
-                    this.isDisposing = false;
-                }
-                Disposable.prototype.dispose = function () {
-                    if (!this.isDisposing) {
-                        this.isDisposing = true;
-                        this._disposables.forEach(function (x) { return x && x.dispose(); });
-                        this._disposables = [];
-                    }
-                };
-                return Disposable;
-            })();
-            Utils.Disposable = Disposable;
             function integerValueConverter(val, defaultValue) {
                 var stringValue = "" + val;
                 return Analytics.Widgets.Internal.ValueEditorHelper.isValid(this.value, "integer", stringValue) ? stringValue : defaultValue;
@@ -2719,6 +3041,16 @@ var DevExpress;
                 var deferred = $.Deferred();
                 try {
                     var requests = [];
+                    var _pushRequest = function (path, propertyName) {
+                        var propertyDeferred = $.Deferred();
+                        options.fieldListProvider.getItemByPath(new Utils.PathRequest(path))
+                            .done(function (_) { return propertyDeferred.resolve(); }).fail(function (_) {
+                            path === propertyName ? propertyDeferred.reject()
+                                : options.fieldListProvider.getItemByPath(new Utils.PathRequest([path.split('.')[0], propertyName].join('.')))
+                                    .done(function (_) { return propertyDeferred.resolve(); }).fail(function (_) { return propertyDeferred.reject(); });
+                        });
+                        requests.push(propertyDeferred);
+                    };
                     var expression = Analytics.Criteria.CriteriaOperator.parse(options.expression);
                     Analytics.Criteria.Utils.criteriaForEach(expression, function (operator, innerPath) {
                         if (operator instanceof Analytics.Criteria.OperandProperty) {
@@ -2727,14 +3059,12 @@ var DevExpress;
                             if ((options.rootItems || []).indexOf(propertyName.split('.')[0]) === -1 && innerPath) {
                                 path = [innerPath, propertyName].join('.');
                             }
-                            var propertyDeferred = $.Deferred();
-                            options.fieldListProvider.getItemByPath(new Utils.PathRequest(path))
-                                .done(function (_) { return propertyDeferred.resolve(); }).fail(function (_) {
-                                path === propertyName ? propertyDeferred.reject()
-                                    : options.fieldListProvider.getItemByPath(new Utils.PathRequest([path.split('.')[0], propertyName].join('.')))
-                                        .done(function (_) { return propertyDeferred.resolve(); }).fail(function (_) { return propertyDeferred.reject(); });
-                            });
-                            requests.push(propertyDeferred);
+                            _pushRequest(path, propertyName);
+                        }
+                        else if (operator instanceof Analytics.Criteria.OperandParameter) {
+                            var parameterName = operator.parameterName;
+                            var parameterPath = "Parameters." + parameterName;
+                            _pushRequest(parameterPath, parameterName);
                         }
                     }, options.path);
                     $.when.apply($, requests).done(function (_) { return deferred.resolve(); }).fail(function (_) { return deferred.reject(); });
@@ -2750,30 +3080,20 @@ var DevExpress;
                 return Analytics.Widgets.Internal.ValueEditorHelper.isValid(this.value, "float", stringValue) ? stringValue : defaultValue;
             }
             Utils.floatValueConverter = floatValueConverter;
-            function classExists(selector) {
-                var lowerCaseSelector = selector.toLowerCase(), styleSheets = document.styleSheets || [], result = false;
-                for (var sheetIndex = 0; sheetIndex < styleSheets.length; sheetIndex++) {
-                    try {
-                        var rules = styleSheets[sheetIndex]["rules"];
-                        if (!rules)
-                            rules = styleSheets[sheetIndex]["cssRules"];
-                    }
-                    catch (e) {
-                        continue;
-                    }
-                    for (var ruleIndex = 0; ruleIndex < (rules || []).length; ruleIndex++) {
-                        if (rules[ruleIndex].selectorText && rules[ruleIndex].selectorText.toLowerCase() === lowerCaseSelector) {
-                            result = true;
-                            break;
-                        }
-                    }
-                    if (result) {
-                        break;
-                    }
-                }
-                return result;
+            var _lightThemes = ['generic.light', 'generic.carmine', 'generic.greenmist', 'generic.softblue', 'generic.light.compact'];
+            var _darkThemes = ['generic.dark', 'generic.contrast', 'generic.dark.compact', 'generic.darkmoon', 'generic.darkviolet'];
+            function getCurrentTheme() {
+                return DevExpress.ui.themes.current();
             }
-            Utils.classExists = classExists;
+            function isDarkTheme(theme) {
+                theme = theme || getCurrentTheme();
+                if ($.inArray(theme, _darkThemes) !== -1)
+                    return true;
+                if ($.inArray(theme, _lightThemes) !== -1)
+                    return false;
+                return false;
+            }
+            Utils.isDarkTheme = isDarkTheme;
             function setCursorInFunctionParameter(paramCount, editor, insertValue) {
                 if (!paramCount || paramCount <= 0)
                     return;
@@ -2787,6 +3107,11 @@ var DevExpress;
                 return data.isList === true || data.specifics === "List" || data.specifics === "ListSource";
             }
             Utils.isList = isList;
+            function getParentContainer(el, container) {
+                if (container === void 0) { container = ".dx-designer-viewport"; }
+                return $(el).closest(container);
+            }
+            Utils.getParentContainer = getParentContainer;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -2816,7 +3141,7 @@ var DevExpress;
                         var guid = ko.observable(null);
                         var theme = values.theme;
                         if (!theme)
-                            theme = Analytics.Utils.classExists(".dx-designer-dark") ? "ace/theme/ambiance" : "ace/theme/dreamweaver";
+                            theme = Analytics.Utils.isDarkTheme() ? "ace/theme/ambiance" : "ace/theme/dreamweaver";
                         editor.setTheme(theme);
                         editor.$blockScrolling = Infinity;
                         var languageMode = viewModel.languageHelper.getLanguageMode();
@@ -2870,6 +3195,10 @@ var DevExpress;
                         }
                         if (!showGutter) {
                             editor.renderer.setShowGutter(showGutter);
+                        }
+                        if (editor.renderer.$gutter) {
+                            var gutterClassName = editor.renderer.$gutter.className + " dxd-border-primary dxd-text-primary dxd-back-primary";
+                            editor.renderer.$gutter.className = gutterClassName;
                         }
                         var oldMouseMove = editor._defaultHandlers.guttermousemove;
                         editor._defaultHandlers.guttermousemove = function (e) {
@@ -2933,6 +3262,12 @@ var DevExpress;
                     });
                 }
             };
+            ko.bindingHandlers["svgAttrs"] = {
+                update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                    element.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+                    element.setAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink");
+                }
+            };
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -2945,27 +3280,27 @@ var DevExpress;
             var Internal;
             (function (Internal) {
                 Internal.operatorNames = [
-                    { text: "+", image: "addition", descriptionStringId: 'XtraEditorsExpressionEditor.Plus.Description' },
-                    { text: "-", image: "subtraction", descriptionStringId: 'XtraEditorsExpressionEditor.Minus.Description' },
-                    { text: "*", image: "multiplication", descriptionStringId: 'XtraEditorsExpressionEditor.Multiply.Description' },
-                    { text: "/", image: "division", descriptionStringId: 'XtraEditorsExpressionEditor.Divide.Description' },
-                    { text: "%", image: "modulus", hasSeparator: true, descriptionStringId: 'XtraEditorsExpressionEditor.Modulo.Description' },
+                    { text: "+", image: "addition", descriptionStringId: 'ExpressionEditorStringId.Operator_Plus' },
+                    { text: "-", image: "subtraction", descriptionStringId: 'ExpressionEditorStringId.Operator_Minus' },
+                    { text: "*", image: "multiplication", descriptionStringId: 'ExpressionEditorStringId.Operator_Multiply' },
+                    { text: "/", image: "division", descriptionStringId: 'ExpressionEditorStringId.Operator_Divide' },
+                    { text: "%", image: "modulus", hasSeparator: true, descriptionStringId: 'ExpressionEditorStringId.Operator_Modulo' },
                     { text: "()", image: "parenthesis", hasSeparator: true },
-                    { text: "|", descriptionStringId: 'XtraEditorsExpressionEditor.BitwiseOr.Description' },
-                    { text: "&", descriptionStringId: 'XtraEditorsExpressionEditor.BitwiseAnd.Description' },
-                    { text: "^", descriptionStringId: 'XtraEditorsExpressionEditor.BitwiseXor.Description' },
-                    { text: "==", image: "equal", descriptionStringId: 'XtraEditorsExpressionEditor.Equal.Description' },
-                    { text: "!=", image: "not_equal", descriptionStringId: 'XtraEditorsExpressionEditor.NotEqual.Description' },
-                    { text: "<", image: "less", descriptionStringId: 'XtraEditorsExpressionEditor.Less.Description' },
-                    { text: "<=", image: "less_or_equal", descriptionStringId: 'XtraEditorsExpressionEditor.LessOrEqual.Description' },
-                    { text: ">=", image: "greater_or_equal", descriptionStringId: 'XtraEditorsExpressionEditor.GreaterOrEqual.Description' },
-                    { text: ">", hasSeparator: true, image: "greater", descriptionStringId: 'XtraEditorsExpressionEditor.Greater.Description' },
-                    { text: "In", descriptionStringId: 'XtraEditorsExpressionEditor.In.Description' },
-                    { text: "Like", descriptionStringId: 'XtraEditorsExpressionEditor.Like.Description' },
-                    { text: "Between", descriptionStringId: 'XtraEditorsExpressionEditor.Between.Description' },
-                    { text: "And", image: "and", descriptionStringId: 'XtraEditorsExpressionEditor.And.Description' },
-                    { text: "Or", image: "or", descriptionStringId: 'XtraEditorsExpressionEditor.Or.Description' },
-                    { text: "Not", image: "not", descriptionStringId: 'XtraEditorsExpressionEditor.Not.Description' }
+                    { text: "|", descriptionStringId: 'ExpressionEditorStringId.Operator_BitwiseOr' },
+                    { text: "&", descriptionStringId: 'ExpressionEditorStringId.Operator_BitwiseAnd' },
+                    { text: "^", descriptionStringId: 'ExpressionEditorStringId.Operator_BitwiseXor' },
+                    { text: "==", image: "equal", descriptionStringId: 'ExpressionEditorStringId.Operator_Equal' },
+                    { text: "!=", image: "not_equal", descriptionStringId: 'ExpressionEditorStringId.Operator_NotEqual' },
+                    { text: "<", image: "less", descriptionStringId: 'ExpressionEditorStringId.Operator_Less' },
+                    { text: "<=", image: "less_or_equal", descriptionStringId: 'ExpressionEditorStringId.Operator_LessOrEqual' },
+                    { text: ">=", image: "greater_or_equal", descriptionStringId: 'ExpressionEditorStringId.Operator_GreaterOrEqual' },
+                    { text: ">", hasSeparator: true, image: "greater", descriptionStringId: 'ExpressionEditorStringId.Operator_Greater' },
+                    { text: "In", descriptionStringId: 'ExpressionEditorStringId.Operator_In' },
+                    { text: "Like", descriptionStringId: 'ExpressionEditorStringId.Operator_Like' },
+                    { text: "Between", descriptionStringId: 'ExpressionEditorStringId.Operator_Between' },
+                    { text: "And", image: "and", descriptionStringId: 'ExpressionEditorStringId.Operator_And' },
+                    { text: "Or", image: "or", descriptionStringId: 'ExpressionEditorStringId.Operator_Or' },
+                    { text: "Not", image: "not", descriptionStringId: 'ExpressionEditorStringId.Operator_Not' }
                 ];
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
@@ -2983,38 +3318,38 @@ var DevExpress;
                 Internal.functionDisplay = [
                     {
                         display: "Aggregate",
-                        localizationId: 'XtraEditorsExpressionEditor.functionsTypes.Properties.AggregateItems',
+                        localizationId: 'DataAccessStringId.ExpressionEditor_FunctionCategory_Aggregate',
                         category: "Aggregate",
                         items: {
-                            Avg: [{ paramCount: 1, text: "[].Avg()", displayName: "Avg()", descriptionStringId: 'XtraEditorsExpressionEditor.AvgAggregate.Description' }],
-                            Count: [{ paramCount: 1, text: "[].Count()", displayName: "Count()", descriptionStringId: 'XtraEditorsExpressionEditor.CountAggregate.Description' }],
-                            Exists: [{ paramCount: 1, text: "[].Exists()", displayName: "Exists()", descriptionStringId: 'XtraEditorsExpressionEditor.ExistsAggregate.Description' }],
-                            Max: [{ paramCount: 1, text: "[].Max()", displayName: "Max()", descriptionStringId: 'XtraEditorsExpressionEditor.MaxAggregate.Description' }],
-                            Min: [{ paramCount: 1, text: "[].Min()", displayName: "Min()", descriptionStringId: 'XtraEditorsExpressionEditor.MinAggregate.Description' }],
-                            Single: [{ paramCount: 1, text: "[].Single()", displayName: "Single()", descriptionStringId: 'XtraEditorsExpressionEditor.SingleAggregate.Description' }],
-                            Sum: [{ paramCount: 1, text: "[].Sum()", displayName: "Sum()", descriptionStringId: 'XtraEditorsExpressionEditor.SumAggregate.Description' }],
+                            Avg: [{ paramCount: 1, text: "[].Avg()", displayName: "Avg()", descriptionStringId: 'ExpressionEditorStringId.Function_AvgAggregate' }],
+                            Count: [{ paramCount: 1, text: "[].Count()", displayName: "Count()", descriptionStringId: 'ExpressionEditorStringId.Function_CountAggregate' }],
+                            Exists: [{ paramCount: 1, text: "[].Exists()", displayName: "Exists()", descriptionStringId: 'ExpressionEditorStringId.Function_ExistsAggregate' }],
+                            Max: [{ paramCount: 1, text: "[].Max()", displayName: "Max()", descriptionStringId: 'ExpressionEditorStringId.Function_MaxAggregate' }],
+                            Min: [{ paramCount: 1, text: "[].Min()", displayName: "Min()", descriptionStringId: 'ExpressionEditorStringId.Function_MinAggregate' }],
+                            Single: [{ paramCount: 1, text: "[].Single()", displayName: "Single()", descriptionStringId: 'ExpressionEditorStringId.Function_SingleAggregate' }],
+                            Sum: [{ paramCount: 1, text: "[].Sum()", displayName: "Sum()", descriptionStringId: 'ExpressionEditorStringId.Function_SumAggregate' }],
                         }
                     }, {
                         display: "Date-Time",
-                        localizationId: 'XtraEditorsExpressionEditor.functionsTypes.Properties.DateTimeItems',
+                        localizationId: 'DataAccessStringId.ExpressionEditor_FunctionCategory_DateTime',
                         items: {
-                            LocalDateTimeThisYear: [{ paramCount: 0, text: "LocalDateTimeThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisYear.Description' }],
-                            LocalDateTimeThisMonth: [{ paramCount: 0, text: "LocalDateTimeThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisMonth.Description' }],
+                            LocalDateTimeThisYear: [{ paramCount: 0, text: "LocalDateTimeThisYear()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeThisYear' }],
+                            LocalDateTimeThisMonth: [{ paramCount: 0, text: "LocalDateTimeThisMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeThisMonth' }],
                             LocalDateTimeLastMonth: [{ paramCount: 0, text: "LocalDateTimeLastMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeLastMonth' }],
-                            LocalDateTimeLastWeek: [{ paramCount: 0, text: "LocalDateTimeLastWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeLastWeek.Description' }],
+                            LocalDateTimeLastWeek: [{ paramCount: 0, text: "LocalDateTimeLastWeek()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeLastWeek' }],
                             LocalDateTimeLastYear: [{ paramCount: 0, text: "LocalDateTimeLastYear()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeLastYear' }],
-                            LocalDateTimeThisWeek: [{ paramCount: 0, text: "LocalDateTimeThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeThisWeek.Description' }],
-                            LocalDateTimeYesterday: [{ paramCount: 0, text: "LocalDateTimeYesterday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeYesterday.Description' }],
-                            LocalDateTimeToday: [{ paramCount: 0, text: "LocalDateTimeToday()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeToday.Description' }],
-                            LocalDateTimeNow: [{ paramCount: 0, text: "LocalDateTimeNow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNow.Description' }],
-                            LocalDateTimeTomorrow: [{ paramCount: 0, text: "LocalDateTimeTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTomorrow.Description' }],
-                            LocalDateTimeDayAfterTomorrow: [{ paramCount: 0, text: "LocalDateTimeDayAfterTomorrow()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeDayAfterTomorrow.Description' }],
-                            LocalDateTimeNextWeek: [{ paramCount: 0, text: "LocalDateTimeNextWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextWeek.Description' }],
+                            LocalDateTimeThisWeek: [{ paramCount: 0, text: "LocalDateTimeThisWeek()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeThisWeek' }],
+                            LocalDateTimeYesterday: [{ paramCount: 0, text: "LocalDateTimeYesterday()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeYesterday' }],
+                            LocalDateTimeToday: [{ paramCount: 0, text: "LocalDateTimeToday()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeToday' }],
+                            LocalDateTimeNow: [{ paramCount: 0, text: "LocalDateTimeNow()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeNow' }],
+                            LocalDateTimeTomorrow: [{ paramCount: 0, text: "LocalDateTimeTomorrow()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeTomorrow' }],
+                            LocalDateTimeDayAfterTomorrow: [{ paramCount: 0, text: "LocalDateTimeDayAfterTomorrow()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeDayAfterTomorrow' }],
+                            LocalDateTimeNextWeek: [{ paramCount: 0, text: "LocalDateTimeNextWeek()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeNextWeek' }],
                             LocalDateTimeTwoMonthsAway: [{ paramCount: 0, text: "LocalDateTimeTwoMonthsAway()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeTwoMonthsAway' }],
                             LocalDateTimeTwoYearsAway: [{ paramCount: 0, text: "LocalDateTimeTwoYearsAway()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeTwoYearsAway' }],
-                            LocalDateTimeTwoWeeksAway: [{ paramCount: 0, text: "LocalDateTimeTwoWeeksAway()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeTwoWeeksAway.Description' }],
-                            LocalDateTimeNextMonth: [{ paramCount: 0, text: "LocalDateTimeNextMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextMonth.Description' }],
-                            LocalDateTimeNextYear: [{ paramCount: 0, text: "LocalDateTimeNextYear()", descriptionStringId: 'XtraEditorsExpressionEditor.LocalDateTimeNextYear.Description' }],
+                            LocalDateTimeTwoWeeksAway: [{ paramCount: 0, text: "LocalDateTimeTwoWeeksAway()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeTwoWeeksAway' }],
+                            LocalDateTimeNextMonth: [{ paramCount: 0, text: "LocalDateTimeNextMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeNextMonth' }],
+                            LocalDateTimeNextYear: [{ paramCount: 0, text: "LocalDateTimeNextYear()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeNextYear' }],
                             LocalDateTimeYearBeforeToday: [{ paramCount: 0, text: "LocalDateTimeYearBeforeToday()", descriptionStringId: 'ExpressionEditorStringId.Function_LocalDateTimeYearBeforeToday' }],
                             IsOutlookIntervalBeyondThisYear: null,
                             IsOutlookIntervalLaterThisYear: null,
@@ -3033,9 +3368,9 @@ var DevExpress;
                             IsLastYear: [{ paramCount: 1, text: "IsLastYear()", descriptionStringId: 'ExpressionEditorStringId.Function_IsLastYear' }],
                             IsNextMonth: [{ paramCount: 1, text: "IsNextMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNextMonth' }],
                             IsNextYear: [{ paramCount: 1, text: "IsNextYear()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNextYear' }],
-                            IsThisWeek: [{ paramCount: 1, text: "IsThisWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisWeek.Description' }],
-                            IsThisMonth: [{ paramCount: 1, text: "IsThisMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisMonth.Description' }],
-                            IsThisYear: [{ paramCount: 1, text: "IsThisYear()", descriptionStringId: 'XtraEditorsExpressionEditor.IsThisYear.Description' }],
+                            IsThisWeek: [{ paramCount: 1, text: "IsThisWeek()", descriptionStringId: 'ExpressionEditorStringId.Function_IsThisWeek' }],
+                            IsThisMonth: [{ paramCount: 1, text: "IsThisMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_IsThisMonth' }],
+                            IsThisYear: [{ paramCount: 1, text: "IsThisYear()", descriptionStringId: 'ExpressionEditorStringId.Function_IsThisYear' }],
                             IsJanuary: [{ paramCount: 1, text: "IsJanuary()", descriptionStringId: 'ExpressionEditorStringId.Function_IsJanuary' }],
                             IsFebruary: [{ paramCount: 1, text: "IsFebruary()", descriptionStringId: 'ExpressionEditorStringId.Function_IsFebruary' }],
                             IsMarch: [{ paramCount: 1, text: "IsMarch()", descriptionStringId: 'ExpressionEditorStringId.Function_IsMarch' }],
@@ -3050,122 +3385,122 @@ var DevExpress;
                             IsDecember: [{ paramCount: 1, text: "IsDecember()", descriptionStringId: 'ExpressionEditorStringId.Function_IsDecember' }],
                             IsSameDay: [{ paramCount: 2, text: "IsSameDay(, )", descriptionStringId: 'ExpressionEditorStringId.Function_IsSameDay' }],
                             IsYearToDate: [{ paramCount: 1, text: "IsYearToDate()", descriptionStringId: 'ExpressionEditorStringId.Function_IsYearToDate' }],
-                            DateDiffTick: [{ paramCount: 2, text: "DateDiffTick(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffTick.Description' }],
-                            DateDiffSecond: [{ paramCount: 2, text: "DateDiffSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffSecond.Description' }],
-                            DateDiffMilliSecond: [{ paramCount: 2, text: "DateDiffMilliSecond(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMilliSecond.Description' }],
-                            DateDiffMinute: [{ paramCount: 2, text: "DateDiffMinute(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMinute.Description' }],
-                            DateDiffHour: [{ paramCount: 2, text: "DateDiffHour(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffHour.Description' }],
-                            DateDiffDay: [{ paramCount: 2, text: "DateDiffDay(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffDay.Description' }],
-                            DateDiffMonth: [{ paramCount: 2, text: "DateDiffMonth(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffMonth.Description' }],
-                            DateDiffYear: [{ paramCount: 2, text: "DateDiffYear(, )", descriptionStringId: 'XtraEditorsExpressionEditor.DateDiffYear.Description' }],
-                            GetDate: [{ paramCount: 1, text: "GetDate()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDate.Description' }],
-                            GetMilliSecond: [{ paramCount: 1, text: "GetMilliSecond()", descriptionStringId: 'XtraEditorsExpressionEditor.GetMilliSecond.Description' }],
-                            GetSecond: [{ paramCount: 1, text: "GetSecond()", descriptionStringId: 'XtraEditorsExpressionEditor.GetSecond.Description' }],
-                            GetMinute: [{ paramCount: 1, text: "GetMinute()", descriptionStringId: 'XtraEditorsExpressionEditor.GetMinute.Description' }],
-                            GetHour: [{ paramCount: 1, text: "GetHour()", descriptionStringId: 'XtraEditorsExpressionEditor.GetHour.Description' }],
-                            GetDay: [{ paramCount: 1, text: "GetDay()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDay.Description' }],
-                            GetMonth: [{ paramCount: 1, text: "GetMonth()", descriptionStringId: 'XtraEditorsExpressionEditor.GetMonth.Description' }],
-                            GetYear: [{ paramCount: 1, text: "GetYear()", descriptionStringId: 'XtraEditorsExpressionEditor.GetYear.Description' }],
-                            GetDayOfWeek: [{ paramCount: 1, text: "GetDayOfWeek()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDayOfWeek.Description' }],
-                            GetDayOfYear: [{ paramCount: 1, text: "GetDayOfYear()", descriptionStringId: 'XtraEditorsExpressionEditor.GetDayOfYear.Description' }],
-                            GetTimeOfDay: [{ paramCount: 1, text: "GetTimeOfDay()", descriptionStringId: 'XtraEditorsExpressionEditor.GetTimeOfDay.Description' }],
-                            Now: [{ paramCount: 0, text: "Now()", descriptionStringId: 'XtraEditorsExpressionEditor.Now.Description' }],
-                            UtcNow: [{ paramCount: 0, text: "UtcNow()", descriptionStringId: 'XtraEditorsExpressionEditor.UtcNow.Description' }],
-                            Today: [{ paramCount: 0, text: "Today()", descriptionStringId: 'XtraEditorsExpressionEditor.Today.Description' }],
-                            AddTimeSpan: [{ paramCount: 2, text: "AddTimeSpan(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddTimeSpan.Description' }],
-                            AddTicks: [{ paramCount: 2, text: "AddTicks(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddTicks.Description' }],
-                            AddMilliSeconds: [{ paramCount: 2, text: "AddMilliSeconds(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddMilliSeconds.Description' }],
-                            AddSeconds: [{ paramCount: 2, text: "AddSeconds(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddSeconds.Description' }],
-                            AddMinutes: [{ paramCount: 2, text: "AddMinutes(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddMinutes.Description' }],
-                            AddHours: [{ paramCount: 2, text: "AddHours(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddHours.Description' }],
-                            AddDays: [{ paramCount: 2, text: "AddDays(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddDays.Description' }],
-                            AddMonths: [{ paramCount: 2, text: "AddMonths(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddMonths.Description' }],
-                            AddYears: [{ paramCount: 2, text: "AddYears(, )", descriptionStringId: 'XtraEditorsExpressionEditor.AddYears.Description' }],
+                            DateDiffTick: [{ paramCount: 2, text: "DateDiffTick(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffTick' }],
+                            DateDiffSecond: [{ paramCount: 2, text: "DateDiffSecond(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffSecond' }],
+                            DateDiffMilliSecond: [{ paramCount: 2, text: "DateDiffMilliSecond(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffMilliSecond' }],
+                            DateDiffMinute: [{ paramCount: 2, text: "DateDiffMinute(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffMinute' }],
+                            DateDiffHour: [{ paramCount: 2, text: "DateDiffHour(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffHour' }],
+                            DateDiffDay: [{ paramCount: 2, text: "DateDiffDay(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffDay' }],
+                            DateDiffMonth: [{ paramCount: 2, text: "DateDiffMonth(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffMonth' }],
+                            DateDiffYear: [{ paramCount: 2, text: "DateDiffYear(, )", descriptionStringId: 'ExpressionEditorStringId.Function_DateDiffYear' }],
+                            GetDate: [{ paramCount: 1, text: "GetDate()", descriptionStringId: 'ExpressionEditorStringId.Function_GetDate' }],
+                            GetMilliSecond: [{ paramCount: 1, text: "GetMilliSecond()", descriptionStringId: 'ExpressionEditorStringId.Function_GetMilliSecond' }],
+                            GetSecond: [{ paramCount: 1, text: "GetSecond()", descriptionStringId: 'ExpressionEditorStringId.Function_GetSecond' }],
+                            GetMinute: [{ paramCount: 1, text: "GetMinute()", descriptionStringId: 'ExpressionEditorStringId.Function_GetMinute' }],
+                            GetHour: [{ paramCount: 1, text: "GetHour()", descriptionStringId: 'ExpressionEditorStringId.Function_GetHour' }],
+                            GetDay: [{ paramCount: 1, text: "GetDay()", descriptionStringId: 'ExpressionEditorStringId.Function_GetDay' }],
+                            GetMonth: [{ paramCount: 1, text: "GetMonth()", descriptionStringId: 'ExpressionEditorStringId.Function_GetMonth' }],
+                            GetYear: [{ paramCount: 1, text: "GetYear()", descriptionStringId: 'ExpressionEditorStringId.Function_GetYear' }],
+                            GetDayOfWeek: [{ paramCount: 1, text: "GetDayOfWeek()", descriptionStringId: 'ExpressionEditorStringId.Function_GetDayOfWeek' }],
+                            GetDayOfYear: [{ paramCount: 1, text: "GetDayOfYear()", descriptionStringId: 'ExpressionEditorStringId.Function_GetDayOfYear' }],
+                            GetTimeOfDay: [{ paramCount: 1, text: "GetTimeOfDay()", descriptionStringId: 'ExpressionEditorStringId.Function_GetTimeOfDay' }],
+                            Now: [{ paramCount: 0, text: "Now()", descriptionStringId: 'ExpressionEditorStringId.Function_Now' }],
+                            UtcNow: [{ paramCount: 0, text: "UtcNow()", descriptionStringId: 'ExpressionEditorStringId.Function_UtcNow' }],
+                            Today: [{ paramCount: 0, text: "Today()", descriptionStringId: 'ExpressionEditorStringId.Function_Today' }],
+                            AddTimeSpan: [{ paramCount: 2, text: "AddTimeSpan(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddTimeSpan' }],
+                            AddTicks: [{ paramCount: 2, text: "AddTicks(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddTicks' }],
+                            AddMilliSeconds: [{ paramCount: 2, text: "AddMilliSeconds(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddMilliSeconds' }],
+                            AddSeconds: [{ paramCount: 2, text: "AddSeconds(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddSeconds' }],
+                            AddMinutes: [{ paramCount: 2, text: "AddMinutes(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddMinutes' }],
+                            AddHours: [{ paramCount: 2, text: "AddHours(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddHours' }],
+                            AddDays: [{ paramCount: 2, text: "AddDays(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddDays' }],
+                            AddMonths: [{ paramCount: 2, text: "AddMonths(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddMonths' }],
+                            AddYears: [{ paramCount: 2, text: "AddYears(, )", descriptionStringId: 'ExpressionEditorStringId.Function_AddYears' }],
                         },
                     }, {
                         display: "Logical",
-                        localizationId: 'XtraEditorsExpressionEditor.functionsTypes.Properties.LogicalItems',
+                        localizationId: 'DataAccessStringId.ExpressionEditor_FunctionCategory_Logical',
                         items: {
-                            Iif: [{ paramCount: 3, text: "Iif(, , )", descriptionStringId: 'XtraEditorsExpressionEditor.Iif.Description' }],
-                            IsNull: [{ paramCount: 1, text: "IsNull()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNull.Description' }],
-                            IsNullOrEmpty: [{ paramCount: 1, text: "IsNullOrEmpty()", descriptionStringId: 'XtraEditorsExpressionEditor.IsNullOrEmpty.Description' }],
+                            Iif: [{ paramCount: 3, text: "Iif(, , )", descriptionStringId: 'ExpressionEditorStringId.Function_Iif' }],
+                            IsNull: [{ paramCount: 1, text: "IsNull()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNull' }],
+                            IsNullOrEmpty: [{ paramCount: 1, text: "IsNullOrEmpty()", descriptionStringId: 'ExpressionEditorStringId.Function_IsNullOrEmpty' }],
                         }
                     }, {
                         display: "Math",
-                        localizationId: 'XtraEditorsExpressionEditor.functionsTypes.Properties.MathItems',
+                        localizationId: 'DataAccessStringId.ExpressionEditor_FunctionCategory_Math',
                         items: {
-                            Abs: [{ paramCount: 1, text: "Abs()", descriptionStringId: 'XtraEditorsExpressionEditor.Abs.Description' }],
-                            Sqr: [{ paramCount: 1, text: "Sqr()", descriptionStringId: 'XtraEditorsExpressionEditor.Sqr.Description' }],
-                            Cos: [{ paramCount: 1, text: "Cos()", descriptionStringId: 'XtraEditorsExpressionEditor.Cos.Description' }],
-                            Sin: [{ paramCount: 1, text: "Sin()", descriptionStringId: 'XtraEditorsExpressionEditor.Sin.Description' }],
-                            Atn: [{ paramCount: 1, text: "Atn()", descriptionStringId: 'XtraEditorsExpressionEditor.Atn.Description' }],
-                            Exp: [{ paramCount: 1, text: "Exp()", descriptionStringId: 'XtraEditorsExpressionEditor.Exp.Description' }],
+                            Abs: [{ paramCount: 1, text: "Abs()", descriptionStringId: 'ExpressionEditorStringId.Function_Abs' }],
+                            Sqr: [{ paramCount: 1, text: "Sqr()", descriptionStringId: 'ExpressionEditorStringId.Function_Sqr' }],
+                            Cos: [{ paramCount: 1, text: "Cos()", descriptionStringId: 'ExpressionEditorStringId.Function_Cos' }],
+                            Sin: [{ paramCount: 1, text: "Sin()", descriptionStringId: 'ExpressionEditorStringId.Function_Sin' }],
+                            Atn: [{ paramCount: 1, text: "Atn()", descriptionStringId: 'ExpressionEditorStringId.Function_Atn' }],
+                            Exp: [{ paramCount: 1, text: "Exp()", descriptionStringId: 'ExpressionEditorStringId.Function_Exp' }],
                             Log: [
-                                { paramCount: 1, text: "Log()", descriptionStringId: 'XtraEditorsExpressionEditor.Log.Description' },
-                                { paramCount: 2, text: "Log(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Log2Param.Description' },
+                                { paramCount: 1, text: "Log()", descriptionStringId: 'ExpressionEditorStringId.Function_Log' },
+                                { paramCount: 2, text: "Log(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Log_2' },
                             ],
-                            Rnd: [{ paramCount: 0, text: "Rnd()", descriptionStringId: 'XtraEditorsExpressionEditor.Rnd.Description' }],
-                            Tan: [{ paramCount: 1, text: "Tan()", descriptionStringId: 'XtraEditorsExpressionEditor.Tan.Description' }],
-                            Power: [{ paramCount: 2, text: "Power(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Power.Description' }],
-                            Sign: [{ paramCount: 1, text: "Sign()", descriptionStringId: 'XtraEditorsExpressionEditor.Sign.Description' }],
+                            Rnd: [{ paramCount: 0, text: "Rnd()", descriptionStringId: 'ExpressionEditorStringId.Function_Rnd' }],
+                            Tan: [{ paramCount: 1, text: "Tan()", descriptionStringId: 'ExpressionEditorStringId.Function_Tan' }],
+                            Power: [{ paramCount: 2, text: "Power(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Power' }],
+                            Sign: [{ paramCount: 1, text: "Sign()", descriptionStringId: 'ExpressionEditorStringId.Function_Sign' }],
                             Round: [
-                                { paramCount: 1, text: "Round()", descriptionStringId: 'XtraEditorsExpressionEditor.Round.Description' },
-                                { paramCount: 2, text: "Round(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Round2Param.Description' },
+                                { paramCount: 1, text: "Round()", descriptionStringId: 'ExpressionEditorStringId.Function_Round' },
+                                { paramCount: 2, text: "Round(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Round_2' },
                             ],
-                            Ceiling: [{ paramCount: 1, text: "Ceiling()", descriptionStringId: 'XtraEditorsExpressionEditor.Ceiling.Description' }],
-                            Floor: [{ paramCount: 1, text: "Floor()", descriptionStringId: 'XtraEditorsExpressionEditor.Floor.Description' }],
-                            Max: [{ paramCount: 2, text: "Max(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Max.Description' }],
-                            Min: [{ paramCount: 2, text: "Min(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Min.Description' }],
-                            Acos: [{ paramCount: 1, text: "Acos()", descriptionStringId: 'XtraEditorsExpressionEditor.Acos.Description' }],
-                            Asin: [{ paramCount: 1, text: "Asin()", descriptionStringId: 'XtraEditorsExpressionEditor.Asin.Description' }],
-                            Atn2: [{ paramCount: 2, text: "Atn2(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Atn2.Description' }],
-                            BigMul: [{ paramCount: 2, text: "BigMul(, )", descriptionStringId: 'XtraEditorsExpressionEditor.BigMul.Description' }],
-                            Cosh: [{ paramCount: 1, text: "Cosh()", descriptionStringId: 'XtraEditorsExpressionEditor.Cosh.Description' }],
-                            Log10: [{ paramCount: 1, text: "Log10()", descriptionStringId: 'XtraEditorsExpressionEditor.Log10.Description' }],
-                            Sinh: [{ paramCount: 1, text: "Sinh()", descriptionStringId: 'XtraEditorsExpressionEditor.Sinh.Description' }],
-                            Tanh: [{ paramCount: 1, text: "Tanh()", descriptionStringId: 'XtraEditorsExpressionEditor.Tanh.Description' }],
-                            ToInt: [{ paramCount: 1, text: "ToInt()", descriptionStringId: 'XtraEditorsExpressionEditor.ToInt.Description' }],
-                            ToLong: [{ paramCount: 1, text: "ToLong()", descriptionStringId: 'XtraEditorsExpressionEditor.ToLong.Description' }],
-                            ToFloat: [{ paramCount: 1, text: "ToFloat()", descriptionStringId: 'XtraEditorsExpressionEditor.ToFloat.Description' }],
-                            ToDouble: [{ paramCount: 1, text: "ToDouble()", descriptionStringId: 'XtraEditorsExpressionEditor.ToDouble.Description' }],
-                            ToDecimal: [{ paramCount: 1, text: "ToDecimal()", descriptionStringId: 'XtraEditorsExpressionEditor.ToDecimal.Description' }],
+                            Ceiling: [{ paramCount: 1, text: "Ceiling()", descriptionStringId: 'ExpressionEditorStringId.Function_Ceiling' }],
+                            Floor: [{ paramCount: 1, text: "Floor()", descriptionStringId: 'ExpressionEditorStringId.Function_Floor' }],
+                            Max: [{ paramCount: 2, text: "Max(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Max' }],
+                            Min: [{ paramCount: 2, text: "Min(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Min' }],
+                            Acos: [{ paramCount: 1, text: "Acos()", descriptionStringId: 'ExpressionEditorStringId.Function_Acos' }],
+                            Asin: [{ paramCount: 1, text: "Asin()", descriptionStringId: 'ExpressionEditorStringId.Function_Asin' }],
+                            Atn2: [{ paramCount: 2, text: "Atn2(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Atn2' }],
+                            BigMul: [{ paramCount: 2, text: "BigMul(, )", descriptionStringId: 'ExpressionEditorStringId.Function_BigMul' }],
+                            Cosh: [{ paramCount: 1, text: "Cosh()", descriptionStringId: 'ExpressionEditorStringId.Function_Cosh' }],
+                            Log10: [{ paramCount: 1, text: "Log10()", descriptionStringId: 'ExpressionEditorStringId.Function_Log10' }],
+                            Sinh: [{ paramCount: 1, text: "Sinh()", descriptionStringId: 'ExpressionEditorStringId.Function_Sinh' }],
+                            Tanh: [{ paramCount: 1, text: "Tanh()", descriptionStringId: 'ExpressionEditorStringId.Function_Tanh' }],
+                            ToInt: [{ paramCount: 1, text: "ToInt()", descriptionStringId: 'ExpressionEditorStringId.Function_ToInt' }],
+                            ToLong: [{ paramCount: 1, text: "ToLong()", descriptionStringId: 'ExpressionEditorStringId.Function_ToLong' }],
+                            ToFloat: [{ paramCount: 1, text: "ToFloat()", descriptionStringId: 'ExpressionEditorStringId.Function_ToFloat' }],
+                            ToDouble: [{ paramCount: 1, text: "ToDouble()", descriptionStringId: 'ExpressionEditorStringId.Function_ToDouble' }],
+                            ToDecimal: [{ paramCount: 1, text: "ToDecimal()", descriptionStringId: 'ExpressionEditorStringId.Function_ToDecimal' }],
                         }
                     }, {
                         display: "String",
-                        localizationId: 'XtraEditorsExpressionEditor.functionsTypes.Properties.StringItems',
+                        localizationId: 'DataAccessStringId.ExpressionEditor_FunctionCategory_Text',
                         items: {
-                            Trim: [{ paramCount: 1, text: "Trim()", descriptionStringId: 'XtraEditorsExpressionEditor.Trim.Description' }],
-                            Len: [{ paramCount: 1, text: "Len()", descriptionStringId: 'XtraEditorsExpressionEditor.Len.Description' }],
+                            Trim: [{ paramCount: 1, text: "Trim()", descriptionStringId: 'ExpressionEditorStringId.Function_Trim' }],
+                            Len: [{ paramCount: 1, text: "Len()", descriptionStringId: 'ExpressionEditorStringId.Function_Len' }],
                             Substring: [
-                                { paramCount: 3, text: "Substring('', , )", descriptionStringId: 'XtraEditorsExpressionEditor.Substring3param.Description' },
-                                { paramCount: 2, text: "Substring('', )", descriptionStringId: 'XtraEditorsExpressionEditor.Substring2param.Description' }
+                                { paramCount: 3, text: "Substring('', , )", descriptionStringId: 'ExpressionEditorStringId.Function_Substring_3' },
+                                { paramCount: 2, text: "Substring('', )", descriptionStringId: 'ExpressionEditorStringId.Function_Substring' }
                             ],
-                            Upper: [{ paramCount: 1, text: "Upper()", descriptionStringId: 'XtraEditorsExpressionEditor.Upper.Description' }],
-                            Lower: [{ paramCount: 1, text: "Lower()", descriptionStringId: 'XtraEditorsExpressionEditor.Lower.Description' }],
-                            Concat: [{ paramCount: Infinity, text: "Concat(, )", descriptionStringId: 'XtraEditorsExpressionEditor.Concat.Description' }],
-                            Ascii: [{ paramCount: 1, text: "Ascii('')", descriptionStringId: 'XtraEditorsExpressionEditor.Ascii.Description' }],
-                            Char: [{ paramCount: 1, text: "Char()", descriptionStringId: 'XtraEditorsExpressionEditor.Char.Description' }],
-                            ToStr: [{ paramCount: 1, text: "ToStr()", descriptionStringId: 'XtraEditorsExpressionEditor.ToStr.Description' }],
-                            Replace: [{ paramCount: 3, text: "Replace('','', '')", descriptionStringId: 'XtraEditorsExpressionEditor.Replace.Description' }],
-                            Reverse: [{ paramCount: 1, text: "Reverse('')", descriptionStringId: 'XtraEditorsExpressionEditor.Reverse.Description' }],
-                            Insert: [{ paramCount: 3, text: "Insert('', , '')", descriptionStringId: 'XtraEditorsExpressionEditor.Insert.Description' }],
+                            Upper: [{ paramCount: 1, text: "Upper()", descriptionStringId: 'ExpressionEditorStringId.Function_Upper' }],
+                            Lower: [{ paramCount: 1, text: "Lower()", descriptionStringId: 'ExpressionEditorStringId.Function_Lower' }],
+                            Concat: [{ paramCount: Infinity, text: "Concat(, )", descriptionStringId: 'ExpressionEditorStringId.Function_Concat' }],
+                            Ascii: [{ paramCount: 1, text: "Ascii('')", descriptionStringId: 'ExpressionEditorStringId.Function_Ascii' }],
+                            Char: [{ paramCount: 1, text: "Char()", descriptionStringId: 'ExpressionEditorStringId.Function_Char' }],
+                            ToStr: [{ paramCount: 1, text: "ToStr()", descriptionStringId: 'ExpressionEditorStringId.Function_ToStr' }],
+                            Replace: [{ paramCount: 3, text: "Replace('','', '')", descriptionStringId: 'ExpressionEditorStringId.Function_Replace' }],
+                            Reverse: [{ paramCount: 1, text: "Reverse('')", descriptionStringId: 'ExpressionEditorStringId.Function_Reverse' }],
+                            Insert: [{ paramCount: 3, text: "Insert('', , '')", descriptionStringId: 'ExpressionEditorStringId.Function_Insert' }],
                             CharIndex: [
-                                { paramCount: 2, text: "CharIndex('','')", descriptionStringId: 'XtraEditorsExpressionEditor.CharIndex.Description' },
-                                { paramCount: 3, text: "CharIndex('','', )", descriptionStringId: 'XtraEditorsExpressionEditor.CharIndex3Param.Description' }],
+                                { paramCount: 2, text: "CharIndex('','')", descriptionStringId: 'ExpressionEditorStringId.Function_CharIndex' },
+                                { paramCount: 3, text: "CharIndex('','', )", descriptionStringId: 'ExpressionEditorStringId.Function_CharIndex_3' }],
                             Remove: [
-                                { paramCount: 2, text: "Remove('', )", descriptionStringId: 'XtraEditorsExpressionEditor.Remove2Param.Description' },
-                                { paramCount: 3, text: "Remove('', , )", descriptionStringId: 'XtraEditorsExpressionEditor.Remove3Param.Description' }],
+                                { paramCount: 2, text: "Remove('', )", descriptionStringId: 'ExpressionEditorStringId.Function_Remove' },
+                                { paramCount: 3, text: "Remove('', , )", descriptionStringId: 'ExpressionEditorStringId.Function_Remove_3' }],
                             PadLeft: [
-                                { paramCount: 2, text: "PadLeft(, )", descriptionStringId: 'XtraEditorsExpressionEditor.PadLeft.Description' },
-                                { paramCount: 3, text: "PadLeft(, , '')", descriptionStringId: 'XtraEditorsExpressionEditor.PadLeft3Param.Description' }
+                                { paramCount: 2, text: "PadLeft(, )", descriptionStringId: 'ExpressionEditorStringId.Function_PadLeft' },
+                                { paramCount: 3, text: "PadLeft(, , '')", descriptionStringId: 'ExpressionEditorStringId.Function_PadLeft_3' }
                             ],
                             PadRight: [
-                                { paramCount: 2, text: "PadRight(, )", descriptionStringId: 'XtraEditorsExpressionEditor.PadRight.Description' },
-                                { paramCount: 3, text: "PadRight(, , '')", descriptionStringId: 'XtraEditorsExpressionEditor.PadRight3Param.Description' }
+                                { paramCount: 2, text: "PadRight(, )", descriptionStringId: 'ExpressionEditorStringId.Function_PadRight' },
+                                { paramCount: 3, text: "PadRight(, , '')", descriptionStringId: 'ExpressionEditorStringId.Function_PadRight_3' }
                             ],
-                            StartsWith: [{ paramCount: 2, text: "StartsWith('', '')", descriptionStringId: 'XtraEditorsExpressionEditor.StartsWith.Description' }],
-                            EndsWith: [{ paramCount: 2, text: "EndsWith('', '')", descriptionStringId: 'XtraEditorsExpressionEditor.EndsWith.Description' }],
-                            Contains: [{ paramCount: 0, text: "Contains('', '')", descriptionStringId: 'XtraEditorsExpressionEditor.Contains.Description' }],
+                            StartsWith: [{ paramCount: 2, text: "StartsWith('', '')", descriptionStringId: 'ExpressionEditorStringId.Function_StartsWith' }],
+                            EndsWith: [{ paramCount: 2, text: "EndsWith('', '')", descriptionStringId: 'ExpressionEditorStringId.Function_EndsWith' }],
+                            Contains: [{ paramCount: 0, text: "Contains('', '')", descriptionStringId: 'ExpressionEditorStringId.Function_Contains' }],
                             Join: [
                                 { paramCount: 1, text: "Join()", descriptionStringId: "ExpressionEditorStringId.Function_Join" },
                                 { paramCount: 2, text: "Join(, '')", descriptionStringId: "ExpressionEditorStringId.Function_Join_2" }],
@@ -3401,26 +3736,59 @@ var DevExpress;
                 };
                 CodeCompletor.prototype.beforeInsertMatch = function (editor, token, parentPrefix) {
                     var cursorPosition = editor.getCursorPosition();
-                    token = token || editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
-                    if (!token)
-                        return;
-                    var endColumn = null;
-                    if (token.type === "support.variable" || token.type === "support.function") {
-                        endColumn = Math.max(token.start + token.value.length, cursorPosition.column);
+                    if (parentPrefix === "Parameters.") {
+                        token = token || !this["_isInContext"]() && editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
+                        if (token) {
+                            if ((token.type === "support.variable.other" || token.type === "support.function")) {
+                                editor.session.remove({
+                                    start: { column: token.start - 1 || 0, row: cursorPosition.row },
+                                    end: { column: Math.max(token.start + token.value.length || 0, cursorPosition.column), row: cursorPosition.row }
+                                });
+                            }
+                            else if (token.type === "support.variable.parameter") {
+                                editor.session.remove({
+                                    start: { column: token.start || 0, row: cursorPosition.row },
+                                    end: { column: Math.max(token.start + token.value.length + 1 || 0, cursorPosition.column), row: cursorPosition.row }
+                                });
+                            }
+                            else if (token.type === "text" && token.value[token.value.length - 1] === '?') {
+                                editor.session.remove({
+                                    start: { column: token.start + token.value.length - 1 || 0, row: cursorPosition.row },
+                                    end: { column: token.start + token.value.length || 0, row: cursorPosition.row },
+                                });
+                            }
+                        }
                     }
-                    else if (token.type === "support.context.start" && cursorPosition.column < token.start + token.value.length) {
-                        endColumn = token.start + token.value.length - 1;
+                    else {
+                        token = token || editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
+                        if (!token)
+                            return;
+                        var endColumn = null;
+                        if (token.type === "support.variable.other" || token.type === "support.function") {
+                            endColumn = Math.max(token.start + token.value.length || 0, cursorPosition.column);
+                        }
+                        else if (token.type === "support.context.start" && cursorPosition.column < token.start + token.value.length) {
+                            endColumn = token.start + token.value.length - 1 || 0;
+                        }
+                        if (endColumn !== null)
+                            editor.session.remove({
+                                start: { column: token.start || 0, row: cursorPosition.row },
+                                end: { column: endColumn, row: cursorPosition.row }
+                            });
                     }
-                    if (endColumn !== null)
-                        editor.session.remove({
-                            start: { column: token.start || 0, row: cursorPosition.row },
-                            end: { column: endColumn, row: cursorPosition.row }
-                        });
                 };
                 CodeCompletor.prototype.insertMatch = function (editor, parentPrefix, fieldName) {
-                    editor.insert("[" + (parentPrefix || "") + fieldName + "]");
+                    if (parentPrefix === "Parameters.") {
+                        editor.insert("?" + fieldName);
+                    }
+                    else {
+                        editor.insert("[" + (parentPrefix || "") + fieldName + "]");
+                    }
                 };
                 CodeCompletor.prototype.generateFieldDisplayName = function (parentPrefix, displayName) {
+                    if (parentPrefix === "Parameters.") {
+                        return "?" + displayName;
+                    }
                     return "[" + displayName + "]";
                 };
                 CodeCompletor.prototype._convertDataMemberInfoToCompletions = function (fields, token, parentPrefix) {
@@ -3458,7 +3826,7 @@ var DevExpress;
                     var dotIndex = token.value.lastIndexOf(".", position);
                     var closeIndex = token.value.lastIndexOf("]", position);
                     dotIndex = Math.max(closeIndex, dotIndex);
-                    var startIndex = token.type === "support.variable" || token.type === "support.context.start" ? 1 : 0;
+                    var startIndex = token.type === "support.variable.other" || token.type === "support.context.start" ? 1 : 0;
                     var parentPrefix = token.value.substring(startIndex, dotIndex);
                     if (parentPrefix[0] === "[")
                         parentPrefix = parentPrefix.substr(1);
@@ -3487,7 +3855,7 @@ var DevExpress;
                     if (ignorePrefix === void 0) { ignorePrefix = false; }
                     var $deferred = $.Deferred();
                     var parentPrefix = undefined;
-                    if (token && (token.type === "support.variable" || token.type === "support.function" || token.type === "support.context.start")) {
+                    if (token && (token.type === "support.variable.other" || token.type === "support.function" || token.type === "support.context.start")) {
                         parentPrefix = this._getParentPrefix(token);
                     }
                     this._getRealPath(this._combinePath(parentPrefix)).done(function (path) {
@@ -3553,13 +3921,23 @@ var DevExpress;
                     var prefix = /\s/.test(text[text.length - 1]) ? "" : " ";
                     completions.push.apply(completions, this.getOperatorCompletions(prefix));
                 };
+                CodeCompletor.prototype._addParameterOperators = function (completions, token) {
+                    var _this = this;
+                    var $deferred = $.Deferred();
+                    var $parametersPromise = ko.unwrap(this["_fieldListProvider"]).getItems(new Analytics.Utils.PathRequest("Parameters"))
+                        .done(function (fields) {
+                        completions.push.apply(completions, _this["_convertDataMemberInfoToCompletions"](fields, token, "Parameters."));
+                    });
+                    $.when($parametersPromise).always(function () { $deferred.resolve(completions); });
+                    return $deferred.promise();
+                };
                 CodeCompletor.prototype._getOperands = function (token) {
                     if (token === void 0) { token = null; }
                     var result = [];
                     this._addFunctions(result);
                     return this._getFields(token, result);
                 };
-                CodeCompletor.prototype._getOperandsOrOperators = function (text, completions) {
+                CodeCompletor.prototype._getOperandsOrOperators = function (token, text, completions) {
                     var exceptionInfo;
                     try {
                         Analytics.Criteria.CriteriaOperator.parse(text);
@@ -3569,7 +3947,10 @@ var DevExpress;
                     }
                     var trimmedText = text.trim();
                     var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
-                    if (!exceptionInfo && trimmedText || (lastNonSpaceSymbol === "]" || lastNonSpaceSymbol === ")")) {
+                    if (lastNonSpaceSymbol === '?' && text[text.length - 1] !== " ") {
+                        this._addParameterOperators(completions, token);
+                    }
+                    else if (!exceptionInfo && trimmedText || (lastNonSpaceSymbol === "]" || lastNonSpaceSymbol === ")")) {
                         this._addOperators(completions, text);
                     }
                     else {
@@ -3653,7 +4034,7 @@ var DevExpress;
                                     var member = trimBrackets(tokens[startContextToken].value.match(/^\[(?:[^\]\)])*\]/)[0]);
                                     path.push(member);
                                 }
-                                else if (tokens[contextPath[i] - 1].type === "support.variable") {
+                                else if (tokens[contextPath[i] - 1].type === "support.variable.other") {
                                     path.push(trimBrackets(tokens[contextPath[i] - 1].value));
                                 }
                             }
@@ -3686,7 +4067,7 @@ var DevExpress;
                     }
                     else if (currentToken.type === "string.quoted.single") {
                     }
-                    else if (currentToken.type === "support.variable") {
+                    else if (currentToken.type.indexOf("support.variable") === 0) {
                         $deferred = this._getFields(currentToken);
                     }
                     else if (currentToken.type === "support.function") {
@@ -3709,7 +4090,7 @@ var DevExpress;
                     return $deferred ? $deferred.promise() : $.Deferred().resolve(completions).promise();
                 };
                 CodeCompletor.prototype.defaultProcess = function (token, text, completions) {
-                    return this._getOperandsOrOperators(text, completions);
+                    return this._getOperandsOrOperators(token, text, completions);
                 };
                 CodeCompletor.prototype.getCompletions = function (aceEditor, session, pos, prefix, callback) {
                     this._getCompletions(aceEditor, session, pos, prefix).done(function (completions) {
@@ -3890,7 +4271,9 @@ var DevExpress;
                                 return;
                             var lines = expression.split('\n');
                             for (var i = 0; i < lines.length; i++) {
-                                var operands = result.filter(function (value) { return value.operand.startPosition.line === i; });
+                                var operands = result.filter(function (value) { return value.operand.startPosition.line === i; }).sort(function (a, b) {
+                                    return a.operand.startPosition.column - b.operand.startPosition.column;
+                                });
                                 for (var j = 0, delta = 0; j < operands.length; j++) {
                                     var column = operands[j].operand.startPosition.column;
                                     var originalName = operands[j].operand.propertyName;
@@ -4326,7 +4709,7 @@ var DevExpress;
                     _super.call(this);
                     this.type = "Value";
                     var result = value !== null && value !== undefined ? value : "";
-                    if (value && value["length"] && value[0] === "'" && value[value.length - 1] === "'") {
+                    if (value && value["length"] && ((value[0] === "'" && value[value.length - 1] === "'") || Analytics.Widgets.validateGuid(value))) {
                         result = value.slice(1, value.length - 1);
                     }
                     else if (value && value["length"] && value[0] === "#" && value[value.length - 1] === "#") {
@@ -4987,7 +5370,7 @@ var DevExpress;
                     Tools.prototype._createFieldsCategory = function (fields, parameters) {
                         var _this = this;
                         var disposables = [], category = {
-                            displayName: Analytics.getLocalization("Fields", "XtraEditorsExpressionEditor.Fields.Text"),
+                            displayName: Analytics.getLocalization("Fields", "ReportStringId.ExpressionEditor_ItemInfo_Fields"),
                             content: {
                                 isSelected: ko.observable(false),
                                 data: { fields: fields, parameters: parameters },
@@ -5005,14 +5388,17 @@ var DevExpress;
                     };
                     Tools.prototype._createConstantCategory = function () {
                         return {
-                            displayName: Analytics.getLocalization("Constants", "XtraEditorsExpressionEditor.Constants.Text"),
+                            displayName: Analytics.getLocalization("Constants", "DataAccessStringId.ExpressionEditor_DocumentationCategory_Constants"),
                             content: {
                                 isSelected: ko.observable(false),
-                                data: [
-                                    { text: "?", descriptionStringId: 'XtraEditorsExpressionEditor.Null.Description' },
-                                    { text: "False", descriptionStringId: 'XtraEditorsExpressionEditor.False.Description' },
-                                    { text: "True", descriptionStringId: 'XtraEditorsExpressionEditor.True.Description' }
-                                ],
+                                data: {
+                                    items: [
+                                        { text: "?", descriptionStringId: 'ExpressionEditorStringId.Constant_Null' },
+                                        { text: "False", descriptionStringId: 'ExpressionEditorStringId.Constant_False' },
+                                        { text: "True", descriptionStringId: 'ExpressionEditorStringId.Constant_True' }
+                                    ],
+                                    selectedItem: ko.observable(null)
+                                },
                                 name: "dx-expressioneditor-collection"
                             },
                             dispose: function () { return void 0; }
@@ -5020,10 +5406,13 @@ var DevExpress;
                     };
                     Tools.prototype._createOperatorsCategory = function (data) {
                         return {
-                            displayName: Analytics.getLocalization("Operators", "XtraEditorsExpressionEditor.Operators.Text"),
+                            displayName: Analytics.getLocalization("Operators", "DataAccessStringId.ExpressionEditor_DocumentationCategory_Operators"),
                             content: {
                                 isSelected: ko.observable(false),
-                                data: data,
+                                data: {
+                                    items: data,
+                                    selectedItem: ko.observable(null)
+                                },
                                 name: "dx-expressioneditor-collection"
                             },
                             dispose: function () { return void 0; }
@@ -5035,7 +5424,8 @@ var DevExpress;
                             data: {
                                 textToSearch: textToSearch,
                                 items: items,
-                                availableItems: ko.observableArray(items)
+                                availableItems: ko.observableArray(items),
+                                selectedItem: ko.observable(null)
                             },
                             name: "dx-expressioneditor-collection-function",
                         };
@@ -5060,7 +5450,7 @@ var DevExpress;
                     };
                     Tools.prototype._createFunctionsCategory = function (items) {
                         var textToSearch = ko.observable(""), disposables = [], isSelected = ko.observable(false), timeout = null, allItems = ko.computed(function () { return (_a = []).concat.apply(_a, items().map(function (x) { return x.data; })); var _a; }), content = this._createFunctionsCategoryContent(textToSearch, isSelected, allItems()), category = {
-                            displayName: Analytics.getLocalization("Functions", "XtraEditorsExpressionEditor.Functions.Text"),
+                            displayName: Analytics.getLocalization("Functions", "DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions"),
                             items: items, allItems: allItems, isSelected: isSelected, content: content,
                             collapsed: ko.observable(true),
                             updateContent: function (items, isSelected) {
@@ -5125,6 +5515,9 @@ var DevExpress;
                     this.resolver = resolver;
                     this._rtl = false;
                     this._data = ko.observable(null);
+                    this._actions = ko.observable([]);
+                    this._actionsSubscription = null;
+                    this._iconName = function () { return (ko.unwrap((_this.data && _this.data.icon) || (_this.data && _this.data.specifics)) || "default").toLowerCase(); };
                     this.level = -1;
                     this.items = ko.observableArray();
                     this.collapsed = ko.observable(true);
@@ -5180,8 +5573,15 @@ var DevExpress;
                     var _this = this;
                     return ko.computed(function () {
                         return "dx-image-fieldlist-"
-                            + (ko.unwrap((_this.data && _this.data.icon) || (_this.data && _this.data.specifics)) || "default").toLowerCase()
+                            + _this._iconName()
                             + (!showIcon ? " dx-treelist-image-empty" : "");
+                    });
+                };
+                TreeListItemViewModel.prototype._getImageTemplateName = function () {
+                    var _this = this;
+                    return ko.computed(function () {
+                        var _templateName = "dxrd-svg-fieldlist-" + _this._iconName();
+                        return Widgets.Internal.SvgTemplatesEngine.getExistingTemplate(_templateName);
                     });
                 };
                 TreeListItemViewModel.prototype._getNodeImageClassName = function () {
@@ -5212,11 +5612,17 @@ var DevExpress;
                     if (this._loader) {
                         this._loader.dispose();
                     }
+                    this._disposables.reverse().forEach(function (x) { return x.dispose && x.dispose(); });
+                    this._disposables.splice(0);
                     var promise = ko.observable();
-                    this._disposables.push(promise.subscribe(function (value) {
+                    var subscription = promise.subscribe(function (value) {
                         if (!value)
                             return;
                         value.done(function (data) {
+                            if (_this.isDisposing) {
+                                deferred.reject();
+                                return;
+                            }
                             var _data = data;
                             var items = _this.items.peek();
                             var dataObj = _this._createItemsObj(_data);
@@ -5244,6 +5650,7 @@ var DevExpress;
                                     newItem.parent = _this;
                                     newItem.padding = _this._applyPadding(_this._rtl ? "right" : "left", 20 * newItem.level + 12);
                                     newItem.imageClassName = newItem._getImageClassName(showIconsForChildItems);
+                                    newItem.imageTemplateName = newItem._getImageTemplateName();
                                     items.splice(index, 0, newItem);
                                     itemsObj[d.name] = { item: newItem, index: index };
                                 }
@@ -5283,7 +5690,13 @@ var DevExpress;
                                 }
                             }
                         });
-                    }));
+                    });
+                    this._disposables.push({
+                        dispose: function () {
+                            subscription.dispose();
+                            promise(null);
+                        }
+                    });
                     this._disposables.push(this._loader = ko.computed(function () {
                         promise(options.itemsProvider.getItems(new Analytics.Utils.PathRequest(_this.path, _this.pathParts)));
                     }));
@@ -5343,7 +5756,12 @@ var DevExpress;
                         return this._data();
                     },
                     set: function (newVal) {
+                        var _this = this;
                         this._data(newVal);
+                        this._actionsSubscription && this._actionsSubscription.dispose();
+                        this._actionsSubscription = ko.computed(function () {
+                            _this._actions(_this._treeListController && _this._treeListController.getActions ? _this._treeListController.getActions(_this) : []);
+                        });
                     },
                     enumerable: true,
                     configurable: true
@@ -5403,7 +5821,7 @@ var DevExpress;
                 });
                 Object.defineProperty(TreeListItemViewModel.prototype, "actions", {
                     get: function () {
-                        return (this._treeListController && this._treeListController.getActions) ? this._treeListController.getActions(this) : [];
+                        return this._actions();
                     },
                     enumerable: true,
                     configurable: true
@@ -5430,11 +5848,15 @@ var DevExpress;
                 });
                 TreeListItemViewModel.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
-                    this.items().forEach(function (item) { return item.dispose(); });
+                    this._actions([]);
+                    this._actionsSubscription && this._actionsSubscription.dispose();
+                    this.disposeObservableArray(this.items);
+                    this.resetObservableArray(this.items);
+                    this.parent = null;
                 };
                 Object.defineProperty(TreeListItemViewModel.prototype, "visible", {
                     get: function () {
-                        return !this._treeListController.itemsFilter || this._treeListController.itemsFilter(this.data, this.path);
+                        return !this._treeListController.itemsFilter || (this.data && this._treeListController.itemsFilter(this.data, this.path));
                     },
                     enumerable: true,
                     configurable: true
@@ -5459,14 +5881,20 @@ var DevExpress;
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
                     _super.call(this, options, path, onItemsVisibilityChanged, rtl);
+                    this._selectedPathSubscription = null;
                     this.resolver.done(function () {
                         onItemsVisibilityChanged();
                     });
-                    this._disposables.push(options.selectedPath.subscribe(function (newPath) {
+                    this._selectedPathSubscription = options.selectedPath.subscribe(function (newPath) {
                         _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
-                    }));
+                    });
                     this._selectItem(!!this.path ? this.path + "." + options.selectedPath() : options.selectedPath());
                 }
+                TreeListRootItemViewModel.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._selectedPathSubscription.dispose();
+                    this._selectedPathSubscription = null;
+                };
                 return TreeListRootItemViewModel;
             })(TreeListItemViewModel);
             Widgets.TreeListRootItemViewModel = TreeListRootItemViewModel;
@@ -5485,6 +5913,9 @@ var DevExpress;
                 function TreeListController() {
                     this.selectedItem = null;
                 }
+                TreeListController.prototype.dispose = function () {
+                    this.selectedItem = null;
+                };
                 TreeListController.prototype.itemsFilter = function (item) {
                     return true;
                 };
@@ -5527,7 +5958,10 @@ var DevExpress;
                     return item.specifics !== "none" && item.name !== "ReportItems";
                 };
                 ExpressionEditorTreeListController.prototype.select = function (value) {
-                    this.selectionHandler && this.selectionHandler(ko.unwrap(value.data["type"]));
+                    if (this.selectionHandler)
+                        this.selectionHandler(value);
+                    else
+                        _super.prototype.select.call(this, value);
                 };
                 ExpressionEditorTreeListController.prototype.getActions = function (item) {
                     var _this = this;
@@ -5551,7 +5985,7 @@ var DevExpress;
                     return item.specifics !== "none" && (!this.customFilter || this.customFilter(item));
                 };
                 ExpressionEditorParametersTreeListController.prototype.select = function (value) {
-                    this.selectionHandler(ko.unwrap(value.data["type"]));
+                    this.selectionHandler(value);
                 };
                 ExpressionEditorParametersTreeListController.prototype.getActions = function (item) {
                     var _this = this;
@@ -5673,8 +6107,9 @@ var DevExpress;
                     };
                     this.patchFieldName = function (fieldName) { return fieldName; };
                     this._parametersPutSelectionHandler = function (selectedItemPath, element) {
-                        var proposedFieldName = selectedItemPath;
-                        var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
+                        var parentPath = "Parameters";
+                        var proposedFieldName = selectedItemPath.substring(parentPath.length + 1);
+                        var newAddedString = '?' + _this.patchFieldName(proposedFieldName);
                         _this._updateValue(newAddedString, element);
                     };
                     this._fieldsPutSelectionHandler = function (selectedItemPath, element) {
@@ -5692,7 +6127,7 @@ var DevExpress;
                     };
                     this.aceAvailable = Widgets.aceAvailable;
                     this.popupVisible = ko.observable(false);
-                    this.title = function () { return DevExpress.Analytics.getLocalization('Expression Editor', 'XtraEditorsExpressionEditor.Expression.Text'); };
+                    this.title = function () { return DevExpress.Analytics.getLocalization('Expression Editor', 'ReportStringId.ExpressionEditor_ExpressionCaption'); };
                     this.value = ko.observable("");
                     this.textAreaValue = ko.observable("");
                     this.languageHelper = {
@@ -5732,7 +6167,7 @@ var DevExpress;
                                 session.clearAnnotations();
                             }
                             catch (exception) {
-                                var row = exception.hash.line;
+                                var row = exception.hash && exception.hash.line || 0;
                                 var column = 0;
                                 var lines = exception.message.split('\n');
                                 var text = lines[1] + "\n" + lines[2];
@@ -5754,6 +6189,7 @@ var DevExpress;
                         }
                         return true;
                     });
+                    this.getPopupContainer = Analytics.Utils.getParentContainer;
                     this.koOptions(options);
                     this.patchFieldName = function (fieldName) {
                         return _this.koOptions().patchFieldName && _this.koOptions().patchFieldName(fieldName) || fieldName;
@@ -5819,13 +6255,18 @@ var DevExpress;
                             _this.popupVisible(false);
                         }
                     };
-                    var selectionHandler = function (objectName) { return function (selectedItemType) {
-                        _this.tools.description(selectedItemType && selectedItemType !== "None" ? DevExpress.Analytics.getLocalization("The type of this " + objectName + " is: ", 'XtraEditorsExpressionEditor.Fields Description Prefix') + " " + selectedItemType : "");
-                    }; };
+                    var selectedItem = null;
+                    var selectionHandler = function (item) {
+                        var selectedItemType = ko.unwrap(item.data["type"]);
+                        if (selectedItem)
+                            selectedItem.isSelected(false);
+                        selectedItem = item;
+                        item.isSelected(true);
+                    };
                     var fieldsTreeListOptions = ko.pureComputed(function () {
-                        return _this.koOptions().path && _this.koOptions().path() && _this._createToolsOptions(_this.koOptions().path(), _this.fieldListProvider(), new Widgets.ExpressionEditorTreeListController(fieldName, function (data, element) { _this._fieldsPutSelectionHandler(data.path, element); }, selectionHandler("field")));
+                        return _this.koOptions().path && _this.koOptions().path() && _this._createToolsOptions(_this.koOptions().path(), _this.fieldListProvider(), new Widgets.ExpressionEditorTreeListController(fieldName, function (data, element) { _this._fieldsPutSelectionHandler(data.path, element); }, selectionHandler));
                     });
-                    this.parametersTreeListController = new Widgets.ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !Analytics.Utils.isList(item); }, this._parametersPutSelectionHandler, selectionHandler("Parameter"));
+                    this.parametersTreeListController = new Widgets.ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !Analytics.Utils.isList(item); }, this._parametersPutSelectionHandler, selectionHandler);
                     var parametersTreeListOptions = ko.pureComputed(function () {
                         return _this._createToolsOptions("", _this.fieldListProvider(), _this.parametersTreeListController);
                     });
@@ -5833,11 +6274,16 @@ var DevExpress;
                     this._createMainPopupButtons();
                     [fieldName, fieldsTreeListOptions, parametersTreeListOptions].forEach(function (x) { return _this._disposables.push(x); });
                 }
+                ExpressionEditor.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.koOptions(null);
+                    this.options = null;
+                };
                 ExpressionEditor.prototype._createMainPopupButtons = function () {
                     var self = this;
                     this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.getLocalization('Save', 'XtraEditorsExpressionEditor.buttonOK.Text'), onClick: function (sender) { self.save(sender); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.getLocalization('Cancel', 'XtraEditorsExpressionEditor.buttonCancel.Text'), onClick: function () { self.popupVisible(false); } } }
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.getLocalization('Save', DevExpress.Analytics.StringId.DataAccessBtnOK), onClick: function (sender) { self.save(sender); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.getLocalization('Cancel', DevExpress.Analytics.StringId.DataAccessBtnCancel), onClick: function () { self.popupVisible(false); } } }
                     ];
                 };
                 ExpressionEditor.prototype._getTextArea = function (element) {
@@ -5856,8 +6302,6 @@ var DevExpress;
                 ExpressionEditor.prototype.onShown = function () {
                     this.callbacks.focus();
                 };
-                ExpressionEditor.prototype.getPopupContainer = function (el) { return $(el).closest('.dx-viewport'); };
-                ;
                 return ExpressionEditor;
             })(Analytics.Utils.Disposable);
             Widgets.ExpressionEditor = ExpressionEditor;
@@ -5876,8 +6320,7 @@ var DevExpress;
                     var $element = $(element);
                     $element.children().remove();
                     $(element).addClass("dx-popup-general");
-                    var templateHtml = $('#dx-expressioneditor').text(), $element = $element.append(templateHtml), values = valueAccessor();
-                    var subscriptions = [];
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-expressioneditor'), $element = $element.append(templateHtml), values = valueAccessor();
                     var optionSubscription = null;
                     var editor = new Widgets.ExpressionEditor(ko.unwrap(values.options), values.fieldListProvider, viewModel.disabled, $(element).closest('.dx-rtl').length > 0, values.displayNameProvider);
                     if (ko.isSubscribable(values.options)) {
@@ -5885,13 +6328,16 @@ var DevExpress;
                             newOptions && editor.koOptions(newOptions);
                         });
                     }
-                    ko.applyBindings(editor, $element.children()[0]);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    var child = $element.children()[0];
+                    ko.applyBindings(editor, child);
+                    var callback = function () {
                         editor.dispose();
+                        editor = null;
                         optionSubscription && optionSubscription.dispose();
-                        subscriptions.forEach(function (x) { return x.dispose(); });
-                        subscriptions.splice(0);
-                    });
+                        ko.utils.domNodeDisposal.removeDisposeCallback(element, callback);
+                        callback = null;
+                    };
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, callback);
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -5914,7 +6360,7 @@ var DevExpress;
                     this.operatorType = ko.observable(null);
                     this.templateName = "dx-filtereditor-common";
                     this.isSelected = ko.observable(false);
-                    this.operatorClass = "criteria-operator-item-operator";
+                    this.operatorClass = "criteria-operator-item-operator dxd-filter-editor-operator-back-color dxd-filter-editor-text-color";
                     this.popupService = parent.popupService || { visible: ko.observable(false) };
                     this.model = operator;
                     this.helper = parent.helper;
@@ -6206,13 +6652,20 @@ var DevExpress;
                     FilterEditorSerializer.prototype.serializeOperandValue = function (operandValue) {
                         var result = operandValue.value;
                         if (result !== null && result !== undefined && ($.isNumeric(result) || String(result).toLowerCase() === "true" || String(result).toLowerCase() === "false")) {
-                            return operandValue.specifics === "string" ? "'" + result + "'" : result;
+                            if (operandValue.specifics === "string")
+                                return "'" + result + "'";
+                            if (operandValue.specifics === "guid" && Widgets.validateGuid(result))
+                                return '{' + result + '}';
+                            return result;
                         }
                         else if (result && operandValue.value instanceof Date) {
                             return "#" + Analytics.Utils.serializeDate(result) + "#";
                         }
                         else if (operandValue.specifics === "integer" || operandValue.specifics === "integer") {
                             return result || "?";
+                        }
+                        else if (Widgets.validateGuid(result)) {
+                            return '{' + result + '}';
                         }
                         return result ? "'" + result + "'" : "?";
                     };
@@ -6700,7 +7153,7 @@ var DevExpress;
                     var _this = this;
                     _super.call(this, operator, parent, fieldListProvider, path);
                     this.templateName = "dx-filtereditor-group";
-                    this.operatorClass = "criteria-operator-item-group";
+                    this.operatorClass = "criteria-operator-item-group dxd-filter-editor-group-back-color dxd-filter-editor-text-color";
                     this.operands = ko.observableArray([]);
                     this.createItems = null;
                     this.createItems = [
@@ -6840,7 +7293,7 @@ var DevExpress;
                         _this.parameterName(item.name);
                         _this.helper.onChange();
                     };
-                    this.operatorClass = "criteria-operator-item-parameter";
+                    this.operatorClass = "criteria-operator-item-parameter dxd-filter-editor-parameter-back-color dxd-filter-editor-text-color";
                     this.parameterName = ko.observable("");
                     this.templateName = "dx-filtereditor-parameter";
                     this.specifics = parent.specifics;
@@ -6889,7 +7342,7 @@ var DevExpress;
                         _this.fieldsOptions().selected(item);
                     };
                     this.templateName = "dx-filtereditor-property";
-                    this.operatorClass = "criteria-operator-item-field";
+                    this.operatorClass = "criteria-operator-item-field dxd-filter-editor-field-back-color dxd-filter-editor-field-back-color dxd-filter-editor-text-color";
                     this.propertyName(operator.propertyName);
                     var options = this.helper.generateTreelistOptions(fieldListProvider, path);
                     if (options.options && options.subscription) {
@@ -7226,6 +7679,9 @@ var DevExpress;
                         group: [],
                     };
                     this.onChange = function () { };
+                    this.onEditorFocusOut = function (criteria) { };
+                    this.onSave = function (criteria) { };
+                    this.onClosing = function () { };
                     this.handlers = {
                         create: function (criteria, popupService) {
                             return {
@@ -7439,62 +7895,6 @@ var DevExpress;
                         });
                         return operators;
                     };
-                    FilterEditorCodeCompletor.prototype.beforeInsertMatch = function (editor, token, parentPrefix) {
-                        if (parentPrefix === "Parameters.") {
-                            var cursorPosition = editor.getCursorPosition();
-                            token = token || !this["_isInContext"]() && editor.session.getTokenAt(cursorPosition.row, cursorPosition.column);
-                            if (token) {
-                                var trimmedText = token.value.trim();
-                                var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
-                                if ((token.type === "support.variable" || token.type === "support.function")) {
-                                    editor.session.remove({
-                                        start: { column: token.start - 1 || 0, row: cursorPosition.row },
-                                        end: { column: Math.max(token.start + token.value.length, cursorPosition.column), row: cursorPosition.row }
-                                    });
-                                }
-                                else if (lastNonSpaceSymbol === "?") {
-                                    editor.session.remove({
-                                        start: { column: (token.start + token.value.length - 1) || 0, row: cursorPosition.row },
-                                        end: { column: Math.max(token.start + token.value.length, cursorPosition.column), row: cursorPosition.row }
-                                    });
-                                }
-                            }
-                        }
-                        else {
-                            _super.prototype.beforeInsertMatch.call(this, editor, token, parentPrefix);
-                        }
-                    };
-                    FilterEditorCodeCompletor.prototype.insertMatch = function (editor, parentPrefix, fieldName) {
-                        if (parentPrefix === "Parameters.") {
-                            editor.insert("?" + fieldName);
-                        }
-                        else {
-                            _super.prototype.insertMatch.call(this, editor, parentPrefix, fieldName);
-                        }
-                    };
-                    FilterEditorCodeCompletor.prototype.generateFieldDisplayName = function (parentPrefix, displayName) {
-                        if (parentPrefix === "Parameters.") {
-                            return "?" + displayName;
-                        }
-                        return _super.prototype.generateFieldDisplayName.call(this, parentPrefix, displayName);
-                    };
-                    FilterEditorCodeCompletor.prototype.defaultProcess = function (token, text, completions) {
-                        var _this = this;
-                        var trimmedText = text.trim();
-                        var lastNonSpaceSymbol = trimmedText[trimmedText.length - 1];
-                        if (lastNonSpaceSymbol === '?' && text[text.length - 1] !== " ") {
-                            var $deferred = $.Deferred();
-                            var $parametersPromise = ko.unwrap(this["_fieldListProvider"]).getItems(new Analytics.Utils.PathRequest("Parameters"))
-                                .done(function (fields) {
-                                completions.push.apply(completions, _this["_convertDataMemberInfoToCompletions"](fields, token, "Parameters."));
-                            });
-                            $.when($parametersPromise).always(function () { $deferred.resolve(completions); });
-                            return $deferred.promise();
-                        }
-                        else {
-                            return _super.prototype.defaultProcess.call(this, token, text, completions);
-                        }
-                    };
                     return FilterEditorCodeCompletor;
                 })(Widgets.CodeCompletor);
                 Internal.FilterEditorCodeCompletor = FilterEditorCodeCompletor;
@@ -7554,6 +7954,9 @@ var DevExpress;
                     };
                     this.editorContainer = ko.observable();
                     this.textVisible = ko.observable(false);
+                    this.getPopupContainer = function (el) {
+                        return Analytics.Utils.getParentContainer(el, _this.options()["popupContainer"]);
+                    };
                     this.timeout = null;
                     this.advancedMode = ko.computed({
                         read: function () {
@@ -7586,9 +7989,13 @@ var DevExpress;
                     this.rtl = rtl;
                     options() && options().helper && (options().helper.rtl = rtl);
                     this.options = options;
+                    this._disposables.push(this.disabled = ko.computed(function () {
+                        return ko.unwrap(_this.options() && _this.options().disabled());
+                    }));
                     this.value = ko.observable("");
                     this.displayExpressionConverter = _displayNameProvider && new Analytics.Utils.DisplayExpressionConverter(_displayNameProvider);
                     this.save = function () {
+                        _this.helper.onSave(_this.value());
                         if (_this.operandSurface() && _this.isSurfaceValid()) {
                             var value = options().helper.serializer.serialize(_this.operand, false);
                             _this.options().value(value);
@@ -7646,6 +8053,7 @@ var DevExpress;
                             };
                         }
                         else {
+                            _this.helper.onClosing();
                             _this.value(null);
                             _this.operandSurface() && _this.operandSurface().dispose();
                             _this.operandSurface(null);
@@ -7666,7 +8074,13 @@ var DevExpress;
                     var self = this;
                     this.buttonItems = [
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.getLocalization("Save", "StringId.OK"), disabled: saveDisabled, onClick: function () { self.save(); } } },
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.getLocalization("Cancel", "StringId.Cancel"), onClick: function () { self.popupVisible(false); } } },
+                        {
+                            toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
+                                text: DevExpress.Analytics.getLocalization("Cancel", "StringId.Cancel"), onClick: function () {
+                                    self.popupVisible(false);
+                                }
+                            }
+                        },
                         { toolbar: 'bottom', location: 'before', widget: 'dxCheckBox', options: { value: self.advancedMode, text: self.advancedModeText() } }
                     ];
                 };
@@ -7749,6 +8163,7 @@ var DevExpress;
                 };
                 FilterEditor.prototype.onBlur = function () {
                     this.textFocused(false);
+                    this.helper.onEditorFocusOut(this.operand);
                 };
                 FilterEditor.prototype.cacheElement = function ($element) {
                     this.editorContainer($element.dxTextArea("instance"));
@@ -7794,9 +8209,6 @@ var DevExpress;
                     else
                         focusFn(this.editorContainer());
                 };
-                FilterEditor.prototype.getPopupContainer = function (el) {
-                    return $(el).closest(this.options()["popupContainer"] || ".dx-viewport");
-                };
                 return FilterEditor;
             })(Analytics.Utils.Disposable);
             Widgets.FilterEditor = FilterEditor;
@@ -7804,7 +8216,7 @@ var DevExpress;
                 init: function (element, valueAccessor) {
                     $(element).children().remove();
                     $(element).addClass("dx-popup-general");
-                    var templateHtml = $('#dx-filtereditor').text(), $element = $(element).append(templateHtml), values = valueAccessor();
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-filtereditor'), $element = $(element).append(templateHtml), values = valueAccessor();
                     var itemsProvider = ko.observable(ko.unwrap(values.fieldListProvider));
                     var subscriptions = [];
                     subscriptions.push(ko.computed(function () {
@@ -7821,8 +8233,8 @@ var DevExpress;
                         }
                     }));
                     var editor = new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0, values.displayNameProvider);
-                    ko.applyBindings(editor, $element.children()[0]);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    ko.applyBindingsToDescendants(editor, $element.children()[0]);
+                    ko.utils.domNodeDisposal.addDisposeCallback($element.children()[0], function () {
                         subscriptions.forEach(function (x) { return x.dispose(); });
                         editor.dispose();
                     });
@@ -7924,7 +8336,7 @@ var DevExpress;
             var FilterStringOptions = (function () {
                 function FilterStringOptions(filterString, dataMember, disabled, title) {
                     var _this = this;
-                    this.popupContainer = ".dx-viewport";
+                    this.popupContainer = ".dx-designer-viewport";
                     this.itemsProvider = null;
                     this.resetValue = function () {
                         _this.value("");
@@ -8004,7 +8416,7 @@ var DevExpress;
                     this.option("value", value);
                     this.option("disabled", disabled || false);
                     this.option("rtl", rtl || false);
-                    this.option("popupContainer", popupContainer || ".dx-viewport");
+                    this.option("popupContainer", popupContainer || ".dx-designer-viewport");
                     var self = this;
                     this.popupService = new Analytics.Internal.PopupService();
                     this._standardPatternSource = defaultPatterns || Widgets.Internal.formatStringStandardPatterns;
@@ -8238,7 +8650,7 @@ var DevExpress;
                 init: function (element, valueAccessor) {
                     $(element).children().remove();
                     $(element).addClass("dx-popup-general");
-                    var templateHtml = $('#dx-format-string').text(), $element = $(element).append(templateHtml), values = valueAccessor();
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-format-string'), $element = $(element).append(templateHtml), values = valueAccessor();
                     var formatEditor = new Widgets.FormatStringEditor(values.value, values['disabled'], values['standardPatterns'], values['customPatterns'] || DevExpress.Designer["Report"] && DevExpress.Designer["Report"]["formatStringEditorCustomSet"], values['actions'] || DevExpress.Designer["Report"] && DevExpress.Designer["Report"]["FormatStringService"].actions, values['rtl'], values['popupContainer']);
                     ko.applyBindings(formatEditor, $element.children()[0]);
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
@@ -8282,6 +8694,27 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
+            function cloneHtmlBinding(data, element, allBindings, viewModel, bindingContext) {
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    data.dispose();
+                });
+                setTimeout(function () {
+                    var isInitialized = false;
+                    ko.computed({
+                        read: function () {
+                            if (!isInitialized && ko.bindingHandlers["html"].init) {
+                                ko.bindingHandlers["html"].init(element, function () { return data.content; }, allBindings, viewModel, bindingContext);
+                                isInitialized = true;
+                            }
+                            if (ko.bindingHandlers["html"].update) {
+                                ko.bindingHandlers["html"].update(element, function () { return data.content; }, allBindings, viewModel, bindingContext);
+                            }
+                        },
+                        disposeWhenNodeIsRemoved: element
+                    });
+                }, 1);
+            }
+            Internal.cloneHtmlBinding = cloneHtmlBinding;
             var HighlightEngine = (function (_super) {
                 __extends(HighlightEngine, _super);
                 function HighlightEngine(options) {
@@ -8338,25 +8771,7 @@ var DevExpress;
             Internal.HighlightEngine = HighlightEngine;
             ko.bindingHandlers["searchHighlighting"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var highlight = new HighlightEngine(valueAccessor());
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        highlight.dispose();
-                    });
-                    setTimeout(function () {
-                        var isInitialized = false;
-                        ko.computed({
-                            read: function () {
-                                if (!isInitialized && ko.bindingHandlers["html"].init) {
-                                    ko.bindingHandlers["html"].init(element, function () { return highlight.content; }, allBindings, viewModel, bindingContext);
-                                    isInitialized = true;
-                                }
-                                if (ko.bindingHandlers["html"].update) {
-                                    ko.bindingHandlers["html"].update(element, function () { return highlight.content; }, allBindings, viewModel, bindingContext);
-                                }
-                            },
-                            disposeWhenNodeIsRemoved: element
-                        });
-                    }, 1);
+                    cloneHtmlBinding(new HighlightEngine(valueAccessor()), element, allBindings, viewModel, bindingContext);
                 }
             };
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
@@ -8373,6 +8788,8 @@ var DevExpress;
             ko.bindingHandlers['treelist'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var treeListViewModel = null;
+                    var childContext = null;
+                    var callback = null;
                     var values = valueAccessor(), options = ko.unwrap(values), pathArray, updateScrollBar = function () {
                         var $scrollView = $(element).closest(".dx-scrollview");
                         if ($scrollView.data("dxScrollView")) {
@@ -8383,11 +8800,15 @@ var DevExpress;
                             options.onItemsVisibilityChanged();
                         }
                     }, updateTreeList = function (options) {
+                        pathArray && pathArray.dispose();
                         options.treeListController = options.treeListController ? options.treeListController : new Widgets.TreeListController();
                         if (!options.treeListController.dragDropHandler) {
                             options.treeListController.dragDropHandler = bindingContext.$root.fieldDragHandler;
                         }
+                        options.itemsProvider = ko.unwrap(options.itemsProvider);
                         treeListViewModel && treeListViewModel.dispose();
+                        if (!options || !options.itemsProvider)
+                            return;
                         if (!options.rtl) {
                             options.rtl = $(element).closest('.dx-rtl').length > 0;
                         }
@@ -8402,22 +8823,32 @@ var DevExpress;
                         if (options.expandRootItems) {
                             treeListViewModel.items().forEach(function (item) { return item.toggleCollapsed(); });
                         }
-                        var templateHtml = $('#dx-treelist').text() || options.templateHtml, $element = $(element).html(templateHtml);
-                        var childContext = bindingContext.createChildContext(treeListViewModel);
+                        var templateHtml = options.templateHtml || DevExpress.Analytics.Widgets.Internal.getTemplate('dx-treelist'), $element = $(element).html(templateHtml);
+                        childContext = bindingContext.createChildContext(treeListViewModel);
                         ko.applyBindings(childContext, $element.children()[0]);
+                        callback && ko.utils.domNodeDisposal.removeDisposeCallback(element, callback);
+                        callback = function () {
+                            treeListViewModel && treeListViewModel.dispose();
+                            treeListViewModel = null;
+                            subscription && subscription.dispose();
+                            pathArray && pathArray.dispose();
+                            callback = null;
+                            ko.utils.domNodeDisposal.removeDisposeCallback(element, callback);
+                        };
+                        ko.utils.domNodeDisposal.addDisposeCallback(element, callback);
                     };
                     updateTreeList($.extend({}, options));
-                    var subscribtion = null;
+                    var subscription = null;
                     if (ko.isSubscribable(values)) {
-                        subscribtion = values.subscribe(function (newValue) {
-                            updateTreeList(newValue);
+                        subscription = values.subscribe(function (newValue) {
+                            newValue && updateTreeList($.extend({}, newValue));
                         });
                     }
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                        treeListViewModel && treeListViewModel.dispose();
-                        subscribtion && subscribtion.dispose();
-                        pathArray && pathArray.dispose();
-                    });
+                    else if (ko.isSubscribable(values.itemsProvider)) {
+                        subscription = values.itemsProvider.subscribe(function (newValue) {
+                            newValue && updateTreeList($.extend({}, values));
+                        });
+                    }
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -8512,7 +8943,6 @@ var DevExpress;
             Utils.Disposable = Disposable;
             Utils.integerValueConverter = DevExpress.Analytics.Utils.integerValueConverter;
             Utils.floatValueConverter = DevExpress.Analytics.Utils.floatValueConverter;
-            Utils.classExists = DevExpress.Analytics.Utils.classExists;
             Utils.setCursorInFunctionParameter = DevExpress.Analytics.Utils.setCursorInFunctionParameter;
             Utils.isList = DevExpress.Analytics.Utils.isList;
             ;
@@ -8529,7 +8959,6 @@ DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.An
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "Disposable");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "integerValueConverter");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "floatValueConverter");
-DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "classExists");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "setCursorInFunctionParameter");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "isList");
 var DevExpress;
@@ -9080,12 +9509,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,28],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,23],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,25],$Vk=[1,27],$Vl=[1,26],$Vm=[1,30],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,49,50,51,53,54,55],$VJ=[1,57],$VK=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VL=[5,26,27,29,35,50],$VM=[1,109],$VN=[1,110],$VO=[1,104],$VP=[1,106],$VQ=[1,107],$VR=[1,105],$VS=[1,108],$VT=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],$VU=[5,18,19,24,25,26,27,29,30,35,50],$VV=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,50],$VW=[29,35];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,29],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,24],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,23],$Vk=[1,26],$Vl=[1,28],$Vm=[1,27],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[1,51],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VJ=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50,51,52,54,55,56],$VK=[1,58],$VL=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VM=[5,26,27,29,35,51],$VN=[1,110],$VO=[1,111],$VP=[1,105],$VQ=[1,107],$VR=[1,108],$VS=[1,106],$VT=[1,109],$VU=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VV=[5,18,19,24,25,26,27,29,30,35,51],$VW=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,51],$VX=[29,35];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"property":48,"[":49,"]":50,".":51,"agg":52,"FIELD_END":53,"CH":54,"ESC_CH":55,"FIELD_START":56,"?":57,"NAME_SOFT":58,"commaseparated":59,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",49:"[",50:"]",51:".",53:"FIELD_END",54:"CH",55:"ESC_CH",56:"FIELD_START",57:"?",58:"NAME_SOFT"},
-productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[52,3],[52,1],[52,3],[52,1],[52,4],[52,4],[52,3],[52,4],[52,4],[52,4],[48,2],[48,2],[48,2],[48,3],[48,3],[48,1],[48,1],[48,1],[8,2],[8,2],[8,1],[33,2],[33,3],[59,1],[59,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"GUID":48,"property":49,"[":50,"]":51,".":52,"agg":53,"FIELD_END":54,"CH":55,"ESC_CH":56,"FIELD_START":57,"?":58,"NAME_SOFT":59,"commaseparated":60,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",48:"GUID",50:"[",51:"]",52:".",54:"FIELD_END",55:"CH",56:"ESC_CH",57:"FIELD_START",58:"?",59:"NAME_SOFT"},
+productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[53,3],[53,1],[53,3],[53,1],[53,4],[53,4],[53,3],[53,4],[53,4],[53,4],[49,2],[49,2],[49,2],[49,3],[49,3],[49,1],[49,1],[49,1],[8,2],[8,2],[8,1],[33,2],[33,3],[60,1],[60,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -9097,7 +9526,7 @@ break;
 case 2:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("const", { value: $$[$0] }); 
 break;
-case 3: case 4: case 40: case 41: case 42: case 43:
+case 3: case 4: case 40: case 41: case 42: case 43: case 44:
  this.$ = $$[$0]; 
 break;
 case 5:
@@ -9171,7 +9600,7 @@ break;
 case 26:
  this.$ = DevExpress.Analytics.Criteria.GroupOperator.combine(DevExpress.Analytics.Criteria.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 27: case 62: case 74:
+case 27: case 63: case 75:
  this.$ = $$[$0-1]; 
 break;
 case 28:
@@ -9215,10 +9644,10 @@ break;
 case 39:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType["Single"] || "Single", operands: $$[$0] }); 
 break;
-case 44:
+case 45:
  this.$ = null; 
 break;
-case 45:
+case 46:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-5].name, startColumn: $$[$0-5].col, startLine: $$[$0-5].line }), 
@@ -9226,7 +9655,7 @@ case 45:
             ); 
         
 break;
-case 46:
+case 47:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-4].name, startColumn: $$[$0-4].col, startLine: $$[$0-4].line }), 
@@ -9234,7 +9663,7 @@ case 46:
             ); 
         
 break;
-case 47:
+case 48:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
@@ -9242,7 +9671,7 @@ case 47:
             ); 
         
 break;
-case 48:
+case 49:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-3].name, startColumn: $$[$0-3].col, startLine: $$[$0-3].line }), 
@@ -9250,19 +9679,19 @@ case 48:
             );
         
 break;
-case 49:
+case 50:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
                 null, DevExpress.Analytics.Criteria.Aggregate.Exists, null);
         
 break;
-case 50:
+case 51:
  
             this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0].name, startColumn: $$[$0].col, startLine: $$[$0].line }); 
         
 break;
-case 51:
+case 52:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { }), 
@@ -9270,73 +9699,73 @@ case 51:
             ); 
         
 break;
-case 52:
+case 53:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Count  };  
 break;
-case 53:
+case 54:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Count };   
 break;
-case 54: case 55:
+case 55: case 56:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Exists }; 
 break;
-case 56:
+case 57:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Avg, expr: $$[$0-1] }; 
 break;
-case 57:
+case 58:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Sum, expr: $$[$0-1] }; 
 break;
-case 58:
+case 59:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Single, expr: DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: "This" }) }; 
 break;
-case 59:
+case 60:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Single, expr: $$[$0-1] }; 
 break;
-case 60:
+case 61:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Min, expr: $$[$0-1] }; 
 break;
-case 61:
+case 62:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Max, expr: $$[$0-1] }; 
 break;
-case 63:
+case 64:
  this.$ = { name: $$[$0-1].name + $$[$0], line: $$[$0-1].line, col: $$[$0-1].col }; 
 break;
-case 64:
+case 65:
  this.$ = { name: $$[$0-1].name +$$[$0].substr(1), line: $$[$0-1].line, col: $$[$0-1].col }; 
 break;
-case 65:
+case 66:
  this.$ = { name: $$[$0-2].name + ".", line: $$[$0-2].line, col: $$[$0-2].col }; 
 break;
-case 66:
+case 67:
  this.$ = { name: $$[$0-2].name + "." + $$[$0], line: $$[$0-2].line, col: $$[$0-2].col }; 
 break;
-case 67:
+case 68:
  this.$ = { name: "", line: _$[$0].first_line - 1, col: _$[$0].first_column + 1 }; 
 break;
-case 68:
+case 69:
  this.$ = { name: $$[$0], line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
 break;
-case 69:
+case 70:
  this.$ = { name: "^", line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
 break;
-case 70: case 71:
+case 71: case 72:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
 break;
-case 72:
+case 73:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("value", { }); 
 break;
-case 73:
+case 74:
  this.$ = []; 
 break;
-case 75:
+case 76:
  this.$ = [$$[$0]]; 
 break;
-case 76:
+case 77:
  this.$ = $$[$0-2].concat($$[$0]); 
 break;
 }
 },
-table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{1:[3]},{5:[1,29],9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG},o($VH,[2,2]),o($VH,[2,3]),o($VH,[2,4]),{4:51,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VI,[2,68],{33:56,28:$VJ}),{28:$VJ,33:58},{28:$VJ,33:59},{28:$VJ,33:60},{28:$VJ,33:61},{28:$VJ,33:62},{28:$VJ,33:63},{28:$VJ,33:64},o($VH,[2,40]),o($VH,[2,41]),o($VH,[2,42]),o($VH,[2,43]),o($VH,[2,44]),o($VH,[2,50],{49:[1,65],51:[1,66],53:[1,67],54:[1,68],55:[1,69]}),{50:[1,70]},o($VH,[2,72],{36:[1,71],58:[1,72]}),o($VI,[2,67]),o($VI,[2,69]),{1:[2,1]},{4:73,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:74,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{24:[1,88]},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:90,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{25:[1,92],31:[1,91]},{28:$VJ,33:93},{28:[1,94]},o($VH,[2,13]),o($VH,[2,14]),o($VK,[2,15],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq}),o($VL,[2,24],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,30:$VE,32:$VF,34:$VG}),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,95],30:$VE,32:$VF,34:$VG},o($VH,[2,32]),{4:98,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,96],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl,59:97},o($VH,[2,33]),o($VH,[2,34]),o($VH,[2,35]),o($VH,[2,36]),o($VH,[2,37]),o($VH,[2,38]),o($VH,[2,39]),{4:99,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,50:[1,100],56:$Vk,57:$Vl},{36:[1,103],37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:101,56:[1,102]},o($VI,[2,62]),o($VI,[2,63]),o($VI,[2,64]),{51:[1,111]},o($VH,[2,70]),o($VH,[2,71]),o($VH,[2,5]),o($VH,[2,6]),o($VT,[2,7],{9:$Vm,10:$Vn,13:$Vq}),o($VT,[2,8],{9:$Vm,10:$Vn,13:$Vq}),o($VH,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],[2,10],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,15:$Vs,16:$Vt}),o($VK,[2,11],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50],[2,12],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,15:$Vs}),o($VU,[2,16],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),o($VU,[2,17],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),o($VV,[2,18],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VV,[2,19],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VV,[2,20],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VV,[2,21],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,32:$VF,34:$VG}),o($VU,[2,22],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),{4:112,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VL,[2,25],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,30:$VE,32:$VF,34:$VG}),o([5,27,29,35,50],[2,26],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,30:$VE,32:$VF,34:$VG}),o($VH,[2,28]),{31:[1,113]},o($VH,[2,30]),{4:114,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VH,[2,27]),o($VH,[2,73]),{29:[1,115],35:[1,116]},o($VW,[2,75],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG}),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG,50:[1,117]},o($VH,[2,49],{51:[1,118]}),o($VH,[2,47]),o($VI,[2,65]),o($VI,[2,66]),o($VH,[2,53],{28:[1,119]}),o($VH,[2,55],{28:[1,120]}),{28:[1,121]},{28:[1,122]},{28:[1,123]},{28:[1,124]},{28:[1,125]},{37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:126},o($VU,[2,23],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,20:$Vw,21:$Vx,22:$Vy,23:$Vz,32:$VF,34:$VG}),o($VH,[2,29]),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG,35:[1,127]},o($VH,[2,74]),{4:128,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VH,[2,48],{51:[1,129]}),{37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:130},{29:[1,131]},{29:[1,132]},{4:133,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:134,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:136,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,135],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VH,[2,51]),{4:139,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:24,49:$Vj,56:$Vk,57:$Vl},o($VW,[2,76],{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,30:$VE,32:$VF,34:$VG}),{37:$VM,38:$VN,39:$VO,40:$VP,41:$VQ,42:$VR,43:$VS,52:140},o($VH,[2,46]),o($VH,[2,52]),o($VH,[2,54]),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,141],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,142],30:$VE,32:$VF,34:$VG},o($VH,[2,58]),{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,143],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,144],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,145],30:$VE,32:$VF,34:$VG},{9:$Vm,10:$Vn,11:$Vo,12:$Vp,13:$Vq,14:$Vr,15:$Vs,16:$Vt,18:$Vu,19:$Vv,20:$Vw,21:$Vx,22:$Vy,23:$Vz,24:$VA,25:$VB,26:$VC,27:$VD,29:[1,146],30:$VE,32:$VF,34:$VG},o($VH,[2,45]),o($VH,[2,56]),o($VH,[2,57]),o($VH,[2,59]),o($VH,[2,60]),o($VH,[2,61]),o($VH,[2,31])],
-defaultActions: {29:[2,1]},
+table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{1:[3]},{5:[1,30],9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH},o($VI,[2,2]),o($VI,[2,3]),o($VI,[2,4]),{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:56,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VJ,[2,69],{33:57,28:$VK}),{28:$VK,33:59},{28:$VK,33:60},{28:$VK,33:61},{28:$VK,33:62},{28:$VK,33:63},{28:$VK,33:64},{28:$VK,33:65},o($VI,[2,40]),o($VI,[2,41]),o($VI,[2,42]),o($VI,[2,43]),o($VI,[2,44]),o($VI,[2,45]),o($VI,[2,51],{50:[1,66],52:[1,67],54:[1,68],55:[1,69],56:[1,70]}),{51:[1,71]},o($VI,[2,73],{36:[1,72],59:[1,73]}),o($VJ,[2,68]),o($VJ,[2,70]),{1:[2,1]},{4:74,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{24:[1,89]},{4:90,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:91,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{25:[1,93],31:[1,92]},{28:$VK,33:94},{28:[1,95]},o($VI,[2,13]),o($VI,[2,14]),o($VL,[2,15],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o($VM,[2,24],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,96],30:$VF,32:$VG,34:$VH},o($VI,[2,32]),{4:99,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,97],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm,60:98},o($VI,[2,33]),o($VI,[2,34]),o($VI,[2,35]),o($VI,[2,36]),o($VI,[2,37]),o($VI,[2,38]),o($VI,[2,39]),{4:100,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,51:[1,101],57:$Vl,58:$Vm},{36:[1,104],37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:102,57:[1,103]},o($VJ,[2,63]),o($VJ,[2,64]),o($VJ,[2,65]),{52:[1,112]},o($VI,[2,71]),o($VI,[2,72]),o($VI,[2,5]),o($VI,[2,6]),o($VU,[2,7],{9:$Vn,10:$Vo,13:$Vr}),o($VU,[2,8],{9:$Vn,10:$Vo,13:$Vr}),o($VI,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,10],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt,16:$Vu}),o($VL,[2,11],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,12],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt}),o($VV,[2,16],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VV,[2,17],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VW,[2,18],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,19],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,20],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,21],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VV,[2,22],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),{4:113,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VM,[2,25],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,30:$VF,32:$VG,34:$VH}),o([5,27,29,35,51],[2,26],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,30:$VF,32:$VG,34:$VH}),o($VI,[2,28]),{31:[1,114]},o($VI,[2,30]),{4:115,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VI,[2,27]),o($VI,[2,74]),{29:[1,116],35:[1,117]},o($VX,[2,76],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,51:[1,118]},o($VI,[2,50],{52:[1,119]}),o($VI,[2,48]),o($VJ,[2,66]),o($VJ,[2,67]),o($VI,[2,54],{28:[1,120]}),o($VI,[2,56],{28:[1,121]}),{28:[1,122]},{28:[1,123]},{28:[1,124]},{28:[1,125]},{28:[1,126]},{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:127},o($VV,[2,23],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VI,[2,29]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,35:[1,128]},o($VI,[2,75]),{4:129,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VI,[2,49],{52:[1,130]}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:131},{29:[1,132]},{29:[1,133]},{4:134,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:135,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,136],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:139,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VI,[2,52]),{4:140,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VX,[2,77],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:141},o($VI,[2,47]),o($VI,[2,53]),o($VI,[2,55]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,142],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,143],30:$VF,32:$VG,34:$VH},o($VI,[2,59]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,144],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,145],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,146],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,147],30:$VF,32:$VG,34:$VH},o($VI,[2,46]),o($VI,[2,57]),o($VI,[2,58]),o($VI,[2,60]),o($VI,[2,61]),o($VI,[2,62]),o($VI,[2,31])],
+defaultActions: {30:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -9811,124 +10240,126 @@ options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0: this.begin('INITIAL'); return 49; 
+case 0: this.begin('INITIAL'); return 50; 
 break;
-case 1: this.begin('INITIAL'); return 53; 
+case 1: this.begin('INITIAL'); return 54; 
 break;
-case 2:return 55;
+case 2:return 56;
 break;
-case 3:return 54;
+case 3:return 55;
 break;
 case 4:return 'INVALID';
 break;
 case 5:return 44
 break;
-case 6:return 46
+case 6:return 48
 break;
-case 7:return 45
+case 7:return 46
 break;
-case 8:return 47
+case 8:return 45
 break;
 case 9:return 47
 break;
-case 10:/* skip whitespace */
+case 10:return 47
 break;
-case 11:return 34
+case 11:/* skip whitespace */
 break;
-case 12:return 32
+case 12:return 34
 break;
-case 13:return 25
+case 13:return 32
 break;
-case 14:return 30
+case 14:return 25
 break;
-case 15:return 31
+case 15:return 30
 break;
-case 16:return 9
+case 16:return 31
 break;
-case 17:return 10
+case 17:return 9
 break;
-case 18:return 12
+case 18:return 10
 break;
-case 19:return 11
+case 19:return 12
 break;
-case 20:return 16
+case 20:return 11
 break;
-case 21:return 17
+case 21:return 16
 break;
-case 22:return 19
+case 22:return 17
 break;
-case 23:return '!'
+case 23:return 19
 break;
-case 24:return 13
+case 24:return '!'
 break;
-case 25:return 19
+case 25:return 13
 break;
-case 26:return 22
+case 26:return 19
 break;
-case 27:return 23
+case 27:return 22
 break;
-case 28:return 20
+case 28:return 23
 break;
-case 29:return 21
+case 29:return 20
 break;
-case 30:return 27
+case 30:return 21
 break;
-case 31:return 26
+case 31:return 27
 break;
-case 32:return 40
+case 32:return 26
 break;
-case 33:return 38
+case 33:return 40
 break;
-case 34:return 37
+case 34:return 38
 break;
-case 35:return 43
+case 35:return 37
 break;
-case 36:return 39
+case 36:return 43
 break;
-case 37:return 42
+case 37:return 39
 break;
-case 38:return 41
+case 38:return 42
 break;
-case 39:return 18
+case 39:return 41
 break;
 case 40:return 18
 break;
-case 41:return 24
+case 41:return 18
 break;
-case 42:return 26
+case 42:return 24
 break;
-case 43:return 27
+case 43:return 26
 break;
-case 44:return 15
+case 44:return 27
 break;
-case 45:return 14
+case 45:return 15
 break;
-case 46: this.begin('fieldname'); return 56; 
+case 46:return 14
 break;
-case 47:return 50;
+case 47: this.begin('fieldname'); return 57; 
 break;
-case 48:return 28
+case 48:return 51;
 break;
-case 49:return 29
+case 49:return 28
 break;
-case 50:return 51
+case 50:return 29
 break;
-case 51:return 35
+case 51:return 52
 break;
-case 52:return 57
+case 52:return 35
 break;
-case 53:return 36
+case 53:return 58
 break;
-case 54:return 58
+case 54:return 36
 break;
-case 55:return 'INVALID'
+case 55:return 59
 break;
-case 56:return 5
+case 56:return 'INVALID'
+break;
+case 57:return 5
 break;
 }
 },
-rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:&)/i,/^(?:\|)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
-conditions: {"fieldname":{"rules":[0,1,2,3,4],"inclusive":false},"INITIAL":{"rules":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56],"inclusive":true}}
+rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:\{[0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}\})/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:&)/i,/^(?:\|)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
+conditions: {"fieldname":{"rules":[0,1,2,3,4],"inclusive":false},"INITIAL":{"rules":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57],"inclusive":true}}
 });
 return lexer;
 })();
@@ -9941,7 +10372,6 @@ return new Parser;
 })();
 DevExpress.JS.Data.criteriaparser = criteriaparser;
 DevExpress.Analytics.Criteria.criteriaparser = criteriaparser
-
 if(window["ace"]) {
     var _define = window["ace"].define || define;
     _define("ace/mode/criteria", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text"], function (require, exports, module) {
@@ -9987,6 +10417,10 @@ if(window["ace"]) {
             this.$rules = {
                 "start": [
                     {
+                        token: "constant.other",
+                        regex: /(?:#(?:[^\\\#]|(?:\\.))*#?)|(?:\{[-0-9A-Fa-f]*\}?)/
+                    },
+                    {
                         token: "string.quoted.single",
                         regex: /N?'(?:\\.|[^'\\])*'?/,
                     },
@@ -10011,14 +10445,17 @@ if(window["ace"]) {
                         regex: /\[(?:[^\]\)])*\]\[/
                     },
                     {
-                        token: "support.variable",
+                        token: "support.variable.other",
                         regex: /\[(?:[^\]\)\,])*\]?/
+                    },
+                    {
+                        token: "support.variable.parameter",
+                        regex: /\?\w+/
                     },
                     {
                         token: "support.context.end",
                         regex: /\]/
                     },
-
                     {
                         token: "support.function",
                         regex: /[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*/
@@ -10091,6 +10528,11 @@ var DevExpress;
         Analytics.Rectangle = Rectangle;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 /// <reference path="../elements/rectangle.ts" />
 var DevExpress;
 (function (DevExpress) {
@@ -10098,9 +10540,11 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
-            var DragDropHandler = (function () {
+            var DragDropHandler = (function (_super) {
+                __extends(DragDropHandler, _super);
                 function DragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent) {
                     var _this = this;
+                    _super.call(this);
                     this._size = new Analytics.Size(0, 0);
                     this.alwaysAlt = false;
                     this.surface = surface;
@@ -10114,6 +10558,13 @@ var DevExpress;
                         snapHelper && snapHelper.deactivateSnapLines();
                     };
                 }
+                DragDropHandler.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.surface = null;
+                    this.selection = null;
+                    this.snapHelper = null;
+                    this.dragHelperContent = null;
+                };
                 DragDropHandler.prototype._getAbsoluteSurfacePosition = function (ui) {
                     return { left: ui.position.left - ui["delta"].left, top: ui.position.top - ui["delta"].top };
                 };
@@ -10173,7 +10624,7 @@ var DevExpress;
                 DragDropHandler.prototype.doStopDrag = function (ui, draggable, event) { };
                 DragDropHandler.started = ko.observable(false);
                 return DragDropHandler;
-            })();
+            })(Analytics.Utils.Disposable);
             Internal.DragDropHandler = DragDropHandler;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -10312,8 +10763,8 @@ var DevExpress;
             }
         };
         ko.bindingHandlers["selectable"] = {
-            update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var values = valueAccessor(), isUpdate = false, selection = ko.unwrap(values.selection), options = $.extend({ filter: '.dxd-selectable', distance: 1 }, ko.unwrap(values), {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var values = valueAccessor(), isUpdate = false, $element = $(element), selection = ko.unwrap(values.selection), options = $.extend({ filter: '.dxd-selectable', distance: 1 }, ko.unwrap(values), {
                     selecting: function (event, ui) {
                         var _event = { control: ko.dataFor(ui.selecting), cancel: false, ctrlKey: event.ctrlKey };
                         selection.selecting(_event);
@@ -10334,7 +10785,23 @@ var DevExpress;
                         selection.unselecting(ko.dataFor(ui.unselecting));
                     }
                 });
-                $(element).selectable(options);
+                $element.selectable(options);
+                var subscriptions = [];
+                var subscribeProperty = function (property, optionName) {
+                    if (property && ko.isSubscribable(property)) {
+                        subscriptions.push(property.subscribe(function (newVal) {
+                            $element.selectable("option", optionName, newVal);
+                        }));
+                    }
+                };
+                subscribeProperty(selection.disabled, "disabled");
+                subscribeProperty(values.zoom, "zoom");
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    $element.selectable("destroy");
+                    $element = null;
+                    subscribeProperty = null;
+                    subscriptions.forEach(function (x) { return x.dispose(); });
+                });
             }
         };
         ko.bindingHandlers["updateTop"] = {
@@ -10399,127 +10866,6 @@ var DevExpress;
                 });
                 options.containment = $parent.find(options.containment);
                 $element.draggable(options);
-            }
-        };
-        ko.bindingHandlers["resizable"] = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var values = valueAccessor(), $element = $(element), $parent = $element.closest(".dx-designer"), currentDirection = null, $selectedNodes = null, resizableDirections = { "north": "n", "east": "e", "south": "s", "west": "w" }, absolutePosition = null, options = $.extend({
-                    handles: values.handles || "all", ghost: false,
-                    stop: function (event, ui) {
-                        $selectedNodes.each(function (_, el) {
-                            var control = ko.dataFor(el), surface = ko.contextFor(el).$root.surface(), $el = $(el);
-                            var rect = control.rect();
-                            var newRect = Analytics.Internal.getControlRect($el, control, surface);
-                            control.rect({
-                                top: currentDirection.indexOf(resizableDirections.north) !== -1 ? newRect.top : rect.top,
-                                left: currentDirection.indexOf(resizableDirections.west) !== -1 ? newRect.left : rect.left,
-                                width: currentDirection.indexOf(resizableDirections.east) !== -1 || currentDirection.indexOf(resizableDirections.west) !== -1 ? newRect.width : rect.width,
-                                height: currentDirection.indexOf(resizableDirections.south) !== -1 || currentDirection.indexOf(resizableDirections.north) !== -1 ? newRect.height : rect.height,
-                            });
-                            if (JSON.stringify(rect) === JSON.stringify(control.rect())) {
-                                $el.css({
-                                    left: rect.left,
-                                    top: rect.top,
-                                    width: rect.width,
-                                    height: rect.height
-                                });
-                            }
-                            $el.removeData("originalPosition");
-                            $el.removeData("originalSize");
-                        });
-                        currentDirection = null;
-                        values.stopped();
-                        values.started = false;
-                        if (values.snapHelper) {
-                            values.snapHelper.deactivateSnapLines();
-                        }
-                    },
-                    start: function (event) {
-                        var currentClassList = event.originalEvent.target.classList;
-                        for (var i = 0; i < currentClassList.length; i++) {
-                            if (currentClassList[i] !== "ui-resizable-handle" && currentClassList[i].indexOf("ui-resizable-") === 0)
-                                currentDirection = currentClassList[i].slice("ui-resizable-".length, currentClassList[i].length);
-                        }
-                        values.started = true;
-                        values.starting();
-                        $selectedNodes = values.$selectedNodes || $(".dxrd-viewport > .dxrd-focused, .dxrd-selected").filter(":visible");
-                        $selectedNodes
-                            .each(function (_, el) {
-                            var $el = $(el);
-                            var bounds = el.getBoundingClientRect();
-                            $el.data("originalPosition", { top: parseFloat($el.css("top")), left: parseFloat($el.css("left")) });
-                            $el.data("originalSize", { width: bounds.width, height: bounds.height });
-                        });
-                        var elementOffset = $element.offset();
-                        var ghostContainerOffset = $parent.find(".dxrd-ghost-container").offset();
-                        if (!ghostContainerOffset) {
-                            absolutePosition = elementOffset;
-                        }
-                        else {
-                            absolutePosition = {
-                                top: elementOffset.top - ghostContainerOffset.top,
-                                left: elementOffset.left - ghostContainerOffset.left
-                            };
-                        }
-                        if (values.snapHelper) {
-                            values.snapHelper.updateSnapLines(viewModel);
-                        }
-                    },
-                    resize: function (event, ui) {
-                        var dw = ui.size.width - ui.originalSize.width, dh = ui.size.height - ui.originalSize.height, dx = ui.position.left - ui.originalPosition.left, dy = ui.position.top - ui.originalPosition.top;
-                        if (values.forceResize) {
-                            values.forceResize({ size: new Analytics.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
-                        }
-                        if (!!event.altKey) {
-                            values.snapHelper && values.snapHelper.deactivateSnapLines();
-                        }
-                        else if (values.snapHelper && $selectedNodes.length === 1) {
-                            var newAbsolutePosition = Analytics.Internal.getControlNewAbsolutePositionOnResize(values.snapHelper, absolutePosition, ui, { x: dx, y: dy, width: dw, height: dh });
-                            values.snapHelper.activateSnapLines(newAbsolutePosition);
-                            $element.css({
-                                left: ui.originalPosition.left + newAbsolutePosition.left - absolutePosition.left,
-                                top: ui.originalPosition.top + newAbsolutePosition.top - absolutePosition.top,
-                                width: newAbsolutePosition.right - newAbsolutePosition.left,
-                                height: newAbsolutePosition.bottom - newAbsolutePosition.top
-                            });
-                        }
-                        $selectedNodes
-                            .each(function (key, el) {
-                            if (el === event.target)
-                                return;
-                            var $el = $(el);
-                            var originalPosition = $el.data("originalPosition"), originalSize = $el.data("originalSize");
-                            $el.css({
-                                left: originalPosition.left + dx,
-                                top: originalPosition.top + dy,
-                                width: originalSize.width + dw,
-                                height: originalSize.height + dh
-                            });
-                        });
-                    }
-                }, ko.unwrap(values));
-                var subscription = null;
-                if (!values.disabled) {
-                    subscription = Analytics.Internal.DragDropHandler.started.subscribe(function (newVal) {
-                        $element.resizable("option", "disabled", newVal);
-                        newVal ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
-                    });
-                }
-                $element.resizable(options);
-                $element.resizable().on("resize", function (event) {
-                    event.stopPropagation();
-                });
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    $element = null;
-                    subscription && subscription.dispose();
-                });
-            },
-            update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                var $element = $(element);
-                var disabled = !!(ko.unwrap(valueAccessor().disabled) || false || viewModel.locked);
-                $element.resizable("option", "disabled", disabled);
-                $element.resizable("option", "minHeight", ko.unwrap(valueAccessor()).minimumHeight) || 1;
-                disabled ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
             }
         };
         var trackCursorData = "dxd-track-cursor-data";
@@ -10602,11 +10948,6 @@ var DevExpress;
         })();
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -10825,15 +11166,16 @@ var DevExpress;
                 this._context = context;
                 control["surface"] = this;
                 if (this._context) {
-                    Analytics.Utils.createUnitProperties(control, this, unitProperties, this._context.measureUnit, this._context.zoom);
+                    Analytics.Utils.createUnitProperties(control, this, unitProperties, this._context.measureUnit, this._context.zoom, function (property) { _this._disposables.push(property); });
                 }
-                this["_x"] = this["_x"] || ko.observable(0);
-                this["_y"] = this["_y"] || ko.observable(0);
-                this["_width"] = this["_width"] || ko.observable(0);
-                this["_height"] = this["_height"] || ko.observable(0);
+                this._x = this._x || ko.observable(0);
+                this._y = this._y || ko.observable(0);
+                this._width = this._width || ko.observable(0);
+                this._height = this._height || ko.observable(0);
                 var container = ko.pureComputed(function () { return _this.container(); });
+                this._disposables.push(container);
                 this._container = container();
-                container.subscribe(function (value) {
+                this._disposables.push(container.subscribe(function (value) {
                     if (_this._container !== value && _this.rtlLayout()) {
                         var x = _this._getX();
                         _this._container = value;
@@ -10842,13 +11184,13 @@ var DevExpress;
                     else {
                         _this._container = value;
                     }
-                });
+                }));
                 var x = ko.computed({
                     read: function () { return _this._getX(); },
                     write: function (value) {
                         _this._setX(value);
                     }
-                }), y = this["_y"], width = this["_width"], height = this["_height"];
+                }), y = this._y, width = this._width, height = this._height;
                 this["position"] = {
                     top: y,
                     left: x,
@@ -10856,13 +11198,14 @@ var DevExpress;
                     height: height,
                     lineHeight: height
                 };
+                this._disposables.push(x);
                 var _rect = ko.observable();
                 this._disposables.push(ko.computed(function () {
                     if (!_this._control.update()) {
                         _rect({ top: y(), left: x(), right: x() + width(), bottom: y() + height(), width: width(), height: height() });
                     }
                 }));
-                this.rect = ko.pureComputed({
+                this._disposables.push(this.rect = ko.pureComputed({
                     read: function () {
                         return _rect();
                     },
@@ -10902,23 +11245,23 @@ var DevExpress;
                             _this._control.update(false);
                         }
                     }
-                });
+                }));
             }
             SurfaceElementArea.prototype._getX = function () {
                 if (this.rtlLayout() && this._container) {
-                    return this._container.rect().width - this["_x"]() - this["_width"]();
+                    return this._container.rect().width - this._x() - this._width();
                 }
                 else {
-                    return this["_x"]();
+                    return this._x();
                 }
             };
             SurfaceElementArea.prototype._setX = function (value, width) {
-                width = width || this["_width"]();
+                width = width || this._width();
                 if (this.rtlLayout() && this._container) {
-                    this["_x"](this._container.rect().width - value - width);
+                    this._x(this._container.rect().width - value - width);
                 }
                 else {
-                    this["_x"](value);
+                    this._x(value);
                 }
             };
             SurfaceElementArea.prototype.getRoot = function () {
@@ -10959,39 +11302,39 @@ var DevExpress;
                 if (this._getChildrenHolderName() && control[this._getChildrenHolderName()]) {
                     var collection = ko.observableArray();
                     if (this._getChildrenHolderName() === "controls") {
-                        Analytics.Utils.createObservableReverseArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface);
+                        this._disposables.push(Analytics.Utils.createObservableReverseArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface));
                     }
                     else {
-                        Analytics.Utils.createObservableArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface);
+                        this._disposables.push(Analytics.Utils.createObservableArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface));
                     }
                     this[this._getChildrenHolderName()] = collection;
-                    this.isSelected = ko.pureComputed(function () {
+                    this._disposables.push(this.isSelected = ko.pureComputed(function () {
                         if (!(_this.focused() || _this.selected())) {
                             return collection().some(function (item) {
                                 return item.isSelected();
                             });
                         }
                         return true;
-                    });
+                    }));
                 }
                 else {
-                    this.isSelected = ko.pureComputed(function () {
+                    this._disposables.push(this.isSelected = ko.pureComputed(function () {
                         return _this.focused() || _this.selected();
-                    });
+                    }));
                 }
-                this.css = ko.pureComputed(function () {
+                this._disposables.push(this.css = ko.pureComputed(function () {
                     return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.backGroundCss(), _this.cssCalculator.textAlignmentCss());
-                });
-                this.contentCss = ko.pureComputed(function () {
+                }));
+                this._disposables.push(this.contentCss = ko.pureComputed(function () {
                     return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.textAlignmentCss(), _this.cssCalculator.angle(), _this.cssCalculator.wordWrapCss(), _this.cssCalculator.paddingsCss());
-                });
+                }));
                 this._disposables.push(ko.computed(function () {
                     _this.updateAbsolutePosition();
                 }));
-                this.absoluteRect = ko.pureComputed(function () {
+                this._disposables.push(this.absoluteRect = ko.pureComputed(function () {
                     var controlRect = _this.rect(), absolutePositionY = _this.absolutePosition.y(), absolutePositionX = _this.absolutePosition.x();
                     return { top: absolutePositionY, left: absolutePositionX, right: absolutePositionX + controlRect.width, bottom: absolutePositionY + controlRect.height, width: controlRect.width, height: controlRect.height };
-                });
+                }));
                 this.locked = control["lockedInUserDesigner"] ? control["lockedInUserDesigner"]() : false;
             }
             Object.defineProperty(SurfaceElementBase.prototype, "parent", {
@@ -11043,13 +11386,13 @@ var DevExpress;
                 this.controlType = this.controlType || this.getControlFactory().getControlType(model);
                 serializer = serializer || new Analytics.Utils.ModelSerializer();
                 serializer.deserialize(this, model);
-                this["displayName"] = ko.pureComputed(function () {
+                this._disposables.push(this["displayName"] = ko.pureComputed(function () {
                     var result = _this.name && _this.name();
                     if (!result) {
                         result = "unnamed " + _this.controlType;
                     }
                     return result;
-                });
+                }));
                 this.resetValue = function (propertyName) {
                     if (_this[propertyName].resetValue) {
                         _this[propertyName].resetValue();
@@ -11078,6 +11421,10 @@ var DevExpress;
             };
             ElementViewModel.prototype.createControl = function (model, serializer) {
                 return this.getControlFactory().createControl(model, this, serializer);
+            };
+            ElementViewModel.prototype.dispose = function () {
+                _super.prototype.dispose.call(this);
+                this.surface && this.surface.dispose();
             };
             ElementViewModel.prototype.getNearestParent = function (target) {
                 return target.getMetaData().isContainer ? target : target.getNearestParent(target.parentModel());
@@ -11220,8 +11567,8 @@ var DevExpress;
     (function (Analytics) {
         Analytics.left = {
             propertyName: "left", modelName: "@Left", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Left", displayName: "Left", editor: Analytics.Widgets.editorTemplates.numeric
-        }, Analytics.right = { propertyName: "right", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Right", modelName: "@Right", displayName: "Right", editor: Analytics.Widgets.editorTemplates.numeric }, Analytics.top = { propertyName: "top", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Top", modelName: "@Top", displayName: "Top", editor: Analytics.Widgets.editorTemplates.numeric }, Analytics.bottom = { propertyName: "bottom", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Bottom", modelName: "@Bottom", displayName: "Bottom", editor: Analytics.Widgets.editorTemplates.numeric };
-        Analytics.paddingSerializationsInfo = [Analytics.left, Analytics.right, Analytics.top, Analytics.bottom];
+        }, Analytics.right = { propertyName: "right", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Right", modelName: "@Right", displayName: "Right", editor: Analytics.Widgets.editorTemplates.numeric }, Analytics.top = { propertyName: "top", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Top", modelName: "@Top", displayName: "Top", editor: Analytics.Widgets.editorTemplates.numeric }, Analytics.bottom = { propertyName: "bottom", localizationId: "DevExpress.XtraPrinting.PaddingInfo.Bottom", modelName: "@Bottom", displayName: "Bottom", editor: Analytics.Widgets.editorTemplates.numeric }, Analytics.all = { propertyName: "all", localizationId: "DevExpress.XtraPrinting.PaddingInfo.All", displayName: "All", editor: Analytics.Widgets.editorTemplates.numeric };
+        Analytics.paddingSerializationsInfo = [Analytics.all, Analytics.left, Analytics.right, Analytics.top, Analytics.bottom];
         var PaddingModel = (function (_super) {
             __extends(PaddingModel, _super);
             function PaddingModel(left, right, top, bottom, dpi) {
@@ -11239,15 +11586,33 @@ var DevExpress;
                 this.dpi = dpi;
                 ["left", "right", "top", "bottom"].forEach(function (propertyName) {
                     _this['_' + propertyName] = ko.observable(_this[propertyName]());
-                    _this[propertyName] = ko.computed({
+                    _this._disposables.push(_this[propertyName] = ko.computed({
                         read: function () {
                             return _this['_' + propertyName]() || 0;
                         },
                         write: function (newVal) {
                             _this['_' + propertyName](newVal);
                         }
-                    });
+                    }));
                 });
+                var isUpdating = ko.observable(false);
+                var oldValue = null;
+                this._disposables.push(this.all = ko.computed({
+                    read: function () {
+                        if (isUpdating())
+                            return oldValue;
+                        if (["right", "top", "bottom"].every(function (propertyName) { return _this[propertyName]() === _this.left(); }))
+                            oldValue = _this.left();
+                        else
+                            oldValue = null;
+                        return oldValue;
+                    },
+                    write: function (newVal) {
+                        isUpdating(true);
+                        ["left", "right", "top", "bottom"].forEach(function (propertyName) { return _this[propertyName](newVal); });
+                        isUpdating(false);
+                    }
+                }));
             }
             PaddingModel.prototype.getInfo = function () {
                 return Analytics.paddingSerializationsInfo;
@@ -11394,22 +11759,12 @@ var DevExpress;
                 function DesignControlsHelper(target, handlers, collectionNames) {
                     var _this = this;
                     _super.call(this);
+                    this.target = target;
                     this.collectionNames = collectionNames;
                     this._handlers = [];
                     this._setText = false;
                     this._visitedCollections = [];
                     this._subscriptions = [];
-                    this._setName = function (value) {
-                        var names = _this.allControls().map(function (item) { return ko.unwrap(item.name); });
-                        if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
-                            var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
-                            var newName = Internal.getUniqueNameForNamedObjectsArray(_this.allControls(), controlType.split('.').pop(), names);
-                            value.name(newName);
-                            if (_this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
-                                value["text"](value.name());
-                            }
-                        }
-                    };
                     this.added = function (value) {
                         _this._setText = true;
                         _this._collectControls(value);
@@ -11449,23 +11804,54 @@ var DevExpress;
                         }
                         ;
                     }, null, "arrayChange"));
-                    this._collectControls(unwrappedTarget);
+                    unwrappedTarget && this._collectControls(unwrappedTarget);
                     this._handlers.push.apply(this._handlers, handlers);
                 }
+                DesignControlsHelper.prototype._setName = function (value) {
+                    var names = this.allControls().map(function (item) { return ko.unwrap(item.name); });
+                    if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
+                        var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
+                        var newName = Internal.getUniqueNameForNamedObjectsArray(this.allControls(), controlType.split('.').pop(), names);
+                        value.name(newName);
+                        if (this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
+                            value["text"](value.name());
+                        }
+                    }
+                };
+                DesignControlsHelper.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._subscriptions.forEach(function (subscription) { return subscription.dispose(); });
+                    this._subscriptions.splice(0);
+                    this._visitedCollections.splice(0);
+                    this._handlers.splice(0);
+                    this.target = null;
+                    this.allControls([]);
+                };
                 DesignControlsHelper.prototype._collectControls = function (target) {
                     var _this = this;
                     var array = [target];
-                    Analytics.Utils.collectionsVisitor(target, function (collection) {
+                    Analytics.Utils.collectionsVisitor(target, function (collection, owner) {
                         if (_this._visitedCollections.indexOf(collection) === -1) {
                             _this._visitedCollections.push(collection);
-                            _this._subscriptions.push(collection.subscribe(function (args) {
+                            var subscriptionsArray = _this._subscriptions;
+                            if (owner instanceof DevExpress.Analytics.Utils.Disposable) {
+                                subscriptionsArray = owner._disposables;
+                            }
+                            var subscription = collection.subscribe(function (args) {
                                 args.forEach(function (changeSet) {
                                     _this[changeSet.status] && _this[changeSet.status](changeSet.value);
                                     _this._handlers.forEach(function (handler) {
                                         handler[changeSet.status] && handler[changeSet.status](changeSet.value);
                                     });
                                 });
-                            }, null, "arrayChange"));
+                            }, null, "arrayChange");
+                            subscriptionsArray.push({
+                                dispose: function () {
+                                    subscription.dispose();
+                                    subscription = null;
+                                    _this._visitedCollections.splice(_this._visitedCollections.indexOf(collection), 1);
+                                }
+                            });
                         }
                         array.push.apply(array, collection());
                     }, this.collectionNames);
@@ -11780,7 +12166,7 @@ var DevExpress;
                 function ColorPickerEditor(info, level, parentDisabled, textToSearch) {
                     var _this = this;
                     _super.call(this, info, level, parentDisabled, textToSearch);
-                    this.displayValue = ko.pureComputed({
+                    this._disposables.push(this.displayValue = ko.pureComputed({
                         read: function () {
                             var value = ko.unwrap(_this.value);
                             if (value && value.toLowerCase() === "transparent") {
@@ -11795,7 +12181,7 @@ var DevExpress;
                         write: function (val) {
                             _this.value(val);
                         }
-                    });
+                    }));
                 }
                 return ColorPickerEditor;
             })(Widgets.Editor);
@@ -11818,6 +12204,8 @@ var DevExpress;
                         return _this._model() && _this._model()["getPath"] && _this._model()["getPath"](_this.name) || "";
                     });
                     this.treeListController = new Widgets.TreeListController();
+                    this._disposables.push(this.path);
+                    this._disposables.push(this.treeListController);
                 }
                 return FieldListEditor;
             })(Widgets.Editor);
@@ -11837,6 +12225,9 @@ var DevExpress;
                     this.selectedItem = null;
                     this.suppressActions = true;
                 }
+                DataMemberTreeListController.prototype.dispose = function () {
+                    this.selectedItem = null;
+                };
                 DataMemberTreeListController.prototype.itemsFilter = function (item) {
                     return item.specifics !== "parameters" && (item.specifics === "List" || item.specifics === "ListSource" || item.isList === true || item.specifics === "none");
                 };
@@ -11861,6 +12252,7 @@ var DevExpress;
                 function DataMemberEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
                     _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
                     this.treeListController = new DataMemberTreeListController();
+                    this._disposables.push(this.treeListController);
                 }
                 return DataMemberEditor;
             })(Widgets.FieldListEditor);
@@ -11974,11 +12366,19 @@ var DevExpress;
             }
             Internal.getShortTypeName = getShortTypeName;
             function getControlFullName(value) {
-                var displayName = value && (ko.unwrap(value.name) || ko.unwrap(value.displayName)), controlType = value && value.controlType;
+                if (!value)
+                    return "";
+                var displayName = ko.unwrap(value.name) || ko.unwrap(value.displayName), controlType = value.displayType && value.displayType() || value.controlType;
+                if (value.getControlFactory) {
+                    var info = value.getControlFactory().getControlInfo(controlType);
+                    if (info.displayName)
+                        controlType = info.displayName;
+                }
                 return displayName + (controlType ? (' (' + Analytics.getLocalization(getShortTypeName(controlType)) + ')') : '');
             }
             Internal.getControlFullName = getControlFullName;
-            function getImageClassName(controlType) {
+            function getImageClassName(controlType, isTemplate) {
+                if (isTemplate === void 0) { isTemplate = false; }
                 var controlType = getTypeNameFromFullName(controlType || "").split(".").join("_"), name;
                 if (controlType.indexOf("XR") === 0) {
                     name = controlType.slice(2).toLowerCase();
@@ -11986,7 +12386,7 @@ var DevExpress;
                 else if (controlType === "DevExpress_XtraReports_UI_XtraReport") {
                     name = "master_report";
                 }
-                return "dxrd-image-" + (name ? name : controlType.toLowerCase());
+                return (isTemplate ? "dxrd-svg-toolbox-" : "dxrd-image-") + (name ? name : controlType.toLowerCase());
             }
             Internal.getImageClassName = getImageClassName;
             function getUniqueNameForNamedObjectsArray(objects, prefix, names) {
@@ -12104,9 +12504,9 @@ var DevExpress;
                         var controlModel = selection.focused() && selection.focused().getControlModel();
                         _controlText = controlModel && (controlModel.textEditableProperty || controlModel.text);
                     }));
-                    this.visible = ko.pureComputed(function () {
+                    this._disposables.push(this.visible = ko.pureComputed(function () {
                         return _this._showInline();
-                    });
+                    }));
                     this.show = function (element) {
                         if (_this._showInline()) {
                             return;
@@ -12159,7 +12559,7 @@ var DevExpress;
                         return item.isList || (listPropertyNames ? listPropertyNames.indexOf(realPropertyName) !== -1 : false);
                     };
                     this.getActions = function (item) {
-                        return item.isSelected() && item.data["innerActions"] || [];
+                        return item.data && item.data["innerActions"] || [];
                     };
                     this.select = function (value) {
                         _this.selectedItem && _this.selectedItem.isSelected(false);
@@ -12168,6 +12568,9 @@ var DevExpress;
                     };
                     this.showIconsForChildItems = function () { return true; };
                 }
+                ObjectStructureTreeListController.prototype.dispose = function () {
+                    this.selectedItem = null;
+                };
                 ObjectStructureTreeListController.prototype.canSelect = function (value) {
                     return true;
                 };
@@ -12271,7 +12674,7 @@ var DevExpress;
                         }
                         return result.promise();
                     };
-                    this.selectedPath = ko.computed({
+                    this._disposables.push(this.selectedPath = ko.computed({
                         read: function () {
                             if (member()) {
                                 if (_this.path.peek()) {
@@ -12297,7 +12700,7 @@ var DevExpress;
                                 member(null);
                             }
                         }
-                    });
+                    }));
                 }
                 ObjectExplorerProvider.prototype.createArrayItem = function (currentTarget, result, propertyName) {
                     for (var i = 0; i < currentTarget.length; i++) {
@@ -12523,6 +12926,150 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
+            ko.bindingHandlers["resizable"] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var values = valueAccessor(), $element = $(element), $parent = $element.closest(".dx-designer"), currentDirection = null, $selectedNodes = null, resizableDirections = { "north": "n", "east": "e", "south": "s", "west": "w" }, calculateSizes = [], absolutePosition = null;
+                    var options = $.extend({
+                        handles: values.handles || "all", ghost: false,
+                        stop: function (event, ui) {
+                            $selectedNodes.each(function (_, el) {
+                                var control = ko.dataFor(el), surface = ko.contextFor(el).$root.surface(), $el = $(el);
+                                var rect = control.rect();
+                                var newRect = Internal.getControlRect($el, control, surface);
+                                newRect = {
+                                    top: currentDirection.indexOf(resizableDirections.north) !== -1 ? newRect.top : rect.top,
+                                    left: currentDirection.indexOf(resizableDirections.west) !== -1 ? newRect.left : rect.left,
+                                    width: currentDirection.indexOf(resizableDirections.east) !== -1 || currentDirection.indexOf(resizableDirections.west) !== -1 ? newRect.width : rect.width,
+                                    height: currentDirection.indexOf(resizableDirections.south) !== -1 || currentDirection.indexOf(resizableDirections.north) !== -1 ? newRect.height : rect.height,
+                                };
+                                calculateSizes.push(function () {
+                                    control.rect(newRect);
+                                    if (JSON.stringify(rect) === JSON.stringify(newRect)) {
+                                        $el.css({
+                                            left: rect.left,
+                                            top: rect.top,
+                                            width: rect.width,
+                                            height: rect.height
+                                        });
+                                    }
+                                });
+                                $el.removeData("originalPosition");
+                                $el.removeData("originalSize");
+                            });
+                            calculateSizes.forEach(function (c) { return c(); });
+                            calculateSizes = [];
+                            currentDirection = null;
+                            values.stopped();
+                            values.started = false;
+                            if (values.snapHelper) {
+                                values.snapHelper.deactivateSnapLines();
+                            }
+                        },
+                        start: function (event) {
+                            var currentClassList = event.originalEvent.target.classList;
+                            for (var i = 0; i < currentClassList.length; i++) {
+                                if (currentClassList[i] !== "ui-resizable-handle" && currentClassList[i].indexOf("ui-resizable-") === 0)
+                                    currentDirection = currentClassList[i].slice("ui-resizable-".length, currentClassList[i].length);
+                            }
+                            values.started = true;
+                            values.starting();
+                            $selectedNodes = values.$selectedNodes || $(".dxrd-viewport .dxrd-selected").filter(":visible");
+                            $selectedNodes
+                                .each(function (_, el) {
+                                var $el = $(el);
+                                var bounds = el.getBoundingClientRect();
+                                $el.data("originalPosition", { top: parseFloat($el.css("top")), left: parseFloat($el.css("left")) });
+                                $el.data("originalSize", { width: bounds.width, height: bounds.height });
+                            });
+                            var elementOffset = $element.offset();
+                            var ghostContainerOffset = $parent.find(".dxrd-ghost-container").offset();
+                            if (!ghostContainerOffset) {
+                                absolutePosition = elementOffset;
+                            }
+                            else {
+                                absolutePosition = {
+                                    top: elementOffset.top - ghostContainerOffset.top,
+                                    left: elementOffset.left - ghostContainerOffset.left
+                                };
+                            }
+                            if (values.snapHelper) {
+                                values.snapHelper.updateSnapLines(viewModel);
+                            }
+                        },
+                        resize: function (event, ui) {
+                            var dw = ui.size.width - ui.originalSize.width, dh = ui.size.height - ui.originalSize.height, dx = ui.position.left - ui.originalPosition.left, dy = ui.position.top - ui.originalPosition.top;
+                            if (values.forceResize) {
+                                values.forceResize({ size: new Analytics.Size(ui.size.width, ui.size.height), delta: { dx: dx, dy: dy, dw: dw, dh: dh } });
+                            }
+                            if (event.altKey) {
+                                values.snapHelper && values.snapHelper.deactivateSnapLines();
+                            }
+                            else if (values.snapHelper && $selectedNodes.length === 1) {
+                                var newAbsolutePosition = Internal.getControlNewAbsolutePositionOnResize(values.snapHelper, absolutePosition, ui, { x: dx, y: dy, width: dw, height: dh });
+                                values.snapHelper.activateSnapLines(newAbsolutePosition);
+                                $element.css({
+                                    left: ui.originalPosition.left + newAbsolutePosition.left - absolutePosition.left,
+                                    top: ui.originalPosition.top + newAbsolutePosition.top - absolutePosition.top,
+                                    width: newAbsolutePosition.right - newAbsolutePosition.left,
+                                    height: newAbsolutePosition.bottom - newAbsolutePosition.top
+                                });
+                            }
+                            $selectedNodes
+                                .each(function (key, el) {
+                                if (el === event.target)
+                                    return;
+                                var $el = $(el);
+                                var originalPosition = $el.data("originalPosition"), originalSize = $el.data("originalSize");
+                                $el.css({
+                                    left: originalPosition.left + dx,
+                                    top: originalPosition.top + dy,
+                                    width: originalSize.width + dw,
+                                    height: originalSize.height + dh
+                                });
+                            });
+                        }
+                    }, ko.unwrap(values));
+                    var subscription = null;
+                    if (!values.disabled) {
+                        subscription = Internal.DragDropHandler.started.subscribe(function (newVal) {
+                            $element.resizable("option", "disabled", newVal);
+                            newVal ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
+                        });
+                    }
+                    $element.resizable(options);
+                    $element.resizable().on("resize", function (event) {
+                        event.stopPropagation();
+                    });
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        $element = null;
+                        subscription && subscription.dispose();
+                    });
+                },
+                update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+                    var $element = $(element);
+                    var disabled = !!(ko.unwrap(valueAccessor().disabled) || false || viewModel.locked);
+                    $element.resizable("option", "disabled", disabled);
+                    $element.resizable("option", "minHeight", ko.unwrap(valueAccessor().minimumHeight) || 1);
+                    $element.resizable("option", "minWidth", ko.unwrap(valueAccessor().minimumWidth) || 1);
+                    if (ko.unwrap(valueAccessor().handles) && $element.resizable("option", "handles") !== ko.unwrap(valueAccessor().handles)) {
+                        $element.resizable("option", "handles", ko.unwrap(valueAccessor().handles));
+                    }
+                    var maxWidth = ko.unwrap(valueAccessor().maximumWidth);
+                    if (maxWidth) {
+                        $element.resizable("option", "maxWidth", maxWidth);
+                    }
+                    disabled ? $element.children(".ui-resizable-handle").css("display", "none") : $element.children(".ui-resizable-handle").css("display", "block");
+                }
+            };
+        })(Internal = Analytics.Internal || (Analytics.Internal = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Internal;
+        (function (Internal) {
             var SortedArrayStore = (function (_super) {
                 __extends(SortedArrayStore, _super);
                 function SortedArrayStore(options, sortPropertyName) {
@@ -12561,22 +13108,26 @@ var DevExpress;
                 return ControlsArrayStore;
             })(SortedArrayStore);
             Internal.ControlsArrayStore = ControlsArrayStore;
-            var ControlsStore = (function () {
+            var ControlsStore = (function (_super) {
+                __extends(ControlsStore, _super);
                 function ControlsStore(allControls) {
                     var _this = this;
+                    _super.call(this);
                     this._filter = ko.observable(null);
-                    this.dataSource = ko.computed(function () {
-                        var dataSource = new DevExpress.data.DataSource({
+                    var dataSource = null;
+                    this._disposables.push(this.dataSource = ko.computed(function () {
+                        dataSource && dataSource.dispose();
+                        dataSource = new DevExpress.data.DataSource({
                             store: new ControlsArrayStore(allControls()),
                             paginate: true,
                             filter: _this._filter(),
                             pageSize: 100
                         });
                         return dataSource;
-                    });
-                    this.visible = ko.computed(function () {
+                    }));
+                    this._disposables.push(this.visible = ko.computed(function () {
                         return allControls().length > 0;
-                    });
+                    }));
                 }
                 ControlsStore.prototype.setFilter = function (filter) {
                     this._filter(filter);
@@ -12585,7 +13136,7 @@ var DevExpress;
                     this._filter(null);
                 };
                 return ControlsStore;
-            })();
+            })(Analytics.Utils.Disposable);
             Internal.ControlsStore = ControlsStore;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12650,7 +13201,7 @@ var DevExpress;
                 return function () {
                     var $root = $(root).find(".dxrd-designer").eq(0);
                     var rightAreaWidth = $root.find(".dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
-                    var otherWidth = rightAreaWidth + $root.find(".dxrd-toolbox-wrapper").outerWidth(), surfaceWidth = $root.width() - (otherWidth + 5);
+                    var otherWidth = rightAreaWidth + $root.find(".dxrd-toolbox-wrapper").outerWidth(), surfaceWidth = $root.width() - (otherWidth);
                     $root.find(".dxrd-surface-wrapper").eq(0).css({
                         "left": rtl ? rightAreaWidth : 64,
                         "right": !rtl ? rightAreaWidth : 64,
@@ -12806,12 +13357,22 @@ var DevExpress;
                     var _this = this;
                     var editableObject = ko.observable(null);
                     var subscriptions = [];
-                    selectionProvider.focused.subscribe(function (newVal) {
+                    var subscription = selectionProvider.focused.subscribe(function (newVal) {
                         editableObject(newVal && newVal.getControlModel());
                     });
+                    if (selectionProvider._disposables) {
+                        selectionProvider._disposables.push(subscription);
+                        selectionProvider._disposables.push({
+                            dispose: function () {
+                                subscriptions.forEach(function (x) { return x.dispose(); });
+                                subscriptions.splice(0);
+                            }
+                        });
+                    }
                     return ko.pureComputed({
                         read: function () {
                             subscriptions.forEach(function (x) { return x.dispose(); });
+                            subscriptions = [];
                             if (selectionProvider.selectedItems.length > 1) {
                                 var combinedObj = _this.mergeControls(selectionProvider.selectedItems.map(function (item) { return item.getControlModel(); }), undoEngine, customMerge, selectionProvider.ignoreMultiSelectProperties);
                                 subscriptions = combinedObj.subscriptions;
@@ -12844,10 +13405,12 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
-            var SurfaceSelection = (function () {
+            var SurfaceSelection = (function (_super) {
+                __extends(SurfaceSelection, _super);
                 function SurfaceSelection(ignoreMultiSelectProperties) {
                     var _this = this;
                     if (ignoreMultiSelectProperties === void 0) { ignoreMultiSelectProperties = ["name"]; }
+                    _super.call(this);
                     this.ignoreMultiSelectProperties = ignoreMultiSelectProperties;
                     this._focused = ko.observable(null);
                     this._selectedControls = ko.observableArray();
@@ -12867,7 +13430,13 @@ var DevExpress;
                     });
                     this.dropTarget = null;
                     this.expectClick = false;
+                    this.disabled = ko.observable(false);
+                    this._disposables.push(this.focused);
                 }
+                SurfaceSelection.prototype.dispose = function () {
+                    this.reset();
+                    _super.prototype.dispose.call(this);
+                };
                 SurfaceSelection.prototype._removeFromSelection = function (control) {
                     control.focused(false);
                     control.selected(false);
@@ -12903,6 +13472,12 @@ var DevExpress;
                 });
                 SurfaceSelection.prototype.clear = function () {
                     this.focused(null);
+                    this._selectedControls([]);
+                };
+                SurfaceSelection.prototype.reset = function () {
+                    this._focused(null);
+                    this._selectedControlsInner.splice(0);
+                    this._firstSelected = null;
                     this._selectedControls([]);
                 };
                 SurfaceSelection.prototype.applySelection = function () {
@@ -13012,7 +13587,7 @@ var DevExpress;
                     }
                 };
                 return SurfaceSelection;
-            })();
+            })(Analytics.Utils.Disposable);
             Internal.SurfaceSelection = SurfaceSelection;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13326,8 +13901,10 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
-            var ActionListsBase = (function () {
+            var ActionListsBase = (function (_super) {
+                __extends(ActionListsBase, _super);
                 function ActionListsBase(enabled) {
+                    _super.call(this);
                     this.toolbarItems = [];
                     this.enabled = enabled || ko.observable(true);
                 }
@@ -13351,7 +13928,7 @@ var DevExpress;
                     return false;
                 };
                 return ActionListsBase;
-            })();
+            })(Analytics.Utils.Disposable);
             Internal.ActionListsBase = ActionListsBase;
             var ActionLists = (function (_super) {
                 __extends(ActionLists, _super);
@@ -13365,12 +13942,14 @@ var DevExpress;
                         var selectionControlsLocked = ko.computed(function () {
                             return selection.selectedItems.some(function (item) { return item.locked; });
                         });
+                        this._disposables.push(selectionControlsLocked);
                         this._keyboardHelper = new Internal.KeyboardHelper(selection, undoEngine);
                         actions.push({
                             id: Analytics.ActionId.Cut,
                             text: "Cut",
                             displayText: function () { return Analytics.getLocalization("Cut", "ReportStringId.UD_TTip_EditCut"); },
                             imageClassName: "dxrd-image-cut",
+                            imageTemplateName: "dxrd-svg-toolbar-cut",
                             disabled: ko.pureComputed(function () {
                                 return !surfaceContext() || !copyPasteHandler.canCopy() || selectionControlsLocked();
                             }),
@@ -13387,6 +13966,7 @@ var DevExpress;
                             text: "Copy",
                             displayText: function () { return Analytics.getLocalization("Copy", "ReportStringId.Cmd_Copy"); },
                             imageClassName: "dxrd-image-copy",
+                            imageTemplateName: "dxrd-svg-toolbar-copy",
                             disabled: ko.pureComputed(function () {
                                 return !surfaceContext() || !copyPasteHandler.canCopy() || selectionControlsLocked();
                             }),
@@ -13401,6 +13981,7 @@ var DevExpress;
                             text: "Paste",
                             displayText: function () { return Analytics.getLocalization("Paste", "ReportStringId.Cmd_Paste"); },
                             imageClassName: "dxrd-image-paste",
+                            imageTemplateName: "dxrd-svg-toolbar-paste",
                             disabled: ko.pureComputed(function () {
                                 return !surfaceContext() || !copyPasteHandler.canPaste() || selectionControlsLocked();
                             }),
@@ -13417,6 +13998,7 @@ var DevExpress;
                             text: "Delete",
                             displayText: function () { return Analytics.getLocalization("Delete", "ReportStringId.Cmd_Delete"); },
                             imageClassName: "dxrd-image-delete",
+                            imageTemplateName: "dxrd-svg-toolbar-delete",
                             disabled: ko.pureComputed(function () {
                                 if (selection.focused()) {
                                     return selection.focused().getControlModel().getMetaData().isDeleteDeny || selectionControlsLocked();
@@ -13439,6 +14021,7 @@ var DevExpress;
                         text: "Undo",
                         displayText: function () { return Analytics.getLocalization("Undo", "ReportStringId.UD_Capt_Undo"); },
                         imageClassName: "dxrd-image-undo",
+                        imageTemplateName: "dxrd-svg-toolbar-undo",
                         disabled: ko.pureComputed(function () { return !surfaceContext() || !undoEngine() || (undoEngine() && !undoEngine().undoEnabled()) || (selection && selectionControlsLocked()); }),
                         visible: true,
                         clickAction: function () {
@@ -13452,6 +14035,7 @@ var DevExpress;
                         text: "Redo",
                         displayText: function () { return Analytics.getLocalization("Redo", "ReportStringId.UD_Capt_Redo"); },
                         imageClassName: "dxrd-image-redo",
+                        imageTemplateName: "dxrd-svg-toolbar-redo",
                         disabled: ko.pureComputed(function () { return !surfaceContext() || !undoEngine() || (undoEngine() && !undoEngine().redoEnabled()) || (selection && selectionControlsLocked()); }),
                         visible: true,
                         clickAction: function () {
@@ -13464,6 +14048,7 @@ var DevExpress;
                         text: "Zoom Out",
                         displayText: function () { return Analytics.getLocalization("Zoom Out", "ReportStringId.UD_Capt_ZoomOut"); },
                         imageClassName: "dxrd-image-zoomout",
+                        imageTemplateName: "dxrd-svg-toolbar-zoomout",
                         disabled: ko.pureComputed(function () {
                             return !surfaceContext();
                         }),
@@ -13500,6 +14085,7 @@ var DevExpress;
                         text: "Zoom In",
                         displayText: function () { return Analytics.getLocalization("Zoom In", "ReportStringId.UD_Capt_ZoomIn"); },
                         imageClassName: "dxrd-image-zoomin",
+                        imageTemplateName: "dxrd-svg-toolbar-zoomin",
                         disabled: ko.pureComputed(function () {
                             return !surfaceContext();
                         }),
@@ -13514,6 +14100,11 @@ var DevExpress;
                         customizeActions(actions);
                     }
                     actions.forEach(function (action) {
+                        for (var name in action) {
+                            if (ko.isComputed(action[name])) {
+                                _this._disposables.push(action[name]);
+                            }
+                        }
                         _this._registerAction(action["container"] === "menu" ? _this.menuItems : ko.unwrap(_this.toolbarItems), action);
                     });
                 }
@@ -13652,19 +14243,33 @@ var DevExpress;
     (function (Analytics) {
         var TabPanel = (function (_super) {
             __extends(TabPanel, _super);
-            function TabPanel(tabs, autoSelectTab, rtl) {
+            function TabPanel(options) {
                 var _this = this;
-                if (autoSelectTab === void 0) { autoSelectTab = false; }
-                if (rtl === void 0) { rtl = false; }
                 _super.call(this);
                 this.tabs = [];
                 this.collapsed = ko.observable(false);
+                this.position = ko.observable(TabPanel.Position.Right);
                 this.toggleCollapsedText = ko.pureComputed(function () {
                     var actionString = _this.collapsed() ? "Open" : "Collapse";
                     return DevExpress.Analytics.getLocalization(actionString, "ASPxReportsStringId.SidePanel_" + actionString);
                 });
+                this.cssClasses = function (extendOptions) {
+                    return Analytics.Utils.extend({
+                        "dxrd-tab-panel-left": _this.position() === TabPanel.Position.Left,
+                        "dxrd-tab-panel-right": _this.position() === TabPanel.Position.Right,
+                        "dxrd-tab-panel-empty": _this.isEmpty()
+                    }, extendOptions);
+                };
+                var tabs = options.tabs;
+                var autoSelectTab = options.autoSelectTab;
+                if (options.rtl)
+                    this.position(TabPanel.Position.Left);
                 var _self = this;
                 this.tabs = tabs;
+                if (tabs && tabs.length)
+                    this._disposables.push(this.isEmpty = ko.computed(function () { return _this.tabs.every(function (tab) { return !tab.visible(); }); }));
+                else
+                    this.isEmpty = ko.observable(true);
                 this._disposables.push(ko.computed(function () {
                     var visibleTabs = tabs.filter(function (tab) { return tab.visible(); });
                     if (visibleTabs.length !== 0) {
@@ -13698,62 +14303,84 @@ var DevExpress;
                     }
                 };
                 var _width = ko.observable(340);
-                this.width = ko.pureComputed({
+                this._disposables.push(this.width = ko.pureComputed({
                     read: function () { return _this.collapsed() ? 0 : _width(); },
                     write: function (newWidth) { _width(newWidth); }
-                });
-                this.headerWidth = ko.pureComputed(function () { return 50 + (_this.collapsed() ? 0 : _this.width()); });
+                }));
+                this._disposables.push(this.headerWidth = ko.pureComputed(function () { return _this.isEmpty() ? 0 : (50 + (_this.collapsed() ? 0 : _this.width())); }));
+                var self = this;
                 this.getResizableOptions = function ($element, panelOffset, minWidth) {
                     if (!_this._resizableOptions || _this._resizableOptions.$element !== $element) {
                         _this._resizableOptions = {
                             starting: function () {
-                                $($element).css(rtl ? 'right' : 'left', '');
+                                $($element).css(self.position() === TabPanel.Position.Left ? 'right' : 'left', '');
                             },
+                            handles: self.position() === TabPanel.Position.Left ? 'e' : 'w',
                             stopped: $.noop,
                             stop: $.noop,
-                            handles: rtl ? 'e' : 'w',
                             resize: function () {
-                                $($element).css({ left: rtl ? panelOffset : '', right: rtl ? '' : panelOffset });
+                                $($element).css({ left: self.position() === TabPanel.Position.Left ? panelOffset : '', right: self.position() === TabPanel.Position.Left ? '' : panelOffset });
                                 _self.width($($element).width());
                             },
                             disabled: _self.collapsed,
                             zoom: 1,
-                            minWidth: minWidth,
-                            maxWidth: 1000,
+                            minimumWidth: minWidth,
+                            maximumWidth: 1000,
                             $element: $element
                         };
+                        self._disposables.push(self.position.subscribe(function (newVal) {
+                            $($element).resizable("option", "handles", self.position() === TabPanel.Position.Left ? 'e' : 'w');
+                        }));
                     }
                     ;
                     return _this._resizableOptions;
                 };
-                this.toggleCollapsedImageClassName = ko.pureComputed(function () { return _this.collapsed() ? "dxrd-image-propertygrid-expand" : "dxrd-image-propertygrid-collapse"; });
+                this._disposables.push(this.toggleCollapsedImage = ko.pureComputed(function () {
+                    var postfix = _this.collapsed() ? "-expand" : "-collapse";
+                    return { class: "dxrd-image-propertygrid" + postfix, template: "dxrd-svg-tabs" + postfix };
+                }));
+                this._disposables.push(this.toggleCollapsedText);
             }
+            TabPanel.prototype.dispose = function () {
+                _super.prototype.dispose.call(this);
+                this.disposeArray(this.tabs);
+            };
+            TabPanel.Position = {
+                Left: "Left",
+                Right: "Right"
+            };
             return TabPanel;
         })(Analytics.Utils.Disposable);
         Analytics.TabPanel = TabPanel;
         var TabInfo = (function (_super) {
             __extends(TabInfo, _super);
-            function TabInfo(text, template, model, localizationId, imageBaseName, computedVisible, computedDisabled) {
+            function TabInfo(options) {
                 var _this = this;
                 _super.call(this);
                 this.active = ko.observable(false);
                 this.visible = ko.observable();
                 this.disabled = ko.observable();
-                imageBaseName = imageBaseName || text.toLowerCase();
-                this._text = text;
-                this._localizationId = localizationId;
-                this.imageClassName = ko.pureComputed(function () {
-                    return "dxrd-image-" + imageBaseName + (_this.active() ? "-active" : "-inactive");
-                });
-                this.template = template;
-                this.visible = ko.pureComputed(function () { return computedVisible !== undefined ? computedVisible() : true; });
-                this.disabled = ko.pureComputed(function () { return computedDisabled !== undefined ? computedDisabled() : false; });
+                var imageBaseName = options.imageClassName || options.text.toLowerCase();
+                this._text = options.text;
+                this._localizationId = options.localizationId;
+                this._disposables.push(this.imageClassName = ko.pureComputed(function () {
+                    return "dxrd-image-" + imageBaseName;
+                }));
+                this.imageTemplateName = options.imageTemplateName || Analytics.Widgets.Internal.SvgTemplatesEngine.getExistingTemplate("dxrd-svg-tabs-" + options.text.toLowerCase());
+                this.template = options.template;
+                this._disposables.push(options.model);
+                var computedVisible = options.visible;
+                var computedDisabled = options.disabled;
+                this._disposables.push(this.visible = ko.pureComputed(function () { return computedVisible !== undefined ? computedVisible() : true; }));
+                this._disposables.push(this.disabled = ko.pureComputed(function () { return computedDisabled !== undefined ? computedDisabled() : false; }));
                 this._disposables.push(this.visible.subscribe(function (visibility) {
                     if (!visibility) {
                         _this.active(false);
                     }
                 }));
-                this.model = model;
+                computedVisible && this._disposables.push(computedVisible);
+                computedDisabled && this._disposables.push(computedDisabled);
+                this.model = options.model;
             }
             Object.defineProperty(TabInfo.prototype, "text", {
                 get: function () {
@@ -13790,9 +14417,24 @@ var DevExpress;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(ToolboxItem.prototype, "imageTemplateName", {
+                get: function () {
+                    var _templateName = Analytics.Internal.getImageClassName(this.type, true);
+                    return Analytics.Widgets.Internal.SvgTemplatesEngine.getExistingTemplate(_templateName);
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(ToolboxItem.prototype, "index", {
                 get: function () {
                     return this.info.index;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ToolboxItem.prototype, "displayName", {
+                get: function () {
+                    return this.info.displayName || this.type;
                 },
                 enumerable: true,
                 configurable: true
@@ -13806,6 +14448,7 @@ var DevExpress;
                 if (!controlsMap[controlType].nonToolboxItem) {
                     var item = {
                         "@ControlType": controlType,
+                        displayName: controlsMap[controlType].displayName,
                         index: controlsMap[controlType].toolboxIndex || 0,
                         canDrop: controlsMap[controlType].canDrop
                     };
@@ -13839,7 +14482,7 @@ var DevExpress;
                     array.splice(0, 0, surface);
                 });
                 target.valueHasMutated();
-                elementModels.subscribe(function (args) {
+                return elementModels.subscribe(function (args) {
                     var unwrapedTarget = target();
                     var targetLength = unwrapedTarget.length;
                     args.forEach(function (changeSet) {
@@ -13863,7 +14506,7 @@ var DevExpress;
                     array.push(surface);
                 });
                 target.valueHasMutated();
-                elementModels.subscribe(function (args) {
+                return elementModels.subscribe(function (args) {
                     var startIndex = target().length, deleteCount = 0, valuesToAdd = [];
                     args.forEach(function (changeSet) {
                         if (changeSet.status === "deleted") {
@@ -14240,7 +14883,7 @@ var DevExpress;
                 return Math.floor(result * 100) / 100;
             }
             Utils.pixelToUnits = pixelToUnits;
-            function createUnitProperty(model, target, propertyName, property, measureUnit, zoom) {
+            function createUnitProperty(model, target, propertyName, property, measureUnit, zoom, afterCreation) {
                 var lastVal = 0;
                 target[propertyName] = ko.pureComputed({
                     read: function () {
@@ -14252,18 +14895,21 @@ var DevExpress;
                         return lastVal;
                     },
                     write: function (val) {
+                        if (Math.abs(val - lastVal) <= 0.2)
+                            return;
                         lastVal = val;
                         var result = pixelToUnits(val, measureUnit.peek(), zoom());
                         property(model)(result);
                     }
                 });
+                afterCreation(target[propertyName]);
             }
             Utils.createUnitProperty = createUnitProperty;
-            function createUnitProperties(model, target, properties, measureUnit, zoom) {
+            function createUnitProperties(model, target, properties, measureUnit, zoom, afterCreation) {
                 if (!properties)
                     return;
                 for (var propertyName in properties) {
-                    createUnitProperty(model, target, propertyName, properties[propertyName], measureUnit, zoom);
+                    createUnitProperty(model, target, propertyName, properties[propertyName], measureUnit, zoom, afterCreation);
                 }
             }
             Utils.createUnitProperties = createUnitProperties;
@@ -14355,6 +15001,8 @@ var DevExpress;
                 root.getLocalization = function () {
                     return Utils.getLocalization.apply(DevExpress.Analytics, arguments);
                 };
+                root.getPopupContainer = Utils.getParentContainer;
+                root.surfaceClass = function (el) { return "dx-designer-viewport" + (!Utils.getParentContainer(el, ".dx-viewport").length ? " dx-viewport dx-theme-generic" : ""); };
             }
             Utils.appendStaticContextToRootViewModel = appendStaticContextToRootViewModel;
             Utils.ajaxSetup = new Analytics.Internal.AjaxSetup();
@@ -14399,16 +15047,6 @@ var DevExpress;
                 return model;
             }
             Utils.cutRefs = cutRefs;
-            function createPopularProperties(info, popularProperties) {
-                var properties = [];
-                popularProperties.forEach(function (name) {
-                    var property = info.filter(function (propertyInfo) { return propertyInfo.propertyName === name; })[0];
-                    if (property) {
-                        properties.push(property);
-                    }
-                });
-                return properties;
-            }
             Utils.DesignerBaseElements = {
                 MenuButton: "dxrd-menubutton-template-base",
                 Toolbar: "dxrd-toolbar-template-base",
@@ -14444,104 +15082,91 @@ var DevExpress;
             function createDesigner(model, surface, controlsFactory, groups, editors, parts, rtl, selection, designControlsHelper, undoEngine, customMerge, snapLinesCollector, groupLocalizationIDs) {
                 if (groups === void 0) { groups = {}; }
                 if (editors === void 0) { editors = []; }
-                var undoEngine = undoEngine || ko.observable(new Utils.UndoEngine(model)), actionUndoEngineWrappingFunction = createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
-                    undoEngine().start();
-                    handler(model);
-                    undoEngine().end();
-                }), selection = selection || new Analytics.Internal.SurfaceSelection(), contextActionProviders = [], snapHelper = new Analytics.Internal.SnapLinesHelper(surface, Analytics.Internal.SnapLinesHelper.snapTolerance, snapLinesCollector || new Analytics.Internal.SnapLinesCollector()), controlsHelper = designControlsHelper || new Analytics.Internal.DesignControlsHelper(model, [{
-                        added: function (control) { },
-                        deleted: function (control) { control.surface === selection.focused() && selection.focused(Analytics.Internal.findNextSelection(control.surface)); }
-                    }]), dragHelperContent = new Analytics.Internal.DragHelperContent(selection), toolboxItems = Analytics.getToolboxItems(controlsFactory.controlsMap), appMenuVisible = ko.observable(false), inlineTextEdit = new Analytics.Internal.InlineTextEdit(selection), editableObject = Analytics.Internal.CombinedObject.getEditableObject(selection, undoEngine, customMerge).extend({ throttle: 1 }), propertyGrid = new Analytics.Widgets.ControlProperties(editableObject, { groups: groups, editors: editors, groupLocalizationIDs: groupLocalizationIDs }, null), popularProperties = new Analytics.Widgets.ObjectProperties(ko.pureComputed(function () {
-                    var popularPropertiesObject = { getInfo: function () { return []; } }, editable = editableObject();
-                    if (editable) {
-                        var controlInfo = controlsFactory.controlsMap[editable.controlType], propertiesInfo = createPopularProperties(controlInfo && controlInfo.info || [], controlInfo && controlInfo.popularProperties || []);
-                        (propertiesInfo).forEach(function (item) {
-                            if (item.propertyName in editable)
-                                popularPropertiesObject[item.propertyName] = editable[item.propertyName];
-                        });
-                        popularPropertiesObject.getInfo = function () {
-                            return propertiesInfo;
+                var context = new Utils.DesignerContextGenerator(rtl)
+                    .addModel(model)
+                    .addSurface(surface)
+                    .addUndoEngine(undoEngine)
+                    .getContext();
+                var designerGenerator = new Utils.CommonDesignerGenerator(context, rtl);
+                return designerGenerator
+                    .mapOnContext()
+                    .addSelection(function (settings) {
+                    settings.selection = selection || new Analytics.Internal.SurfaceSelection();
+                    settings.snapHelper = new Analytics.Internal.SnapLinesHelper(surface, Analytics.Internal.SnapLinesHelper.snapTolerance, snapLinesCollector || new Analytics.Internal.SnapLinesCollector());
+                    settings.editableObject = Analytics.Internal.CombinedObject.getEditableObject(settings.selection, context.undoEngine, customMerge).extend({ throttle: 1 });
+                    settings.addDragDrop(function (dragDropSettings) {
+                        dragDropSettings.dragHelperContent = new Analytics.Internal.DragHelperContent(settings.selection);
+                        dragDropSettings.dragDropStarted = Analytics.Internal.DragDropHandler.started;
+                        dragDropSettings.addDragDropHandler("dragHandler", new Analytics.Internal.SelectionDragDropHandler(context.surface, settings.selection, context.undoEngine, settings.snapHelper, dragDropSettings.dragHelperContent));
+                        dragDropSettings.addDragDropHandler("toolboxDragHandler", new Analytics.Internal.ToolboxDragDropHandler(context.surface, settings.selection, context.undoEngine, settings.snapHelper, dragDropSettings.dragHelperContent, controlsFactory));
+                    });
+                    settings.addResize(function (resizeSettings) {
+                        resizeSettings.handler = {
+                            starting: function () {
+                                selection.expectClick = true;
+                                context.undoEngine().start();
+                            },
+                            stopped: function () {
+                                context.undoEngine().end();
+                                setTimeout(function () { selection.expectClick = false; }, 100);
+                            },
+                            disabled: Analytics.Internal.DragDropHandler.started,
+                            snapHelper: settings.snapHelper
                         };
-                        popularPropertiesObject["root"] = editable.root;
-                        popularPropertiesObject["actions"] = editable.actions;
-                        popularPropertiesObject["getPath"] = function (propertyName) { return editable.getPath && editable.getPath(propertyName) || ""; };
-                        popularPropertiesObject["isPropertyModified"] = function (name) {
-                            return editable.isPropertyModified ? editable.isPropertyModified(name) : false;
-                        };
-                        popularPropertiesObject["getActionClassName"] = function (name) {
-                            return editable["getActionClassName"] ? editable["getActionClassName"](name) : "";
-                        };
-                        popularPropertiesObject["isPropertyVisible"] = function (propertyName) {
-                            return editable["isPropertyVisible"](propertyName);
-                        };
-                        popularPropertiesObject["isPropertyDisabled"] = function (name) {
-                            return editable.isPropertyDisabled ? editable.isPropertyDisabled(name) : false;
-                        };
-                        popularPropertiesObject["isSame"] = function (x) { return x === editable; };
-                    }
-                    return popularPropertiesObject;
-                }), undefined, undefined, undefined), tabPanel = new Analytics.TabPanel([
-                    new Analytics.TabInfo("Properties", "dxrd-propertiestab", propertyGrid, 'ReportStringId.Cmd_Properties', undefined, ko.pureComputed(function () { return !!model(); }), ko.pureComputed(function () { return propertyGrid.focusedItem() instanceof Array; }).extend({ throttle: 100 }))
-                ], undefined, rtl);
-                var designerModel = {
-                    parts: parts,
-                    model: model,
-                    isLoading: ko.observable(true),
-                    surface: surface,
-                    surfaceSize: ko.observable(0),
-                    controlsHelper: controlsHelper,
-                    selection: selection,
-                    undoEngine: undoEngine,
-                    toolboxItems: toolboxItems,
-                    editableObject: editableObject,
-                    popularProperties: popularProperties,
-                    tabPanel: tabPanel,
-                    rtl: rtl,
-                    controlsStore: new Analytics.Internal.ControlsStore(controlsHelper.allControls),
-                    appMenuVisible: appMenuVisible,
-                    toggleAppMenu: function () {
-                        appMenuVisible(!appMenuVisible());
-                    },
-                    getMenuPopupContainer: function (el) { return $(el).closest(".dxrd-menu-button").prev(".dxrd-menu-container"); },
-                    getMenuPopupTarget: function (el) { return $(el).closest(".dxrd-menu-button").find(".dxrd-menu-place"); },
-                    actionLists: new Analytics.Internal.ActionLists(surface, selection, undoEngine, function () { }),
-                    contextActionProviders: contextActionProviders,
-                    contextActions: ko.pureComputed(function () {
-                        var editable = editableObject(), contextActions = [];
-                        contextActionProviders.forEach(function (actionProvider) {
-                            contextActions.push.apply(contextActions, actionProvider.getActions(editable));
-                        });
-                        actionUndoEngineWrappingFunction(contextActions);
-                        return contextActions;
-                    }),
-                    actionsGroupTitle: function () { return Analytics.getLocalization('Actions', 'ASPxReportsStringId.ReportDesigner_Actions'); },
-                    inlineTextEdit: inlineTextEdit,
-                    resizeHandler: {
-                        starting: function () {
-                            selection.expectClick = true;
-                            undoEngine().start();
-                        },
-                        stopped: function () {
-                            undoEngine().end();
-                            setTimeout(function () { selection.expectClick = false; }, 100);
-                        },
-                        disabled: Analytics.Internal.DragDropHandler.started,
-                        snapHelper: snapHelper
-                    },
-                    snapHelper: snapHelper,
-                    dragHelperContent: dragHelperContent,
-                    dragHandler: new Analytics.Internal.SelectionDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent),
-                    toolboxDragHandler: new Analytics.Internal.ToolboxDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent, controlsFactory),
-                    dragDropStarted: Analytics.Internal.DragDropHandler.started,
-                    updateFont: function (values) {
-                        DevExpress.Analytics.Widgets.availableFonts($.extend(DevExpress.Analytics.Widgets.availableFonts(), values));
-                    }
-                };
-                designerModel["popularVisible"] = ko.pureComputed(function () {
-                    return designerModel.popularProperties._editors().some(function (x) { return x.visible(); }) || designerModel.contextActions().length > 0;
-                });
-                designerModel.parts = designerModel.parts || generateDefaultParts(designerModel);
-                return designerModel;
+                    });
+                })
+                    .addToolboxItems(function () { return Analytics.getToolboxItems(controlsFactory.controlsMap); })
+                    .addIsLoading()
+                    .addControlProperties(editors, groups, groupLocalizationIDs)
+                    .addPopularProperties(controlsFactory)
+                    .addControlsHelper(function (settings) {
+                    settings
+                        .addControlsHelper(designControlsHelper)
+                        .addControlsStore();
+                })
+                    .addTabPanel(undefined, function () {
+                    return [
+                        new Analytics.TabInfo({
+                            text: "Properties",
+                            template: "dxrd-propertiestab",
+                            model: designerGenerator.getModel().propertyGrid,
+                            localizationId: 'ReportStringId.Cmd_Properties',
+                            visible: ko.pureComputed(function () { return !!model(); }),
+                            disabled: ko.pureComputed(function () { return designerGenerator.getModel().propertyGrid.focusedItem() instanceof Array; }).extend({ throttle: 100 })
+                        })
+                    ];
+                })
+                    .addContextActions(function (settings) {
+                    settings.actionProviders = [];
+                    settings.createDefaultActions(designerGenerator.getModel().editableObject, designerGenerator.getModel().undoEngine);
+                })
+                    .addMenu(function (settings) {
+                    settings.appMenuVisible = ko.observable(false);
+                    settings.toggleAppMenu = function () {
+                        settings.appMenuVisible(!settings.appMenuVisible());
+                    };
+                    settings.getMenuPopupContainer = function (el) { return $(el).closest(".dxrd-menu-button").prev(".dxrd-menu-container"); };
+                    settings.getMenuPopupTarget = function (el) { return $(el).closest(".dxrd-menu-button").find(".dxrd-menu-place"); };
+                })
+                    .addElement("inlineTextEdit", function () { return new Analytics.Internal.InlineTextEdit(designerGenerator.getModel().selection); })
+                    .addElement("actionsGroupTitle", function () { return function () { return Analytics.getLocalization('Actions', 'ASPxReportsStringId.ReportDesigner_Actions'); }; })
+                    .addElement("updateFont", function () { return function (values) {
+                    DevExpress.Analytics.Widgets.availableFonts($.extend(DevExpress.Analytics.Widgets.availableFonts(), values));
+                }; })
+                    .addElement("sortFont", function () { return function () {
+                    var sortedObj = {};
+                    var fonts = DevExpress.Analytics.Widgets.availableFonts.peek();
+                    Object.keys(fonts).sort(function (a, b) { return a.localeCompare(b); }).forEach(function (key) { return sortedObj[key] = fonts[key]; });
+                    DevExpress.Analytics.Widgets.availableFonts(sortedObj);
+                }; })
+                    .addElement("surfaceSize", function () { return ko.observable(0); })
+                    .addElement("popularVisible", function () { return ko.pureComputed(function () {
+                    return designerGenerator.getModel().popularProperties._editors().some(function (x) { return x.visible(); }) ||
+                        designerGenerator.getModel().contextActions().length > 0;
+                }); })
+                    .addActionList()
+                    .addParts()
+                    .getModel();
             }
             Utils.createDesigner = createDesigner;
             function localizeNoneString(noneValue) {
@@ -14624,7 +15249,7 @@ var DevExpress;
                     this.option("value") && this._value(this.option("value"));
                     this.option("itemsProvider") && this._itemsProvider(this.option("itemsProvider"));
                     this.option("valueChangeEvent", "change");
-                    this._parentViewport = this["_$element"].parents(".dx-viewport");
+                    this._parentViewport = this["_$element"].parents(".dx-designer-viewport");
                 }
                 dxFieldListPicker.prototype._showDropDown = function () {
                     if (this._popup) {
@@ -14738,7 +15363,7 @@ var DevExpress;
             ko.bindingHandlers['dxBorderEditor'] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     $(element).children().remove();
-                    var templateHtml = $('#dxrd-bordereditor').text(), $element = $(element).append(templateHtml);
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dxrd-bordereditor'), $element = $(element).append(templateHtml);
                     ko.applyBindings({ value: new Widgets.BordersModel(valueAccessor(), viewModel.disabled) }, $element.children()[0]);
                     return { controlsDescendantBindings: true };
                 }
@@ -14835,18 +15460,12 @@ var DevExpress;
         (function (Widgets) {
             var ControlProperties = (function (_super) {
                 __extends(ControlProperties, _super);
-                function ControlProperties(target, editorsInfo, level) {
+                function ControlProperties(target, editorsInfo, level, addAddons) {
                     var _this = this;
                     if (level === void 0) { level = 0; }
+                    if (addAddons === void 0) { addAddons = true; }
                     _super.call(this, target, editorsInfo, level, undefined, undefined, ko.observable(""));
                     this.focusedItem = ko.observable();
-                    this.createEditorAddOn = function (editor) {
-                        var editorAddOn = new Analytics.Internal.EditorAddOn(editor, _this.popupService);
-                        return {
-                            templateName: editorAddOn.templateName,
-                            data: editorAddOn
-                        };
-                    };
                     this.editorsRendered = ko.observable(false);
                     this.isSortingByGroups = ko.observable(true);
                     this.isSearching = ko.observable(false);
@@ -14864,28 +15483,39 @@ var DevExpress;
                             _this._searchBox && _this._searchBox.focus();
                         }
                     };
+                    if (addAddons) {
+                        this.createEditorAddOn = function (editor) {
+                            var editorAddOn = new Analytics.Internal.EditorAddOn(editor, _this.popupService);
+                            editor._disposables.push(editorAddOn);
+                            return {
+                                templateName: editorAddOn.templateName,
+                                data: editorAddOn
+                            };
+                        };
+                    }
                     this.popupService = new Analytics.Internal.PopupService();
-                    this.createGroups(editorsInfo.groups, editorsInfo.groupLocalizationIDs);
+                    this.createGroups(editorsInfo.groups);
                     this.update(target());
-                    this.focusedImageClassName = ko.pureComputed(function () {
+                    this._disposables.push(this.focusedImageClassName = ko.pureComputed(function () {
                         return Analytics.Internal.getImageClassName(target() && target().controlType);
-                    });
+                    }));
                     var subscription = this.isSortingByGroups.subscribe(function (newVal) {
                         if (!newVal) {
                             _this.editorsRendered(true);
                             subscription.dispose();
                         }
                     });
+                    this._disposables.push(subscription);
                     this.focusedItem = target;
                     this.displayExpr = function (value) { return DevExpress.Analytics.Internal.getControlFullName(value); };
                     var timeout = null;
-                    this.textToSearch.subscribe(function (newValue) {
+                    this._disposables.push(this.textToSearch.subscribe(function (newValue) {
                         timeout && clearTimeout(timeout);
                         timeout = setTimeout(function () {
                             _this._textToSearch(newValue);
                             newValue && _this.groups.forEach(function (group) { return group.collapsed() && group.editors().some(function (editor) { return editor.isSearchedProperty(); }) && group.collapsed(false); });
                         }, 200);
-                    });
+                    }));
                 }
                 ControlProperties.prototype.getEditors = function () {
                     var editors = _super.prototype.getEditors.call(this);
@@ -14895,18 +15525,30 @@ var DevExpress;
                     });
                     return editors;
                 };
-                ControlProperties.prototype.update = function (viewModel) {
-                    _super.prototype.update.call(this, viewModel);
-                    if (this.isSortingByGroups && !this.isSortingByGroups())
-                        return;
-                    (this.groups || []).forEach(function (group) {
-                        group.update(viewModel);
+                ControlProperties.prototype._update = function (target, editorsInfo, recreateEditors) {
+                    this.groups && this.groups.forEach(function (group) {
+                        if (group.editors().length === 0)
+                            group.recreate();
                     });
+                    return _super.prototype._update.call(this, target, editorsInfo, recreateEditors);
                 };
-                ControlProperties.prototype.createGroups = function (groups, getGroupLocalizationId) {
+                ControlProperties.prototype.cleanEditors = function () {
+                    _super.prototype.cleanEditors.call(this);
+                    this.groups.forEach(function (x) { return x.resetEditors(); });
+                };
+                ControlProperties.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.disposeArray(this.groups);
+                    this.disposeObservableArray(this._editors);
+                    this.resetObservableArray(this._editors);
+                    this.cleanSubscriptions();
+                    this._searchBox = null;
+                    this.focusedItem = null;
+                };
+                ControlProperties.prototype.createGroups = function (groups) {
                     var _this = this;
-                    this.groups = $.map(groups, function (groupInfo, displayName) {
-                        return new Widgets.Group(displayName, groupInfo, function (serializationInfo) {
+                    this.groups = Object.keys(groups).map(function (name) {
+                        return new Widgets.Group(name, groups[name].info, function (serializationInfo) {
                             return serializationInfo
                                 .filter(function (info) { return !!info.editor; })
                                 .map(function (info) {
@@ -14917,8 +15559,9 @@ var DevExpress;
                                 _this._editors.push(editor);
                                 return editor;
                             });
-                        }, true, getGroupLocalizationId && getGroupLocalizationId[displayName]);
+                        }, true, groups[name].displayName);
                     });
+                    this._disposables.push.apply(this._disposables, this.groups);
                 };
                 ControlProperties.prototype.searchBox = function ($element) {
                     this._searchBox = $element.dxTextBox("instance");
@@ -14937,16 +15580,15 @@ var DevExpress;
         (function (Widgets) {
             var Group = (function (_super) {
                 __extends(Group, _super);
-                function Group(displayName, serializationsInfo, createEditors, collapsed, localizationId) {
+                function Group(name, serializationsInfo, createEditors, collapsed, displayName) {
                     var _this = this;
                     if (collapsed === void 0) { collapsed = true; }
-                    if (localizationId === void 0) { localizationId = ""; }
                     _super.call(this);
-                    this.editors = ko.observableArray();
+                    this.editors = ko.observableArray([]);
                     this.editorsCreated = ko.observable(false);
                     this.editorsRendered = ko.observable(false);
-                    this._displayName = displayName;
-                    this._localizationId = localizationId;
+                    this._displayName = name;
+                    this.displayName = displayName || (function () { return Analytics.getLocalization(name); });
                     this._serializationsInfo = serializationsInfo;
                     this.collapsed = ko.observable(collapsed);
                     if (collapsed) {
@@ -14954,22 +15596,32 @@ var DevExpress;
                             subscription.dispose();
                             _this.editorsRendered(true);
                         });
+                        this._disposables.push(subscription);
                     }
+                    this.recreate = function () {
+                        _this.editors(createEditors(serializationsInfo));
+                    };
+                    this.editors(createEditors(serializationsInfo));
                     this.visible = ko.computed(function () {
                         return _this.editors().some(function (editor) { return editor.visible(); });
                     });
-                    this.editors(createEditors(serializationsInfo));
                     this._disposables.push(this.visible);
                 }
+                Group.prototype.resetEditors = function () {
+                    this.disposeObservableArray(this.editors);
+                    this.resetObservableArray(this.editors);
+                };
+                Group.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.disposeObservableArray(this.editors);
+                    this.resetObservableArray(this.editors);
+                };
                 Group.prototype.update = function (viewModel) {
                     var _this = this;
                     this._viewModel = viewModel;
                     this.editors().forEach(function (editor) {
                         editor.update(_this._viewModel);
                     });
-                };
-                Group.prototype.displayName = function () {
-                    return this._localizationId ? Analytics.getLocalization(this._displayName, this._localizationId) : Analytics.getLocalization(this._displayName);
                 };
                 return Group;
             })(Analytics.Utils.Disposable);
@@ -15701,5 +16353,638 @@ var DevExpress;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "FieldListEditor");
         })(Widgets = Designer.Widgets || (Designer.Widgets = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Utils;
+        (function (Utils) {
+            var DesignerContextGeneratorInternal = (function () {
+                function DesignerContextGeneratorInternal(_context, _rtl) {
+                    this._context = _context;
+                    this._rtl = _rtl;
+                }
+                DesignerContextGeneratorInternal.prototype.addElement = function (propertyName, model) {
+                    this._context[propertyName] = model;
+                    return this;
+                };
+                DesignerContextGeneratorInternal.prototype.addUndoEngine = function (undoEngine) {
+                    if (undoEngine === void 0) { undoEngine = ko.observable(new Utils.UndoEngine(this._context.model)); }
+                    this._context.undoEngine = undoEngine;
+                    return this;
+                };
+                DesignerContextGeneratorInternal.prototype.addSurface = function (surface) {
+                    this._context.surface = surface;
+                    return this;
+                };
+                DesignerContextGeneratorInternal.prototype.getContext = function () {
+                    return this._context;
+                };
+                return DesignerContextGeneratorInternal;
+            })();
+            Utils.DesignerContextGeneratorInternal = DesignerContextGeneratorInternal;
+            var DesignerContextGenerator = (function () {
+                function DesignerContextGenerator(_rtl) {
+                    this._rtl = _rtl;
+                }
+                DesignerContextGenerator.prototype.addModel = function (model) {
+                    return new DesignerContextGeneratorInternal({ model: model }, this._rtl);
+                };
+                return DesignerContextGenerator;
+            })();
+            Utils.DesignerContextGenerator = DesignerContextGenerator;
+            var ResizeSettings = (function (_super) {
+                __extends(ResizeSettings, _super);
+                function ResizeSettings() {
+                    _super.apply(this, arguments);
+                }
+                Object.defineProperty(ResizeSettings.prototype, "handler", {
+                    get: function () { return this._handler; },
+                    set: function (newVal) {
+                        this._disposables.push(newVal);
+                        this._handler = newVal;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                ;
+                ResizeSettings.prototype.generate = function () {
+                    var result = {};
+                    if (this.handler)
+                        result["resizeHandler"] = this.handler;
+                    return result;
+                };
+                return ResizeSettings;
+            })(Utils.Disposable);
+            Utils.ResizeSettings = ResizeSettings;
+            var ContextActionsSettings = (function (_super) {
+                __extends(ContextActionsSettings, _super);
+                function ContextActionsSettings() {
+                    _super.apply(this, arguments);
+                }
+                ContextActionsSettings.prototype._actionUndoEngineWrappingFunction = function (contextActions, undoEngine) {
+                    return Utils.createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
+                        undoEngine().start();
+                        handler(model);
+                        undoEngine().end();
+                    })(contextActions);
+                };
+                Object.defineProperty(ContextActionsSettings.prototype, "actionProviders", {
+                    get: function () {
+                        return this._actionProviders;
+                    },
+                    set: function (val) {
+                        this._disposables.push.apply(this._disposables, val);
+                        this._actionProviders = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ContextActionsSettings.prototype, "actions", {
+                    get: function () {
+                        return this._actions;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._actions = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                ContextActionsSettings.prototype.createDefaultActions = function (editableObj, undoEngine) {
+                    var _this = this;
+                    this.actions = ko.computed(function () {
+                        var editable = editableObj(), contextActions = [];
+                        _this.actionProviders.forEach(function (actionProvider) {
+                            contextActions.push.apply(contextActions, actionProvider.getActions(editable));
+                        });
+                        _this._actionUndoEngineWrappingFunction(contextActions, undoEngine);
+                        return contextActions;
+                    });
+                };
+                ContextActionsSettings.prototype.generate = function () {
+                    var result = {};
+                    if (this.actionProviders)
+                        result["contextActionProviders"] = this.actionProviders;
+                    if (this.actions)
+                        result["contextActions"] = this.actions;
+                    return result;
+                };
+                return ContextActionsSettings;
+            })(Utils.Disposable);
+            Utils.ContextActionsSettings = ContextActionsSettings;
+            var DragDropSettings = (function (_super) {
+                __extends(DragDropSettings, _super);
+                function DragDropSettings() {
+                    _super.apply(this, arguments);
+                    this._model = {};
+                }
+                Object.defineProperty(DragDropSettings.prototype, "dragHelperContent", {
+                    get: function () {
+                        return this._dragHelperContent;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._dragHelperContent = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(DragDropSettings.prototype, "dragDropStarted", {
+                    get: function () {
+                        return this._dragDropStarted;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._dragDropStarted = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                DragDropSettings.prototype.addDragDropHandler = function (propertyName, handler) {
+                    this._disposables.push(handler);
+                    this._model[propertyName] = handler;
+                };
+                DragDropSettings.prototype.generate = function () {
+                    var result = this._model;
+                    if (this.dragHelperContent)
+                        result["dragHelperContent"] = this.dragHelperContent;
+                    if (this.dragDropStarted)
+                        result["dragDropStarted"] = this.dragDropStarted;
+                    return result;
+                };
+                return DragDropSettings;
+            })(Utils.Disposable);
+            Utils.DragDropSettings = DragDropSettings;
+            var ControlsHelperSettings = (function (_super) {
+                __extends(ControlsHelperSettings, _super);
+                function ControlsHelperSettings(_selection, _context) {
+                    _super.call(this);
+                    this._selection = _selection;
+                    this._context = _context;
+                    this._model = {};
+                }
+                ControlsHelperSettings.prototype.generate = function () {
+                    var result = this._model;
+                    if (this.controlsHelper)
+                        result["controlsHelper"] = this.controlsHelper;
+                    return result;
+                };
+                ControlsHelperSettings.prototype.addControlsHelper = function (helper) {
+                    var _this = this;
+                    this.controlsHelper = helper || new Analytics.Internal.DesignControlsHelper(this._context.model, [{
+                            added: function (control) { },
+                            deleted: function (control) { control.surface === _this._selection.focused() && _this._selection.focused(Analytics.Internal.findNextSelection(control.surface)); }
+                        }]);
+                    this._disposables.push(this.controlsHelper);
+                    return this;
+                };
+                ControlsHelperSettings.prototype.addControlsStore = function (store) {
+                    store = store || new Analytics.Internal.ControlsStore(this.controlsHelper.allControls);
+                    this._disposables.push(store);
+                    this._model["controlsStore"] = store;
+                    return this;
+                };
+                return ControlsHelperSettings;
+            })(Utils.Disposable);
+            Utils.ControlsHelperSettings = ControlsHelperSettings;
+            var MenuSettings = (function (_super) {
+                __extends(MenuSettings, _super);
+                function MenuSettings() {
+                    _super.apply(this, arguments);
+                }
+                MenuSettings.prototype.generate = function () {
+                    var result = {};
+                    if (this.appMenuVisible)
+                        result["appMenuVisible"] = this.appMenuVisible;
+                    if (this.toggleAppMenu)
+                        result["toggleAppMenu"] = this.toggleAppMenu;
+                    if (this.getMenuPopupContainer)
+                        result["getMenuPopupContainer"] = this.getMenuPopupContainer;
+                    if (this.getMenuPopupTarget)
+                        result["getMenuPopupTarget"] = this.getMenuPopupTarget;
+                    return result;
+                };
+                Object.defineProperty(MenuSettings.prototype, "appMenuVisible", {
+                    get: function () {
+                        return this._appMenuVisible;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._appMenuVisible = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return MenuSettings;
+            })(Utils.Disposable);
+            Utils.MenuSettings = MenuSettings;
+            var SelectionSettings = (function (_super) {
+                __extends(SelectionSettings, _super);
+                function SelectionSettings() {
+                    _super.apply(this, arguments);
+                    this._dragDropSettings = new DragDropSettings();
+                    this._resizeSettings = new ResizeSettings();
+                }
+                SelectionSettings.prototype.dispose = function () {
+                    this._editableObject(null);
+                    _super.prototype.dispose.call(this);
+                    this.removeProperties();
+                };
+                Object.defineProperty(SelectionSettings.prototype, "selection", {
+                    get: function () {
+                        return this._selection;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._selection = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(SelectionSettings.prototype, "snapHelper", {
+                    get: function () {
+                        return this._snapHelper;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._snapHelper = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(SelectionSettings.prototype, "editableObject", {
+                    get: function () {
+                        return this._editableObject;
+                    },
+                    set: function (val) {
+                        this._disposables.push(val);
+                        this._editableObject = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                SelectionSettings.prototype.addDragDrop = function (func) {
+                    func(this._dragDropSettings);
+                    this._disposables.push(this._dragDropSettings);
+                };
+                SelectionSettings.prototype.addResize = function (func) {
+                    func(this._resizeSettings);
+                    this._disposables.push(this._resizeSettings);
+                };
+                SelectionSettings.prototype.generate = function () {
+                    var result = {};
+                    if (this.selection)
+                        result["selection"] = this.selection;
+                    if (this.snapHelper)
+                        result["snapHelper"] = this.snapHelper;
+                    if (this.editableObject)
+                        result["editableObject"] = this.editableObject;
+                    return Utils.extend(result, this._dragDropSettings.generate(), this._resizeSettings.generate());
+                };
+                return SelectionSettings;
+            })(Utils.Disposable);
+            Utils.SelectionSettings = SelectionSettings;
+            var CommonDesignerGenerator = (function (_super) {
+                __extends(CommonDesignerGenerator, _super);
+                function CommonDesignerGenerator(_context, _rtl) {
+                    var _this = this;
+                    _super.call(this);
+                    this._context = _context;
+                    this._rtl = _rtl;
+                    this._model = {};
+                    this._selectionSettings = new SelectionSettings();
+                    this._model.rtl = this._rtl;
+                    this._model.dispose = function () {
+                        _this.dispose();
+                    };
+                }
+                CommonDesignerGenerator.prototype._createPopularProperties = function (info, popularProperties) {
+                    var properties = [];
+                    popularProperties.forEach(function (name) {
+                        var property = info.filter(function (propertyInfo) { return propertyInfo.propertyName === name; })[0];
+                        if (property) {
+                            properties.push(property);
+                        }
+                    });
+                    return properties;
+                };
+                CommonDesignerGenerator.prototype._resetModel = function () {
+                    var _this = this;
+                    Object.keys(this._model).forEach(function (propertyName) {
+                        if (propertyName !== "dispose")
+                            delete _this._model[propertyName];
+                    });
+                };
+                Object.defineProperty(CommonDesignerGenerator.prototype, "rtl", {
+                    get: function () {
+                        return this._rtl;
+                    },
+                    set: function (newVal) {
+                        this._rtl = newVal;
+                        this._model.rtl = newVal;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                CommonDesignerGenerator.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._resetModel();
+                };
+                CommonDesignerGenerator.prototype.initializeContext = function (context) {
+                    this._context = context;
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.getPropertyByName = function (propertyName) {
+                    return this._model[propertyName];
+                };
+                CommonDesignerGenerator.prototype.addElement = function (propertyName, elementFunc) {
+                    this._model[propertyName] = elementFunc();
+                    this._disposables.push(this._model[propertyName]);
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.mapOnContext = function () {
+                    this._model.model = this._context.model;
+                    this._model.surface = this._context.surface;
+                    this._model.undoEngine = this._context.undoEngine;
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addSelection = function (func) {
+                    func(this._selectionSettings);
+                    this._disposables.push(this._selectionSettings);
+                    Utils.extend(this._model, this._selectionSettings.generate());
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addPropertyGrid = function (propertyGrid, propertyName) {
+                    if (propertyName === void 0) { propertyName = "propertyGrid"; }
+                    this._model[propertyName] = propertyGrid && propertyGrid();
+                    this._disposables.push(this._model[propertyName]);
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addControlProperties = function (editors, groups, groupLocalizationIDs) {
+                    var _this = this;
+                    return this.addPropertyGrid(function () { return new Analytics.Widgets.ControlProperties(_this._model.editableObject, { groups: groups, editors: editors }, null); });
+                };
+                CommonDesignerGenerator.prototype.addPopularProperties = function (controlsFactory) {
+                    var _this = this;
+                    return this.addPropertyGrid(function () { return new Analytics.Widgets.ObjectProperties(ko.pureComputed(function () {
+                        var popularPropertiesObject = { getInfo: function () { return []; } }, editable = _this._model.editableObject();
+                        if (editable) {
+                            var controlInfo = controlsFactory.controlsMap[editable.controlType], propertiesInfo = _this._createPopularProperties(controlInfo && controlInfo.info || [], controlInfo && controlInfo.popularProperties || []);
+                            (propertiesInfo).forEach(function (item) {
+                                if (item.propertyName in editable)
+                                    popularPropertiesObject[item.propertyName] = editable[item.propertyName];
+                            });
+                            popularPropertiesObject.getInfo = function () {
+                                return propertiesInfo;
+                            };
+                            popularPropertiesObject["root"] = editable.root;
+                            popularPropertiesObject["actions"] = editable.actions;
+                            popularPropertiesObject["getPath"] = function (propertyName) { return editable.getPath && editable.getPath(propertyName) || ""; };
+                            popularPropertiesObject["isPropertyModified"] = function (name) {
+                                return editable.isPropertyModified ? editable.isPropertyModified(name) : false;
+                            };
+                            popularPropertiesObject["getActionClassName"] = function (name) {
+                                return editable["getActionClassName"] ? editable["getActionClassName"](name) : "";
+                            };
+                            popularPropertiesObject["isPropertyVisible"] = function (propertyName) {
+                                return editable["isPropertyVisible"](propertyName);
+                            };
+                            popularPropertiesObject["isPropertyDisabled"] = function (name) {
+                                return editable.isPropertyDisabled ? editable.isPropertyDisabled(name) : false;
+                            };
+                            popularPropertiesObject["isSame"] = function (x) { return x === editable; };
+                        }
+                        return popularPropertiesObject;
+                    }), undefined, undefined, undefined); }, "popularProperties");
+                };
+                CommonDesignerGenerator.prototype.addToolboxItems = function (items) {
+                    this._model.toolboxItems = items && items();
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addTabPanel = function (panel, addTabInfo) {
+                    if (addTabInfo === void 0) { addTabInfo = function () { return []; }; }
+                    var panelModel = panel && panel() || new Analytics.TabPanel({ tabs: addTabInfo(), rtl: this._rtl });
+                    this._model.tabPanel = panelModel;
+                    this._disposables.push(panelModel);
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addIsLoading = function (isLoadingFunc) {
+                    if (isLoadingFunc === void 0) { isLoadingFunc = function () { return ko.observable(true); }; }
+                    this._model.isLoading = isLoadingFunc();
+                    this._disposables.push(this._model.isLoading);
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addControlsHelper = function (func) {
+                    var settings = new ControlsHelperSettings(this._selectionSettings.selection, this._context);
+                    func(settings);
+                    this._disposables.push(settings);
+                    Utils.extend(this._model, settings.generate());
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addMenu = function (func) {
+                    var settings = new MenuSettings();
+                    func(settings);
+                    this._disposables.push(settings);
+                    Utils.extend(this._model, settings.generate());
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addContextActions = function (func) {
+                    var settings = new ContextActionsSettings();
+                    func(settings);
+                    this._disposables.push(settings);
+                    Utils.extend(this._model, settings.generate());
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.addParts = function (func, useDefaults) {
+                    if (func === void 0) { func = function (parts) { return parts; }; }
+                    if (useDefaults === void 0) { useDefaults = true; }
+                    var parts = [];
+                    if (useDefaults)
+                        parts = Utils.generateDefaultParts(this._model);
+                    this._model.parts = func(parts);
+                    return this;
+                };
+                CommonDesignerGenerator.prototype.getModel = function () {
+                    return this._model;
+                };
+                CommonDesignerGenerator.prototype.addActionList = function (actionListsFunc) {
+                    var actionLists = actionListsFunc && actionListsFunc() || new Analytics.Internal.ActionLists(this._context.surface, this._selectionSettings.selection, this._context.undoEngine, function () { });
+                    this._disposables.push(actionLists);
+                    this._model.actionLists = actionLists;
+                    return this;
+                };
+                return CommonDesignerGenerator;
+            })(Utils.Disposable);
+            Utils.CommonDesignerGenerator = CommonDesignerGenerator;
+        })(Utils = Analytics.Utils || (Analytics.Utils = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Widgets;
+        (function (Widgets) {
+            var editor_template = {
+                render: function (options) {
+                    var $icon = $("<i />").addClass('dx-icon');
+                    if (!!options.model.iconClass) {
+                        $icon.addClass('dx-icon-' + options.model.iconClass);
+                    }
+                    else if (!!options.model.icon) {
+                        $icon.addClass(options.model.icon);
+                    }
+                    if (options.model.icon) {
+                        $icon.attr("data-bind", "template: '" + options.model.icon + "'");
+                    }
+                    var icon = $icon.get(0);
+                    $(options.container).append(icon);
+                    ko.applyBindings(options.model, icon);
+                }
+            };
+            var dxButtonWithTemplate = (function (_super) {
+                __extends(dxButtonWithTemplate, _super);
+                function dxButtonWithTemplate(element, options) {
+                    options["template"] = editor_template;
+                    _super.call(this, element, options);
+                }
+                dxButtonWithTemplate.prototype._getContentData = function () {
+                    var data = _super.prototype._getContentData.call(this);
+                    return ko.utils.extend(data, { iconClass: this.option("iconClass") });
+                };
+                dxButtonWithTemplate.prototype._optionChanged = function (args) {
+                    switch (args.name) {
+                        case "iconClass":
+                            this._updateContent();
+                            this._updateAriaLabel();
+                            break;
+                        default:
+                            _super.prototype._optionChanged.call(this, args);
+                    }
+                };
+                return dxButtonWithTemplate;
+            })(DevExpress.ui.dxButton);
+            Widgets.dxButtonWithTemplate = dxButtonWithTemplate;
+            DevExpress.registerComponent("dxButtonWithTemplate", dxButtonWithTemplate);
+        })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
+        var Templates;
+        (function (Templates) {
+            DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
+                'dx-editor-addons': '<!-- ko if: visible -->    <div class="dxrd-editormenu-box dxd-property-grid-menu-box-color dxd-back-contrast" data-bind="dxAction: showPopup, css: editorMenuButtonCss">        <div class="dxrd-editormenu-box-inside dxd-back-secondary"></div>    </div>    <!-- /ko -->',
+                'dx-boolean': '<div class="propertygrid-editor-checkbox" data-bind="dxCheckBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
+                'dx-boolean-select': '<div data-bind="dxLocalizedSelectBox: { dataSource: [ { val: true, text: $root.getLocalization(\'Yes\', \'ASPxReportsStringId.ParametersPanel_True\') }, { val: false, text: $root.getLocalization(\'No\', \'ASPxReportsStringId.ParametersPanel_False\') }], valueExpr: \'val\', displayExpr: \'text\', value: value, disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>',
+                'dx-commonCollection': '<div class="dx-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, displayName: displayName, level: level, info: info }">        </div>    </div>',
+                'dx-commonCollectionItem': '<div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1, parentDisabled: editor.disabled }"></div>',
+                'dx-color': '<div data-bind="dxColorBox: { value: value, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled }"></div>',
+                'dx-combobox': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>',
+                'dx-combobox-editable': '<div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', disabled: disabled, placeholder: $root.dx.Analytics.Localization.selectPlaceholder(), acceptCustomValue: true, onCustomItemCreating: function(arg) { return { value: arg.text, displayValue: arg.text }; } })"></div>',
+                'dx-combobox-undo': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>',
+                'dx-property-editor': '<div class="dx-editor" data-bind="visible: visible">        <div class="dx-group" data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dx-editor-header">                <div class="dx-field">                    <div class="dx-field-label dx-accordion-header dxd-text-primary" data-bind="styleunit: padding, css: { \'dx-accordion-empty\': templateName === \'dx-emptyHeader\' }">                        <!-- ko if: isComplexEditor -->                        <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }"></div>                        <!-- ko if: !!$data.textToSearch -->                        <div class="dx-group-header-font" data-bind="searchHighlighting: { text: displayName, textToSearch: textToSearch }, attr: { \'title\': displayName }"></div>                        <!-- /ko -->                        <!-- ko ifnot: !!$data.textToSearch -->                        <div class="dx-group-header-font" data-bind="text: displayName, attr: { \'title\': displayName }"></div>                        <!-- /ko -->                        <!-- /ko -->                        <!-- ko if: !isComplexEditor -->                        <!-- ko if: !!$data.textToSearch -->                        <div class="propertygrid-editor-displayName" data-bind="searchHighlighting: { text: displayName, textToSearch: textToSearch }, attr: { \'title\': displayName }, style: { fontWeight: isPropertyModified() ? \'Bold\' : \'\'}"></div>                        <!-- /ko -->                        <!-- ko ifnot: !!$data.textToSearch -->                        <div class="propertygrid-editor-displayName" data-bind="text: displayName, attr: { \'title\': displayName }, style: { fontWeight: isPropertyModified() ? \'Bold\' : \'\'}"></div>                        <!-- /ko -->                        <!-- /ko -->                    </div>                    <div class="dx-field-value">                        <div data-bind="service: { name: \'createEditorAddOn\' }"></div>                        <!-- ko if: templateName !== \'dx-emptyHeader\' -->                        <!-- ko lazy: { template: templateName } -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>            </div>            <!-- ko if: isComplexEditor -->            <div class="dx-editor-content dx-accordion-content">                <!-- ko if: (!$data.editorCreated || editorCreated) -->                <!-- ko template: contentTemplateName -->                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->        </div>    </div>',
+                'dx-emptyHeader': ' ',
+                'dx-date': '<div class="dx-datebox-container">        <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: \'datetime\', disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>    </div>',
+                'dx-file': '<div data-bind="dxFileImagePicker: { value: value, placeHolder: \'File\', disabled: disabled }"></div>',
+                'dx-modificators': '<div class="dx-font-content">        <div class="dx-field">            <div class="dx-field-label dxd-text-primary" data-bind="styleunit: { \'paddingLeft\': padding }"></div>            <!-- ko with: value -->            <div class="dx-field-value">                <div class="dx-font-styles-content">                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-bold" data-bind="css: { \'dxd-state-active\': bold(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { bold(!bold()); } }"><!-- ko template: \'dxrd-svg-fontstyle-bold\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-italic" data-bind="css: { \'dxd-state-active\': italic(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { italic(!italic()); } }"><!-- ko template: \'dxrd-svg-fontstyle-italic\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-underline" data-bind="css: { \'dxd-state-active\': underline(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { underline(!underline()); } }"><!-- ko template: \'dxrd-svg-fontstyle-underline\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-strikeout" data-bind="css: { \'dxd-state-active\': strikeout(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { strikeout(!strikeout()); } }"><!-- ko template: \'dxrd-svg-fontstyle-strikeout\'--><!-- /ko --></div>                </div>            </div>            <!-- /ko -->        </div>    </div>',
+                'dx-image': '<div data-bind="dxFileImagePicker: { value: value, placeHolder: \'Image\', accept: \'image/*\', type: \'img\', disabled: disabled }"></div>',
+                'dx-numeric': '<div data-bind="dxNumberBox: getOptions({ value:value, showSpinButtons:true, disabled:disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
+                'dx-number-editor': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
+                'dx-text': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
+                'dx-string-array': '<div class="dx-field">        <div class="dx-string-array-container dx-texteditor dx-multiline">            <textarea class="dx-string-array-textarea dx-texteditor-input" data-bind="value: value, disable: disabled"></textarea>        </div>    </div>',
+                'dx-propertieseditor': '<div data-bind="css: { \'dx-rtl\' : rtl }">        <div class="dx-editors">            <div class="dx-fieldset">                <!-- ko foreach: getEditors() -->                <!-- ko template: editorTemplate -->                <!-- /ko -->                <!-- /ko -->            </div>        </div>    </div>',
+                'dx-objectEditorContent': '<!-- ko if: visible -->    <div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>    <!-- /ko -->',
+                'dx-collectioneditor': '<div class="dx-collectioneditor">        <div data-bind="dxdAccordion: { collapsed: collapsed, alwaysShow: alwaysShow }">            <div class="dx-collectioneditor-header dx-accordion-header">                <div class="dx-editor-header">                    <div class="dx-field">                        <!-- ko if: showButtons-->                        <div class="dx-collectioneditor-actions-wrapper">                            <!-- ko if: isVisibleButton(\'delete\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: remove, disabled: isDisabledButton(\'delete\'), icon: \'dxrd-svg-operations-remove\', iconClass: \'dx-image-remove\' }, attr: { title: getDisplayTextButton(\'delete\') }"></div>                            <!-- /ko -->                            <!-- ko if: isVisibleButton(\'add\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: add, disabled: isDisabledButton(\'add\'), icon: \'dxrd-svg-operations-add\', iconClass: \'dx-image-add\' }, attr: { title: getDisplayTextButton(\'add\') }"></div>                            <!-- /ko -->                            <div class="dx-collectioneditor-action-separator"></div>                            <!-- ko if: isVisibleButton(\'down\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: down, disabled: isDisabledButton(\'down\'), icon: \'dxrd-svg-operations-movedown\', iconClass: \'dx-image-movedown\' }, attr: { title: getDisplayTextButton(\'down\') }"></div>                            <!-- /ko -->                            <!-- ko if: isVisibleButton(\'up\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: up, disabled: isDisabledButton(\'up\'), icon: \'dxrd-svg-operations-moveup\', iconClass: \'dx-image-moveup\' }, attr: { title: getDisplayTextButton(\'up\') }"></div>                            <!-- /ko -->                        </div>                        <!-- /ko -->                        <!-- ko if: displayName -->                        <div class="dx-collectioneditor-header-text dxd-text-primary" data-bind="styleunit: { \'paddingLeft\': padding }">                            <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }"></div>                            <div class="dx-group-header-font dxd-text-primary" data-bind="text: displayName, attr: { title: displayName }"></div>                        </div>                        <!-- /ko -->                    </div>                </div>            </div>            <div class="dx-accordion-content">                <!-- ko if: values().length === 0 && showButtons -->                <div class="dx-collectioneditor-empty dxd-empty-area-placeholder-text-color dxd-text-info">                    <span class="dx-collectioneditor-empty-text" data-bind="text: getDisplayTextEmptyArray()"></span>                </div>                <!-- /ko -->                <!-- ko if: values().length !== 0 -->                <div class="dx-collectioneditor-items" data-bind="foreach: values">                    <div data-bind="with: $parent.createCollectionItemWrapper($parents[1], $index)">                        <div class="dx-collectioneditor-item-container dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: $parents[1].select, css: { \'dxd-state-selected\' : $parents[1].selectedIndex() === $index() }">                            <div class="dx-collection-item"></div>                        </div>                    </div>                </div>                <!-- /ko -->            </div>        </div>    </div>',
+                'dx-expressioneditor-main': '<div class="dx-expression-tree">        <!-- ko if: !aceAvailable -->        <div class="dx-expressioneditor-textarea dxd-border-secondary dxd-back-primary2" data-bind="dxTextArea: { value: textAreaValue, isValid: isValid, spellcheck: false, onKeyUp: function() { isValid(true); } }"></div>        <!-- /ko -->        <!-- ko if: aceAvailable -->        <div class="dx-expressioneditor-textarea dxd-border-secondary dxd-back-primary2" data-bind="dxAceEditor: { value: textAreaValue, editorContainer: editorContainer, theme: theme, options: aceOptions, additionalOptions: additionalOptions, callbacks: callbacks }"></div>        <!-- /ko -->        <div class="dx-expressioneditor-tools">            <!-- ko with: tools-->            <div class="dx-expressioneditor-tools-tabs">                <!-- ko foreach: toolBox-->                <div class="dx-expressioneditor-tools-tab dxd-back-primary2" data-bind="style: { width: width }, visible: visible">                    <!-- ko if: $data.templateName -->                    <!-- ko template: { name: $data.templateName }-->                    <!-- /ko -->                    <!-- /ko -->                </div>                <!-- /ko-->            </div>            <!-- /ko-->        </div>    </div>',
+                'dx-expressioneditor': '<div>        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: displayValue, buttonAction: function() { popupVisible(true); }, disabled: disabled, isValid: modelValueValid }"></div>        <div class="dx-expressioneditor dx-popup-general" data-bind="dxPopup: {            showTitle: true,            title: title(),            visible: popupVisible,            toolbarItems: buttonItems,            showCloseButton: true,            fullScreen: false,            height: \'600px\',            width: \'645px\',            container: getPopupContainer($element),            position: { of: getPopupContainer($element)},            onShown: onShown        }">            <!-- ko if: popupVisible -->            <!-- ko template: "dx-expressioneditor-main" -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-expressioneditor-categories': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko foreach: content -->        <!-- ko if: $data.templateName -->        <!-- ko template: $data.templateName-->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: $data.templateName -->        <div class="dx-expressioneditor-tools-tab-category dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': content.isSelected }, text: displayName, dxAction: function() { $parent.click($data.content) }">        </div>        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dx-expressioneditor-category-accordion': '<div class="dx-fieldset" style="margin: 0;">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': $data.isSelected }, dxAction: function() { $data.updateContent($data.allItems(), $data.isSelected); $parent.click($data.content) }">                <div class=" dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: displayName"></span>            </div>            <div class="dx-accordion-content">                <!-- ko foreach: items-->                <div class="dx-expressioneditor-tools-tab-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': isSelected }, text: $data.display, dxAction: function() { $parent.updateContent($data.data, $data.isSelected); $parents[1].click($parent.content); }"></div>                <!-- /ko -->            </div>        </div>    </div>',
+                'dx-expressioneditor-description': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <div class="dx-expressioneditor-description dxd-text-primary" data-bind="text: content"></div>    </div>',
+                'dx-expressioneditor-fields': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko if: fields -->        <div class="dx-treelist-wrapper" data-bind="treelist: fields"></div>        <!-- /ko -->        <!-- ko if: $data.parameters -->        <div class="dx-treelist-wrapper" data-bind="treelist: parameters"></div>        <!-- /ko -->    </div>',
+                'dx-ee-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="visible: visible, event: { dblclick: function() { actions[0].clickAction($element); }}, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-item-images">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>            <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>        </div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
+                'dx-expressioneditor-selectedcontent': '<!-- ko with: content -->    <!-- ko template: $data-->    <!-- /ko -->    <!-- /ko -->',
+                'dx-expressioneditor-collection': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko foreach: items -->        <div class="dx-expressioneditor-tools-tab-item dxd-list-item-back-color dxd-text-primary dxd-back-highlighted" data-bind="text: $data.displayName || $data.text, css: { \'dx-expressioneditor-state-selected dxd-state-selected\': $parent.selectedItem() === $data }, dxAction: function() { $parent.selectedItem($data); $parents[2].click($data); }, event: { dblclick: function() { $parents[2].dblclick($data, $element); } }"></div>        <!-- /ko -->    </div>',
+                'dx-expressioneditor-collection-function': '<div class="dx-expressioneditor-collection-function">        <div class="dx-expressioneditor-collection-function-search">            <div data-bind="dxTextBox: { value: textToSearch, showClearButton: true, valueChangeEvent: \'keyup\', placeholder: $parents[2].searchPlaceholder() }"></div>        </div>        <div class="dx-expressioneditor-collection-function-items dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">            <!-- ko foreach: availableItems -->            <div class="dx-expressioneditor-tools-tab-item dxd-list-item-back-color dxd-text-primary dxd-back-highlighted" data-bind="css: { \'dx-expressioneditor-state-selected dxd-state-selected\': $parent.selectedItem() === $data }, dxAction: function() { $parent.selectedItem($data); $parents[2].click($data); }, event: { dblclick: function() { $parents[2].dblclick($data, $element); } }, searchHighlighting: { text: $data.displayName || $data.text, textToSearch: $parent.textToSearch }"></div>            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-content': '<div class="dx-filtereditor-tree-container" data-bind="css: { \'advanced\': advancedMode }">        <!-- ko template: \'dx-filtereditor-content-tree\' -->        <!-- /ko -->    </div>    <div class="dx-filtereditor-text-container" data-bind="css: { \'advanced\': advancedMode }, visible: textVisible">        <!-- ko template: \'dx-filtereditor-content-text\'-->        <!-- /ko -->    </div>',
+                'dx-filtereditor-content-plain': '<div class="dx-filtereditor-plain-advanced" data-bind="dxCheckBox: { value: advancedMode, text: advancedModeText }"></div>    <div class="dx-filtereditor-plain-content" data-bind="style: { height: plainContentHeightPerc }">        <div class="dx-filtereditor-text-container" data-bind="css: { \'advanced\': advancedMode }, style: { height: textContentHeightPerc }">            <!-- ko template: \'dx-filtereditor-content-text\'-->            <!-- /ko -->        </div>        <div class="dx-filtereditor-tree-container" data-bind="css: { \'advanced\': advancedMode }, style: { height: treeContentHeightPerc }">            <!-- ko template: \'dx-filtereditor-content-tree\' -->            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-content-text': '<!-- ko if: !aceAvailable -->    <div class="dx-filtereditor-text" data-bind="dxTextArea: { value: displayValue, isValid: isValid, onInput: onInput, spellcheck: false }, cacheElement: { action: function(element) { cacheElement(element) } }"></div>    <!-- /ko -->    <!-- ko if: aceAvailable -->    <div class="dx-filtereditor-text dx-texteditor dx-textarea" data-bind="css: {\'dx-invalid\': !$data.isValid(), \'dx-state-focused\': textFocused }">        <div class="dx-texteditor-container">            <div class="dx-filtereditor-ace dxd-back-primary2" data-bind="dxAceEditor: { value: $data.displayValue, theme: helper.aceTheme, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }"></div>            <div class="dx-texteditor-buttons-container"></div>        </div>    </div>    <!-- /ko -->',
+                'dx-filtereditor-content-tree': '<div class="dx-filtereditor-tree dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', direction: \'both\' }">        <!-- ko with: operandSurface -->        <!-- ko template: { name: $data.templateName, data: $data}-->        <!-- /ko -->        <!-- /ko -->    </div>    <!-- ko ifnot: isSurfaceValid -->    <div class="dx-filtereditor-tree-lockscreen" data-bind="dxAction: function() { $data.advancedMode(true); }">        <div class="dx-filtereditor-tree-lockscreen-content">            <div class="dx-filtereditor-tree-lockscreen-content-text" data-bind="text: invalidMessage()">            </div>        </div>    </div>    <!-- /ko -->',
+                'dx-filtereditor': '<div>        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: modelDisplayValue, isValid: modelValueIsValid, disabled: disabled, buttonAction: function() { popupVisible(true); } }"></div>        <!-- ko template: \'dx-filtereditor-popup\' -->        <!-- /ko -->    </div>',
+                'dx-filtereditor-advanced': '<div class="dx-filtereditor" style="width: 100%; height: 100%;" data-bind="style: { pointerEvents: $data.options().disabled() ? \'none\' : \'\' }">        <!-- ko template: \'dx-filtereditor-content\' -->        <!-- /ko -->        <!-- ko template: \'dx-filtereditor-content-popups\' -->        <!-- /ko -->    </div>',
+                'dx-filtereditor-plain': '<div class="dx-filtereditor" style="width: 100%; height: 100%;" data-bind="style: { pointerEvents: $data.options().disabled() ? \'none\' : \'\' }">        <!-- ko template: \'dx-filtereditor-content-plain\' -->        <!-- /ko -->        <!-- ko template: \'dx-filtereditor-content-popups\' -->        <!-- /ko -->    </div>',
+                'dx-filtereditor-aggregate-common': '<!-- ko with: property-->    <!-- ko template: { name: templateName, data: $data }-->    <!-- /ko -->    <!-- /ko -->    <div data-bind="service: { name: \'createChangeType\' }"></div>    <!-- ko if: $data.aggregatedExpression() -->    <div class="criteria-operator-text dxd-filter-editor-text-color">(</div>    <!-- ko with: aggregatedExpression-->    <!-- ko template: { name: templateName, data: $data }-->    <!-- /ko -->    <!-- /ko -->    <div class="criteria-operator-text dxd-filter-editor-text-color">)</div>    <!-- /ko -->',
+                'dx-filtereditor-aggregate': '<div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <!-- ko template: { name: \'dx-filtereditor-aggregate-common\' }-->            <!-- /ko -->        </div>        <div class="criteria-operator-content">            <!-- ko with: condition-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-between': '<div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <!-- ko with: property-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->            <div data-bind="service: { name: \'createChangeType\' }"></div>            <!-- ko with: begin-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->            <div class="criteria-operator-text dxd-filter-editor-text-color">and</div>            <!-- ko with: end-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-binary': '<div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <!-- ko with: leftOperand-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->            <div data-bind="service: { name: \'createChangeType\' }"></div>            <!-- ko with: rightOperand-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-common': '<!-- ko template: contentTemplateName -->    <!-- /ko -->    <!-- ko if: $data.leftPart && $data.leftPart.condition -->    <div class="criteria-operator-content">        <!-- ko with: leftPart-->        <!-- ko with: condition-->        <!-- ko template: { name: templateName, data: $data }-->        <!-- /ko -->        <!-- /ko -->        <!-- /ko -->    </div>    <!-- /ko -->',
+                'dx-filtereditor-function-lightweight': '<div class="criteria-operator-text dxd-filter-editor-text-color" data-bind="css: css">        <div class="criteria-operator-text dxd-filter-editor-text-color" data-bind="text: displayType"></div>        <div data-bind="service: { name: \'createChangeValueType\' }"></div>    </div>',
+                'dx-filtereditor-function': '<div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <!-- ko template: { name: $data.leftPart.templateName, data: $data.leftPart }-->            <!-- /ko -->            <div data-bind="service: { name: \'createChangeType\' }"></div>            <!-- ko foreach: rightPart -->            <!-- ko template: { name: $data.templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-group': '<div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <div class="criteria-operator-item">                <div data-bind="service: { name: \'createChangeType\' }"></div>            </div>            <div data-bind="service: { name: \'createAddButton\' }"></div>        </div>        <div class="criteria-operator-content">            <!-- ko foreach: operands -->            <!-- ko template: { name: templateName, data: $data } -->            <!-- /ko-->            <!-- /ko -->        </div>    </div>',
+                'dx-filtereditor-in': '<div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <!-- ko with: criteriaOperator-->            <!-- ko template: { name: templateName, data: $data }-->            <!-- /ko -->            <!-- /ko -->            <div data-bind="service: { name: \'createChangeType\' }"></div>            <!-- ko if: $data.operands().length > 1-->            <div class="criteria-operator-item criteria-operator-text dxd-filter-editor-text-color">(</div>            <div class="criteria-operator-item">                <!-- ko foreach: $data.operands() -->                <!-- ko template: { name: $data.templateName, data: $data }-->                <!-- /ko -->                <div class="criteria-operator-item criteria-operator-text dxd-filter-editor-text-color">,</div>                <!-- /ko -->            </div>            <div class="criteria-operator-item criteria-operator-text dxd-filter-editor-text-color">)</div>            <!-- /ko -->            <!-- ko if: $data.operands().length == 1-->            <!-- ko template: { name: $data.operands()[0].templateName, data: $data.operands()[0] }-->            <!-- /ko -->            <!-- /ko -->            <div class="criteria-operator-action" data-bind="dxAction: addValue">                <div class="criteria-operator-action-image dx-image-filtereditor-add"><!-- ko template: \'dxrd-svg-filtereditor-add\' --><!-- /ko --></div>            </div>        </div>    </div>',
+                'dx-filtereditor-parameter': '<div class="criteria-operator-text dxd-filter-editor-text-color" data-bind="css: css">        <div data-bind="service: { name: \'createChangeParameter\' }"></div>        <!-- ko if: $data.canChange -->        <div data-bind="service: { name: \'createChangeValueType\' }"></div>        <!-- /ko -->    </div>',
+                'dx-filtereditor-property': '<div class="criteria-operator-text dxd-filter-editor-text-color" data-bind="css: css">        <div data-bind="service: { name: \'createChangeProperty\' }"></div>        <!-- ko if: $data.canChange -->        <div data-bind="service: { name: \'createChangeValueType\' }"></div>        <!-- /ko -->    </div>',
+                'dx-filtereditor-unary': '<!-- ko if: $data.operand().reverse -->    <!-- ko template: {name: $data.operand().templateName, data: $data.operand() }-->    <!-- /ko -->    <!-- /ko -->    <!-- ko ifnot: $data.operand().reverse -->    <div class="criteria-operator-group">        <div class="criteria-operator-group-item">            <div class="criteria-operator-action" data-bind="dxAction: function() {  $data.remove && $data.remove(); }">                <div class="criteria-operator-action-image dx-image-filtereditor-remove" data-bind="visible: !!$data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>            </div>            <!-- ko with: operand-->            <div class="criteria-operator-item">                <!-- ko template: { name: templateName, data: $data }-->                <!-- /ko -->            </div>            <!-- /ko -->            <div data-bind="service: { name: \'createChangeType\' }"></div>        </div>    </div>    <!-- /ko -->',
+                'dx-filtereditor-not': '<!-- ko with: operand-->    <!-- ko template: { name: templateName, data: $data }-->    <!-- /ko -->    <!-- /ko -->',
+                'dx-filtereditor-value': '<div class="criteria-operator-item" data-bind="visible: isEditable">        <!-- ko if: $data.items.length === 0 -->        <!-- ko if: $data.specifics() === "string" || $data.specifics() === "guid" -->        <div class="criteria-operator-item-editor" data-bind="dxTextBox: { value: _value, onFocusOut: function() { isEditable(false); } }, focus: { on: isEditable }"></div>        <!-- /ko -->        <!-- ko if: $data.specifics() === "bool" -->        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: \'True\', text: \'Yes\', localizationId: \'ASPxReportsStringId.ParametersPanel_True\' }, { val: \'False\', text: \'No\', localizationId: \'ASPxReportsStringId.ParametersPanel_False\' }], valueExpr: \'val\', displayExpr: \'text\', value: _value, onFocusOut: function() { isEditable(false); } }"></div>        <!-- /ko -->        <!-- ko if: $data.specifics() === "date" -->        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: \'date\', onFocusOut: function() { isEditable(false); } }"></div>        <!-- /ko -->        <!-- ko if: $data.specifics() !== "string" && $data.specifics() !== "bool" && $data.specifics() !== "date" && $data.specifics() !== "guid" -->        <div class="criteria-operator-item-editor" data-bind="dxTextBox: getNumberEditorOptions(), focus: { on: isEditable }"></div>        <!-- /ko -->        <!-- /ko -->        <!-- ko if: $data.items.length > 0 && typeof $data.items[0] === "object" -->        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: items, valueExpr: \'value\', displayExpr: \'display\', searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>        <!-- /ko -->        <!-- ko if: $data.items.length > 0 && typeof $data.items[0] !== "object" -->        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: items, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>        <!-- /ko -->    </div>    <div class="criteria-operator-text dxd-filter-editor-text-color criteria-operator-item-value dxd-filter-editor-value-back-color" data-bind="visible: !isEditable()">        <div class="criteria-operator-text dxd-filter-editor-text-color clickable" data-bind="text: value, click: function() { isEditable(true); }, css: { \'default\': $data.isDefaultDisplay() } "></div>        <div data-bind="service: { name: \'createChangeValueType\' }"></div>    </div>',
+                'dx-filtereditor-popup': '<div class="dx-filtereditor dx-popup-general" data-bind="dxPopup: {        showTitle: true,        width: \'95%\',        height: \'95%\',        title: options() && options().title(),        visible: popupVisible,        onShown: function() { $data.focusText() },        toolbarItems: buttonItems,        showCloseButton: true,        container: getPopupContainer($element),        position: { of: getPopupContainer($element) }    }">        <!-- ko template: \'dx-filtereditor-content\' -->        <!-- /ko -->    </div>    <!-- ko template: \'dx-filtereditor-content-popups\' -->    <!-- /ko -->',
+                'dx-filtereditor-create': '<div class="criteria-operator-action" data-bind="dxAction: showPopup">        <div class="criteria-operator-action-image dx-image-filtereditor-add"><!-- ko template: \'dxrd-svg-filtereditor-add\' --><!-- /ko --></div>    </div>',
+                'dx-filtereditor-change': '<div class="criteria-operator-text dxd-filter-editor-text-color clickable" data-bind="text: target.displayType, dxAction: showPopup, css: target.css"></div>',
+                'dx-filtereditor-changeParameter': '<div class="criteria-operator-text dxd-filter-editor-text-color clickable " data-bind="text: target.parameterName(), dxAction: showPopup, css: { \'dxd-state-selected\': target.isSelected }"></div>',
+                'dx-filtereditor-changeProperty': '<div class="criteria-operator-text dxd-filter-editor-text-color clickable" data-bind="text: target.displayName, dxAction: showPopup, css: { \'dxd-state-selected\': target.isSelected }"></div>',
+                'dx-filtereditor-changeValueType': '<div class="criteria-operator-action" data-bind="dxAction: showPopup">        <div class="criteria-operator-action-image-edit dx-image-filtereditor-edit"><!-- ko template: \'dxrd-svg-filtereditor-edit\' --><!-- /ko --></div>    </div>',
+                'dx-filtereditor-content-popups': '<div class="dx-selectbox-popup-wrapper dx-dropdownlist-popup-wrapper dx-filtereditor-criteriaoperator-popup dx-dropdowneditor-overlay" data-bind="dxPopupWithAutoHeight: { width: \'170px\', height: \'300px\', focusStateEnabled: false,    position: $data.rtl ? { my: \'right top\', at: \'right bottom\', of: popupService.target} : { my: \'left top\', at: \'left bottom\', of: popupService.target },    container: options().popupContainer,    target: popupService.target,    showTitle: false,    showCloseButton: false,    animation: {},    closeOnOutsideClick: true,    shading: false,    visible: popupService.visible }">        <!-- ko with: popupService-->        <!-- ko with: data -->        <!-- ko template: template-->        <!-- /ko -->        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dx-filtereditor-popup-common': '<div class="dx-widget" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko foreach: data -->        <!-- ko if: !$data.hidden -->        <div class="dx-filtereditor-popup-item dx-item dx-list-item dxd-list-item-back-color dxd-back-highlighted">            <span class="dx-item-content dx-list-item-content" data-bind="text: $data.displayText || $data.name, click: function() { $parent.click($data); } "></span>        </div>        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dx-filtereditor-popup-treelist': '<div class="dx-widget" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <div class="dx-treelist-wrapper" data-bind="treelist: data"></div>    </div>',
+                'dx-format-string-list': '<div class="dx-format-string-list dxd-format-string-editor-border-color dxd-border-secondary">        <div data-bind="dxList: { items: $data.items, selectedItems: $data.selectedItems, onItemClick: $data.action, selectionMode: \'single\', activeStateEnabled: false }">            <div data-options="dxTemplate: { name: \'item\' }" class="dx-theme-border-color">                <div class="dx-image-filtereditor-remove" data-bind="click: $parent.removeItem, visible: $data.canRemove"><!-- ko template: \'dxrd-svg-filtereditor-remove\' --><!-- /ko --></div>                <div class="dx-format-string-list-item" data-bind="text: $data.displayName"></div>            </div>        </div>    </div>',
+                'dx-format-string-edit-area': '<div class="dx-format-string-content-area-title dxd-text-primary" data-bind="text: getDisplayText(\'types\')"></div>    <div class="dx-format-string-formats">        <!-- ko template: { name: \'dx-format-string-list\', data: { items: patternList, action: setFormat, removeItem: removeCustomFormat, selectedItems: selectedFormats } } -->        <!-- /ko -->        <div class="dx-format-string-customization">            <div class="dx-format-string-customization-add" data-bind="dxButton:{ onClick: addCustomFormat, text: getDisplayText(\'add\'), disabled: !canAddCustomFormat() }"></div>            <div class="dx-format-string-customization-value dx-format-string-value dxd-back-primary" data-bind="dxTextBox: { value: formatResult, onInput: function(e) { updateInputText(\'formatResult\', e.component); }  }"></div>        </div>    </div>',
+                'dx-format-string-edit-area-general': '<div class="dx-format-string-content-area-title dxd-text-primary" data-bind="text: getDisplayText(\'prefix\')"></div>    <div class="dx-format-string-customization-general-value dx-format-string-value" data-bind="dxTextBox: { value: formatPrefix, onInput: function(e) { updateInputText(\'formatPrefix\', e.component); } }"></div>    <div class="dx-format-string-content-area-title dxd-text-primary" data-bind="text: getDisplayText(\'suffix\')"></div>    <div class="dx-format-string-customization-general-value dx-format-string-value" data-bind="dxTextBox: { value: formatSuffix, onInput: function(e) { updateInputText(\'formatSuffix\', e.component); } }"></div>',
+                'dx-format-string': '<div>        <div class="no-margin-right" data-bind="dxEllipsisEditor: { value: value, disabled: disabled, buttonAction: function() { popupVisible(true); } }"></div>        <div class="dx-format-string dx-popup-general" data-bind="dxPopup: {            showTitle: true,            width: \'95%\',            height: \'95%\',            minWidth: 650,            title: getDisplayText(\'title\'),            visible: popupVisible,            toolbarItems: buttonItems,            showCloseButton: true,            container: getPopupContainer($element),            position: { of: getPopupContainer($element) }        }">            <div class="dx-format-string-content">                <div class="dx-format-string-content-area-left">                    <div class="dx-format-string-content-area-title dxd-text-primary" data-bind="text: getDisplayText(\'category\')"></div>                    <!-- ko template: { name: \'dx-format-string-list\', data: { items: types, action: setType, selectedItems: selectedTypes } } -->                    <!-- /ko -->                </div>                <div class="dx-format-string-content-area-right">                    <!-- ko if: !isGeneralType -->                    <!-- ko template: \'dx-format-string-edit-area\' -->                    <!-- /ko -->                    <!-- /ko -->                    <!-- ko if: isGeneralType -->                    <!-- ko template: \'dx-format-string-edit-area-general\' -->                    <!-- /ko -->                    <!-- /ko -->                    <div class="dx-format-string-preview-area" data-bind="css: { \'dx-format-general\': isGeneralType }">                        <div class="dx-format-string-preview-area-caption dxd-text-primary" data-bind="text: getDisplayText(\'preview\')"></div>                        <div class="dx-format-string-preview-value dxd-format-string-editor-border-color dxd-text-primary dxd-back-primary dxd-border-secondary">                            <span class="dx-format-string-preview-value-inner" data-bind="text: previewString"></span>                        </div>                    </div>                </div>            </div>        </div>    </div>',
+                'dx-treelist-item-actions': '<!-- ko foreach: actions -->    <!-- ko if: $data.templateName -->    <!-- ko template: templateName  -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: !$data.templateName -->    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: ko.unwrap($data.imageTemplateName), iconClass: imageClassName, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible), disabled: $data.disabled && $data.disabled() }, attr: { title: $data.displayText && $data.displayText() || text }"></div>    <!-- /ko -->    <!-- /ko -->',
+                'dx-treelist-edit-action': '<div class="dx-treelist-action-edit dx-accordion-button" data-bind="dxButtonWithTemplate: { icon: \'dxrd-svg-operations-edit\', iconClass: \'dx-image-edit\',  onClick: function() { $parent.collapsed(!$parent.collapsed()); } }, visible: $parent.hasContent, attr: { title: $data.displayText() }"></div>',
+                'dx-treelist-item-actions-with-edit': '<!-- ko template: { name: \'dx-treelist-edit-action\', data: treeListEditAction() }  -->    <!-- /ko -->    <!-- ko template: \'dx-treelist-item-actions\'  -->    <!-- /ko -->',
+                'dx-treelist-item': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dx-treelist-accordion-item': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-treelist-header-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <!--<div class="dx-treelist-item-images">-->        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>        <!--</div>-->        <div class="dx-treelist-caption">            <!-- ko if: actions && actions.length > 0 -->            <div class="dx-treelist-action-container" data-bind="visible: isSelected">                <!-- ko template: actionsTemplate() -->                <!-- /ko -->            </div>            <!-- /ko  -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
+                'dx-treelist-item-with-hover': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dx-treelist-accordion-item-with-hover': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dx-treelist-header-item-with-hover': '<div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">        <div class="dx-treelist-item dx-fontsize-reestablished dxd-list-item-back-color" data-bind="event: {         dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() },         mouseenter: mouseenter,         mouseleave: mouseleave    }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected dxd-back-secondary\': isSelected() || isMultiSelected() }">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed, style: { \'visibility\': hasItems ? \'visible\' : \'hidden\' }"></div>            <div class="dx-treelist-caption">                <!-- ko if: actions && actions.length > 0 -->                <div class="dx-treelist-action-container" data-bind="visible: $data.isSelected() || $data.isHovered()">                    <!-- ko template: actionsTemplate() -->                    <!-- /ko -->                </div>                <!-- /ko  -->                <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                    <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>                    <div class="dx-treelist-text-wrapper">                        <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                    </div>                </div>            </div>        </div>    </div>',
+                'dx-treelist': '<div class="dx-treelist dxd-text-primary">        <!-- ko foreach: items -->        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->        <!-- /ko -->        <div data-bind="visible: !collapsed()">            <!-- ko template: { name: \'dx-treelist\', data: $data } -->            <!-- /ko -->        </div>        <!-- /ko -->    </div>',
+                'dxrd-borders': '<div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>',
+                'dxrd-colorpicker': '<div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled }"></div>',
+                'dxrd-expressionstring': '<!-- ko if: $data.value() -->    <div data-bind="dxExpressionEditor: getOptions({ options: value, fieldListProvider: $root.dataBindingsProvider, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() })"></div>    <!-- /ko -->',
+                'dxrd-field': '<!-- ko displayNameExtender: { path: path, dataMember: value } -->    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>    <!-- /ko -->',
+                'dxrd-filterstring': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
+                'dxrd-filterstringgroup': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
+                'dxrd-formatstring': '<div data-bind="dxFormatEditor: { value: value, disabled: disabled }"></div>',
+                'dxrd-guid': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: (validationRules || []) }"></div>',
+                'dxrd-emptyHeader': ' ',
+                'dxrd-objectEditorContent': '<!-- ko if: $data.visible() && $data.editorCreated() -->    <div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>    <!-- /ko -->',
+                'dxrd-objectEditor': '<div data-bind="dxPropertyGrid: { target: ko.observable($data), level: $parent.level, textToSearch: $parent.textToSearch }"></div>',
+                'dxrd-commonCollectionItem': '<div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1, parentDisabled: editor.disabled }"></div>',
+                'dxrd-controls': '<div data-bind="dxLocalizedSelectBox: { items: $root.controls, value: value, displayExpr: \'displayName\', valueExpr: \'value\', disabled: disabled }"></div>',
+                'dxrd-treelistContent': '<!-- ko if: visible -->    <!-- ko if: value -->    <!-- ko with: value -->    <div data-bind="treelist: { itemsProvider: itemsProvider, selectedPath: selectedPath, treeListController: treeListController }"></div>    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->',
+                'dxrd-objectVisitor': '<!-- ko if: options -->    <div data-bind="treelist: options"></div>    <!-- /ko -->',
+                'dxd-snap-lines-holder': '<div class="dxd-snap-lines-holder">        <div class="dxd-snap-line dxd-snap-line-horizontal" data-bind="style: { transform: snapLineSurfaces[0].transform() }"></div>        <div class="dxd-snap-line dxd-snap-line-horizontal" data-bind="style: { transform: snapLineSurfaces[1].transform() }"></div>        <div class="dxd-snap-line dxd-snap-line-vertical" data-bind="style: { transform: snapLineSurfaces[2].transform() }"></div>        <div class="dxd-snap-line dxd-snap-line-vertical" data-bind="style: { transform: snapLineSurfaces[3].transform() }"></div>    </div>',
+                'dxrd-surface-template-base': '<!-- ko ifnot: isLoading -->    <!-- ko with: surface -->    <div class="dxrd-surface-wrapper" data-bind="template: templateName, click: function(_, e) { $root.selection.clickHandler($data, e); e.stopPropagation(); }">    </div>    <!-- /ko -->    <!-- /ko -->    <!-- ko if: isLoading -->    <div class="dxrd-surface-wrapper">        <div style="text-align: center; padding-top: 25%;">            <div data-bind="dxLoadIndicator: { visible: isLoading() }"></div>        </div>    </div>    <!-- /ko -->',
+                'dxrd-designer': '<div data-bind="css: surfaceClass($element)">        <div class="dxrd-designer-wrapper dx-editors dxd-surface-back-color dxd-scrollbar-color" data-bind="visible: (!$data.designMode || designMode()), cssArray: [ $data.rootStyle , { \'dx-rtl\' : $data.rtl, \'dx-ltr\': !$data.rtl } ]">            <!-- ko foreach: parts -->            <!-- ko template: { name: templateName, data: model }-->            <!-- /ko -->            <!-- /ko -->        </div>        <!-- ko if: ($data.addOns) -->        <!-- ko foreach: addOns -->        <!-- ko template: { name: templateName, data: model } -->        <!-- /ko -->        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dxrd-collectionactions-template': '<div class="dxrd-action-items-container"></div>    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap(imageClassName) }, attr: { id: id, title: text }"></div>    <div data-bind="dxPopup: { width: 235, height: \'auto\',            position: { my: $root.rtl ? \'left top\': \'right top\', at: \'bottom\', of: (\'#\' + id) },            showTitle: false,            showCloseButton: false,            animation: {},            closeOnOutsideClick: true,            container: ($data.getContainer || function(_e, selector) { return selector; })($element, \'.dxrd-action-items-container\'),            shading: false,            visible: popoverVisible }">        <!-- ko foreach: actions -->        <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: clickAction, css: { \'dxrd-disabled-button\': disabled }">            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap(imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>        </div>        <!-- /ko -->    </div>',
+                'dxrd-menubutton-template-base': '<div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">        <div class="dxrd-menu-place" style="width:54px;"></div>        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: toggleAppMenu, template: \'dxrd-svg-menu-menu\', css: {\'dxd-state-active\': appMenuVisible }"></div>        <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {                            width: 250,                            height: \'100%\',                            position: $data.rtl ? { my: \'right top\', at: \'left top\', offset: \'-10 0\' } : { my: \'left top\', at: \'right top\', offset: \'10 0\' },                            showTitle: false,                            showCloseButton: false,                            container: getMenuPopupContainer($element),                            target: getMenuPopupTarget($element),                            animation: {},                            closeOnOutsideClick: true,                            shading: false,                            focusStateEnabled: false,                            visible: appMenuVisible }">            <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>            <!-- ko foreach: actionLists.menuItems -->            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { \'dxrd-disabled-button\': disabled }, visible: visible">                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap(imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>            </div>            <!-- /ko -->        </div>    </div>',
+                'dxrd-top-grid': '<!-- ko if: popularVisible -->    <div class="dx-fieldset">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dxrd-group-header-text" data-bind="text: $root.actionsGroupTitle()"></span>            </div>            <div class="dx-accordion-content dxd-back-primary">                <!-- ko foreach: (contextActions || []) -->                <!-- ko if: $data.templateName -->                <!-- ko template: templateName  -->                <!-- /ko -->                <!-- /ko -->                <!-- ko if: !$data.templateName -->                <div class="dxrd-properties-grid-action" data-bind="dxAction: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { \'dxrd-disabled-button\': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>                </div>                <!-- /ko -->                <!-- /ko -->                <!-- ko with: popularProperties -->                <div style="position: relative" data-bind="template: { name: \'dx-propertieseditor\', data: $data }"></div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
+                'dxrd-propertiestab': '<div class="dxrd-properties-wrapper" data-bind="visible: active() && visible()">    <div style="height:100%" class="dxd-text-primary">        <div class="dxrd-right-panel-header">            <span data-bind="text: text"></span>        </div>        <!-- ko with: model -->        <!-- ko if: $root.controlsStore.visible() -->        <div class="dx-property-grid-header">            <div class="dx-property-grid-header-content">                <div class="dx-property-grid-sorting-actions-group" data-bind="css: { \'dx-property-gread-search-collapsed\': isSearching }">                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>                    <div class="dx-property-grid-sorting-actions-container">                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: \'dxrd-svg-properties-sortingbyalphabet\', iconClass: \'image-sortingbyalphabet\' }"></div>                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: \'dxrd-svg-properties-sortingbygroups\', iconClass: \'image-sortingbygroups\' }"></div>                    </div>                </div>                <div class="dx-property-grid-search-group dx-property-gread-search-collapsed" data-bind="css: { \'dx-property-gread-search-collapsed\': !isSearching() }">                    <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active\': isSearching }, dxButtonWithTemplate: { onClick: switchSearchBox, icon: \'dxrd-svg-properties-search\', iconClass: \'image-search\' }"></div>                    <div class="dx-property-grid-search-box" data-bind="dxTextBox: { value: textToSearch, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true }, cacheElement: { action: function(element) { searchBox(element); } }"></div>                </div>            </div>        </div>        <!-- /ko -->        <div class="dxrd-properties-grid dxd-border-primary" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, styleunit: { top: $root.controlsStore.visible() ? 80 : 40 }">            <!-- ko template: { name: \'dxrd-top-grid\', data: { contextActions: $root.contextActions, popularProperties: $root.popularProperties, collapsed: ko.observable(false), popularVisible: $root.popularVisible() && isSortingByGroups(), actionsGroupTitle: $root.actionsGroupTitle } } -->            <!-- /ko -->            <div data-bind="visible: isSortingByGroups">                <!-- ko foreach: groups -->                <div class="dx-fieldset" data-bind="visible: visible">                    <div data-bind="dxdAccordion: { collapsed: collapsed }">                        <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                            <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                            <span class="dxrd-group-header-text" data-bind="text: displayName()"></span>                        </div>                        <div class="dx-accordion-content dxd-back-primary">                            <!-- ko ifnot: editorsCreated -->                            <div class="dx-accordion-content-loading-panel">                                <div data-bind="dxLoadIndicator: { visible: !editorsCreated() }"></div>                            </div>                            <!-- /ko -->                            <!-- ko if: $data.editorsRendered() -->                            <div data-bind="visible: editorsCreated">                                <div class="dx-editors">                                    <!-- ko foreach: editors -->                                    <!-- ko template: editorTemplate -->                                    <!-- /ko -->                                    <!-- ko if: ($index() === $parent.editors().length - 1 && $parent.editorsCreated(true)) -->                                    <!-- /ko -->                                    <!-- /ko -->                                </div>                            </div>                            <!-- /ko -->                        </div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dx-fieldset dxd-back-primary" data-bind="visible: !isSortingByGroups()">                <div data-bind="dxLoadIndicator: { visible: !allEditorsCreated() }"></div>                <!-- ko if: $data.editorsRendered() -->                <div data-bind="visible: allEditorsCreated">                    <div class="dx-editors">                        <!-- ko foreach: $data.getEditors() -->                        <!-- ko template: editorTemplate -->                        <!-- /ko -->                        <!-- ko if: ($index() === $parent._editors().length - 1 && $parent.allEditorsCreated(true)) -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>                <!-- /ko -->            </div>            <div data-bind="dxPopup: { width: 148, height: \'auto\',        position: $data.rtl ? { my: \'left top\', at: \'right top\', of: popupService.target } : { my: \'right top\', at: \'left top\', of: popupService.target },        container: \'.dx-viewport\',        target: popupService.target,        showTitle: false,        showCloseButton: false,        animation: {},        closeOnOutsideClick: true,        shading: false,        visible: popupService.visible }">                <div data-options="dxTemplate: { name: \'content\' }">                    <!-- ko if: popupService.title -->                    <div class="dxrd-editor-menu-caption dxd-text-primary" data-bind="text: popupService.title"></div>                    <!-- /ko -->                    <!-- ko foreach: popupService.actions -->                    <!-- ko if: (!visible || visible && visible()) -->                    <div class="dxrd-editor-menu-item dxd-list-item-back-color dxd-back-highlighted dxd-state-normal" data-bind="dxAction: action">                        <div class="dxrd-menuitem-box dxd-property-grid-menu-box-color dxd-back-contrast">                            <div class="dxrd-menuitem-box-inside dxd-back-secondary"></div>                        </div>                        <span class="dxrd-editor-menu-title dxd-text-primary" data-bind="text: title"></span>                    </div>                    <!-- /ko -->                    <!-- /ko -->                </div>            </div>        </div>        <!-- /ko -->    </div></div>',
+                'dx-right-panel-lightweight': '<div class="dxrd-right-panel dx-shadow dxd-border-secondary dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'1px\', 325)">        <!-- ko foreach: tabPanel.tabs -->        <!-- ko lazy: { template: $data.template } -->        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dxrd-right-panel-template-base': '<div class="dx-shadow dxd-border-secondary" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses({\'border\': !tabPanel.collapsed()})">        <div class="dxrd-right-panel-collapse dxd-back-primary dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses(), dxAction: function() { tabPanel.collapsed(!tabPanel.collapsed()); }, attr: { title: tabPanel.toggleCollapsedText }">            <div class="dxrd-right-panel-collapse-image" data-bind="css: tabPanel.toggleCollapsedImage().class, template: tabPanel.toggleCollapsedImage().template"></div>        </div>        <div class="dxrd-right-panel dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'50px\', 340)">            <!-- ko foreach: tabPanel.tabs -->            <!-- ko lazy: { template: $data.template } -->            <!-- /ko -->            <!-- /ko -->        </div>        <div class="dxrd-right-tabs dxd-side-panel-tabs-back-color dxd-back-contrast" data-bind="css: tabPanel.cssClasses()">            <!-- ko foreach: tabPanel.tabs -->            <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxAction: $parent.tabPanel.selectTab, css: { \'dxd-state-active dxd-state-no-hover\': active, \'dxrd-tab-item-disabled\': disabled }, attr: { title: text }, visible: visible">                <div class="dxrd-image-padding" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>            </div>            <!-- /ko -->        </div>    </div>',
+                'dxrd-toolbar-template-base': '<div class="dxrd-toolbar-wrapper">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }"></div>    </div>',
+                'dxrd-toolbar-tmplt': '<!-- ko foreach: $data -->    <!-- ko if: $data.templateName -->    <!-- ko template: templateName  -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: !$data.templateName -->    <div class="dxrd-toolbar-item" data-bind="visible: visible">        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: \'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted \' + ko.unwrap(imageClassName), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === \'function\') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {\'dxrd-disabled-button\': disabled, \'dxd-state-active\': $data.selected }"></div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>    <!-- /ko -->    <!-- /ko -->',
+                'dxrd-toolbox-template-base': '<div class="dxrd-toolbox-wrapper dxd-toolbox-back-color dxd-back-primary2" data-bind="dxScrollView: { showScrollbar: \'onHover\', scrollByContent: false, bounceEnabled: false, useNative: false, scrollByThumb: true }">        <!-- ko foreach: toolboxItems -->        <div class="dxrd-toolbox-item" data-bind="attr: { title: displayName }">            <div class="dx-background-inheritor dxd-toolbox-item-back-color dxd-back-secondary">                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: imageClassName, draggable: $root.toolboxDragHandler"></div>            </div>        </div>        <!-- /ko -->    </div>',
+                'dxrd-zoom-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomLevels, value: $data.zoom, displayExpr: function(val) { return Math.round((val || this.option(\'value\')) * 100) + \'%\'; }, displayCustomValue: true, disabled: disabled }"></div>    </div>',
+                'dxrd-bordereditor': '<div class="bordereditor-content">    <!-- ko with: value-->    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-none" data-bind="template: \'dxrd-svg-properties-borders-none\', css: { \'dxd-state-active\': (!bottom() && !left() && !top() && !right()), \'dxrd-disabled-button\': disabled }, click: function() { setNone() }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-all right-margin" data-bind="template: \'dxrd-svg-properties-borders-all\', css: { \'dxd-state-active\': (bottom() && left() && top() && right()), \'dxrd-disabled-button\': disabled  }, click: function() { setAll() }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-left" data-bind="template: \'dxrd-svg-properties-borders-left\', css: { \'dxd-state-active\': left(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'left\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-top" data-bind="template: \'dxrd-svg-properties-borders-top\', css: { \'dxd-state-active\': top(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'top\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-right" data-bind="template: \'dxrd-svg-properties-borders-right\', css: { \'dxd-state-active\': right(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'right\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-bottom" data-bind="template: \'dxrd-svg-properties-borders-bottom\', css: { \'dxd-state-active\': bottom(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'bottom\') }"></div>    <!-- /ko --></div>',
+            });
+        })(Templates = Analytics.Templates || (Analytics.Templates = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
 //# sourceMappingURL=dx-designer-core.js.map

@@ -1,7 +1,7 @@
 /**
-* DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 18.1.6
-* Build date: 2018-09-03
+* DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
+* Version: 18.2.1-pre-18207
+* Build date: 2018-10-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -102,11 +102,12 @@ var DevExpress;
                     var _this = this;
                     _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
                     this.options = ko.observable(null);
-                    this.value.subscribe(function (newVal) {
+                    this._disposables.push(this.value.subscribe(function (newVal) {
                         _this.options() && _this.options().dispose();
                         _this.options(_this._createOptions(newVal));
-                    });
+                    }));
                     this.options(this._createOptions(this.value()));
+                    this._disposables.push(this.options());
                 }
                 MultiValueEditor.prototype._createOptions = function (helper) {
                     if (!helper)
@@ -127,7 +128,18 @@ var DevExpress;
         (function (Preview) {
             Preview.cultureInfo = {};
             Preview.editorTemplates = {
-                multiValue: { header: "dxrd-multivalue" },
+                multiValue: {
+                    header: "dxrd-multivalue", extendedOptions: {
+                        placeHolder: function () { return DevExpress.Analytics.Localization.selectPlaceholder(); },
+                        onMultiTagPreparing: function (args) {
+                            var selectedItemsLength = args.selectedItems.length, totalCount = args.model.items.length;
+                            if (selectedItemsLength === totalCount) {
+                                var stringFormat = DevExpress.Analytics.getLocalization("All selected ({0})", "ASPxReportsStringId.WebDocumentViewer_MultiValueEditor_AllSelected");
+                                args.text = DevExpress.Analytics.Utils.formatUnicorn(stringFormat, selectedItemsLength);
+                            }
+                        }
+                    }
+                },
                 multiValueEditable: { custom: "dxrd-multivalue-editable" },
                 multiValueSelectBox: { header: "dxrd-multivalue-selectbox", editorType: Preview.MultiValueEditor },
                 csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "PreviewStringId.ExportOption_CsvSeparator_UsingSystem"); } } },
@@ -357,7 +369,15 @@ var DevExpress;
                     var _this = this;
                     this.actions = [];
                     this._reportPreview = reportPreview;
-                    this.tabInfo = new DevExpress.Designer.TabInfo("Export Options", "dxrd-preview-export-options", reportPreview.exportOptionsModel, 'DevExpress.XtraPrinting.ExportOptions', "properties", ko.pureComputed(function () { return !!reportPreview.exportOptionsModel(); }));
+                    this.tabInfo = new DevExpress.Designer.TabInfo({
+                        text: "Export Options",
+                        template: "dxrd-preview-export-options",
+                        model: reportPreview.exportOptionsModel,
+                        localizationId: 'DevExpress.XtraPrinting.ExportOptions',
+                        imageClassName: "properties",
+                        imageTemplateName: "dxrd-svg-tabs-properties",
+                        visible: ko.pureComputed(function () { return !!reportPreview.exportOptionsModel() && (!reportPreview.exportOptionsTabVisible || reportPreview.exportOptionsTabVisible()); })
+                    });
                     this.actions.push({
                         id: Preview.ActionId.ExportTo,
                         text: "Export To",
@@ -375,6 +395,7 @@ var DevExpress;
                                     text: "Export To",
                                     textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
                                     imageClassName: "dxrd-image-export-to",
+                                    imageTemplateName: "dxrd-svg-preview-export-export-to",
                                     items: result
                                 }];
                         }),
@@ -1561,6 +1582,10 @@ var DevExpress;
                 PreviewPage.prototype._initializeEditingFields = function (editingFieldBricks, previewEditngFields, originalWidth, originalHeight) {
                     var _this = this;
                     if (this.editingFields) {
+                        var oldEditFields = ko.unwrap(this.editingFields());
+                        if (oldEditFields && oldEditFields.length > 0) {
+                            oldEditFields.forEach(function (field) { return field.dispose && field.dispose(); });
+                        }
                         this.editingFields.dispose();
                     }
                     this.editingFields = ko.pureComputed(function () {
@@ -1756,6 +1781,7 @@ var DevExpress;
                         id: Preview.ActionId.Search,
                         text: DevExpress.Designer.getLocalization("Search", 'ASPxReportsStringId.SearchDialog_Header'),
                         imageClassName: "dxrd-image-search",
+                        imageTemplateName: "dxrd-svg-preview-search",
                         disabled: disabled,
                         visible: ko.pureComputed(function () { return Preview.searchAvailable(); }),
                         hasSeparator: true,
@@ -1769,7 +1795,15 @@ var DevExpress;
                             }
                         }
                     });
-                    this.tabInfo = new DevExpress.Designer.TabInfo("Search", "dxrd-preview-search", this, 'ASPxReportsStringId.SearchDialog_Header', "search", ko.pureComputed(function () { return !disabled() && Preview.searchAvailable(); }));
+                    this.tabInfo = new DevExpress.Designer.TabInfo({
+                        text: "Search",
+                        template: "dxrd-preview-search",
+                        model: this,
+                        localizationId: 'ASPxReportsStringId.SearchDialog_Header',
+                        imageClassName: "search",
+                        imageTemplateName: "dxrd-svg-preview-search",
+                        visible: ko.pureComputed(function () { return !disabled() && Preview.searchAvailable(); })
+                    });
                     this._disposables.push(this.tabInfo.active.subscribe(function (newVal) {
                         newVal && setTimeout(function () { return _this.focusRequested.notifySubscribers(); }, 100);
                     }));
@@ -1900,7 +1934,7 @@ var DevExpress;
                 return SearchResultNavigator;
             })(DevExpress.Designer.Disposable);
             Preview.SearchResultNavigator = SearchResultNavigator;
-            var editor_prefix = "dx-searcheditor", EDITOR_CLASS = editor_prefix + "", EDITOR_BUTTON_CLASS = editor_prefix + "-button dx-widget dx-dropdowneditor-button", EDITOR_BUTTON_SELECTOR = "." + editor_prefix + "-button", EDITOR_BUTTON_ICON = editor_prefix + "-icon dx-dropdowneditor-icon dx-icon-dxrd-image-move";
+            var editor_prefix = "dx-searcheditor", EDITOR_CLASS = editor_prefix + "", EDITOR_BUTTON_CLASS = editor_prefix + "-button dx-widget dx-dropdowneditor-button", EDITOR_BUTTON_SELECTOR = "." + editor_prefix + "-button", EDITOR_BUTTON_ICON_CLASS = editor_prefix + "-icon dx-dropdowneditor-icon dx-icon-dxrd-image-move", EDITOR_BUTTON_ICON_UP_TEMPLATE = "dxrd-svg-operations-moveup", EDITOR_BUTTON_ICON_DOWN_TEMPLATE = "dxrd-svg-operations-movedown";
             var dxSearchEditor = (function (_super) {
                 __extends(dxSearchEditor, _super);
                 function dxSearchEditor(element, options) {
@@ -1946,6 +1980,7 @@ var DevExpress;
                 dxSearchEditor.prototype._init = function () {
                     _super.prototype._init.call(this);
                     this.element().addClass(EDITOR_CLASS);
+                    this._koContext = ko.contextFor(this.element()[0]);
                 };
                 dxSearchEditor.prototype._render = function () {
                     _super.prototype._render.call(this);
@@ -1955,7 +1990,10 @@ var DevExpress;
                 dxSearchEditor.prototype._renderButton = function (direction) {
                     this._button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
                     this._attachButtonEvents(direction);
-                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON + direction.toLowerCase()).appendTo(this._button);
+                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS + direction.toLowerCase())
+                        .append(ko.utils.parseHtmlFragment(DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.templates[direction.toLowerCase() === "up" ? EDITOR_BUTTON_ICON_UP_TEMPLATE : EDITOR_BUTTON_ICON_DOWN_TEMPLATE]))
+                        .appendTo(this._button);
+                    ko.applyBindingsToDescendants(this._koContext, this._buttonIcon[0]);
                     var buttonsContainer = _super.prototype._buttonsContainer.call(this);
                     this._button.appendTo(buttonsContainer);
                 };
@@ -2023,7 +2061,15 @@ var DevExpress;
                             treeListController: treeListController
                         };
                     });
-                    this.tabInfo = new DevExpress.Designer.TabInfo("Document Map", "dxrd-preview-document-map", this, "DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap", "reportexplorer", ko.pureComputed(function () { return !_this.isEmpty(); }));
+                    this.tabInfo = new DevExpress.Designer.TabInfo({
+                        text: "Document Map",
+                        template: "dxrd-preview-document-map",
+                        model: this,
+                        localizationId: "DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap",
+                        imageClassName: "reportexplorer",
+                        imageTemplateName: "dxrd-svg-tabs-reportexplorer",
+                        visible: ko.pureComputed(function () { return !_this.isEmpty(); })
+                    });
                 }
                 return DocumentMapModel;
             })();
@@ -2132,6 +2178,7 @@ var DevExpress;
                     this.value = value;
                     this.dataSource = items;
                     var allValues;
+                    this.maxDisplayedTags = ((items && items.length) || 1) - 1;
                     this.isSelectedAll = ko.pureComputed({
                         read: function () { return _this.value.length == items.length; },
                         write: function (selectAll) {
@@ -2159,6 +2206,7 @@ var DevExpress;
             var ParameterHelper = (function () {
                 function ParameterHelper() {
                     this._customizeParameterEditors = ko.observable();
+                    this.getUnspecifiedDisplayText = function () { return DevExpress.Designer.getLocalization('(none)', "ReportDesignerStringId.Editors_NullValue_Text"); };
                 }
                 ParameterHelper.prototype._isKnownEnumType = function (type) {
                     return !!this._knownEnums && this._knownEnums.some(function (knownEnumType) { return knownEnumType.enumType === type; });
@@ -2195,10 +2243,19 @@ var DevExpress;
                         propertyName: "value",
                         displayName: parameterDescriptor["displayName"],
                         localizationId: parameterDescriptor["localizationId"],
-                        editor: getEditorType(typeString) || DevExpress.Designer.getEditorType(typeString)
+                        editor: getEditorType(typeString) || DevExpress.Designer.getEditorType(typeString),
+                        editorOptions: {}
                     };
+                    if (parameterDescriptor.type === "System.Guid") {
+                        info.editorOptions.isNullable = parameterDescriptor.allowNull;
+                    }
                     this.assignValueStore(info, parameter);
                     return info;
+                };
+                ParameterHelper.prototype.addShowCleanButton = function (info, parameter) {
+                    var _this = this;
+                    info.editorOptions.showClearButton = parameter.allowNull;
+                    info.editorOptions.placeholder = ko.computed(function () { return ko.unwrap(parameter.allowNull) ? _this.getUnspecifiedDisplayText() : ""; });
                 };
                 ParameterHelper.prototype.assignValueStore = function (info, parameter) {
                     var items = this.getEnumCollection(parameter);
@@ -2243,6 +2300,9 @@ var DevExpress;
                     var _this = this;
                     var valueInfo = this.createInfo(parameter);
                     parameter.multiValueInfo($.extend(true, {}, valueInfo, { propertyName: "value" }));
+                    if (parameter.allowNull !== undefined) {
+                        this.addShowCleanButton(valueInfo, parameter);
+                    }
                     if (ko.unwrap(parameter.isMultiValue)) {
                         valueInfo.editor = getEditorType(parameter["isMultiValueWithLookUp"] ? "multiValueWithLookUp" : "multiValue");
                         valueInfo["addHandler"] = function () { return _this.createMultiValue(parameter); };
@@ -2278,13 +2338,13 @@ var DevExpress;
                 PreviewParameterHelper.prototype.createInfo = function (parameter) {
                     var info = _super.prototype.createInfo.call(this, parameter);
                     info.propertyName = PreviewParameterHelper.getPrivatePropertyName(parameter.path);
-                    if (!parameter.isMultiValue && (parameter.lookUpValues() || this.isEnumType(parameter)))
-                        info.editorOptions = { searchEnabled: true };
-                    if (parameter.type === "System.DateTime") {
+                    if (!parameter.isMultiValue && (parameter.lookUpValues() || this.isEnumType(parameter))) {
+                        info.editorOptions.searchEnabled = true;
+                    }
+                    if (parameter.type === "System.DateTime" && !parameter.allowNull) {
                         info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty', "ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError") }];
                     }
                     else if (parameter.type === "System.Guid") {
-                        info.editorOptions = info.editorOptions || {};
                         info.editorOptions.displayCustomValue = false;
                     }
                     return info;
@@ -2346,7 +2406,7 @@ var DevExpress;
                     this.intTypes = ["System.Int16", "System.Int32", "System.Int64"];
                     this.floatTypes = ["System.Single", "System.Double", "System.Decimal"];
                     this.isTypesCurrentType = function (types, type) { return types.indexOf(type) > -1; };
-                    this.type = parameterInfo.TypeString;
+                    this.type = parameterInfo.TypeName;
                     this.path = parameterInfo.Path;
                     this.visible = parameterInfo.Visible;
                     this.isFilteredLookUpSettings = parameterInfo.IsFilteredLookUpSettings;
@@ -2354,6 +2414,7 @@ var DevExpress;
                     this.lookUpValues(this._originalLookUpValues);
                     this.lookUpValues.subscribe(function () { _this.valueStoreCache = null; });
                     this.isMultiValue = parameterInfo.MultiValue;
+                    this.allowNull = parameterInfo.AllowNull;
                     this.isMultiValueWithLookUp = this.isMultiValue && !!this.lookUpValues();
                     this._originalValue = parameterInfo.Value;
                     if (parameterInfo.ValueInfo && this.isTypesCurrentType(this.intTypes.concat(this.floatTypes), this.type) && !this.isMultiValueWithLookUp) {
@@ -2364,9 +2425,11 @@ var DevExpress;
                             description: parameterInfo.Description,
                             displayName: parameterInfo.Description || parameterInfo.Name,
                             name: parameterInfo.Name,
-                            type: parameterInfo.TypeString,
+                            type: parameterInfo.TypeName,
                             value: _this._originalValue,
                             multiValue: parameterInfo.MultiValue,
+                            allowNull: parameterInfo.AllowNull,
+                            hasLookUpValues: !!_this.lookUpValues() || parameterHelper.isEnumType(_this),
                             visible: parameterInfo.Visible
                         };
                     };
@@ -2387,6 +2450,7 @@ var DevExpress;
                 };
                 PreviewParameter.prototype.initialize = function (value, parameterHelper) {
                     var _this = this;
+                    var resultValue;
                     if (this.isMultiValueWithLookUp) {
                         this.safeAssignObservable("_value", ko.observableArray((value || []).map(function (arrayItem) {
                             return parameterHelper.getValueConverter(_this.type)(arrayItem);
@@ -2405,14 +2469,18 @@ var DevExpress;
                             });
                             multiValuesHelper.dataSource = ParameterHelper.createDefaultDataSource(store);
                         }
-                        this.safeAssignObservable("value", ko.observable(multiValuesHelper));
+                        resultValue = ko.observable(multiValuesHelper);
                     }
                     else if (this.isMultiValue) {
-                        this.safeAssignObservable("value", parameterHelper.createMultiValueArray(value, this));
+                        resultValue = value ? parameterHelper.createMultiValueArray(value, this) : ko.observableArray();
+                    }
+                    else if (this.allowNull && !value) {
+                        resultValue = ko.observable(null);
                     }
                     else {
-                        this.safeAssignObservable("value", ko.observable(parameterHelper.getValueConverter(this.type)(value)));
+                        resultValue = ko.observable(parameterHelper.getValueConverter(this.type)(value));
                     }
+                    this.safeAssignObservable("value", resultValue);
                 };
                 return PreviewParameter;
             })(DevExpress.Designer.Disposable);
@@ -2476,7 +2544,15 @@ var DevExpress;
                     }));
                     this.initialize(reportPreview.originalParametersInfo());
                     var notEmpty = ko.pureComputed(function () { return !_this.isEmpty(); });
-                    this.tabInfo = new DevExpress.Designer.TabInfo("Parameters", "dxrd-preview-parameters", this, 'PreviewStringId.RibbonPreview_Parameters_Caption', "parameters", notEmpty);
+                    this.tabInfo = new DevExpress.Designer.TabInfo({
+                        text: "Parameters",
+                        template: "dxrd-preview-parameters",
+                        model: this,
+                        localizationId: 'PreviewStringId.RibbonPreview_Parameters_Caption',
+                        imageClassName: "parameters",
+                        imageTemplateName: "dxrd-svg-tabs-parameters",
+                        visible: notEmpty
+                    });
                     var popupVisibleSwitch = ko.observable(false);
                     var popupVisible = ko.pureComputed({
                         read: function () {
@@ -2644,7 +2720,9 @@ var DevExpress;
                             return (parameter.type === "System.DateTime" && !!item && (item instanceof Date)) ? self._convertLocalDateToUTC(item) : item;
                         };
                         var value = parameter.isMultiValueWithLookUp ? parameter._value() : parameter.value();
-                        params.push({ Value: ParameterHelper.getSerializationValue(value, convertItem), Key: parameter.path, TypeString: parameter.type });
+                        if (parameter.isMultiValue && Array.isArray(value) && value.length === 0)
+                            value = null;
+                        params.push({ Value: ParameterHelper.getSerializationValue(value, convertItem), Key: parameter.path, TypeName: parameter.type });
                     });
                     return params;
                 };
@@ -2803,12 +2881,14 @@ var DevExpress;
                     this.canSwitchToDesigner = true;
                     this.allowURLsWithJSContent = false;
                     this.zoomStep = ko.observable(0.05);
+                    this.exportOptionsTabVisible = ko.observable(true);
                     Preview.HandlerUri = handlerUri || Preview.HandlerUri;
                     this.previewHandlersHelper = previewHandlersHelper || new Preview.PreviewHandlersHelper(this);
                     this.requestWrapper = previewRequestWrapper || new Preview.PreviewRequestWrapper(null, callbacks);
                     this.rtlViewer = rtl;
                     if (callbacks) {
                         this.customProcessBrickClick = callbacks.previewClick;
+                        this.customizeExportOptions = callbacks.customizeExportOptions;
                     }
                     this.documentBuilding.subscribe(function (newVal) {
                         if (!newVal) {
@@ -3114,9 +3194,14 @@ var DevExpress;
                                 _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
                             }
                             var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions);
+                            var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
+                            _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
+                            _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
+                                _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
+                                _this.documentBuilding(true);
                                 var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
@@ -3206,7 +3291,7 @@ var DevExpress;
                     }
                     this._startBuildOperationId = Preview.generateGuid();
                     this._currentDocumentId(null);
-                    this.progressBar.text(DevExpress.Designer.getLocalization('Document is building...', 'ASPxReportsStringId.WebDocumentViewer_DocumentBuilding'));
+                    this.progressBar.text(DevExpress.Designer.getLocalization("Creating the document...", "PreviewStringId.Msg_CreatingDocument"));
                     this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'));
                     this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
                     this.documentBuilding(true);
@@ -3310,6 +3395,9 @@ var DevExpress;
                         _this._sortingState = response.sortingState || [];
                         if (response.canPerformContinuousExport === false && _this.reportId) {
                             var deserializedExportOptions = _this._deserializeExportOptions(response.exportOptions || {}, true);
+                            var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
+                            _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
+                            _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
                             _this.exportOptionsModel(deserializedExportOptions);
                         }
                         _this.documentMap(response.documentMap);
@@ -3504,14 +3592,18 @@ var DevExpress;
             })(DevExpress.Designer.Disposable);
             Preview.ReportPreview = ReportPreview;
             function updatePreviewContentSize(previewSize, root, rtl) {
-                return function () {
-                    var $root = $(root);
-                    var rightAreaWidth = $root.find(".dxrd-preview .dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
+                return function (tabPanelPosition) {
+                    var $root = $(root).find(".dxrd-preview");
+                    var rightAreaWidth = $root.find(".dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
                     rightAreaWidth = isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
-                    var surfaceWidth = $root.find(".dxrd-preview").width() - (rightAreaWidth + 5);
-                    var cssStyleData = rtl ? { 'right': '', 'left': rightAreaWidth } : { 'right': rightAreaWidth, 'left': '' };
+                    var surfaceWidth = $root.width() - (rightAreaWidth + 5);
+                    var cssStyleData = (rtl || tabPanelPosition === DevExpress.Analytics.TabPanel.Position.Left) ? { 'right': '', 'left': rightAreaWidth } : { 'right': rightAreaWidth, 'left': '' };
                     cssStyleData['width'] = surfaceWidth;
                     $root.find(".dxrd-preview-wrapper").css(cssStyleData);
+                    if (tabPanelPosition === DevExpress.Analytics.TabPanel.Position.Left)
+                        $root.find(".dxrd-toolbar-wrapper").css(cssStyleData);
+                    else
+                        $root.find(".dxrd-toolbar-wrapper").css({ 'left': 'unset' });
                     previewSize(surfaceWidth);
                 };
             }
@@ -3541,7 +3633,7 @@ var DevExpress;
                 Surface: 'dxrdp-surface',
                 RightPanel: 'dxrd-right-panel-template-base',
             };
-            function createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl) {
+            function createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl, tabPanelSettings) {
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
@@ -3553,18 +3645,22 @@ var DevExpress;
                 reportPreview.canSwitchToDesigner = !previewVisible;
                 reportPreview.allowURLsWithJSContent = allowURLsWithJSContent;
                 previewWrapper.initialize(reportPreview, parametersModel, searchModel);
-                var tabPanel = new DevExpress.Designer.TabPanel([
-                    parametersModel.tabInfo,
-                    exportModel.tabInfo,
-                    searchModel.tabInfo,
-                    documentMapModel.tabInfo
-                ], true, rtl);
+                var tabPanel = new DevExpress.Designer.TabPanel({
+                    tabs: [
+                        parametersModel.tabInfo,
+                        exportModel.tabInfo,
+                        searchModel.tabInfo,
+                        documentMapModel.tabInfo
+                    ],
+                    autoSelectTab: true,
+                    rtl: rtl
+                });
                 tabPanel.collapsed(true);
                 var globalActionProviders = ko.observableArray([new Preview.PreviewActions(reportPreview), exportModel, searchModel, new Preview.PreviewDesignerActions(reportPreview)]);
                 var actionLists = new Preview.ActionLists(reportPreview, globalActionProviders, callbacks && callbacks.customizeActions, reportPreview.previewVisible);
                 reportPreview.previewVisible(previewVisible);
                 var designerModel = {
-                    rootStyle: { 'dxrd-preview': true },
+                    rootStyle: "dxrd-preview dxd-back-primary",
                     reportPreview: reportPreview,
                     parametersModel: parametersModel,
                     exportModel: exportModel,
@@ -3581,16 +3677,29 @@ var DevExpress;
                 ];
                 callbacks && callbacks.customizeParts && callbacks.customizeParts(designerModel.parts);
                 var updatePreviewContentSize_ = updatePreviewContentSize(reportPreview.previewSize, element, rtl);
-                $(window).bind("resize", function () {
-                    updatePreviewContentSize_();
-                });
+                if (tabPanelSettings) {
+                    tabPanelSettings.width && tabPanel.width(tabPanelSettings.width);
+                    tabPanelSettings.position && tabPanel.position(tabPanelSettings.position);
+                }
+                designerModel.resizeCallback = function () {
+                    updatePreviewContentSize_(tabPanel.position());
+                };
+                $(window).bind("resize", designerModel.resizeCallback);
                 tabPanel.width.subscribe(function () {
-                    setTimeout(updatePreviewContentSize_, 1);
+                    setTimeout(function () { return updatePreviewContentSize_(tabPanel.position()); }, 1);
+                });
+                tabPanel.position.subscribe(function (newVal) {
+                    updatePreviewContentSize_(newVal);
+                });
+                tabPanel.isEmpty.subscribe(function () {
+                    setTimeout(function () {
+                        updatePreviewContentSize_(tabPanel.position());
+                    }, 1);
                 });
                 designerModel.updateSurfaceSize = function () {
-                    updatePreviewContentSize_();
+                    updatePreviewContentSize_(tabPanel.position());
                 };
-                updatePreviewContentSize_();
+                updatePreviewContentSize_(tabPanel.position());
                 DevExpress.Designer.appendStaticContextToRootViewModel(designerModel);
                 if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
                     callbacks.beforeRender && callbacks.beforeRender(designerModel);
@@ -3600,7 +3709,7 @@ var DevExpress;
                 return designerModel;
             }
             Preview.createDesktopPreview = createDesktopPreview;
-            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent, remoteSettings) {
+            function createPreview(element, callbacks, localization, parametersInfo, handlerUri, previewVisible, rtl, isMobile, mobileModeSettings, applyBindings, allowURLsWithJSContent, remoteSettings, tabPanelSettings) {
                 if (previewVisible === void 0) { previewVisible = true; }
                 if (applyBindings === void 0) { applyBindings = true; }
                 if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
@@ -3631,7 +3740,7 @@ var DevExpress;
                     designerModel = DevExpress.Report.Preview.createMobilePreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, mobileModeSettings);
                 }
                 else {
-                    designerModel = createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl);
+                    designerModel = createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl, tabPanelSettings);
                 }
                 designerModel.GetParametersModel = function () {
                     return designerModel.parametersModel;
@@ -3673,7 +3782,7 @@ var DevExpress;
             Preview.createPreview = createPreview;
             function createAndInitPreviewModel(viewerModel, element, callbacks, applyBindings) {
                 DevExpress.Designer.initGlobalize(viewerModel);
-                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent, viewerModel.remoteSettings);
+                var previewModel = DevExpress.Report.Preview.createPreview(element, callbacks, viewerModel.localization, viewerModel.parametersInfo, viewerModel.handlerUri, undefined, viewerModel.rtl, viewerModel.isMobile, viewerModel.mobileModeSettings, applyBindings, viewerModel.allowURLsWithJSContent, viewerModel.remoteSettings, viewerModel.tabPanelSettings);
                 if (viewerModel.reportId || viewerModel.documentId) {
                     previewModel.reportPreview.initialize($.Deferred().resolve(viewerModel));
                 }
@@ -3698,6 +3807,275 @@ var DevExpress;
 /// <reference path="sources/preview-document-map.ts" />
 /// <reference path="sources/preview-parameters.ts" />
 /// <reference path="sources/preview.ts" /> 
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Internal;
+        (function (Internal) {
+            DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
+                'dxrd-svg-actions-add_field_to_column_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h4v14H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h2v2H6zM6 4h2v2H6zM6 8h2v2H6zM6 12h2v2H6zM10 0h2v2h-2zM10 4h2v2h-2zM10 8h2v2h-2zM14 0h2v2h-2zM14 4h2v2h-2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 12h-4V8h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-add_field_to_data_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 14v-4h-4v4h-4v4h4v4h4v-4h4v-4z"/><ellipse class="dxd-icon-fill dxd-opacity-80" cx="6" cy="2" rx="6" ry="2"/><path class="dxd-icon-fill dxd-opacity-80" d="M12 4c0 1.1-2.7 2-6 2s-6-.9-6-2v12c0 1.1 2.7 2 6 2 .7 0 1.4 0 2-.1V12h4V4z"/></svg>',
+                'dxrd-svg-actions-add_field_to_filter_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 14v-4h-4v4h-4v4h4v4h4v-4h4v-4zM7 0C3.1 0 0 1.3 0 3v1l6 6v7c0 .5.4 1 1 1 .5 0 1-.4 1-1v-7l6-6V3c0-1.7-3.1-3-7-3zm0 4c-2.8 0-5-.4-5-1s2.2-1 5-1 5 .4 5 1-2.2 1-5 1z"/></svg>',
+                'dxrd-svg-actions-add_field_to_row_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 0h14v4H2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M14 6h2v2h-2zM10 6h2v2h-2zM6 6h2v2H6zM2 6h2v2H2zM10 10h2v2h-2zM6 10h2v2H6zM2 10h2v2H2zM6 14h2v2H6zM2 14h2v2H2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 14h-4v-4h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-align_bottoms': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 20h22v2H0zM2 0h8v18H2zM12 8h8v10h-8z"/></svg>',
+                'dxrd-svg-actions-align_centers': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 12H12v-2h6V4h-6V0h-2v4H4v6h6v2H0v6h10v4h2v-4h10z"/></svg>',
+                'dxrd-svg-actions-align_lefts': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h2v22H0zM4 12h18v8H4zM4 2h10v8H4z"/></svg>',
+                'dxrd-svg-actions-align_middles': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M12 0v10h-2V4H4v6H0v2h4v6h6v-6h2v10h6V12h4v-2h-4V0z"/></svg>',
+                'dxrd-svg-actions-align_rights': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 0h2v22h-2zM0 12h18v8H0zM8 2h10v8H8z"/></svg>',
+                'dxrd-svg-actions-align_to_grid': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M24 6V4h-4V0h-2v4H6V0H4v4H0v2h4v12H0v2h4v4h2v-4h12v4h2v-4h4v-2h-4V6h4zm-6 12H6v-4h8V6h4v12z"/><path class="dxd-icon-fill dxd-opacity-80" d="M14 0h-4l2 2zM2 12l-2-2v4z"/></svg>',
+                'dxrd-svg-actions-align_tops': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h22v2H0zM2 4h8v18H2zM12 4h8v10h-8z"/></svg>',
+                'dxrd-svg-actions-bottom_margin': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 20h10v2H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h10v2H6zM18 0h2v2h-2zM2 4h2v14H2zM6 4h10v14H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M18 20h2v2h-2zM2 20h2v2H2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 4h2v14h-2zM2 0h2v2H2z"/></svg>',
+                'dxrd-svg-actions-bring_to_front': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 6h12v12H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M4 4h4V0H0v8h4zM20 20v-4h4v8h-8v-4z"/></svg>',
+                'dxrd-svg-actions-center_horizontally': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M8 6h6v10H8z"/><path class="dxd-icon-fill dxd-opacity-60" d="M0 0v22h22V0H0zm20 10h-4v2h4v8H2v-8h4v-2H2V2h18v8z"/></svg>',
+                'dxrd-svg-actions-center_vertically': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 8h10v6H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M22 0H0v22h22V0zM12 20v-4h-2v4H2V2h8v4h2V2h8v18h-8z"/></svg>',
+                'dxrd-svg-actions-decrease_horizontal_spacing': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 2v4h-4V0H8v6H4V4H0v6h4V8h4v6h6V8h4v4h4V2zM4 20H0v2h4v2l4-3-4-3zM18 18l-4 3 4 3v-2h4v-2h-4z"/></svg>',
+                'dxrd-svg-actions-decrease_vertical_spacing': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 18h4v-4H0V8h6V4H4V0h6v4H8v4h6v6H8v4h4v4H2zM20 4V0h2v4h2l-3 4-3-4zM18 18l3-4 3 4h-2v4h-2v-4z"/></svg>',
+                'dxrd-svg-actions-delete_cell': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 12l-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3 2-2-3-3z"/><path class="dxd-icon-fill dxd-opacity-60" d="M10 2h2v2h-2zM10 6h2v2h-2zM6 14h2v2H6zM14 2h2v2h-2zM14 6h2v2h-2zM6 2h2v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 6h2v2H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 10h2v2H6zM2 2h2v2H2zM2 6h2v2H2zM2 10h2v2H2zM2 14h2v2H2z"/></svg>',
+                'dxrd-svg-actions-delete_column': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 12l-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3 2-2-3-3z"/><path class="dxd-icon-fill dxd-opacity-60" d="M12 2h2v2h-2zM12 6h2v2h-2zM8 14h2v2H8zM16 2h2v2h-2zM16 6h2v2h-2zM8 2h2v2H8zM8 6h2v2H8zM8 10h2v2H8z"/><path class="dxd-icon-fill dxd-opacity-80" d="M2 2h4v14H2z"/></svg>',
+                'dxrd-svg-actions-delete_row': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 14l-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3 2-2-3-3z"/><path class="dxd-icon-fill dxd-opacity-60" d="M2 8h2v2H2zM6 12h2v2H6zM2 12h2v2H2zM6 16h2v2H6zM2 16h2v2H2zM14 8h2v2h-2zM10 8h2v2h-2zM6 8h2v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M2 2h14v4H2z"/></svg>',
+                'dxrd-svg-actions-detail': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 0v22h18V0H2zm14 18H6v-2h10v2zm0-4H6v-2h10v2zm0-4H6V8h10v2zm0-4H6V4h10v2z"/></svg>',
+                'dxrd-svg-actions-detail_report': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M16 2h-2V0H8v2H6v2h10z"/><path class="dxd-icon-fill dxd-opacity-80" d="M18 2v4H4V2H2v22h18V2h-2zm-2 18H6v-2h10v2zm0-4H6v-2h10v2zm0-4H6v-2h10v2z"/></svg>',
+                'dxrd-svg-actions-distribute_columns_evenly': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 2v10h-2V8h-8v4h-2V8H2v4H0V2h2v4h8V2h2v4h8V2h2zM0 22h10v-8H0v8zm12 0h10v-8H12v8z"/></svg>',
+                'dxrd-svg-actions-distribute_rows_evenly': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 4v6h4v2h-4v6h4v2H14v-2h4v-6h-4v-2h4V4h-4V2h10v2h-4zM2 10h10V2H2v8zm0 10h10v-8H2v8z"/></svg>',
+                'dxrd-svg-actions-fit_bounds_to_text': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M16 24H8l4-4 4 4zm8-8V8l-4 4 4 4zM12 4l4-4H8l4 4zM0 8v8l4-4-4-4zm13.7-2h-3.4L6 18h3l1-3h4l1 3h3L13.7 6zm-3.1 7l1.2-3.8c.1-.3.2-.6.2-1.1 0 .4.1.8.2 1.1l1.2 3.8h-2.8z"/></svg>',
+                'dxrd-svg-actions-fit_text_to_bounds': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M16 4H8l4-4 4 4zM4 16V8l-4 4 4 4zm8 8l4-4H8l4 4zm8-16v8l4-4-4-4zm-6.3-2h-3.4L6 18h3l1-3h4l1 3h3L13.7 6zm-3.1 7l1.2-3.8c.1-.3.2-.6.2-1.1 0 .4.1.8.2 1.1l1.2 3.8h-2.8z"/></svg>',
+                'dxrd-svg-actions-fit_to_сontainer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M23 0H1C.5 0 0 .5 0 1v22c0 .5.5 1 1 1h22c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 22H2V2h20v20zm-6-6H8V8h8v8zM10 6l2-2 2 2s-3.9-.1-4 0zm-4 8l-2-2s2-2.1 2-2v4zm4 4h4l-2 2s-2.1-2-2-2zm10-6l-2 2v-4c0-.1 2 2 2 2z"/></svg>',
+                'dxrd-svg-actions-group_footer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M0 0h12v6H0z"/><path class="dxd-icon-fill dxd-opacity-80" d="M0 16h12v6H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M8 8h14v2H8zM8 12h14v2H8z"/></svg>',
+                'dxrd-svg-actions-group_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M0 16h12v6H0z"/><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h12v6H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M8 12h14v2H8zM8 8h14v2H8z"/></svg>',
+                'dxrd-svg-actions-increase_horizontal_spacing': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 2v4h-4V0H8v6H4V4H0v6h4V8h4v6h6V8h4v4h4V2zM18 20h-4v2h4v2l4-3-4-3zM4 18l-4 3 4 3v-2h4v-2H4z"/></svg>',
+                'dxrd-svg-actions-increase_vertical_spacing': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 18h4v-4H0V8h6V4H4V0h6v4H8v4h6v6H8v4h4v4H2zM20 18v-4h2v4h2l-3 4-3-4zM18 4l3-4 3 4h-2v4h-2V4z"/></svg>',
+                'dxrd-svg-actions-insert_cell': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 2h2v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 6h2v2H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 10h2v2H6zM6 14h2v2H6zM2 2h2v2H2zM2 6h2v2H2zM2 10h2v2H2zM2 14h2v2H2zM10 2h2v2h-2zM10 6h2v2h-2zM10 10h2v2h-2zM14 2h2v2h-2zM14 6h2v2h-2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 14h-4v-4h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-insert_column_to_left': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h4v14H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h2v2H6zM6 4h2v2H6zM6 8h2v2H6zM6 12h2v2H6zM10 0h2v2h-2zM10 4h2v2h-2zM10 8h2v2h-2zM14 0h2v2h-2zM14 4h2v2h-2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 12h-4V8h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-insert_column_to_right': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M14 2h4v6h-4z"/><path class="dxd-icon-fill dxd-opacity-60" d="M10 2h2v2h-2zM10 6h2v2h-2zM10 10h2v2h-2zM6 14h2v2H6zM6 2h2v2H6zM6 6h2v2H6zM6 10h2v2H6zM2 2h2v2H2zM2 6h2v2H2zM2 10h2v2H2zM2 14h2v2H2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 14h-4v-4h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-insert_row_above': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 0h14v4H2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M14 6h2v2h-2zM10 6h2v2h-2zM6 6h2v2H6zM2 6h2v2H2zM10 10h2v2h-2zM6 10h2v2H6zM2 10h2v2H2zM6 14h2v2H6zM2 14h2v2H2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 14h-4v-4h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-insert_row_below': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 14h6v4H2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M2 10h2v2H2zM6 10h2v2H6zM10 10h2v2h-2zM6 6h2v2H6zM2 6h2v2H2zM10 6h2v2h-2zM14 6h2v2h-2zM10 2h2v2h-2zM14 2h2v2h-2zM2 2h2v2H2zM6 2h2v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 14h-4v-4h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
+                'dxrd-svg-actions-make_horizontal_spacing_equal': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 4v6h-4V2H8v8H4V6H0v10h4v-4h4v8h6v-8h4v6h4V4z"/></svg>',
+                'dxrd-svg-actions-make_same_height': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 16h-2v2h-2l3 4 3-4h-2zM18 6h2V4h2l-3-4-3 4h2zM0 0h6v22H0zM16 8h6v6h-6zM8 0h2v2H8zM12 0h2v2h-2zM8 20h2v2H8zM12 20h2v2h-2z"/></svg>',
+                'dxrd-svg-actions-make_same_sizes': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M12 18v-2h-2v2H8l3 4 3-4zM10 4v2h2V4h2l-3-4-3 4zM4 12h2v-2H4V8l-4 3 4 3zM18 10h-2v2h2v2l4-3-4-3zM8 8h6v6H8zM2 2h6V0H0v8h2zM20 0h-6v2h6v6h2V0zM20 20h-6v2h8v-8h-2zM2 14H0v8h8v-2H2z"/></svg>',
+                'dxrd-svg-actions-make_same_width': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 20v-2H4v-2l-4 3 4 3v-2zM16 18v2h2v2l4-3-4-3v2zM0 0h22v6H0zM8 16h6v6H8zM20 8h2v2h-2zM20 12h2v2h-2zM0 8h2v2H0zM0 12h2v2H0z"/></svg>',
+                'dxrd-svg-actions-make_vertical_spacing_equal': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 18h-6v-4h8V8h-8V4h4V0H6v4h4v4H2v6h8v4H4v4h14z"/></svg>',
+                'dxrd-svg-actions-master_report': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M12 2h-2V0H6v2H4v2h8zM14 14h10v4H14zM14 20h10v4H14z"/><path class="dxd-icon-fill dxd-opacity-80" d="M12 12h4V2h-2v4H2V2H0v20h12z"/></svg>',
+                'dxrd-svg-actions-none': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 0v22h16V0H4zm14 14l-2 2-4-4-4 4-2-2 4-4-4-4 2-2 4 4 4-4 2 2-4 4 4 4z"/></svg>',
+                'dxrd-svg-actions-page_footer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h10v2H6zM6 4h10v8H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 14h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 0h2v2h-2zM6 20h10v2H6zM2 20h2v2H2zM2 4h2v14H2zM18 20h2v2h-2zM2 0h2v2H2zM18 4h2v14h-2z"/></svg>',
+                'dxrd-svg-actions-page_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 10h10v8H6zM6 20h10v2H6zM18 0h2v2h-2zM2 4h2v14H2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 4h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h10v2H6zM18 20h2v2h-2zM2 20h2v2H2zM2 0h2v2H2zM18 4h2v14h-2z"/></svg>',
+                'dxrd-svg-actions-remove_horizontal_spacing': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 18H0v2h4v2l4-3-4-3zM18 16l-4 3 4 3v-2h4v-2h-4zM4 8V4H0v6h4zM14 8V0H8v14h6zM18 2v10h4V2z"/></svg>',
+                'dxrd-svg-actions-remove_vertical_spacing': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 4h-2V0h-2v4h-2l3 4zM16 18h2v4h2v-4h2l-3-4zM4 0h6v4H4zM0 8h14v6H0zM2 18h10v4H2z"/></svg>',
+                'dxrd-svg-actions-report_footer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M16 2h-2V0H8v2H6v2h10zM6 22h10v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 16h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 2h2v2h-2zM6 6h10v8H6zM2 6h2v14H2zM18 22h2v2h-2zM2 22h2v2H2zM2 2h2v2H2zM18 6h2v14h-2z"/></svg>',
+                'dxrd-svg-actions-report_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M16 2h-2V0H8v2H6v2h10zM6 22h10v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 6h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 2h2v2h-2zM6 12h10v8H6zM2 6h2v14H2zM18 22h2v2h-2zM2 22h2v2H2zM2 2h2v2H2zM18 6h2v14h-2z"/></svg>',
+                'dxrd-svg-actions-send_to_back': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M0 0h8v8H0zM16 16h8v8h-8z"/><path class="dxd-icon-fill dxd-opacity-80" d="M14 14h4V6h-8v4H6v8h8z"/></svg>',
+                'dxrd-svg-actions-size_to_grid': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 4V0h-2v4H6V0H4v4H0v2h4v12H0v2h4v4h2v-4h12v4h2v-4h4v-2h-4V6h4V4z"/><path class="dxd-icon-fill dxd-opacity-80" d="M14 0h-4l2 2zM0 10v4l2-2zM10 24h4l-2-2zM24 14v-4l-2 2z"/></svg>',
+                'dxrd-svg-actions-subband': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M2 4h14v6H2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M8 14h14v6H8z"/></svg>',
+                'dxrd-svg-actions-top_margin': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 20h10v2H6z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 0h10v2H6zM18 0h2v2h-2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M2 4h2v14H2zM6 4h10v14H6zM18 20h2v2h-2zM2 20h2v2H2zM18 4h2v14h-2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M2 0h2v2H2z"/></svg>',
+                'dxrd-svg-actions-vertical_detail': '<svg data-bind="xlink" viewBox="0 0 24 24"><g><path class="dxd-icon-fill dxd-opacity-80" d="M10 6h4v10h-4z"/><path class="dxd-icon-fill dxd-opacity-80" d="M2 4H0V2h2v2zm0 2H0v10h2V6zm0 12H0v2h2v-2zM20 6h-4v10h4V6zM8 6H4v10h4V6zm12-4H4v2h16V2zm4 0h-2v2h2V2zm0 4h-2v10h2V6zm0 12h-2v2h2v-2zM4 20h16v-2H4v2z" opacity=".72"/></g></svg>',
+                'dxrd-svg-actions-vertical_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><g><path class="dxd-icon-fill dxd-opacity-80" d="M4 6h4v10H4z"/><path class="dxd-icon-fill dxd-opacity-80" d="M2 4H0V2h2v2zm0 2H0v10h2V6zm0 12H0v2h2v-2zM20 6H10v10h10V6zm0-4H4v2h16V2zm4 0h-2v2h2V2zm0 4h-2v10h2V6zm0 12h-2v2h2v-2zM4 20h16v-2H4v2z" opacity=".72"/></g></svg>',
+                'dxrd-svg-actions-vertical_total': '<svg data-bind="xlink" viewBox="0 0 24 24"><g><path class="dxd-icon-fill dxd-opacity-80" d="M16 6h4v10h-4z"/><path class="dxd-icon-fill dxd-opacity-80" d="M2 4H0V2h2v2zm0 2H0v10h2V6zm0 12H0v2h2v-2zM14 6H4v10h10V6zm6-4H4v2h16V2zm4 0h-2v2h2V2zm0 4h-2v10h2V6zm0 12h-2v2h2v-2zM4 20h16v-2H4v2z" opacity=".72"/></g></svg>',
+                'dxrd-svg-bands-bottom_margin': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M6 20h10v2H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h10v2H6zM18 0h2v2h-2zM2 4h2v14H2zM6 4h10v14H6z"/><path class="dxd-icon-fill" d="M18 20h2v2h-2zM2 20h2v2H2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 4h2v14h-2zM2 0h2v2H2z"/></svg>',
+                'dxrd-svg-bands-detail': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v22h18V0H2zm14 18H6v-2h10v2zm0-4H6v-2h10v2zm0-4H6V8h10v2zm0-4H6V4h10v2z"/></svg>',
+                'dxrd-svg-bands-detail_report': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 2h-2V0H8v2H6v2h10z"/><path class="dxd-icon-fill" d="M18 2v4H4V2H2v22h18V2h-2zm-2 18H6v-2h10v2zm0-4H6v-2h10v2zm0-4H6v-2h10v2z"/></svg>',
+                'dxrd-svg-bands-group_footer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M0 0h12v6H0z"/><path class="dxd-icon-fill" d="M0 16h12v6H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M8 8h14v2H8zM8 12h14v2H8z"/></svg>',
+                'dxrd-svg-bands-group_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M0 16h12v6H0z"/><path class="dxd-icon-fill" d="M0 0h12v6H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M8 12h14v2H8zM8 8h14v2H8z"/></svg>',
+                'dxrd-svg-bands-master_report': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 2h-2V0H6v2H4v2h8zM14 14h10v4H14zM14 20h10v4H14z"/><path class="dxd-icon-fill" d="M12 12h4V2h-2v4H2V2H0v20h12z"/></svg>',
+                'dxrd-svg-bands-page_footer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h10v2H6zM6 4h10v8H6z"/><path class="dxd-icon-fill" d="M6 14h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 0h2v2h-2zM6 20h10v2H6zM2 20h2v2H2zM2 4h2v14H2zM18 20h2v2h-2zM2 0h2v2H2zM18 4h2v14h-2z"/></svg>',
+                'dxrd-svg-bands-page_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 10h10v8H6zM6 20h10v2H6zM18 0h2v2h-2zM2 4h2v14H2z"/><path class="dxd-icon-fill" d="M6 4h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h10v2H6zM18 20h2v2h-2zM2 20h2v2H2zM2 0h2v2H2zM18 4h2v14h-2z"/></svg>',
+                'dxrd-svg-bands-report_footer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M16 2h-2V0H8v2H6v2h10zM6 22h10v2H6z"/><path class="dxd-icon-fill" d="M6 16h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 2h2v2h-2zM6 6h10v8H6zM2 6h2v14H2zM18 22h2v2h-2zM2 22h2v2H2zM2 2h2v2H2zM18 6h2v14h-2z"/></svg>',
+                'dxrd-svg-bands-report_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M16 2h-2V0H8v2H6v2h10zM6 22h10v2H6z"/><path class="dxd-icon-fill" d="M6 6h10v4H6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 2h2v2h-2zM6 12h10v8H6zM2 6h2v14H2zM18 22h2v2h-2zM2 22h2v2H2zM2 2h2v2H2zM18 6h2v14h-2z"/></svg>',
+                'dxrd-svg-bands-sub_band': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M2 4h14v6H2z"/><path class="dxd-icon-fill" d="M8 14h14v6H8z"/></svg>',
+                'dxrd-svg-bands-top_margin': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M6 20h10v2H6z"/><path class="dxd-icon-fill" d="M6 0h10v2H6zM18 0h2v2h-2z"/><path class="dxd-icon-fill dxd-opacity-60" d="M2 4h2v14H2zM6 4h10v14H6zM18 20h2v2h-2zM2 20h2v2H2zM18 4h2v14h-2z"/><path class="dxd-icon-fill" d="M2 0h2v2H2z"/></svg>',
+                'dxrd-svg-bands-vertical_detail': '<svg data-bind="xlink" viewBox="0 0 24 24"><g><path class="dxd-icon-fill" d="M10 6h4v10h-4z"/><path class="dxd-icon-fill" d="M2 4H0V2h2v2zm0 2H0v10h2V6zm0 12H0v2h2v-2zM20 6h-4v10h4V6zM8 6H4v10h4V6zm12-4H4v2h16V2zm4 0h-2v2h2V2zm0 4h-2v10h2V6zm0 12h-2v2h2v-2zM4 20h16v-2H4v2z" opacity=".72"/></g></svg>',
+                'dxrd-svg-bands-vertical_header': '<svg data-bind="xlink" viewBox="0 0 24 24"><g><path class="dxd-icon-fill" d="M4 6h4v10H4z"/><path class="dxd-icon-fill" d="M2 4H0V2h2v2zm0 2H0v10h2V6zm0 12H0v2h2v-2zM20 6H10v10h10V6zm0-4H4v2h16V2zm4 0h-2v2h2V2zm0 4h-2v10h2V6zm0 12h-2v2h2v-2zM4 20h16v-2H4v2z" opacity=".72"/></g></svg>',
+                'dxrd-svg-bands-vertical_total': '<svg data-bind="xlink" viewBox="0 0 24 24"><g><path class="dxd-icon-fill" d="M16 6h4v10h-4z"/><path class="dxd-icon-fill" d="M2 4H0V2h2v2zm0 2H0v10h2V6zm0 12H0v2h2v-2zM14 6H4v10h10V6zm6-4H4v2h16V2zm4 0h-2v2h2V2zm0 4h-2v10h2V6zm0 12h-2v2h2v-2zM4 20h16v-2H4v2z" opacity=".72"/></g></svg>',
+                'dxrd-svg-chartstructure-axes': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 20H4V0H2v4H0v2h2v4H0v2h2v4H0v2h2v4h4v2h2v-2h4v2h2v-2h4v2h2v-2h4z"/><path class="dxd-icon-fill dxd-opacity-80" d="M24 6V4h-2V2h-2V0h-2v2h-4V0h-2v2H8V0H6v4h14v14h4v-2h-2v-4h2v-2h-2V6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M10 14V6H6v2h2v4H6v2h2v2h2v2h2v-2h4v2h2v-4z"/></svg>',
+                'dxrd-svg-chartstructure-axisx': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 17l-6-5v4h-4v-2h-2v2H6v-2H4v2H0v2h4v2h2v-2h4v2h2v-2h4v4zM4 8h2V6h4v4l6-5-6-5v4H6V2H4v2H0v2h4z"/></svg>',
+                'dxrd-svg-chartstructure-axisy': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M17 0l-5 6h4v4h-2v2h2v4h-2v2h2v4h2v-4h2v-2h-2v-4h2v-2h-2V6h4zM8 18v-2H6v-4h4L5 6l-5 6h4v4H2v2h2v4h2v-4z"/></svg>',
+                'dxrd-svg-chartstructure-chart': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M10 22V12H0c.5 5 5 9.5 10 10zM12 12v10c5-.5 9.5-5 10-10H12z"/><path class="dxd-icon-fill" d="M0 6h4v4H0zM6 4h4v6H6zM12 2h4v8h-4z"/><g><path class="dxd-icon-fill" d="M18 0h4v10h-4z"/></g></svg>',
+                'dxrd-svg-chartstructure-constantline': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 6h-6V0h-2v6H0v2h16v16h2V8h6z"/></svg>',
+                'dxrd-svg-chartstructure-constantlines': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M24 20H4V0H2v4H0v2h2v4H0v2h2v4H0v2h2v4h4v2h2v-2h4v2h2v-2h4v2h2v-2h4z"/><path class="dxd-icon-fill" d="M24 6V4h-4V0h-2v4h-4V0h-2v4H6v2h6v4H6v2h6v6h2v-6h4v6h2v-6h4v-2h-4V6h4zm-10 4V6h4v4h-4z"/></svg>',
+                'dxrd-svg-chartstructure-defaultpane': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 0h10v22H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M12 0v10h10V0H12zm8 8h-6V2h6v6zM12 22h10V12H12v10zm2-8h6v6h-6v-6z"/></svg>',
+                'dxrd-svg-chartstructure-diagram': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M0 16h4v6H0zM12 10h4v12h-4z"/><path class="dxd-icon-fill" d="M18 2h4v20h-4zM6 6h4v16H6z"/></svg>',
+                'dxrd-svg-chartstructure-legend': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 0h10v10H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M0 12h10v10H0z"/><path class="dxd-icon-fill" d="M12 2h10v2H12zM12 6h10v2H12zM12 14h10v2H12zM12 18h10v2H12z"/></svg>',
+                'dxrd-svg-chartstructure-panes': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 0h10v22H0z"/><path class="dxd-icon-fill dxd-opacity-80" d="M12 0v10h10V0H12z"/><path class="dxd-icon-fill dxd-opacity-60" d="M12 22h10V12H12v10z"/></svg>',
+                'dxrd-svg-chartstructure-series': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 22h22V10l-4-4-8 8-4-4-6 6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M18 0l-8 8-4-4-6 6v4l6-6 4 4 8-8 4 4V4z"/></svg>',
+                'dxrd-svg-chartstructure-seriescollection': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 20H4V0H2v4H0v2h2v4H0v2h2v4H0v2h2v4h4v2h2v-2h4v2h2v-2h4v2h2v-2h4z"/><path class="dxd-icon-fill" d="M15 7l-9 9v2h18v-2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M15 4l9 9V4z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 13l9-9-9-4z"/></svg>',
+                'dxrd-svg-chartstructure-title': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M4 8v14h14V8H4zm12 8h-2v-2h2v2zm-6 0v-2h2v2h-2zm2 2v2h-2v-2h2zm-4-2H6v-2h2v2zm8-6v2h-2v-2h2zm-4 2h-2v-2h2v2zm-4-2v2H6v-2h2zm-2 8h2v2H6v-2zm8 2v-2h2v2h-2z"/><path class="dxd-icon-fill" d="M8 0h6v6H8z"/></svg>',
+                'dxrd-svg-chartstructure-titles': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2h4v4H2zM10 2h4v4h-4zM10 18h4v4h-4zM18 2h4v4h-4zM2 18h4v4H2zM2 10h4v4H2zM18 17.9h4v4h-4zM18 10h4v4h-4z"/><path class="dxd-icon-fill dxd-opacity-60" d="M8 8v8h8V8H8zm6 6h-4v-4h4v4z"/></svg>',
+                'dxrd-svg-color_gear': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.White{fill:#FFFFFF;}</style><path class="White" d="M30 18v-4l-4.4-.7c-.2-.8-.5-1.5-.9-2.1l2.6-3.6-2.8-2.8-3.6 2.6c-.7-.4-1.4-.7-2.1-.9L18 2h-4l-.7 4.4c-.8.2-1.5.5-2.1.9L7.5 4.7 4.7 7.5l2.6 3.6c-.4.7-.7 1.4-.9 2.1L2 14v4l4.4.7c.2.8.5 1.5.9 2.1l-2.6 3.6 2.8 2.8 3.6-2.6c.7.4 1.4.7 2.1.9L14 30h4l.7-4.4c.8-.2 1.5-.5 2.1-.9l3.6 2.6 2.8-2.8-2.6-3.6c.4-.7.7-1.4.9-2.1L30 18zm-14 2c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/></svg>',
+                'dxrd-svg-fieldlist-calcboolean': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm18 8L8 18l-4-4v-4l4 4L18 4v4z"/></svg>',
+                'dxrd-svg-fieldlist-calcdate': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm11 18c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7z"/><path class="dxd-icon-fill dxd-opacity-80" d="M15 10h-3V7c0-.5-.4-1-1-1-.5 0-1 .4-1 1v4c0 .5.4 1 1 1h4c.5 0 1-.4 1-1s-.4-1-1-1z"/></svg>',
+                'dxrd-svg-fieldlist-calcdefault': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm17.6 5.8c-.2.1-.4.2-.7.2-.3 0-.5-.1-.7-.2-.2-.1-.2-.3-.2-.4 0-.2 0-.4.1-.6.1-.1.2-.2.2-.3 0-.1 0-.1-.1-.1s-.1-.1-.2-.1c-.4 0-.8.3-1.2.6-.7.6-1.4 2.1-1.8 3.1h2l-1 1.9h-1.6l-.8 2.3c-.6 1.7-1.1 2.8-1.6 3.6-.5.7-1.2 1.3-1.9 1.6-.7.4-1.6.6-2.5.6-.6 0-1-.1-1.3-.3-.2-.1-.3-.5-.3-.7s.2-1 1.2-1c.9 0 1 .8 1 1s-.1.3-.2.4-.2.1-.2.2l.1.1H6c.2 0 .4 0 .5-.1.4-.2.6-.5.8-.9.1-.2.4-.7.7-1.7l1.7-5H8l1-1.9h1.3c.2-.1.6-.9.7-1.1.8-1 1.4-1.7 2.2-2.2.9-.6 1.8-.8 2.9-.8.7 0 1.1.1 1.4.3.3.2.5.4.5.7s-.2.6-.4.8z"/></svg>',
+                'dxrd-svg-fieldlist-calcfloat': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm8 16H2v-2h2v-4H2V8h2V6h2v8h2v2zm4 0h-2v-2h2v2zm8-8v2h-2v2h-2v2h4v2h-6v-4h2v-2h2V8h-4V6h6v2z"/></svg>',
+                'dxrd-svg-fieldlist-calcinteger': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm6 16H4v-6H2V8h2V6h2v10zm6-9v3h-2v4h2v2H8v-6h2V8H8V6h4v1zm8 0v9h-6v-2h4v-2h-2v-2h2V8h-4V6h6v1z"/></svg>',
+                'dxrd-svg-fieldlist-calcstring': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0v22h22V0H0zm10 18H4v-6h4v-2H4V8h6v10zm8-4.3V18h-6V4h2v6h4v3.7z"/><path class="dxd-icon-fill dxd-opacity-80" d="M6 14h2v2H6zM14 12h2v4h-2z"/></svg>',
+                'dxrd-svg-landscape': '<svg data-bind="xlink" viewBox="0 0 34 34"><style>.st0{opacity:0.5;}</style><g><path class="dxd-icon-fill" d="M33 4H1c-.5 0-1 .5-1 1v24c0 .5.5 1 1 1h32c.5 0 1-.5 1-1V5c0-.5-.5-1-1-1zm-1 24H2V6h30v22z"/><path class="st0 dxd-icon-fill" d="M28 12H6v-2h22v2zm0 2H6v2h22v-2zm0 4H6v2h22v-2zm0 4H6v2h22v-2z"/></g></svg>',
+                'dxrd-svg-menu-add_datasource': '<svg data-bind="xlink" viewBox="0 0 24 24"><ellipse class="dxd-icon-fill" cx="8" cy="2" rx="6" ry="2"/><path class="dxd-icon-fill" d="M16 10c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm3 7h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2zM8 13c-3.1 0-6-.9-6-2v5c0 1.1 2.9 2 6 2h.3c-.2-.6-.3-1.3-.3-2 0-1.1.2-2.1.6-3H8zM14 8.3V4c0 1.1-2.9 2-6 2s-6-.9-6-2v5c0 1.1 2.9 2 6 2 .6 0 1.3 0 1.9-.1 1-1.3 2.5-2.2 4.1-2.6z"/></svg>',
+                'dxrd-svg-menu-exit': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 12l-6-6v4H8v4h8v4z"/><path class="dxd-icon-fill" d="M12 20H2V4h10v4h2V2H0v20h14v-6h-2z"/></svg>',
+                'dxrd-svg-menu-new_via_wizard': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M5.7 11.3L9.1 16l1.5-5.4L16 9.1l-4.7-3.4-.1-5.7-4.5 3.3-5.4-2 2 5.4L0 11.2z"/><path class="dxd-icon-fill" d="M23.5 20.6l-8.7-8.8-2.3.7-.6 2.1 8.7 8.8c.7.7 1.9.7 2.6 0l.2-.2c.8-.7.8-1.9.1-2.6zM18 12l2 2V2h-6v2h4zM6 20v-6H4v8h12l-2-2z"/></svg>',
+                'dxrd-svg-menu-newreport': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M14 0v6h6z"/><path class="dxd-icon-fill" d="M12 0H2v22h18V8h-8z"/></svg>',
+                'dxrd-svg-menu-run_wizard': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M11.3 5.7L11.2 0 6.7 3.3 1.5 1.5l1.8 5.2L0 11.2l5.7.1L9.1 16l1.5-5.4L16 9.1z"/><path class="dxd-icon-fill" d="M23.5 20.6l-8.7-8.8-2.3.7-.6 2.1 8.7 8.8c.7.7 1.9.7 2.6 0l.2-.2c.8-.7.8-1.9.1-2.6z"/></svg>',
+                'dxrd-svg-multi_select': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 12h12v12H12zM12 0H0v12h4V4h8z"/><path class="dxd-icon-fill" d="M18 6H6v12h4v-8h8z"/></svg>',
+                'dxrd-svg-none': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 0v22h16V0H4zm14 14l-2 2-4-4-4 4-2-2 4-4-4-4 2-2 4 4 4-4 2 2-4 4 4 4z"/></svg>',
+                'dxrd-svg-pictureeditor-alignment_bottomcenter': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M10 16h12v12H10z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_bottomleft': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M4 16h12v12H4z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_bottomright': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M16 16h12v12H16z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_middlecenter': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M10 10h12v12H10z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_middleleft': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M4 10h12v12H4z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_middleright': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M16 10h12v12H16z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_topcenter': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M10 4h12v12H10z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_topleft': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M4 4h12v12H4z"/></g></svg>',
+                'dxrd-svg-pictureeditor-alignment_topright': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .Green{fill:#039C23;} .Yellow{fill:#FFB115;} .Red{fill:#D11C1C;} .White{fill:#FFFFFF;} .st0{opacity:0.5;} .st1{opacity:0.75;}</style><g><path class="Black" d="M31 0H1C.5 0 0 .5 0 1v30c0 .5.5 1 1 1h30c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 30H2V2h28v28z"/><path class="Green" d="M16 4h12v12H16z"/></g></svg>',
+                'dxrd-svg-pictureeditor-image_gallery': '<svg data-bind="xlink" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .st0{opacity:0.5;}</style><path class="White" d="M22 2H2c-.5 0-1 .5-1 1v18c0 .5.5 1 1 1h20c.5 0 1-.5 1-1V3c0-.5-.5-1-1-1zm-1 18H3V4h18v16zM15.5 6C16.9 6 18 7.1 18 8.5S16.9 11 15.5 11 13 9.9 13 8.5 14.1 6 15.5 6zM15 19l-8-8-3 3v5h11z"/><path class="st0 White" d="M16.4 19H19l-4-4-1.3 1.3z"/></svg>',
+                'dxrd-svg-pictureeditor-size_mode_normal': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .st0{opacity:0.35;}</style><g><path class="Blue" d="M10 10h12v12H10z"/><path class="st0 Black" d="M5 15h3v2H5v4l-5-5 5-5v4zm6-10h4v3h2V5h4l-5-5-5 5zm21 11l-5-5v4h-3v2h3v4l5-5zm-15 8h-2v3h-4l5 5 5-5h-4v-3z"/><path class="Black" d="M28 22c-2.2 0-4 1.8-4 4v5c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-5c0-2.2-1.8-4-4-4zm0 2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2z"/></g></svg>',
+                'dxrd-svg-pictureeditor-size_mode_squeeze': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .st0{opacity:0.35;}</style><g><path class="Blue" d="M10 10h12v12H10z"/><path class="Black" d="M28.2 26.8l2.1 2.1-1.4 1.4-2.1-2.1L24 31v-7h7l-2.8 2.8zm-24.4 0l-2.1 2.1 1.4 1.4 2.1-2.1L8 31v-7H1l2.8 2.8zM28.2 5.2l2.1-2.1-1.4-1.4-2.1 2.1L24 1v7h7l-2.8-2.8zM1 8h7V1L5.2 3.8 3.1 1.7 1.7 3.1l2.1 2.1L1 8z"/></g></svg>',
+                'dxrd-svg-pictureeditor-size_mode_stretchimage': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .st0{opacity:0.35;}</style><g><path class="Blue" d="M10 10h12v12H10z"/><path class="Black" d="M5 15h3v2H5v4l-5-5 5-5v4zm6-10h4v3h2V5h4l-5-5-5 5zm21 11l-5-5v4h-3v2h3v4l5-5zm-15 8h-2v3h-4l5 5 5-5h-4v-3z"/></g></svg>',
+                'dxrd-svg-pictureeditor-size_mode_zoomimage': '<svg data-bind="xlink" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .st0{opacity:0.35;}</style><g><path class="Blue" d="M10 10h12v12H10z"/><path class="Black" d="M6.2 4.8l2.1 2.1-1.4 1.4-2.1-2.1L2 9V2h7L6.2 4.8zm19.6 0l-2.1 2.1 1.4 1.4 2.1-2.1L30 9V2h-7l2.8 2.8zM6.2 27.2l2.1-2.1-1.4-1.4-2.1 2.1L2 23v7h7l-2.8-2.8zM23 30h7v-7l-2.8 2.8-2.1-2.1-1.4 1.4 2.1 2.1L23 30z"/></g></svg>',
+                'dxrd-svg-pictureeditor-toolbar_brush_options': '<svg data-bind="xlink" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .BrushColor{fill:#000000;} .st0{opacity:0.75;}</style><g><path class="BrushColor" d="M2 21c8.5 8.6 11.8-4.5 19 0-8.4-8.6-11.8 4.6-19 0z"/><path class="White" d="M8 13l2 2c-2.5 4.2-4 4-8 4 2.5-2.5 3.3-6 6-6zm6-1l6.5-6.5c.3-.3.3-.7 0-1l-2-2c-.3-.3-.7-.3-1 0L11 9l3 3zm-5-1c-.3.3-.3.7 0 1l2 2c.3.3.7.3 1 0l1-1-3-3-1 1z"/></g></svg>',
+                'dxrd-svg-pictureeditor-toolbar_clear': '<svg data-bind="xlink" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><path class="White" d="M14.2 12l5.5-5.5c.3-.3.3-.8 0-1.1l-1.1-1.1c-.3-.3-.8-.3-1.1 0L12 9.8 6.5 4.2c-.3-.3-.8-.3-1.1 0L4.2 5.4c-.3.3-.3.8 0 1.1L9.8 12l-5.5 5.5c-.3.3-.3.8 0 1.1l1.1 1.1c.3.3.8.3 1.1 0l5.5-5.5 5.5 5.5c.3.3.8.3 1.1 0l1.1-1.1c.3-.3.3-.8 0-1.1L14.2 12z"/></svg>',
+                'dxrd-svg-pictureeditor-toolbar_open': '<svg data-bind="xlink" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><g><path class="st0 White" d="M7.9 11.9c.4-.6 1-.9 1.7-.9H19V8.7c0-.4-.3-.7-.7-.7H10V5.7c0-.4-.3-.7-.7-.7H3.7c-.4 0-.7.3-.7.7v14l4.9-7.8z"/><path class="White" d="M9.6 12h13.2c.5 0 .9.6.6 1.1l-4 6.5c-.2.3-.5.5-.8.5H4l4.7-7.5c.2-.4.5-.6.9-.6z"/></g></svg>',
+                'dxrd-svg-pictureeditor-toolbar_size_mode_and_alignment': '<svg data-bind="xlink" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><path class="White" d="M20 12V4h-8l3 3-8 8-3-3v8h8l-3-3 8-8z"/></svg>',
+                'dxrd-svg-portrait': '<svg data-bind="xlink" viewBox="0 0 34 34"><style>.st0{opacity:0.5;}</style><g><path class="dxd-icon-fill" d="M29 0H5c-.5 0-1 .5-1 1v32c0 .5.5 1 1 1h24c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 32H6V2h22v30z"/><path class="st0 dxd-icon-fill" d="M24 8H10V6h14v2zm0 2H10v2h14v-2zm0 4H10v2h14v-2zm0 4H10v2h14v-2zm0 4H10v2h14v-2zm0 4H10v2h14v-2z"/></g></svg>',
+                'dxrd-svg-preview-export-Export': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 10l-4-4v2h-1.4C11.8 8 8 11.1 8 15.9V18c1-4.2 4.6-6 8.6-6H18v2l4-4z"/><path class="dxd-icon-fill" d="M18 22H4V2h14l2 2V0H2v24h18v-8l-2 2z"/></svg>',
+                'dxrd-svg-preview-export-export-to-csv': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h12v9H2v11h10v-7l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3zM0 3v7h13V3H0zm4 2H2v3h2v1H2V8H1V5h1V4h2v1zm4 0H6v1h1v1h1v1H7v1H5V8h2V7H6V6H5V5h1V4h2v1zm4 3h-1v1h-1V8H9V4h1v4h1V4h1v4z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4z"/></svg>',
+                'dxrd-svg-preview-export-export-to-html': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h18v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM0 3v7h19V3H0zm4 6H3V7H2v2H1V4h1v2h1V4h1v5zm4-4H7v4H6V5H5V4h3v1zm6 4h-1V6h-1v1h-1V6h-1v3H9V4h1v1h1v1h1V5h1V4h1v5zm4 0h-3V4h1v4h2v1z"/></svg>',
+                'dxrd-svg-preview-export-export-to-image': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h14v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM0 3v7h15V3H0zm2 6H1V4h1v5zm6 0H7V6H6v1H5V6H4v3H3V4h1v1h1v1h1V5h1V4h1v5zm5-4h-3v3h2V7h1v2h-3V8H9V5h1V4h3v1z"/></svg>',
+                'dxrd-svg-preview-export-export-to-mht': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h12v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM2 5h1v1H2z"/><path class="dxd-icon-fill" d="M0 3v7h13V3H0zm4 3H3v1h1v2H3V7H2v2H1V4h2v1h1v1zm4-1H7v4H6V5H5V4h3v1zm4 0h-2v1h1v1h-1v2H9V4h3v1z"/></svg>',
+                'dxrd-svg-preview-export-export-to-pdf': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h12v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM2 5h1v1H2z"/><path class="dxd-icon-fill" d="M0 3v7h13V3H0zm4 3H3v1H2v2H1V4h2v1h1v1zm4 2H7v1H5V4h2v1h1v3zm4-3h-2v1h1v1h-1v2H9V4h3v1z"/><path class="dxd-icon-fill" d="M6 5h1v3H6z"/></svg>',
+                'dxrd-svg-preview-export-export-to-rtf': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h14v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM0 3v7h15V3H0zm6 6H5V6H4v1H3V6H2v3H1V4h1v1h1v1h1V5h1V4h1v5zm4 0H9V7H8v2H7V4h1v2h1V4h1v5zm4-4h-1v4h-1V5h-1V4h3v1z"/></svg>',
+                'dxrd-svg-preview-export-export-to-txt': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h18v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM18 3H0v7h19V3h-1zM4 6H3v1h1v2H3V7H2v2H1V7h1V6H1V4h1v2h1V4h1v2zm4 3H5V4h1v4h2v1zm4-4h-2v1h1v1h1v1h-1v1H9V8h2V7h-1V6H9V5h1V4h2v1zm4 1h-1v1h1v2h-1V7h-1v2h-1V7h1V6h-1V4h1v2h1V4h1v2z"/></svg>',
+                'dxrd-svg-preview-export-export-to-xls': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h12v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM12.3 3H0v7h13V3h-.7zM4 6H3v1h1v2H3V7H2v2H1V7h1V6H1V4h1v2h1V4h1v2zm4 3H5V4h1v4h2v1zm4-4h-2v1h1v1h1v1h-1v1H9V8h2V7h-1V6H9V5h1V4h2v1z"/></svg>',
+                'dxrd-svg-preview-export-export-to-xlsx': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v2h12v9H2v12h10v-8l2-2h7V0z"/><path class="dxd-icon-fill" d="M17 14h3v3h-3z"/><path class="dxd-icon-fill" d="M21 14v4h-6v-4l-2 2v8h10V14h-2zm0 9h-6v-4h6v4zM0 3v7h13V3H0zm4 2H3v4H2V5H1V4h3v1zm4 1H7v1h1v2H7V7H6v2H5V7h1V6H5V4h1v2h1V4h1v2zm4-1h-1v4h-1V5H9V4h3v1z"/></svg>',
+                'dxrd-svg-preview-export-export-to': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 4l-4-4v4h4zM22 10v6H12v-6l-2 2v12h14V10h-2zm0 12H12v-4h10v4z"/><path class="dxd-icon-fill" d="M16 10h4v4h-4z"/><path class="dxd-icon-fill" d="M18 6h-6V0H0v20h8V10l2-2h8z"/></svg>',
+                'dxrd-svg-preview-first_page': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M6 12l14 8V4zM2 3h2v18H2z"/></svg>',
+                'dxrd-svg-preview-last_page': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 12L2 20V4zM18 3h2v18h-2z"/></svg>',
+                'dxrd-svg-preview-multi_page_preview': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 0H0v10h10V2H8V0zm0 8H2V2h4v2h2v4zM20 2V0h-8v10h10V2h-2zm0 6h-6V2h4v2h2v4zM8 12H0v10h10v-8H8v-2zm0 8H2v-6h4v2h2v4z"/></svg>',
+                'dxrd-svg-preview-next_page': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 12L4 20V4z"/></svg>',
+                'dxrd-svg-preview-previous_page': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 12l14 8V4z"/></svg>',
+                'dxrd-svg-preview-print': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 0H6v10h10V0zm-2 8H8V2h6v6zM6 24h10v-6H6v6zm2-4h6v2H8v-2z"/><path class="dxd-icon-fill" d="M20 8h-2v4H4V8H2l-2 2v10h4v-4h14v4h4V10z"/></svg>',
+                'dxrd-svg-preview-print_page': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 0H6v10h10V0zm-2 8H8V2h6v6zM20 8h-2v2h4z"/><path class="dxd-icon-fill" d="M4 8H2l-2 2v10h12v-8H4zM22 14v-2h-8v12h10V14h-2zm0 8h-6v-8h4v2h2v6z"/></svg>',
+                'dxrd-svg-preview-print_preview': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 4l-4-4v4zM21.7 22.3l-4.5-4.5c.5-.8.8-1.8.8-2.8 0-2.8-2.2-5-5-5s-5 2.2-5 5 2.2 5 5 5c1 0 2-.3 2.8-.8l4.5 4.5c.4.4 1 .4 1.4 0s.4-1 0-1.4zM13.1 18c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.4 3-3 3z"/><path class="dxd-icon-fill" d="M13 8c2 0 3.7.8 5 2.1V6h-6V0H0v20h8.1C6.8 18.7 6 17 6 15c0-3.9 3.1-7 7-7z"/></svg>',
+                'dxrd-svg-preview-report_designer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 6l-4-4v4h4zM14 18h2l8-8-2-2-8 8z"/><path class="dxd-icon-fill" d="M12 20v-4l6-6V8h-6V2H0v20h18v-4l-2 2h-4zm-6-4c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/><path class="dxd-icon-fill" d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2H6v-2z"/></svg>',
+                'dxrd-svg-preview-search': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2.6 21.4c.8.8 2 .8 2.8 0l4.6-4.6c1.2.7 2.6 1.1 4.1 1.1 4.4 0 8-3.6 8-8s-3.6-8-8-8-8 3.6-8 8c0 1.5.4 2.9 1.1 4.1l-4.6 4.6c-.8.8-.8 2 0 2.8zM10 10.1c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.9-4-4z"/></svg>',
+                'dxrd-svg-preview-single_page': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 4V0H2v24h20V4h-4zm2 18H4V2h12v4h4v16z"/></svg>',
+                'dxrd-svg-preview-sort_asc': '<svg data-bind="xlink" viewBox="0 0 11 11"><path class="dxd-icon-fill" d="M0 7l5-5 5 5z"/></svg>',
+                'dxrd-svg-preview-sort_desc': '<svg data-bind="xlink" viewBox="0 0 11 11"><path class="dxd-icon-fill" d="M10 3L5 8 0 3z"/></svg>',
+                'dxrd-svg-reportexplorer-component': '<svg data-bind="xlink" viewBox="0 0 24 24"><ellipse class="dxd-icon-fill" cx="11" cy="4" rx="7" ry="2"/><path class="dxd-icon-fill" d="M11 10c-3.9 0-7-.9-7-2v12c0 1.1 3.1 2 7 2s7-.9 7-2V8c0 1.1-3.1 2-7 2z"/></svg>',
+                'dxrd-svg-reportexplorer-components': '<svg data-bind="xlink" viewBox="0 0 24 24"><circle class="dxd-icon-fill" cx="12" cy="12" r="2"/><path class="dxd-icon-fill" d="M20 10h-.3c-.2-.7-.5-1.4-.9-2.1l.2-.2c.8-.8.8-2.1 0-2.8-.8-.8-2.1-.8-2.8 0l-.2.2c-.6-.4-1.3-.7-2.1-.9V4c0-1.1-.9-2-2-2S10 2.9 10 4v.3c-.7.2-1.4.4-2.1.8l-.1-.2c-.8-.7-2.1-.7-2.9 0-.7.8-.7 2.1 0 2.9l.2.2c-.4.6-.6 1.3-.8 2H4c-1.1 0-2 .9-2 2s.9 2 2 2h.3c.2.7.5 1.4.9 2.1l-.2.2c-.8.8-.8 2.1 0 2.8.8.8 2.1.8 2.8 0l.2-.2c.6.4 1.3.7 2.1.9v.2c0 1.1.9 2 2 2s2-.9 2-2v-.3c.7-.2 1.4-.5 2.1-.9l.2.2c.8.8 2.1.8 2.8 0 .8-.8.8-2.1 0-2.8L19 16c.4-.6.7-1.3.9-2.1h.1c1.1 0 2-.9 2-2 0-1-.9-1.9-2-1.9zm-8 6c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/></svg>',
+                'dxrd-svg-reportexplorer-formatting_rule': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 10h6V2H2v18h12v-2l-4-4z"/><path class="dxd-icon-fill" d="M12 12v2l4 4v4h2v-4l4-4v-2z"/></svg>',
+                'dxrd-svg-reportexplorer-formatting_rules': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 0H0v16h2V2h10z"/><path class="dxd-icon-fill" d="M10 10h6V4H4v16h10v-2l-4-4z"/><path class="dxd-icon-fill" d="M12 12v2l4 4v4h2v-4l4-4v-2z"/></svg>',
+                'dxrd-svg-reportexplorer-style': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M6 20c1-.3 1.5-1.1 1.7-2 .2-.5.4-1 .8-1.4.3-.3.5-.5.9-.6 0 0 .7-.1 1-.5.1-.1.2-.3.2-.3l.7-1.3c.1-.2.8-.9.8-.9.6-.7 1.3-1.4 1.9-2.1V2H0v18h6zm5.4-6.4c-.1.3-.2.4 0 0zM21.8 8.1c-.2-.2-.5-.1-.8.1-.4.4-.9.7-1.3 1.1-2 1.7-3.5 3.4-5.3 5.3-.1.1-.5.5-.5.6-.2.2-.3.4-.6.8.6.5 1.5 1.2 2.1 1.7.4-.3.6-.6.6-.6l.4-.4c.7-.9 1.1-1.5 1.8-2.4 1.3-1.7 2.5-3.5 3.5-5.4.4-.3.3-.6.1-.8zM12.5 18.1c-.1-.1-.2-.1-.3-.1-.7-.1-1.2.2-1.7.7-.3.3-.6.8-.8 1.3-.2.9-.7 1.7-1.7 2h2.6c1 0 1.8-.4 2.5-1.1.4-.4.7-.9.6-1.5 0-.2-.1-.4-.2-.5-.3-.3-.7-.5-1-.8z"/></svg>',
+                'dxrd-svg-reportexplorer-styles': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 0v2H2v14H0V0z"/><path class="dxd-icon-fill" d="M8 20c1-.3 1.5-1.1 1.7-2 .2-.5.4-1 .8-1.4.3-.3.5-.5.9-.6 0 0 .7-.1 1-.5.1-.1.2-.3.2-.3l.7-1.3c.1-.2.8-.9.8-.9.6-.7 1.3-1.4 1.9-2.1V4H4v16h4zm5.4-6.4c-.1.3-.2.4 0 0zM23.8 8.1c-.2-.2-.5-.1-.8.1-.4.4-.9.7-1.3 1.1-2 1.7-3.5 3.4-5.3 5.3-.1.1-.5.5-.5.6-.2.2-.3.4-.6.8.6.5 1.5 1.2 2.1 1.7.4-.3.6-.6.6-.6l.4-.4c.7-.9 1.1-1.5 1.8-2.4 1.3-1.7 2.5-3.5 3.5-5.4.4-.3.3-.6.1-.8zM14.5 18.1c-.1-.1-.2-.1-.3-.1-.7-.1-1.2.2-1.7.7-.4.4-.6.9-.8 1.4-.3.9-.7 1.6-1.7 2h2.6c1 0 1.8-.4 2.5-1.1.4-.4.7-.9.6-1.5 0-.2-.1-.4-.2-.5-.3-.4-.7-.6-1-.9z"/></svg>',
+                'dxrd-svg-reportexplorer-tablecell': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 8v8h8V8H8zm6 6h-4v-4h4v4z"/><path class="dxd-icon-fill dxd-opacity-60" d="M2 2v20h20V2H2zm18 6h-4v2h4v4h-4v2h4v4h-4v-4h-2v4h-4v-4H8v4H4v-4h4v-2H4v-4h4V8H4V4h4v4h2V4h4v4h2V4h4v4z"/></svg>',
+                'dxrd-svg-reportexplorer-tablerow': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 8H2v8h20V8h-6zm-8 6H4v-4h4v4zm6 0h-4v-4h4v4zm6 0h-4v-4h4v4z"/><path class="dxd-icon-fill dxd-opacity-60" d="M4 8V4h4v4h2V4h4v4h2V4h4v4h2V2H2v6zM20 16v4h-4v-4h-2v4h-4v-4H8v4H4v-4H2v6h20v-6z"/></svg>',
+                'dxrd-svg-series-area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 20v-4l8-8 4 4 8-8v16z"/></svg>',
+                'dxrd-svg-series-area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 12v2h4v2H8v2h4v2H8v2h6V12zM20 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/><path class="dxd-icon-fill" d="M12 8L8 4l-8 8v4h6v-6h14V0z"/></svg>',
+                'dxrd-svg-series-bubbles': '<svg data-bind="xlink" viewBox="0 0 24 24"><circle class="dxd-icon-fill" cx="8" cy="4" r="2"/><circle class="dxd-icon-fill" cx="16" cy="10" r="4"/><circle class="dxd-icon-fill" cx="7" cy="19" r="3"/></svg>',
+                'dxrd-svg-series-candle_stick': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 4V2h-2v2h-2v16h2v2h2v-2h2V4h-2zm0 14h-2V6h2v12zM8 2H6v2H4v16h2v2h2v-2h2V4H8z"/></svg>',
+                'dxrd-svg-series-doughnut': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M5.1 10C5.5 7 7 5.5 10 5.1V0C5 .5.5 5 0 10h5.1zM12 5.1c3 .5 5 2.9 5 5.9 0 1.3-.4 2.5-1.1 3.5l3.6 3.6c1.5-2 2.5-4.4 2.5-7.1C22 5.3 18 .5 12 0v5.1zM14.5 15.9c-1 .7-2.2 1.1-3.5 1.1-3 0-5.4-2-5.9-5H0c.5 6 5.2 10 11 10 2.7 0 5.1-1 7-2.6l-3.5-3.5z"/></svg>',
+                'dxrd-svg-series-doughnut3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2.5v-5.9L22 12zm0 8h-2v-6h2v6zM10 4.9V0C5 .5.5 5 0 10h5c.5-3 2-4.6 5-5.1zM12 0v4.9c2 .4 4.5 2.1 4.9 5.1h5C21.5 5 17 .5 12 0zM5.1 12H0c.4 5 4 7.9 8 9.1v-5.3C6 14.9 5.4 14 5.1 12z"/></svg>',
+                'dxrd-svg-series-full_stacked_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2v14L12 6l4 4 6-6V2z"/><path class="dxd-icon-fill" d="M12 10L2 20v2h20V8l-6 6z"/></svg>',
+                'dxrd-svg-series-full_stacked_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM14 8l6-6V0H0v14L10 4z"/><path class="dxd-icon-fill" d="M10 8L0 18v2h8v-8h6zM20 6l-6 6h6z"/></svg>',
+                'dxrd-svg-series-full_stacked_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 4h4v10H4zM10 4h4v6h-4zM10 12h4v8h-4zM16 4h4v8h-4zM16 14h4v6h-4zM4 16h4v4H4z"/></svg>',
+                'dxrd-svg-series-full_stacked_bar3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0h4v10H2zM8 0h4v6H8zM8 8h4v4H8zM14 0h4v8h-4zM14 10h4v2h-4zM2 12h4v4H2zM8 14v2h4v2H8v2h4v2H8v2h6V14h-2zM20 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/></svg>',
+                'dxrd-svg-series-full_stacked_line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2h20v2H2zM12 8L2 18v4l10-10 4 4 6-6V6l-6 6z"/></svg>',
+                'dxrd-svg-series-full_stacked_line3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 14v2h4v2H8v2h4v2H8v2h6V14h-2zM20 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM0 0h20v2H0z"/><path class="dxd-icon-fill" d="M12 12h4l4-4V4l-6 6-4-4L0 16v4l10-10z"/></svg>',
+                'dxrd-svg-series-full_stacked_spline_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 11.9c1.8 0 2.6 1.3 3.3 2.3S6.5 16 8 16c1.4 0 2.6-2.1 3.7-4.2C13.3 9.1 14.9 6 18 6c1.5 0 2.8.7 4 1.8V2H2v9.9z"/><path class="dxd-icon-fill" d="M18 8c-1.9 0-3.2 2.4-4.5 4.7C12.1 15.3 10.6 18 8 18s-3.7-1.6-4.4-2.7C3 14.3 2.7 14 2 14v8h20V10.7C20.8 9.3 19.4 8 18 8z"/></svg>',
+                'dxrd-svg-series-full_stacked_spline_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM16 4c1.5 0 2.8.7 4 1.8V0H0v9.9c1.8 0 2.6 1.3 3.3 2.3C4 13.2 4.5 14 6 14c1.4 0 2.6-2.1 3.7-4.2C11.3 7.1 12.9 4 16 4z"/><path class="dxd-icon-fill" d="M11.5 10.8l-.6 1.2H20V8.7C18.8 7.3 17.4 6 16 6c-1.9 0-3.2 2.5-4.5 4.8zM1.6 13.3C1 12.3.7 12 0 12v8h8v-4.6c-1 .4-1.2.6-2 .6-2.6 0-3.6-1.6-4.4-2.7z"/></svg>',
+                'dxrd-svg-series-funnel': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12h4l6-6H4zM4 2h16v2H4zM10 22l4-2v-6h-4z"/></svg>',
+                'dxrd-svg-series-funnel3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM6 10h4l6-6H0zM0 0h16v2H0zM6 20l2-1v-7H6z"/></svg>',
+                'dxrd-svg-series-gantt': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 4h8v4H2zM6 10h14v4H6zM2 16h12v4H2z"/></svg>',
+                'dxrd-svg-series-line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 16L12 6l4 4 6-6v4l-6 6-4-4L2 20z"/></svg>',
+                'dxrd-svg-series-line3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 0l-6 6-4-4L0 12v4L10 6l4 4 6-6z"/><path class="dxd-icon-fill" d="M8 12v2h4v2H8v2h4v2H8v2h6V12h-2zM20 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/></svg>',
+                'dxrd-svg-series-manhattan_bar3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM0 12h4v8H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M12 5.9h4V10h-4z"/><path class="dxd-icon-fill dxd-opacity-80" d="M8 10h2V2H6v18h2z"/></svg>',
+                'dxrd-svg-series-nested_doughnut': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 10h2c-.5-5-5-9.5-10-10v2c4 .5 7.5 4 8 8z"/><path class="dxd-icon-fill" d="M11 20c-5 0-9-4-9-9 0-4.6 3-8.5 8-9V0C4 .5 0 5.2 0 11c0 6.1 4.9 11 11 11 5.7 0 10.5-4 11-10h-2c-.5 5-4.3 8-9 8z"/><path class="dxd-icon-fill" d="M11 16c-2.4 0-4.4-2-4.9-4h-2c.5 3 3.4 6 6.9 6 1.4 0 2.7-.4 3.8-1.2l-1.5-1.5c-.6.5-1.4.7-2.3.7zM4.1 10h2c.5-2 2.5-4 4.9-4 2.8 0 5 2.2 5 5 0 .9-.2 1.7-.7 2.4l1.5 1.5c.8-1.1 1.2-2.5 1.2-3.9 0-3.9-3.1-7-7-7-3.5 0-6.4 3-6.9 6z"/></svg>',
+                'dxrd-svg-series-pie': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M12 2v10H2c0 5.5 4.5 10 10 10s10-4.5 10-10S17.5 2 12 2z"/><path class="dxd-icon-fill" d="M10 0C4.5 0 0 4.5 0 10h10V0z"/></svg>',
+                'dxrd-svg-series-pie3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM10 0C4.5 0 0 4.5 0 10h10V0zM12 2v8h9.8c-.9-4.6-5-8-9.8-8zM8 21.1V12H2c0 4.1 2 7.6 6 9.1z"/></svg>',
+                'dxrd-svg-series-point': '<svg data-bind="xlink" viewBox="0 0 24 24"><circle class="dxd-icon-fill" cx="4" cy="16" r="2"/><circle class="dxd-icon-fill" cx="8" cy="8" r="2"/><circle class="dxd-icon-fill" cx="14" cy="12" r="2"/><circle class="dxd-icon-fill" cx="20" cy="6" r="2"/></svg>',
+                'dxrd-svg-series-polar_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M11.1 0H11C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11C22 5 17.1.1 11.1 0zm.9 19.9V17c0-.5-.5-1-1-1s-1 .5-1 1v3c-4-.4-7.5-3.8-8-8h3.1c.5 0 1-.5 1-1s-.5-1-1-1h-3H2c.5-4.2 4-7.5 8-8v1c0 .5.5 1 1 1s1-.5 1-1v-.9c4 .5 7.5 3.8 7.9 7.9H19c-.5 0-1 .5-1 1s.5 1 1 1h.9c-.4 4.1-3.9 7.4-7.9 7.9z"/><path class="dxd-icon-fill" d="M6 6h10v10z"/></svg>',
+                'dxrd-svg-series-polar_line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M11.1 0H11C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11C22 5 17.1.1 11.1 0zm.9 19.9V17c0-.5-.5-1-1-1s-1 .5-1 1v3c-4-.4-7.5-3.8-8-8h3.1c.5 0 1-.5 1-1s-.5-1-1-1h-3H2c.5-4.2 4-7.5 8-8v1c0 .5.5 1 1 1s1-.5 1-1v-.9c4 .5 7.5 3.8 7.9 7.9H19c-.5 0-1 .5-1 1s.5 1 1 1h.9c-.4 4.1-3.9 7.4-7.9 7.9z"/><path class="dxd-icon-fill" d="M16 16L6 6h10v10zm-6-8l4 4V8h-4z"/></svg>',
+                'dxrd-svg-series-polar_point': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M11.1 0H11C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11C22 5 17.1.1 11.1 0zm8.8 10H12V2.1c4 .5 7.5 3.8 7.9 7.9zM10 2v8H2.1 2c.5-4.2 4-7.5 8-8zm0 18c-4-.4-7.5-3.8-8-8h8v8zm2-.1V12h7.9c-.4 4.1-3.9 7.4-7.9 7.9z"/><circle class="dxd-icon-fill" cx="7" cy="7" r="1"/><circle class="dxd-icon-fill" cx="7" cy="15" r="1"/><circle class="dxd-icon-fill" cx="15" cy="7" r="1"/><circle class="dxd-icon-fill" cx="15" cy="15" r="1"/></svg>',
+                'dxrd-svg-series-radar_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 16L6 6h10v10zm-6-8l4 4V8h-4z"/><path class="dxd-icon-fill dxd-opacity-60" d="M11.9 15.9c-.3.1-.6.1-.9.1-2.8 0-5-2.2-5-5 0-.3 0-.6.1-.9L4.5 8.5c-.3.8-.5 1.6-.5 2.5 0 3.9 3.1 7 7 7 .9 0 1.7-.2 2.5-.5l-1.6-1.6z"/><path class="dxd-icon-fill dxd-opacity-60" d="M11.1 0H11C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11C22 5 17.1.1 11.1 0zM11 20c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9z"/></svg>',
+                'dxrd-svg-series-radar_line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M11.1 0H11C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11C22 5 17.1.1 11.1 0zM11 20c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9z"/><circle class="dxd-icon-fill" cx="7" cy="7" r="1"/><circle class="dxd-icon-fill" cx="7" cy="15" r="1"/><circle class="dxd-icon-fill" cx="15" cy="7" r="1"/><circle class="dxd-icon-fill" cx="15" cy="15" r="1"/><g><path class="dxd-icon-fill dxd-opacity-60" d="M13.1 15.5c-.6.3-1.4.5-2.1.5-.7 0-1.4-.2-2.1-.5-.2.7-.8 1.3-1.6 1.4 1.1.7 2.3 1 3.6 1 1.3 0 2.6-.4 3.7-1-.7-.1-1.3-.6-1.5-1.4zM17 7.4c-.1.8-.7 1.4-1.4 1.6.2.6.4 1.3.4 2s-.2 1.4-.5 2.1c.7.2 1.3.8 1.4 1.6.6-1.1 1-2.3 1-3.6s-.3-2.7-.9-3.7zM8.9 6.5c.7-.3 1.4-.5 2.1-.5.7 0 1.5.2 2.1.5.2-.7.8-1.3 1.6-1.4-1.1-.7-2.3-1-3.7-1-1.3-.1-2.6.3-3.6.9.7.2 1.3.7 1.5 1.5zM6.5 13.1c-.3-.7-.5-1.4-.5-2.1s.2-1.4.5-2.1c-.8-.2-1.3-.8-1.5-1.6-.6 1.1-1 2.4-1 3.7s.4 2.6 1 3.7c.2-.8.7-1.4 1.5-1.6z"/></g></svg>',
+                'dxrd-svg-series-radar_point': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-60" d="M11.1 0H11C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11C22 5 17.1.1 11.1 0zM11 20c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9z"/><circle class="dxd-icon-fill" cx="7" cy="7" r="1"/><circle class="dxd-icon-fill" cx="15" cy="7" r="1"/><circle class="dxd-icon-fill" cx="15" cy="15" r="1"/><g><path class="dxd-icon-fill dxd-opacity-60" d="M13.1 15.5c-.6.3-1.4.5-2.1.5-.3 0-.6 0-.9-.1h-.2c-.2-.1-.5-.1-.7-.2-.1 0-.2-.1-.3-.1-1.1-.5-2-1.4-2.5-2.5-.1-.1-.1-.2-.1-.3-.1-.2-.2-.4-.2-.7v-.2c-.1-.3-.1-.6-.1-.9 0-.5.1-1 .2-1.5.1-.2.1-.4.2-.6-.7-.2-1.2-.8-1.4-1.6-.1.3-.2.5-.4.8 0 .1-.1.1-.1.2 0 .2-.1.4-.2.6 0 .1-.1.2-.1.3 0 .2-.1.4-.1.6v.3c-.1.3-.1.6-.1.9 0 .3 0 .6.1.9v.2c0 .3.1.5.2.8v.1c.5 1.7 1.6 3.1 3.1 4 .5.3 1.1.6 1.7.8h.1c.3.1.5.1.8.2h.2c.3 0 .6.1.9.1h.5c1.1-.1 2.2-.4 3.1-1-.8-.3-1.4-.8-1.6-1.6zM17 7.4c-.1.8-.7 1.4-1.4 1.6.2.6.4 1.3.4 2s-.2 1.4-.5 2.1c.7.2 1.3.8 1.4 1.6.6-1.1 1-2.3 1-3.6s-.3-2.7-.9-3.7zM7.4 5c.8.1 1.4.7 1.6 1.4.6-.2 1.3-.4 2-.4s1.5.2 2.1.5c.2-.7.8-1.3 1.6-1.4-1.1-.7-2.3-1-3.7-1-1.3-.1-2.6.3-3.6.9z"/></g></svg>',
+                'dxrd-svg-series-range_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 14L12 4l4 4 6-6v6l-6 6-4-4L2 20z"/></svg>',
+                'dxrd-svg-series-range_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/><path class="dxd-icon-fill" d="M20 0l-6 6-4-4L0 12v6L10 8l2 2h4l4-4z"/></svg>',
+                'dxrd-svg-series-range_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 12h4v8H4zM16 6h4v14h-4zM10 2h4v14h-4z"/></svg>',
+                'dxrd-svg-series-scatter_line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22.8 8c-1.5-2.7-4-4.7-7-5.5-3-.8-6.1-.8-8.8.8C3 5.6.5 10 0 14h2.1c.4-4 2.5-6.9 6-8.9 2.2-1.3 4.8-1.4 7.2-.7 2.4.6 4.4 2.3 5.7 4.5 1 1.7 1.2 3.8.7 5.7-.5 1.9-1.8 3.5-3.5 4.5-2.7 1.6-6.2.6-7.8-2.2-1.2-2.1-.4-4.8 1.6-6 .8-.4 1.6-.5 2.5-.3.8.2 1.5.8 2 1.6.3.6.4 1.2.2 1.9-.2.6-.6 1.2-1.1 1.5-.8.5-1.9.2-2.4-.7-.3-.6-.1-1.3.4-1.6l-1-1.8c-1.5.9-2.1 2.9-1.2 4.4 1 1.8 3.3 2.5 5.1 1.4 2.1-1.2 2.9-4 1.7-6.1-.7-1.3-1.8-2.1-3.2-2.5-1.4-.4-2.8-.2-4 .5C8 11 6.9 14.9 8.7 18c2.1 3.8 6.8 5.1 10.6 2.9 2.2-1.3 3.8-3.3 4.4-5.7.6-2.4.3-5-.9-7.2z"/></svg>',
+                'dxrd-svg-series-side_by_side_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 12h4v8H4zM16 6h4v14h-4zM10 2h4v18h-4z"/></svg>',
+                'dxrd-svg-series-side_by_side_bar3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM0 10h4v8H0zM12 4h4v6h-4zM10 0H6v18h2v-8h2z"/></svg>',
+                'dxrd-svg-series-side_by_side_full_stacked_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 0h4v12H0zM0 14h4v8H0zM12 0h4v16h-4zM12 18h4v4h-4zM18 8h4v14h-4zM18 0h4v6h-4zM6 8h4v14H6zM6 0h4v6H6z"/></svg>',
+                'dxrd-svg-series-side_by_side_full_stacked_bar3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM0 0h4v12H0zM0 14h4v8H0zM12 0h4v12h-4zM18 8h4v4h-4zM18 0h4v6h-4zM6 0h4v6H6zM10 8H6v14h2V12h2z"/></svg>',
+                'dxrd-svg-series-side_by_side_gantt': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0h8v4H2zM4 12h12v4H4zM6 18h12v4H6zM6 6h14v4H6z"/></svg>',
+                'dxrd-svg-series-side_by_side_range_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 12h4v8H0zM12 6h4v12h-4zM18 4h4v12h-4zM6 2h4v14H6z"/></svg>',
+                'dxrd-svg-series-side_by_side_stacked_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 10h4v2H0zM0 14h4v8H0zM6 12h4v10H6zM6 0h4v10H6zM12 4h4v4h-4zM12 10h4v12h-4zM18 2h4v4h-4zM18 8h4v14h-4z"/></svg>',
+                'dxrd-svg-series-side_by_side_stacked_bar3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM0 8h4v4H0zM0 14h4v8H0zM6 12h2v10H6zM6 0h4v10H6zM12 4h4v4h-4zM12 10h4v2h-4zM18 2h4v4h-4zM18 8h4v2h-4z"/></svg>',
+                'dxrd-svg-series-spline': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 11.5C22.1 8.6 19.7 6 17 6c-3 0-4.7 3.1-6.2 5.8C9.6 13.8 8.4 16 7 16c-1.5 0-2-.8-2.7-1.8-.6-1-1.5-2.2-3.3-2.3-.4 0-.7.1-1 .2V15c0-.1.1-.5.4-.8.2-.2.5-.3.6-.3.7 0 1 .4 1.6 1.3C3.4 16.4 4.4 18 7 18c2.6 0 4.1-2.7 5.5-5.2C13.8 10.4 15.1 8 17 8c2.9 0 5.9 5.4 6.9 7.2l.1.2v-3.9z"/></svg>',
+                'dxrd-svg-series-spline3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM15 2c2.9 0 5.9 5.4 6.9 7.2l.1.2V5.5C20.1 2.6 17.7 0 15 0c-3 0-4.7 3.1-6.2 5.8C7.6 7.8 6.4 10 5 10c-1.5 0-2-.8-2.7-1.8-.5-.8-1.1-1.7-2.3-2.1v2.3c.2.2.4.5.6.9C1.4 10.4 2.4 12 5 12c2.6 0 4.1-2.7 5.5-5.2C11.8 4.4 13.1 2 15 2z"/></svg>',
+                'dxrd-svg-series-spline_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M15 2c-3 0-4.7 3.1-6.2 5.8C7.6 9.8 6.4 12 5 12c-1.5 0-2-.8-2.7-1.8-.5-.8-1.1-1.7-2.3-2.1V20h22V7.5C20.1 4.6 17.8 2 15 2z"/></svg>',
+                'dxrd-svg-series-spline_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/><path class="dxd-icon-fill" d="M22 7.5C20.1 4.6 17.8 2 15 2c-3 0-4.7 3.1-6.2 5.8C7.6 9.8 6.4 12 5 12c-1.5 0-2-.8-2.7-1.8-.5-.8-1.1-1.7-2.3-2.1V20h8v-8h14V7.5z"/></svg>',
+                'dxrd-svg-series-stacked_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 8l-4-4L2 14v4L12 8l4 4 6-6V2z"/><path class="dxd-icon-fill" d="M12 12L2 22h20V10l-6 6z"/></svg>',
+                'dxrd-svg-series-stacked_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 12v2h4v2h-4v2h4v2h-4v2h6V12h-2zM22 12h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM8 22v-8l-8 8z"/><path class="dxd-icon-fill" d="M20 2l-6 6-4-4L0 14v4L10 8l2 2h4l4-4z"/></svg>',
+                'dxrd-svg-series-stacked_bar': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 8h4v4H4zM4 14h4v6H4zM10 2h4v6h-4zM10 10h4v10h-4zM16 6h4v4h-4zM16 12h4v8h-4z"/></svg>',
+                'dxrd-svg-series-stacked_bar3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM0 6h4v4H0zM0 12h4v6H0zM6 0h4v6H6zM10 8H6v10h2v-6h2zM12 4h4v4h-4zM12 10h4v2h-4z"/></svg>',
+                'dxrd-svg-series-stacked_line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M14 8l-4-4L0 14v4L10 8l4 4 8-8V0z"/><path class="dxd-icon-fill" d="M10 10L0 20v4l10-10 8 8 4-4v-4l-4 4z"/></svg>',
+                'dxrd-svg-series-stacked_line3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M14 12l8-8V0l-8 8-4-4L0 14v4L10 8zM10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/><path class="dxd-icon-fill" d="M10 10l-2 2h4zM0 24l8-8v-4l-8 8zM22 10V6l-6 6h4z"/></svg>',
+                'dxrd-svg-series-stacked_spline_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M15 0c-3 0-4.7 3.1-6.2 5.8C7.6 7.8 6.4 10 5 10c-1.5 0-2-.8-2.7-1.8-.5-.8-1.1-1.7-2.3-2.1v6c1.2.4 1.8 1.3 2.3 2.1C3 15.2 3.5 16 5 16c1.4 0 2.6-2.1 3.7-4.2C10.3 9.1 12 6 15 6c2.8 0 5.1 2.6 7 5.5v-6C20.1 2.6 17.8 0 15 0z"/><path class="dxd-icon-fill" d="M15 9c-3 0-4.7 3.1-6.2 5.8C7.6 16.8 6.4 19 5 19c-1.5 0-2-.8-2.7-1.8-.5-.8-1.1-1.7-2.3-2.1V22h22v-7.5C20.1 11.6 17.8 9 15 9z"/></svg>',
+                'dxrd-svg-series-stacked_spline_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6z"/><path class="dxd-icon-fill" d="M15 6c2.8 0 5.1 2.6 7 5.5v-6C20.1 2.6 17.8 0 15 0c-3 0-4.7 3.1-6.2 5.8C7.6 7.8 6.4 10 5 10c-1.5 0-2-.8-2.7-1.8-.5-.8-1.1-1.7-2.3-2.1v6c1.2.4 1.8 1.3 2.3 2.1C3 15.2 3.5 16 5 16c1.4 0 2.6-2.1 3.7-4.2C10.3 9.1 12 6 15 6z"/><path class="dxd-icon-fill" d="M5.1 19c-1.5 0-2.1-.8-2.8-1.8-.5-.8-1.2-1.7-2.3-2.1V22h8v-5.7C7 17.8 6.1 19 5.1 19zM10.4 12h9.7c-1.5-1.7-3.2-3-5.2-3-1.9 0-3.3 1.3-4.5 3z"/></svg>',
+                'dxrd-svg-series-step_area': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 6V0h-6v12H6V8H0v14h24V6z"/></svg>',
+                'dxrd-svg-series-step_area3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM18 14v10h4l2-2v-6l-2-2h-4zm4 8h-2v-6h2v6z"/><path class="dxd-icon-fill" d="M18 6V0h-6v10H6V6H0v14h8v-8h16V6z"/></svg>',
+                'dxrd-svg-series-step_line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M14 2v18H8v-6H0v2h6v6h10V4h6v8h2V2z"/></svg>',
+                'dxrd-svg-series-step_line3d': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M10 14v2h4v2h-4v2h4v2h-4v2h6V14h-2zM22 14h-4v10h4l2-2v-6l-2-2zm0 8h-2v-6h2v6zM6 12H0v2h4v6h4v-2H6zM16 10h4V8h-2V0h-8v12h2V2h4v6z"/></svg>',
+                'dxrd-svg-series-stock': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 0H4v4H0v4h4v14h4v-4h4v-4H8zM20 18V0h-8v4h4v18h8v-4z"/></svg>',
+                'dxrd-svg-series-swift_plot': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 8l-4 4-2-2-6 6-4-4-2 2-4-4-2 2v-2l2-2 4 4 2-2 4 4 6-6 2 2 4-4"/></svg>',
+                'dxrd-svg-tabs-collapse': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M16 12l-6 6-2-2 4-4-4-4 2-2z"/></svg>',
+                'dxrd-svg-tabs-expand': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 12l6 6 2-2-4-4 4-4-2-2z"/></svg>',
+                'dxrd-svg-tabs-expressions': '<svg data-bind="xlink" viewBox="0 0 32 32"><path class="dxd-icon-fill" d="M18.6 10c.3-2.5.6-3.4.8-3.7.6-1 2.2-.2 3 0l4.1-4c-3.6-.5-7.1-1.1-9.8 2-1.2 1.4-2 3.3-2.3 5.7l-.2 2H10l-4 4h7.7l-.7 7c-.2 1.9-.8 3.6-3 2.9l-.8-.3-3.7 3.3 2.3.8c2.4.8 4.9-.1 6.7-1.7 1-.9 1.7-1.9 2.2-3 .4-1.1.7-2.5.9-4.4L18 16h4l4-4h-7.6l.2-2z"/></svg>',
+                'dxrd-svg-tabs-fieldlist': '<svg data-bind="xlink" viewBox="0 0 24 24"><ellipse class="dxd-icon-fill" cx="11" cy="2" rx="7" ry="2"/><path class="dxd-icon-fill" d="M11 6c-3.9 0-7-.9-7-2v4c0 1.1 3.1 2 7 2s7-.9 7-2V4c0 1.1-3.1 2-7 2zM11 12c-3.9 0-7-.9-7-2v4c0 1.1 3.1 2 7 2s7-.9 7-2v-4c0 1.1-3.1 2-7 2zM11 18c-3.9 0-7-.9-7-2v4c0 1.1 3.1 2 7 2s7-.9 7-2v-4c0 1.1-3.1 2-7 2z"/></svg>',
+                'dxrd-svg-tabs-parameters': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M19.8 5c-.2-.4-.4-.7-.9-1.1C17.3 2.7 14 2 11 2c-3.4 0-6.3.7-7.8 1.9 0 0-.7.5-1 1.1-.1.3-.2.7-.2 1 0 .2-.1.9 1 2l7 7v6c0 .6.5 1 1 1s1-.5 1-1v-6l7-7c.5-.4 1-1.2 1-2 0-.3-.1-.7-.2-1zM11 8c-3.9 0-7-.9-7-2s3.1-2 7-2c4 0 7 .9 7 2s-3.1 2-7 2z"/></svg>',
+                'dxrd-svg-tabs-reportexplorer': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 16v-6h-6V6h4V0H6v6h4v4H4v6H0v6h10v-6H6v-4h10v4h-4v6h10v-6z"/></svg>',
+                'dxrd-svg-tabs-search': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2.6 21.4c.8.8 2 .8 2.8 0l4.6-4.5c1.1.7 2.5 1.1 4 1.1 4.4 0 8-3.6 8-8s-3.6-8-8-8-8 3.6-8 8c0 1.5.4 2.9 1.1 4.1l-4.6 4.6c-.7.7-.7 1.9.1 2.7zM10 10c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z"/></svg>',
+                'dxrd-svg-titles-bottom_center': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M4 0v14h14V0H4zm6 8V6h2v2h-2zm2 2v2h-2v-2h2zm-2-6V2h2v2h-2zM6 2h2v2H6V2zm0 4h2v2H6V6zm0 4h2v2H6v-2zm10 2h-2v-2h2v2zm0-4h-2V6h2v2zm-2-4V2h2v2h-2z"/><path class="dxd-icon-fill" d="M6 18h10v4H6z"/></svg>',
+                'dxrd-svg-titles-bottom_left': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M6 0v14h14V0H6zm6 8V6h1.9v2H12zm1.9 2v2H12v-2h1.9zM12 4V2h1.9v2H12zM8 2h1.9v2H8V2zm0 4h1.9v2H8V6zm0 4h1.9v2H8v-2zm9.9 2H16v-2h1.9v2zm0-4H16V6h1.9v2zM16 4V2h1.9v2H16z"/><path class="dxd-icon-fill" d="M2 18h10v4H2z"/></svg>',
+                'dxrd-svg-titles-bottom_right': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 0v14h14V0H2zm6 8V6h2v2H8zm2 2v2H8v-2h2zM8 4V2h2v2H8zm6 0h-2V2h2v2zm0 4h-2V6h2v2zm0 4h-2v-2h2v2zM4 10h2v2H4v-2zm0-4h2v2H4V6zm0-2V2h2v2H4z"/><path class="dxd-icon-fill" d="M10 18h10v4H10z"/></svg>',
+                'dxrd-svg-titles-left_bottom_vertical': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 2H8v14h14V2zm-8 6h2v2h-2V8zm-2 2h-2V8h2v2zm6-2h2v2h-2V8zm0 6v-2h2v2h-2zm-4 0v-2h2v2h-2zm-4 0v-2h2v2h-2zm2-10v2h-2V4h2zm4 0v2h-2V4h2zm2 0h2v2h-2V4z"/><path class="dxd-icon-fill" d="M0 10h4v10H0z"/></svg>',
+                'dxrd-svg-titles-left_center_vertical': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 4H8v14h14V4zm-8 6h2v2h-2v-2zm-2 2h-2v-2h2v2zm6-2h2v2h-2v-2zm2-4v2h-2V6h2zm-4 0v2h-2V6h2zm-4 0v2h-2V6h2zm-2 10v-2h2v2h-2zm4 0v-2h2v2h-2zm4-2h2v2h-2v-2z"/><path class="dxd-icon-fill" d="M0 6h4v10H0z"/></svg>',
+                'dxrd-svg-titles-left_top_vertical': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M22 6H8v14h14V6zm-8 6h2v2h-2v-2zm-2 2h-2v-2h2v2zm6-2h2v2h-2v-2zm2-4v2h-2V8h2zm-4 0v2h-2V8h2zm-4 0v2h-2V8h2zm-2 10v-2h2v2h-2zm4 0v-2h2v2h-2zm4-2h2v2h-2v-2z"/><path class="dxd-icon-fill" d="M0 2h4v10H0z"/></svg>',
+                'dxrd-svg-titles-right_bottom_vertical': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 16h14V2H0v14zm8-6H6V8h2v2zm2-2h2v2h-2V8zm-6 2H2V8h2v2zm-2 4v-2h2v2H2zm4 0v-2h2v2H6zm4 0v-2h2v2h-2zm2-10v2h-2V4h2zM8 4v2H6V4h2zM4 6H2V4h2v2z"/><path class="dxd-icon-fill" d="M18 10h4v10h-4z"/></svg>',
+                'dxrd-svg-titles-right_center_vertical': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 18h14V4H0v14zm8-6H6v-2h2v2zm2-2h2v2h-2v-2zm-6 2H2v-2h2v2zm0-6v2H2V6h2zm4 0v2H6V6h2zm4 0v2h-2V6h2zm-2 10v-2h2v2h-2zm-4 0v-2h2v2H6zm-2 0H2v-2h2v2z"/><path class="dxd-icon-fill" d="M18 6h4v10h-4z"/></svg>',
+                'dxrd-svg-titles-right_top_vertical': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 20h14V6H0v14zm8-6H6v-2h2v2zm2-2h2v2h-2v-2zm-6 2H2v-2h2v2zm0-6v2H2V8h2zm4 0v2H6V8h2zm4 0v2h-2V8h2zm-2 10v-2h2v2h-2zm-4 0v-2h2v2H6zm-2 0H2v-2h2v2z"/><path class="dxd-icon-fill" d="M18 2h4v10h-4z"/></svg>',
+                'dxrd-svg-titles-top_center': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 22V8H4v14h14zm-6-8v2h-2v-2h2zm-2-2v-2h2v2h-2zm2 6v2h-2v-2h2zm-6 0h2v2H6v-2zm0-4h2v2H6v-2zm0-4h2v2H6v-2zm10 2h-2v-2h2v2zm0 4h-2v-2h2v2zm0 2v2h-2v-2h2z"/><path class="dxd-icon-fill" d="M6 0h10v4H6z"/></svg>',
+                'dxrd-svg-titles-top_left': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 22V8H6v14h14zm-6-8v2h-2v-2h2zm-2-2v-2h2v2h-2zm2 6v2h-2v-2h2zm-6 0h2v2H8v-2zm0-4h2v2H8v-2zm0-4h2v2H8v-2zm10 2h-2v-2h2v2zm0 4h-2v-2h2v2zm0 2v2h-2v-2h2z"/><path class="dxd-icon-fill" d="M2 0h10v4H2z"/></svg>',
+                'dxrd-svg-titles-top_right': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M16 22V8H2v14h14zm-6-8v2H8v-2h2zm-2-2v-2h2v2H8zm2 6v2H8v-2h2zm4 2h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2v-2h2v2zM4 10h2v2H4v-2zm0 4h2v2H4v-2zm2 4v2H4v-2h2z"/><path class="dxd-icon-fill" d="M10 0h10v4H10z"/></svg>',
+                'dxrd-svg-todo-chart': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 10h4v12H0zM18 12h4v10h-4zM6 6h4v16H6zM12 2h4v20h-4z"/></svg>',
+                'dxrd-svg-todo-gauge': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M11 0C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11S17.1 0 11 0zm0 20c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9z"/><path class="dxd-icon-fill dxd-opacity-80" d="M11 9c-.2 0-.4 0-.5.1L7.4 6c-.4-.3-1.1-.3-1.5 0s-.4 1 0 1.4L9 10.5v.5c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2zM6 10.1L4.5 8.5c-.3.8-.5 1.6-.5 2.5 0 1.9.8 3.7 2 5l1.3-1.3c-.9-.9-1.4-2.1-1.4-3.5 0-.4.1-.8.1-1.1z"/><path class="dxd-icon-fill dxd-opacity-80" d="M11 4c-.9 0-1.8.2-2.5.5l1.8 1.8c.2 0 .5-.1.7-.1 2.8 0 5 2.2 5 5 0 1.3-.5 2.5-1.4 3.4L16 16c1.3-1.3 2-3.1 2-5 0-3.9-3.1-7-7-7z"/></svg>',
+                'dxrd-svg-todo-pivotgrid': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M20 2H4v2l8 8-8 8v2h16v-2H7l8-8-8-8h13z"/></svg>',
+                'dxrd-svg-todo-sparkline': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M2 4v16h20V4H2zm18 10l-2-2-4 4-2-2-4 4-2-2-2 2v-4l2-2 2 2 4-4 2 2 4-4 2 2v4z"/></svg>',
+                'dxrd-svg-toolbar-hightlightEditingFields': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M24 15l-12-5 5 12 2-3 3 3 2-2-3-3zM18 0H0v8h18V0zm-2 6H2V2h14v4zM2 16v-4h8.8l-.8-2H0v8h13.3l-.8-2z"/></svg>',
+                'dxrd-svg-toolbar-scripts': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 6c-.1-1-1.4-3.4-3-4-.7.5-1.5 1.3-.5 4H22z"/><path class="dxd-icon-fill" d="M16 4c0-1.5.8-2.7 1.9-3.4-.4-.3-1.1-.6-2-.6h-12C1.7 0 0 1.8 0 4v.2L3.4 16H17.2s.2 1.9.4 2.4c.1.3.3 1 .5 1.2.4.6.7 1.1.8 1.1C19.6 20 20 19 20 18L16 4zM17.9.6c.2.1-.1-.1 0 0z"/><path class="dxd-icon-fill" d="M16.4 19.9c-.3-.8-.4-1.9-.4-1.9H0c0 2.2 1.7 4 3.9 4h12c.6 0 1.1-.1 1.6-.3 0-.1-.2-.3-.5-.8-.2-.2-.3-.5-.6-1z"/></svg>',
+                'dxrd-svg-toolbar-validateBindingMode': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 5V3c0-1.7 3.6-3 8-3s8 1.3 8 3v2c0 1.7-3.6 3-8 3S0 6.7 0 5zm8 9h.5c.6-1.8 1.8-3.3 3.3-4.4-1.1.3-2.4.4-3.8.4-4.4 0-8-1.3-8-3v4c0 1.7 3.6 3 8 3zm0 3c0-.3 0-.7.1-1H8c-4.4 0-8-1.3-8-3v4c0 1.7 3.6 3 8 3h.5c-.3-.9-.5-2-.5-3zm9-7c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7zm1 12h-2v-2h2v2zm0-4h-2v-6h2v6z"/></svg>',
+                'dxrd-svg-toolbox-barcode': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 0h2v20H0zM14 0h4v18h-4zM10 0h2v16h-2zM4 0h4v18H4zM20 0h2v20h-2z"/></svg>',
+                'dxrd-svg-toolbox-charactercomb': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 3v18h9V3H2zm7 10v5H5v-1H4v-3h1v-1h3v-2H5v-1h3v1h1v2z"/><path class="dxd-icon-fill" d="M5 14h3v3H5z"/><g><path class="dxd-icon-fill" d="M15 12h3v5h-3z"/><path class="dxd-icon-fill" d="M12 3v18h9V3h-9zm7 9v6h-5V8h1v3h4v1z"/></g></svg>',
+                'dxrd-svg-toolbox-chart': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 10h4v12H0zM18 12h4v10h-4zM6 6h4v16H6zM12 2h4v20h-4z"/></svg>',
+                'dxrd-svg-toolbox-checkbox': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2v20h20V2H2zm18 6L8 20l-4-4v-4l4 4L20 4v4z"/></svg>',
+                'dxrd-svg-toolbox-crossbandbox': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 8h20v2H2zM2 12h20v2H2zM6 4h12v2h2V2H4v4h2zM18 18H6v-2H4v4h16v-4h-2z"/></svg>',
+                'dxrd-svg-toolbox-crossbandline': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 8h18v2H2zM2 12h18v2H2zM10 0h2v6h-2zM10 16h2v6h-2z"/></svg>',
+                'dxrd-svg-toolbox-gauge': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M11 0C4.9 0 0 4.9 0 11s4.9 11 11 11 11-4.9 11-11S17.1 0 11 0zm0 20c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9z"/><path class="dxd-icon-fill" d="M11 9c-.2 0-.4 0-.5.1L7.4 6c-.4-.3-1.1-.3-1.5 0s-.4 1 0 1.4L9 10.5v.5c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2zM6 10.1L4.5 8.5c-.3.8-.5 1.6-.5 2.5 0 1.9.8 3.7 2 5l1.3-1.3c-.9-.9-1.4-2.1-1.4-3.5 0-.4.1-.8.1-1.1z"/><path class="dxd-icon-fill" d="M11 4c-.9 0-1.8.2-2.5.5l1.8 1.8c.2 0 .5-.1.7-.1 2.8 0 5 2.2 5 5 0 1.3-.5 2.5-1.4 3.4L16 16c1.3-1.3 2-3.1 2-5 0-3.9-3.1-7-7-7z"/></svg>',
+                'dxrd-svg-toolbox-label': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20.7 20.9c-.4-.4-.9-1.4-1.6-2.9L12.3 2H12L5.3 17.6c-.6 1.5-1.2 2.5-1.6 3s-1 .8-1.7.9v.5h6v-.5c-1-.1-1.5-.2-1.7-.3-.4-.3-.6-.7-.6-1.2 0-.4.2-.9.4-1.6l.2-.4h8l.4.9c.3.6.4 1 .4 1.1.1.2.1.4.1.5 0 .3-.1.3-.3.4-.4.2-.9.1-1.6.1H13v1h9v-.5c-.6-.1-1-.3-1.3-.6zM13.4 16H7.2l3.2-7.4 3 7.4z"/></svg>',
+                'dxrd-svg-toolbox-line': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M18 16L8 6V0H0v8h6l10 10v6h8v-8h-6zM2 6V2h4v4H2zm20 16h-4v-4h4v4z"/></svg>',
+                'dxrd-svg-toolbox-pagebreak': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M4 2h14v6H4zM4 16h14v6H4zM0 8v8l4-4zM18 12l4 4V8z"/></svg>',
+                'dxrd-svg-toolbox-pageinfo': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M15 10c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7zm1 12h-2v-6h2v6zm0-8h-2v-2h2v2z"/><path class="dxd-icon-fill" d="M14.9 8c.4 0 .8 0 1.1.1V6h-6V0H0v20h6.3c-.3-.9-.5-1.9-.5-3 0-5 4.1-9 9.1-9z"/><path class="dxd-icon-fill" d="M12 0v4h4z"/></svg>',
+                'dxrd-svg-toolbox-panel': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2v20h20V2H2zm18 18H4V4h16v16z"/></svg>',
+                'dxrd-svg-toolbox-picturebox': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 4v16h20V4H2zm6 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm12 12H4v-1.9L8 12l2 2 6-6 4 4v6z"/></svg>',
+                'dxrd-svg-toolbox-pivotgrid': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 2H4v2l8 8-8 8v2h16v-2H7l8-8-8-8h13z"/></svg>',
+                'dxrd-svg-toolbox-richtext': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M20 6h-4V2z"/><path class="dxd-icon-fill" d="M10 16v-6h6l4 4V8h-6V2H4v20h12z"/><path class="dxd-icon-fill" d="M12 12v2l8 8v-4l-6-6z"/></svg>',
+                'dxrd-svg-toolbox-shape': '<svg data-bind="xlink" viewBox="0 0 24 24"><circle class="dxd-icon-fill" cx="14" cy="14" r="6"/><path class="dxd-icon-fill" d="M14 6c.7 0 1.4.1 2 .3V2H4v12h2c0-4.4 3.6-8 8-8z"/></svg>',
+                'dxrd-svg-toolbox-sparkline': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 4v16h20V4H2zm18 10l-2-2-4 4-2-2-4 4-2-2-2 2v-4l2-2 2 2 4-4 2 2 4-4 2 2v4z"/></svg>',
+                'dxrd-svg-toolbox-subreport': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M8 0h6v4H8z"/><path class="dxd-icon-fill" d="M16 2v2h2v18H4V4h2V2H2v22h18V2z"/><path class="dxd-icon-fill" d="M6 6v14h10V6H6zm8 12H8v-2h6v2zm0-4H8v-2h6v2zm0-4H8V8h6v2z"/></svg>',
+                'dxrd-svg-toolbox-table': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M0 0h6v4H0zM8 0h6v4H8zM16 0h6v4h-6zM0 6h6v4H0zM8 6h6v4H8zM16 6h6v4h-6zM0 12h6v4H0zM8 12h6v4H8zM16 12h6v4h-6zM0 18h6v4H0zM8 18h6v4H8zM16 18h6v4h-6z"/></svg>',
+                'dxrd-svg-toolbox-tableofcontents': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 0v22h18V0H2zm5 18H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V8h2v2zm0-4H5V4h2v2zm10 12H9v-2h8v2zm0-4H9v-2h8v2zm0-4H9V8h8v2zm0-4H9V4h8v2z"/></svg>',
+                'dxrd-svg-toolbox-zipcode': '<svg data-bind="xlink" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M2 2h6v2H2zM0 4h2v6H0zM8 4h2v6H8zM0 12h2v8H0zM8 12h2v8H8zM2 10h6v2H2zM2 20h6v2H2zM14 2h6v2h-6zM12 4h2v6h-2zM20 4h2v6h-2zM12 12h2v8h-2zM20 12h2v8h-2zM14 10h6v2h-6zM14 20h6v2h-6z"/></svg>',
+            });
+        })(Internal = Designer.Internal || (Designer.Internal = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
+})(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
     var Report;
@@ -3728,6 +4106,7 @@ var DevExpress;
                         id: Preview.ActionId.Design,
                         text: DevExpress.Designer.getLocalization("Design", 'ReportStringId.RepTabCtl_Designer'),
                         imageClassName: "dxrd-image-design",
+                        imageTemplateName: "dxrd-svg-preview-report_designer",
                         disabled: ko.observable(false),
                         visible: reportPreview.canSwitchToDesigner,
                         hotKey: { ctrlKey: true, keyCode: 68 },
@@ -3774,6 +4153,7 @@ var DevExpress;
                         id: Preview.ActionId.FirstPage,
                         text: DevExpress.Designer.getLocalization("First Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_FirstPage"),
                         imageClassName: "dxrd-image-preview-first",
+                        imageTemplateName: "dxrd-svg-preview-first_page",
                         disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 1; }),
                         visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: true, keyCode: 37 },
@@ -3787,6 +4167,7 @@ var DevExpress;
                         id: Preview.ActionId.PrevPage,
                         text: DevExpress.Designer.getLocalization("Previous Page", "ASPxReportsStringId.ToolBarItemText_PreviousPage"),
                         imageClassName: "dxrd-image-preview-prev",
+                        imageTemplateName: "dxrd-svg-preview-previous_page",
                         disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 1; }),
                         visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: false, keyCode: 37 },
@@ -3875,6 +4256,7 @@ var DevExpress;
                         id: Preview.ActionId.NextPage,
                         text: DevExpress.Designer.getLocalization("Next Page", "ASPxReportsStringId.ToolBarItemText_NextPage"),
                         imageClassName: "dxrd-image-preview-next",
+                        imageTemplateName: "dxrd-svg-preview-next_page",
                         disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; }),
                         visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: false, keyCode: 39 },
@@ -3888,6 +4270,7 @@ var DevExpress;
                         id: Preview.ActionId.LastPage,
                         text: DevExpress.Designer.getLocalization("Last Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_LastPage"),
                         imageClassName: "dxrd-image-preview-last",
+                        imageTemplateName: "dxrd-svg-preview-last_page",
                         disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; }),
                         visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: true, keyCode: 39 },
@@ -3901,6 +4284,7 @@ var DevExpress;
                         id: Preview.ActionId.MultipageToggle,
                         text: DevExpress.Designer.getLocalization("Toggle Multipage Mode", "ASPxReportsStringId.WebDocumentViewer_ToggleMultipageMode"),
                         imageClassName: ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage"; }),
+                        imageTemplateName: ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-svg-preview-single_page" : "dxrd-svg-preview-multi_page_preview"; }),
                         disabled: ko.observable(false),
                         visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
                         hotKey: { ctrlKey: true, keyCode: 77 },
@@ -3915,6 +4299,7 @@ var DevExpress;
                         id: Preview.ActionId.ZoomOut,
                         text: DevExpress.Designer.getLocalization("Zoom Out", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomOut"),
                         imageClassName: "dxrd-image-zoomout",
+                        imageTemplateName: "dxrd-svg-toolbar-zoomout",
                         disabled: ko.observable(false),
                         visible: true,
                         zoomStep: reportPreview.zoomStep,
@@ -3963,6 +4348,7 @@ var DevExpress;
                         id: Preview.ActionId.ZoomIn,
                         text: DevExpress.Designer.getLocalization("Zoom In", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomIn"),
                         imageClassName: "dxrd-image-zoomin",
+                        imageTemplateName: "dxrd-svg-toolbar-zoomin",
                         disabled: ko.observable(false),
                         visible: true,
                         zoomStep: reportPreview.zoomStep,
@@ -3977,6 +4363,7 @@ var DevExpress;
                         id: Preview.ActionId.HightlightEditingFields,
                         text: DevExpress.Designer.getLocalization("Highlight Editing Fields", "DevExpress.XtraPrinting.PrintingSystemCommand.HighlightEditingFields"),
                         imageClassName: "dxrp-image-hightlight-editing-fields",
+                        imageTemplateName: "dxrd-svg-toolbar-hightlightEditingFields",
                         disabled: ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; }),
                         visible: ko.pureComputed(function () {
                             var available = Preview.editablePreviewEnabled();
@@ -3994,6 +4381,7 @@ var DevExpress;
                         id: Preview.ActionId.Print,
                         text: DevExpress.Designer.getLocalization("Print", "ASPxReportsStringId.DocumentViewer_RibbonPrintGroupText"),
                         imageClassName: "dxrd-image-print",
+                        imageTemplateName: "dxrd-svg-preview-print",
                         hasSeparator: true,
                         disabled: printDisabled,
                         visible: true,
@@ -4009,6 +4397,7 @@ var DevExpress;
                         id: Preview.ActionId.PrintPage,
                         text: DevExpress.Designer.getLocalization("Print Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintPage"),
                         imageClassName: "dxrd-image-print-page",
+                        imageTemplateName: "dxrd-svg-preview-print_page",
                         disabled: printDisabled,
                         visible: true,
                         clickAction: function () {
@@ -4034,6 +4423,25 @@ var DevExpress;
     (function (Report) {
         var Preview;
         (function (Preview) {
+            (function (ImageAlignment) {
+                ImageAlignment[ImageAlignment["TopLeft"] = 1] = "TopLeft";
+                ImageAlignment[ImageAlignment["TopCenter"] = 2] = "TopCenter";
+                ImageAlignment[ImageAlignment["TopRight"] = 3] = "TopRight";
+                ImageAlignment[ImageAlignment["MiddleLeft"] = 4] = "MiddleLeft";
+                ImageAlignment[ImageAlignment["MiddleCenter"] = 5] = "MiddleCenter";
+                ImageAlignment[ImageAlignment["MiddleRight"] = 6] = "MiddleRight";
+                ImageAlignment[ImageAlignment["BottomLeft"] = 7] = "BottomLeft";
+                ImageAlignment[ImageAlignment["BottomCenter"] = 8] = "BottomCenter";
+                ImageAlignment[ImageAlignment["BottomRight"] = 9] = "BottomRight";
+            })(Preview.ImageAlignment || (Preview.ImageAlignment = {}));
+            var ImageAlignment = Preview.ImageAlignment;
+            (function (ImageSizeMode) {
+                ImageSizeMode[ImageSizeMode["Normal"] = 0] = "Normal";
+                ImageSizeMode[ImageSizeMode["StretchImage"] = 1] = "StretchImage";
+                ImageSizeMode[ImageSizeMode["ZoomImage"] = 4] = "ZoomImage";
+                ImageSizeMode[ImageSizeMode["Squeeze"] = 5] = "Squeeze";
+            })(Preview.ImageSizeMode || (Preview.ImageSizeMode = {}));
+            var ImageSizeMode = Preview.ImageSizeMode;
             var EditingField = (function () {
                 function EditingField(model, index, htmlProvider) {
                     var _this = this;
@@ -4103,6 +4511,9 @@ var DevExpress;
                     else if (this._model.type === "charactercomb") {
                         return new Preview.CharacterCombEditingFieldViewModel(this, pageWidth, pageHeight, zoom, bounds);
                     }
+                    else if (this._model.type === "image") {
+                        return new Preview.ImageEditingFieldViewModel(this, pageWidth, pageHeight, zoom, bounds);
+                    }
                 };
                 return EditingField;
             })();
@@ -4115,6 +4526,7 @@ var DevExpress;
     var Report;
     (function (Report) {
         Report.Categories = {
+            Image: function () { return "Image"; },
             Numeric: function () { return "Numeric"; },
             DateTime: function () { return "Date-Time"; },
             Letters: function () { return "Letters"; }
@@ -4143,11 +4555,12 @@ var DevExpress;
                 return EditingFieldExtensions._instance;
             };
             EditingFieldExtensions.prototype._registerStandartEditors = function () {
-                EditingFieldExtensions.registerRegExpEditor("Integer", "Integer", Report.Categories.Numeric(), /^-?\d*$/, /^-?\d+$/, "0");
-                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", "Integer Positive", Report.Categories.Numeric(), /^\d+$/, /^\d+$/, "0");
-                EditingFieldExtensions.registerRegExpEditor("FixedPoint", "Fixed - Point", Report.Categories.Numeric(), /^-?(\d+([\.,]?\d*)?)?$/, /^-?\d+([\.,]?\d*)?$/, "0");
-                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", "Fixed - Point Positive", Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/, /^\d+([\.,]?\d*)?$/, "0");
-                EditingFieldExtensions.registerEditor("Date", "Date", Report.Categories.DateTime(), {
+                var getLocalizedString = DevExpress.Designer.getLocalization;
+                EditingFieldExtensions.registerRegExpEditor("Integer", getLocalizedString("Integer", "PreviewStringId.EditingFieldEditors_Integer"), Report.Categories.Numeric(), /^-?\d*$/, /^-?\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("IntegerPositive", getLocalizedString("Integer Positive", "PreviewStringId.EditingFieldEditors_IntegerPositive"), Report.Categories.Numeric(), /^\d+$/, /^\d+$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPoint", getLocalizedString("Fixed-Point", "PreviewStringId.EditingFieldEditors_FixedPoint"), Report.Categories.Numeric(), /^-?(\d+([\.,]?\d*)?)?$/, /^-?\d+([\.,]?\d*)?$/, "0");
+                EditingFieldExtensions.registerRegExpEditor("FixedPointPositive", getLocalizedString("Fixed-Point Positive", "PreviewStringId.EditingFieldEditors_FixedPointPositive"), Report.Categories.Numeric(), /^\d+([\.,]?\d*)?$/, /^\d+([\.,]?\d*)?$/, "0");
+                var dateEditorOptions = {
                     onPreRender: function (data) {
                         if (!(data.options.value() instanceof Date)) {
                             data.options.value(DevExpress.JS.Localization.Globalize.parseDate(data.options.value()) || new Date(Date.now()));
@@ -4156,8 +4569,61 @@ var DevExpress;
                     onHideEditor: function (field) {
                         field.editValue(DevExpress.JS.Localization.Globalize["formatDate"](field._editorValue()));
                     }
-                }, "dxrp-editing-field-datetime");
-                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", "Only Latin Letters", Report.Categories.Letters(), /^[a-zA-Z]*$/, /^[a-zA-Z]*$/, "");
+                };
+                EditingFieldExtensions.registerEditor("Date", getLocalizedString("Date", "PreviewStringId.EditingFieldEditors_Date"), Report.Categories.DateTime(), dateEditorOptions, "dxrp-editing-field-datetime");
+                EditingFieldExtensions.registerImageEditor({
+                    name: "Image",
+                    displayName: getLocalizedString("Image", "PreviewStringId.EditingFieldEditors_Image"),
+                    drawEnabled: false,
+                    imageLoadEnabled: true
+                });
+                EditingFieldExtensions.registerImageEditor({
+                    name: "Signature",
+                    displayName: getLocalizedString("Signature", "PreviewStringId.EditingFieldEditors_Signature"),
+                    drawEnabled: true,
+                    imageLoadEnabled: false
+                });
+                EditingFieldExtensions.registerImageEditor({
+                    name: "ImageAndSignature",
+                    displayName: getLocalizedString("Image And Signature", "PreviewStringId.EditingFieldEditors_ImageAndSignature"),
+                    drawEnabled: true,
+                    imageLoadEnabled: true
+                });
+                EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", getLocalizedString("Only Latin Letters", "PreviewStringId.EditingFieldEditors_OnlyLatinLetters"), Report.Categories.Letters(), /^[a-zA-Z]*$/, /^[a-zA-Z]*$/, "");
+            };
+            EditingFieldExtensions.registerImageEditor = function (imageRegistrationOptions) {
+                imageRegistrationOptions.imageLoadEnabled = imageRegistrationOptions.imageLoadEnabled === undefined ? true : imageRegistrationOptions.imageLoadEnabled;
+                imageRegistrationOptions.drawEnabled = imageRegistrationOptions.drawEnabled === undefined ? false : imageRegistrationOptions.drawEnabled;
+                var editMode = Report.Preview.PictureEditMode.ImageAndSignature;
+                if (!imageRegistrationOptions.imageLoadEnabled)
+                    editMode = Report.Preview.PictureEditMode.Signature;
+                if (!imageRegistrationOptions.drawEnabled)
+                    editMode = Report.Preview.PictureEditMode.Image;
+                var options = { editMode: editMode };
+                if (imageRegistrationOptions.images || imageRegistrationOptions.customizeActions) {
+                    options["callbacks"] = {
+                        customizeActions: function (s, actions) {
+                            if (imageRegistrationOptions.customizeActions) {
+                                imageRegistrationOptions.customizeActions(s, actions);
+                                return;
+                            }
+                            var imagePickerAction = s.actionsProvider.createImagePickerAction(imageRegistrationOptions.images, imageRegistrationOptions.filterEnabled, function (base64) {
+                                s.painter.image(base64);
+                                s.painter.refresh();
+                            });
+                            var openFile = actions.filter((function (x) { return x.id === DevExpress.Report.Preview.PictureEditorActionId.OpenFile; }))[0];
+                            if (openFile) {
+                                actions.splice(actions.indexOf(openFile), 1);
+                            }
+                            actions.splice(0, 0, imagePickerAction);
+                            if (!imageRegistrationOptions.sizeOptionsEnabled) {
+                                var alignmentAction = actions.filter(function (x) { return x.id === Report.Preview.PictureEditorActionId.Alignment; })[0];
+                                actions.splice(actions.indexOf(alignmentAction), 1);
+                            }
+                        }
+                    };
+                }
+                EditingFieldExtensions.registerEditor(imageRegistrationOptions.name, imageRegistrationOptions.displayName, Report.Categories.Image(), options, "dxrp-editing-field-image");
             };
             EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template, validate, defaultVal) {
                 if (defaultVal === void 0) { defaultVal = ""; }
@@ -4200,11 +4666,12 @@ var DevExpress;
             EditingFieldExtensions.unregisterEditor = function (editorID) {
                 delete EditingFieldExtensions.instance()._editors[editorID];
             };
-            EditingFieldExtensions.prototype.categories = function () {
+            EditingFieldExtensions.prototype.categories = function (excludeCategories) {
+                if (excludeCategories === void 0) { excludeCategories = []; }
                 var categories = [];
                 for (var p in this._editors) {
                     var category = this._editors[p].category;
-                    if (categories.indexOf(category) === -1) {
+                    if (excludeCategories.indexOf(category) === -1 && categories.indexOf(category) === -1) {
                         categories.push(category);
                     }
                 }
@@ -4214,10 +4681,11 @@ var DevExpress;
                 var _this = this;
                 return Object.keys(this._editors).map(function (key) { return _this._editors[key]; });
             };
-            EditingFieldExtensions.prototype.editorsByCategory = function (category) {
+            EditingFieldExtensions.prototype.editorsByCategories = function (categories) {
+                if (categories === void 0) { categories = []; }
                 var editors = [];
                 for (var p in this._editors) {
-                    if (this._editors[p].category === category) {
+                    if (categories.indexOf(this._editors[p].category) != -1) {
                         editors.push(this._editors[p]);
                     }
                 }
@@ -4338,7 +4806,7 @@ var DevExpress;
                     this.hideEditor = function (shouldCommit) {
                         setTimeout(function () {
                             if (shouldCommit) {
-                                if (!!editorOptions.onHideEditor) {
+                                if (editorOptions.onHideEditor) {
                                     editorOptions.onHideEditor(field);
                                 }
                                 else {
@@ -4629,8 +5097,889 @@ var DevExpress;
                 return CharacterCombEditingFieldViewModel;
             })(TextEditingFieldViewModelBase);
             Preview.CharacterCombEditingFieldViewModel = CharacterCombEditingFieldViewModel;
+            var ImageEditingFieldViewModel = (function (_super) {
+                __extends(ImageEditingFieldViewModel, _super);
+                function ImageEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
+                    var _this = this;
+                    _super.call(this);
+                    this.field = field;
+                    this.zoom = zoom;
+                    this.bounds = bounds;
+                    this.popupTarget = '.dxrd-preview-surface';
+                    this.popupOptions = {
+                        target: this.popupTarget,
+                        positionBoundary: this.popupTarget,
+                        container: this.popupTarget,
+                    };
+                    this.template = "dxrp-editing-field-image";
+                    this.isActive = ko.observable(false);
+                    var brickStyle = field.model().brickOptions;
+                    var style = { rtl: function () { return brickStyle.rtl; } };
+                    new DevExpress.JS.Utils.ModelSerializer().deserialize(style, JSON.parse(brickStyle.style), DevExpress.Designer.Report.brickStyleSerializationsInfo);
+                    var cssCalculator = new DevExpress.Designer.CssCalculator(style, ko.observable(!!brickStyle.rtlLayout));
+                    this._disposables.push(this.alignment = ko.computed(function () {
+                        return field.editValue().alignment;
+                    }), this.sizeMode = ko.computed(function () {
+                        return field.editValue().sizeMode;
+                    }));
+                    var editor = DevExpress.Report.EditingFieldExtensions.instance().editor(field.editorName());
+                    var options = editor ? editor.options : { editMode: Preview.PictureEditMode.ImageAndSignature };
+                    this.editMode = options.editMode;
+                    this.containerStyle = function () {
+                        return $.extend({
+                            height: _this.bounds.height * zoom() + "px",
+                            width: _this.bounds.width * zoom() + "px",
+                            zIndex: _this.isActive() ? 10 : 0,
+                            top: _this.bounds.top * 100 / pageHeight + "%",
+                            left: _this.bounds.left * 100 / pageWidth + "%"
+                        }, cssCalculator.borderCss(), cssCalculator.paddingsCss());
+                    };
+                    this.callbacks = $.extend({
+                        onDraw: function (s) { return _this.onDraw(s); },
+                        onFocusIn: function (s) { return _this.onFocusIn(s); },
+                        onFocusOut: function (s) { return _this.onBlur(s); }
+                    }, options.callbacks);
+                }
+                ImageEditingFieldViewModel.prototype.getImage = function () {
+                    return this.field.editValue().image;
+                };
+                ImageEditingFieldViewModel.prototype.getImageType = function () {
+                    return this.field.editValue().imageType;
+                };
+                ImageEditingFieldViewModel.prototype.onKeyDown = function (_, e) {
+                    if (e.keyCode == 32) {
+                    }
+                    else {
+                    }
+                };
+                ImageEditingFieldViewModel.prototype.onFocusIn = function (s) {
+                    Preview.PreviewSelection.disabled = true;
+                };
+                ImageEditingFieldViewModel.prototype.onDraw = function (s) {
+                    Preview.PreviewSelection.disabled = true;
+                };
+                ImageEditingFieldViewModel.prototype.onBlur = function (s) {
+                    var options = s.getCurrentOptions();
+                    this.field.editValue($.extend({}, this.field.editValue(), options, { imageType: options.imageType === "svg" ? "svg" : "img" }));
+                    Preview.PreviewSelection.disabled = false;
+                };
+                return ImageEditingFieldViewModel;
+            })(DevExpress.Analytics.Utils.Disposable);
+            Preview.ImageEditingFieldViewModel = ImageEditingFieldViewModel;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var Preview;
+        (function (Preview) {
+            function getImageBase64(url) {
+                var deferred = $.Deferred();
+                var background = new Image();
+                background.src = url;
+                background.crossOrigin = "anonymous";
+                background.onload = function () {
+                    var canvas = document.createElement("canvas");
+                    canvas.width = background.width;
+                    canvas.height = background.height;
+                    canvas.getContext("2d").drawImage(background, 0, 0);
+                    try {
+                        deferred.resolve(canvas.toDataURL());
+                    }
+                    catch (e) {
+                        deferred.reject(e);
+                    }
+                };
+                return deferred.promise();
+            }
+            Preview.getImageBase64 = getImageBase64;
+            (function (PictureEditMode) {
+                PictureEditMode[PictureEditMode["Image"] = 0] = "Image";
+                PictureEditMode[PictureEditMode["Signature"] = 1] = "Signature";
+                PictureEditMode[PictureEditMode["ImageAndSignature"] = 2] = "ImageAndSignature";
+            })(Preview.PictureEditMode || (Preview.PictureEditMode = {}));
+            var PictureEditMode = Preview.PictureEditMode;
+            (function (PictureEditorActionId) {
+                PictureEditorActionId[PictureEditorActionId["OpenFile"] = 0] = "OpenFile";
+                PictureEditorActionId[PictureEditorActionId["PickImage"] = 1] = "PickImage";
+                PictureEditorActionId[PictureEditorActionId["Alignment"] = 2] = "Alignment";
+                PictureEditorActionId[PictureEditorActionId["Brush"] = 3] = "Brush";
+                PictureEditorActionId[PictureEditorActionId["Clear"] = 4] = "Clear";
+            })(Preview.PictureEditorActionId || (Preview.PictureEditorActionId = {}));
+            var PictureEditorActionId = Preview.PictureEditorActionId;
+            var ImagePainter = (function () {
+                function ImagePainter(options) {
+                    this.format = ko.observable();
+                    this.image = options.imageSource;
+                    this.sizeMode = options.sizeMode;
+                    this.alignment = options.alignment;
+                }
+                ImagePainter.prototype._drawImage = function (imageSource, context, scale, contentSize) {
+                    var _this = this;
+                    var deferred = $.Deferred();
+                    if (!imageSource)
+                        return deferred.resolve().promise();
+                    var background = new Image();
+                    var prefix = "data:image/" + (this.format() || "png") + ";base64,";
+                    if (this.format() === "svg") {
+                        prefix = "data:image/svg+xml;charset=UTF-8;base64,";
+                    }
+                    var imageBase64 = imageSource.indexOf("base64,") !== -1 ? imageSource : prefix + imageSource;
+                    background.src = imageBase64;
+                    background.onload = function () {
+                        var size = _this._getImageSize(background, scale, contentSize);
+                        var location = _this._getImageCoordinate(size, contentSize);
+                        context.drawImage(background, location.x, location.y, size.width, size.height);
+                        deferred.resolve();
+                    };
+                    return deferred.promise();
+                };
+                ImagePainter.prototype._getImageSize = function (image, scale, contentSize) {
+                    var sizeMode = this.sizeMode();
+                    var width = image.width * scale, height = image.height * scale;
+                    if (sizeMode === Preview.ImageSizeMode.StretchImage) {
+                        width = contentSize.width;
+                        height = contentSize.height;
+                    }
+                    else if (sizeMode === Preview.ImageSizeMode.ZoomImage || (sizeMode === Preview.ImageSizeMode.Squeeze && (contentSize.width < width || contentSize.height < height))) {
+                        var ratio = Math.min(contentSize.width / width, contentSize.height / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+                    return { width: width, height: height };
+                };
+                ImagePainter.prototype._getImageCoordinate = function (imageSize, contentSize) {
+                    var alignment = this.alignment();
+                    var x = 0, y = 0;
+                    if (alignment === Preview.ImageAlignment.MiddleLeft || alignment === Preview.ImageAlignment.MiddleCenter || alignment === Preview.ImageAlignment.MiddleRight) {
+                        y = (contentSize.height - imageSize.height) / 2;
+                    }
+                    else if (alignment === Preview.ImageAlignment.BottomLeft || alignment === Preview.ImageAlignment.BottomCenter || alignment === Preview.ImageAlignment.BottomRight) {
+                        y = contentSize.height - imageSize.height;
+                    }
+                    if (alignment === Preview.ImageAlignment.TopCenter || alignment === Preview.ImageAlignment.MiddleCenter || alignment === Preview.ImageAlignment.BottomCenter) {
+                        x = (contentSize.width - imageSize.width) / 2;
+                    }
+                    else if (alignment === Preview.ImageAlignment.TopRight || alignment === Preview.ImageAlignment.MiddleRight || alignment === Preview.ImageAlignment.BottomRight) {
+                        x = contentSize.width - imageSize.width;
+                    }
+                    return { x: x, y: y };
+                };
+                ImagePainter.prototype.refresh = function (context, scale, contentSize) {
+                    if (scale === void 0) { scale = 1; }
+                    contentSize = contentSize || {
+                        width: context.canvas.width,
+                        height: context.canvas.height
+                    };
+                    return this._drawImage(this.image(), context, scale, contentSize);
+                };
+                return ImagePainter;
+            })();
+            Preview.ImagePainter = ImagePainter;
+            var SignaturePainter = (function (_super) {
+                __extends(SignaturePainter, _super);
+                function SignaturePainter() {
+                    var _this = this;
+                    _super.call(this);
+                    this._points = ko.observableArray([]);
+                    this.hasPoints = ko.computed(function () { return _this._points().length > 0; });
+                    this._disposables.push(this.hasPoints);
+                }
+                SignaturePainter.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.reset();
+                };
+                SignaturePainter.prototype._drawPath = function (context, x, y, lastX, lastY, color, lineWidth) {
+                    context.beginPath();
+                    context.strokeStyle = color;
+                    context.lineWidth = lineWidth;
+                    context.lineJoin = "round";
+                    context.moveTo(lastX, lastY);
+                    context.lineTo(x, y);
+                    context.closePath();
+                    context.stroke();
+                };
+                SignaturePainter.prototype._drawCircle = function (context, x, y, color, lineWidth) {
+                    context.beginPath();
+                    context.fillStyle = color;
+                    context.arc(x, y, lineWidth / 2, 0, 2 * Math.PI, false);
+                    context.fill();
+                };
+                SignaturePainter.prototype._drawAllPoints = function (context) {
+                    var _this = this;
+                    this._points().forEach(function (point) {
+                        if (point.isStart) {
+                            _this._drawCircle(context, point.x, point.y, point.color, point.width);
+                        }
+                        else {
+                            _this._drawPath(context, point.x, point.y, point.lastX, point.lastY, point.color, point.width);
+                        }
+                    });
+                };
+                SignaturePainter.prototype.drawCircle = function (context, x, y, color, width) {
+                    this._lastX = x;
+                    this._lastY = y;
+                    this._drawCircle(context, x, y, color, width);
+                    this._points.push({ x: this._lastX, y: this._lastY, color: color, width: width, isStart: true });
+                };
+                SignaturePainter.prototype.drawPath = function (context, x, y, color, width) {
+                    this._drawPath(context, x, y, this._lastX, this._lastY, color, width);
+                    this._points.push({ x: x, y: y, lastX: this._lastX, lastY: this._lastY, color: color, width: width });
+                    this._lastX = x;
+                    this._lastY = y;
+                };
+                SignaturePainter.prototype.resetLastPosition = function () {
+                    this._lastX = undefined;
+                    this._lastY = undefined;
+                };
+                SignaturePainter.prototype.resetPoints = function () {
+                    this._points([]);
+                };
+                SignaturePainter.prototype.reset = function () {
+                    this.resetLastPosition();
+                    this.resetPoints();
+                };
+                SignaturePainter.prototype.refresh = function (context) {
+                    this._drawAllPoints(context);
+                };
+                return SignaturePainter;
+            })(DevExpress.Analytics.Utils.Disposable);
+            Preview.SignaturePainter = SignaturePainter;
+            var Painter = (function (_super) {
+                __extends(Painter, _super);
+                function Painter(options) {
+                    var _this = this;
+                    _super.call(this);
+                    this._pointerDownHandler = function (e) {
+                        var point = _this._getContextPoint(e);
+                        point && _this.signaturePainter.drawCircle(_this._context, point.x, point.y, _this.lineColor(), _this.lineWidth());
+                    };
+                    this._pointerMoveHandler = function (e) {
+                        if (e.pointerType === "touch" || e.originalEvent["buttons"] == 1) {
+                            var point = _this._getContextPoint(e);
+                            point && _this.signaturePainter.drawPath(_this._context, point.x, point.y, _this.lineColor(), _this.lineWidth());
+                        }
+                    };
+                    this._pointerLeaveHandler = function (e) {
+                        _this.signaturePainter.resetLastPosition();
+                    };
+                    this.format = function (newVal) {
+                        if (newVal)
+                            _this.imagePainter.format(newVal);
+                        return _this.imagePainter.format();
+                    };
+                    this.imageSizeMode = ko.observable(Preview.ImageSizeMode.Normal);
+                    this.imageAlignment = ko.observable(Preview.ImageAlignment.TopLeft);
+                    this.lineWidth = ko.observable(1);
+                    this.lineColor = ko.observable("#000000");
+                    this.zoom = options.zoom;
+                    this.image = ko.observable(options.imageSource);
+                    this.format = ko.observable(options.imageType);
+                    this.imageSizeMode(options.sizeMode);
+                    this.imageAlignment(options.alignment);
+                    this.imagePainter = new ImagePainter({
+                        alignment: this.imageAlignment,
+                        imageSource: this.image,
+                        sizeMode: this.imageSizeMode
+                    });
+                    this._disposables.push(this.signaturePainter = new SignaturePainter());
+                    this._disposables.push(this.signaturePainter.hasPoints.subscribe(function (newVal) {
+                        if (newVal)
+                            _this._setCanvasSize(_this.initialSize.width, _this.initialSize.height);
+                        else
+                            _this._setCanvasSize(_this.initialSize.width * _this.zoom(), _this.initialSize.height * _this.zoom());
+                        _this.refresh();
+                    }));
+                    if (options.canDraw) {
+                        this._disposables.push((options.canDraw).subscribe(function (newValue) {
+                            if (newValue) {
+                                _this._addEvents();
+                            }
+                            else {
+                                _this._removeEvents();
+                            }
+                        }));
+                    }
+                    this._disposables.push(this.zoom.subscribe(function (newVal) {
+                        if (!_this.signaturePainter.hasPoints()) {
+                            _this._setCanvasSize(_this.initialSize.width * newVal, _this.initialSize.height * newVal);
+                            _this.refresh();
+                        }
+                    }));
+                }
+                Painter.prototype._getContextPoint = function (e) {
+                    if (e.target.nodeName !== "CANVAS")
+                        return;
+                    var zoom = this.hasSignature() ? 1 : this.zoom();
+                    var x = e.offsetX / zoom;
+                    var y = e.offsetY / zoom;
+                    return { x: x, y: y };
+                };
+                Painter.prototype._addEvents = function () {
+                    this.$element.on('dxpointerdown', this._pointerDownHandler);
+                    this.$element.on('dxpointermove', this._pointerMoveHandler);
+                    this.$element.on('dxpointerleave', this._pointerLeaveHandler);
+                };
+                Painter.prototype._removeEvents = function () {
+                    this.$element.off('dxpointerdown', this._pointerDownHandler);
+                    this.$element.off('dxpointermove', this._pointerMoveHandler);
+                    this.$element.off('dxpointerleave', this._pointerLeaveHandler);
+                };
+                Painter.prototype._cleanCanvas = function () {
+                    this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
+                };
+                Painter.prototype._setCanvasSize = function (width, height) {
+                    this._context.canvas.setAttribute('width', width);
+                    this._context.canvas.setAttribute('height', height);
+                };
+                Painter.prototype.refresh = function () {
+                    var _this = this;
+                    this._cleanCanvas();
+                    var zoom = this.signaturePainter.hasPoints() ? 1 : this.zoom();
+                    var size = this.signaturePainter.hasPoints() ? this.initialSize : undefined;
+                    this.imagePainter.refresh(this._context, zoom, size)
+                        .done(function () { return _this.signaturePainter.refresh(_this._context); });
+                };
+                Painter.prototype.initSize = function (element, zoom) {
+                    this.$element = element;
+                    this.initialSize = {
+                        width: this.$element.outerWidth() / zoom,
+                        height: this.$element.outerHeight() / zoom
+                    };
+                };
+                Painter.prototype.initCanvas = function (element, zoom) {
+                    var canvas = this.$element.find("canvas")[0];
+                    this._context = canvas.getContext('2d');
+                    this._setCanvasSize(this.initialSize.width * zoom, this.initialSize.height * zoom);
+                    this.imagePainter.refresh(this._context, zoom, {
+                        width: this._context.canvas.offsetWidth,
+                        height: this._context.canvas.offsetHeight
+                    });
+                };
+                Painter.prototype.getImage = function () {
+                    return this._context.canvas.toDataURL('image/png');
+                };
+                Painter.prototype.hasSignature = function () {
+                    return this.signaturePainter.hasPoints();
+                };
+                Painter.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._removeEvents();
+                    this.$element = null;
+                    this._context = null;
+                };
+                Painter.prototype.reset = function (initialImage, initialAlignment, initialSizeMode) {
+                    this.image(initialImage);
+                    this.imageAlignment(initialAlignment);
+                    this.imageSizeMode(initialSizeMode);
+                    this.signaturePainter.reset();
+                    this.refresh();
+                };
+                return Painter;
+            })(DevExpress.Analytics.Utils.Disposable);
+            Preview.Painter = Painter;
+            var PictureEditorToolbarItem = (function () {
+                function PictureEditorToolbarItem(options) {
+                    this.id = options.id;
+                    this.icon = options.icon;
+                    this.action = options.action;
+                    this.isActive = options.isActive;
+                    this.showBeak = options.showBeak;
+                    this.renderedHandler = options.renderedHandler;
+                    this.title = options.title;
+                }
+                PictureEditorToolbarItem.prototype.dispose = function () {
+                    this.renderedHandler = null;
+                    this.action = null;
+                };
+                return PictureEditorToolbarItem;
+            })();
+            Preview.PictureEditorToolbarItem = PictureEditorToolbarItem;
+            var PictureEditorToolbarItemWithPopup = (function (_super) {
+                __extends(PictureEditorToolbarItemWithPopup, _super);
+                function PictureEditorToolbarItemWithPopup(options) {
+                    var _this = this;
+                    _super.call(this, options);
+                    this.component = ko.observable();
+                    this.template = options.template;
+                    if (options.templateOptions) {
+                        this.templateOptions = options.templateOptions;
+                        this.templateOptions.onContentReady = function (e) {
+                            _this.component(e.component);
+                        };
+                        this.templateOptions.closeOnOutsideClick = function (e) {
+                            var component = ko.unwrap(_this.component);
+                            var content = component && component.$content();
+                            return !content || !(content.has(e.target).length || content.is(e.target));
+                        };
+                    }
+                }
+                PictureEditorToolbarItemWithPopup.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    var component = this.component();
+                    component && component.dispose();
+                    this.component(null);
+                    this.templateOptions = null;
+                };
+                return PictureEditorToolbarItemWithPopup;
+            })(PictureEditorToolbarItem);
+            Preview.PictureEditorToolbarItemWithPopup = PictureEditorToolbarItemWithPopup;
+            var PictureEditorActionProvider = (function (_super) {
+                __extends(PictureEditorActionProvider, _super);
+                function PictureEditorActionProvider(_editorModel, _popupOptions) {
+                    _super.call(this);
+                    this._editorModel = _editorModel;
+                    this._popupOptions = _popupOptions;
+                }
+                PictureEditorActionProvider.prototype._getEnumValues = function (enumType, prefix, propertyName) {
+                    var _this = this;
+                    var array = [];
+                    Object.keys(enumType).filter(function (key) { return !isNaN(Number(enumType[key])); }).forEach(function (item) {
+                        array.push({
+                            value: item,
+                            iconTemplate: 'dxrd-svg-pictureeditor-' + prefix + '_' + item.toLowerCase(),
+                            isSelected: ko.computed(function () { return _this._editorModel.painter[propertyName]() === enumType[item]; }),
+                            action: function () {
+                                _this._editorModel.painter[propertyName](enumType[item]);
+                                _this._editorModel.painter.refresh();
+                            }
+                        });
+                    });
+                    return array;
+                };
+                PictureEditorActionProvider.prototype._getColorValues = function () {
+                    var _this = this;
+                    var array = [];
+                    PictureEditorActionProvider.colors.forEach(function (item) {
+                        array.push({
+                            value: item,
+                            isSelected: ko.computed(function () { return _this._editorModel.painter.lineColor() === item; }),
+                            action: function (e) {
+                                _this._editorModel.painter.lineColor(item);
+                            }
+                        });
+                    });
+                    return array;
+                };
+                PictureEditorActionProvider.prototype._initPopupOptions = function (options) {
+                    var _this = this;
+                    options.boundary = this._popupOptions.boundary;
+                    options.getPositionTarget = function () { return _this._popupOptions.getPositionTarget(); };
+                    options.target = this._popupOptions.target;
+                    options.container = this._popupOptions.container;
+                    return options;
+                };
+                PictureEditorActionProvider.prototype.createOpenFileAction = function (action) {
+                    var openFileActionOptions = {
+                        id: PictureEditorActionId.OpenFile,
+                        icon: "dxrd-svg-pictureeditor-toolbar_open",
+                        title: DevExpress.Designer.getLocalization("Load Image"),
+                        template: "dx-file-dialog",
+                        isActive: ko.observable(false),
+                        action: function (e) { return action(e); }
+                    };
+                    return new PictureEditorToolbarItemWithPopup(openFileActionOptions);
+                };
+                PictureEditorActionProvider.prototype.createImagePickerAction = function (images, filterEnabled, action) {
+                    var _this = this;
+                    filterEnabled = filterEnabled && images.every(function (image) { return image.text !== undefined; });
+                    var active = ko.observable(false);
+                    var filter = ko.observable("");
+                    images.forEach(function (image) {
+                        if (filterEnabled) {
+                            _this._disposables.push(image.visible = ko.computed(function () {
+                                return !!DevExpress.Analytics.Utils.findMatchesInString(image.text, filter());
+                            }));
+                        }
+                        else {
+                            image.visible = true;
+                        }
+                    });
+                    var popupOptions = this._initPopupOptions({
+                        width: 'auto',
+                        height: '300px',
+                        visible: active,
+                        contentTemplate: filterEnabled ? "dx-picture-editing-imagepickerwithfilter" : "dx-picture-editing-imagespicker",
+                        contentData: {
+                            filterEnabled: filterEnabled,
+                            filter: filter,
+                            searchPlaceholder: function () { return DevExpress.Analytics.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); },
+                            contentWidth: this._editorModel.painter.initialSize.width * 2 + 35,
+                            width: Math.min(this._editorModel.painter.initialSize.width, 150),
+                            height: Math.min(this._editorModel.painter.initialSize.height, 150),
+                            action: function (data) {
+                                if (data.url) {
+                                    DevExpress.Report.Preview.getImageBase64(data.url).done(function (result) {
+                                        action(result);
+                                    }).fail(function (e) {
+                                        DevExpress.ui.notify(e.name + " :" + e.message.split(':').pop(), "error");
+                                    });
+                                }
+                                else {
+                                    action(data.data);
+                                }
+                            },
+                            images: images
+                        }
+                    });
+                    return new Preview.PictureEditorToolbarItemWithPopup({
+                        id: PictureEditorActionId.PickImage,
+                        icon: "dxrd-svg-pictureeditor-toolbar_open",
+                        title: DevExpress.Designer.getLocalization("Load Image"),
+                        isActive: active,
+                        showBeak: true,
+                        template: "dx-picture-editing-toolbar-popup",
+                        templateOptions: popupOptions
+                    });
+                };
+                PictureEditorActionProvider.prototype.createSizingAction = function () {
+                    var alignmentActive = ko.observable(false);
+                    var popupOptions = this._initPopupOptions({
+                        width: '174px',
+                        height: '300px',
+                        visible: alignmentActive,
+                        contentTemplate: "dx-picture-editing-sizemode-alignment",
+                        contentData: {
+                            sizeModeText: DevExpress.Designer.getLocalization("Size mode", "DevExpress.XtraReports.UI.XRPictureBox.Sizing"),
+                            sizeMode: this._editorModel.painter.imageSizeMode,
+                            sizeModeValues: this._getEnumValues(Preview.ImageSizeMode, 'size_mode', 'imageSizeMode'),
+                            alignmentText: DevExpress.Designer.getLocalization("Alignment"),
+                            alignment: this._editorModel.painter.imageAlignment,
+                            alignmentValues: this._getEnumValues(Preview.ImageAlignment, 'alignment', 'imageAlignment'),
+                        }
+                    });
+                    return new PictureEditorToolbarItemWithPopup({
+                        id: PictureEditorActionId.Alignment,
+                        icon: "dxrd-svg-pictureeditor-toolbar_size_mode_and_alignment",
+                        title: DevExpress.Designer.getLocalization("Size Mode and Alignment"),
+                        isActive: alignmentActive,
+                        showBeak: true,
+                        template: "dx-picture-editing-toolbar-popup",
+                        templateOptions: popupOptions
+                    });
+                };
+                PictureEditorActionProvider.prototype.createBrushAction = function () {
+                    var brushItemActive = ko.observable(false);
+                    var popupOptions = this._initPopupOptions({
+                        width: '226px',
+                        height: '295px',
+                        visible: brushItemActive,
+                        contentTemplate: "dx-picture-editing-brush-options",
+                        contentData: {
+                            lineWidth: this._editorModel.painter.lineWidth,
+                            lineColor: this._editorModel.painter.lineColor,
+                            colors: this._getColorValues(),
+                            brushWidthText: DevExpress.Designer.getLocalization("Brush size"),
+                            brushColorText: DevExpress.Designer.getLocalization("Brush color"),
+                        }
+                    });
+                    return new PictureEditorToolbarItemWithPopup({
+                        id: PictureEditorActionId.Brush,
+                        icon: "dxrd-svg-pictureeditor-toolbar_brush_options",
+                        title: DevExpress.Designer.getLocalization("Brush Options"),
+                        isActive: brushItemActive,
+                        showBeak: true,
+                        template: "dx-picture-editing-toolbar-popup",
+                        templateOptions: popupOptions,
+                        renderedHandler: function (elem, mod) {
+                            if (elem[0].nodeName.toLowerCase() === "svg") {
+                                var brushIcon = $(elem[0]).find(".BrushColor");
+                                if (brushIcon) {
+                                    brushIcon.attr('data-bind', '{ style: { fill: $data.templateOptions.contentData.lineColor }}');
+                                    ko.applyBindings(mod, brushIcon[0]);
+                                }
+                            }
+                        }
+                    });
+                };
+                PictureEditorActionProvider.prototype.createClearItem = function (action) {
+                    var clearItemOptions = {
+                        id: PictureEditorActionId.Clear,
+                        icon: "dxrd-svg-pictureeditor-toolbar_clear",
+                        title: DevExpress.Designer.getLocalization("Clear Changes"),
+                        isActive: ko.observable(false),
+                        action: function (e) { return action(); }
+                    };
+                    return new PictureEditorToolbarItem(clearItemOptions);
+                };
+                PictureEditorActionProvider.colors = ["#FFFFFF", "#FFC0C0", "#FFE0C0", "#FFFFC0", "#C0FFC0", "#C0FFFF", "#C0C0FF", "#FFC0FF", "#E0E0E0", "#FF8080", "#FFC080", "#FFFF80", "#80FF80", "#80FFFF", "#8080FF", "#FF80FF", "#C0C0C0", "#FF0000", "#FF8000", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF", "#808080", "#C00000", "#C04000", "#C0C000", "#00C000", "#00C0C0", "#0000C0", "#C000C0", "#404040", "#800000", "#804000", "#808000", "#008000", "#008080", "#000080", "#800080", "#000000", "#400000", "#804040", "#404000", "#004000", "#004040", "#000040", "#400040"];
+                return PictureEditorActionProvider;
+            })(DevExpress.Analytics.Utils.Disposable);
+            Preview.PictureEditorActionProvider = PictureEditorActionProvider;
+            var PictureEditorModel = (function (_super) {
+                __extends(PictureEditorModel, _super);
+                function PictureEditorModel(options, element) {
+                    var _this = this;
+                    _super.call(this);
+                    this.GESTURE_COVER_CLASS = "dx-gesture-cover";
+                    this.actions = [];
+                    this.canDraw = ko.observable(false);
+                    var imageType = ko.unwrap(options.imageType) || "png";
+                    this.zoom = options.zoom || ko.observable(1);
+                    this.editMode = ko.unwrap(options.imageMode);
+                    this._initialImage = ko.unwrap(options.image);
+                    this._initialAlignment = ko.unwrap(options.alignment);
+                    this._initialSizeMode = ko.unwrap(options.sizeMode);
+                    this._callbacks = options.callbacks;
+                    this.$element = $(element);
+                    this.isActive = ko.isObservable(options.isActive) ? options.isActive : ko.observable(!!options.isActive);
+                    var painterOptions = {
+                        alignment: this._initialAlignment,
+                        canDraw: this.editMode !== PictureEditMode.Image && this.canDraw,
+                        imageSource: this._initialImage,
+                        imageType: imageType,
+                        sizeMode: this._initialSizeMode,
+                        zoom: this.zoom
+                    };
+                    this.painter = new Painter(painterOptions);
+                    this._disposables.push(this.painter);
+                    this._disposables.push(this.scale = ko.computed(function () {
+                        return _this.painter.hasSignature() ? _this.zoom() : 1;
+                    }));
+                    this.painter.initSize(this.$element, this.zoom());
+                    this.actionsProvider = new PictureEditorActionProvider(this, $.extend(true, {
+                        getPositionTarget: function () {
+                            return _this.$element.find(".dx-picture-editing-toolbar");
+                        }
+                    }, (options.popupOptions || {})));
+                    this._disposables.push(this.actionsProvider);
+                    this._initActions(options.callbacks && options.callbacks.customizeActions);
+                    this.applyBindings();
+                }
+                PictureEditorModel.prototype._takeFocus = function () {
+                    if (!this.isActive()) {
+                        this._callbacks && this._callbacks.onFocusIn && this._callbacks.onFocusIn(this);
+                        this.isActive(true);
+                    }
+                    else if (this.editMode !== PictureEditMode.Image) {
+                        this.canDraw(true);
+                        this._callbacks && this._callbacks.onDraw && this._callbacks.onDraw(this);
+                    }
+                };
+                PictureEditorModel.prototype._releaseFocus = function () {
+                    if (this.isActive()) {
+                        this._callbacks && this._callbacks.onFocusOut && this._callbacks.onFocusOut(this);
+                        this.isActive(false);
+                        this.canDraw(false);
+                    }
+                };
+                PictureEditorModel.prototype._wrapButtonAction = function (item, model) {
+                    var oldAction = item.action;
+                    item.action = function (e) {
+                        model.changeActiveButton(e.model);
+                        if (oldAction)
+                            oldAction(e, model);
+                    };
+                };
+                PictureEditorModel.prototype._initActions = function (customizeActionsCallback) {
+                    var _this = this;
+                    if (this.editMode == PictureEditMode.Image || this.editMode == PictureEditMode.ImageAndSignature) {
+                        this.actions.push(this.actionsProvider.createOpenFileAction(function (e) { return _this._loadImage(e); }));
+                        this.actions.push(this.actionsProvider.createSizingAction());
+                    }
+                    if (this.editMode == PictureEditMode.Signature || this.editMode == PictureEditMode.ImageAndSignature) {
+                        this.actions.push(this.actionsProvider.createBrushAction());
+                    }
+                    this.actions.push(this.actionsProvider.createClearItem(function () {
+                        _this.painter.reset(_this._initialImage, _this._initialAlignment, _this._initialSizeMode);
+                    }));
+                    customizeActionsCallback && customizeActionsCallback(this, this.actions);
+                    this.actions.forEach(function (item) { return _this._wrapButtonAction(item, _this); });
+                };
+                PictureEditorModel.prototype._loadImage = function (e) {
+                    var self = this;
+                    var $input = e.element.siblings('input');
+                    $input.on("change", function (e) {
+                        self._handleFiles($input.get(0));
+                    });
+                    $input.click();
+                };
+                PictureEditorModel.prototype._handleFiles = function (filesHolder) {
+                    var _this = this;
+                    var files = filesHolder.files;
+                    for (var i = 0; i < files.length; i++) {
+                        var file = files[i];
+                        var fileReader = new FileReader();
+                        fileReader.onload = function (args) {
+                            _this.painter.format(files[0].name.split('.').pop());
+                            var encodedContent = fileReader.result.replace(/^data:[^,]+,/, '');
+                            _this.painter.image(encodedContent);
+                            _this.painter.refresh();
+                        };
+                        fileReader.readAsDataURL(file);
+                    }
+                };
+                PictureEditorModel.prototype._addEvents = function () {
+                    var _this = this;
+                    this._pointerDownHandler = function (e) {
+                        _this._takeFocus();
+                    };
+                    this._pointerCancelHandler = function (e) {
+                        _this._releaseFocus();
+                    };
+                    this._pointerUpHandler = function (e) {
+                        if (!_this.isActive())
+                            return;
+                        var isEditorContainer = _this.$element.is(e.target) || _this.$element.has(e.target).length > 0
+                            || _this.actions.some(function (a) {
+                                if (!a.isActive())
+                                    return false;
+                                var component = ko.unwrap(a.component);
+                                var componentContent = component && component.$content();
+                                return componentContent && (componentContent.is(e.target) || componentContent.has(e.target).length > 0);
+                            })
+                            || (e.target.className.indexOf && e.target.className.indexOf(_this.GESTURE_COVER_CLASS) !== -1);
+                        if (!isEditorContainer) {
+                            _this._releaseFocus();
+                        }
+                    };
+                    this.$element.on('dxpointerdown', this._pointerDownHandler);
+                    this.$element.on('dxpointercancel', this._pointerCancelHandler);
+                    $(document).on('dxpointerup', this._pointerUpHandler);
+                };
+                PictureEditorModel.prototype.changeActiveButton = function (selectedItem) {
+                    this.actions.forEach(function (action) {
+                        action.isActive(action === selectedItem);
+                    });
+                };
+                PictureEditorModel.prototype.applyBindings = function () {
+                    ko.cleanNode(this.$element[0]);
+                    ko.applyBindings(this, this.$element[0]);
+                    this._addEvents();
+                    this.painter.initCanvas(this.$element, this.zoom());
+                };
+                PictureEditorModel.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.$element.off('dxpointerdown', this._pointerDownHandler);
+                    this.$element.off('dxpointercancel', this._pointerCancelHandler);
+                    $(document).off('dxpointerup', this._pointerUpHandler);
+                    this.actions.forEach(function (action) { return action.dispose && action.dispose(); });
+                    this.$element = null;
+                };
+                PictureEditorModel.prototype.getImage = function () {
+                    return this.painter.getImage();
+                };
+                PictureEditorModel.prototype.getCurrentOptions = function () {
+                    var imageBase64 = (this.painter.hasSignature() ? this.painter.getImage() : this.painter.image()) || "";
+                    var imageParts = imageBase64.split(",");
+                    return {
+                        sizeMode: this.painter.imageSizeMode(),
+                        alignment: this.painter.imageAlignment(),
+                        imageType: this.painter.format(),
+                        image: imageParts[imageParts.length - 1]
+                    };
+                };
+                return PictureEditorModel;
+            })(DevExpress.Analytics.Utils.Disposable);
+            Preview.PictureEditorModel = PictureEditorModel;
+            ko.bindingHandlers['dxPictureEditor'] = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var options = (valueAccessor());
+                    $(element).children().remove();
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-picture-editing');
+                    var $element = $(element).append(templateHtml);
+                    var child = $element.children()[0];
+                    var model = new PictureEditorModel(options, child);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        model.dispose();
+                    });
+                    return { controlsDescendantBindings: true };
+                }
+            };
+        })(Preview = Report.Preview || (Report.Preview = {}));
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Report;
+    (function (Report) {
+        var ImageSource = (function () {
+            function ImageSource(sourceType, data) {
+                this.sourceType = sourceType;
+                this.data = data;
+            }
+            ImageSource.prototype.getDataUrl = function (format) {
+                switch (this.sourceType) {
+                    case 'svg':
+                        return "data:image/svg+xml;charset=UTF-8;base64," + encodeURI(this.data);
+                    case 'img':
+                        return DevExpress.Analytics.Utils.formatUnicorn("data:image/{0};base64,{1}", ko.unwrap(format) || "x", this.data);
+                }
+            };
+            ImageSource.parse = function (val) {
+                var sourceType, data;
+                _a = (val || '').split(','), sourceType = _a[0], data = _a[1];
+                return sourceType && new ImageSource(sourceType, data);
+                var _a;
+            };
+            ImageSource.toString = function (val) {
+                return DevExpress.Analytics.Utils.formatUnicorn('{0},{1}', val.sourceType, val.data);
+            };
+            return ImageSource;
+        })();
+        Report.ImageSource = ImageSource;
+    })(Report = DevExpress.Report || (DevExpress.Report = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Designer;
+    (function (Designer) {
+        var Report;
+        (function (Report) {
+            var Internal;
+            (function (Internal) {
+                var templates = DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.templates;
+                DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
+                    'dxrd-svg-fieldlist-xrbarcode': templates['dxrd-svg-toolbox-barcode'],
+                    'dxrd-svg-fieldlist-xrchart': templates['dxrd-svg-toolbox-chart'],
+                    'dxrd-svg-fieldlist-xrcheckbox': templates['dxrd-svg-toolbox-checkbox'],
+                    'dxrd-svg-fieldlist-xrcrossbandbox': templates['dxrd-svg-toolbox-crossbandbox'],
+                    'dxrd-svg-fieldlist-xrcrossbandline': templates['dxrd-svg-toolbox-crossbandline'],
+                    'dxrd-svg-fieldlist-xrlabel': templates['dxrd-svg-toolbox-label'],
+                    'dxrd-svg-fieldlist-xrcharactercomb': templates['dxrd-svg-toolbox-charactercomb'],
+                    'dxrd-svg-fieldlist-xrline': templates['dxrd-svg-toolbox-line'],
+                    'dxrd-svg-fieldlist-xrpagebreak': templates['dxrd-svg-toolbox-pagebreak'],
+                    'dxrd-svg-fieldlist-xrpageinfo': templates['dxrd-svg-toolbox-pageinfo'],
+                    'dxrd-svg-fieldlist-xrpanel': templates['dxrd-svg-toolbox-panel'],
+                    'dxrd-svg-fieldlist-xrpicturebox': templates['dxrd-svg-toolbox-picturebox'],
+                    'dxrd-svg-fieldlist-xrpivotgrid': templates['dxrd-svg-toolbox-pivotgrid'],
+                    'dxrd-svg-fieldlist-xrsubreport': templates['dxrd-svg-toolbox-subreport'],
+                    'dxrd-svg-fieldlist-xrtableofcontents': templates['dxrd-svg-toolbox-tableofcontents'],
+                    'dxrd-svg-fieldlist-xrrichtext': templates['dxrd-svg-toolbox-richtext'],
+                    'dxrd-svg-fieldlist-xrshape': templates['dxrd-svg-toolbox-shape'],
+                    'dxrd-svg-fieldlist-xrgauge': templates['dxrd-svg-toolbox-gauge'],
+                    'dxrd-svg-fieldlist-xrsparkline': templates['dxrd-svg-toolbox-sparkline'],
+                    'dxrd-svg-fieldlist-xrtable': templates['dxrd-svg-toolbox-table'],
+                    'dxrd-svg-fieldlist-xrzipcode': templates['dxrd-svg-toolbox-zipcode'],
+                    'dxrd-svg-fieldlist-xrtablerow': templates['dxrd-svg-reportexplorer-tablerow'],
+                    'dxrd-svg-fieldlist-xrtablecell': templates['dxrd-svg-reportexplorer-tablecell'],
+                    'dxrd-svg-fieldlist-bottommarginband': templates['dxrd-svg-bands-bottom_margin'],
+                    'dxrd-svg-fieldlist-detailband': templates['dxrd-svg-bands-detail'],
+                    'dxrd-svg-fieldlist-detailreportband': templates['dxrd-svg-bands-detail_report'],
+                    'dxrd-svg-fieldlist-groupfooterband': templates['dxrd-svg-bands-group_footer'],
+                    'dxrd-svg-fieldlist-groupheaderband': templates['dxrd-svg-bands-group_header'],
+                    'dxrd-svg-fieldlist-master_report': templates['dxrd-svg-bands-master_report'],
+                    'dxrd-svg-fieldlist-pagefooterband': templates['dxrd-svg-bands-page_footer'],
+                    'dxrd-svg-fieldlist-pageheaderband': templates['dxrd-svg-bands-page_header'],
+                    'dxrd-svg-fieldlist-reportfooterband': templates['dxrd-svg-bands-report_footer'],
+                    'dxrd-svg-fieldlist-reportheaderband': templates['dxrd-svg-bands-report_header'],
+                    'dxrd-svg-fieldlist-verticaldetailband': templates['dxrd-svg-bands-vertical_detail'],
+                    'dxrd-svg-fieldlist-verticalheaderband': templates['dxrd-svg-bands-vertical_header'],
+                    'dxrd-svg-fieldlist-verticaltotalband': templates['dxrd-svg-bands-vertical_total'],
+                    'dxrd-svg-fieldlist-topmarginband': templates['dxrd-svg-bands-top_margin'],
+                    'dxrd-svg-fieldlist-subband': templates['dxrd-svg-bands-sub_band'],
+                    'dxrd-svg-fieldlist-styles': templates['dxrd-svg-reportexplorer-styles'],
+                    'dxrd-svg-fieldlist-formattingrules': templates['dxrd-svg-reportexplorer-formatting_rules'],
+                    'dxrd-svg-fieldlist-component': templates['dxrd-svg-reportexplorer-component'],
+                    'dxrd-svg-fieldlist-components': templates['dxrd-svg-reportexplorer-components'],
+                    'dxrd-svg-fieldlist-stylemodel': templates['dxrd-svg-reportexplorer-style'],
+                    'dxrd-svg-fieldlist-formattingrule': templates['dxrd-svg-reportexplorer-formatting_rules'],
+                });
+            })(Internal = Report.Internal || (Report.Internal = {}));
+        })(Report = Designer.Report || (Designer.Report = {}));
+    })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
 var DevExpress;
 (function (DevExpress) {
@@ -4926,12 +6275,14 @@ var DevExpress;
                             options.searchModel.focusEditor({ element: $('.dxrdp-taptosearch') });
                             options.reportPreview.actionsVisible(false);
                         },
-                        imageClassName: "dxrd-image-search-inactive",
+                        imageClassName: "dxrd-image-search",
+                        imageTemplateName: "dxrd-svg-preview-search",
                         visible: Preview.searchAvailable
                     },
                     {
                         clickAction: function () { exportToModel.visible(!exportToModel.visible()); },
                         imageClassName: "dxrd-image-export-to",
+                        imageTemplateName: "dxrd-svg-preview-export-export-to",
                         visible: true,
                         content: {
                             name: "dxrd-menu-export-content",
@@ -4943,24 +6294,27 @@ var DevExpress;
                             options.parametersModel.popupInfo.visible(!options.parametersModel.popupInfo.visible());
                             options.reportPreview.actionsVisible(false);
                         },
-                        imageClassName: "dxrd-image-parameters-inactive",
+                        imageClassName: "dxrd-image-parameters",
+                        imageTemplateName: "dxrd-svg-tabs-parameters",
                         visible: options.parametersModel.popupInfo.notEmpty
                     }
                 ];
                 options.callbacks && options.callbacks.customizeActions && options.callbacks.customizeActions(actions);
                 return new Preview.MobileActionList(actions);
             }
-            var ParametersPopupModel = (function () {
+            var ParametersPopupModel = (function (_super) {
+                __extends(ParametersPopupModel, _super);
                 function ParametersPopupModel(parametersModel, _reportPreview) {
                     var _this = this;
+                    _super.call(this);
                     this.parametersModel = parametersModel;
                     this._reportPreview = _reportPreview;
                     this.showIcons = ko.observable(false);
                     this.visible = parametersModel.popupInfo.visible;
                     this.model = parametersModel;
-                    this.cancelDisabled = ko.computed(function () {
+                    this._disposables.push(this.cancelDisabled = ko.computed(function () {
                         return _this._reportPreview._currentDocumentId() === null;
-                    });
+                    }));
                     this.actionButtons = [
                         { className: "dxrdp-parameters-reset", text: DevExpress.Analytics.getLocalization('Reset', 'ASPxReportsStringId.ParametersPanel_Reset'), action: this._reset, disabled: false },
                         { className: "dxrdp-parameters-cancel", text: DevExpress.Analytics.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'), action: this._cancel, disabled: this.cancelDisabled },
@@ -4999,8 +6353,12 @@ var DevExpress;
                     this._parametersButtonContaner = element;
                     this.initVisibilityIcons();
                 };
+                ParametersPopupModel.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this._parametersButtonContaner = null;
+                };
                 return ParametersPopupModel;
-            })();
+            })(DevExpress.Designer.Disposable);
             function updatePreviewContentSizeMobile(previewWrapperSize, $root) {
                 return function () {
                     var height = $root.outerHeight();
@@ -5055,7 +6413,7 @@ var DevExpress;
                 reportPreview.pageIndex.subscribe(function (newVal) { mobileActions.visible(false); });
                 reportPreview.actionsVisible = mobileActions.visible;
                 var designerModel = {
-                    rootStyle: { 'dxrd-preview': true, 'dxrdp-mobile': true },
+                    rootStyle: "dxrd-preview dxrdp-mobile dxd-back-primary",
                     reportPreview: reportPreview,
                     parametersModel: parametersModel,
                     exportModel: exportModel,
@@ -5566,7 +6924,7 @@ var DevExpress;
             ko.bindingHandlers['dxCircleMenu'] = {
                 init: function (element, valueAccessor) {
                     $(element).children().remove();
-                    var templateHtml = $('#dx-circle-menu').text(), $element = $(element).append(templateHtml), values = valueAccessor();
+                    var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-circle-menu'), $element = $(element).append(templateHtml), values = valueAccessor();
                     ko.applyBindings(new InteractiveMenu(values.options, $element), $element.children()[0]);
                     return { controlsDescendantBindings: true };
                 }
@@ -6041,6 +7399,56 @@ var DevExpress;
 (function (DevExpress) {
     var Report;
     (function (Report) {
+        var CustomizeExportOptionsEventArgs = (function () {
+            function CustomizeExportOptionsEventArgs(options) {
+                this._options = options;
+            }
+            CustomizeExportOptionsEventArgs.prototype.HideExportOptionsPanel = function () { this._options.panelVisible = false; };
+            CustomizeExportOptionsEventArgs.prototype.HideFormat = function (format) { delete this._options.exportOptions[format.format]; };
+            CustomizeExportOptionsEventArgs.prototype.HideProperties = function (format) {
+                var _this = this;
+                var paths = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    paths[_i - 1] = arguments[_i];
+                }
+                var patchPropName = function (propName, obj) {
+                    var info = obj.getInfo && obj.getInfo();
+                    if (info) {
+                        var p = info.filter(function (x) { return x.modelName === propName || x.modelName === '@' + propName; })[0];
+                        if (p)
+                            return p.propertyName;
+                    }
+                    return propName;
+                };
+                var addPredicate = function (obj, propName) {
+                    propName = patchPropName(propName, obj);
+                    var oldPredicate = obj.isPropertyVisible;
+                    obj.isPropertyVisible =
+                        oldPredicate
+                            ? (function (x) { return oldPredicate(x) && x !== propName; })
+                            : (function (x) { return x !== propName; });
+                };
+                if (paths.length == 0) {
+                    addPredicate(this._options.exportOptions, format.format);
+                }
+                else {
+                    paths.forEach(function (property) {
+                        var path = Array.isArray(property)
+                            ? property
+                            : property.split('.');
+                        var obj = _this._options.exportOptions[format.format];
+                        while (path.length > 1) {
+                            obj = ko.unwrap(obj[patchPropName(path[0], obj)]);
+                            path.splice(0, 1);
+                        }
+                        addPredicate(obj, path[0]);
+                    });
+                }
+            };
+            CustomizeExportOptionsEventArgs.prototype.GetExportOptionsModel = function (format) { return this._options.exportOptions[format.format]; };
+            return CustomizeExportOptionsEventArgs;
+        })();
+        Report.CustomizeExportOptionsEventArgs = CustomizeExportOptionsEventArgs;
         var EventGenerator = (function () {
             function EventGenerator() {
             }
@@ -6107,6 +7515,11 @@ var DevExpress;
                     fireEvent("ReportOpening", arg);
                     args.cancel = arg.Cancel;
                 }
+                function tabChanged(tab) {
+                    fireEvent("TabChanged", {
+                        Tab: tab
+                    });
+                }
                 function onServerError(args) {
                     fireEvent("OnServerError", { Error: args });
                 }
@@ -6155,6 +7568,12 @@ var DevExpress;
                 function customizeLocalization() {
                     fireEvent("CustomizeLocalization");
                 }
+                function customizeFieldListActions(item, actions) {
+                    fireEvent("CustomizeFieldListActions", {
+                        Item: item,
+                        Actions: actions
+                    });
+                }
                 return {
                     customizeActions: customizeActions,
                     customizeParameterEditors: customizeParameterEditors,
@@ -6164,6 +7583,7 @@ var DevExpress;
                     reportSaved: reportSaved,
                     reportOpening: reportOpening,
                     reportOpened: reportOpened,
+                    tabChanged: tabChanged,
                     onServerError: onServerError,
                     customizeParts: customizeParts,
                     componentAdded: componentAdded,
@@ -6172,6 +7592,7 @@ var DevExpress;
                     customizeOpenDialog: customizeOpenDialog,
                     customizeToolbox: customizeToolbox,
                     customizeLocalization: customizeLocalization,
+                    customizeFieldListActions: customizeFieldListActions,
                     beforeRender: beforeRender
                 };
             };
@@ -6252,6 +7673,10 @@ var DevExpress;
                         PageCount: pageCount
                     });
                 }
+                function customizeExportOptions(options) {
+                    var arg = new CustomizeExportOptionsEventArgs(options);
+                    fireEvent([prefix, "CustomizeExportOptions"].join(''), arg);
+                }
                 var result = {
                     previewClick: previewClick,
                     documentReady: documentReady,
@@ -6261,7 +7686,8 @@ var DevExpress;
                     customizeParameterLookUpSource: customizeParameterLookUpSource,
                     customizeParameterEditors: customizeParameterEditors,
                     customizeActions: customizeActions,
-                    customizeParts: customizeParts
+                    customizeParts: customizeParts,
+                    customizeExportOptions: customizeExportOptions
                 };
                 function customizeLocalization() {
                     fireEvent("CustomizeLocalization");
@@ -6292,7 +7718,7 @@ var DevExpress;
             function JSDesignerBindingCommon(_options, _customEventRaiser) {
                 this._options = _options;
                 this._customEventRaiser = _customEventRaiser;
-                this._templateHtml = $('#dxrd-designer').text();
+                this._templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dxrd-designer');
             }
             JSDesignerBindingCommon.prototype._fireEvent = function (eventName, args) {
                 if (this._customEventRaiser) {
@@ -6318,20 +7744,6 @@ var DevExpress;
                     });
                 }
                 return result;
-            };
-            JSDesignerBindingCommon.prototype._loadTemplates = function () {
-                var _this = this;
-                var deferred = $.Deferred();
-                if (!this._templateHtml) {
-                    DevExpress.Designer.loadTemplates().done(function () {
-                        _this._templateHtml = $('#dxrd-designer').text();
-                        deferred.resolve();
-                    });
-                }
-                else {
-                    deferred.resolve();
-                }
-                return deferred.promise();
             };
             JSDesignerBindingCommon.prototype._getLocalizationRequest = function () {
                 var self = this;
@@ -6432,10 +7844,26 @@ var DevExpress;
                         move: null,
                         up: null
                     };
+                    this.dispose = function () { return _this._dispose && _this._dispose(); };
                     this._$element = $(this._element);
-                    this._element.addEventListener("mousemove", function (event) { return _this._mouseMove(event); });
-                    this._element.addEventListener("mouseup", function (event) { return _this._mouseUp(event); });
-                    this._element.addEventListener("mousedown", function (event) { return _this._mouseDown(event); });
+                    var mousemove = function (event) { return _this._mouseMove(event); };
+                    var mouseup = function (event) { return _this._mouseUp(event); };
+                    var mousedown = function (event) { return _this._mouseDown(event); };
+                    this._element.addEventListener("mousemove", mousemove);
+                    this._element.addEventListener("mouseup", mouseup);
+                    this._element.addEventListener("mousedown", mousedown);
+                    this._dispose = function () {
+                        _this._element.removeEventListener("mousemove", mousemove);
+                        _this._element.removeEventListener("mouseup", mouseup);
+                        _this._element.removeEventListener("mousedown", mousedown);
+                        _this._dispose = null;
+                        _this._click = null;
+                        _this._page = null;
+                        _this._element = null;
+                        mousemove = null;
+                        mouseup = null;
+                        mousedown = null;
+                    };
                 }
                 PreviewSelection.prototype._updateSelectionContent = function (event) {
                     if (this._startRect.left > event.pageX) {
@@ -6473,7 +7901,7 @@ var DevExpress;
                 };
                 PreviewSelection.prototype._mouseMove = function (event) {
                     var _this = this;
-                    if (!this._startRect || !this._page.active())
+                    if (!this._startRect || !this._page.active() || PreviewSelection.disabled)
                         return;
                     var leftButtonPressed = event.which === 1;
                     if (leftButtonPressed) {
@@ -6508,6 +7936,9 @@ var DevExpress;
                     }, 1);
                 };
                 PreviewSelection.prototype._mouseDown = function (event) {
+                    if (PreviewSelection.disabled) {
+                        return;
+                    }
                     this._startRect = {
                         left: event.pageX,
                         top: event.pageY,
@@ -6517,6 +7948,7 @@ var DevExpress;
                     this._click(this._page.pageIndex);
                 };
                 PreviewSelection.started = false;
+                PreviewSelection.disabled = false;
                 return PreviewSelection;
             })();
             Preview.PreviewSelection = PreviewSelection;
@@ -6524,6 +7956,9 @@ var DevExpress;
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var values = valueAccessor(), unwrappedValues = ko.unwrap(values);
                     var selection = new PreviewSelection(element, unwrappedValues.page, unwrappedValues.click);
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        selection.dispose();
+                    });
                 }
             };
             ko.bindingHandlers["textCopier"] = {
@@ -6654,8 +8089,8 @@ var DevExpress;
             Preview.JSReportViewer = JSReportViewer;
             var JSReportViewerBinding = (function (_super) {
                 __extends(JSReportViewerBinding, _super);
-                function JSReportViewerBinding(_options) {
-                    _super.call(this, _options);
+                function JSReportViewerBinding(_options, customEventRaiser) {
+                    _super.call(this, _options, customEventRaiser);
                     _options.viewerModel = ko.isWriteableObservable(_options.viewerModel) ? _options.viewerModel : ko.observable(null);
                     this.sender = new JSReportViewer(_options.viewerModel);
                 }
@@ -6687,43 +8122,41 @@ var DevExpress;
                 JSReportViewerBinding.prototype.applyBindings = function (element) {
                     var _this = this;
                     var self = this;
-                    this._loadTemplates().done(function () {
-                        var _$element = $(element);
-                        _$element.addClass("dx-designer");
-                        if (self._options.reportPreview && self._options.parts) {
-                            self._applyBindings(self._options, _$element);
-                            return;
+                    var _$element = $(element);
+                    _$element.addClass("dx-designer");
+                    if (self._options.reportPreview && self._options.parts) {
+                        self._applyBindings(self._options, _$element);
+                        return;
+                    }
+                    var requestOptions = self._options.requestOptions;
+                    var subscription = null;
+                    var applyModel = function () {
+                        if (requestOptions && requestOptions.invokeAction) {
+                            self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                         }
-                        var requestOptions = self._options.requestOptions;
-                        var subscription = null;
-                        var applyModel = function () {
-                            if (requestOptions && requestOptions.invokeAction) {
-                                self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
+                        self.sender.previewModel = self._createModel(element);
+                        if (self._options.reportUrl) {
+                            if (ko.isSubscribable(self._options.reportUrl)) {
+                                subscription = self._options.reportUrl.subscribe(function (newVal) {
+                                    self.sender.OpenReport(newVal);
+                                });
                             }
-                            self.sender.previewModel = self._createModel(element);
-                            if (self._options.reportUrl) {
-                                if (ko.isSubscribable(self._options.reportUrl)) {
-                                    subscription = self._options.reportUrl.subscribe(function (newVal) {
-                                        self.sender.OpenReport(newVal);
-                                    });
-                                }
-                            }
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                                subscription && subscription.dispose();
-                            });
-                            self._applyBindings(self.sender.previewModel, _$element);
-                        };
-                        if (requestOptions) {
-                            self._getLocalizationRequest().done(function (localization) {
-                                localization && DevExpress.JS.Localization.addCultureInfo(localization);
-                            }).always(function () {
-                                applyModel();
-                            });
                         }
-                        else {
+                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                            subscription && subscription.dispose();
+                        });
+                        self._applyBindings(self.sender.previewModel, _$element);
+                    };
+                    if (requestOptions) {
+                        self._getLocalizationRequest().done(function (localization) {
+                            localization && DevExpress.JS.Localization.addCultureInfo(localization);
+                        }).always(function () {
                             applyModel();
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        applyModel();
+                    }
                 };
                 return JSReportViewerBinding;
             })(Report.JSDesignerBindingCommon);
@@ -7098,4 +8531,60 @@ var DevExpress;
         })(Preview = Report.Preview || (Report.Preview = {}));
     })(Report = DevExpress.Report || (DevExpress.Report = {}));
 })(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=web-document-viewer.js.map
+var DevExpress;
+(function (DevExpress) {
+    var Reporting;
+    (function (Reporting) {
+        var Templates;
+        (function (Templates) {
+            DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
+                'dx-picture-editing': '<div class="dx-picture-editing">        <!-- ko if: $data.isActive -->        <div class="dx-picture-editing-toolbar" data-bind="foreach: $data.actions">            <div class="dx-picture-editing-toolbar-item" data-bind="dxAction: $data.action, attr: { title: title }">                <!-- ko if: $data.showBeak -->                <div class="dx-picture-editing-toolbar-beak" data-bind="visible: isActive"></div>                <!-- /ko -->                <div class="dx-picture-editing-toolbar-item-icon" data-bind="template: { name: icon, afterRender: $data.renderedHandler }"></div>            </div>            <!-- ko template: { if: $data.template, name: $data.template, data: $data.templateOptions }-->            <!-- /ko -->        </div>        <!-- /ko -->        <canvas style="position:absolute;top: 0px;left: 0px;" data-bind="zoom: scale"></canvas>    </div>',
+                'dx-file-dialog': '<input type="file" accept="image/*" style="display:none">',
+                'dx-picture-editing-toolbar-popup': '<div class="dx-picture-edit-popup-content" data-bind="dxPopup: {            width: width,            height: height,            closeOnOutsideClick: $data.closeOnOutsideClick,            onContentReady: $data.onContentReady,            position: { my: \'left top\', at: \'right top\', boundary: $data.boundary, of: getPositionTarget() },            container: $data.container,            showTitle: false,            target: $data.target,            showCloseButton: false,            shading: false,            animation: {},            visible: visible }">        <!-- ko template: { name: contentTemplate, data: contentData } -->        <!--/ko-->    </div>',
+                'dx-picture-editing-brush-options': '<div class="dx-picture-editing-brush-options">        <div class="dx-picture-editing-line-width">            <div class="dx-picture-editing-text" data-bind="text: brushWidthText"></div>            <div class="dx-picture-editing-line-width-slider" data-bind="dxSlider: { min: 1, max: 9, value: $data.lineWidth,             label: { visible: true },             tooltip: { enabled: true, showMode: \'always\', position: \'bottom\' } }"></div>        </div>        <div class="dx-picture-editing-line-color">            <div class="dx-picture-editing-text" data-bind="text: brushColorText"></div>            <div class="dx-picture-editing-brush-options-colors" data-bind="foreach: $data.colors">                <div class="dx-picture-editing-brush-options-color" data-bind="css: { selected: $data.isSelected }">                    <div class="dx-picture-editing-brush-options-color-cell" data-bind="style: { background: $data.value }, dxAction: $data.action"></div>                </div>            </div>        </div>    </div>',
+                'dx-picture-editing-sizemode-alignment': '<div class="dx-picture-editing-sizemode-alignment">        <div class="dx-picture-editing-sizemode">            <div class="dx-picture-editing-text" data-bind="text: sizeModeText"></div>            <div class="dx-picture-editing-sizemode-values" data-bind="foreach: { data: sizeModeValues }">                <div class="dx-picture-editing-sizemode-alignment-value" data-bind="css: { selected: isSelected }, template: $data.iconTemplate, dxAction: $data.action">                </div>            </div>        </div>        <div class="dx-picture-editing-alignment">            <div class="dx-picture-editing-text" data-bind="text: alignmentText"></div>            <div class="dx-picture-editing-alignment-values" data-bind="foreach: { data: alignmentValues }">                <div class="dx-picture-editing-sizemode-alignment-value" data-bind="css: { selected: isSelected }, template: $data.iconTemplate, dxAction: $data.action">                </div>            </div>        </div>    </div>',
+                'dx-picture-editing-imagepickerwithfilter': '<div class="dx-picture-editing-filtercontent" data-bind="styleunit: { width: contentWidth }">        <div class="dx-picture-editing-filtercontent-editor" data-bind="dxTextBox: { value: filter, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true  }"></div>        <div class="dx-picture-editing-filtercontent-images">            <!-- ko template: \'dx-picture-editing-imagespicker\' -->            <!-- /ko -->        </div>    </div>',
+                'dx-picture-editing-imagespicker': '<div class="dx-picture-editing-imagescontainer dxd-text-primary" data-bind="styleunit: { width: contentWidth }, dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <!-- ko foreach: images -->        <div class="dx-picture-editing-block dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: $parent.width + 10 }, visible: visible, click: function() { $parent.action($data); }">            <div class="dx-picture-editing-block-image" data-bind="styleunit: { width: $parent.width, height: $parent.height }, style: { backgroundImage: \'url(\' + ($data.url || $data.data) + \')\' }"></div>            <!-- ko if: $data.text-->            <!-- ko if: $parent.filterEnabled -->            <div class="dx-picture-editing-block-text" data-bind="searchHighlighting: { text: $data.text, textToSearch: $parent.filter }, attr: { title: $data.text }"></div>            <!-- /ko -->            <!-- ko ifnot: $parent.filterEnabled -->            <div class="dx-picture-editing-block-text" data-bind="text: $data.text, attr: { title: $data.text }"></div>            <!-- /ko -->            <!-- /ko -->        </div>        <!-- /ko -->    </div>',
+                'dxrp-editing-field-container': '<div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">        <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>        <div class="dxrp-editing-field-content" data-bind="dxclick: activateEditor">            <!-- ko if: !active() || field.readOnly()  -->            <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {\'dxrp-editing-field-text-wordwrap\': !wordWrap}">                <!-- ko if: htmlValue()  -->                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), html: htmlValue()"></div>                <!--/ko-->                <!-- ko ifnot: htmlValue()  -->                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), text: field.editValue()"></div>                <!--/ko-->            </div>            <!--/ko-->            <!-- ko if: active() && !field.readOnly() -->            <!-- ko template: { name: editorTemplate, data: data } -->            <!--/ko-->            <!--/ko-->        </div>    </div>',
+                'dxrp-editing-field-text': '<textarea class="dxrp-editing-field-text" data-bind="value: value, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>',
+                'dxrp-editing-field-mask': '<div class="dxrp-editing-field-mask" data-bind="dxTextBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
+                'dxrp-editing-field-number': '<div class="dxrp-editing-field-mask" data-bind="dxNumberBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
+                'dxrp-editing-field-datetime': '<div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
+                'dxrp-editing-field-image': '<div class="dxrp-editing-field-container" data-bind="style: containerStyle()">        <div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: { image: $data.getImage(), imageType: $data.getImageType(), imageMode: editMode, alignment: alignment, sizeMode: sizeMode, callbacks: callbacks, isActive: isActive, zoom: zoom, popupOptions: popupOptions }"></div>    </div>',
+                'dxrp-editing-field-checkbox': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 650 650" preserveAspectRatio="xMidYMid meet">                <path d="M0 25 H625 V625 H25 V50" class="highlight" style="stroke: #808080; stroke-width: 50;"></path>                <path d="M222 437 l-72 -72 0 -70 0 -69 70 69 70 70 110 -110 110 -110 0 75 0 75 -108 108 -107 107 -73 -73z" data-bind="style: { fill: checked() ? \'black\' : \'transparent\' }" />            </svg>        </div>    </div>',
+                'dxrp-editing-field-radio': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet">                <g fill="#010101" stroke="none">                    <path d="M32,380a348,348 0 1,0 696,0a348,348 0 1,0 -696,0" class="highlight" style="stroke-width: 50;stroke: rgb(0, 0, 0);" />                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? \'black\' : \'transparent\' }"/>                </g>            </svg>        </div>    </div>',
+                'dxrp-character-comb-editing-field': '<div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">        <!-- ko if: !active() || field.readOnly()  -->        <!-- ko foreach: cells -->            <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>        <!-- /ko -->        <!-- /ko -->        <!-- ko if: active() && !field.readOnly() -->        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>        <!--/ko-->    </div>',
+                'dxrdp-search-mobile': '<!-- ko if: $data.enabled -->    <div class="dxrdp-search-wrapper" data-bind="styleunit:{ height: height }, dxrdSearchBar: $data">        <div class="dxrd-mobile-search">            <div class="dxrdp-taptosearch" data-bind="visible: !$data.editorVisible(), dxAction: function(s) { $data.focusEditor(s); }">                <div class="dxrdp-taptosearch-text" data-bind="text: $root.getLocalization(\'Tap here to Search\', \'ASPxReportsStringId.WebDocumentViewer_Mobile_TapHereToSearch\')"></div>            </div>            <div class="dxrdp-search-panel" data-bind="visible: $data.editorVisible()">                <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText, onEnterKey: function() { $data.startSearch(); } }"></div>            </div>        </div>    </div>    <!-- /ko -->',
+                'dxrdp-surface-mobile': '<div class="dxrd-preview-wrapper dxrdp-fullscreen" data-bind="style: { pointerEvents: $data.documentId === null ? \'none\' : \'\', touchEvents: $data.documentId === null ? \'none\' : \'\' }, styleunit: { top: topOffset, height: previewWrapperSize().height, width: previewWrapperSize().width }, slide: $root.slideOptions, mobileZoom: { zoom: mobileZoom, zoomUpdating: zoomUpdating }, dxclick: function(s,e) { if(!$root.brickEventsDisabled()) { $data.showActions(s,e); } }">        <!-- ko template: {name: \'dxrd-preview-progress-bar\', data: progressBar }-->        <!-- /ko -->        <div class="dxrd-mobile-content">            <div class="dxrd-mobile-gallery" data-bind="style: { pointerEvents: $data.zoomUpdating() ? \'none\' : \'\', touchEvents: $data.zoomUpdating() ? \'none\' : \'\' }, dxGalleryReportPreview: { dataSource: $root.gallery.items, gallery: $root.gallery, animationEnabled: $root.gallery.animationEnabled, selectedIndex: $root.gallery.selectedIndex, width:\'100%\', height: \'100%\', showIndicator: false, loop: true, onSelectionChanged: onSlide, swipeEnabled: $root.slideOptions.swipeEnabled }">                <div data-options="dxTemplate: { name: \'item\' }">                    <div class="dxrd-scrollView-mobile" data-bind="dxScrollView: $root.reportPreview.getScrollViewOptions()">                        <div class="dxrd-gallery-blocks" data-bind="style: $root.gallery.contentSize()">                            <!-- ko foreach: $data.blocks() -->                            <!-- ko if: $data.page -->                            <div class="dxrd-gallery-block" data-bind="styleunit: position, css: $data.classSet">                                <div class="dxrd-gallery-block-content" data-bind="styleunit: { width: Math.max(page.width(), position().width), height: Math.max(page.height(), position().height) }, style: { \'background-color\': page.color }">                                    <div class="dxrdp-active-border" data-bind="css: { \'dxrdp-active\': page.active() && $parents[0].blocks().length > 1, \'dxrdp-page-padding\': $parents[0].blocks().length > 1 }, visible: $root.slideOptions.readerMode"></div>                                    <div class="dxrd-mobile-page" data-bind="styleunit: { width: page.width, height: page.height }, style: { pointerEvents: $root.brickEventsDisabled() ? \'none\' : \'\', touchEvents: $root.brickEventsDisabled() ? \'none\' : \'\' }">                                        <!-- ko template: { name :\'dxrd-preview-page-mobile\', data: page } -->                                        <!-- /ko -->                                    </div>                                </div>                            </div>                            <!-- /ko -->                            <!-- /ko -->                        </div>                    </div>                </div>            </div>        </div>    </div>    <input type="text" style="display:none" />',
+                'dxrd-preview-page-mobile': '<div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading, skipIfInvisible: true }">        <div class="dxrdp-loading-wrapper" data-bind="styleunit: { width: width, height: height, lineHeight: height }, style: { \'background-color\': color }, visible: pageLoading, text: loadingText">        </div>        <img style="width:100%; height:100%;" data-bind="attr: { src: displayImageSrc }, style:{ \'background-color\': color }" />        <div class="dxrdp-active-border" data-bind="css: { \'dxrdp-active\': active() && $parents[1].blocks().length > 1 }, visible: !$root.slideOptions.readerMode"></div>        <!-- ko foreach: activeBricks -->        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko if: !brickLoading() && $data.editingFields-->        <!-- ko foreach: editingFields -->        <!-- ko template: template -->        <!--/ko-->        <!--/ko-->        <!--/ko-->    </div>',
+                'dxrd-page-brick-mobile': '<div class="dxrd-report-preview-brick" data-bind="style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active }">    </div>',
+                'dxrd-preview-export-to-mobile': '<div class="dxrd-preview-export-to" data-bind="dxMenu: { items: items, onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">        <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: \'item\' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">            <!--ko if: $data.format -->            <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>            <!-- /ko -->            <!--ko ifnot: $data.format -->            <div class="dxrd-preview-export-item-image-wrapper">                <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: { name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}"></div>            </div>            <div class="dx-menu-item-popout-container">                <div class="dx-menu-item-popout"></div>            </div>            <!-- /ko -->        </div>    </div>',
+                'dxrdp-pages-mobile': '<div class="dxrdp-mobile-paginator" data-bind="dxrdMobilePaginator: $data">        <div class="dxrdp-mobile-paginator-content">            <div class="dxrdp-mobile-paginator-text" data-bind="text : text"></div>        </div>    </div>',
+                'dxrdp-surface-mobile-bottom': '<div class="dxrdp-mobile-actions" data-bind="visible: visible">        <div class="dxrdp-mobile-actions-content">            <!-- ko foreach: actions -->            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, dxAction: clickAction">            </div>            <!-- ko if: $data.content -->            <!-- ko template: $data.content -->            <!-- /ko -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dxrd-menu-export-content': '<div class="dxrd-menu-export-popover" data-bind="dxPopover: { width: \'266px\', height: \'266px\', visible: visible, target: \'.dxrdp-mobile-action.dxrd-image-export-to\' }">        <!-- ko foreach: items -->        <div class="dxrd-menu-export-item" data-bind="dxAction: action, text: text">        </div>        <!-- /ko-->    </div>',
+                'dxrd-menu-parameters-content': '<div class="dxrd-menu-parameters-popup" data-bind="dxPopup: { showTitle: false, width: \'100%\', height: \'100%\', visible: visible }">        <!--TODO: use container: \'.dxrd-preview-wrapper\' and fix styles-->        <!-- ko template: { name: \'dxrd-preview-parameters-mobile\', data: $data }-->        <!-- /ko -->    </div>',
+                'dxrd-preview-parameters-mobile': '<div class="dxrdp-parameters-mobile" data-bind="dxValidationGroup: {}">        <div class="dxrdp-parameters-title" data-bind="text: $root.getLocalization(\'Parameters\', \'DevExpress.XtraReports.UI.XtraReport.Parameters\')"> </div>        <div class="dxrdp-parameters-scroll" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true, bounceEnabled: false }">            <div class="dx-fieldset">                <div data-bind="dxPropertyGrid: { target: ko.observable(model) }"></div>            </div>        </div>        <div class="dxrdp-parameters-buttons text-buttons" data-bind="foreach: { data: $data.actionButtons }, cacheElement: { action: function(element) { $data.cacheElementContent(element); } }">            <div class="dxrdp-parameter-action" data-bind="dxButton: { text: text, onClick: function(params){ $data.action($parent.parametersModel, params) }, disabled: disabled }, css: className"></div>        </div>        <div class="dxrdp-parameters-buttons" data-bind="visible: showIcons, foreach: { data: $data.actionIcons }">            <div class="dxrdp-parameter-icon" data-bind="dxButton: { onClick: function(params){ $data.action($parent.parametersModel, params)}, disabled: disabled }, css: className"></div>        </div>    </div>',
+                'dx-circle-menu': '<div class="dx-circle-menu">        <div class="dx-circle-menu-container" data-bind="visible: collectionVisible">            <!-- ko foreach: items-->            <div class="dx-circle-menu-item" data-bind="visible: visible">                <div class="dx-circle-menu-item-content">                    <div class="dx-circle-menu-item-image" data-bind="css: image, dxAction: action"></div>                    <div class="dx-circle-menu-item-text" data-bind="text: text"></div>                </div>            </div>            <!-- /ko -->        </div>        <div class="dx-circle-menu-mainbutton" data-bind="dxAction: function() { $data.changeMenuItemVisible() }, css: { expanded: collectionVisible() }"></div>    </div>',
+                'dxrd-preview-document-map': '<div class="dxrd-preview-document-map" data-bind="visible: active() && visible()" style="height: 100%; overflow:hidden">    <div class="dxrd-right-panel-header dxd-text-primary">        <div style="display: inline-block;" data-bind="text: $root.getLocalization(\'Document Map\', \'ASPxReportsStringId.DocumentViewer_RibbonCommandText_DocumentMap\')"></div>    </div>    <!-- ko if: model -->    <!-- ko with: model -->    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <div id="documentMapTree" data-bind="treelist: documentMapOptions" style="width:100%; height: 100%;"></div>    </div>    <!-- /ko -->    <!-- /ko --></div>',
+                'dxrd-preview-export-options': '<div class="dxrd-preview-export-options-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">    <div class="dxrd-right-panel-header dxd-text-primary">        <span data-bind="text: $root.getLocalization(\'Export Options\', \'DevExpress.XtraReports.UI.XtraReport.ExportOptions\')"></span>    </div>    <!-- ko if: model-->    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <div class="dx-fieldset">            <div data-bind="dxPropertyGrid: { target: model }"></div>        </div>    </div>    <!-- /ko --></div>',
+                'dxrd-page-brick-clickable': '<div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->    </div>',
+                'dxrd-preview-page': '<div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, \'brick-selection-prog\': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">        <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { \'width\': width() + 2, \'height\': height() + 2 }, visible: pageLoading">            <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { \'paddingTop\': height() / 2.3 }">                <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>            </div>        </div>        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="attr: { src: displayImageSrc }" />        <!-- ko foreach: activeBricks -->        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko foreach: clickableBricks -->        <!-- ko template: { name: "dxrd-page-brick-clickable", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko if: !brickLoading() && $data.editingFields-->        <!-- ko foreach: editingFields -->        <!-- ko template: template -->        <!--/ko-->        <!--/ko-->        <!--/ko-->    </div>',
+                'dxrd-preview-parameters': '<div class="dxrd-preview-parameters-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">    <div class="dxrd-right-panel-header dxd-text-primary">        <span data-bind="text: $root.getLocalization(\'Preview Parameters\', \'ASPxReportsStringId.ReportDesigner_Preview_ParametersTitle\')"></span>        <!-- ko if: (model && !model.isEmpty()) -->        <!-- /ko -->    </div>    <!-- ko if: (!model || model.isEmpty()) -->    <div class="dxrd-group-header-parameters-empty dxd-text-primary" data-bind="text: $root.getLocalization(\'The report does not contain any parameters.\', \'ASPxReportsStringId.WebDocumentViewer_NoParameters\')"></div>    <!-- /ko -->    <!-- ko if: (model && !model.isEmpty()) -->    <div class="dxrd-right-panel-body" id="propertiesPanel" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, dxValidationGroup: {}">        <div class="dx-fieldset">            <div data-bind="dxPropertyGrid: { target: ko.observable(model), recreateEditors: true }"></div>        </div>        <div class="dxrd-preview-parameter-action dxrdp-parameters-submit" data-bind="dxButton: { text: $root.getLocalization(\'Submit\', \'ASPxReportsStringId.ParametersPanel_Submit\'), onClick: function(params) { model.validateAndSubmit(params); } }"></div>        <div class="dxrd-preview-parameter-action dxrdp-parameters-reset" data-bind="dxButton: { text: $root.getLocalization(\'Reset\', \'ASPxReportsStringId.ParametersPanel_Reset\'), onClick: function() { model.restore(); } }"></div>        <div class="dxrd-preview-parameter-action dxrd-preview-loading" data-bind="dxLoadIndicator: { visible: model.parametersLoading }"></div>    </div>    <!-- /ko --></div>',
+                'dxrd-preview-search': '<div class="dxrd-preview-search-wrapper" data-bind="visible: active() && visible()">    <!-- ko with: model -->    <div class="dxrd-preview-search-tab-header">        <span class="dxrd-preview-search-tab-header-text dxd-text-primary" data-bind="text: $root.getLocalization(\'Search\', \'ASPxReportsStringId.SearchDialog_Header\')"></span>        <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: $data } "></div>        <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: $root.getLocalization(\'Match case\', \'ASPxReportsStringId.SearchDialog_Case\')}"></div>        <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: $root.getLocalization(\'Match whole word only\', \'ASPxReportsStringId.SearchDialog_WholeWord\')}"></div>    </div>    <div class="dxrd-preview-search-result-header dxd-border-primary">        <div class="dxrd-preview-search-result-header-text" data-bind="text: $root.getLocalization(\'Search result\', \'ASPxReportsStringId.WebDocumentViewer_SearchResultText\')"></div><!--TODO: correctors-->    </div>    <div class="dxrd-preview-search-result" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko foreach: searchResult -->        <div class="dxrd-preview-search-result-item dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function() { $parent.goToResult($data); }">            <div class="dxrd-preview-search-tab-item-text propertygrid-editor-displayName dxd-text-primary" data-bind="text: text"></div>            <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Report.Preview.formatSearchResult($data)"></div>        </div>        <!-- /ko -->        <div class="dxrd-preview-search-result" data-bind="dxLoadIndicator: { visible: loading, height: \'30px\', weight: \'30px\' }"></div>    </div>    <!-- /ko --></div>',
+                'dxrd-preview-export-to': '<div class="dxrd-preview-export-toolbar-item dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: \'dxrdp-export-to-menu\', onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">            <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: \'item\' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">                <!--ko if: $data.format -->                <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>                <!-- /ko -->                <!--ko ifnot: $data.format -->                <div class="dxrd-preview-export-item-image-wrapper">                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"></div>                </div>                <div class="dx-menu-item-popout-container">                    <div class="dx-menu-item-popout"></div>                </div>                <!-- /ko -->            </div>        </div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
+                'dxrd-preview-progress-bar': '<div class="dxrd-preview-progress dxd-popup-back-color dxd-back-primary2 dxd-border-primary" data-bind="visible: visible">        <div class="dxrd-preview-progress-text dxd-text-primary" data-bind="text : text"></div>        <div class="dxrd-preview-progress-bar dxd-back-primary">            <div class="dxrd-preview-progress-value dxd-preview-progress-bar-value-color dxd-back-accented" data-bind="style : { width: progress()  + \'%\' }"></div>        </div>        <div class="dxrd-preview-progress-cancel dxd-hyperlink-color dxd-border-accented dxd-text-accented" data-bind="text: cancelText, dxAction: function() { $data.stop && stop(); }"></div>    </div>',
+                'dxrd-preview-pager': '<div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled }"></div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
+                'dxrd-page-brick': '<div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->        <!-- ko foreach: ($data.bricks || []) -->        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->        <!--/ko-->        <!--/ko-->    </div>',
+                'dx-selectbox': '<div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }), dxValidator: { validationRules: $data.validationRules || [] }"></div>',
+                'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true }"></div>    </div>',
+                'dxrd-multivalue': '<!-- ko with: value -->    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: [\'displayValue\'], value: value, displayExpr: \'displayValue\', valueExpr: \'value\', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: \'allPages\', selectedItems: $data.selectedItems, maxDisplayedTags: $data.maxDisplayedTags })">    </div>    <!-- /ko -->',
+                'dxrd-multivalue-selectbox': '<!-- ko if: options -->    <!-- ko with: options -->    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: \'valueItem\', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: \'valueItem\' }" data-bind="dxAction: function(args) { toggleSelected(); args.event.stopPropagation(); }">            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>        </div>    </div>    <!-- /ko -->    <!-- /ko -->',
+                'dxrd-multivalue-editable': '<!-- ko if: value -->    <div class="dxrd-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, info: info, level: level, displayName: $root.getLocalization(displayName) }">            <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1 }"></div>        </div>    </div>    <!-- /ko -->',
+                'dxrd-report-preview': '<div class="dxrd-preview dxrd-designer-wrapper dxd-scrollbar-color dxd-surface-back-color" data-bind="visible: reportPreview.previewVisible, cssArray: [ $data.rootStyle , { \'dx-rtl\' : $data.rtl, \'dx-ltr\': !$data.rtl } ]">        <!-- ko foreach: parts -->        <!-- ko template: { name: templateName, data: model }-->        <!-- /ko -->        <!-- /ko -->    </div>',
+                'dxrd-preview-toolbar-scrollable': '<div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: \'onHover\', direction: \'horizontal\', useNative: false, scrollByThumb: true }">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }, keyDownActions: actionLists"></div>    </div>',
+                'dxrdp-surface': '<div class="dxrd-preview-wrapper" data-bind="textCopier, css: { \'dx-rtl\': $data.rtlReport, \'dxrp-editing-fields-hightlighted\': editingFieldsHighlighted } ">        <!-- ko with: progressBar-->        <!-- ko template: \'dxrd-preview-progress-bar\'-->        <!-- /ko -->        <!-- /ko -->        <div class="dxrd-preview-surface" data-bind="styleunit: { width: previewSize() }">            <!-- ko if: !showMultipagePreview() -->            <div class="dxrd-report-preview-holder">                <!-- ko with: currentPage-->                <!-- ko if: pageLoading() || (!pageLoading() && displayImageSrc()) -->                <div class="dxrd-report-preview" data-bind="styleunit: { width: width, height: height }, autoFit: { autoFitBy: $parent.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, rightPanelWidth: $root.tabPanel.width, previewSize: $parent.previewSize, brickLoading: brickLoading } ">                    <!-- ko template: \'dxrd-preview-page\'-->                    <!-- /ko -->                </div>                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->            <!-- ko if: showMultipagePreview() && !!currentPage() -->            <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">                <!-- ko foreach: pages -->                <!-- ko lazy: { if: pageLoading() || (!pageLoading() && displayImageSrc()) } -->                <div class="dxrd-report-preview dxrd-report-preview-multipage" data-bind="styleunit: { \'width\': width(), \'height\': height() }, toView: { active: active }, css : { \'dxrd-report-preview-active\': active }">                    <!-- ko template: \'dxrd-preview-page\'-->                    <!-- /ko -->                </div>                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->            <!-- ko if: !currentPage() -->            <div class="dxrd-report-preview-placeholder">                <div class="dxd-empty-area-placeholder-text-color dxd-text-info" data-bind="text: emptyDocumentCaption()"></div>            </div>            <!-- /ko -->        </div>    </div>    <div id="clipboard-container" style="position:absolute;top:-100px;"><textarea id="clipboard"></textarea></div>',
+            });
+        })(Templates = Reporting.Templates || (Reporting.Templates = {}));
+    })(Reporting = DevExpress.Reporting || (DevExpress.Reporting = {}));
+})(DevExpress || (DevExpress = {}));
+//# sourceMappingURL=dx-webdocumentviewer.js.map
