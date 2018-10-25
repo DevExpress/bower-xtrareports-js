@@ -1,0 +1,499 @@
+<!--
+/**
+* DevExpress HTML/JS Reporting (web-document-viewer.html)
+* Version: 18.2.1-pre-18207
+* Build date: 2018-09-27
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
+*/
+-->
+
+<script type="text/html" id="dxrp-editing-field-container">
+    <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
+        <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>
+        <div class="dxrp-editing-field-content" data-bind="dxclick: activateEditor">
+            <!-- ko if: !active() || field.readOnly()  -->
+            <div class="dxrp-editing-field-readonly-text" data-bind="style: textStyle(), css: {'dxrp-editing-field-text-wordwrap': !wordWrap}">
+                <!-- ko if: htmlValue()  -->
+                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), html: htmlValue()"></div>
+                <!--/ko-->
+                <!-- ko ifnot: htmlValue()  -->
+                <div class="dxrp-editing-field-text-html" data-bind="style: breakOffsetStyle(), text: field.editValue()"></div>
+                <!--/ko-->
+            </div>
+            <!--/ko-->
+            <!-- ko if: active() && !field.readOnly() -->
+            <!-- ko template: { name: editorTemplate, data: data } -->
+            <!--/ko-->
+            <!--/ko-->
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrp-editing-field-text">
+    <textarea class="dxrp-editing-field-text" data-bind="value: value, valueUpdate: 'keypress', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>
+</script>
+
+<script type="text/html" id="dxrp-editing-field-mask">
+    <div class="dxrp-editing-field-mask" data-bind="dxTextBox: options, childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
+</script>
+
+<script type="text/html" id="dxrp-editing-field-number">
+    <div class="dxrp-editing-field-mask" data-bind="dxNumberBox: options, childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
+</script>
+
+<script type="text/html" id="dxrp-editing-field-datetime">
+    <div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: options, childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
+</script>
+
+<script type="text/html" id="dxrp-editing-field-checkbox">
+    <div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">
+        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 650 650" preserveAspectRatio="xMidYMid meet">
+                <path d="M0 25 H625 V625 H25 V50" class="highlight" style="stroke: #808080; stroke-width: 50;"></path>
+                <path d="M222 437 l-72 -72 0 -70 0 -69 70 69 70 70 110 -110 110 -110 0 75 0 75 -108 108 -107 107 -73 -73z" data-bind="style: { fill: checked() ? 'black' : 'transparent' }" />
+            </svg>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrp-editing-field-radio">
+    <div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">
+        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet">
+                <g fill="#010101" stroke="none">
+                    <path d="M32,380a348,348 0 1,0 696,0a348,348 0 1,0 -696,0" class="highlight" style="stroke-width: 50;stroke: rgb(0, 0, 0);" />
+                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? 'black' : 'transparent' }"/>
+                </g>
+            </svg>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrp-character-comb-editing-field">
+    <div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
+        <!-- ko if: !active() || field.readOnly()  -->
+        <!-- ko foreach: cells -->
+            <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: active() && !field.readOnly() -->
+        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: 'keypress', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>
+        <!--/ko-->
+    </div>
+</script>
+<script type="text/html" id="dxrdp-search-mobile">
+    <!-- ko if: $data.enabled -->
+    <div class="dxrdp-search-wrapper" data-bind="styleunit:{ height: height }, dxrdSearchBar: $data">
+        <div class="dxrd-mobile-search">
+            <div class="dxrdp-taptosearch" data-bind="visible: !$data.editorVisible(), dxAction: function(s) { $data.focusEditor(s); }">
+                <div class="dxrdp-taptosearch-text" data-bind="text: $root.getLocalization('Tap here to Search', 'ASPxReportsStringId.WebDocumentViewer_Mobile_TapHereToSearch')"></div>
+            </div>
+            <div class="dxrdp-search-panel" data-bind="visible: $data.editorVisible()">
+                <div class="dxrdp-search-editor" data-bind="dxTextBox: { value: searchText, onEnterKey: function() { $data.startSearch(); } }"></div>
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dxrdp-surface-mobile">
+    <div class="dxrd-preview-wrapper dxrdp-fullscreen" data-bind="style: { pointerEvents: $data.documentId === null ? 'none' : '', touchEvents: $data.documentId === null ? 'none' : '' }, styleunit: { top: topOffset, height: previewWrapperSize().height, width: previewWrapperSize().width }, slide: $root.slideOptions, mobileZoom: { zoom: mobileZoom, zoomUpdating: zoomUpdating }, dxclick: function(s,e) { if(!$root.brickEventsDisabled()) { $data.showActions(s,e); } }">
+        <!-- ko template: {name: 'dxrd-preview-progress-bar', data: progressBar }-->
+        <!-- /ko -->
+
+        <div class="dxrd-mobile-content">
+            <div class="dxrd-mobile-gallery" data-bind="style: { pointerEvents: $data.zoomUpdating() ? 'none' : '', touchEvents: $data.zoomUpdating() ? 'none' : '' }, dxGalleryReportPreview: { dataSource: $root.gallery.items, gallery: $root.gallery, animationEnabled: $root.gallery.animationEnabled, selectedIndex: $root.gallery.selectedIndex, width:'100%', height: '100%', showIndicator: false, loop: true, onSelectionChanged: onSlide, swipeEnabled: $root.slideOptions.swipeEnabled }">
+                <div data-options="dxTemplate: { name: 'item' }">
+                    <div class="dxrd-scrollView-mobile" data-bind="dxScrollView: $root.reportPreview.getScrollViewOptions()">
+                        <div class="dxrd-gallery-blocks" data-bind="style: $root.gallery.contentSize()">
+                            <!-- ko foreach: $data.blocks() -->
+                            <!-- ko if: $data.page -->
+                            <div class="dxrd-gallery-block" data-bind="styleunit: position, css: $data.classSet">
+                                <div class="dxrd-gallery-block-content" data-bind="styleunit: { width: Math.max(page.width(), position().width), height: Math.max(page.height(), position().height) }, style: { 'background-color': page.color }">
+                                    <div class="dxrdp-active-border" data-bind="css: { 'dxrdp-active': page.active() && $parents[0].blocks().length > 1, 'dxrdp-page-padding': $parents[0].blocks().length > 1 }, visible: $root.slideOptions.readerMode"></div>
+                                    <div class="dxrd-mobile-page" data-bind="styleunit: { width: page.width, height: page.height }, style: { pointerEvents: $root.brickEventsDisabled() ? 'none' : '', touchEvents: $root.brickEventsDisabled() ? 'none' : '' }">
+                                        <!-- ko template: { name :'dxrd-preview-page-mobile', data: page } -->
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="text" style="display:none" />
+</script>
+
+<script type="text/html" id="dxrd-preview-page-mobile">
+    <div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading, skipIfInvisible: true }">
+        <div class="dxrdp-loading-wrapper" data-bind="styleunit: { width: width, height: height, lineHeight: height }, style: { 'background-color': color }, visible: pageLoading, text: loadingText">
+        </div>
+        <img style="width:100%; height:100%;" data-bind="attr: { src: displayImageSrc }, style:{ 'background-color': color }" />
+        <div class="dxrdp-active-border" data-bind="css: { 'dxrdp-active': active() && $parents[1].blocks().length > 1 }, visible: !$root.slideOptions.readerMode"></div>
+        <!-- ko foreach: activeBricks -->
+        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
+        <!--/ko-->
+        <!--/ko-->
+        <!-- ko if: !brickLoading() && $data.editingFields-->
+        <!-- ko foreach: editingFields -->
+        <!-- ko template: template -->
+        <!--/ko-->
+        <!--/ko-->
+        <!--/ko-->
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-page-brick-mobile">
+    <div class="dxrd-report-preview-brick" data-bind="style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active }">
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-preview-export-to-mobile">
+    <div class="dxrd-preview-export-to" data-bind="dxMenu: { items: items, onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">
+        <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: 'item' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">
+            <!--ko if: $data.format -->
+            <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>
+            <!-- /ko -->
+            <!--ko ifnot: $data.format -->
+            <div class="dxrd-preview-export-item-image-wrapper">
+                <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: { name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}"></div>
+            </div>
+            <div class="dx-menu-item-popout-container">
+                <div class="dx-menu-item-popout"></div>
+            </div>
+            <!-- /ko -->
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrdp-pages-mobile">
+    <div class="dxrdp-mobile-paginator" data-bind="dxrdMobilePaginator: $data">
+        <div class="dxrdp-mobile-paginator-content">
+            <div class="dxrdp-mobile-paginator-text" data-bind="text : text"></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrdp-surface-mobile-bottom">
+    <div class="dxrdp-mobile-actions" data-bind="visible: visible">
+        <div class="dxrdp-mobile-actions-content">
+            <!-- ko foreach: actions -->
+            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, dxAction: clickAction">
+            </div>
+            <!-- ko if: $data.content -->
+            <!-- ko template: $data.content -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-menu-export-content">
+    <div class="dxrd-menu-export-popover" data-bind="dxPopover: { width: '266px', height: '266px', visible: visible, target: '.dxrdp-mobile-action.dxrd-image-export-to' }">
+        <!-- ko foreach: items -->
+        <div class="dxrd-menu-export-item" data-bind="dxAction: action, text: text">
+        </div>
+        <!-- /ko-->
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-menu-parameters-content">
+
+    <div class="dxrd-menu-parameters-popup" data-bind="dxPopup: { showTitle: false, width: '100%', height: '100%', visible: visible }">
+        <!--TODO: use container: '.dxrd-preview-wrapper' and fix styles-->
+        <!-- ko template: { name: 'dxrd-preview-parameters-mobile', data: $data }-->
+        <!-- /ko -->
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-preview-parameters-mobile">
+    <div class="dxrdp-parameters-mobile" data-bind="dxValidationGroup: {}">
+        <div class="dxrdp-parameters-title" data-bind="text: $root.getLocalization('Parameters', 'DevExpress.XtraReports.UI.XtraReport.Parameters')"> </div>
+        <div class="dxrdp-parameters-scroll" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true, bounceEnabled: false }">
+            <div class="dx-fieldset">
+                <div data-bind="dxPropertyGrid: { target: ko.observable(model) }"></div>
+            </div>
+        </div>
+        <div class="dxrdp-parameters-buttons text-buttons" data-bind="foreach: { data: $data.actionButtons }, cacheElement: { action: function(element) { $data.cacheElementContent(element); } }">
+            <div class="dxrdp-parameter-action" data-bind="dxButton: { text: text, onClick: function(params){ $data.action($parent.parametersModel, params) }, disabled: disabled }, css: className"></div>
+        </div>
+        <div class="dxrdp-parameters-buttons" data-bind="visible: showIcons, foreach: { data: $data.actionIcons }">
+            <div class="dxrdp-parameter-icon" data-bind="dxButton: { onClick: function(params){ $data.action($parent.parametersModel, params)}, disabled: disabled }, css: className"></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dx-circle-menu">
+    <div class="dx-circle-menu">
+        <div class="dx-circle-menu-container" data-bind="visible: collectionVisible">
+            <!-- ko foreach: items-->
+            <div class="dx-circle-menu-item" data-bind="visible: visible">
+                <div class="dx-circle-menu-item-content">
+                    <div class="dx-circle-menu-item-image" data-bind="css: image, dxAction: action"></div>
+                    <div class="dx-circle-menu-item-text" data-bind="text: text"></div>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <div class="dx-circle-menu-mainbutton" data-bind="dxAction: function() { $data.changeMenuItemVisible() }, css: { expanded: collectionVisible() }"></div>
+    </div>
+</script>
+<script type='text/html' id='dxrd-preview-document-map'>
+<div class="dxrd-preview-document-map" data-bind="visible: active() && visible()" style="height: 100%; overflow:hidden">
+    <div class="dxrd-right-panel-header dxd-text-primary">
+        <div style="display: inline-block;" data-bind="text: $root.getLocalization('Document Map', 'ASPxReportsStringId.DocumentViewer_RibbonCommandText_DocumentMap')"></div>
+    </div>
+    <!-- ko if: model -->
+    <!-- ko with: model -->
+    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }">
+        <div id="documentMapTree" data-bind="treelist: documentMapOptions" style="width:100%; height: 100%;"></div>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+</div></script>
+
+<script type='text/html' id='dxrd-preview-export-options'>
+<div class="dxrd-preview-export-options-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">
+    <div class="dxrd-right-panel-header dxd-text-primary">
+        <span data-bind="text: $root.getLocalization('Export Options', 'DevExpress.XtraReports.UI.XtraReport.ExportOptions')"></span>
+    </div>
+    <!-- ko if: model-->
+    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }">
+        <div class="dx-fieldset">
+            <div data-bind="dxPropertyGrid: { target: model }"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+
+</div></script>
+
+<script type="text/html" id="dxrd-page-brick-clickable">
+    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
+        <!-- ko if: $data.navigation -->
+        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { 'dxrdp-navigation-brick-drill-down' : !!navigation.drillDownKey, 'dxrdp-navigation-brick-sorting' : !!navigation.sortData }"></div>
+        <!--/ko-->
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-preview-page">
+    <div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, 'brick-selection-prog': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">
+        <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { 'width': width() + 2, 'height': height() + 2 }, visible: pageLoading">
+            <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { 'paddingTop': height() / 2.3 }">
+                <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>
+            </div>
+        </div>
+        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="attr: { src: displayImageSrc }" />
+        <!-- ko foreach: activeBricks -->
+        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->
+        <!--/ko-->
+        <!--/ko-->
+        <!-- ko foreach: clickableBricks -->
+        <!-- ko template: { name: "dxrd-page-brick-clickable", data: $data } -->
+        <!--/ko-->
+        <!--/ko-->
+        <!-- ko if: !brickLoading() && $data.editingFields-->
+        <!-- ko foreach: editingFields -->
+        <!-- ko template: template -->
+        <!--/ko-->
+        <!--/ko-->
+        <!--/ko-->
+    </div>
+</script>
+<script type='text/html' id='dxrd-preview-parameters'>
+<div class="dxrd-preview-parameters-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">
+    <div class="dxrd-right-panel-header dxd-text-primary">
+        <span data-bind="text: $root.getLocalization('Preview Parameters', 'ASPxReportsStringId.ReportDesigner_Preview_ParametersTitle')"></span>
+        <!-- ko if: (model && !model.isEmpty()) -->
+        <!-- /ko -->
+    </div>
+    <!-- ko if: (!model || model.isEmpty()) -->
+    <div class="dxrd-group-header-parameters-empty dxd-text-primary" data-bind="text: $root.getLocalization('The report does not contain any parameters.', 'ASPxReportsStringId.WebDocumentViewer_NoParameters')"></div>
+    <!-- /ko -->
+    <!-- ko if: (model && !model.isEmpty()) -->
+    <div class="dxrd-right-panel-body" id="propertiesPanel" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }, dxValidationGroup: {}">
+        <div class="dx-fieldset">
+            <div data-bind="dxPropertyGrid: { target: ko.observable(model), recreateEditors: true }"></div>
+        </div>
+        <div class="dxrd-preview-parameter-action dxrdp-parameters-submit" data-bind="dxButton: { text: $root.getLocalization('Submit', 'ASPxReportsStringId.ParametersPanel_Submit'), onClick: function(params) { model.validateAndSubmit(params); } }"></div>
+        <div class="dxrd-preview-parameter-action dxrdp-parameters-reset" data-bind="dxButton: { text: $root.getLocalization('Reset', 'ASPxReportsStringId.ParametersPanel_Reset'), onClick: function() { model.restore(); } }"></div>
+        <div class="dxrd-preview-parameter-action dxrd-preview-loading" data-bind="dxLoadIndicator: { visible: model.parametersLoading }"></div>
+    </div>
+    <!-- /ko -->
+</div></script>
+
+<script type='text/html' id='dxrd-preview-search'>
+<div class="dxrd-preview-search-wrapper" data-bind="visible: active() && visible()">
+    <!-- ko with: model -->
+    <div class="dxrd-preview-search-tab-header">
+        <span class="dxrd-preview-search-tab-header-text dxd-text-primary" data-bind="text: $root.getLocalization('Search', 'ASPxReportsStringId.SearchDialog_Header')"></span>
+        <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: $data } "></div>
+        <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: $root.getLocalization('Match case', 'ASPxReportsStringId.SearchDialog_Case')}"></div>
+        <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: $root.getLocalization('Match whole word only', 'ASPxReportsStringId.SearchDialog_WholeWord')}"></div>
+    </div>
+    <div class="dxrd-preview-search-result-header dxd-border-primary">
+        <div class="dxrd-preview-search-result-header-text" data-bind="text: $root.getLocalization('Search result', 'ASPxReportsStringId.WebDocumentViewer_SearchResultText')"></div><!--TODO: correctors-->
+    </div>
+    <div class="dxrd-preview-search-result" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
+        <!-- ko foreach: searchResult -->
+        <div class="dxrd-preview-search-result-item dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function() { $parent.goToResult($data); }">
+            <div class="dxrd-preview-search-tab-item-text propertygrid-editor-displayName dxd-text-primary" data-bind="text: text"></div>
+            <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Report.Preview.formatSearchResult($data)"></div>
+        </div>
+        <!-- /ko -->
+        <div class="dxrd-preview-search-result" data-bind="dxLoadIndicator: { visible: loading, height: '30px', weight: '30px' }"></div>
+    </div>
+    <!-- /ko -->
+</div>
+</script>
+
+<script type="text/html" id="dxrd-preview-export-to">
+    <div class="dxrd-preview-export-toolbar-item dxrd-toolbar-item" data-bind="visible: visible">
+        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: 'dxrdp-export-to-menu', onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">
+            <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: 'item' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">
+                <!--ko if: $data.format -->
+                <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>
+                <!-- /ko -->
+                <!--ko ifnot: $data.format -->
+                <div class="dxrd-preview-export-item-image-wrapper">
+                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"></div>
+                </div>
+                <div class="dx-menu-item-popout-container">
+                    <div class="dx-menu-item-popout"></div>
+                </div>
+                <!-- /ko -->
+            </div>
+        </div>
+        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-preview-progress-bar">
+    <div class="dxrd-preview-progress dxd-popup-back-color dxd-back-primary2 dxd-border-primary" data-bind="visible: visible">
+        <div class="dxrd-preview-progress-text dxd-text-primary" data-bind="text : text"></div>
+        <div class="dxrd-preview-progress-bar dxd-back-primary">
+            <div class="dxrd-preview-progress-value dxd-preview-progress-bar-value-color dxd-back-accented" data-bind="style : { width: progress()  + '%' }"></div>
+        </div>
+        <div class="dxrd-preview-progress-cancel dxd-hyperlink-color dxd-border-accented dxd-text-accented" data-bind="text: cancelText, dxAction: function() { $data.stop && stop(); }"></div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-preview-pager">
+    <div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">
+        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled }"></div>
+        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-page-brick">
+    <div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
+        <!-- ko if: $data.navigation -->
+        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { 'dxrdp-navigation-brick-drill-down' : !!navigation.drillDownKey, 'dxrdp-navigation-brick-sorting' : !!navigation.sortData }"></div>
+        <!--/ko-->
+        <!-- ko foreach: ($data.bricks || []) -->
+        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->
+        <!--/ko-->
+        <!--/ko-->
+    </div>
+</script>
+
+<script type="text/html" id="dx-selectbox">
+    <div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }), dxValidator: { validationRules: $data.validationRules || [] }"></div>
+</script>
+
+<script type="text/html" id="dxrd-zoom-autofit-select-template">
+    <div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">
+        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true }"></div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-multivalue">
+    <!-- ko with: value -->
+    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems, placeholder: $root.dx.Analytics.Localization.selectPlaceholder() })">
+    </div>
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dxrd-multivalue-selectbox">
+    <!-- ko if: options -->
+    <!-- ko with: options -->
+    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">
+        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxAction: function(args) { toggleSelected(); args.event.stopPropagation(); }">
+            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
+            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dxrd-multivalue-editable">
+    <!-- ko if: value -->
+    <div class="dxrd-editor" data-bind="visible: visible">
+        <div data-bind="dxCollectionEditor: { values: value, info: info, level: level, displayName: $root.getLocalization(displayName) }">
+            <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1 }"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dxrd-report-preview">
+    <div class="dxrd-preview dxrd-designer-wrapper dxd-scrollbar-color dxd-surface-back-color" data-bind="visible: reportPreview.previewVisible, cssArray: [ $data.rootStyle , { 'dx-rtl' : $data.rtl, 'dx-ltr': !$data.rtl } ]">
+        <!-- ko foreach: parts -->
+        <!-- ko template: { name: templateName, data: model }-->
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+</script>
+
+<script type="text/html" id="dxrd-preview-toolbar-scrollable">
+    <div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: 'onHover', direction: 'horizontal', useNative: false, scrollByThumb: true }">
+        <div class="dxrd-toolbar" data-bind="template: {name: 'dxrd-toolbar-tmplt', data: actionLists.toolbarItems }, keyDownActions: actionLists"></div>
+    </div>
+</script>
+
+<script type="text/html" id="dxrdp-surface">
+    <div class="dxrd-preview-wrapper" data-bind="textCopier, css: { 'dx-rtl': $data.rtlReport, 'dxrp-editing-fields-hightlighted': editingFieldsHighlighted } ">
+        <!-- ko with: progressBar-->
+        <!-- ko template: 'dxrd-preview-progress-bar'-->
+        <!-- /ko -->
+        <!-- /ko -->
+        <div class="dxrd-preview-surface" data-bind="styleunit: { width: previewSize() }">
+            <!-- ko if: !showMultipagePreview() -->
+            <div class="dxrd-report-preview-holder">
+                <!-- ko with: currentPage-->
+                <!-- ko if: pageLoading() || (!pageLoading() && displayImageSrc()) -->
+                <div class="dxrd-report-preview" data-bind="styleunit: { width: width, height: height }, autoFit: { autoFitBy: $parent.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, rightPanelWidth: $root.tabPanel.width, previewSize: $parent.previewSize, brickLoading: brickLoading } ">
+                    <!-- ko template: 'dxrd-preview-page'-->
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+            <!-- ko if: showMultipagePreview() && !!currentPage() -->
+            <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">
+                <!-- ko foreach: pages -->
+                <!-- ko lazy: { if: pageLoading() || (!pageLoading() && displayImageSrc()) } -->
+                <div class="dxrd-report-preview dxrd-report-preview-multipage" data-bind="styleunit: { 'width': width(), 'height': height() }, toView: { active: active }, css : { 'dxrd-report-preview-active': active }">
+                    <!-- ko template: 'dxrd-preview-page'-->
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+            <!-- ko if: !currentPage() -->
+            <div class="dxrd-report-preview-placeholder">
+                <div class="dxd-empty-area-placeholder-text-color dxd-text-info" data-bind="text: emptyDocumentCaption()"></div>
+            </div>
+            <!-- /ko -->
+        </div>
+    </div>
+    <div id="clipboard-container" style="position:absolute;top:-100px;"><textarea id="clipboard"></textarea></div>
+</script>

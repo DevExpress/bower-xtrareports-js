@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.js)
-* Version: 18.2.1-pre-18207
-* Build date: 2018-10-18
+* Version: 18.2.2-pre-beta
+* Build date: 2018-10-22
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4072,21 +4072,15 @@ var DevExpress;
                     });
                     return item;
                 };
-                ReportExpressionEditor.prototype._createValuesTab = function (onClick) {
-                    return {
-                        displayName: Designer.getLocalization("Values", "ReportStringId.ExpressionEditor_ItemInfo_Values"),
-                        content: {
-                            isSelected: ko.observable(false),
-                            data: this.values().map(function (item) {
-                                var display = item.value || item;
-                                return {
-                                    text: "'" + display + "'",
-                                    displayName: display
-                                };
-                            }),
-                            name: "dx-expressioneditor-collection"
-                        }
-                    };
+                ReportExpressionEditor.prototype._createValuesTab = function () {
+                    var items = this.values().map(function (item) {
+                        var display = item.value || item;
+                        return {
+                            text: "'" + display + "'",
+                            displayName: display
+                        };
+                    });
+                    return DevExpress.Analytics.Widgets.createExpressionEditorCollectionToolOptions(items, "Values", "ReportStringId.ExpressionEditor_ItemInfo_Values");
                 };
                 ReportExpressionEditor.prototype.patchOptions = function (reportExplorerProvider) {
                     var _this = this;
@@ -4099,9 +4093,9 @@ var DevExpress;
                                 _this._subscription && _this._subscription.dispose();
                                 groups.splice(0, 0, _this._createReportItems(reportExplorerProvider, onClick, sender));
                                 if (_this.values() && _this.values().length > 0) {
-                                    groups.splice(2, 0, _this._createValuesTab(onClick));
+                                    groups.splice(2, 0, _this._createValuesTab());
                                 }
-                                Report.Utils.addVaraiblesToExpressionEditor(groups, _this.value().eventName === "PrintOnPage" ? function (items) {
+                                Report.Utils.addVariablesToExpressionEditor(groups, _this.value().eventName === "PrintOnPage" ? function (items) {
                                     items.push({ text: "Arguments.PageIndex", val: "[Arguments.PageIndex]", descriptionStringId: 'ReportStringId.ExpressionEditor_Description_Arguments_PageIndex' });
                                     items.push({ text: "Arguments.PageCount", val: "[Arguments.PageCount]", descriptionStringId: 'ReportStringId.ExpressionEditor_Description_Arguments_PageCount' });
                                     return items;
@@ -4655,7 +4649,7 @@ var DevExpress;
                         value: this.condition,
                         path: path,
                         functions: DevExpress.Designer.Report.reportFunctionDisplay,
-                        customizeCategories: function (_, categories, __) { Report.Utils.addVaraiblesToExpressionEditor(categories); }
+                        customizeCategories: function (_, categories, __) { Report.Utils.addVariablesToExpressionEditor(categories); }
                     };
                 }
                 FormattingRule.createNew = function (report) {
@@ -5807,7 +5801,7 @@ var DevExpress;
                 };
                 ControlViewModel.prototype.isPropertyDisabled = function (name) {
                     if (name === "textFitMode") {
-                        return this["canGrow"]() || this["canShrink"]() || this["autoWidth"]();
+                        return this["canGrow"]() || this["canShrink"]() || (this.controlType === "XRLabel" && this["autoWidth"]());
                     }
                     else if (name === "processNullValues") {
                         return this["Summary"] && ko.unwrap(this["Summary"]["Running"]) !== "None";
@@ -23675,24 +23669,15 @@ var DevExpress;
                         return control.root;
                 }
                 Utils.findFirstParentWithPropertyName = findFirstParentWithPropertyName;
-                function addVaraiblesToExpressionEditor(categories, customizeItems) {
+                function addVariablesToExpressionEditor(categories, customizeItems) {
                     if (customizeItems === void 0) { customizeItems = function (items) { return items; }; }
-                    categories.push({
-                        displayName: Designer.getLocalization("Variables", "ReportStringId.ExpressionEditor_ItemInfo_Variables"),
-                        content: {
-                            isSelected: ko.observable(false),
-                            data: {
-                                items: customizeItems([
-                                    { text: "DataSource.CurrentRowIndex", val: "[DataSource.CurrentRowIndex]", descriptionStringId: 'ReportStringId.ExpressionEditor_ItemInfo_Variables_CurrentRowIndex_Description' },
-                                    { text: "DataSource.RowCount", val: "[DataSource.RowCount]", descriptionStringId: 'ReportStringId.ExpressionEditor_ItemInfo_Variables_RowCount_Description' }
-                                ]),
-                                selectedItem: ko.observable(null)
-                            },
-                            name: "dx-expressioneditor-collection"
-                        }
-                    });
+                    var items = customizeItems([
+                        { text: "DataSource.CurrentRowIndex", val: "[DataSource.CurrentRowIndex]", descriptionStringId: 'ReportStringId.ExpressionEditor_ItemInfo_Variables_CurrentRowIndex_Description' },
+                        { text: "DataSource.RowCount", val: "[DataSource.RowCount]", descriptionStringId: 'ReportStringId.ExpressionEditor_ItemInfo_Variables_RowCount_Description' }
+                    ]);
+                    categories.push(DevExpress.Analytics.Widgets.createExpressionEditorCollectionToolOptions(items, "Variables", "ReportStringId.ExpressionEditor_ItemInfo_Variables"));
                 }
-                Utils.addVaraiblesToExpressionEditor = addVaraiblesToExpressionEditor;
+                Utils.addVariablesToExpressionEditor = addVariablesToExpressionEditor;
                 function createIDataMemberInfoByName(name, specifics) {
                     if (specifics === void 0) { specifics = "list"; }
                     return {

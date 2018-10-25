@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 18.2.1-pre-18207
-* Build date: 2018-10-18
+* Version: 18.2.2-pre-beta
+* Build date: 2018-10-22
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2341,8 +2341,8 @@ var DevExpress;
                     if (!parameter.isMultiValue && (parameter.lookUpValues() || this.isEnumType(parameter))) {
                         info.editorOptions.searchEnabled = true;
                     }
-                    if (parameter.type === "System.DateTime" && !parameter.allowNull) {
-                        info.validationRules = [{ type: 'required', message: DevExpress.Designer.getLocalization('The value cannot be empty', "ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError") }];
+                    if ((parameter.type === "System.DateTime" || parameter.isTypesCurrentType(parameter.intTypes.concat(parameter.floatTypes), parameter.type)) && !parameter.allowNull) {
+                        info.validationRules = DevExpress.Analytics.Widgets.requiredValidationRules;
                     }
                     else if (parameter.type === "System.Guid") {
                         info.editorOptions.displayCustomValue = false;

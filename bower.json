@@ -1,11 +1,25 @@
 {
   "name": "xtrareportsjs",
-  "version": "18.2.1-pre-18291",
+  "version": "18.2.2-beta",
   "description": "DevExpress Reporting",
   "moduleType": [
     "globals"
   ],
-  "main": ["js/dx-designer.js", "js/dx-designer.min.js", "js/report-designer.js", "js/report-designer.min.js", "js/web-document-viewer.js", "js/web-document-viewer.min.js", "css/web-document-viewer-dark.css", "css/web-document-viewer-light.css", "css/report-designer-dark.css", "css/report-designer-light.css", "html/report-designer.html", "html/web-document-viewer.html"],
+  "main": [
+    "js/dx-analytics-core.js", 
+    "js/dx-querybuilder.js", 
+    "js/dx-webdocumentviewer.js", 
+    "js/dx-reportdesigner.js", 
+    "css/dx-querybuilder.min.css", 
+    "css/dx-webdocumentviewer.min.css", 
+    "css/dx-reportdesigner.min.css", 
+    "css/dx-analytics.common.min.css", 
+    "css/dx-analytics.light.min.css", 
+    "html/dx-analytics-core.html", 
+    "html/dx-querybuilder.html", 
+    "html/dx-webdocumentviewer.html",
+    "html/dx-reportdesigner.html"
+  ],
   "authors": [
     { "name": "Developer Express Inc.", "email": "support@devexpress.com", "homepage": "http://www.devexpress.com" }
   ],
@@ -15,13 +29,13 @@
   },
   "license": "http://www.devexpress.com/Support/EULAs/NetComponents.xml",
   "homepage": "http://www.devexpress.com/Subscriptions/Reporting",
-  "keywords": [ "xtrareports", "devexpress", "developer express", "reporting", "document viewer", "report designer"],
+  "keywords": [ "xtrareports", "devexpress", "developer express", "reporting", "document viewer", "report designer", "analytics"],
   "dependencies": {
     "jquery": "^2.2.3 || ^3.0.0",
     "jquery-ui": "^1.11.4",
     "knockout": "latest",
     "globalize": "^1.1",
-    "devextreme": "~18.2.1-pre-18225"
+    "devextreme": "~18.2.2-pre-beta"
   },
   "ignore": [
     "node_modules",
