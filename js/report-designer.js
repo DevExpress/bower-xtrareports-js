@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.6
-* Build date: 2018-09-03
+* Version: 18.1.7
+* Build date: 2018-09-26
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8119,8 +8119,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.6
-* Build date: 2018-09-03
+* Version: 18.1.7
+* Build date: 2018-10-24
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -9843,11 +9843,8 @@ var DevExpress;
                 ChartControlViewModel.prototype._initSeries = function (series) {
                     var _this = this;
                     series["getPath"] = function (propertyName) {
-                        if (propertyName === "argumentDataMember" || propertyName === "colorDataMember") {
+                        if (propertyName === "argumentDataMember" || propertyName === "colorDataMember" || propertyName === "summaryFunction") {
                             return _this.getPath("seriesDataMember");
-                        }
-                        else if (propertyName === "summaryFunction") {
-                            return _this.getPath("dataMember");
                         }
                     };
                     series["isPropertyDisabled"] = function (name) {
@@ -13148,6 +13145,7 @@ var DevExpress;
                             type: parameterInfo.TypeString,
                             value: _this._originalValue,
                             multiValue: parameterInfo.MultiValue,
+                            hasLookUpValues: !!_this.lookUpValues() || parameterHelper.isEnumType(_this),
                             visible: parameterInfo.Visible
                         };
                     };
@@ -13898,6 +13896,8 @@ var DevExpress;
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
+                                _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
+                                _this.documentBuilding(true);
                                 var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
@@ -13987,7 +13987,7 @@ var DevExpress;
                     }
                     this._startBuildOperationId = Preview.generateGuid();
                     this._currentDocumentId(null);
-                    this.progressBar.text(DevExpress.Designer.getLocalization('Document is building...', 'ASPxReportsStringId.WebDocumentViewer_DocumentBuilding'));
+                    this.progressBar.text(DevExpress.Designer.getLocalization("Creating the document...", "PreviewStringId.Msg_CreatingDocument"));
                     this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'));
                     this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
                     this.documentBuilding(true);
@@ -20556,7 +20556,7 @@ var DevExpress;
                 };
                 ControlViewModel.prototype.isPropertyDisabled = function (name) {
                     if (name === "textFitMode") {
-                        return this["canGrow"]() || this["canShrink"]() || this["wordWrap"]();
+                        return this["canGrow"]() || this["canShrink"]() || this["autoWidth"]();
                     }
                     else if (name === "processNullValues") {
                         return this["Summary"] && ko.unwrap(this["Summary"]["Running"]) !== "None";
@@ -21279,7 +21279,7 @@ var DevExpress;
                 };
                 CalculatedFieldsSource.prototype.getActions = function (context) {
                     var result = [];
-                    if (context.hasItems && context.path.indexOf("Parameters") !== 0) {
+                    if (context.hasItems && (context.data.specifics === "List" || context.data.specifics === "ListSource") && context.path.indexOf("Parameters") !== 0) {
                         result.push(this.addAction);
                     }
                     if (context.data.specifics && context.data.specifics.indexOf("calc") === 0) {
@@ -23202,12 +23202,14 @@ var DevExpress;
                     this.rightMarginOptions = function (undoEngine, element) {
                         if (!rightOptions) {
                             var margin = margins.right();
+                            var maxRightMargin = pageWidth() - margins.left() - 1;
                             rightOptions = _this._createOptions(undoEngine, function (ui) {
                                 margin = margins.right();
+                                maxRightMargin = pageWidth() - margins.left() - 1;
                                 $(ui.element).resizable("option", "minWidth", 0);
-                                $(ui.element).resizable("option", "maxWidth", pageWidth() - margins.left() - 1);
+                                $(ui.element).resizable("option", "maxWidth", maxRightMargin);
                             }, function (ui) {
-                                margins.right(Math.max(0, ui.size.width - ui.originalSize.width + margin));
+                                margins.right(Math.min(Math.max(0, ui.size.width - ui.originalSize.width + margin), maxRightMargin));
                                 if (!ui.element.hasClass("dxrd-ruler-shadow")) {
                                     $(ui.element).css({ left: _this.rightMarginResizableOffset(), width: 0 });
                                 }
@@ -24427,9 +24429,9 @@ var DevExpress;
                 modelName: "@CheckState", displayName: "Check State", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.CheckState", editor: DevExpress.JS.Widgets.editorTemplates.combobox,
                 defaultVal: "Unchecked",
                 valuesArray: [
-                    { value: "Unchecked", displayValue: "Unchecked", localizationId: "System.Windows.Forms.CheckState.Unchecked" },
-                    { value: "Checked", displayValue: "Checked", localizationId: "System.Windows.Forms.CheckState.Checked" },
-                    { value: "Indeterminate", displayValue: "Indeterminate", localizationId: "System.Windows.Forms.CheckState.Indeterminate" }
+                    { value: "Unchecked", displayValue: "Unchecked", localizationId: "StringId.CheckUnchecked" },
+                    { value: "Checked", displayValue: "Checked", localizationId: "StringId.CheckChecked" },
+                    { value: "Indeterminate", displayValue: "Indeterminate", localizationId: "StringId.CheckIndeterminate" }
                 ]
             };
             Report.checked = { propertyName: "checked", modelName: "@Checked", defaultVal: false, from: Designer.parseBool, displayName: "Checked", localizationId: "DevExpress.XtraReports.UI.XRCheckBox.Checked", editor: DevExpress.JS.Widgets.editorTemplates.bool };
@@ -27000,20 +27002,28 @@ var DevExpress;
             var calcCheckSum = { propertyName: "calcCheckSum", modelName: "@CalcCheckSum", defaultVal: true, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool, displayName: "Calculate a Checksum", localizationId: "DevExpress.XtraPrinting.BarCode.BarCodeGeneratorBase.CalcCheckSum" };
             var code93SerializationInfo = [defaultCodeSerializationInfo, calcCheckSum];
             var wideNarrowRation = { propertyName: "wideNarrowRation", modelName: "@WideNarrowRatio", defaultVal: 2.5, from: Designer.floatFromModel, displayName: "Wide Narrow Ratio", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarGenerator.WideNarrowRatio", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
+            var codabarStartStopSymbolValues = [
+                { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopSymbol.None" },
+                { value: "A", displayValue: "A", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopSymbol.A" },
+                { value: "B", displayValue: "B", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopSymbol.B" },
+                { value: "C", displayValue: "C", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopSymbol.C" },
+                { value: "D", displayValue: "D", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopSymbol.D" },
+            ];
+            var codaBarStartSymbol = {
+                propertyName: "startSymbol", modelName: "@StartSymbol", defaultVal: "A",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Start Symbol", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarGenerator.StartSymbol",
+                valuesArray: codabarStartStopSymbolValues
+            };
+            var codaBarStopSymbol = {
+                propertyName: "stopSymbol", modelName: "@StopSymbol", defaultVal: "A",
+                editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Stop Symbol", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarGenerator.StopSymbol",
+                valuesArray: codabarStartStopSymbolValues
+            };
             var codabarSerializationInfo = [
                 defaultCodeSerializationInfo,
-                wideNarrowRation,
-                {
-                    propertyName: "startStopPait",
-                    modelName: "@StartStopPair", defaultVal: "AT", editor: DevExpress.JS.Widgets.editorTemplates.combobox, displayName: "Start and Stop Symbols", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarGenerator.StartStopPair",
-                    valuesArray: [
-                        { value: "None", displayValue: "None", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.None" },
-                        { value: "AT", displayValue: "AT", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.AT" },
-                        { value: "BN", displayValue: "BN", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.BN" },
-                        { value: "CStar", displayValue: "CStar", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.CStar" },
-                        { value: "DE", displayValue: "DE", localizationId: "DevExpress.XtraPrinting.BarCode.CodabarStartStopPair.DE" }
-                    ]
-                },
+                codaBarStartSymbol,
+                codaBarStopSymbol,
+                wideNarrowRation
             ];
             var charset = {
                 propertyName: "characterSet",
@@ -31357,12 +31367,12 @@ var DevExpress;
                     this.designerModel.openReport(url);
                 };
                 JSReportDesigner.prototype.ShowPreview = function () {
+                    var _this = this;
                     var reportPreview = this.designerModel.reportPreviewModel.reportPreview;
                     reportPreview.previewVisible(true);
-                    reportPreview.initialize(DevExpress.Designer.Report.ReportPreviewService.initializePreview(this.designerModel.model()));
-                    this.designerModel.model.subscribe(function (newVal) {
-                        reportPreview.initialize(DevExpress.Designer.Report.ReportPreviewService.initializePreview(newVal));
-                    });
+                    setTimeout(function () {
+                        reportPreview.initialize(DevExpress.Designer.Report.ReportPreviewService.initializePreview(_this.designerModel.model()));
+                    }, 1);
                 };
                 return JSReportDesigner;
             })();
@@ -35285,12 +35295,14 @@ var DevExpress;
                     return Designer.Chart.ChartRequests.getChartImage(Report.HandlerUri, new DevExpress.JS.Utils.ModelSerializer().serialize(surface._control["chart"], Designer.Chart.chartSerializationsInfo), surface["position"].width(), surface["position"].height());
                 };
                 ReportRenderingService.getShapeImage = function (surface) {
+                    var _usefulRect = surface.getUsefulRect();
                     var params = {
                         shapeType: surface._control["Shape"]()["shapeType"] && surface._control["Shape"]()["shapeType"]() || "Ellipse",
-                        width: surface["_width"](),
+                        width: _usefulRect.width,
                         lineWidth: surface._control["lineWidth"](),
                         fillColor: Designer.colorToString(surface._control["fillColor"]()),
-                        height: surface["_height"](),
+                        lineStyle: surface._control["lineStyle"] && surface._control["lineStyle"]() || "Solid",
+                        height: _usefulRect.height,
                         fillet: surface._control["Shape"]()["fillet"] && surface._control["Shape"]()["fillet"]() || 0,
                         numberOfSides: surface._control["Shape"]()["numberOfSides"] && surface._control["Shape"]()["numberOfSides"]() || 3,
                         angle: surface._control["angle"] && surface._control["angle"]() || 0,
@@ -35304,6 +35316,7 @@ var DevExpress;
                         tailLength: surface._control["Shape"]()["tailLength"] && surface._control["Shape"]()["tailLength"]() || 30,
                         foreColor: Designer.colorToString(surface._control["foreColor"] && surface._control["foreColor"]() || "black"),
                         stretch: surface._control["stretch"] && surface._control["stretch"]() || false,
+                        padding: surface._control["padding"] && surface._control["padding"]() || DevExpress.Analytics.PaddingModel.defaultVal,
                         dpi: surface._control["dpi"] && surface._control["dpi"]() || 100
                     };
                     return DevExpress.Designer.Report.HandlerUri + "?actionKey=shapeGlyph&arg=" + encodeURIComponent(JSON.stringify(params));
@@ -36868,24 +36881,24 @@ var DevExpress;
                             }
                             else {
                                 fieldListProvider.getItems(pathRequest).done(function (value) {
-                                    if (pathRequest.pathParts.length <= 5) {
-                                        var currentParentNode = _this._getParentNode(pathRequest);
-                                        if (currentParentNode.children().length === 0) {
-                                            var array = [];
-                                            value.forEach(function (item) {
-                                                if (Report.isList(item)) {
+                                    var currentParentNode = _this._getParentNode(pathRequest);
+                                    if (currentParentNode.children().length === 0) {
+                                        var array = [];
+                                        value.forEach(function (item) {
+                                            if (Report.isList(item)) {
+                                                if (pathRequest.pathParts.length <= 5) {
                                                     array.push(generateTreeNode(item, false, [pathRequest.fullPath, item.name].join(".")));
                                                 }
-                                                else {
-                                                    array.push(generateTreeLeafNode(item, currentParentNode.checked(), [pathRequest.fullPath, item.name].join(".")));
-                                                }
-                                            });
-                                            currentParentNode.initializeChildern(array);
-                                            result.resolve(array);
-                                        }
-                                        else {
-                                            result.resolve(currentParentNode.children());
-                                        }
+                                            }
+                                            else {
+                                                array.push(generateTreeLeafNode(item, currentParentNode.checked(), [pathRequest.fullPath, item.name].join(".")));
+                                            }
+                                        });
+                                        currentParentNode.initializeChildern(array);
+                                        result.resolve(array);
+                                    }
+                                    else {
+                                        result.resolve(currentParentNode.children());
                                     }
                                 });
                             }
@@ -36898,7 +36911,7 @@ var DevExpress;
                         });
                     }
                     TreeNodeItemsProvider.prototype._getParentNode = function (pathRequest) {
-                        var parentNode = this._rootItems().filter(function (item) { return item.path === pathRequest.id; })[0];
+                        var parentNode = this._rootItems().filter(function (item) { return item.path === (pathRequest.id || pathRequest.ref); })[0];
                         var childPath = parentNode.path;
                         for (var index = 1; index < pathRequest.pathParts.length; index++) {
                             childPath += "." + pathRequest.pathParts[index];

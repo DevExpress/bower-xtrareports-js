@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 18.1.6
-* Build date: 2018-09-03
+* Version: 18.1.7
+* Build date: 2018-10-24
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2367,6 +2367,7 @@ var DevExpress;
                             type: parameterInfo.TypeString,
                             value: _this._originalValue,
                             multiValue: parameterInfo.MultiValue,
+                            hasLookUpValues: !!_this.lookUpValues() || parameterHelper.isEnumType(_this),
                             visible: parameterInfo.Visible
                         };
                     };
@@ -3117,6 +3118,8 @@ var DevExpress;
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
+                                _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
+                                _this.documentBuilding(true);
                                 var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
@@ -3206,7 +3209,7 @@ var DevExpress;
                     }
                     this._startBuildOperationId = Preview.generateGuid();
                     this._currentDocumentId(null);
-                    this.progressBar.text(DevExpress.Designer.getLocalization('Document is building...', 'ASPxReportsStringId.WebDocumentViewer_DocumentBuilding'));
+                    this.progressBar.text(DevExpress.Designer.getLocalization("Creating the document...", "PreviewStringId.Msg_CreatingDocument"));
                     this.progressBar.cancelText(DevExpress.Designer.getLocalization('Cancel', 'ASPxReportsStringId.SearchDialog_Cancel'));
                     this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
                     this.documentBuilding(true);
