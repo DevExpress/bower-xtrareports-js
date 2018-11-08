@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.css)
-* Version: 18.2.2-pre-beta
-* Build date: 2018-10-22
+* Version: 18.2.3
+* Build date: 2018-11-05
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -206,6 +206,9 @@
   color: gray;
   font-size: 10px;
   margin: 7px 13px 10px;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-search-wrapper .dxrdp-search-loading {
+  text-align: center;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-search-wrapper .dxrd-preview-search-result {
   top: 200px;
@@ -1013,6 +1016,8 @@
 .dx-picture-editing-imagescontainer .dx-picture-editing-block .dx-picture-editing-block-image {
   display: block;
   background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 .dx-picture-editing-imagescontainer .dx-picture-editing-block .dx-picture-editing-block-text {
   text-overflow: ellipsis;
@@ -1020,7 +1025,7 @@
   overflow: hidden;
   text-align: center;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   -ms-border-radius: 0;
@@ -1029,68 +1034,80 @@
   background-color: white;
   border-color: #0173c7;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-popup-content {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal > .dx-popover-arrow {
+  display: block;
+}
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal > .dx-popover-arrow:after {
+  border-color: #0173c7;
+}
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-popup-content {
   padding: 20px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options {
   width: 100%;
   height: 100%;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-width {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-width {
   height: 80px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-width .dx-picture-editing-line-width-slider {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-width .dx-picture-editing-line-width-slider {
   width: 100%;
   padding-top: 5px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-color {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-width .dx-picture-editing-line-width-slider .dx-popover-arrow:after {
+  right: 0;
+  bottom: 0;
+  -webkit-transform-origin: bottom right;
+  transform-origin: bottom right;
+}
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-color {
   padding-top: 15px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors {
   width: 100%;
   padding-top: 5px;
   font-size: 0;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors .dx-picture-editing-brush-options-color {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors .dx-picture-editing-brush-options-color {
   width: 23px;
   height: 23px;
   padding: 1px;
   display: inline-block;
   border: 1px dotted transparent;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors .dx-picture-editing-brush-options-color .dx-picture-editing-brush-options-color-cell {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors .dx-picture-editing-brush-options-color .dx-picture-editing-brush-options-color-cell {
   width: 19px;
   height: 19px;
   border: 1px solid #a6a6a6;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors .dx-picture-editing-brush-options-color.selected {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-color .dx-picture-editing-brush-options-colors .dx-picture-editing-brush-options-color.selected {
   border: 1px dotted #404040;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment {
   width: 100%;
   height: 100%;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode {
   width: 100%;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode .dx-picture-editing-sizemode-values {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode .dx-picture-editing-sizemode-values {
   width: 100px;
   padding-top: 5px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment .dx-picture-editing-alignment {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment .dx-picture-editing-alignment {
   padding-top: 15px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment .dx-picture-editing-alignment .dx-picture-editing-alignment-values {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment .dx-picture-editing-alignment .dx-picture-editing-alignment-values {
   width: 100%;
   padding-top: 5px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode-alignment-value {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode-alignment-value {
   width: 40px;
   height: 40px;
   display: inline-block;
   padding: 4px;
 }
-.dx-picture-edit-popup-content .dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode-alignment-value.selected {
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-sizemode-alignment .dx-picture-editing-sizemode-alignment-value.selected {
   background-color: #b8b8b8;
 }
 .dx-picture-edit-popup-content .dx-picture-editing-text {
@@ -1111,36 +1128,46 @@
         position: relative;
     }*/
 }
-.dx-picture-editing .dx-picture-editing-toolbar {
-  float: right;
+.dx-picture-editing-active {
+  position: absolute;
+  width: 48px;
+}
+.dx-picture-editing-active.dx-popup-wrapper > .dx-overlay-content {
+  border: none;
+  border-radius: unset;
+  box-shadow: none;
+  overflow: visible;
+}
+.dx-picture-editing-active.dx-popup-wrapper > .dx-overlay-content > .dx-popover-arrow {
+  display: none;
+}
+.dx-picture-editing-active.dx-popup-wrapper > .dx-overlay-content > .dx-popup-content {
+  padding: 0;
+}
+.dx-picture-editing-active .dx-picture-editing-toolbar {
   width: 48px;
   position: absolute;
-  right: -48px;
   z-index: 10;
 }
-.dx-picture-editing .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item {
+.dx-picture-editing-active .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item {
   width: 48px;
   height: 48px;
   background-color: #666666;
   position: relative;
 }
-.dx-picture-editing .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item .dx-picture-editing-toolbar-beak {
-  width: 15px;
-  height: 15px;
-  position: absolute;
-  right: -8px;
-  top: 34%;
-  background-color: #ffffff;
-  transform: rotate(45deg);
-  border-left: 1px solid #0173c7;
-  border-bottom: 1px solid #0173c7;
+.dx-picture-editing-active .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item .dx-picture-editing-toolbar-item-icon {
+  width: 48px;
+  height: 48px;
 }
-.dx-picture-editing .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item .dx-picture-editing-toolbar-item-icon {
+.dx-picture-editing-active .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item .dx-picture-editing-toolbar-item-icon svg {
   width: 24px;
   height: 24px;
-  padding: 12px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
 }
-.dx-picture-editing .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item:hover {
+.dx-picture-editing-active .dx-picture-editing-toolbar .dx-picture-editing-toolbar-item:hover {
   background-color: #535353;
 }
 /*@import 'mobile/widgets/circlemenu.less';*/

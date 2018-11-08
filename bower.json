@@ -1,6 +1,6 @@
 {
   "name": "xtrareportsjs",
-  "version": "18.2.2-beta",
+  "version": "18.2.3",
   "description": "DevExpress Reporting",
   "moduleType": [
     "globals"
@@ -35,7 +35,7 @@
     "jquery-ui": "^1.11.4",
     "knockout": "latest",
     "globalize": "^1.1",
-    "devextreme": "~18.2.2-pre-beta"
+    "devextreme": "18.2.3"
   },
   "ignore": [
     "node_modules",

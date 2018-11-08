@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.css)
-* Version: 18.2.2-pre-beta
-* Build date: 2018-10-22
+* Version: 18.2.3
+* Build date: 2018-11-05
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -376,8 +376,10 @@
   border-color: transparent;
 }
 .dxrd-reportdialog .dx-popup-content {
-  padding-bottom: 20px;
   margin-bottom: 0;
+}
+.dx-designer .dx-designer-viewport .dxrd-reportdialog .dx-popup-content {
+  padding: 20px;
 }
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-easy-content {
   margin: 40px 60px 35px 60px;
@@ -393,10 +395,6 @@
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-content .dx-texteditor-container .dx-placeholder {
   font-size: 14px;
   margin-top: 0;
-}
-.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-content .dxrd-reportdialog-urls {
-  border-width: 1px;
-  border-style: solid;
 }
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-content .dxrd-reportdialog-urls .dx-list-item {
   border: none;
@@ -560,6 +558,19 @@
   border-width: 1px;
   border-style: solid;
 }
+.dxrd-master-detail-report-wizard.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-selectlabelproduct-page {
+  width: 360px;
+  height: 209px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+}
+.dxrd-master-detail-report-wizard.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-selectlabelproduct-page .dxrd-wizard-selectlabelproduct-list {
+  padding-top: 0px;
+}
 .dxrd-wizard .dxrd-wizard-content .dxrd-wizard-selectlabelproduct-page {
   width: 360px;
   margin: 0 auto;
@@ -579,9 +590,6 @@
 }
 .dxrd-wizard .dxrd-wizard-content .dxrd-wizard-selectlabelproduct-page .dxrd-wizard-selectlabelproduct-list .dx-texteditor-input {
   font-size: 14px;
-}
-.dxrd-master-detail-report-wizard.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-selectlabelproduct-page .dxrd-wizard-selectlabelproduct-list {
-  padding-top: 91px;
 }
 .dxrd-wizard .dxrd-wizard-content .dxrd-wizard-selectlabelproduct-page .dxrd-wizard-selectproduct-props > div {
   padding: 5px 0 5px 0;
@@ -662,6 +670,16 @@
   margin-top: 6px;
   float: right;
   text-align: right;
+}
+.dxrd-master-detail-report-wizard.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-customizelabel-page {
+  width: 646px;
+  margin: auto;
+  height: 345px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 .dxrd-master-detail-report-wizard.dxrd-wizard .dxrd-wizard-content .dxrd-wizard-customizelabel-page .dxrd-wizard-customizelabel-head-props {
   height: 55px;
@@ -1499,12 +1517,20 @@
 }
 .dxrd-image-ghost-formattingrule,
 .dxrd-image-ghost-stylemodel {
-  border: none;
+  border-width: 0px;
+  border-style: none;
   border-width: 0;
   position: absolute;
 }
+.dxrd-control-border-box {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+}
 .dxrd-designer-wrapper .dxrd-image-ghost-bounded {
-  border: none;
+  border-width: 0px;
+  border-style: none;
   border-width: 0;
   position: absolute;
 }
@@ -1675,6 +1701,7 @@
   position: absolute;
   top: 100%;
   padding-left: 1em;
+  white-space: nowrap;
   padding-top: 0.5em;
   opacity: 0.75;
   cursor: default;
@@ -1937,7 +1964,8 @@
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-control .dxrd-table-row-control .dxrd-table-cell-control.dxrd-table-cell-over-rowSpan .ui-resizable-handle {
   height: 0;
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-control {
   position: absolute;
@@ -2006,18 +2034,21 @@
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-cross-band {
   position: absolute;
   z-index: 1;
+  box-sizing: border-box;
+}
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-cross-band.dxrd-intersect {
+  box-sizing: content-box;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection {
   z-index: 5;
 }
-.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-pagebreak.dxrd-selected {
-  border: 1px solid gray;
-}
-.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-pagebreak.dxrd-focused {
-  border: 1px solid gray;
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-selected .dxrd-control-border-box,
+.dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-focused .dxrd-control-border-box {
+  border-width: 2px;
+  border-style: solid;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-pagebreak.dxrd-selected.dxrd-locked {
-  border: 1px solid orangered;
+  border: 2px solid orangered;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-focused,
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-selected,
@@ -2108,7 +2139,8 @@
   border: 1px solid #e04a6f;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-intersect:not(.dxrd-selected) > .ui-resizable-handle {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-selected.dxrd-intersect:not(.dxrd-focused) > .ui-resizable-handle {
   background: #e04a6f;
@@ -2163,6 +2195,7 @@
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection .dxrd-vertical-band-marker {
   height: 27px;
   border: 1px solid #a7a7ab;
+  position: relative;
   overflow: hidden;
   background-color: #B3DCEE;
   text-align: left;
@@ -2199,7 +2232,8 @@
   left: 0px;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-main .dxrd-control.dxrd-control-table-of-content.dxrd-intersect {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-main .dxrd-control.dxrd-control-table-of-content.dxrd-intersect::before {
   border: 1px solid rgba(255, 0, 0, 0.5);
@@ -2210,7 +2244,8 @@
   line-height: inherit;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-main .dxrd-control.dxrd-control-table-of-content .dxrd-control-table-of-content-levelsElements .dxrd-control-content .dxrd-control-content-level-text table {
-  border: none;
+  border-width: 0px;
+  border-style: none;
   vertical-align: top;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-main .dxrd-control.dxrd-control-table-of-content .dxrd-control-table-of-content-levelsElements .dxrd-control-content .dxrd-control-content-level-text table td {
@@ -2280,7 +2315,8 @@
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-main .dxrd-cross-band .dxrd-control {
   background-color: transparent;
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-main .dxrd-cross-band .dxrd-cross-band-intersect {
   stroke: rgba(255, 0, 0, 0.2);
@@ -2302,24 +2338,28 @@
   border: 1px solid #e04a6f;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-of-contents-selected.dxrd-intersect .ui-resizable-resizing .ui-resizable-handle {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-of-contents-selected.dxrd-intersect .dxrd-control-line-ui-resizeble .ui-resizable-handle {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-of-contents-selected .dxrd-control-line-ui-resizeble .ui-resizable-s {
   width: 100%;
   height: 7px;
   bottom: -5px;
   left: 4px;
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-table-of-contents-selected .ui-resizable-resizing .ui-resizable-s {
   width: 100%;
   height: 7px;
   bottom: -5px;
   left: 4px;
-  border: none;
+  border-width: 0px;
+  border-style: none;
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAIAAAAW4yFwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXYwADBgYAAAgAAWnvujMAAAAASUVORK5CYII=) repeat-x 3px 0;
 }
 .dxrd-designer-wrapper .dxrd-surface-wrapper .dxrd-surface .dxrd-content-panel-wrapper .dxrd-viewport .dxrd-selection.ghost .dxrd-focused {
@@ -2398,7 +2438,8 @@
   left: 64px;
 }
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-tabs-wrapper .dx-tab,
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-indent-wrapper .dx-tab {
@@ -2479,11 +2520,13 @@
 }
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-tabs-wrapper .dx-tab-selected:after,
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-indent-wrapper .dx-tab-selected:after {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-tabs-wrapper .dx-tab.dx-state-focused:after,
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-indent-wrapper .dx-tab.dx-state-focused:after {
-  border: none;
+  border-width: 0px;
+  border-style: none;
 }
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-tabs-wrapper .dx-state-focused,
 .dxrd-designer-wrapper .dxrd-navigation-panel-wrapper .dx-tabs .dx-indent-wrapper .dx-state-focused {

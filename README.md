@@ -3,7 +3,7 @@
 To install with `bower`, run the following command:
 
 ```shell
-bower install xtrareportsjs#18.2.2-beta
+bower install xtrareportsjs
 ```
 
 ## Documentation
