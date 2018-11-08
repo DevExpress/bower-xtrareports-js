@@ -1,13 +1,129 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.2.1-pre-18207
-* Build date: 2018-09-27
+* Version: 18.2.3
+* Build date: 2018-11-08
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
 
+<script type="text/html" id="dx-picture-editing">
+    <div class="dx-picture-editing">
+        <canvas style="position:absolute;top: 0px;left: 0px;" data-bind="zoom: scale"></canvas>
+        <div class="dx-picture-editing-active" data-bind="dxPopup: {
+                width: 48, height: 'auto',
+                position:{ my: 'left top', at: 'right top', boundary: '.dxrd-preview-surface', of: $data.$element, collision: 'fit fit' },
+                container: '.dx-designer',
+                target: '.dx-designer',
+                showTitle: false,
+                showCloseButton: false,
+                animation: {},
+                shading: false,
+                visible: $data.isActive
+            }">
+            <div data-options="dxTemplate: { name: 'content' }">
+                <div class="dx-picture-editing-toolbar" data-bind="foreach: $data.actions">
+                    <div class="dx-picture-editing-toolbar-item" data-bind="dxAction: $data.action, attr: { title: title }">
+                        <div class="dx-picture-editing-toolbar-item-icon" data-bind="template: { name: icon, afterRender: $data.renderedHandler }"></div>
+                    </div>
+                    <!-- ko template: { if: $data.template, name: $data.template, data: $data.templateOptions }-->
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dx-file-dialog">
+    <input type="file" accept="image/*" style="display:none">
+</script>
+
+<script type="text/html" id="dx-picture-editing-toolbar-popup">
+    <div class="dx-picture-edit-popup-content" data-bind="dxPopover: {
+            width: width,
+            height: height,
+            closeOnOutsideClick: $data.closeOnOutsideClick,
+            onShown: $data.onShown,
+            onContentReady: $data.onContentReady,
+            position: { my: 'left top', at: 'right top', boundary: '.dx-designer', of: getPositionTarget(), collision: 'none fit', offset: '-10 0' },
+            container: getPositionTarget(),
+            showTitle: false,
+            target: getPositionTarget(),
+            showCloseButton: false,
+            shading: false,
+            animation: {},
+            visible: visible }">
+        <!-- ko template: { name: contentTemplate, data: contentData } -->
+        <!--/ko-->
+    </div>
+</script>
+
+<script type="text/html" id="dx-picture-editing-brush-options">
+    <div class="dx-picture-editing-brush-options">
+        <div class="dx-picture-editing-line-width">
+            <div class="dx-picture-editing-text" data-bind="text: brushWidthText"></div>
+            <div class="dx-picture-editing-line-width-slider" data-bind="dxSlider: { min: 1, max: 9, value: $data.lineWidth,
+             label: { visible: true },
+             tooltip: { enabled: true, showMode: 'always', position: 'bottom' } }"></div>
+        </div>
+        <div class="dx-picture-editing-line-color">
+            <div class="dx-picture-editing-text" data-bind="text: brushColorText"></div>
+            <div class="dx-picture-editing-brush-options-colors" data-bind="foreach: $data.colors">
+                <div class="dx-picture-editing-brush-options-color" data-bind="css: { selected: $data.isSelected }">
+                    <div class="dx-picture-editing-brush-options-color-cell" data-bind="style: { background: $data.value }, dxAction: $data.action"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dx-picture-editing-sizemode-alignment">
+    <div class="dx-picture-editing-sizemode-alignment">
+        <div class="dx-picture-editing-sizemode">
+            <div class="dx-picture-editing-text" data-bind="text: sizeModeText"></div>
+            <div class="dx-picture-editing-sizemode-values" data-bind="foreach: { data: sizeModeValues }">
+                <div class="dx-picture-editing-sizemode-alignment-value" data-bind="css: { selected: isSelected }, template: $data.iconTemplate, dxAction: $data.action">
+                </div>
+            </div>
+        </div>
+        <div class="dx-picture-editing-alignment">
+            <div class="dx-picture-editing-text" data-bind="text: alignmentText"></div>
+            <div class="dx-picture-editing-alignment-values" data-bind="foreach: { data: alignmentValues }">
+                <div class="dx-picture-editing-sizemode-alignment-value" data-bind="css: { selected: isSelected }, template: $data.iconTemplate, dxAction: $data.action">
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dx-picture-editing-imagepickerwithfilter">
+    <div class="dx-picture-editing-filtercontent" data-bind="styleunit: { width: contentWidth }">
+        <div class="dx-picture-editing-filtercontent-editor" data-bind="dxTextBox: { value: filter, valueChangeEvent: 'keyup', placeholder: searchPlaceholder(), showClearButton: true  }"></div>
+        <div class="dx-picture-editing-filtercontent-images">
+            <!-- ko template: 'dx-picture-editing-imagespicker' -->
+            <!-- /ko -->
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="dx-picture-editing-imagespicker">
+    <div class="dx-picture-editing-imagescontainer dxd-text-primary" data-bind="styleunit: { width: contentWidth }, dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }">
+        <!-- ko foreach: images -->
+        <div class="dx-picture-editing-block dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: $parent.width + 10 }, visible: visible, click: function() { $parent.action($data); }">
+            <div class="dx-picture-editing-block-image" data-bind="styleunit: { width: $parent.width, height: $parent.height }, style: { backgroundImage: 'url(' + ($data.url || $data.data) + ')' }"></div>
+            <!-- ko if: $data.text-->
+            <!-- ko if: $parent.filterEnabled -->
+            <div class="dx-picture-editing-block-text" data-bind="searchHighlighting: { text: $data.text, textToSearch: $parent.filter }, attr: { title: $data.text }"></div>
+            <!-- /ko -->
+            <!-- ko ifnot: $parent.filterEnabled -->
+            <div class="dx-picture-editing-block-text" data-bind="text: $data.text, attr: { title: $data.text }"></div>
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+</script>
 <script type="text/html" id="dxrp-editing-field-container">
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle(), zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
         <div class="dxrp-editing-field-borders" data-bind="style: borderStyle()"></div>
@@ -46,6 +162,12 @@
     <div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: options, childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
 </script>
 
+<script type="text/html" id="dxrp-editing-field-image">
+    <div class="dxrp-editing-field-container" data-bind="style: containerStyle()">
+        <div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: { image: $data.getImage(), imageType: $data.getImageType(), imageMode: editMode, alignment: alignment, sizeMode: sizeMode, callbacks: callbacks, isActive: isActive, zoom: zoom, popupOptions: popupOptions }"></div>
+    </div>
+</script>
+
 <script type="text/html" id="dxrp-editing-field-checkbox">
     <div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">
         <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">
@@ -82,6 +204,7 @@
         <!--/ko-->
     </div>
 </script>
+
 <script type="text/html" id="dxrdp-search-mobile">
     <!-- ko if: $data.enabled -->
     <div class="dxrdp-search-wrapper" data-bind="styleunit:{ height: height }, dxrdSearchBar: $data">
@@ -346,7 +469,9 @@
             <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Report.Preview.formatSearchResult($data)"></div>
         </div>
         <!-- /ko -->
-        <div class="dxrd-preview-search-result" data-bind="dxLoadIndicator: { visible: loading, height: '30px', weight: '30px' }"></div>
+        <div class="dxrd-preview-search-result dxrdp-search-loading" data-bind="visible: loading">
+            <div data-bind="dxLoadIndicator: { height: '30px', width: '30px' }"></div>
+        </div>
     </div>
     <!-- /ko -->
 </div>
@@ -414,7 +539,7 @@
 
 <script type="text/html" id="dxrd-multivalue">
     <!-- ko with: value -->
-    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems, placeholder: $root.dx.Analytics.Localization.selectPlaceholder() })">
+    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: ['displayValue'], value: value, displayExpr: 'displayValue', valueExpr: 'value', multiline: false, showSelectionControls: true, showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems, maxDisplayedTags: $data.maxDisplayedTags })">
     </div>
     <!-- /ko -->
 </script>

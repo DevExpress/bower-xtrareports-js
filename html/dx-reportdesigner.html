@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 18.2.1-pre-18207
-* Build date: 2018-09-27
+* Version: 18.2.3
+* Build date: 2018-11-08
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -203,8 +203,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 18.2.1-pre-18207
-* Build date: 2018-09-27
+* Version: 18.2.3
+* Build date: 2018-11-08
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -375,7 +375,7 @@
 
 <script type="text/html" id="dxrd-band-collapsed">
     <!-- ko if: collapsed -->
-    <div class="dxrd-band-collapsed dxd-selectable" data-bind="styleunit: { 'height': height, 'line-height': height, 'top': absolutePosition.y }" style="position:absolute">
+    <div class="dxrd-band-collapsed dxd-selectable" data-bind="styleunit: { 'height': height, 'line-height': height, 'top': absolutePosition.y, width: rect().width }" style="position:absolute">
         <!-- ko if: $root.surface().rtl() -->
         <div style="position: absolute" data-bind="text: (name() || '').toUpperCase(), styleunit: { 'right': leftMargin }"></div>
         <!-- /ko -->
@@ -398,7 +398,7 @@
     <!-- /ko -->
 </script>
 <script type="text/html" id="dxrd-vertical-band-selection">
-    <div data-bind="styleunit: { 'height': height, 'width': _width, left: absolutePosition.x }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting() }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;}, handles: 'w, e, s', disabled: !canResize(), forceResize: resize, zoom: $root.surface().zoom, minimumWidth: minWidth, minimumHeight: minimumHeight()  },  css: { 'dxrd-band-content-selected': selected() }, trackCursor: underCursor" style="position:absolute">
+    <div data-bind="styleunit: { 'height': height, 'width': _width, left: absolutePosition.x }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting() }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;}, handles: resizeHandles(), disabled: !canResize(), forceResize: resize, zoom: $root.surface().zoom, minimumWidth: minimumWidth(), minimumHeight: minimumHeight() },  css: { 'dxrd-band-content-selected': selected() }, trackCursor: underCursor" style="position:absolute">
         <div class="dxrd-vertical-band-marker" data-bind="css: { 'dxrd-vertical-band-marker-focused': focused }">
             <div class="dxrd-banding-marker-text" data-bind="text: name"></div>
         </div>
@@ -427,20 +427,26 @@
 
 <script type="text/html" id="dxrd-vertical-bands-container">
     <!-- ko ifnot: collapsed -->
-    <div class="dxrd-band-content dxrd-vertical-bands-container" data-bind="styleunit: { 'height': height, left: leftOffset, 'width': width, top: topOffset }">
+    <div class="dxrd-band-content dxrd-vertical-bands-container" data-bind="styleunit: { 'height': height, left: leftOffset, 'width': width, top: topOffset },
+        resizable: { starting: function() {
+            $root.resizeHandler.started = true; $root.resizeHandler.starting();
+        }, stopped: function() {
+            $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;
+        }, handles: 's', forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight || 1 }">
         <div data-bind="styleunit: { 'width': width }" style="height: 100%; overflow:hidden;position: absolute;">
             <div data-bind="style: { transform: 'translateX(-' + $data.scrollOffset() + 'px)' }">
                 <!-- ko foreach: verticalBands -->
                 <!-- ko template: { name: templateName } -->
                 <!-- /ko -->
                 <!-- /ko -->
-                <div data-bind="styleunit: { width: grayAreaWidth, height: height, left: grayAreaLeft }" class="dxrd-band-content-greyarea"></div>
+                <div data-bind="styleunit: { width: grayAreaWidth, height: height, left: !$root.surface().rtl() ? grayAreaLeft : 0  }" class="dxrd-band-content-greyarea"></div>
             </div>
         </div>
     </div>
     <!-- /ko -->
     <!-- ko if: collapsed -->
-    <div class="dxrd-band-collapsed" data-bind="styleunit: { 'height': height, left: leftOffset, 'line-height': height, 'top': topOffset }" style="position:absolute">
+    <div class="dxrd-band-collapsed" data-bind="styleunit: { 'height': height, 'line-height': height, 'top': topOffset, width: width }" style="position:absolute">
+        <div style="position: absolute" data-bind="text: (name || '').toUpperCase(), styleunit: { 'right': $root.surface().rtl() ? leftMargin : 'auto', 'left': !$root.surface().rtl() ? leftMargin: 'auto' }"></div>
     </div>
     <!-- /ko -->
 </script>
@@ -469,7 +475,25 @@
     }, handles: 's', forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight || 1 }">
             <div data-bind="ruler: { 'zoom': zoom, 'length': height, 'units': $parent.measureUnit, 'direction': 'vertical', flip: $root.dx['config']()['rtlEnabled'] }"></div>
         </div>
-        <div class="dxrd-band-marker dxrd-band-marker-body" data-bind="styleunit: { 'height': height(), 'width': markerWidth }, click: function(_, e) { $data.collapsed(!$data.collapsed()); e.stopPropagation(); }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting(); $root.selection.initialize($data); }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false; }, handles: 's', disabled: collapsed, forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight() }">
+        <div class="dxrd-band-marker dxrd-band-marker-body" data-bind="
+             css: { 
+                'dxrd-band-marker-body' : !$data.focused(),
+                'dxrd-band-marker-body-focused' : $data.focused() 
+             }, 
+             styleunit: {
+                'height': height(), 
+                'width': markerWidth 
+             }, 
+             click: function(_, e) { $data.markerClick($root.selection); e.stopPropagation(); },
+             resizable: { 
+                starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting(); }, 
+                stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false; },
+                handles: 's', 
+                disabled: collapsed, 
+                forceResize: resize, 
+                zoom: $root.surface().zoom, 
+                minimumHeight: minHeight() 
+             }">
             <div style="width: 1px; height: 1px; margin-left: 9px;"></div>
             <div class="dxrd-band-marker-rotation">
                 <div class="dxrd-band-marker-rotation-text" data-bind="text: collapsed() ? '' : name"></div>
@@ -488,7 +512,7 @@
 
 <script type="text/html" id="dxrd-vertical-bands-leftMargin">
     <!-- ko with: surface -->
-    <div class="dxrd-band-content" data-bind="styleunit: { 'height': height, top: topOffset }">
+    <div data-bind="css: { 'dxrd-band-content': !$data.collapsed(), 'dxrd-band-collapsed': $data.collapsed() }, styleunit: { 'height': height, top: topOffset }">
     </div>
     <!-- /ko -->
 </script>
@@ -547,6 +571,7 @@
 
 <script type='text/html' id='dxrd-chart-selection'>
 <div class="dxrd-control" data-bind="visible: selected() || focused(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+    <div class="dxd-border-accented dxrd-control-border-box"></div>
     <div class="dxrd-chart-panel">
         <div class="dxrd-chart-panel-text" data-bind="dxAction: function() { $root.runChartDesigner($data); }, text: runDesignerButtonText(), attr: { title: runDesignerButtonText() }"></div>
     </div>
@@ -572,6 +597,7 @@
 
 <script type='text/html' id='dxrd-control-selection'>
 <div class="dxrd-control" data-bind="event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: selected() || focused(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+    <div class="dxd-border-accented dxrd-control-border-box"></div>
     <!-- ko if: $root.inlineTextEdit.visible() && selected() -->
     <!-- ko with: $root.inlineTextEdit-->
     <div class="inline-text-edit" data-bind="dxTextArea: { value: text, onKeyUp: keypressAction, valueChangeEvent: 'keyup' }"></div>
@@ -718,7 +744,7 @@
         <div class="dxrd-fieldslist-wrapper-header" data-bind="text: $root.getLocalization('Field List', 'ReportStringId.UD_Title_FieldList')"></div>
         <div id="btn-add-dataSouce" class="dxrd-collectioneditor-action" style="line-height: 20px; margin-top: 8px" data-bind="dxButtonWithTemplate: { onClick: showPopover, icon: 'dxrd-svg-operations-add_datasource', iconClass: 'dxrd-image-add-datasource', visible: addDataSourceBtnVisible }, attr: { title: $root.getLocalization('Add Data Source', 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText') }">
         </div>
-        <div class="dxrd-add-dataSource-popup-content" data-bind="dxPopover:{ width: 200, visible: popoverVisible, target: '#btn-add-dataSouce', title:$root.getLocalization('Add Data Source', 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText') + ':' }">
+        <div class="dxrd-add-dataSource-popup-content" data-bind="dxPopover:{ width: 200, visible: popoverVisible, target: '#btn-add-dataSouce', container: $root.getPopupContainer($element), title:$root.getLocalization('Add Data Source', 'ReportStringId.UD_Title_FieldList_AddNewDataSourceText') + ':' }">
             <div data-bind="dxList: { dataSource: dataSourceListItems(), onItemClick: itemClickAction }">
                 <div data-options="dxTemplate : { name: 'item' }">
                     <div class="dxrd-list-item-ellipsis-text" data-bind="text: name, attr: { title: name }"></div>
@@ -773,6 +799,7 @@
 </script>
 <script type='text/html' id='dxrd-pagebreak-selection'>
 <div class="dxrd-control dxrd-pagebreak" data-bind="visible: isSelected(), trackCursor: underCursor, css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-locked': locked }, draggable: $root.dragHandler, styleunit: { 'width': position.width(), 'height': 3, 'top': position.top() - 1, left: position.left() }">
+    <div class="dxd-border-accented dxrd-control-border-box"></div>
 </div>
 <div class="dxrd-control dxrd-pagebreak" data-bind="visible: !isSelected(), trackCursor: underCursor, styleunit: { 'width': position.width(), 'height': 3, 'top': position.top() - 1, left: position.left() }">
 </div>
@@ -783,6 +810,18 @@
     <div data-bind="zoom: _context.zoom, template: contenttemplate, styleunit: { 'lineHeight': lineHeight, 'height': lineHeight, 'width': position.width() / _context.zoom() }">
     </div>
 </div>
+</script>
+
+<script type='text/html' id='dxrd-picturebox-selection'>
+<div class="dxrd-control" data-bind="visible: selected() || focused(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $data.getResizeOptions($root.resizeHandler), draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+    <div class="dxd-border-accented dxrd-control-border-box"></div>
+</div>
+<div class="dxrd-control" data-bind="visible: !(selected() && focused()), styleunit: position, trackCursor: underCursor, style:{ overflow: isSelected() ? 'visible' : 'hidden'}">
+    <div class="dxrd-control-content-select-main" data-bind="styleunit: { 'top': contentSizes().top + (isIntersect() ? 1 : 0), 'left': contentSizes().left + (isIntersect()? 1 : 0), lineHeight: contentSizes().height, height: contentSizes().height, width: contentSizes().width}">
+    </div>
+</div>
+
+
 </script>
 
 <script type='text/html' id='dxrd-pivotgrid-field-selection'>
@@ -796,8 +835,6 @@
 </div>
 </script>
 
-<script type="text/html">
-</script>
 <script type="text/html" id="dxrd-pivotGridFields">
     <div class="dxrd-editor" data-bind="visible: visible">
         <div data-bind="dxCollectionEditor: { values: value, addHandler: $root.dx.Designer.Pivot.PivotGridFieldViewModel.createNew(_model), displayName: $root.getLocalization(displayName), level: level, info: info }">
@@ -1004,6 +1041,7 @@
         <!-- /ko -->
     </div>
     <div class="dxrd-control" data-bind="visible: $data.selected() || $data.focused(), css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked, 'dxrd-control-rtl': getControlModel().rtl() }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+        <div class="dxd-border-accented dxrd-control-border-box"></div>
         <!-- ko template: 'dxrd-pivotgrid-selection-context' -->
         <!-- /ko -->
     </div>
@@ -1049,9 +1087,11 @@
                 <div data-bind="dxTextBox: { value: $data.reportName, height: 36, placeholder: reportNamePlaceholder(), valueChangeEvent: 'keyup' }"></div>
             </div>
         </div>
-        <div class="dxrd-reportdialog-urls dxd-border-secondary" data-bind="dxList: { dataSource: urls, selectedItems: [], editEnabled: true, height: 200, editConfig: { selectionEnabled: true }, selectionMode: 'single', onItemClick: function(e) { this.reportName(e.itemData.Value); }, activeStateEnabled: false, noDataText: $data.noDataText, nextButtonText: $root.getLocalization('More', 'ASPxReportsStringId.List_More') }">
-            <div data-options="dxTemplate : { name: 'item' }">
-                <div data-bind="text: $data.Value"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-reportdialog-urls" data-bind="dxList: { dataSource: urls, selectedItems: [], editEnabled: true, height: 200, editConfig: { selectionEnabled: true }, selectionMode: 'single', onItemClick: function(e) { this.reportName(e.itemData.Value); }, activeStateEnabled: false, noDataText: $data.noDataText, nextButtonText: $root.getLocalization('More', 'ASPxReportsStringId.List_More') }">
+                <div data-options="dxTemplate : { name: 'item' }">
+                    <div data-bind="text: $data.Value"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1068,9 +1108,11 @@
                 <div class="dx-property-grid-search-box" data-bind="dxTextBox: { mode: 'search', height: 36, value: searchValue, valueChangeEvent: 'keyup', placeholder: searchPlaceholder(), showClearButton: true }"></div>
             </div>
         </div>
-        <div class="dxrd-reportdialog-urls dxd-border-secondary" data-bind="dxList: { dataSource: urls, selectedItems: [], searchExpr: ['Value'], searchValue: searchValue, editEnabled: true, height: 200, editConfig: { selectionEnabled: true }, selectionMode: 'single', onItemClick: function(e) { this.reportUrl(e.itemData.Key); }, activeStateEnabled: false, nextButtonText: $root.getLocalization('More', 'ASPxReportsStringId.List_More'), noDataText: $data.noDataText }">
-            <div data-options="dxTemplate : { name: 'item' }">
-                <div data-bind="text: $data.Value"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-reportdialog-urls" data-bind="dxList: { dataSource: urls, selectedItems: [], searchExpr: ['Value'], searchValue: searchValue, editEnabled: true, height: 200, editConfig: { selectionEnabled: true }, selectionMode: 'single', onItemClick: function(e) { this.reportUrl(e.itemData.Key); }, activeStateEnabled: false, nextButtonText: $root.getLocalization('More', 'ASPxReportsStringId.List_More'), noDataText: $data.noDataText }">
+                <div data-options="dxTemplate : { name: 'item' }">
+                    <div data-bind="text: $data.Value"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1265,6 +1307,7 @@
 
 <script type='text/html' id='dxrd-subreport-selection'>
 <div class="dxrd-control" data-bind="event: { dblclick:  function (control, e) { $root.navigateByReports.goToSubreport(control); } }, visible: isSelected, css: {'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+    <div class="dxd-border-accented dxrd-control-border-box"></div>
 </div>
 <div class="dxrd-control" data-bind="visible: !isSelected(), styleunit: position, trackCursor: underCursor">
 </div></script>
@@ -1295,6 +1338,7 @@
 </div>
 
 <div class="dxrd-table-control" data-bind="visible: selected() || focused(), css: { 'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, resizable: $root.resizeHandler, draggable: $root.dragHandler, styleunit: position">
+    <div class="dxd-border-accented dxrd-control-border-box"></div>
     <!-- ko if: rows().length > 0 -->
     <!-- ko foreach: rows()[0].cells -->
     <div class="dxrd-table-column-selection dxrd-table-column-selection-top" data-bind="click: function(_, e) { selectColumn($root.selection); e.stopPropagation(); }, visible: !$root.dx.Designer.DragDropHandler.started(), styleunit: { 'left': position.left, 'width': position.width }"></div>
@@ -1326,9 +1370,11 @@
     <!-- /ko -->
     <!-- ko foreach: rows -->
     <div class="dxrd-table-row-control" data-bind="visible: isSelected(), css: { 'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-locked': locked }, resizable: { starting: $root.resizeHandler.starting, stopped: $root.resizeHandler.stopped, handles: 'n,s', disabled: !(selected() || focused()), zoom: $root.surface().zoom }, styleunit: { 'top': position.top, 'height': position.height }">
+        <div class="dxd-border-accented dxrd-control-border-box"></div>
         <div class="dxrd-table-row-selection dxrd-table-row-selection-left" data-bind="visible: !$root.dx.Designer.DragDropHandler.started(), trackCursor: underCursor"></div>
         <!-- ko foreach: cells -->
         <div class="dxrd-table-cell-control" data-bind="trackCursor: underCursor, event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: isSelected, css: { 'dxrd-selected': selected, 'dxrd-focused': focused, 'dxrd-intersect': isIntersect, 'dxrd-locked': locked, 'dxrd-table-cell-over-rowSpan': rowSpan() === 0  }, resizable: { starting: $root.resizeHandler.starting, stopped: $root.resizeHandler.stopped, handles: 'e,w', disabled: !(selected() || focused()), zoom: $root.surface().zoom, snapHelper: $root.resizeHandler.snapHelper }, styleunit: { 'left': position.left, 'width': position.width, 'height': heightWithRowSpan }, style : { 'z-index': offsetZIndex() }">
+            <div class="dxd-border-accented dxrd-control-border-box"></div>
             <!-- ko if: $root.inlineTextEdit.visible() && selected() -->
             <!-- ko with: $root.inlineTextEdit-->
             <div class="inline-text-edit" data-bind="dxTextArea: { value: text, onKeyUp: keypressAction, valueChangeEvent: 'keyup' }"></div>
@@ -1454,7 +1500,8 @@
 
 
 <script type="text/html" id="dxrd-table-of-contents-selected">
-    <div class="dxrd-control dxrd-table-of-contents-selected" data-bind="event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: isSelected, css: {'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">    
+    <div class="dxrd-control dxrd-table-of-contents-selected" data-bind="event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: isSelected, css: {'dxrd-intersect': isIntersect, 'dxrd-locked': locked }, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">
+        <div class="dxd-border-accented dxrd-control-border-box"></div>
         <!-- ko with: levelTitle -->
         <div class="dxrd-control dxrd-control-line-ui-resizeble" data-bind="styleunit: position, resizable: resizable($root.resizeHandler, $element)">
             <!-- ko with: $root.inlineTextEdit-->
@@ -1522,7 +1569,7 @@
 
 <script type='text/html' id='dxrd-todocontrol'>
 <div class="dxrd-control dxd-selectable" data-bind="styleunit: position, trackCursor: underCursor, style: css, css: adorntemplate">
-    <div data-bind="style: borderCss" style="width:100%; height: 100%; position:absolute; box-sizing:border-box"></div>
+    <div data-bind="style: borderCss" class="dxrd-control-border-box"></div>
     <div data-bind="css: controlTypeClass, template: controlTypeIconTemplate" style="position: absolute; width: 24px; height: 24px; right: 5px; top: 5px;"></div>
     <span class="dxrd-control-content" data-bind="text: displayName, style: contentCss"></span>
 </div>
@@ -1535,9 +1582,6 @@
 <!-- ko if: $data.reportSurface.watermark.text() -->
 <div data-bind="css: {'dxrd-flip': forLeftMargin }, dxWatermark: { band: band, reportSurface: reportSurface, forLeftMargin: forLeftMargin, image: reportSurface._watermarkTextRenderingResult(), transparency: reportSurface.watermark.textTransparency(), viewMode: 'Stretch', align: 'MiddleCenter', tiling: false }" style="position: absolute"></div>
 <!-- /ko --></script>
-
-<script type="text/html">
-</script>
 
 <script type="text/html" id="dxrd-viewStyle">
     <div data-bind="dxLocalizedSelectBox: { items: viewmodel.items, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }"></div>
@@ -1730,7 +1774,7 @@
 </script>
 
 <script type="text/html" id="dxrd-editOptionsEditorName">
-    <div data-bind="dxFieldListPicker: new $root.dx.Designer.Report.EditOptionsEditorNameEditorModel(value, disabled)"></div>
+    <div data-bind="dxFieldListPicker: $data"></div>
 </script>
 
 <script type="text/html" id="dxrd-editingField-editor-treelist-item">
@@ -1776,13 +1820,52 @@
     <div data-bind="dxImageSourceEditor: { value: value, placeHolder: 'Image', accept: 'image/*', type: 'img', disabled: disabled }"></div>
 </script>
 
+<script type='text/html' id='dxrd-page-colorScheme'>
+<div class="dxrd-wizard-page dxrd-page-color-scheme">
+    <!-- ko foreach: lookupData.scheme -->
+    <div class="dxrd-page-color-scheme-tile" data-bind="click: function () { $parent.applyScheme($data); }, style: { backgroundColor: color }">
+        <div class="dxrd-page-color-scheme-tile-content">
+            <!-- ko ifnot: $data.name === 'Custom' -->
+            <div class="dxrd-page-color-scheme-tile-content-title" data-bind="text: displayName"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.name === 'Custom' -->
+            <div class="dxrd-page-color-scheme-tile-content-custom">
+                <div class="dxrd-page-color-scheme-tile-content-title" data-bind="text: displayName"></div>
+                <div class="dxrd-page-color-scheme-tile-content-edit" data-bind="css: { 'dxrd-page-color-scheme-tile-content-edit-active': $data.popoverVisible() }, click: function() { $data.popoverVisible(!$data.popoverVisible()) }">
+                    <div class="dxrd-page-color-scheme-tile-content-edit-icon" data-bind="template:'dxrd-svg-color_gear'"></div>
+                </div>
+            </div>
+            <div class="dxrd-page-color-scheme-colorpicker" data-bind="dxPopover: {
+             visible: $data.popoverVisible,
+             width: 'auto',
+             height: 'auto',
+             target: '.dxrd-page-color-scheme-tile-content-edit-icon',
+             position: { my: 'left center', at: 'right center' }
+             }">
+                <div class="dxrd-page-color-scheme-colorpicker-editor-container dxd-border-secondary">
+                    <div data-bind="dxColorView: { value: editorColor, editAlphaChannel: true }"></div>
+                </div>
+                <div class="dxrd-page-color-scheme-colorpicker-buttons">
+                    <div class="dxrd-page-color-scheme-colorpicker-button" data-bind="dxButton: { text: 'Cancel', onClick: function() { $data.resetColor() }}"></div>
+                    <div class="dxrd-page-color-scheme-colorpicker-button" data-bind="dxButton: { text: 'Ok', onClick: function() { $data.applyColor() }}"></div>
+                </div>
+            </div>
+            <!-- /ko -->
+            <div class="dxrd-page-color-scheme-tile-selected dxd-border-accented" data-bind="visible: $data.selected()"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+</div></script>
+
 <script type='text/html' id='dxrd-page-columns'>
 <div class="dxrd-wizard-page dxrd-wizard-columns-page">
     <div class="dxrd-wizard-left-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: availableFields.caption"></div>
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { items: availableFields.items, selectedItems: availableFields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: availableFieldClick }">
-            <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.availableFieldDblClick }">
-                <div data-bind="text: displayName"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { items: availableFields.items, selectedItems: availableFields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: availableFieldClick }">
+                <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.availableFieldDblClick }">
+                    <div data-bind="text: displayName"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1794,9 +1877,11 @@
     </div>
     <div class="dxrd-wizard-right-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: selectedFields.caption"></div>
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { items: selectedFields.items, selectedItems: selectedFields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: selectedFieldClick }">
-            <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.selectedFieldDblClick }">
-                <div data-bind="text: displayName"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { items: selectedFields.items, selectedItems: selectedFields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: selectedFieldClick }">
+                <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.selectedFieldDblClick }">
+                    <div data-bind="text: displayName"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1889,9 +1974,11 @@
         </div>
     </div>
     <!-- /ko -->
-    <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: 'single', activeStateEnabled: false, disabled: createNewDataSource, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-        <div data-options="dxTemplate : { name: 'item' }">
-            <div data-bind="text: name"></div>
+    <div class="dx-default-border-style dxd-border-secondary">
+        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: 'single', activeStateEnabled: false, disabled: createNewDataSource, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+            <div data-options="dxTemplate : { name: 'item' }">
+                <div data-bind="text: name"></div>
+            </div>
         </div>
     </div>
 </div></script>
@@ -1900,9 +1987,11 @@
 <div class="dxrd-wizard-page dxrd-wizard-groups-page">
     <div class="dxrd-wizard-left-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: fields.caption"></div>
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { dataSource: fields.items, selectedItems: fields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-            <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
-                <div data-bind="text: $data"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: fields.items, selectedItems: fields.activeItemArray, height: 257, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+                <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
+                    <div data-bind="text: $data"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1915,9 +2004,11 @@
     </div>
     <div class="dxrd-wizard-right-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: groups.caption"></div>
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { items: groups.items, height: 257, selectionMode: 'single', selectedItems: groups.activeItemArray, activeStateEnabled: false, onItemClick: groupClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-            <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
-                <div data-bind="text: fields().join(', ')"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { items: groups.items, height: 257, selectionMode: 'single', selectedItems: groups.activeItemArray, activeStateEnabled: false, onItemClick: groupClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+                <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
+                    <div data-bind="text: fields().join(', ')"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1929,9 +2020,11 @@
     <!-- /ko -->
     <div class="dxrd-wizard-left-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: fieldCaption"></div>
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { items: currentFields().items, selectedItems: currentFields().activeItemArray, height: 245, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-            <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
-                <div data-bind="text: $data"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { items: currentFields().items, selectedItems: currentFields().activeItemArray, height: 288, selectionMode: 'single', activeStateEnabled: false, onItemClick: fieldClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+                <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.fieldDblClick }">
+                    <div data-bind="text: $data"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1944,9 +2037,11 @@
     </div>
     <div class="dxrd-wizard-right-panel">
         <div class="dxrd-wizard-list-title" data-bind="text: groupCaption"></div>
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { items: currentGroups().items, height: 245, selectionMode: 'single', selectedItems: currentGroups().activeItemArray, activeStateEnabled: false, onItemClick: groupClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-            <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
-                <div data-bind="text: fields().join(', ')"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { items: currentGroups().items, height: 288, selectionMode: 'single', selectedItems: currentGroups().activeItemArray, activeStateEnabled: false, onItemClick: groupClick, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+                <div data-options="dxTemplate : { name: 'item' }" data-bind="event: { dblclick: $parent.groupDblClick }">
+                    <div data-bind="text: fields().join(', ')"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1956,10 +2051,10 @@
 <div class="dxrd-wizard-page dxrd-wizard-masterdetail-select-reportdata-page">
     <div class="dxrd-wizard-reportdata-title dx-first-column" data-bind="text: selectDataMembersCaption"></div>
     <div class="dxrd-wizard-reportdata-title" data-bind="text: selectDataFieldsCaption"></div>
-    <div class="dxrd-wizard-add-queries-page dxrd-wizard-masterdetail-dataMember dx-first-column dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', height: 318 }">
+    <div class="dxrd-wizard-add-queries-page dxrd-wizard-masterdetail-dataMember dx-first-column dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', height: 361 }">
         <div data-bind="treelist: dataMemberFieldListModel" style="width:100%; height: 100%;"></div>
     </div>
-    <div class="dxrd-wizard-add-queries-page dxrd-wizard-masterdetail-fields dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', height: 318 }">
+    <div class="dxrd-wizard-add-queries-page dxrd-wizard-masterdetail-fields dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', height: 361 }">
         <div data-bind="treelist: fieldMemberFieldListModel" style="width:100%; height: 100%;"></div>
     </div>
 </div></script>
@@ -1969,7 +2064,7 @@
     <!-- ko template: { name: 'dxrd-wizard-report-tree', data: { items: $data.reportTree, value: $data.currentPath  } }-->
     <!-- /ko -->
     <div class="dxrd-wizard-list-title" data-bind="text: selectFieldToSummaryCaption"></div>
-    <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', height: 211 }">
+    <div class="dxrd-wizard-list dx-default-border-style dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', height: 254 }">
         <div class="dxrd-wizard-summary-infos dxrd-wizard-summary-infos-paragraf dxd-border-secondary">
             <div class="dxrd-wizard-summary-infos-container dxd-wizard-title-back-color dxd-back-secondary dxd-border-secondary" data-bind="text: fieldsCaprion"></div>
             <div class="dxrd-wizard-summary-infos-container dxd-wizard-title-back-color dxd-back-secondary dxd-border-secondary" data-bind="text: summaryFunctionCaption"></div>
@@ -1997,6 +2092,79 @@
         </div>
     </div>
     <div class="dxrd-wizard-ignore-null-values" data-bind="dxCheckBox: { value: ignoreNullValues, text: ignoreNullValuesCaption }"></div>
+</div>
+</script>
+
+<script type='text/html' id='dxrd-page-pageSetup'>
+<div class="dxrd-wizard-page dxrd-page-setup-page">
+    <div class="dxrd-wizard-preview dxd-back-secondary">
+        <div class="dxrd-wizard-preview-page" data-bind="styleunit: { width: previewPageWidth, height: previewPageHeight }">
+            <div class="dxrd-wizard-preview-margin-top" data-bind="styleunit: { top: $data.previewTopMargin() }"></div>
+            <div class="dxrd-wizard-preview-margin-right" data-bind="styleunit: { right: $data.previewRightMargin() }"></div>
+            <div class="dxrd-wizard-preview-margin-bottom" data-bind="styleunit: { bottom: $data.previewBottomMargin() }"></div>
+            <div class="dxrd-wizard-preview-margin-left" data-bind="styleunit: { left: $data.previewLeftMargin() }"></div>
+        </div>
+    </div>
+    <div class="dxrd-page-setup-content">
+        <div class="dxrd-page-setup-group">
+            <div class="dxrd-page-setup-group-caption dxd-back-primary" data-bind="text: DevExpress.Analytics.getLocalization('Paper', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Paper')"></div>
+            <div class="dx-fieldset dxrd-page-setup-long-group">
+                <div class="dx-field">
+                    <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Size')"></div>
+                    <div class="dx-field-value" data-bind="dxSelectBox: { items: lookupData.paperKind, valueExpr: 'value', displayExpr: 'displayName', value: paperKind }"></div>
+                </div>
+            </div>
+            <div class="dxrd-page-setup-setting">
+                <div class="dx-fieldset dxrd-group-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Unit:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Unit')"></div>
+                        <div class="dx-field-value" data-bind="dxSelectBox: { items: lookupData.unit, valueExpr: 'value', displayExpr: 'displayName', value: unit }"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_Width')"></div>
+                        <div class="dx-field-value" data-bind="dxNumberBox: { value: width, disabled: fixedSize, format: valueFormat }"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Height:', 'ASPxReportsStringId.ReportDesigner_Wizard_Height')"></div>
+                        <div class="dx-field-value" data-bind="dxNumberBox: { value: height, disabled: fixedSize, format: valueFormat }"></div>
+                    </div>
+                </div>
+                <div class="dxrd-group-fieldset dxrd-page-setup-pagemode">
+                    <div class="dxrd-page-setup-landscape-item dxd-back-primary dxd-state-normal dxd-back-highlighted" style="margin-left: 0px" data-bind="css: { 'dxd-state-no-hover dxd-state-active': !$data.landscape() }, click: function() { $data.landscape(false); }">
+                        <div class="dxrd-page-setup-landscape-item-icon" data-bind="template:'dxrd-svg-portrait'"></div>
+                    </div>
+                    <div class="dxrd-page-setup-landscape-item dxd-back-primary dxd-state-normal dxd-back-highlighted" data-bind="css: { 'dxd-state-no-hover dxd-state-active': $data.landscape() }, click: function() { $data.landscape(true); }">
+                        <div class="dxrd-page-setup-landscape-item-icon" data-bind="template:'dxrd-svg-landscape'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dxrd-page-setup-group" style="margin-top: 16px;">
+            <div class="dxrd-page-setup-group-caption dxd-back-primary" data-bind="text: DevExpress.Analytics.getLocalization('Page Margins', 'ReportDesigner_Wizard_PageSetup_PageMargins')"></div>
+            <div class="dxrd-page-setup-setting">
+                <div class="dx-fieldset dxrd-group-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Left:', 'ReportDesigner_Wizard_PageSetup_LeftMargin')"></div>
+                        <div class="dx-field-value" data-bind="dxNumberBox: { value: marginLeft, format: valueFormat }"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Top:', 'ReportDesigner_Wizard_PageSetup_TopMargin')"></div>
+                        <div class="dx-field-value" data-bind="dxNumberBox: { value: marginTop, format: valueFormat }"></div>
+                    </div>
+                </div>
+                <div class="dx-fieldset dxrd-group-fieldset" style="float:right">
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Right:', 'ReportDesigner_Wizard_PageSetup_RightMargin')"></div>
+                        <div class="dx-field-value" data-bind="dxNumberBox: { value: marginRight, format: valueFormat }"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label dxd-text-primary" data-bind="text: DevExpress.Analytics.getLocalization('Bottom:', 'ReportDesigner_Wizard_PageSetup_BottomMargin')"></div>
+                        <div class="dx-field-value" data-bind="dxNumberBox: { value: marginBottom, format: valueFormat }"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </script>
 
