@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.ja.js)
-* Version: 18.2.3
-* Build date: 2018-11-05
+* Version: 18.2.4
+* Build date: 2018-12-18
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 18.2.3
-* Build date: 2018-11-05
+* Version: 18.2.4
+* Build date: 2018-12-17
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -501,6 +501,33 @@ var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
+        var Internal;
+        (function (Internal) {
+            function applyLocalizationToDevExtreme(currentCulture) {
+                if (!currentCulture) {
+                    return;
+                }
+                var messagesByLocales = DevExpress.localization.message.getMessagesByLocales();
+                var specificLocaleMessages = messagesByLocales[currentCulture] || {};
+                var neutralLocaleMessages = messagesByLocales[currentCulture.split("-")[0]] || {};
+                if (!specificLocaleMessages["dxList-selectAll"] && !neutralLocaleMessages["dxList-selectAll"]) {
+                    var message = Analytics.Localization.messages["ASPxReportsStringId.WebDocumentViewer_SelectAll"];
+                    if (message) {
+                        specificLocaleMessages["dxList-selectAll"] = message;
+                    }
+                }
+                var cultureJson = {};
+                cultureJson[currentCulture] = specificLocaleMessages;
+                DevExpress.localization.loadMessages(cultureJson);
+            }
+            Internal.applyLocalizationToDevExtreme = applyLocalizationToDevExtreme;
+        })(Internal = Analytics.Internal || (Analytics.Internal = {}));
+    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
+})(DevExpress || (DevExpress = {}));
+var DevExpress;
+(function (DevExpress) {
+    var Analytics;
+    (function (Analytics) {
         function _getLocalization(text) {
             return (Analytics.Localization.localize(text)) || text;
         }
@@ -536,16 +563,6 @@ var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
-        var Utils;
-        (function (Utils) {
-            DevExpress.Analytics.Utils.getLocalization = Analytics.getLocalization;
-        })(Utils = Analytics.Utils || (Analytics.Utils = {}));
-    })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
-})(DevExpress || (DevExpress = {}));
-var DevExpress;
-(function (DevExpress) {
-    var Analytics;
-    (function (Analytics) {
         Analytics.StringId = {
             MasterDetailRelationsEditor: "DataAccessUIStringId.MasterDetailEditorForm_Title",
             DataAccessBtnOK: "DataAccessUIStringId.Button_OK",
@@ -568,10 +585,6 @@ var DevExpress;
                     && editor1.editorType === editor2.editorType;
             }
             Utils.compareEditorInfo = compareEditorInfo;
-            function getLocalization(value) {
-                return Analytics.Localization && Analytics.Localization.localize(value) || value;
-            }
-            Utils.getLocalization = getLocalization;
             function findMatchesInString(textToTest, searchPattern) {
                 var searchExpr = escapeToRegExp(searchPattern);
                 return !!textToTest && textToTest.match(new RegExp(searchExpr, "gi"));
@@ -652,7 +665,7 @@ var DevExpress;
                     this.isVisibleByContent = ko.observable(true);
                     this.isSearchedProperty = ko.observable(true);
                     this.isParentSearched = ko.observable(false);
-                    this.rtl = DevExpress["config"]()["rtlEnabled"];
+                    this.rtl = DevExpress.config().rtlEnabled;
                     this._cachedValue = undefined;
                     this.isEditorSelected = ko.observable(false);
                     this.isPropertyModified = ko.computed(function () {
@@ -1260,10 +1273,10 @@ var DevExpress;
                 return !guid || RegexGuid(guid);
             }
             Widgets.validateNullableGuid = validateNullableGuid;
-            var guidValidationMessage = DevExpress.Analytics.getLocalization('Guid is required and should have a valid format.', 'ASPxReportsStringId.ReportDesigner_GuidIsRequired_Error');
+            var guidValidationMessage = function () { return DevExpress.Analytics.getLocalization('Guid is required and should have a valid format.', 'ASPxReportsStringId.ReportDesigner_GuidIsRequired_Error'); };
             Widgets.guidValidationRules = [{ type: "custom", validationCallback: function (options) { return validateNullableGuid(options.value); }, message: guidValidationMessage }];
             Widgets.guidRequiredValidationRules = [{ type: 'required', message: guidValidationMessage }];
-            Widgets.requiredValidationRules = [{ type: 'required', message: DevExpress.Analytics.getLocalization('The value cannot be empty', "ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError") }];
+            Widgets.requiredValidationRules = [{ type: 'required', message: function () { return DevExpress.Analytics.getLocalization('The value cannot be empty', "ASPxReportsStringId.ParametersPanel_DateTimeValueValidationError"); } }];
             var GuidEditor = (function (_super) {
                 __extends(GuidEditor, _super);
                 function GuidEditor() {
@@ -1825,7 +1838,7 @@ var DevExpress;
     (function (JS) {
         var Utils;
         (function (Utils) {
-            Utils.getLocalization = DevExpress.Analytics.Utils.getLocalization;
+            Utils.getLocalization = DevExpress.Analytics.getLocalization;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "getLocalization");
             Utils.findMatchesInString = DevExpress.Analytics.Utils.findMatchesInString;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "findMatchesInString");
@@ -2018,6 +2031,7 @@ var DevExpress;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "isCustomizedWithUpdateLocalizationMethod");
         Designer.getLocalization = DevExpress.Analytics.getLocalization;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "getLocalization");
+        DevExpress.Analytics.Internal._defineProperty(DevExpress.Analytics.Utils, DevExpress.Analytics, "getLocalization");
         Designer.updateLocalization = DevExpress.Analytics.updateLocalization;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "updateLocalization");
         Designer.StringId = undefined;
@@ -2400,12 +2414,8 @@ var DevExpress;
                     if (target && info) {
                         for (var i = 0; i < info.length; i++) {
                             if (info[i].modelName || info[i].editor || info[i].info) {
-                                var propertyName = info[i].propertyName;
-                                if ((!this._ignoredProperties || (this._ignoredProperties && this._ignoredProperties.indexOf(propertyName) === -1)) && propertyName.indexOf("_") !== 0) {
-                                    var realPropertyName = propertyName;
-                                    if (ko.isWriteableObservable(target["_" + propertyName])) {
-                                        realPropertyName = "_" + realPropertyName;
-                                    }
+                                var realPropertyName = this.validatePropertyName(target, info[i].propertyName);
+                                if (realPropertyName) {
                                     if (!ko.isComputed(target[realPropertyName])) {
                                         if (!ko.isObservable(target[realPropertyName])) {
                                             subscribtions.push.apply([], this._createDisposeFunction(target[realPropertyName], info[i].info));
@@ -2525,6 +2535,15 @@ var DevExpress;
                             subscribtionArray.dispose && subscribtionArray.dispose();
                         }
                     }
+                };
+                UndoEngine.prototype.validatePropertyName = function (target, propertyName) {
+                    if ((!this._ignoredProperties || (this._ignoredProperties && this._ignoredProperties.indexOf(propertyName) === -1)) && propertyName.indexOf("_") !== 0) {
+                        if (ko.isWriteableObservable(target["_" + propertyName])) {
+                            return "_" + propertyName;
+                        }
+                        return propertyName;
+                    }
+                    return null;
                 };
                 UndoEngine.prototype.subscribeProperty = function (property, subscribeChilds) {
                     var _this = this;
@@ -3884,6 +3903,7 @@ var DevExpress;
                     return $deferred.promise();
                 };
                 CodeCompletor._cleanupFields = function (fields) {
+                    if (fields === void 0) { fields = []; }
                     return fields.filter(function (x) { return x.specifics !== "parameters" && x.specifics !== "none"; });
                 };
                 CodeCompletor.prototype.getFunctionsCompletions = function () {
@@ -3901,11 +3921,12 @@ var DevExpress;
                 CodeCompletor.prototype.getAggregateCompletions = function () {
                     var functions = [];
                     var aggregates = ko.unwrap(this._functions).filter(function (fnDisplay) { return fnDisplay.category === "Aggregate"; })[0];
-                    Object.keys(aggregates.items).forEach(function (fnKey) {
-                        if (aggregates.items[fnKey]) {
-                            functions.push(createFunctionCompletion(aggregates.items[fnKey][0], fnKey, fnKey + "()"));
-                        }
-                    });
+                    if (aggregates)
+                        Object.keys(aggregates.items).forEach(function (fnKey) {
+                            if (aggregates.items[fnKey]) {
+                                functions.push(createFunctionCompletion(aggregates.items[fnKey][0], fnKey, fnKey + "()"));
+                            }
+                        });
                     return functions;
                 };
                 CodeCompletor.prototype.getOperatorCompletions = function (prefix) {
@@ -4078,7 +4099,7 @@ var DevExpress;
                     else if (currentToken.type === "support.other.aggregate") {
                         var previousToken = tokens[currentTokenIndex - 1];
                         this._addAggregates(completions);
-                        if (trimBrackets(previousToken.value).trim()) {
+                        if (previousToken && trimBrackets(previousToken.value).trim()) {
                             $deferred = this._getFields({
                                 start: (currentToken.start - (previousToken.value || "").length) || 0,
                                 value: previousToken.value + currentToken.value,
@@ -7644,7 +7665,7 @@ var DevExpress;
             var FilterEditorHelper = (function () {
                 function FilterEditorHelper(serializer) {
                     this.rtl = false;
-                    this.parameters = ko.observable(null);
+                    this.parameters = ko.observable([]);
                     this.canSelectLists = true;
                     this.canCreateParameters = false;
                     this.canChoiceParameters = true;
@@ -9505,12 +9526,12 @@ var DevExpress;
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,29],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,24],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,23],$Vk=[1,26],$Vl=[1,28],$Vm=[1,27],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[1,51],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VJ=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50,51,52,54,55,56],$VK=[1,58],$VL=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VM=[5,26,27,29,35,51],$VN=[1,110],$VO=[1,111],$VP=[1,105],$VQ=[1,107],$VR=[1,108],$VS=[1,106],$VT=[1,109],$VU=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VV=[5,18,19,24,25,26,27,29,30,35,51],$VW=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,51],$VX=[29,35];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,29],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,24],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,23],$Vk=[1,26],$Vl=[1,28],$Vm=[1,27],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[1,51],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VJ=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50,51,52,54,55,56],$VK=[1,58],$VL=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VM=[5,26,27,29,35,51],$VN=[1,111],$VO=[1,112],$VP=[1,106],$VQ=[1,108],$VR=[1,109],$VS=[1,107],$VT=[1,110],$VU=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,36,51,59],$VV=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VW=[5,18,19,24,25,26,27,29,30,35,51],$VX=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,51],$VY=[29,35];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"GUID":48,"property":49,"[":50,"]":51,".":52,"agg":53,"FIELD_END":54,"CH":55,"ESC_CH":56,"FIELD_START":57,"?":58,"NAME_SOFT":59,"commaseparated":60,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",48:"GUID",50:"[",51:"]",52:".",54:"FIELD_END",55:"CH",56:"ESC_CH",57:"FIELD_START",58:"?",59:"NAME_SOFT"},
-productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[53,3],[53,1],[53,3],[53,1],[53,4],[53,4],[53,3],[53,4],[53,4],[53,4],[49,2],[49,2],[49,2],[49,3],[49,3],[49,1],[49,1],[49,1],[8,2],[8,2],[8,1],[33,2],[33,3],[60,1],[60,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"GUID":48,"property":49,"[":50,"]":51,".":52,"agg":53,"FIELD_END":54,"CH":55,"ESC_CH":56,"FIELD_START":57,"paramName":58,"NAME_SOFT":59,"?":60,"commaseparated":61,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",48:"GUID",50:"[",51:"]",52:".",54:"FIELD_END",55:"CH",56:"ESC_CH",57:"FIELD_START",59:"NAME_SOFT",60:"?"},
+productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[53,3],[53,1],[53,3],[53,1],[53,4],[53,4],[53,3],[53,4],[53,4],[53,4],[49,2],[49,2],[49,2],[49,3],[49,3],[49,1],[49,1],[49,1],[58,1],[58,1],[58,2],[58,2],[8,2],[8,1],[33,2],[33,3],[61,1],[61,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -9596,7 +9617,7 @@ break;
 case 26:
  this.$ = DevExpress.Analytics.Criteria.GroupOperator.combine(DevExpress.Analytics.Criteria.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 27: case 63: case 75:
+case 27: case 63: case 78:
  this.$ = $$[$0-1]; 
 break;
 case 28:
@@ -9744,23 +9765,29 @@ case 70:
  this.$ = { name: "^", line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
 break;
 case 71: case 72:
+ this.$ = $$[$0] 
+break;
+case 73: case 74:
+ this.$ = $$[$0-1] + $$[$0] 
+break;
+case 75:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
 break;
-case 73:
+case 76:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("value", { }); 
 break;
-case 74:
+case 77:
  this.$ = []; 
 break;
-case 76:
+case 79:
  this.$ = [$$[$0]]; 
 break;
-case 77:
+case 80:
  this.$ = $$[$0-2].concat($$[$0]); 
 break;
 }
 },
-table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{1:[3]},{5:[1,30],9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH},o($VI,[2,2]),o($VI,[2,3]),o($VI,[2,4]),{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:56,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VJ,[2,69],{33:57,28:$VK}),{28:$VK,33:59},{28:$VK,33:60},{28:$VK,33:61},{28:$VK,33:62},{28:$VK,33:63},{28:$VK,33:64},{28:$VK,33:65},o($VI,[2,40]),o($VI,[2,41]),o($VI,[2,42]),o($VI,[2,43]),o($VI,[2,44]),o($VI,[2,45]),o($VI,[2,51],{50:[1,66],52:[1,67],54:[1,68],55:[1,69],56:[1,70]}),{51:[1,71]},o($VI,[2,73],{36:[1,72],59:[1,73]}),o($VJ,[2,68]),o($VJ,[2,70]),{1:[2,1]},{4:74,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{24:[1,89]},{4:90,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:91,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{25:[1,93],31:[1,92]},{28:$VK,33:94},{28:[1,95]},o($VI,[2,13]),o($VI,[2,14]),o($VL,[2,15],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o($VM,[2,24],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,96],30:$VF,32:$VG,34:$VH},o($VI,[2,32]),{4:99,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,97],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm,60:98},o($VI,[2,33]),o($VI,[2,34]),o($VI,[2,35]),o($VI,[2,36]),o($VI,[2,37]),o($VI,[2,38]),o($VI,[2,39]),{4:100,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,51:[1,101],57:$Vl,58:$Vm},{36:[1,104],37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:102,57:[1,103]},o($VJ,[2,63]),o($VJ,[2,64]),o($VJ,[2,65]),{52:[1,112]},o($VI,[2,71]),o($VI,[2,72]),o($VI,[2,5]),o($VI,[2,6]),o($VU,[2,7],{9:$Vn,10:$Vo,13:$Vr}),o($VU,[2,8],{9:$Vn,10:$Vo,13:$Vr}),o($VI,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,10],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt,16:$Vu}),o($VL,[2,11],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,12],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt}),o($VV,[2,16],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VV,[2,17],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VW,[2,18],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,19],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,20],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,21],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VV,[2,22],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),{4:113,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VM,[2,25],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,30:$VF,32:$VG,34:$VH}),o([5,27,29,35,51],[2,26],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,30:$VF,32:$VG,34:$VH}),o($VI,[2,28]),{31:[1,114]},o($VI,[2,30]),{4:115,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VI,[2,27]),o($VI,[2,74]),{29:[1,116],35:[1,117]},o($VX,[2,76],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,51:[1,118]},o($VI,[2,50],{52:[1,119]}),o($VI,[2,48]),o($VJ,[2,66]),o($VJ,[2,67]),o($VI,[2,54],{28:[1,120]}),o($VI,[2,56],{28:[1,121]}),{28:[1,122]},{28:[1,123]},{28:[1,124]},{28:[1,125]},{28:[1,126]},{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:127},o($VV,[2,23],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VI,[2,29]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,35:[1,128]},o($VI,[2,75]),{4:129,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VI,[2,49],{52:[1,130]}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:131},{29:[1,132]},{29:[1,133]},{4:134,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:135,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,136],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},{4:139,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VI,[2,52]),{4:140,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,58:$Vm},o($VX,[2,77],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:141},o($VI,[2,47]),o($VI,[2,53]),o($VI,[2,55]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,142],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,143],30:$VF,32:$VG,34:$VH},o($VI,[2,59]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,144],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,145],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,146],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,147],30:$VF,32:$VG,34:$VH},o($VI,[2,46]),o($VI,[2,57]),o($VI,[2,58]),o($VI,[2,60]),o($VI,[2,61]),o($VI,[2,62]),o($VI,[2,31])],
+table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{1:[3]},{5:[1,30],9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH},o($VI,[2,2]),o($VI,[2,3]),o($VI,[2,4]),{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:56,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VJ,[2,69],{33:57,28:$VK}),{28:$VK,33:59},{28:$VK,33:60},{28:$VK,33:61},{28:$VK,33:62},{28:$VK,33:63},{28:$VK,33:64},{28:$VK,33:65},o($VI,[2,40]),o($VI,[2,41]),o($VI,[2,42]),o($VI,[2,43]),o($VI,[2,44]),o($VI,[2,45]),o($VI,[2,51],{50:[1,66],52:[1,67],54:[1,68],55:[1,69],56:[1,70]}),{51:[1,71]},o($VI,[2,76],{58:72,36:[1,73],59:[1,74]}),o($VJ,[2,68]),o($VJ,[2,70]),{1:[2,1]},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{24:[1,90]},{4:91,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:92,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{25:[1,94],31:[1,93]},{28:$VK,33:95},{28:[1,96]},o($VI,[2,13]),o($VI,[2,14]),o($VL,[2,15],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o($VM,[2,24],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,97],30:$VF,32:$VG,34:$VH},o($VI,[2,32]),{4:100,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,98],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm,61:99},o($VI,[2,33]),o($VI,[2,34]),o($VI,[2,35]),o($VI,[2,36]),o($VI,[2,37]),o($VI,[2,38]),o($VI,[2,39]),{4:101,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,51:[1,102],57:$Vl,60:$Vm},{36:[1,105],37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:103,57:[1,104]},o($VJ,[2,63]),o($VJ,[2,64]),o($VJ,[2,65]),{52:[1,113]},o($VI,[2,75],{36:[1,114],59:[1,115]}),o($VU,[2,71]),o($VU,[2,72]),o($VI,[2,5]),o($VI,[2,6]),o($VV,[2,7],{9:$Vn,10:$Vo,13:$Vr}),o($VV,[2,8],{9:$Vn,10:$Vo,13:$Vr}),o($VI,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,10],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt,16:$Vu}),o($VL,[2,11],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,12],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt}),o($VW,[2,16],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VW,[2,17],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VX,[2,18],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,19],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,20],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,21],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,22],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),{4:116,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VM,[2,25],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,30:$VF,32:$VG,34:$VH}),o([5,27,29,35,51],[2,26],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,30:$VF,32:$VG,34:$VH}),o($VI,[2,28]),{31:[1,117]},o($VI,[2,30]),{4:118,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,27]),o($VI,[2,77]),{29:[1,119],35:[1,120]},o($VY,[2,79],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,51:[1,121]},o($VI,[2,50],{52:[1,122]}),o($VI,[2,48]),o($VJ,[2,66]),o($VJ,[2,67]),o($VI,[2,54],{28:[1,123]}),o($VI,[2,56],{28:[1,124]}),{28:[1,125]},{28:[1,126]},{28:[1,127]},{28:[1,128]},{28:[1,129]},{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:130},o($VU,[2,73]),o($VU,[2,74]),o($VW,[2,23],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VI,[2,29]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,35:[1,131]},o($VI,[2,78]),{4:132,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,49],{52:[1,133]}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:134},{29:[1,135]},{29:[1,136]},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:140,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,139],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:141,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:142,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,52]),{4:143,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VY,[2,80],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:144},o($VI,[2,47]),o($VI,[2,53]),o($VI,[2,55]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,145],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,146],30:$VF,32:$VG,34:$VH},o($VI,[2,59]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,147],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,148],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,149],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,150],30:$VF,32:$VG,34:$VH},o($VI,[2,46]),o($VI,[2,57]),o($VI,[2,58]),o($VI,[2,60]),o($VI,[2,61]),o($VI,[2,62]),o($VI,[2,31])],
 defaultActions: {30:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
@@ -10342,7 +10369,7 @@ case 51:return 52
 break;
 case 52:return 35
 break;
-case 53:return 58
+case 53:return 60
 break;
 case 54:return 36
 break;
@@ -11053,14 +11080,11 @@ var DevExpress;
                         if (!adjustedTarget || !adjustedTarget.canDrop()) {
                             return;
                         }
+                        var position = this._getAbsoluteSurfacePosition(ui);
+                        adjustedTarget.underCursor().x = position.left - (adjustedTarget["absolutePosition"] && adjustedTarget["absolutePosition"].x() || 0) - focusedSurface.underCursor().offsetX;
+                        adjustedTarget.underCursor().y = position.top - (adjustedTarget["absolutePosition"] && adjustedTarget["absolutePosition"].y() || 0) - focusedSurface.underCursor().offsetY;
                         var dropPointRelativeX = ui.position.left;
                         var dropPointRelativeY = ui.position.top;
-                        if (adjustedTarget["absolutePosition"]) {
-                            dropPointRelativeX -= adjustedTarget["absolutePosition"].x();
-                            dropPointRelativeY -= adjustedTarget["absolutePosition"].y();
-                            adjustedTarget.underCursor().x = dropPointRelativeX - focusedSurface.underCursor().offsetX;
-                            adjustedTarget.underCursor().y = dropPointRelativeY - focusedSurface.underCursor().offsetY;
-                        }
                         var itemsToDrop = this.selection.selectedItems
                             .filter(function (item) { return !item.locked && item.parent === focusedSurface.parent; })
                             .map(function (item) {
@@ -11128,7 +11152,7 @@ var DevExpress;
                 ToolboxDragDropHandler.prototype.doStopDrag = function (ui, draggable) {
                     if (this.selection.dropTarget) {
                         var toolboxItem = draggable, control = this._controlsFactory.createControl($.extend({}, toolboxItem.info), null), parent = control.getNearestParent(this.selection.dropTarget.getControlModel()), dropTargetSurface = Internal.findSurface(parent);
-                        if (!dropTargetSurface.canDrop()) {
+                        if (!dropTargetSurface || !dropTargetSurface.canDrop()) {
                             return;
                         }
                         var position = this._getAbsoluteSurfacePosition(ui);
@@ -11803,14 +11827,18 @@ var DevExpress;
                     unwrappedTarget && this._collectControls(unwrappedTarget);
                     this._handlers.push.apply(this._handlers, handlers);
                 }
+                DesignControlsHelper.prototype.getNameProperty = function (model) {
+                    return model.name;
+                };
                 DesignControlsHelper.prototype._setName = function (value) {
-                    var names = this.allControls().map(function (item) { return ko.unwrap(item.name); });
-                    if (!value.name() || names.filter(function (x) { return x === value.name(); }).length > 1) {
+                    var _this = this;
+                    var names = this.allControls().map(function (item) { return ko.unwrap(_this.getNameProperty(item)); });
+                    if (!this.getNameProperty(value)() || names.filter(function (x) { return x === _this.getNameProperty(value)(); }).length > 1) {
                         var controlType = value.controlType || "Unknown", initialText = value.getControlInfo && value.getControlInfo().defaultVal && value.getControlInfo().defaultVal["@Text"];
                         var newName = Internal.getUniqueNameForNamedObjectsArray(this.allControls(), controlType.split('.').pop(), names);
-                        value.name(newName);
+                        this.getNameProperty(value)(newName);
                         if (this._setText && value["text"] && !value["text"]() && (initialText === null || initialText === undefined)) {
-                            value["text"](value.name());
+                            value["text"](this.getNameProperty(value)());
                         }
                     }
                 };
@@ -12130,15 +12158,21 @@ var DevExpress;
                         'transform': "rotate(" + angle + "deg)"
                     };
                 };
-                CssCalculator.prototype.contentSizeCss = function (controlSurfaceWidth, controlSurfaceHeight, zoom, borders) {
+                CssCalculator.prototype.contentSizeCss = function (controlSurfaceWidth, controlSurfaceHeight, zoom, borders, paddings) {
                     var _this = this;
                     var result = { top: 1, left: 1, right: 1, bottom: 1, width: 1, height: 1 };
                     borders = borders || this._control["borders"] && this._control["borders"]() || "";
                     var borderWidth = this._getBorderWidth(this._control, zoom);
                     ["Left", "Top", "Right", "Bottom"].forEach(function (item) {
-                        if (borders.indexOf(item) !== -1 || borders.indexOf("All") !== -1) {
-                            result[_this._patchPosition(item).toLowerCase()] = borderWidth;
+                        var value = 0;
+                        if (borderWidth != "" && (borders.indexOf(item) !== -1 || borders.indexOf("All") !== -1)) {
+                            value += borderWidth;
                         }
+                        if (paddings) {
+                            value += _this._getPixelValueFromUnit(ko.unwrap(paddings[item.toLowerCase()]), _this._control) * (zoom || 1);
+                        }
+                        if (value)
+                            result[_this._patchPosition(item).toLowerCase()] = value;
                     });
                     result.width = controlSurfaceWidth - result.left - result.right;
                     result.height = controlSurfaceHeight - result.top - result.bottom;
@@ -13078,44 +13112,57 @@ var DevExpress;
     (function (Analytics) {
         var Internal;
         (function (Internal) {
+            var CustomSortedArrayStore = (function (_super) {
+                __extends(CustomSortedArrayStore, _super);
+                function CustomSortedArrayStore(items, sortPropertyName) {
+                    if (sortPropertyName === void 0) { sortPropertyName = 'name'; }
+                    _super.call(this, CustomSortedArrayStore._createOptions(items, sortPropertyName));
+                }
+                CustomSortedArrayStore._sortItems = function (items, sortPropertyName) {
+                    return items.sort(function (a, b) {
+                        var propA = ko.unwrap(a[sortPropertyName]), propB = ko.unwrap(b[sortPropertyName]);
+                        if (propA && propB) {
+                            var diff = propA - propB;
+                            if (!isNaN(diff))
+                                return diff;
+                            propA = propA.toLowerCase ? propA.toLowerCase() : propA;
+                            propB = propB.toLowerCase ? propB.toLowerCase() : propB;
+                            return (propA < propB) ? -1 : (propA > propB) ? 1 : 0;
+                        }
+                    });
+                };
+                CustomSortedArrayStore._createOptions = function (items, sortPropertyName) {
+                    items = this._sortItems(items, sortPropertyName);
+                    return {
+                        load: function (options) {
+                            var result = [].concat(items);
+                            if (options.take)
+                                result = result.splice(options.skip, options.take);
+                            if (options.filter)
+                                result = result.filter(options.filter);
+                            return $.Deferred().resolve(result).promise();
+                        },
+                        byKey: function (key) {
+                            if (items.some(function (x) { return x === key; }))
+                                return key;
+                        }
+                    };
+                };
+                return CustomSortedArrayStore;
+            })(DevExpress.data.CustomStore);
+            Internal.CustomSortedArrayStore = CustomSortedArrayStore;
             var SortedArrayStore = (function (_super) {
                 __extends(SortedArrayStore, _super);
                 function SortedArrayStore(options, sortPropertyName) {
                     if (sortPropertyName === void 0) { sortPropertyName = 'name'; }
                     if (options instanceof Array) {
-                        options.sort(function (a, b) {
-                            var propA = ko.unwrap(a[sortPropertyName]), propB = ko.unwrap(b[sortPropertyName]);
-                            if (propA && propB) {
-                                var diff = propA - propB;
-                                if (!isNaN(diff))
-                                    return diff;
-                                propA = propA.toLowerCase ? propA.toLowerCase() : propA;
-                                propB = propB.toLowerCase ? propB.toLowerCase() : propB;
-                                return (propA < propB) ? -1 : (propA > propB) ? 1 : 0;
-                            }
-                        });
+                        CustomSortedArrayStore._sortItems(options, sortPropertyName);
                     }
                     _super.call(this, options);
                 }
                 return SortedArrayStore;
             })(DevExpress.data.ArrayStore);
             Internal.SortedArrayStore = SortedArrayStore;
-            var ControlsArrayStore = (function (_super) {
-                __extends(ControlsArrayStore, _super);
-                function ControlsArrayStore() {
-                    _super.apply(this, arguments);
-                }
-                ControlsArrayStore.prototype.load = function (options) {
-                    if (options && options.filter && options.filter.length === 2) {
-                        return $.Deferred()
-                            .resolve([options.filter[1]])
-                            .promise();
-                    }
-                    return _super.prototype.load.call(this, options);
-                };
-                return ControlsArrayStore;
-            })(SortedArrayStore);
-            Internal.ControlsArrayStore = ControlsArrayStore;
             var ControlsStore = (function (_super) {
                 __extends(ControlsStore, _super);
                 function ControlsStore(allControls) {
@@ -13126,7 +13173,7 @@ var DevExpress;
                     this._disposables.push(this.dataSource = ko.computed(function () {
                         dataSource && dataSource.dispose();
                         dataSource = new DevExpress.data.DataSource({
-                            store: new ControlsArrayStore(allControls()),
+                            store: new CustomSortedArrayStore(allControls()),
                             paginate: true,
                             filter: _this._filter(),
                             pageSize: 100
@@ -13156,7 +13203,7 @@ var DevExpress;
         var Internal;
         (function (Internal) {
             function findSurface(viewModel) {
-                return viewModel["surface"];
+                return !!viewModel ? viewModel["surface"] : null;
             }
             Internal.findSurface = findSurface;
             function getControlNewAbsolutePositionOnResize(snapHelper, absolutePosition, ui, delta) {
@@ -15007,10 +15054,10 @@ var DevExpress;
             function appendStaticContextToRootViewModel(root) {
                 root.dx = DevExpress;
                 root.getLocalization = function () {
-                    return Utils.getLocalization.apply(DevExpress.Analytics, arguments);
+                    return Analytics.getLocalization.apply(DevExpress.Analytics, arguments);
                 };
                 root.getPopupContainer = Utils.getParentContainer;
-                root.surfaceClass = function (el) { return "dx-designer-viewport" + (!Utils.getParentContainer(el, ".dx-viewport").length ? " dx-viewport dx-theme-generic" : ""); };
+                root.surfaceClass = function (el) { return "dx-designer-viewport" + (!Utils.getParentContainer(el, ".dx-theme-generic").length ? " dx-theme-generic" : ""); };
             }
             Utils.appendStaticContextToRootViewModel = appendStaticContextToRootViewModel;
             Utils.ajaxSetup = new Analytics.Internal.AjaxSetup();
@@ -15028,18 +15075,26 @@ var DevExpress;
                     data: requestData,
                     url: uri
                 }, customOptions)).fail(function (jqXHR, textStatus, errorThrown) {
-                    if (ignoreError && ignoreError())
+                    if (ignoreError && ignoreError()) {
+                        deferred.reject();
                         return;
+                    }
                     Analytics.Internal._errorProcessor.call({ jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, getRequestDetails: function () { return requestData || uri; } });
                     Analytics.Internal._processError(errorThrown, deferred, jqXHR, textStatus, processErrorCallback);
                 })
                     .done(function (data, textStatus, jqXHR) {
+                    if (!data) {
+                        deferred.reject();
+                        return;
+                    }
                     if (data.success) {
                         deferred.resolve(data.result);
                     }
                     else {
-                        if (ignoreError && ignoreError())
+                        if (ignoreError && ignoreError()) {
+                            deferred.reject();
                             return;
+                        }
                         Analytics.Internal._errorProcessor.call({ jqXHR: jqXHR, data: data, textStatus: textStatus, getRequestDetails: function () { return requestData || uri; } });
                         Analytics.Internal._processError("Internal Server Error", deferred, jqXHR, textStatus, processErrorCallback);
                     }
@@ -16098,16 +16153,6 @@ var DevExpress;
         Designer.SortedArrayStore = SortedArrayStore;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SortedArrayStore");
-        var ControlsArrayStore = (function (_super) {
-            __extends(ControlsArrayStore, _super);
-            function ControlsArrayStore() {
-                _super.apply(this, arguments);
-            }
-            return ControlsArrayStore;
-        })(DevExpress.Analytics.Internal.ControlsArrayStore);
-        Designer.ControlsArrayStore = ControlsArrayStore;
-        ;
-        DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ControlsArrayStore");
         var ControlsStore = (function (_super) {
             __extends(ControlsStore, _super);
             function ControlsStore() {
@@ -16914,7 +16959,7 @@ var DevExpress;
                 'dx-expressioneditor-category-accordion': '<div class="dx-fieldset" style="margin: 0;">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': $data.isSelected }, dxAction: function() { $data.updateContent($data.allItems(), $data.isSelected); $parent.click($data.content) }">                <div class=" dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: displayName"></span>            </div>            <div class="dx-accordion-content">                <!-- ko foreach: items-->                <div class="dx-expressioneditor-tools-tab-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': isSelected }, text: $data.display, dxAction: function() { $parent.updateContent($data.data, $data.isSelected); $parents[1].click($parent.content); }"></div>                <!-- /ko -->            </div>        </div>    </div>',
                 'dx-expressioneditor-description': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <div class="dx-expressioneditor-description dxd-text-primary" data-bind="text: content"></div>    </div>',
                 'dx-expressioneditor-fields': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko if: fields -->        <div class="dx-treelist-wrapper" data-bind="treelist: fields"></div>        <!-- /ko -->        <!-- ko if: $data.parameters -->        <div class="dx-treelist-wrapper" data-bind="treelist: parameters"></div>        <!-- /ko -->    </div>',
-                'dx-ee-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="visible: visible, event: { dblclick: function() { actions[0].clickAction($element); }}, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-item-images">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>            <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>        </div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
+                'dx-ee-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="visible: visible, event: { dblclick: function() { actions[0].clickAction($element); }}, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-item-images">            <!-- ko if: hasItems -->            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>            <!-- /ko -->            <!-- ko ifnot: hasItems -->            <div class="dx-treelist-collapsedbutton"></div>            <!-- /ko -->            <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>        </div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
                 'dx-expressioneditor-selectedcontent': '<!-- ko with: content -->    <!-- ko template: $data-->    <!-- /ko -->    <!-- /ko -->',
                 'dx-expressioneditor-collection': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko foreach: items -->        <div class="dx-expressioneditor-tools-tab-item dxd-list-item-back-color dxd-text-primary dxd-back-highlighted" data-bind="text: $data.displayName || $data.text, css: { \'dx-expressioneditor-state-selected dxd-state-selected\': $parent.selectedItem() === $data }, dxAction: function() { $parent.selectedItem($data); $parents[2].click($data); }, event: { dblclick: function() { $parents[2].dblclick($data, $element); } }"></div>        <!-- /ko -->    </div>',
                 'dx-expressioneditor-collection-function': '<div class="dx-expressioneditor-collection-function">        <div class="dx-expressioneditor-collection-function-search">            <div data-bind="dxTextBox: { value: textToSearch, showClearButton: true, valueChangeEvent: \'keyup\', placeholder: $parents[2].searchPlaceholder() }"></div>        </div>        <div class="dx-expressioneditor-collection-function-items dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">            <!-- ko foreach: availableItems -->            <div class="dx-expressioneditor-tools-tab-item dxd-list-item-back-color dxd-text-primary dxd-back-highlighted" data-bind="css: { \'dx-expressioneditor-state-selected dxd-state-selected\': $parent.selectedItem() === $data }, dxAction: function() { $parent.selectedItem($data); $parents[2].click($data); }, event: { dblclick: function() { $parents[2].dblclick($data, $element); } }, searchHighlighting: { text: $data.displayName || $data.text, textToSearch: $parent.textToSearch }"></div>            <!-- /ko -->        </div>    </div>',

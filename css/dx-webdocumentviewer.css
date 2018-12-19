@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.css)
-* Version: 18.2.3
-* Build date: 2018-11-05
+* Version: 18.2.4
+* Build date: 2018-12-18
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -10,11 +10,6 @@
 .dx-rtl .dxrd-preview-parameter-action {
   margin-left: 16px;
   float: left;
-}
-.dxrd-preview.dxrd-designer-wrapper.dx-rtl .dxrd-preview-wrapper,
-.dx-rtl .dxrd-preview-wrapper {
-  right: 5px;
-  left: 375px;
 }
 .dxrd-preview.dxrd-designer-wrapper.dx-rtl .dxrd-preview-progress,
 .dx-rtl .dxrd-preview-progress {
@@ -57,11 +52,6 @@
 .dx-ltr .dxrd-preview-parameter-action {
   margin-right: 16px;
   float: right;
-}
-.dxrd-preview.dxrd-designer-wrapper.dx-ltr .dxrd-preview-wrapper,
-.dx-ltr .dxrd-preview-wrapper {
-  left: 5px;
-  right: 375px;
 }
 .dxrd-preview.dxrd-designer-wrapper.dx-ltr .dxrd-preview-progress,
 .dx-ltr .dxrd-preview-progress {
@@ -255,6 +245,8 @@
   top: 84px;
   bottom: 0;
   text-align: center;
+  right: 0px;
+  left: 0px;
   min-width: 100px;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrd-preview-progress {
@@ -450,6 +442,15 @@
   line-height: normal;
   resize: none;
 }
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-popup-container {
+  width: 100%;
+  height: 100%;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-container .dxrp-editing-field-popup-container-cloned {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-check-container {
   position: absolute;
   box-sizing: content-box;
@@ -566,6 +567,15 @@
   overflow: hidden;
   line-height: normal;
   resize: none;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-popup-container {
+  width: 100%;
+  height: 100%;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-charactercomb .dxrp-editing-field-popup-container-cloned {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-wrapper .dxrp-editing-field-focused {
   background-color: rgba(241, 244, 255, 0.7);
@@ -1025,13 +1035,19 @@
   overflow: hidden;
   text-align: center;
 }
+.dx-picture-edit-popup-content.dx-picture-edit-popup-content-fullscreen .dx-overlay-content.dx-popup-normal {
+  box-sizing: content-box;
+  background: none;
+}
 .dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
-  background-color: white;
+  border-color: #0173c7;
+}
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal.dx-state-focused {
   border-color: #0173c7;
 }
 .dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal > .dx-popover-arrow {
@@ -1042,6 +1058,36 @@
 }
 .dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-popup-content {
   padding: 20px;
+}
+.dx-picture-edit-popup-content-fullscreen.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-popup-content {
+  padding: 0px;
+  height: 100%;
+  background-color: white;
+}
+.dx-picture-edit-popup-content-fullscreen.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-popup-content .dxrd-transform-origin-left-top {
+  -moz-transform-origin: 0% 0%;
+  -ms-transform-origin: 0% 0%;
+  -o-transform-origin: 0% 0%;
+  -webkit-transform-origin: 0% 0%;
+  transform-origin: 0% 0%;
+}
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-mobile-signature-options {
+  border-width: 1px;
+  border-style: solid;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+}
+.dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-mobile-signature-options-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
 }
 .dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options {
   width: 100%;
@@ -1057,6 +1103,8 @@
 .dx-picture-edit-popup-content > .dx-overlay-content.dx-popup-normal .dx-picture-editing-brush-options .dx-picture-editing-line-width .dx-picture-editing-line-width-slider .dx-popover-arrow:after {
   right: 0;
   bottom: 0;
+  top: auto;
+  left: auto;
   -webkit-transform-origin: bottom right;
   transform-origin: bottom right;
 }
@@ -1117,7 +1165,8 @@
   font-size: 11px;
   color: #777777;
 }
-.dx-picture-editing {
+.dx-picture-editing,
+.dx-painter {
   width: 100%;
   height: 100%;
   position: relative;
@@ -1128,6 +1177,12 @@
         position: relative;
     }*/
 }
+.dx-picture-editing canvas,
+.dx-painter canvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
 .dx-picture-editing-active {
   position: absolute;
   width: 48px;
@@ -1137,6 +1192,9 @@
   border-radius: unset;
   box-shadow: none;
   overflow: visible;
+}
+.dx-picture-editing-active.dx-popup-wrapper > .dx-overlay-content.dx-state-focused {
+  border: none;
 }
 .dx-picture-editing-active.dx-popup-wrapper > .dx-overlay-content > .dx-popover-arrow {
   display: none;
