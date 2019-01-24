@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.css)
-* Version: 18.2.4
-* Build date: 2018-12-18
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.2.5
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -120,19 +120,12 @@
   width: 100px;
   height: 27px;
 }
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-tab-wrapper {
-  position: relative;
-  height: 100%;
-}
-.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-tab-wrapper .dx-fieldset {
-  margin: 0;
-}
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-export-options-wrapper {
   position: relative;
   height: 100%;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-export-options-wrapper .dx-fieldset {
-  margin: 0;
+  margin: -6px 0 0;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-export-options-wrapper .dxrd-report-preview-content-loading-panel {
   text-align: center;
@@ -142,7 +135,7 @@
   height: 100%;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-parameters-wrapper .dx-fieldset {
-  margin: 0;
+  margin: -6px 0 0;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-parameters-wrapper .dx-field .dx-field-value .dx-selectbox {
   min-height: 26px;
@@ -168,7 +161,7 @@
   height: 100%;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-search-wrapper .dx-fieldset {
-  margin: 0;
+  margin: -6px 0 0;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-search-wrapper .dxrd-preview-search-tab-header-text {
   text-transform: uppercase;

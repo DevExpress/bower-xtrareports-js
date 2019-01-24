@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.js)
-* Version: 18.2.4
-* Build date: 2018-12-18
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.2.5
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -3553,6 +3553,20 @@ var DevExpress;
                 return data.isList === true || data.specifics === "List" || data.specifics === "ListSource";
             }
             Report.isList = isList;
+            function _disableCanGrowProperty(model) {
+                if (model.controlType === "XRTable") {
+                    model.rows().forEach(function (row) { return row.cells().forEach(function (cell) { return _disableCanGrowProperty(cell); }); });
+                }
+                if (model["canGrow"] && model["canGrow"]()) {
+                    model["canGrow"](false);
+                }
+            }
+            function dragDropComponentAdded(model, parent) {
+                if (!(parent instanceof Report.VerticalBandViewModel))
+                    return;
+                _disableCanGrowProperty(model);
+            }
+            Report.dragDropComponentAdded = dragDropComponentAdded;
             var FieldListDragDropHelper = (function () {
                 function FieldListDragDropHelper(_dataBindingMode, _size) {
                     this._dataBindingMode = _dataBindingMode;
@@ -3749,7 +3763,9 @@ var DevExpress;
                     this.addControl(control, dropTarget, this._size);
                     this._updateInnerControlSize(control);
                     this._undoEngine().end();
-                    this.onComponentAdded({ parent: dropTarget.getControlModel(), model: control });
+                    var parent = dropTarget.getControlModel();
+                    dragDropComponentAdded(control, parent);
+                    this.onComponentAdded({ parent: parent, model: control });
                 };
                 FieldListDragDropHandler.prototype._isDefaultBindingAssigned = function (control, treeListItem) {
                     if (control["hasDefaultBindingProperty"] && !isList(treeListItem.data)) {
@@ -3887,7 +3903,9 @@ var DevExpress;
                         });
                     }
                     _super.prototype.addControl.call(this, control, dropTargetSurface, size);
-                    this.onComponentAdded({ parent: dropTargetSurface.getControlModel(), model: control });
+                    var parent = dropTargetSurface.getControlModel();
+                    dragDropComponentAdded(control, parent);
+                    this.onComponentAdded({ parent: parent, model: control });
                 };
                 return ReportToolboxDragDropHandler;
             })(Designer.ToolboxDragDropHandler);
@@ -3935,7 +3953,15 @@ var DevExpress;
                         }
                     }
                     if (bandsHolder.verticalBandsContainer && !bandsHolder.verticalBandsContainer.scrollOffset()) {
-                        bandsHolder.verticalBandsContainer.verticalBands().forEach((function (band) { return callback(band, band.getUsefulRect()); }));
+                        bandsHolder.verticalBandsContainer.verticalBands().forEach((function (band) {
+                            var absoluteRect = {
+                                top: band.absolutePosition.y(),
+                                bottom: band.absolutePosition.y() + band._height(),
+                                left: band.absolutePosition.x() - band.verticalBandsContainer.scrollOffset(),
+                                right: band.absolutePosition.x() + band.rect().width - band.verticalBandsContainer.scrollOffset()
+                            };
+                            callback(band, absoluteRect);
+                        }));
                     }
                 };
                 ReportSnapLinesCollector.prototype._processBandRtl = function (itemAbsoluteRect) {
@@ -4044,16 +4070,12 @@ var DevExpress;
                 __extends(ReportExpressionEditor, _super);
                 function ReportExpressionEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
                     _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
-                    this._subscription = null;
                 }
-                ReportExpressionEditor.prototype.dispose = function () {
-                    _super.prototype.dispose.call(this);
-                    this._subscription && this._subscription.dispose();
-                };
-                ReportExpressionEditor.prototype._createReportItems = function (reportExplorerProvider, onClick, sender) {
+                ReportExpressionEditor.prototype._createReportItems = function (reportExplorerProvider, onClick) {
                     var item = {
                         displayName: Designer.getLocalization("Report Items", "ReportStringId.ExpressionEditor_ItemInfo_ReportItems"),
                         content: {
+                            showDescription: false,
                             isSelected: ko.observable(false),
                             data: {
                                 fields: {
@@ -4067,9 +4089,6 @@ var DevExpress;
                             name: "dx-expressioneditor-fields"
                         }
                     };
-                    this._subscription = item.content.isSelected.subscribe(function (newVal) {
-                        sender.showDescription(!newVal);
-                    });
                     return item;
                 };
                 ReportExpressionEditor.prototype._createValuesTab = function () {
@@ -4080,7 +4099,7 @@ var DevExpress;
                             displayName: display
                         };
                     });
-                    return DevExpress.Analytics.Widgets.createExpressionEditorCollectionToolOptions(items, "Values", "ReportStringId.ExpressionEditor_ItemInfo_Values");
+                    return DevExpress.Analytics.Widgets.createExpressionEditorCollectionToolOptions(items, "Values", "ReportStringId.ExpressionEditor_ItemInfo_Values", false);
                 };
                 ReportExpressionEditor.prototype.patchOptions = function (reportExplorerProvider) {
                     var _this = this;
@@ -4090,8 +4109,7 @@ var DevExpress;
                     else {
                         if (!this.value()["customizeCategories"])
                             this.value()["customizeCategories"] = function (sender, groups, onClick) {
-                                _this._subscription && _this._subscription.dispose();
-                                groups.splice(0, 0, _this._createReportItems(reportExplorerProvider, onClick, sender));
+                                groups.splice(0, 0, _this._createReportItems(reportExplorerProvider, onClick));
                                 if (_this.values() && _this.values().length > 0) {
                                     groups.splice(2, 0, _this._createValuesTab());
                                 }
@@ -7099,7 +7117,18 @@ var DevExpress;
                     });
                 };
                 Parameter.prototype.getParameterDescriptor = function () {
-                    return { description: this.description.peek(), displayName: "Value", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Value", name: this.parameterName.peek(), type: this.type.peek(), value: this.value.peek(), visible: this.visible.peek(), multiValue: this.isMultiValue.peek(), allowNull: this.allowNull.peek() };
+                    return {
+                        description: this.description.peek(),
+                        displayName: "Value",
+                        localizationId: "DevExpress.XtraReports.Parameters.Parameter.Value",
+                        name: this.parameterName.peek(),
+                        type: this.type.peek(),
+                        value: this.value.peek(),
+                        visible: this.visible.peek(),
+                        multiValue: this.isMultiValue.peek(),
+                        allowNull: this.allowNull.peek(),
+                        tag: this.tag.peek()
+                    };
                 };
                 Object.defineProperty(Parameter.prototype, "name", {
                     get: function () {
@@ -7167,6 +7196,7 @@ var DevExpress;
                 { propertyName: "description", modelName: "@Description", displayName: "Description", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Description", defaultVal: "", editor: DevExpress.JS.Widgets.editorTemplates.text },
                 Report.visible,
                 { propertyName: "isMultiValue", modelName: "@MultiValue", displayName: "MultiValue", localizationId: "DevExpress.XtraReports.Parameters.Parameter.MultiValue", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
+                { propertyName: "tag", modelName: "@Tag", displayName: "Tag", localizationId: "DevExpress.XtraReports.UI.XRControl.Tag", editor: DevExpress.JS.Widgets.editorTemplates.text, defaultVal: "" },
                 { propertyName: "allowNull", modelName: "@AllowNull", displayName: "Allow Null", localizationId: "DevExpress.XtraReports.Parameters.Parameter.AllowNull", defaultVal: false, from: Designer.parseBool, editor: DevExpress.JS.Widgets.editorTemplates.bool },
                 { propertyName: "type", displayName: "Type", localizationId: "DevExpress.XtraReports.Parameters.Parameter.Type", editor: DevExpress.JS.Widgets.editorTemplates.combobox, valuesArray: (Parameter.typeValues) },
                 parameterValueSerializationInfo,
@@ -8002,12 +8032,12 @@ var DevExpress;
             Report.ExpressionWrapper = ExpressionWrapper;
             var ReportItemsProvider = (function (_super) {
                 __extends(ReportItemsProvider, _super);
-                function ReportItemsProvider(allControls, fieldListProvider) {
+                function ReportItemsProvider(controlsHelper, fieldListProvider) {
                     var _this = this;
                     _super.call(this);
                     this._rootItems = {
-                        "ReportItems": function (path, allControls) {
-                            return _this.getReportElementsByPath(allControls, path.split('.'));
+                        "ReportItems": function (path, controlsHelper) {
+                            return _this.getReportElementsByPath(controlsHelper, path.split('.'));
                         }
                     };
                     this.getItems = function (path, rootItems) {
@@ -8020,7 +8050,7 @@ var DevExpress;
                         });
                         if (getItemsFunc) {
                             var $deferred = $.Deferred();
-                            var items = getItemsFunc(allControls());
+                            var items = getItemsFunc(controlsHelper);
                             items && $deferred.resolve(items) || $deferred.reject();
                             return $deferred.promise();
                         }
@@ -8038,29 +8068,29 @@ var DevExpress;
                         return _this._getItemByPath(pathRequest, rootItems, true);
                     };
                 }
-                ReportItemsProvider.prototype._getControlByName = function (allControls, name) {
+                ReportItemsProvider.prototype._getControlByName = function (controlsHelper, name) {
                     if (name === "Report") {
-                        return allControls.filter(function (x) { return x instanceof Report.ReportViewModel; })[0];
+                        return controlsHelper.allControls().filter(function (x) { return x instanceof Report.ReportViewModel; })[0];
                     }
-                    return allControls.filter(function (x) { return x.name() === name; })[0];
+                    return controlsHelper.allControls().filter(function (x) { return controlsHelper.getNameProperty(x)() === name; })[0];
                 };
                 ReportItemsProvider.prototype._getProperties = function (targetInfo, propertyName) {
                     return targetInfo.filter(function (x) { return x.modelName === '@' + propertyName || x.modelName === propertyName; })[0];
                 };
                 ReportItemsProvider.prototype._tryGenerateGetItemsFunc = function (rootItem, path) {
                     if (path.indexOf(rootItem.propertyName) === 0) {
-                        return function (allControls) { return rootItem.getItems(path, allControls); };
+                        return function (controlsHelper) { return rootItem.getItems(path, controlsHelper); };
                     }
                 };
-                ReportItemsProvider.prototype.getReportElementsByPath = function (allControls, path) {
+                ReportItemsProvider.prototype.getReportElementsByPath = function (controlsHelper, path) {
                     if (path.length === 1) {
-                        return allControls.map(function (x) {
-                            var name = x instanceof Report.ReportViewModel ? 'Report' : x.name();
+                        return controlsHelper.allControls().map(function (x) {
+                            var name = x instanceof Report.ReportViewModel ? 'Report' : controlsHelper.getNameProperty(x)();
                             return Report.Utils.createIDataMemberInfoByName(name);
                         });
                     }
                     path = path.slice(1);
-                    var control = this._getControlByName(allControls, path[0]);
+                    var control = this._getControlByName(controlsHelper, path[0]);
                     if (!control) {
                         return null;
                     }
@@ -8372,6 +8402,26 @@ var DevExpress;
                         this.onSave(data);
                     }
                     return data;
+                };
+                ReportViewModel.prototype.clone = function () {
+                    var _this = this;
+                    var dataSourceRefs = this.objectStorage().reduce(function (result, objectStorageItem, index) {
+                        var dataSourceRef = _this.dataSourceRefs.filter(function (x) { return x.ref === objectStorageItem["_model"]["@Ref"]; })[0];
+                        if (dataSourceRef) {
+                            result.push({
+                                index: index,
+                                dataSourceRef: $.extend(true, {}, dataSourceRef)
+                            });
+                        }
+                        return result;
+                    }, []);
+                    var report = new ReportViewModel(this.save());
+                    report.dataSourceRefs = [];
+                    dataSourceRefs.forEach(function (item) {
+                        item.dataSourceRef.ref = report.objectStorage()[item.index]["_model"]["@Ref"];
+                        report.dataSourceRefs.push(item.dataSourceRef);
+                    });
+                    return report;
                 };
                 ReportViewModel.prototype.getPath = function (propertyName) {
                     var helper = ko.unwrap(this.dataSourceHelper);
@@ -10168,6 +10218,7 @@ var DevExpress;
                 function VerticalBandViewModel(band, parent, serializer) {
                     var _this = this;
                     _super.call(this, band, parent, serializer);
+                    this.preInit(band, parent, serializer);
                     var _widthFromControls = 0;
                     this._disposables.push(this.widthFromControls = ko.pureComputed(function () {
                         _widthFromControls = 0;
@@ -10202,15 +10253,34 @@ var DevExpress;
                     this.size.height = this.height;
                     this.size.width = this.width;
                 };
+                VerticalBandViewModel.prototype.preInit = function (band, parent, serializer) {
+                };
                 return VerticalBandViewModel;
             })(Report.BandViewModel);
             Report.VerticalBandViewModel = VerticalBandViewModel;
+            var VerticalDetailBandViewModel = (function (_super) {
+                __extends(VerticalDetailBandViewModel, _super);
+                function VerticalDetailBandViewModel() {
+                    _super.apply(this, arguments);
+                }
+                VerticalDetailBandViewModel.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    this.disposeObservableArray(this.sortFields);
+                    this.resetObservableArray(this.sortFields);
+                };
+                VerticalDetailBandViewModel.prototype.preInit = function (band, parent, serializer) {
+                    this.sortFields = DevExpress.JS.Utils.deserializeArray(band.SortFields, function (field) { return new Report.GroupFieldModel(field, serializer); });
+                };
+                return VerticalDetailBandViewModel;
+            })(VerticalBandViewModel);
+            Report.VerticalDetailBandViewModel = VerticalDetailBandViewModel;
             var VerticalBandSurface = (function (_super) {
                 __extends(VerticalBandSurface, _super);
                 function VerticalBandSurface(band, context, unitProperties) {
                     var _this = this;
                     if (unitProperties === void 0) { unitProperties = VerticalBandSurface._unitProperties; }
                     _super.call(this, band, context, unitProperties);
+                    this.isSomeParentCollapsed = ko.observable(false);
                     this._resize = function (delta, oldDelta) {
                         var width = Math.max(_this._width() + delta - oldDelta, _this.minimumWidth());
                         _this._width(width);
@@ -10273,10 +10343,12 @@ var DevExpress;
                     }));
                     this.getUsefulRect = function () {
                         return {
-                            top: _this.absolutePosition.y(),
-                            bottom: _this.absolutePosition.y() + _this._height(),
-                            left: _this.absolutePosition.x() - _this.verticalBandsContainer.scrollOffset(),
-                            right: _this.absolutePosition.x() + _this.rect().width - _this.verticalBandsContainer.scrollOffset()
+                            top: 0,
+                            left: 0,
+                            right: _this._width(),
+                            bottom: _this._height(),
+                            width: _this._width(),
+                            height: _this._height()
                         };
                     };
                     var x = this.underCursor().x;
@@ -10395,6 +10467,10 @@ var DevExpress;
                     }), this.collapsed = ko.computed({
                         read: function () { return _this.verticalBands().some(function (x) { return x.collapsed(); }); },
                         write: function (newVal) { return _this.verticalBands().forEach(function (x) { return x.collapsed(newVal); }); }
+                    }), this.selected = ko.computed(function () {
+                        return _this.verticalBands().some(function (x) { return x.selected(); });
+                    }), this.canResize = ko.computed(function () {
+                        return _this.selected() && !_this.isLocked() && !_this.collapsed() && !DevExpress.Analytics.Internal.DragDropHandler.started();
                     }), this.width = ko.computed(function () { return _parent._context.pageWidth() - _parent._context.margins.left() - (!_this.collapsed() ? _parent._context.margins.right() : 0); }), this.leftMargin = ko.pureComputed(function () { return 0 - (_parent._context.margins && _parent._context.margins.left() || 0) + 10; }), this.height = ko.computed({
                         read: function () {
                             return _this.verticalBands()[0] && _this.verticalBands()[0].height() || 0;
@@ -10435,6 +10511,9 @@ var DevExpress;
                     if (this.visible)
                         return this._parent.getControlModel().bands().indexOf(this.verticalBands()[0]._control);
                     return -1;
+                };
+                VerticalBandsContainerSurface.prototype.isLocked = function () {
+                    return this.verticalBands().some(function (x) { return x.locked; });
                 };
                 VerticalBandsContainerSurface.prototype.createScrollViewOptions = function (target, selection) {
                     return {
@@ -10514,7 +10593,7 @@ var DevExpress;
             Report.verticalHeaderBandSerializationInfo = [Report.repeatEveryPage].concat(commonVerticalBandProperties);
             Report.popularPropertiesVerticalHeaderBand = ["repeatEveryPage"];
             Report.verticalDetailBandSerializationInfo = [bandLayout, Report.sortFields].concat(commonVerticalBandProperties);
-            Report.popularPropertiesVerticalDetailBand = ["bandLayout", "sortFields"];
+            Report.popularPropertiesVerticalDetailBand = ["sortFields", "bandLayout"];
             Report.verticalTotalBandSerializationInfo = [].concat(commonVerticalBandProperties);
             Report.popularPropertiesVerticalTotalBand = [];
         })(Report = Designer.Report || (Designer.Report = {}));
@@ -14578,24 +14657,7 @@ var DevExpress;
                     }
                 };
                 XRSubreportViewModel.prototype.cloneReportSource = function () {
-                    var _this = this;
-                    var dataSourceRefs = this.reportSource.objectStorage().reduce(function (result, objectStorageItem, index) {
-                        var dataSourceRef = _this.reportSource.dataSourceRefs.filter(function (x) { return x.ref === objectStorageItem["_model"]["@Ref"]; })[0];
-                        if (dataSourceRef) {
-                            result.push({
-                                index: index,
-                                dataSourceRef: dataSourceRef
-                            });
-                        }
-                        return result;
-                    }, []);
-                    var report = new Report.ReportViewModel(this.reportSource.save());
-                    report.dataSourceRefs = [];
-                    dataSourceRefs.forEach(function (item) {
-                        item.dataSourceRef.ref = report.objectStorage()[item.index]["_model"]["@Ref"];
-                        report.dataSourceRefs.push(item.dataSourceRef);
-                    });
-                    return report;
+                    return this.reportSource.clone();
                 };
                 return XRSubreportViewModel;
             })(Report.ControlViewModel);
@@ -17273,7 +17335,7 @@ var DevExpress;
                 });
                 Report.controlsFactory.registerControl("VerticalDetailBand", {
                     info: Report.verticalDetailBandSerializationInfo,
-                    type: Report.VerticalBandViewModel,
+                    type: Report.VerticalDetailBandViewModel,
                     nonToolboxItem: true,
                     popularProperties: Report.popularPropertiesVerticalDetailBand,
                     surfaceType: Report.VerticalBandSurface,
@@ -20404,10 +20466,15 @@ var DevExpress;
                     var container = this._container();
                     if (!container || container.getChildrenCollection()().length > 1)
                         return false;
-                    return (container instanceof Report.TableCellSurface || container instanceof Report.ControlSurface || container instanceof Report.BandSurface);
+                    return (container instanceof Report.TableCellSurface ||
+                        container instanceof Report.ControlSurface ||
+                        container instanceof Report.BandSurface ||
+                        container instanceof Report.VerticalBandSurface);
                 };
                 FitToContainerAction.prototype.visible = function () {
-                    return !(this._control() instanceof Report.CrossBandSurface || this._control() instanceof Report.XRPageBreakSurface || this._control() instanceof Report.TableOfContentsSurface);
+                    return !(this._control() instanceof Report.CrossBandSurface ||
+                        this._control() instanceof Report.XRPageBreakSurface ||
+                        this._control() instanceof Report.TableOfContentsSurface);
                 };
                 return FitToContainerAction;
             })();
@@ -20524,7 +20591,7 @@ var DevExpress;
                     this.controlsHelper = new Report.DesignControlsHelper(this.report, selection);
                     var wrappedCallback = this.fieldListDataSourceHelper.wrapFieldsCallback(designerCallbacks.fieldLists, this.state);
                     this.fieldListProvider = new Designer.FieldListProvider(wrappedCallback, this.fieldListDataSourceHelper.fieldListDataSources, this.fieldListItemsExtenders);
-                    this.reportItemsProvider = new Report.ReportItemsProvider(this.controlsHelper.allControls, this.fieldListProvider);
+                    this.reportItemsProvider = new Report.ReportItemsProvider(this.controlsHelper, this.fieldListProvider);
                     this.dataBindingsProvider = new Designer.FieldListProvider(wrappedCallback, this.fieldListDataSourceHelper.fieldListDataSources, [this.parameters, this.calcFieldsSource, chartFieldListExtender]);
                     this.chartValueBindingProvider = new Designer.FieldListProvider(wrappedCallback, chartValueBindingAvailableSources, [this.parameters, this.calcFieldsSource]);
                     this.displayNameProvider = new Report.DisplayNameProvider(this.fieldListProvider, this.fieldListDataSourceHelper.dataSourceHelper(), this.report.dataSource);
@@ -23180,7 +23247,7 @@ var DevExpress;
                 function ReportPreviewService() {
                 }
                 ReportPreviewService.initializePreview = function (report) {
-                    return Designer.ajax(Report.HandlerUri, "initializePreview", encodeURIComponent(JSON.stringify({ "XtraReportsLayoutSerializer": report.serialize() })), DevExpress.Report.Preview.PreviewRequestWrapper.processError);
+                    return Designer.ajax(Report.HandlerUri, "initializePreview", encodeURIComponent(JSON.stringify({ "XtraReportsLayoutSerializer": report.serialize() })), DevExpress.Report.Preview.PreviewRequestWrapper.getProcessErrorCallback());
                 };
                 return ReportPreviewService;
             })();
@@ -23222,8 +23289,8 @@ var DevExpress;
                     return Designer.ajax(Report.HandlerUri, 'renderRich', encodeURIComponent(JSON.stringify({
                         layout: JSON.stringify(new DevExpress.JS.Utils.ModelSerializer().serialize(surface._control)),
                         scale: surface._context.zoom(),
-                        text: surface._control["textRtf"]().replace(/\n/g, "\r\n"),
-                        rtf: surface._control["_rtf"]().replace(/\n/g, "\r\n"),
+                        text: (surface._control["textRtf"]() || "").replace(/\n/g, "\r\n"),
+                        rtf: (surface._control["_rtf"]() || "").replace(/\n/g, "\r\n"),
                         format: surface._control["format"](),
                         base64rtf: surface._control["_serializableRtfString"](),
                         propertyName: propertyName
@@ -23813,7 +23880,7 @@ var DevExpress;
                         { text: "DataSource.CurrentRowIndex", val: "[DataSource.CurrentRowIndex]", descriptionStringId: 'ReportStringId.ExpressionEditor_ItemInfo_Variables_CurrentRowIndex_Description' },
                         { text: "DataSource.RowCount", val: "[DataSource.RowCount]", descriptionStringId: 'ReportStringId.ExpressionEditor_ItemInfo_Variables_RowCount_Description' }
                     ]);
-                    categories.push(DevExpress.Analytics.Widgets.createExpressionEditorCollectionToolOptions(items, "Variables", "ReportStringId.ExpressionEditor_ItemInfo_Variables"));
+                    categories.push(DevExpress.Analytics.Widgets.createExpressionEditorCollectionToolOptions(items, "Variables", "ReportStringId.ExpressionEditor_ItemInfo_Variables", true));
                 }
                 Utils.addVariablesToExpressionEditor = addVariablesToExpressionEditor;
                 function createIDataMemberInfoByName(name, specifics) {
@@ -23841,6 +23908,10 @@ var DevExpress;
                 function dxImageSourceEditor(element, options) {
                     _super.call(this, element, options);
                 }
+                dxImageSourceEditor.prototype._toggleReadOnlyState = function () {
+                    _super.prototype._toggleReadOnlyState.call(this);
+                    this["_input"]().prop("readOnly", true);
+                };
                 dxImageSourceEditor.prototype._handleFiles = function (filesHolder) {
                     var _this = this;
                     var files = filesHolder.files;
@@ -25445,10 +25516,10 @@ var DevExpress;
                 'dxrd-band-holder': '<!-- ko foreach: holder.bands -->    <!-- ko template: { name: $data[$parent.templateName], data: $parent.getData($data) } -->    <!-- /ko -->    <!-- /ko -->    <!-- ko with: holder.verticalBandsContainer -->    <!-- ko if: visible && !!$data[$parent.templateName] -->    <!-- ko template: { name: $data[$parent.templateName], data: $parent.getData($data) } -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->',
                 'dxrd-vertical-band-selection': '<div data-bind="styleunit: { \'height\': height, \'width\': _width, left: absolutePosition.x }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting() }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;}, handles: resizeHandles(), disabled: !canResize(), forceResize: resize, zoom: $root.surface().zoom, minimumWidth: minimumWidth(), minimumHeight: minimumHeight() },  css: { \'dxrd-band-content-selected\': selected() }, trackCursor: underCursor" style="position:absolute">        <div class="dxrd-vertical-band-marker" data-bind="css: { \'dxrd-vertical-band-marker-focused\': focused }">            <div class="dxrd-banding-marker-text" data-bind="text: name"></div>        </div>        <div style="height: calc(100% - 29px); width: 100%; position: absolute">            <!-- ko foreach: controls -->            <!-- ko template: { name: $data.selectiontemplate } -->            <!-- /ko -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
                 'dxrd-vertical-band': '<div class="dxrd-band-content dxrd-vertical-band" data-bind="styleunit: { \'width\': _width(), \'left\': absolutePosition.x() }">        <!-- ko if: $data._context.drawWatermark() -->        <!-- ko template: { name: \'dxrd-watermark\', data: { forLeftMargin: false, band: $data, reportSurface: $data._context } } -->        <!-- /ko -->        <!-- /ko -->        <div data-bind="coordinateGrid: coordinateGridOptions" class="dxrd-band-content-grid"></div>        <!-- ko foreach: controls -->        <!-- ko template: { name: $data.template } -->        <!-- /ko -->        <!-- /ko -->    </div>',
-                'dxrd-vertical-bands-container': '<!-- ko ifnot: collapsed -->    <div class="dxrd-band-content dxrd-vertical-bands-container" data-bind="styleunit: { \'height\': height, left: leftOffset, \'width\': width, top: topOffset },        resizable: { starting: function() {            $root.resizeHandler.started = true; $root.resizeHandler.starting();        }, stopped: function() {            $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;        }, handles: \'s\', forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight || 1 }">        <div data-bind="styleunit: { \'width\': width }" style="height: 100%; overflow:hidden;position: absolute;">            <div data-bind="style: { transform: \'translateX(-\' + $data.scrollOffset() + \'px)\' }">                <!-- ko foreach: verticalBands -->                <!-- ko template: { name: templateName } -->                <!-- /ko -->                <!-- /ko -->                <div data-bind="styleunit: { width: grayAreaWidth, height: height, left: !$root.surface().rtl() ? grayAreaLeft : 0  }" class="dxrd-band-content-greyarea"></div>            </div>        </div>    </div>    <!-- /ko -->    <!-- ko if: collapsed -->    <div class="dxrd-band-collapsed" data-bind="styleunit: { \'height\': height, \'line-height\': height, \'top\': topOffset, width: width }" style="position:absolute">        <div style="position: absolute" data-bind="text: (name || \'\').toUpperCase(), styleunit: { \'right\': $root.surface().rtl() ? leftMargin : \'auto\', \'left\': !$root.surface().rtl() ? leftMargin: \'auto\' }"></div>    </div>    <!-- /ko -->',
+                'dxrd-vertical-bands-container': '<!-- ko ifnot: collapsed -->    <div class="dxrd-band-content dxrd-vertical-bands-container" data-bind="styleunit: { \'height\': height, left: leftOffset, \'width\': width, top: topOffset },        resizable: { starting: function() {            $root.resizeHandler.started = true; $root.resizeHandler.starting();        }, stopped: function() {            $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;        }, handles: \'s\', disabled: !canResize(), forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight || 1 }">        <div data-bind="styleunit: { \'width\': width }" style="height: 100%; overflow:hidden;position: absolute;">            <div data-bind="style: { transform: \'translateX(-\' + $data.scrollOffset() + \'px)\' }">                <!-- ko foreach: verticalBands -->                <!-- ko template: { name: templateName } -->                <!-- /ko -->                <!-- /ko -->                <div data-bind="styleunit: { width: grayAreaWidth, height: height, left: !$root.surface().rtl() ? grayAreaLeft : 0  }" class="dxrd-band-content-greyarea"></div>            </div>        </div>    </div>    <!-- /ko -->    <!-- ko if: collapsed -->    <div class="dxrd-band-collapsed" data-bind="styleunit: { \'height\': height, \'line-height\': height, \'top\': topOffset, width: width }" style="position:absolute">        <div style="position: absolute" data-bind="text: (name || \'\').toUpperCase(), styleunit: { \'right\': $root.surface().rtl() ? leftMargin : \'auto\', \'left\': !$root.surface().rtl() ? leftMargin: \'auto\' }"></div>    </div>    <!-- /ko -->',
                 'dxrd-vertical-bands-container-selection': '<!-- ko ifnot: collapsed -->    <div data-bind="styleunit: { \'width\': width, top: topOffset, left: leftOffset, height: height() }" style="overflow:hidden;position: absolute;">        <div data-bind="dxScrollView: $data.createScrollViewOptions($data, $root.selection)">            <!-- ko foreach: verticalBands -->            <!-- ko template: { name: $data.selectiontemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>    <!-- /ko -->',
                 'dxrd-vertical-bands-container-vruler': '<!-- ko with: surface -->    <div class="dxrd-band-marker-wrapper" data-bind="styleunit: { \'width\': markerWidth() + 20, \'top\': topOffset, \'height\': height }" style="position:absolute">        <div class="dxrd-band-vruler" data-bind="styleunit: { \'height\': height, top: $data.bandOffset },    resizable: { starting: function() {        $root.resizeHandler.started = true; $root.resizeHandler.starting();    }, stopped: function() {        $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;    }, handles: \'s\', forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight || 1 }">            <div data-bind="ruler: { \'zoom\': zoom, \'length\': height, \'units\': $parent.measureUnit, \'direction\': \'vertical\', flip: $root.dx[\'config\']()[\'rtlEnabled\'] }"></div>        </div>        <div class="dxrd-band-marker dxrd-band-marker-body" data-bind="             css: {                 \'dxrd-band-marker-body\' : !$data.focused(),                \'dxrd-band-marker-body-focused\' : $data.focused()              },              styleunit: {                \'height\': height(),                 \'width\': markerWidth              },              click: function(_, e) { $data.markerClick($root.selection); e.stopPropagation(); },             resizable: {                 starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting(); },                 stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false; },                handles: \'s\',                 disabled: collapsed,                 forceResize: resize,                 zoom: $root.surface().zoom,                 minimumHeight: minHeight()              }">            <div style="width: 1px; height: 1px; margin-left: 9px;"></div>            <div class="dxrd-band-marker-rotation">                <div class="dxrd-band-marker-rotation-text" data-bind="text: collapsed() ? \'\' : name"></div>            </div>        </div>    </div>    <!-- /ko -->',
-                'dxrd-vertical-bands-leftMargin-selection': '<!-- ko with: surface -->    <div data-bind="styleunit: { \'height\': height, \'width\': $parent.width, top: topOffset }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting() }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;}, handles: \'s\', forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight() }" style="position:absolute">    </div>    <!-- /ko -->',
+                'dxrd-vertical-bands-leftMargin-selection': '<!-- ko with: surface -->    <div data-bind="styleunit: { \'height\': height, \'width\': $parent.width, top: topOffset }, resizable: { starting: function() { $root.resizeHandler.started = true; $root.resizeHandler.starting() }, stopped: function() { $data.stopResize(); $root.resizeHandler.stopped(); $root.resizeHandler.started = false;}, handles: \'s\', disabled: !canResize(), forceResize: resize, zoom: $root.surface().zoom, minimumHeight: minHeight() }" style="position:absolute">    </div>    <!-- /ko -->',
                 'dxrd-vertical-bands-leftMargin': '<!-- ko with: surface -->    <div data-bind="css: { \'dxrd-band-content\': !$data.collapsed(), \'dxrd-band-collapsed\': $data.collapsed() }, styleunit: { \'height\': height, top: topOffset }">    </div>    <!-- /ko -->',
                 'dxrd-barcode-content': '<div style="margin:auto; width: 150px; height: 37px;" class="dxrd-image-surface-barcode"></div><div data-bind="styleunit: { \'lineHeight\': (contentSizes().height - 37) / _context.zoom() }">    <div class="dxrd-control-content" data-bind="text: displayName, style: contentCss"></div></div>',
                 'dxrd-calculatedfield-content': '<div data-bind="with: propertyGrid">    <!-- ko foreach: getEditors() -->    <!-- ko template: editorTemplate -->    <!-- /ko -->    <!-- /ko --></div>',
@@ -25502,7 +25573,7 @@ var DevExpress;
                 'dxrd-table-of-contents-level': '<div class="dxrd-control" data-bind="styleunit: { height: position.height, top: position.top, lineHeight: position.lineHeight}, css: adorntemplate" style="left: 0; width: 100%">        <div class="dxrd-tocLevel-border" data-bind="styleunit: { \'height\': _context.zoom()}"></div>        <!-- ko if: getControlModel().rtl() -->        <div data-bind="style: borderCss, styleunit: { left: position.left, width: contentSizes().width + (contentSizes().left + contentSizes().right)} " style="height: 100%; position:absolute; box-sizing:border-box"></div>        <!-- /ko -->        <!-- ko if: !getControlModel().rtl() -->        <div data-bind="style: borderCss, styleunit: { left: position.left} " style="height: 100%; right: 0; position:absolute; box-sizing:border-box"></div>        <!-- /ko -->        <div class="dxrd-control-content-main" style="overflow:hidden" data-bind="styleunit: { \'top\': contentSizes().top, \'left\': contentSizes().left + position.left(), lineHeight: contentSizes().height, height: contentSizes().height, width: contentSizes().width}, style: css">            <div class="dxrd-tocLevel-zoomer" data-bind="zoom: _context.zoom, styleunit: { \'height\': contentHeightWithoutZoom, \'width\': contentWidthWithoutZoom }">                <div style="box-sizing: border-box; letter-spacing: normal; width:100%;height:100%;" data-bind="styleunit: { lineHeight: contentHeightWithoutZoom }">                    <!-- ko if: getControlModel().isTitle -->                    <div class="dxrd-control-content dxrd-control-content-multiline" data-bind="controlDisplayName: $data, style: contentCss"></div>                    <!-- /ko -->                    <!-- ko ifnot: getControlModel().isTitle -->                    <div class="dxrd-control-content" data-bind="style: contentCss" style="width: 100%; height: 100%; line-height:inherit;">                        <div class="dxrd-control-content-level-text">                            <table border="0" cellspacing="0" cellpadding="0">                                <tr>                                    <td>                                        <div class="dxrd-control-content-line-text"><span data-bind="text: $data.getControlModel().name"></span></div>                                    </td>                                    <td class="middle">                                        <table border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed; width: 100%">                                            <tr>                                                <td data-bind="text: leaderSymbols" style="word-wrap: break-word"></td>                                            </tr>                                        </table>                                    </td>                                    <td>                                        <div class="dxrd-control-content-number">&nbsp;&nbsp;#&nbsp;&nbsp;</div>                                    </td>                                </tr>                            </table>                        </div>                    </div>                    <!-- /ko -->                </div>            </div>        </div>    </div>',
                 'dxrd-table-of-contents-selected': '<div class="dxrd-control dxrd-table-of-contents-selected" data-bind="event: { dblclick: function() { $root.inlineTextEdit.show($element) } }, visible: isSelected, css: {\'dxrd-intersect\': isIntersect, \'dxrd-locked\': locked }, draggable: $root.dragHandler, styleunit: position, trackCursor: underCursor">        <div class="dxd-border-accented dxrd-control-border-box"></div>        <!-- ko with: levelTitle -->        <div class="dxrd-control dxrd-control-line-ui-resizeble" data-bind="styleunit: position, resizable: resizable($root.resizeHandler, $element)">            <!-- ko with: $root.inlineTextEdit-->            <!-- ko if: visible -->            <div class="inline-text-edit" data-bind="dxTextArea: { value: text, onKeyUp: keypressAction, valueChangeEvent: \'keyup\' }"></div>            <!-- /ko -->            <!-- /ko -->        </div>        <!-- /ko -->        <!-- ko foreach: $data.levels() -->        <div class="dxrd-control dxrd-control-line-ui-resizeble" data-bind="styleunit: {            height: position.height,            top: position.top,            lineHeight: position.lineHeight        },        resizable: resizable($root.resizeHandler, $element)" style="left:0; width:100%"></div>        <!-- /ko -->        <!-- ko with: levelDefault -->        <div class="dxrd-control" data-bind="styleunit: {            height: position.height,            top: position.top,            lineHeight: position.lineHeight        },        resizable: resizable($root.resizeHandler, $element)" style="left:0; width:100%"></div>        <!-- /ko -->    </div>    <div class="dxrd-control" data-bind="visible: !isSelected(), styleunit: position, trackCursor: underCursor">    </div>',
                 'dxrd-reportRtlProperty': '<!-- ko if: !!$root.surface() -->    <!-- ko template: { name: $root.dx.Analytics.Widgets.editorTemplates.combobox.header, data: $root.surface().wrapRtlProperty($data, $root.undoEngine, $element) } -->    <!-- /ko -->    <!-- /ko -->',
-                'dxrd-drag-helper-source-reportexplorer': '<div class="dxrd-drag-helper-source-reportexplorer dxd-back-primary dxd-text-primary dxd-ghost-border-color dxd-border-accented">        <div class="dxrd-drag-helper-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>        <div class="dxrd-drag-helper-treelist-text-wrapper">            <div class="dxrd-drag-helper-treelist-text" data-bind="text: text, attr: { title: text }"></div>        </div>    </div>',
+                'dxrd-drag-helper-source-reportexplorer': '<div class="dxrd-drag-helper-source-reportexplorer dxd-back-primary dxd-text-primary dxd-ghost-border-color dxd-border-accented">        <div class="dxrd-drag-helper-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>        <div class="dxrd-drag-helper-treelist-text-wrapper">            <div class="dxrd-drag-helper-treelist-text" data-bind="text: text, attr: { title: text }"></div>        </div>    </div>',
                 'dxrd-wizard-report-tree': '<div class="dxrd-wizard-report-tree">        <div class="dxrd-wizard-report-tree-title" data-bind="text: $root.getLocalization(\'Select the report\', \'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_SelectReport\')"></div>        <div class="dxrd-wizard-report-tree-selectbox" data-bind="dxSelectBox: { dataSource: $data.items, itemTemplate: \'stateItem\', valueExpr: \'path\', displayExpr: \'name\', value: $data.value  }">            <div data-options="dxTemplate:{ name:\'stateItem\' }" style="text-align: left;">                <div data-bind="text: name, styleunit: {marginLeft: 30 * level}"></div>            </div>        </div>    </div>',
                 'dxrd-textcontrol-content': '<div style="box-sizing: border-box; letter-spacing: normal; width:100%" data-bind="styleunit: { lineHeight: contentHeightWithoutZoom }">    <div class="dxrd-control-content" data-bind="controlDisplayName: $data, style: contentCss, css: {\'dxrd-control-content-multiline\' : multiline }, cacheElement: { action: function(element) { $data.cacheElementContent(element); } } "></div></div>',
                 'dxrd-todocontrol': '<div class="dxrd-control dxd-selectable" data-bind="styleunit: position, trackCursor: underCursor, style: css, css: adorntemplate">    <div data-bind="style: borderCss" class="dxrd-control-border-box"></div>    <div data-bind="css: controlTypeClass, template: controlTypeIconTemplate" style="position: absolute; width: 24px; height: 24px; right: 5px; top: 5px;"></div>    <span class="dxrd-control-content" data-bind="text: displayName, style: contentCss"></span></div>',
@@ -25533,7 +25604,7 @@ var DevExpress;
                 'dx-numeric-undo': '<div data-bind="dxNumberBox: getOptions({ value:generateValue($root.undoEngine), showSpinButtons:true, disabled:disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
                 'dx-objectEditorContentUndo': '<!-- ko if: visible -->    <div data-bind="template: { name: \'dx-propertieseditor\', data: generateValue($root.undoEngine) }"></div>    <!-- /ko -->',
                 'dxrd-editOptionsEditorName': '<div data-bind="dxFieldListPicker: $data"></div>',
-                'dxrd-editingField-editor-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: data.title }"></div>                </div>            </div>        </div>    </div>',
+                'dxrd-editingField-editor-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: data.title }"></div>                </div>            </div>        </div>    </div>',
                 'dxrd-name': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: generateRules($root.controlsHelper.allControls) || [] }"></div>',
                 'dxrd-reportexpression': '<!-- ko if: visible -->    <!-- ko if: $data.patchOptions($root.reportExplorerProvider) -->    <div data-bind="dxExpressionEditor: getOptions({ options: value, fieldListProvider: $root.reportItemsProvider, displayNameProvider: $root.expressionDisplayNameProvider && $root.expressionDisplayNameProvider() })"></div>    <!-- /ko -->    <!-- /ko -->',
                 'dxrd-pivotcriteria': '<!-- ko with: $data.wrapModel($root.fieldListProvider) -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: itemsProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: displayNameProvider }"></div>    <!-- /ko -->',

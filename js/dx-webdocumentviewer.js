@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 18.2.4
-* Build date: 2018-12-18
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.2.5
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -1762,7 +1762,6 @@ var DevExpress;
                             self.findTextRequestDone(result, cache[text]);
                         }).fail(function (error) {
                             self.loading(false);
-                            reportPreview._processError(DevExpress.Designer.getLocalization("An error occurred during search", "ASPxReportsStringId.WebDocumentViewer_SearchError"), error);
                         });
                     };
                     this.findNext = function () {
@@ -2406,6 +2405,7 @@ var DevExpress;
                     this.intTypes = ["System.Int16", "System.Int32", "System.Int64"];
                     this.floatTypes = ["System.Single", "System.Double", "System.Decimal"];
                     this.isTypesCurrentType = function (types, type) { return types.indexOf(type) > -1; };
+                    this.tag = parameterInfo.Tag;
                     this.type = parameterInfo.TypeName;
                     this.path = parameterInfo.Path;
                     this.visible = parameterInfo.Visible;
@@ -2425,6 +2425,7 @@ var DevExpress;
                             description: parameterInfo.Description,
                             displayName: parameterInfo.Description || parameterInfo.Name,
                             name: parameterInfo.Name,
+                            tag: parameterInfo.Tag,
                             type: parameterInfo.TypeName,
                             value: _this._originalValue,
                             multiValue: parameterInfo.MultiValue,
@@ -2500,7 +2501,7 @@ var DevExpress;
                     _super.call(this);
                     this._parameters = [];
                     this._getLookUpValueRequest = function (argsObject) {
-                        return DevExpress.Designer.ajax(Preview.HandlerUri, 'getLookUpValues', encodeURIComponent(JSON.stringify(argsObject)));
+                        return DevExpress.Designer.ajax(Preview.HandlerUri, 'getLookUpValues', encodeURIComponent(JSON.stringify(argsObject)), function (message, jqXHR, textStatus) { return _this._reportPreview._processError(DevExpress.Designer.getLocalization("Cannot supply filtered lookup values to a report parameter editor", "ASPxReportsStringId.WebDocumentViewer_GetLookUpValuesError")); });
                     };
                     this._getDoneGetLookUpValueHandler = function () {
                         var parametersViewModel = _this;
@@ -2525,7 +2526,6 @@ var DevExpress;
                         var parametersViewModel = _this;
                         return function (jqXHRError) {
                             parametersViewModel.parametersLoading(false);
-                            parametersViewModel._reportPreview._processError(DevExpress.Designer.getLocalization("Cannot supply filtered lookup values to a report parameter editor", "ASPxReportsStringId.WebDocumentViewer_GetLookUpValuesError"), jqXHRError);
                         };
                     };
                     this.getInfo = ko.observable(null);
@@ -2795,9 +2795,13 @@ var DevExpress;
             Preview.TimeOut = 105000;
             Preview.PollingDelay = 300;
             Preview.MessageHandler = {
-                processError: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); },
+                processError: function (message, showForUser, prefix) {
+                    if (prefix === void 0) { prefix = ""; }
+                    showForUser && DevExpress.Designer.ShowMessage(message.substr(prefix.length));
+                    DevExpress.Designer.NotifyAboutWarning(message, false);
+                },
                 processMessage: function (message, showForUser) { showForUser && DevExpress.Designer.ShowMessage(message, DevExpress.Designer.NotifyType.success, 10000); },
-                processWarning: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); }
+                processWarning: function (message, showForUser) { showForUser && DevExpress.Designer.ShowMessage(message); }
             };
             Preview.ZoomAutoBy = {
                 None: 1,
@@ -3152,7 +3156,6 @@ var DevExpress;
                     };
                 };
                 ReportPreview.prototype.openReport = function (reportName) {
-                    var _this = this;
                     this._clearReportInfo();
                     var deferred = $.Deferred();
                     this._openReportOperationDeferred = deferred;
@@ -3160,7 +3163,6 @@ var DevExpress;
                         deferred.resolve(response);
                     }).fail(function (error) {
                         deferred.reject(error);
-                        _this._processError(DevExpress.Designer.getLocalization("Could not open report", "ASPxReportsStringId.WebDocumentViewer_OpenReportError") + " '" + reportName + "'", error);
                     });
                     return this.initialize(deferred.promise());
                 };
@@ -3176,7 +3178,6 @@ var DevExpress;
                         deferred.resolve(response);
                     }).fail(function (error) {
                         deferred.reject(error);
-                        _this._processError(DevExpress.Designer.getLocalization("Drill through operation failed", "ASPxReportsStringId.WebDocumentViewer_DrillThroughError"), error);
                     });
                     return deferred.promise();
                 };
@@ -3282,12 +3283,7 @@ var DevExpress;
                     })
                         .fail(function (error) {
                         var response = { message: DevExpress.Designer.getLocalization("The requested document operation cannot be performed.", "ASPxReportsStringId.WebDocumentViewer_CustomDocumentOperationsDenied_Error") };
-                        try {
-                            Preview.MessageHandler.processError(response.message, !hideMessageFromUser);
-                        }
-                        finally {
-                            deferred.reject(response);
-                        }
+                        deferred.reject(response);
                     });
                     return deferred.promise();
                 };
@@ -3420,10 +3416,6 @@ var DevExpress;
                             _this._editingValuesSubscriptions.push(field.editValue);
                             return field;
                         }));
-                    })
-                        .fail(function (error) {
-                        if (!ignoreErrorPredicate())
-                            _this._processError(DevExpress.Designer.getLocalization("Cannot obtain additional document data for the current document", "ASPxReportsStringId.WebDocumentViewer_GetDocumentDataError"), error);
                     });
                 };
                 ReportPreview.prototype.exportDocumentTo = function (format, inlineResult) {
@@ -3562,9 +3554,10 @@ var DevExpress;
                 };
                 ReportPreview.prototype._processError = function (error, jqXHR, showForUser) {
                     if (showForUser === void 0) { showForUser = true; }
+                    var prefix = error + ": ";
                     var serverError = DevExpress.Designer.getErrorMessage(jqXHR);
-                    serverError && (error += ": " + serverError);
-                    Preview.MessageHandler.processError(error, showForUser);
+                    serverError && (error = prefix + serverError);
+                    Preview.MessageHandler.processError(error, showForUser, serverError && prefix);
                 };
                 ReportPreview.prototype.emptyDocumentCaption = function () {
                     var parametersInfo = this.originalParametersInfo();
@@ -3731,6 +3724,7 @@ var DevExpress;
                     });
                 }
                 callbacks && callbacks.customizeLocalization && callbacks.customizeLocalization();
+                callbacks && callbacks.onServerError && DevExpress.Designer.processErrorEvent(callbacks.onServerError);
                 if (localization && localization.currentCulture) {
                     DevExpress.Analytics.Internal.applyLocalizationToDevExtreme(localization.currentCulture);
                 }
@@ -7872,6 +7866,9 @@ var DevExpress;
                         PageCount: pageCount
                     });
                 }
+                function onServerError(args) {
+                    fireEvent("OnServerError", { Error: args });
+                }
                 function customizeExportOptions(options) {
                     var arg = new CustomizeExportOptionsEventArgs(options);
                     fireEvent([prefix, "CustomizeExportOptions"].join(''), arg);
@@ -7886,7 +7883,8 @@ var DevExpress;
                     customizeParameterEditors: customizeParameterEditors,
                     customizeActions: customizeActions,
                     customizeParts: customizeParts,
-                    customizeExportOptions: customizeExportOptions
+                    customizeExportOptions: customizeExportOptions,
+                    onServerError: onServerError
                 };
                 function customizeLocalization() {
                     fireEvent("CustomizeLocalization");
@@ -8432,9 +8430,6 @@ var DevExpress;
                 };
                 PreviewHandlersHelper.prototype.errorStartExportHandler = function (deffered, error) {
                     this._preview.progressBar.complete();
-                    if (error) {
-                        this._preview._processError(DevExpress.Designer.getLocalization("An error occurred during the export", "ASPxReportsStringId.WebDocumentViewer_ExportError"), error);
-                    }
                 };
                 PreviewHandlersHelper.prototype.doneExportStatusHandler = function (deffered, operationId, response) {
                     try {
@@ -8461,7 +8456,6 @@ var DevExpress;
                 PreviewHandlersHelper.prototype.errorExportStatusHandler = function (deffered, error) {
                     this._preview.progressBar.complete();
                     deffered.resolve({ requestAgain: false, created: false });
-                    this._preview._processError(DevExpress.Designer.getLocalization("Error obtaining an export status", "ASPxReportsStringId.WebDocumentViewer_GetExportStatusError"), error);
                 };
                 PreviewHandlersHelper.prototype.doneStartBuildHandler = function (deffered, response) {
                     var _this = this;
@@ -8505,13 +8499,9 @@ var DevExpress;
                     deffered.resolve(true);
                     this._preview._startBuildOperationId = "";
                     this._preview.removeEmptyPages();
-                    if (!this._preview._closeDocumentRequests[startBuildOperationId])
-                        this._preview._processError(DevExpress.Designer.getLocalization("Cannot create a document for the current report", "ASPxReportsStringId.WebDocumentViewer_DocumentCreationError"), error);
                 };
                 PreviewHandlersHelper.prototype.errorGetBuildStatusHandler = function (deffered, error, ignoreError) {
                     deffered.resolve({ requestAgain: false, created: false });
-                    if (!ignoreError())
-                        this._preview._processError(DevExpress.Designer.getLocalization("Error obtaining a build status", "ASPxReportsStringId.WebDocumentViewer_GetBuildStatusError"), error);
                 };
                 PreviewHandlersHelper.prototype.doneGetBuildStatusHandler = function (deffered, documentId, response, stopProcessingPredicate) {
                     var _this = this;
@@ -8522,8 +8512,9 @@ var DevExpress;
                         }
                         if (response.faultMessage) {
                             deffered.resolve({ requestAgain: false, pageCount: -1, error: response.faultMessage });
-                            if (!stopProcessingPredicate())
+                            if (!stopProcessingPredicate()) {
                                 this._preview._processError(response.faultMessage, null);
+                            }
                             return;
                         }
                         this._preview.progressBar.progress() < response.progress && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate()
@@ -8637,11 +8628,19 @@ var DevExpress;
                         this[name] = handlers[name];
                     }
                 }
-                PreviewRequestWrapper.processError = function (message, jqXHR, textStatus) {
-                    Preview.MessageHandler.processError(message, true);
+                PreviewRequestWrapper.getProcessErrorCallback = function (reportPreview, defaultErrorMessage, showMessage) {
+                    if (showMessage === void 0) { showMessage = true; }
+                    return function (message, jqXHR, textStatus) {
+                        if (!reportPreview) {
+                            var error = DevExpress.Analytics.Utils.getErrorMessage(jqXHR);
+                            Preview.MessageHandler.processError(error || defaultErrorMessage || "Internal Server Error", showMessage);
+                        }
+                        else
+                            reportPreview._processError(defaultErrorMessage, jqXHR, showMessage);
+                    };
                 };
                 PreviewRequestWrapper.getPage = function (url, ignoreError) {
-                    return DevExpress.Designer.ajax(url, undefined, undefined, PreviewRequestWrapper.processError, ignoreError, { type: "GET" });
+                    return DevExpress.Designer.ajax(url, undefined, undefined, PreviewRequestWrapper.getProcessErrorCallback(), ignoreError, { type: "GET" });
                 };
                 PreviewRequestWrapper.prototype.initialize = function (reportPreview, parametersModel, searchModel) {
                     this._reportPreview = reportPreview;
@@ -8655,7 +8654,7 @@ var DevExpress;
                         matchCase: this._searchModel.matchCase(),
                         wholeWord: this._searchModel.matchWholeWord(),
                         searchUp: this._searchModel.searchUp()
-                    })));
+                    })), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("An error occurred during search", "ASPxReportsStringId.WebDocumentViewer_SearchError")));
                 };
                 PreviewRequestWrapper.prototype.stopBuild = function (id) {
                     DevExpress.Designer.ajax(Preview.HandlerUri, 'stopBuild', encodeURIComponent(id), undefined, function () { return true; });
@@ -8676,16 +8675,16 @@ var DevExpress;
                         sortingState: this._reportPreview["_sortingState"],
                         timeZoneOffset: 0 - new Date().getTimezoneOffset(),
                         parameters: parameters
-                    })));
+                    })), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("Cannot create a document for the current report", "ASPxReportsStringId.WebDocumentViewer_DocumentCreationError")));
                 };
                 PreviewRequestWrapper.prototype.getBuildStatusRequest = function (documentId, shouldIgnoreError) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'getBuildStatus', encodeURIComponent(JSON.stringify({
                         documentId: documentId,
                         timeOut: Math.max(5000, DevExpress.Report.Preview.TimeOut)
-                    })), undefined, shouldIgnoreError);
+                    })), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("Error obtaining a build status", "ASPxReportsStringId.WebDocumentViewer_GetBuildStatusError")), shouldIgnoreError);
                 };
                 PreviewRequestWrapper.prototype.getDocumentData = function (documentId, shouldIgnoreError) {
-                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'getDocumentData', encodeURIComponent(documentId), undefined, shouldIgnoreError);
+                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'getDocumentData', encodeURIComponent(documentId), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("Cannot obtain additional document data for the current document", "ASPxReportsStringId.WebDocumentViewer_GetDocumentDataError")), shouldIgnoreError);
                 };
                 PreviewRequestWrapper.prototype.customDocumentOperation = function (documentId, serializedExportOptions, editindFields, customData, hideMessageFromUser) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'documentOperation', encodeURIComponent(JSON.stringify({
@@ -8693,10 +8692,10 @@ var DevExpress;
                         customData: customData,
                         exportOptions: serializedExportOptions,
                         editingFieldValues: editindFields
-                    })), hideMessageFromUser ? undefined : PreviewRequestWrapper.processError);
+                    })), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("The requested document operation cannot be performed.", "ASPxReportsStringId.WebDocumentViewer_CustomDocumentOperationsDenied_Error"), !hideMessageFromUser));
                 };
                 PreviewRequestWrapper.prototype.openReport = function (reportName) {
-                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName), PreviewRequestWrapper.processError);
+                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'openReport', encodeURIComponent(reportName), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("Could not open report", "ASPxReportsStringId.WebDocumentViewer_OpenReportError") + " '" + reportName + "'"));
                 };
                 PreviewRequestWrapper.prototype.drillThrough = function (customData) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'drillThrough', encodeURIComponent(JSON.stringify({
@@ -8706,16 +8705,16 @@ var DevExpress;
                         parameters: this._parametersModel.serializeParameters(),
                         editingFields: this._reportPreview.editingFieldsProvider().map(function (field) { return field.model(); }),
                         customData: customData
-                    })));
+                    })), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("Drill through operation failed", "ASPxReportsStringId.WebDocumentViewer_DrillThroughError")));
                 };
                 PreviewRequestWrapper.prototype.getStartExportOperation = function (arg) {
-                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'startExport', arg);
+                    return DevExpress.Designer.ajax(Preview.HandlerUri, 'startExport', arg, PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("An error occurred during the export", "ASPxReportsStringId.WebDocumentViewer_ExportError")));
                 };
                 PreviewRequestWrapper.prototype.getExportStatusRequest = function (operationId) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, 'getExportStatus', encodeURIComponent(JSON.stringify({
                         id: operationId,
                         timeOut: Math.max(5000, DevExpress.Report.Preview.TimeOut)
-                    })));
+                    })), PreviewRequestWrapper.getProcessErrorCallback(this._reportPreview, DevExpress.Designer.getLocalization("Error obtaining an export status", "ASPxReportsStringId.WebDocumentViewer_GetExportStatusError")));
                 };
                 PreviewRequestWrapper.prototype.getEditingFieldHtml = function (value, editingFieldIndex) {
                     return DevExpress.Designer.ajax(Preview.HandlerUri, "getEditingFieldHtmlValue", encodeURIComponent(JSON.stringify({
@@ -8761,7 +8760,7 @@ var DevExpress;
                 'dxrd-page-brick-mobile': '<div class="dxrd-report-preview-brick" data-bind="style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active }">    </div>',
                 'dxrd-preview-export-to-mobile': '<div class="dxrd-preview-export-to" data-bind="dxMenu: { items: items, onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">        <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: \'item\' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">            <!--ko if: $data.format -->            <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>            <!-- /ko -->            <!--ko ifnot: $data.format -->            <div class="dxrd-preview-export-item-image-wrapper">                <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: { name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}"></div>            </div>            <div class="dx-menu-item-popout-container">                <div class="dx-menu-item-popout"></div>            </div>            <!-- /ko -->        </div>    </div>',
                 'dxrdp-pages-mobile': '<div class="dxrdp-mobile-paginator" data-bind="dxrdMobilePaginator: $data">        <div class="dxrdp-mobile-paginator-content">            <div class="dxrdp-mobile-paginator-text" data-bind="text : text"></div>        </div>    </div>',
-                'dxrdp-surface-mobile-bottom': '<div class="dxrdp-mobile-actions" data-bind="visible: visible">        <div class="dxrdp-mobile-actions-content">            <!-- ko foreach: actions -->            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, dxAction: clickAction">            </div>            <!-- ko if: $data.content -->            <!-- ko template: $data.content -->            <!-- /ko -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
+                'dxrdp-surface-mobile-bottom': '<div class="dxrdp-mobile-actions" data-bind="visible: visible">        <div class="dxrdp-mobile-actions-content">            <!-- ko foreach: actions -->            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, dxAction: clickAction">            </div>            <!-- ko if: $data.content -->            <!-- ko template: $data.content -->            <!-- /ko -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
                 'dxrd-menu-export-content': '<div class="dxrd-menu-export-popover" data-bind="dxPopover: { width: \'266px\', height: \'266px\', visible: visible, target: \'.dxrdp-mobile-action.dxrd-image-export-to\' }">        <!-- ko foreach: items -->        <div class="dxrd-menu-export-item" data-bind="dxAction: action, text: text">        </div>        <!-- /ko-->    </div>',
                 'dxrd-menu-parameters-content': '<div class="dxrd-menu-parameters-popup" data-bind="dxPopup: { showTitle: false, width: \'100%\', height: \'100%\', visible: visible }">        <!--TODO: use container: \'.dxrd-preview-wrapper\' and fix styles-->        <!-- ko template: { name: \'dxrd-preview-parameters-mobile\', data: $data }-->        <!-- /ko -->    </div>',
                 'dxrd-preview-parameters-mobile': '<div class="dxrdp-parameters-mobile" data-bind="dxValidationGroup: {}">        <div class="dxrdp-parameters-title" data-bind="text: $root.getLocalization(\'Parameters\', \'DevExpress.XtraReports.UI.XtraReport.Parameters\')"> </div>        <div class="dxrdp-parameters-scroll" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true, bounceEnabled: false }">            <div class="dx-fieldset">                <div data-bind="dxPropertyGrid: { target: ko.observable(model) }"></div>            </div>        </div>        <div class="dxrdp-parameters-buttons text-buttons" data-bind="foreach: { data: $data.actionButtons }, cacheElement: { action: function(element) { $data.cacheElementContent(element); } }">            <div class="dxrdp-parameter-action" data-bind="dxButton: { text: text, onClick: function(params){ $data.action($parent.parametersModel, params) }, disabled: disabled }, css: className"></div>        </div>        <div class="dxrdp-parameters-buttons" data-bind="visible: showIcons, foreach: { data: $data.actionIcons }">            <div class="dxrdp-parameter-icon" data-bind="dxButton: { onClick: function(params){ $data.action($parent.parametersModel, params)}, disabled: disabled }, css: className"></div>        </div>    </div>',
@@ -8780,7 +8779,7 @@ var DevExpress;
                 'dxrd-page-brick': '<div class="dxrd-report-preview-brick" data-bind="dxAction: function(a){ onClick(a && a.event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->        <!-- ko foreach: ($data.bricks || []) -->        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->        <!--/ko-->        <!--/ko-->    </div>',
                 'dx-selectbox': '<div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }), dxValidator: { validationRules: $data.validationRules || [] }"></div>',
                 'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true }"></div>    </div>',
-                'dxrd-multivalue': '<!-- ko with: value -->    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: [\'displayValue\'], value: value,          displayExpr: $data.displayExpr || \'displayValue\', valueExpr: \'value\', multiline: false, showSelectionControls: true,          showDropDownButton: !!$data.showDropDownButton, selectAllMode: \'allPages\', selectedItems: $data.selectedItems,          placeholder: $root.dx.Analytics.Localization.selectPlaceholder(), maxDisplayedTags: $data.maxDisplayedTags })">    </div>    <!-- /ko -->',
+                'dxrd-multivalue': '<!-- ko with: value -->    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: dataSource, searchEnabled: true, searchExpr: [\'displayValue\'], value: value,          displayExpr: $data.displayExpr || \'displayValue\', valueExpr: \'value\', multiline: false, showSelectionControls: true,          showDropDownButton: !!$data.showDropDownButton, selectAllMode: \'allPages\', selectedItems: $data.selectedItems,          placeholder: $root.dx.Analytics.Localization.selectPlaceholder(), maxDisplayedTags: $data.maxDisplayedTags }), dxValidator: { validationRules: $parent.validationRules || [] }">    </div>    <!-- /ko -->',
                 'dxrd-multivalue-selectbox': '<!-- ko if: options -->    <!-- ko with: options -->    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: \'valueItem\', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: \'valueItem\' }" data-bind="dxAction: function(args) { toggleSelected(); args.event.stopPropagation(); }">            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>        </div>    </div>    <!-- /ko -->    <!-- /ko -->',
                 'dxrd-multivalue-editable': '<!-- ko if: value -->    <div class="dxrd-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, info: info, level: level, displayName: $root.getLocalization(displayName) }">            <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1 }"></div>        </div>    </div>    <!-- /ko -->',
                 'dxrd-report-preview': '<div class="dxrd-preview dxrd-designer-wrapper dxd-scrollbar-color dxd-surface-back-color" data-bind="visible: reportPreview.previewVisible, cssArray: [ $data.rootStyle , { \'dx-rtl\' : $data.rtl, \'dx-ltr\': !$data.rtl } ]">        <!-- ko foreach: parts -->        <!-- ko template: { name: templateName, data: model }-->        <!-- /ko -->        <!-- /ko -->    </div>',
