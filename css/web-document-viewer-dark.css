@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.dark.css)
-* Version: 18.1.7
-* Build date: 2018-09-26
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -3036,9 +3036,9 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-dark.css)
-* Version: 18.1.7
-* Build date: 2018-10-24
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -3365,6 +3365,9 @@
   color: gray;
   font-size: 10px;
   padding: 7px 13px 10px;
+}
+.dxrd-preview.dxrd-designer-wrapper .dxrd-preview-search-wrapper .dxrdp-search-loading {
+  text-align: center;
 }
 .dxrd-preview.dxrd-designer-wrapper .dxrd-preview-search-wrapper .dxrd-preview-search-result {
   top: 200px;

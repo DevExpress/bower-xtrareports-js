@@ -1,9 +1,9 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.7
-* Build date: 2018-09-26
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -1341,9 +1341,9 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.7
-* Build date: 2018-10-24
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -1686,7 +1686,9 @@
             <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Report.Preview.formatSearchResult($data)"></div>
         </div>
         <!-- /ko -->
-        <div class="dxrd-preview-search-result" data-bind="dxLoadIndicator: { visible: loading, height: '30px', weight: '30px' }"></div>
+        <div class="dxrd-preview-search-result dxrdp-search-loading">
+            <div data-bind="dxLoadIndicator: { visible: loading, height: '30px', width: '30px' }"></div>
+        </div>
     </div>
     <!-- /ko -->
 </div>

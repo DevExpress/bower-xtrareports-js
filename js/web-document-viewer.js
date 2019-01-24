@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 18.1.7
-* Build date: 2018-10-24
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -2708,7 +2708,7 @@ var DevExpress;
             Preview.ReportServerDownloadUri = "";
             var ReportServerInvokeUri = "/RSWebDocumentViewerApi/Invoke";
             var ReportServerExportUri = "/RSWebDocumentViewerApi/Download";
-            Preview.TimeOut = 120000;
+            Preview.TimeOut = 105000;
             Preview.PollingDelay = 300;
             Preview.MessageHandler = {
                 processError: function (message, showForUser) { DevExpress.Designer.NotifyAboutWarning(message, showForUser); },
@@ -3236,10 +3236,12 @@ var DevExpress;
                     }, 250);
                     return deffered.promise();
                 };
-                ReportPreview.prototype.getExportResult = function (operationId, inlineDisposition, token, printable) {
+                ReportPreview.prototype.getExportResult = function (operationId, inlineDisposition, token, printable, uri) {
                     if (printable === void 0) { printable = false; }
-                    var uri = "";
-                    if (token) {
+                    if (uri === void 0) { uri = ""; }
+                    if (uri) {
+                    }
+                    else if (token) {
                         var arg = DevExpress.JS.Utils.formatUnicorn("?token={0}&printable={1}", encodeURIComponent(token), printable);
                         uri = Preview.ReportServerDownloadUri + arg;
                     }
@@ -6785,7 +6787,7 @@ var DevExpress;
                                     _this._preview.progressBar.complete();
                                     if (!result.requestAgain && result.completed) {
                                         _this._preview.updateExportStatus(result.progress);
-                                        _this._preview.getExportResult(operationId, inlineResult, result.token, printable);
+                                        _this._preview.getExportResult(operationId, inlineResult, result.token, printable, result.uri);
                                     }
                                     if (result.error) {
                                         _this._preview._processError(DevExpress.Designer.getLocalization("Error on retrieving an exporting status: ", "ASPxReportsStringId.WebDocumentViewer_ExportStatusError") + result.error);

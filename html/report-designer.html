@@ -1,9 +1,9 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.7
-* Build date: 2018-09-26
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -1341,9 +1341,9 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 18.1.7
-* Build date: 2018-09-26
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -2371,9 +2371,9 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 18.1.7
-* Build date: 2018-10-24
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -2573,9 +2573,9 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.7
-* Build date: 2018-10-24
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -2918,7 +2918,9 @@
             <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Report.Preview.formatSearchResult($data)"></div>
         </div>
         <!-- /ko -->
-        <div class="dxrd-preview-search-result" data-bind="dxLoadIndicator: { visible: loading, height: '30px', weight: '30px' }"></div>
+        <div class="dxrd-preview-search-result dxrdp-search-loading">
+            <div data-bind="dxLoadIndicator: { visible: loading, height: '30px', width: '30px' }"></div>
+        </div>
     </div>
     <!-- /ko -->
 </div>
@@ -3072,9 +3074,9 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 18.1.7
-* Build date: 2018-10-24
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.1.8
+* Build date: 2019-01-21
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -3828,7 +3830,7 @@
                         </div>
                     </div>
                     <div class="dxrd-ghost-containment" data-bind="styleunit: { left: ghostContainerOffset }">
-                        <div class="dxrd-ghost-container" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }, trackCursor: underCursor ">
+                        <div class="dxrd-ghost-container" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin } ">
                             <div class="dxrd-bands-content dxrd-selection" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }">
                                 <div class="dxrd-bands-content-offset">
                                     <div class="dxrd-leftMargin-resizable" data-bind="styleunit: { 'width': pageWidthWithoutLeftMargin }, resizable: leftMarginResizeOptions($root.undoEngine, $element)"></div>
@@ -4002,7 +4004,7 @@
 <script type='text/html' id='dxrd-subreport'>
 <div class="dxrd-control dxd-selectable" data-bind="styleunit: position, css: adorntemplate">
     <div data-bind="style: borderCss" style="width:100%; height: 100%; position:absolute; box-sizing:border-box"></div>
-    <div class="dxrd-control-content" data-bind="text: displayName, style: contentCss"></div>
+    <div class="dxrd-control-content" data-bind="text: displayText(), style: contentCss"></div>
 </div>
 </script>
 
@@ -4470,10 +4472,6 @@
 
 <script type="text/html" id="dxrd-name">
     <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: generateRules($root.controlsHelper.allControls) || [] }"></div>
-</script>
-
-<script type="text/html" id="dxrd-component-name">
-    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: generateRules(value) || [] }"></div>
 </script>
 
 <script type="text/html" id="dxrd-reportexpression">
