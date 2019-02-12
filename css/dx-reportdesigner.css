@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.css)
-* Version: 18.2.5
-* Build date: 2019-01-21
+* Version: 18.2.6
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -385,8 +385,53 @@
   margin: 40px 60px 35px 60px;
 }
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content {
-  margin: 40px 60px 35px 60px;
-  max-width: 460px;
+  margin: 16px 60px 64px 60px;
+  max-width: 100%;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-image-exlamation-icons {
+  padding: 30px 24px;
+  display: inline-block;
+  vertical-align: top;
+  line-height: normal;
+  position: relative;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-image-exlamation-icons svg {
+  width: 31px;
+  height: 31px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text {
+  display: inline-block;
+  vertical-align: middle;
+  letter-spacing: 0;
+  line-height: normal;
+  cursor: default;
+  width: 462px;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-toggle-link {
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-toggle-link:hover {
+  text-decoration: none;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-content-confirm-message {
+  display: table-cell;
+  height: 66px;
+  vertical-align: middle;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-scroll-view-content {
+  height: 193px;
+  margin-top: 10px;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-scroll-view-content .dxrd-reportdialog-scroll-view-content-text {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  padding-right: 15px;
 }
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-content {
   margin: 10px 10px 5px 10px;

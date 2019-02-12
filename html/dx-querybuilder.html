@@ -1,9 +1,9 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 18.2.5
-* Build date: 2018-09-27
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.2.6
+* Build date: 2019-02-12
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -57,7 +57,7 @@
             <marker data-bind="attr: { id: 'dxqb-arrow_' + connectorID() }" viewBox="0 0 5 10" refX="5" refY="5"
                     markerUnits="userSpaceOnUse" orient="auto"
                     markerWidth="14" markerHeight="14">
-                <polyline class="dxd-qb-relationship-line-color dxd-back-highlighted dxd-state-active dxd-text-no-hover" points="0,0 5,5 0,10" />
+                <polyline class="dxd-qb-relationship-line-color" points="0,0 5,5 0,10" />
             </marker>
         </defs>
         <!-- /ko -->
@@ -303,7 +303,7 @@
         <div class="dxrd-control-content-main dxd-qb-table-back-color dxd-back-primary2" data-bind="styleunit: { lineHeight: position.lineHeight }, style: css">
             <div class="dxqb-table-background dxd-back-accented"></div>
             <div class="dx-background-inheritor dxd-back-accented">
-                <div class="dxqb-table-border dxd-qb-table-border-color dxd-back-highlighted dxd-state-active dxd-text-no-hover"></div>
+                <div class="dxqb-table-border dxd-qb-table-border-color dxd-back-highlighted dxd-state-active dxd-state-no-hover"></div>
             </div>
             <div data-bind="template: contenttemplate, styleunit: { 'height': position.lineHeight, 'width': position.width }">
             </div>
@@ -349,7 +349,7 @@
     <!-- ko if: $data -->
     <div>
         <div class="dx-filtereditor" data-bind="dxPopup: { showTitle: true, width: '95%', height: '95%', title: title(), visible: popupVisible,
-                 toolbarItems: buttonItems, showCloseButton: true, container: getPopupContainer($element), position: { of: getPopupContainer($element) },
+                 toolbarItems: buttonItems, showCloseButton: true, container: $root.getPopupContainer($element), position: { of: $root.getPopupContainer($element) },
              }">
             <div class="dx-filtereditor-tree dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover', direction: 'both' }" style="cursor: default">
                 <!-- ko foreach: masterQueries -->
@@ -368,7 +368,7 @@
         </div>
         <div class="dx-selectbox-popup-wrapper dx-dropdownlist-popup-wrapper dx-filtereditor-criteriaoperator-popup dx-dropdowneditor-overlay" data-bind="dxPopupWithAutoHeight: { width: '170px', height: '300px', focusStateEnabled: false,
         position: $root.rtl ? { my: 'right top', at: 'right bottom', of: popupService.target } : { my: 'left top', at: 'left bottom', of: popupService.target },
-        container: '.dx-viewport',
+        container: '.dx-designer-viewport',
         target: popupService.target,
         showTitle: false,
         showCloseButton: false,
@@ -547,43 +547,75 @@
     <div id="tree" data-bind="treelist: treeListOptions" style="width:100%; height: 100%;"></div>
 </script>
 
+
 <script type='text/html' id='dxqb-properties-wrapper'>
-    <div class="dxrd-properties-wrapper" data-bind="dxAccordion: { dataSource: model, height: '100%', itemTemplate:'item', itemTitleTemplate: 'title', selectedIndex: selectedIndex, onInitialized: function (e) { var inst = e.component; $data.afterUpdate(function () { inst.updateDimensions(); }); } }">
-        <div data-options="dxTemplate: { name: 'title' }">
-            <div class="dxrd-right-panel-header dxd-text-primary">
-                <div style="display: inline-block;" data-bind="text: caption()"></div>
+    <div class="dxrd-properties-wrapper" data-bind="visible: active() && visible()">
+        <div style="height:100%" class="dxd-text-primary">
+            <!-- ko with: model -->
+            <div class="dxrd-properties-grid dxd-border-primary" data-bind="dxScrollView: { showScrollbar: 'onHover', useNative: false, scrollByThumb: true }" style="top: 0px;">
+                <div>
+                    <!-- ko foreach: groups -->
+                    <div class="dx-fieldset" data-bind="visible: visible">
+                        <div data-bind="dxdAccordion: { collapsed: collapsed }">
+                            <div class="dxrd-group-header dx-accordion-header" data-bind="css: { 'dxrd-group-header-collapsed dxd-border-primary': collapsed() }">
+                                <div class="dx-collapsing-image" data-bind="template: 'dxrd-svg-collapsed', css: { 'dx-image-expanded': !collapsed() }" style="display:inline-block;"></div>
+                                <span class="dxrd-group-header-text" data-bind="text: displayName()"></span>
+                            </div>
+                            <div class="dx-accordion-content dxd-back-primary">
+                                <!-- ko ifnot: editorsCreated -->
+                                <div class="dx-accordion-content-loading-panel">
+                                    <div data-bind="dxLoadIndicator: { visible: !editorsCreated() }"></div>
+                                </div>
+                                <!-- /ko -->
+                                <!-- ko if: $data.editorsRendered() -->
+                                <div data-bind="visible: editorsCreated">
+                                    <div class="dx-editors">
+                                        <!-- ko foreach: editors -->
+                                        <!-- ko template: editorTemplate -->
+                                        <!-- /ko -->
+                                        <!-- ko if: ($index() === $parent.editors().length - 1 && $parent.editorsCreated(true)) -->
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
             </div>
-        </div>
-        <div data-options="dxTemplate: { name: 'item' }">
-            <!-- ko template: { name: contentTemplate, data: model } -->
             <!-- /ko -->
         </div>
     </div>
 </script>
 
 <script type="text/html" id="dxqb-propertygrid">
+    <!-- ko with: value -->
     <div class="dx-fieldset dxqb-selected-properties">
         <!-- ko foreach: properties.getEditors() -->
         <!-- ko template: editorTemplate -->
         <!-- /ko -->
         <!-- /ko -->
     </div>
+    <!-- /ko -->
 </script>
-
 <script type="text/html" id="dxqb-fieldspanel">
+    <!-- ko with: value -->
     <div class="dxqb-right-panel-search-box" data-bind="dxTextBox: { value: searchName, valueChangeEvent: 'keyup', placeholder: searchPlaceholder(), showClearButton: true  }"></div>
-    <div style="width: 100%; position:absolute; top: 39px; bottom: 0;" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false, scrollByThumb: true, bounceEnabled: false, useNative: false }">
+    <div class="dxqb-right-panel-fields" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false, scrollByThumb: true, bounceEnabled: false, useNative: false }">
         <!-- ko template: { name: "dxqb-fieldlist-wrapper", data: fieldListModel } -->
         <!-- /ko -->
     </div>
+    <!-- /ko -->
 </script>
-
 <script type="text/html" id="dxqb-parameterspanel">
-    <div style="width: 100%; height: 100%;" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false, scrollByThumb: true, bounceEnabled: false, useNative: false }">
+    <!-- ko with: value -->
+    <div class="dxqb-right-panel-parameters" data-bind="dxScrollView: { showScrollbar: 'onHover', scrollByContent: false, scrollByThumb: true, bounceEnabled: false, useNative: false }">
         <div style="width: 100%" data-bind="dxCollectionEditor: $data"></div>
     </div>
+    <!-- /ko -->
 </script>
-
 <script type="text/html" id="dxqb-collectioneditor-template">
     <div class="dxrd-accordion-collection-item" data-bind="dxdAccordion: { collapsed: collapsed }">
         <div class="dxrd-group-header dx-accordion-header">
@@ -614,7 +646,7 @@
     <div class="dxrd-toolbar-item" data-bind="visible: visible">
         <div class="dxqb-toolbar-item-container">
             <div class="dxqb-toolbar-item-background dxd-back-secondary"></div>
-            <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: 'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted ' + ko.unwrap(imageClassName), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === 'function') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }"></div>            
+            <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: 'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted ' + (ko.unwrap($data.imageClassName) || ''), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === 'function') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }"></div>            
         </div>
         <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
     </div>
@@ -695,16 +727,10 @@
 
 <script type="text/html" id="dxqb-treelist-header-item-with-search">
     <div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { 'dx-treelist-item-selected dxd-state-selected': isSelected() || isMultiSelected() }">
-        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: 'dxrd-svg-collapsed', click: toggleCollapsed"></div>
+        <div class="dx-treelist-collapsedbutton"></div>
         <div class="dx-treelist-caption">
-            <!-- ko if: actions && actions.length > 0 -->
-            <div class="dx-treelist-action-container" data-bind="visible: isSelected">
-                <!-- ko template: actionsTemplate() -->
-                <!-- /ko -->
-            </div>
-            <!-- /ko  -->
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">
-                <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
                 <div class="dx-treelist-text-wrapper">
                     <!-- ko if: treeListController && !!$data.treeListController.searchName -->
                     <div class="dx-treelist-text dxdr-highlighted-search-text" data-bind="searchHighlighting: { text: text, textToSearch: treeListController.searchName }, attr: { title: text }"></div>
@@ -768,7 +794,7 @@
         </div>
         <div class="dx-selectbox-popup-wrapper dx-dropdownlist-popup-wrapper dx-filtereditor-criteriaoperator-popup dx-dropdowneditor-overlay" data-bind="dxPopupWithAutoHeight: { width: '170px', height: '235px', focusStateEnabled: false,
         position: $root.rtl ? { my: 'right top', at: 'right bottom', of: popupService.target } : { my: 'left top', at: 'left bottom', of: popupService.target },
-        container: '.dx-viewport',
+        container: '.dx-designer-viewport',
         target: popupService.target,
         showTitle: false,
         showCloseButton: false,
@@ -802,7 +828,7 @@
                 width: 800,
                 height: 544,
                 container: closest($element, '.dxrd-wizard'),
-                position: { of: closest($element, '.dx-viewport') },
+                position: { of: closest($element, '.dx-designer-viewport') },
                 onHidden: function() { $data.data(null) },
                 focusStateEnabled: false
             }">
@@ -865,9 +891,12 @@
          },
          styleunit: padding,
          css: { 'dx-treelist-item-selected dxd-state-selected dxd-back-secondary': isSelected }">
-        <!--<div class="dx-treelist-item-images">-->
-        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: 'dxrd-svg-collapsed', click: toggleCollapsed"></div>
-        <!--</div>-->
+        <!-- ko ifnot: $data.hasItems-->
+        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass"></div>
+        <!-- /ko -->
+        <!-- ko if: $data.hasItems -->
+        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, visible: hasItems, template: 'dxrd-svg-collapsed', click: toggleCollapsed"></div>
+        <!-- /ko -->
         <div class="dx-treelist-caption">
             <!-- ko if: actions && actions.length > 0 -->
             <div class="dx-treelist-action-container" data-bind="visible: isSelected() || isHovered()">
@@ -877,7 +906,7 @@
                 <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !$data.templateName -->
-                <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: $data.imageTemplateName, iconClass: imageClassName, disabled: $data.disabled && $data.disabled() }, attr: { title: text }"></div>
+                <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: $data.imageTemplateName, iconClass: $data.imageClassName, disabled: $data.disabled && $data.disabled() }, attr: { title: text }"></div>
                 <!-- /ko -->
                 <!-- /ko -->
             </div>
@@ -899,8 +928,8 @@
 
 <script type="text/html" id="dx-treelist-action-with-popover">
     <div class="dx-treelist-action-with-popover" style="display: inline-block">
-        <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: $data.imageTemplateName, iconClass: imageClassName , disabled: $data.disabled && $data.disabled() }, attr: { title: text }"></div>
-        <div data-bind="dxPopover:{ width: 200, position: !$root.rtl ? 'left' : 'right', visible: $parent.data.popoverVisible, target: '.dx-treelist-action-with-popover'}">
+        <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: $data.imageTemplateName, iconClass: $data.imageClassName , disabled: $data.disabled && $data.disabled() }, attr: { title: text }"></div>
+        <div data-bind="dxPopover:{ width: 200, position: !$root.rtl ? 'left' : 'right', visible: $parent.data.popoverVisible, target: '.dx-treelist-action-with-popover', container: $root.getPopupContainer($element)}">
             <div data-bind="dxList: { dataSource: $parent.data.popoverListItems(), onItemClick: $parent.data.itemClickAction }">
                 <div data-options="dxTemplate : { name: 'item' }">
                     <div class="dx-text-content" data-bind="text: name, attr: { title: name }"></div>
@@ -963,9 +992,11 @@
 
 <script type="text/html" id="dxrd-page-connectionstring">
     <div class="dxrd-wizard-page">
-        <div class="dxrd-wizard-list dxd-border-secondary" data-bind="dxList: { items: connectionStrings, selectedItems: selectedConnectionString, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-            <div data-options="dxTemplate : { name: 'item' }">
-                <div data-bind="text: $data['description'] || $data['name']"></div>
+        <div class="dx-default-border-style dxd-border-secondary">
+            <div class="dxrd-wizard-list" data-bind="dxList: { items: connectionStrings, selectedItems: selectedConnectionString, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+                <div data-options="dxTemplate : { name: 'item' }">
+                    <div data-bind="text: $data['description'] || $data['name']"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -974,7 +1005,7 @@
 <script type="text/html" id="dxrd-select-control">
     <div data-bind="text: caption()"></div>
     <!-- ko if: !aceAvailable -->
-    <div class="dxrd-wizard-list dxrd-create-query-page-editor dxd-border-secondary" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: 'keyup input blur', readOnly: disableCustomSql() }"></div>
+    <div class="dxrd-wizard-list dxrd-create-query-page-editor dx-default-border-style dxd-border-secondary" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: 'keyup input blur', readOnly: disableCustomSql() }"></div>
     <!-- /ko -->
     <!-- ko if: aceAvailable -->
     <div class="dxrd-create-query-page-editor dxrd-create-query-page-editor-border dxd-border-secondary">
@@ -987,9 +1018,11 @@
 
 <script type="text/html" id="dxrd-procedures-control">
     <div data-bind="text: caption()"></div>
-    <div class="dxrd-wizard-list dxrd-create-query-page-editor dxd-border-secondary" data-bind="dxList: { items: storedProcedures, onContentReady: scrollActiveItem, selectedItems: selectedProcedure, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false, noDataText: $root.dx.Analytics.Localization.noDataText() }">
-        <div data-options="dxTemplate : { name: 'item' }">
-            <div data-bind="text: $parent.generateStoredProcedureDisplayName($data)"></div>
+    <div class="dx-default-border-style dxd-border-secondary">
+        <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxList: { items: storedProcedures, onContentReady: scrollActiveItem, selectedItems: selectedProcedure, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: 'single', activeStateEnabled: false, noDataText: $root.dx.Analytics.Localization.noDataText() }">
+            <div data-options="dxTemplate : { name: 'item' }">
+                <div data-bind="text: $parent.generateStoredProcedureDisplayName($data)"></div>
+            </div>
         </div>
     </div>
 </script>
@@ -1056,7 +1089,7 @@
         width: width,
         height: height,
         container: container($element),
-        titleTemplate: document.getElementById('dxrd-wizard-header-custom'),
+        titleTemplate: titleTemplate,
         position: wizardPopupPosition($element)
     }, css: extendCssClass">
         <div class="dxrd-wizard-content">

@@ -1,9 +1,9 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.html)
-* Version: 18.2.5
-* Build date: 2018-09-27
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 18.2.6
+* Build date: 2019-02-12
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -305,8 +305,13 @@
 <script type="text/html" id="dx-ee-treelist-item">
     <div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="visible: visible, event: { dblclick: function() { actions[0].clickAction($element); }}, styleunit: padding, css: { 'dx-treelist-item-selected dxd-state-selected': isSelected }">
         <div class="dx-treelist-item-images">
+            <!-- ko if: hasItems -->
             <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: 'dxrd-svg-collapsed', click: toggleCollapsed"></div>
-            <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+            <!-- /ko -->
+            <!-- ko ifnot: hasItems -->
+            <div class="dx-treelist-collapsedbutton"></div>
+            <!-- /ko -->
+            <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
         </div>
         <div class="dx-treelist-caption">
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">
@@ -376,7 +381,7 @@
     <div class="dx-filtereditor-text" data-bind="dxTextArea: { value: displayValue, isValid: isValid, onInput: onInput, spellcheck: false }, cacheElement: { action: function(element) { cacheElement(element) } }"></div>
     <!-- /ko -->
     <!-- ko if: aceAvailable -->
-    <div class="dx-filtereditor-text dx-texteditor dx-textarea" data-bind="css: {'dx-invalid': !$data.isValid(), 'dx-state-focused': textFocused }">
+    <div class="dx-filtereditor-text dx-texteditor dx-textarea dx-editor-outlined" data-bind="css: {'dx-invalid': !$data.isValid(), 'dx-state-focused': textFocused }">
         <div class="dx-texteditor-container">
             <div class="dx-filtereditor-ace dxd-back-primary2" data-bind="dxAceEditor: { value: $data.displayValue, theme: helper.aceTheme, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }"></div>
             <div class="dx-texteditor-buttons-container"></div>
@@ -653,10 +658,10 @@
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: $data.items.length > 0 && typeof $data.items[0] === "object" -->
-        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: items, valueExpr: 'value', displayExpr: 'display', searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: dataSource, valueExpr: 'value', displayExpr: 'display', searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
         <!-- /ko -->
         <!-- ko if: $data.items.length > 0 && typeof $data.items[0] !== "object" -->
-        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: items, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: dataSource, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
         <!-- /ko -->
     </div>
     <div class="criteria-operator-text dxd-filter-editor-text-color criteria-operator-item-value dxd-filter-editor-value-back-color" data-bind="visible: !isEditable()">
@@ -826,7 +831,7 @@
     <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: !$data.templateName -->
-    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: ko.unwrap($data.imageTemplateName), iconClass: imageClassName, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible), disabled: $data.disabled && $data.disabled() }, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: ko.unwrap($data.imageTemplateName), iconClass: $data.imageClassName, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible), disabled: $data.disabled && $data.disabled() }, attr: { title: $data.displayText && $data.displayText() || text }"></div>
     <!-- /ko -->
     <!-- /ko -->
 </script>
@@ -836,9 +841,9 @@
 </script>
 
 <script type="text/html" id="dx-treelist-item-actions-with-edit">
-    <!-- ko template: 'dx-treelist-item-actions'  -->
-    <!-- /ko -->
     <!-- ko template: { name: 'dx-treelist-edit-action', data: treeListEditAction() }  -->
+    <!-- /ko -->
+    <!-- ko template: 'dx-treelist-item-actions'  -->
     <!-- /ko -->
 </script>
 
@@ -870,9 +875,12 @@
 
 <script type="text/html" id="dx-treelist-header-item">
     <div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { 'dx-treelist-item-selected dxd-state-selected': isSelected() || isMultiSelected() }">
-        <!--<div class="dx-treelist-item-images">-->
+        <!-- ko if: $data.hasItems-->
         <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: 'dxrd-svg-collapsed', click: toggleCollapsed"></div>
-        <!--</div>-->
+        <!-- /ko -->
+        <!-- ko ifnot: $data.hasItems-->
+        <div class="dx-treelist-collapsedbutton"></div>
+        <!-- /ko -->
         <div class="dx-treelist-caption">
             <!-- ko if: actions && actions.length > 0 -->
             <div class="dx-treelist-action-container" data-bind="visible: isSelected">
@@ -881,7 +889,7 @@
             </div>
             <!-- /ko  -->
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">
-                <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
                 <div class="dx-treelist-text-wrapper">
                     <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>
                 </div>
@@ -931,7 +939,7 @@
                 </div>
                 <!-- /ko  -->
                 <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">
-                    <div class="dx-treelist-image" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
                     <div class="dx-treelist-text-wrapper">
                         <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>
                     </div>
@@ -1057,7 +1065,7 @@
 
 
 <script type="text/html" id="dxrd-designer">
-    <div class="dx-viewport dx-theme-generic">
+    <div data-bind="css: surfaceClass($element)">
         <div class="dxrd-designer-wrapper dx-editors dxd-surface-back-color dxd-scrollbar-color" data-bind="visible: (!$data.designMode || designMode()), cssArray: [ $data.rootStyle , { 'dx-rtl' : $data.rtl, 'dx-ltr': !$data.rtl } ]">
             <!-- ko foreach: parts -->
             <!-- ko template: { name: templateName, data: model }-->
@@ -1076,7 +1084,7 @@
 
 <script type="text/html" id="dxrd-collectionactions-template">
     <div class="dxrd-action-items-container"></div>
-    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap(imageClassName) }, attr: { id: id, title: text }"></div>
+    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap($data.imageClassName) }, attr: { id: id, title: text }"></div>
     <div data-bind="dxPopup: { width: 235, height: 'auto',
             position: { my: $root.rtl ? 'left top': 'right top', at: 'bottom', of: ('#' + id) },
             showTitle: false,
@@ -1088,7 +1096,7 @@
             visible: popoverVisible }">
         <!-- ko foreach: actions -->
         <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: clickAction, css: { 'dxrd-disabled-button': disabled }">
-            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap(imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
         </div>
         <!-- /ko -->
     </div>
@@ -1098,24 +1106,29 @@
     <div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>
     <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">
         <div class="dxrd-menu-place" style="width:54px;"></div>
-        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: toggleAppMenu, template: 'dxrd-svg-menu-menu', css: {'dxd-state-active': appMenuVisible }"></div>
+        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: 'dxrd-svg-menu-menu', css: {'dxd-state-active': appMenuVisible }"></div>
         <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {
-                            width: 250,
-                            height: '100%',
-                            position: $data.rtl ? { my: 'right top', at: 'left top', offset: '-10 0' } : { my: 'left top', at: 'right top', offset: '10 0' },
-                            showTitle: false,
-                            showCloseButton: false,
-                            container: getMenuPopupContainer($element),
-                            target: getMenuPopupTarget($element),
-                            animation: {},
-                            closeOnOutsideClick: true,
-                            shading: false,
-                            focusStateEnabled: false,
-                            visible: appMenuVisible }">
+                             width: 250,
+                             height: '100%' ,
+                             position: $data.rtl ? { my: 'right top' , at: 'left top' , offset: '-10 0' } : { my: 'left top' , at: 'right top' , offset: '10 0' },
+                             showTitle: false,
+                             showCloseButton: false,
+                             container: getMenuPopupContainer($element),
+                             target: getMenuPopupTarget($element),
+                             animation: {},
+                             closeOnOutsideClick: function(e) {
+                                var buttonClassName = 'dxrd-menu-button-image';
+                                var parentClassList = e.target.parentNode && e.target.parentNode.parentNode && e.target.parentNode.parentNode.classList;
+                                stopPropagation = (e.target.classList && e.target.classList.contains(buttonClassName)) || (parentClassList && parentClassList.contains(buttonClassName));
+                                return true;
+                             },
+                             shading: false,
+                             focusStateEnabled: false,
+                             visible: appMenuVisible }">
             <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>
             <!-- ko foreach: actionLists.menuItems -->
             <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled }, visible: visible">
-                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap(imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
                 <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>
                 <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
             </div>
@@ -1140,7 +1153,7 @@
                 <!-- /ko -->
                 <!-- ko if: !$data.templateName -->
                 <div class="dxrd-properties-grid-action" data-bind="dxAction: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { 'dxrd-disabled-button': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">
-                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
                 </div>
                 <!-- /ko -->
                 <!-- /ko -->
@@ -1165,8 +1178,8 @@
                 <div class="dx-property-grid-sorting-actions-group" data-bind="css: { 'dx-property-gread-search-collapsed': isSearching }">
                     <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>
                     <div class="dx-property-grid-sorting-actions-container">
-                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { 'dxd-state-active dxd-text-no-hover': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: 'dxrd-svg-properties-sortingbyalphabet', iconClass: 'image-sortingbyalphabet' }"></div>
-                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { 'dxd-state-active dxd-text-no-hover': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: 'dxrd-svg-properties-sortingbygroups', iconClass: 'image-sortingbygroups' }"></div>
+                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { 'dxd-state-active dxd-state-no-hover': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: 'dxrd-svg-properties-sortingbyalphabet', iconClass: 'image-sortingbyalphabet' }"></div>
+                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { 'dxd-state-active dxd-state-no-hover': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: 'dxrd-svg-properties-sortingbygroups', iconClass: 'image-sortingbygroups' }"></div>
                     </div>
                 </div>
                 <div class="dx-property-grid-search-group dx-property-gread-search-collapsed" data-bind="css: { 'dx-property-gread-search-collapsed': !isSearching() }">
@@ -1227,7 +1240,7 @@
             </div>
             <div data-bind="dxPopup: { width: 148, height: 'auto',
         position: $data.rtl ? { my: 'left top', at: 'right top', of: popupService.target } : { my: 'right top', at: 'left top', of: popupService.target },
-        container: '.dx-viewport',
+        container: '.dx-designer-viewport',
         target: popupService.target,
         showTitle: false,
         showCloseButton: false,
@@ -1258,7 +1271,7 @@
 </script>
 
 <script type="text/html" id="dx-right-panel-lightweight">
-    <div class="dxrd-right-panel dxd-border-primary dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, '1px', 325)">
+    <div class="dxrd-right-panel dx-shadow dxd-border-secondary dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, '1px', 325)">
         <!-- ko foreach: tabPanel.tabs -->
         <!-- ko lazy: { template: $data.template } -->
         <!-- /ko -->
@@ -1280,8 +1293,8 @@
         </div>
         <div class="dxrd-right-tabs dxd-side-panel-tabs-back-color dxd-back-contrast" data-bind="css: tabPanel.cssClasses()">
             <!-- ko foreach: tabPanel.tabs -->
-            <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxAction: $parent.tabPanel.selectTab, css: { 'dxd-state-active dxd-text-no-hover': active, 'dxrd-tab-item-disabled': disabled }, attr: { title: text }, visible: visible">
-                <div class="dxrd-image-padding" data-bind="css: imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>
+            <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxAction: $parent.tabPanel.selectTab, css: { 'dxd-state-active dxd-state-no-hover': active, 'dxrd-tab-item-disabled': disabled }, attr: { title: text }, visible: visible">
+                <div class="dxrd-image-padding" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>
             </div>
             <!-- /ko -->
         </div>
@@ -1302,7 +1315,7 @@
     <!-- /ko -->
     <!-- ko if: !$data.templateName -->
     <div class="dxrd-toolbar-item" data-bind="visible: visible">
-        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: 'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted ' + ko.unwrap(imageClassName), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === 'function') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }"></div>
+        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: 'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted ' + (ko.unwrap($data.imageClassName) || ''), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === 'function') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }"></div>
         <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
     </div>
     <!-- /ko -->
@@ -1314,7 +1327,7 @@
         <!-- ko foreach: toolboxItems -->
         <div class="dxrd-toolbox-item" data-bind="attr: { title: displayName }">
             <div class="dx-background-inheritor dxd-toolbox-item-back-color dxd-back-secondary">
-                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: imageClassName, draggable: $root.toolboxDragHandler"></div>
+                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: $data.imageClassName, draggable: $root.toolboxDragHandler"></div>
             </div>
         </div>
         <!-- /ko -->
