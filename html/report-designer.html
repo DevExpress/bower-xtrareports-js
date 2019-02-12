@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1341,8 +1341,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2371,8 +2371,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2573,8 +2573,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3074,8 +3074,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3752,10 +3752,10 @@
 </script>
 
 <script type="text/html" id="dxrd-report-dialog-converter-template">
-    <div class="dxrd-reportdialog dx-editors dx-widget" data-bind="dxPopup: {
+    <div class="dxrd-reportdialog dxrd-reportdialog-converter dx-editors dx-widget" data-bind="dxPopup: {
             showTitle: true,
-            minWidth: 460,
-            height: 260,
+            minWidth: 530,
+            height: 250,
             width: 'auto',
             title: popupOptions.title,
             visible: popupOptions.visible,
@@ -3764,7 +3764,13 @@
             container: popupOptions.container($element),
             position: { of: popupOptions.container($element) }
 }">
-        <div class="dxrd-reportdialog-converter-content" data-bind="text: popupOptions.confirmMessage"></div>
+        <div class="dxrd-reportdialog-converter-content">
+            <div class="dxrd-image-exlamation-icons"></div>
+            <div class="dxrd-reportdialog-content-text">
+                <div class="dxrd-reportdialog-content-confirm-message" data-bind="text: popupOptions.confirmMessage"></div>
+                <a class="dxrd-reportdialog-toggle-link dxd-hyperlink-color dxd-text-accented" data-bind="text: popupOptions.linkText, attr: {href: popupOptions.linkUrl, target: '_blank' }"></a>
+            </div>
+        </div>
     </div>
 </script>
 

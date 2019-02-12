@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.light.css)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3036,8 +3036,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3180,8 +3180,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.light.css)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4261,8 +4261,8 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-light.css)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4735,8 +4735,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-light.css)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5852,8 +5852,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-light.css)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -6837,6 +6837,10 @@
   background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M10%2010h6V2H2v18h12v-2l-4-4z%22%2F%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M12%2012v2l4%204v4h2v-4l4-4v-2z%22%2F%3E%3C%2Fsvg%3E');
   position: absolute;
 }
+.dxrd-image-exlamation-icons {
+  background-repeat: no-repeat;
+  background-image: url('data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2031%2031%22%3E%3Cstyle%3E.st0%7Bfill%3A%233D3D3D%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22st0%22%20d%3D%22M15.5%200C6.9%200%200%206.9%200%2015.5S6.9%2031%2015.5%2031%2031%2024.1%2031%2015.5%2024.1%200%2015.5%200zm0%2025c-1.4%200-2.5-1.1-2.5-2.5s1.1-2.5%202.5-2.5%202.5%201.1%202.5%202.5-1.1%202.5-2.5%202.5zm0-7C14.1%2018%2013%209.9%2013%208.5%2013%207.1%2014.1%206%2015.5%206S18%207.1%2018%208.5%2016.9%2018%2015.5%2018z%22%2F%3E%3C%2Fsvg%3E');
+}
 .dxrd-pivot-content {
   direction: ltr;
 }
@@ -7083,8 +7087,47 @@
   margin: 40px 60px 35px 60px;
 }
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content {
-  margin: 40px 60px 35px 60px;
-  max-width: 460px;
+  margin: 16px 60px 64px 60px;
+  max-width: 100%;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-image-exlamation-icons {
+  padding: 30px 24px;
+  display: inline-block;
+  vertical-align: top;
+  line-height: normal;
+  background-size: 31px 31px;
+  background-position: center;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text {
+  display: inline-block;
+  vertical-align: middle;
+  letter-spacing: 0;
+  line-height: normal;
+  cursor: default;
+  width: 462px;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-toggle-link {
+  display: inline-block;
+  cursor: pointer;
+  color: #1364c4;
+  text-decoration: underline;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-toggle-link:hover {
+  text-decoration: none;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-content-confirm-message {
+  display: table-cell;
+  height: 66px;
+  vertical-align: middle;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-scroll-view-content {
+  height: 193px;
+  margin-top: 10px;
+}
+.dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-converter-content .dxrd-reportdialog-content-text .dxrd-reportdialog-scroll-view-content .dxrd-reportdialog-scroll-view-content-text {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  padding-right: 15px;
 }
 .dxrd-reportdialog .dx-popup-content .dxrd-reportdialog-content {
   margin: 20px 10px 5px 10px;

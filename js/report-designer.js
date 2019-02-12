@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8119,8 +8119,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -14494,7 +14494,7 @@ var DevExpress;
                 NextPage: "dxxrp-next-page",
                 LastPage: "dxxrp-last-page",
                 MultipageToggle: "dxxrp-multipage-toggle",
-                HightlightEditingFields: "dxxrp-highlight-editing-fields",
+                HighlightEditingFields: "dxxrp-highlight-editing-fields",
                 ZoomOut: "dxxrp-zoom-out",
                 ZoomSelector: "dxxrp-zoom-selector",
                 ZoomIn: "dxxrp-zoom-in",
@@ -14503,6 +14503,17 @@ var DevExpress;
                 ExportTo: "dxxrp-export-menu",
                 Search: "dxxrp-search"
             };
+            Object.defineProperty(Preview.ActionId, "HightlightEditingFields", {
+                configurable: true,
+                get: function () {
+                    console.warn("DevExpress.Report.Preview.ActionId.HightlightEditingFields is DEPRECATED and will be removed in 19.1! Use DevExpress.Report.Preview.ActionId.HighlightEditingFields instead");
+                    return Preview.ActionId.HighlightEditingFields;
+                },
+                set: function (newVal) {
+                    console.warn("DevExpress.Report.Preview.ActionId.HightlightEditingFields is DEPRECATED and will be removed in 19.1! Use DevExpress.Report.Preview.ActionId.HighlightEditingFields instead");
+                    Preview.ActionId.HighlightEditingFields = newVal;
+                }
+            });
             var PreviewDesignerActions = (function () {
                 function PreviewDesignerActions(reportPreview) {
                     this.actions = [];
@@ -14756,7 +14767,7 @@ var DevExpress;
                         }
                     });
                     this.actions.push({
-                        id: Preview.ActionId.HightlightEditingFields,
+                        id: Preview.ActionId.HighlightEditingFields,
                         text: DevExpress.Designer.getLocalization("Highlight Editing Fields", "DevExpress.XtraPrinting.PrintingSystemCommand.HighlightEditingFields"),
                         imageClassName: "dxrp-image-hightlight-editing-fields",
                         disabled: ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; }),
@@ -22835,8 +22846,8 @@ var DevExpress;
                     this.styles = DevExpress.JS.Utils.deserializeArray(report.StyleSheet, function (item) { return new Report.StyleModel(item, serializer); });
                     this.objectStorage = DevExpress.JS.Utils.deserializeArray(report.ObjectStorage, function (item) { return Report.ObjectItem.createNew(item, _this.dsHelperProvider, serializer); });
                     this.componentStorage = DevExpress.JS.Utils.deserializeArray(report.ComponentStorage, function (item) { return Report.ObjectItem.createNew(item, _this.dsHelperProvider, serializer); });
-                    this.objectStorage.push.apply(this.objectStorage, this.componentStorage().filter(function (item) { return item.objectType().indexOf("DataSource") !== -1; }));
-                    this.componentStorage.remove(function (item) { return item.objectType().indexOf("DataSource") !== -1; });
+                    this.objectStorage.push.apply(this.objectStorage, this.componentStorage().filter(function (item) { return ReportViewModel.availableDataSourceTypes.some(function (x) { return item.objectType().indexOf(x) !== -1; }); }));
+                    this.componentStorage.remove(function (item) { return ReportViewModel.availableDataSourceTypes.some(function (x) { return item.objectType().indexOf(x) !== -1; }); });
                     this.objectsStorageHelper = new Report.ObjectsStorage(this.objectStorage, this.dsHelperProvider);
                     this.parameters = DevExpress.JS.Utils.deserializeArray(report.Parameters, function (item) { return new Report.Parameter(item, _this, _this.objectsStorageHelper, _this.parameterHelper, serializer); });
                     this.objectStorage().forEach(function (objectStorage) {
@@ -23013,6 +23024,7 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
+                ReportViewModel.availableDataSourceTypes = ["DataSource", "ObjectSource"];
                 ReportViewModel.bandsTypeOrdering = ["TopMarginBand", "ReportHeaderBand", "PageHeaderBand", "GroupHeaderBand", "DetailBand", "DetailReportBand", "GroupFooterBand", "ReportFooterBand", "PageFooterBand", "BottomMarginBand"];
                 ReportViewModel.unitProperties = ["snapGridSize"];
                 ReportViewModel.defaultPageSize = {
@@ -27301,7 +27313,7 @@ var DevExpress;
             Report.segmentWidth = { propertyName: "segmentWidth", modelName: "@SegmentWidth", defaultVal: 4, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Segment Width", localizationId: "DevExpress.XtraReports.UI.XRZipCode.SegmentWidth" };
             Report.zipCodeSerializationInfo = [
                 Report.foreColor, Report.segmentWidth, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
-                $.extend({}, Report.text, { defaultVal: "0" }, Report.textFormatString),
+                $.extend({}, Report.text, { defaultVal: "0" }), Report.textFormatString,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag", "Text"])
             ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
             Report.popularPropertiesZipCode = ["text", "popularDataBinding", "popularExpression", "segmentWidth", "bookmark", "bookmarkParent"];
@@ -34400,10 +34412,13 @@ var DevExpress;
                     this._lastChoice = null;
                     this._defaultFormatting = {};
                     this._notShowAgain = ko.observable(false);
+                    this._detailLink = "https://devexpress.github.io/dotnet-eud/interface-elements-for-web/articles/report-designer/bind-to-data/data-binding-modes.html";
                     this.popupOptions = {
                         visible: ko.observable(false),
                         title: Designer.getLocalization("Convert", "ReportStringId.UD_Msg_ConvertBindingsCaption"),
                         confirmMessage: DevExpress.JS.Utils.formatUnicorn(Designer.getLocalization("The {0} contains bindings. Do you want to convert them to expressions?", "ReportStringId.UD_Msg_ConvertBindings"), Designer.getLocalization("Report", "DevExpress.XtraReports.UI.XtraReport")),
+                        linkText: Designer.getLocalization("Learn more about the expressions...", "ReportStringId.UD_Msg_ConvertBindings_LinkText"),
+                        linkUrl: this._detailLink,
                         container: function (element) {
                             return $(element).closest('.dx-designer');
                         },

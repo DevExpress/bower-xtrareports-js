@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.js)
-* Version: 18.1.8
-* Build date: 2019-01-21
+* Version: 18.1.9
+* Build date: 2019-02-12
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3717,7 +3717,7 @@ var DevExpress;
                 NextPage: "dxxrp-next-page",
                 LastPage: "dxxrp-last-page",
                 MultipageToggle: "dxxrp-multipage-toggle",
-                HightlightEditingFields: "dxxrp-highlight-editing-fields",
+                HighlightEditingFields: "dxxrp-highlight-editing-fields",
                 ZoomOut: "dxxrp-zoom-out",
                 ZoomSelector: "dxxrp-zoom-selector",
                 ZoomIn: "dxxrp-zoom-in",
@@ -3726,6 +3726,17 @@ var DevExpress;
                 ExportTo: "dxxrp-export-menu",
                 Search: "dxxrp-search"
             };
+            Object.defineProperty(Preview.ActionId, "HightlightEditingFields", {
+                configurable: true,
+                get: function () {
+                    console.warn("DevExpress.Report.Preview.ActionId.HightlightEditingFields is DEPRECATED and will be removed in 19.1! Use DevExpress.Report.Preview.ActionId.HighlightEditingFields instead");
+                    return Preview.ActionId.HighlightEditingFields;
+                },
+                set: function (newVal) {
+                    console.warn("DevExpress.Report.Preview.ActionId.HightlightEditingFields is DEPRECATED and will be removed in 19.1! Use DevExpress.Report.Preview.ActionId.HighlightEditingFields instead");
+                    Preview.ActionId.HighlightEditingFields = newVal;
+                }
+            });
             var PreviewDesignerActions = (function () {
                 function PreviewDesignerActions(reportPreview) {
                     this.actions = [];
@@ -3979,7 +3990,7 @@ var DevExpress;
                         }
                     });
                     this.actions.push({
-                        id: Preview.ActionId.HightlightEditingFields,
+                        id: Preview.ActionId.HighlightEditingFields,
                         text: DevExpress.Designer.getLocalization("Highlight Editing Fields", "DevExpress.XtraPrinting.PrintingSystemCommand.HighlightEditingFields"),
                         imageClassName: "dxrp-image-hightlight-editing-fields",
                         disabled: ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; }),
