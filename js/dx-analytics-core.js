@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 18.2.6
-* Build date: 2019-02-12
+* Version: 18.2.7
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1081,13 +1081,13 @@ var DevExpress;
             ko.bindingHandlers["dxdAccordion"] = {
                 init: function (element, valueAccessor) {
                     var options = valueAccessor(), $element = $(element), $accordionContent = $element.find(".dx-accordion-content").first(), scrollUpdateCallback = function () {
-                        var scrollView = $element.parents(".dx-scrollview").dxScrollView("instance");
+                        var scrollView = DevExpress.ui.dxScrollView["getInstance"]($element.parents(".dx-scrollview").get(0));
                         scrollView && scrollView["update"]();
                     };
-                    $element
-                        .find(".dx-accordion-header,.dx-accordion-button").first()
-                        .off("dxclick")
-                        .on("dxclick", function () {
+                    var accordionButton = $element
+                        .find(".dx-accordion-header,.dx-accordion-button").get(0);
+                    DevExpress["events"].off(accordionButton, "dxclick");
+                    DevExpress["events"].on(accordionButton, "dxclick", function () {
                         options.collapsed(options.alwaysShow && options.alwaysShow() ? false : !options.collapsed());
                     });
                     options.collapsed() ? $accordionContent.hide() : $accordionContent.show();
@@ -1100,7 +1100,7 @@ var DevExpress;
             ko.bindingHandlers["dxdAccordionExt"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var options = valueAccessor(), $element = $(element), scrollUpdateCallback = function () {
-                        var scrollView = $element.parents(".dx-scrollview").dxScrollView("instance");
+                        var scrollView = DevExpress.ui.dxScrollView["getInstance"]($element.parents(".dx-scrollview").get(0));
                         scrollView && scrollView["update"]();
                     }, $accordionContent = $element.find(".dx-accordion-content").first(), accordionContentHTML = null;
                     if (options.collapsed() && options.lazyContentRendering === true) {
@@ -1525,29 +1525,30 @@ var DevExpress;
                 }
                 dxEllipsisEditor.prototype._init = function () {
                     _super.prototype._init.call(this);
-                    this.element().addClass(EDITOR_CLASS);
-                    this._koContext = ko.contextFor(this.element()[0]);
+                    var $element = $(this.element());
+                    $element.addClass(EDITOR_CLASS);
+                    this._koContext = ko.contextFor($element.get(0));
                 };
                 dxEllipsisEditor.prototype._render = function () {
                     _super.prototype._render.call(this);
                     this._renderButton();
                 };
                 dxEllipsisEditor.prototype._renderButton = function () {
-                    this._button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
+                    this._$button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
                     this._attachButtonEvents();
-                    this._buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS).height("100%").append(ko.utils.parseHtmlFragment(Analytics.Widgets.Internal.SvgTemplatesEngine.templates[EDITOR_BUTTON_ICON_TEMPLATE])).appendTo(this._button);
-                    ko.applyBindingsToDescendants(this._koContext, this._buttonIcon[0]);
+                    this._$buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS).height("100%").append(ko.utils.parseHtmlFragment(Analytics.Widgets.Internal.SvgTemplatesEngine.templates[EDITOR_BUTTON_ICON_TEMPLATE])).appendTo(this._$button);
+                    ko.applyBindingsToDescendants(this._koContext, this._$buttonIcon[0]);
                     var buttonsContainer = _super.prototype._buttonsContainer.call(this);
-                    this._button.prependTo(buttonsContainer);
+                    this._$button.prependTo(buttonsContainer);
                 };
                 dxEllipsisEditor.prototype._updateButtonSize = function () {
-                    this._buttonIcon.height(this.element().height());
+                    this._$buttonIcon.height($(this.element()).height());
                 };
                 dxEllipsisEditor.prototype._attachButtonEvents = function () {
                     var _this = this;
-                    this._button.off("click");
+                    this._$button.off("click");
                     if (!this.option("disabled")) {
-                        this._button.on("click", function (e) {
+                        this._$button.on("click", function (e) {
                             if (_this.option("buttonAction")) {
                                 _this.option("buttonAction")();
                                 e.stopPropagation();
@@ -1630,16 +1631,17 @@ var DevExpress;
                     }).appendTo(this.element());
                 };
                 dxFileImagePicker.prototype._renderInput = function (inputContainer) {
-                    this._inputContainer = inputContainer || $("<div />");
-                    this._inputContainer.addClass(EDITOR_INPUT_WRAPPER_CLASS);
-                    this.element().append(this["_inputContainer"]);
+                    var $inputContainer = inputContainer && $(inputContainer) || $("<div />");
+                    $inputContainer.addClass(EDITOR_INPUT_WRAPPER_CLASS);
+                    this._inputContainer = $inputContainer.get(0);
+                    $(this.element()).append(this["_inputContainer"]);
                     _super.prototype._renderInput.call(this, inputContainer);
                 };
                 dxFileImagePicker.prototype._attachButtonEvents = function () {
                     var _this = this;
-                    this._button.off("click");
+                    this._$button.off("click");
                     if (!this.option("disabled")) {
-                        this._button.on("click", function (e) {
+                        this._$button.on("click", function (e) {
                             if (!_this.option("value")) {
                                 _this._filesinput.val("");
                             }
@@ -2323,12 +2325,16 @@ var DevExpress;
                     this._observers = [];
                     this._subscriptions = [];
                     this._visited = [];
-                    this._position = -1;
+                    this._position = ko.observable(-1);
+                    this._lockedPosition = ko.observable(-1);
                     this._inUndoRedo = false;
                     this.redoEnabled = ko.observable(false);
                     this.undoEnabled = ko.observable(false);
                     this.isIngroup = -1;
-                    this.isDirty = ko.observable(false);
+                    this.isDirty = ko.computed({
+                        read: function () { return _this._position() !== _this._lockedPosition(); },
+                        write: function (value) { value ? _this._lockedPosition("forcibly marked as dirty") : _this._lockedPosition(_this._position()); }
+                    });
                     this._model = ko.unwrap(target);
                     this._getInfoMethodName = getInfoMethodName;
                     this._ignoredProperties = ignoredProperties;
@@ -2358,6 +2364,7 @@ var DevExpress;
                             });
                         }
                     }
+                    this._disposables.push(this.isDirty);
                 }
                 UndoEngine.tryGetUndoEngine = function (object) {
                     return object[UndoEngine._disposeUndoEngineSubscriptionsName] && object[UndoEngine._disposeUndoEngineSubscriptionsName].instance;
@@ -2391,7 +2398,7 @@ var DevExpress;
                     if (this._inUndoRedo) {
                         return;
                     }
-                    var currentPosition = this._position + 1;
+                    var currentPosition = this._position() + 1;
                     if (currentPosition < this._observers.length) {
                         var removedItems = this._observers.splice(currentPosition, this._observers.length);
                         removedItems.forEach(function (changeSet) {
@@ -2404,8 +2411,7 @@ var DevExpress;
                         });
                     }
                     this._observers.push(undoRecord);
-                    this.isDirty(true);
-                    this._position = currentPosition;
+                    this._position(currentPosition);
                     this.undoEnabled(true);
                     this.redoEnabled(false);
                 };
@@ -2635,6 +2641,7 @@ var DevExpress;
                     this._visited = [];
                 };
                 UndoEngine.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
                     this.removeTargetSubscription();
                 };
                 UndoEngine.prototype.removeTargetSubscription = function () {
@@ -2658,15 +2665,15 @@ var DevExpress;
                     this.undoEnabled(false);
                     this._inUndoRedo = false;
                     this._groupPosition = -1;
-                    this._position = -1;
-                    this.isDirty(false);
+                    this._position(-1);
+                    this._lockedPosition(this._position());
                 };
                 UndoEngine.prototype.undo = function () {
                     var _this = this;
                     try {
                         this._inUndoRedo = true;
                         if (this.undoEnabled()) {
-                            var changeSet = this._observers[this._position];
+                            var changeSet = this._observers[this._position()];
                             if (changeSet) {
                                 if (Array.isArray(changeSet)) {
                                     changeSet.reverse().forEach(function (item) { return _this.undoChangeSet(item); });
@@ -2674,9 +2681,8 @@ var DevExpress;
                                 else {
                                     this.undoChangeSet(changeSet);
                                 }
-                                this._position = this._position - 1;
-                                this.isDirty(true);
-                                this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
+                                this._position(this._position() - 1);
+                                this.undoEnabled(this._observers.length !== 0 && this._position() >= 0);
                                 this.redoEnabled(true);
                             }
                         }
@@ -2690,7 +2696,7 @@ var DevExpress;
                     try {
                         this._inUndoRedo = true;
                         if (this.redoEnabled()) {
-                            var changeSet = this._observers[this._position + 1];
+                            var changeSet = this._observers[this._position() + 1];
                             if (changeSet) {
                                 if (Array.isArray(changeSet)) {
                                     changeSet.reverse().forEach(function (item) { return _this.redoChangeSet(item); });
@@ -2698,10 +2704,9 @@ var DevExpress;
                                 else {
                                     this.redoChangeSet(changeSet);
                                 }
-                                this._position = this._position + 1;
-                                this.isDirty(true);
-                                this.undoEnabled(this._observers.length !== 0 && this._position >= 0);
-                                this.redoEnabled(this._position + 1 < this._observers.length);
+                                this._position(this._position() + 1);
+                                this.undoEnabled(this._observers.length !== 0 && this._position() >= 0);
+                                this.redoEnabled(this._position() + 1 < this._observers.length);
                             }
                         }
                     }
@@ -2715,8 +2720,9 @@ var DevExpress;
                         return;
                     this._groupObservers = this._observers;
                     this._observers = [];
-                    this._groupPosition = this._position;
-                    this._position = -1;
+                    this._groupPosition = this._position();
+                    this._position(-1);
+                    this._lockedPosition(this._position());
                 };
                 UndoEngine.prototype.end = function () {
                     var _this = this;
@@ -2725,8 +2731,8 @@ var DevExpress;
                         return;
                     }
                     if (this._observers.length > 0) {
-                        this._position = this._groupPosition + 1;
-                        var removedItems = this._groupObservers.splice(this._position, this._groupObservers.length - this._position, this._observers);
+                        this._position(this._groupPosition + 1);
+                        var removedItems = this._groupObservers.splice(this._position(), this._groupObservers.length - this._position(), this._observers);
                         removedItems.forEach(function (changeSet) {
                             if (Array.isArray(changeSet)) {
                                 changeSet.reverse().forEach(function (item) { return _this._disposeObserver(item); });
@@ -2737,7 +2743,7 @@ var DevExpress;
                         });
                     }
                     else {
-                        this._position = this._groupPosition;
+                        this._position(this._groupPosition);
                     }
                     this._observers = this._groupObservers;
                 };
@@ -4213,13 +4219,15 @@ var DevExpress;
         (function (Criteria) {
             var OperandProperty = (function (_super) {
                 __extends(OperandProperty, _super);
-                function OperandProperty(propertyName, startColumn, startLine) {
+                function OperandProperty(propertyName, startColumn, startLine, originalPropertyLength) {
                     if (propertyName === void 0) { propertyName = ""; }
                     if (startColumn === void 0) { startColumn = -1; }
                     if (startLine === void 0) { startLine = -1; }
+                    if (originalPropertyLength === void 0) { originalPropertyLength = 0; }
                     _super.call(this);
                     this.type = "Property";
                     this.propertyName = propertyName;
+                    this.originalPropertyLength = originalPropertyLength;
                     this.startPosition = { column: startColumn, line: startLine };
                 }
                 Object.defineProperty(OperandProperty.prototype, "displayType", {
@@ -4267,6 +4275,7 @@ var DevExpress;
                     }
                     var requests = [];
                     var result = [];
+                    var serializer = new Analytics.Widgets.Internal.FilterEditorSerializer();
                     Analytics.Criteria.Utils.criteriaForEach(expressionCriteria, function (operator, innerPath) {
                         if (operator instanceof Analytics.Criteria.OperandProperty) {
                             var isContainsParentRelationshipTraversalOperator = operator.propertyName.indexOf("^.") === 0;
@@ -4299,12 +4308,13 @@ var DevExpress;
                                 });
                                 for (var j = 0, delta = 0; j < operands.length; j++) {
                                     var column = operands[j].operand.startPosition.column;
-                                    var originalName = operands[j].operand.propertyName;
+                                    var propertyName = operands[j].operand.propertyName;
+                                    var deltaName = operands[j].operand.originalPropertyLength - serializer.serialize(operands[j].operand, false).length;
                                     var convertedName = operands[j].convertedName;
-                                    if (!originalName || column < 0)
+                                    if (!propertyName || column < 0)
                                         continue;
-                                    lines[i] = lines[i].substring(0, column + delta) + convertedName + lines[i].substring(column + originalName.length + delta);
-                                    delta += convertedName.length - originalName.length;
+                                    lines[i] = lines[i].substring(0, column + delta) + convertedName + lines[i].substring(column + propertyName.length + deltaName + delta);
+                                    delta += convertedName.length - propertyName.length - deltaName;
                                 }
                             }
                             def.resolve(lines.join('\n'));
@@ -4364,7 +4374,7 @@ var DevExpress;
                     return new Criteria.OperandParameter(options.parameterName, options.value);
                 };
                 CriteriaOperatorPreprocessor.prototype.OperandProperty = function (options) {
-                    return new Criteria.OperandProperty(options.propertyName, options.startColumn, options.startLine);
+                    return new Criteria.OperandProperty(options.propertyName, options.startColumn, options.startLine, options.originalPropertyLength);
                 };
                 CriteriaOperatorPreprocessor.prototype.UnaryOperator = function (options) {
                     return new Criteria.UnaryOperator(options.operatorType, options.operator);
@@ -4395,9 +4405,6 @@ var DevExpress;
                             break;
                         case "between":
                             operand = this.BetweenOperator(options);
-                            break;
-                        case "unary":
-                            operand = this.UnaryOperator(options);
                             break;
                         case "property":
                             operand = this.OperandProperty(options);
@@ -8210,7 +8217,7 @@ var DevExpress;
                     this.helper.onEditorFocusOut(this.operand);
                 };
                 FilterEditor.prototype.cacheElement = function ($element) {
-                    this.editorContainer($element.dxTextArea("instance"));
+                    this.editorContainer(DevExpress.ui.dxTextArea["getInstance"]($element.get(0)));
                 };
                 FilterEditor.prototype.updateCriteria = function () {
                     if (this.isSurfaceValid()) {
@@ -8416,7 +8423,7 @@ var DevExpress;
             (function (Internal) {
                 Internal.formatStringStandardPatterns = {
                     'DateTime': { type: 'System.DateTime', value: new Date(Date.now()), patterns: [] },
-                    'Number': { type: 'System.Int32', value: '123456789', patterns: ['#.00', '#, #', '0.E+0.0', '0.e+0.0', 'n', 'n1', 'n2', 'e', 'e1', 'f', 'f1'] },
+                    'Number': { type: 'System.Int32', value: '123456789', patterns: ['#.00', '#,#', '0.E+0.0', '0.e+0.0', 'n', 'n1', 'n2', 'e', 'e1', 'f', 'f1'] },
                     'Percent': { type: 'System.Int32', value: '100', patterns: ['0.00%', '0%'] },
                     'Currency': { type: 'System.Int32', value: '100', patterns: ['$0.00', '$0', 'c', 'c1', 'c2'] },
                     'Special': { type: 'System.Int32', value: '123456789', patterns: ['(###) ### - ####', '### - ## - ####'] },
@@ -8543,7 +8550,7 @@ var DevExpress;
                 };
                 FormatStringEditor.prototype._scrollToBottom = function () {
                     var $scrollView = $(".dx-format-string .dx-format-string-formats").find(".dx-scrollview").filter(":visible");
-                    var scrollViewInstance = $scrollView.data("dxScrollView") && $scrollView.dxScrollView("instance");
+                    var scrollViewInstance = DevExpress.ui.dxScrollView["getInstance"]($scrollView.get(0));
                     scrollViewInstance && scrollViewInstance["scrollTo"] && scrollViewInstance["scrollTo"](scrollViewInstance["scrollHeight"]());
                 };
                 FormatStringEditor.prototype._updateFormatList = function () {
@@ -8836,10 +8843,8 @@ var DevExpress;
                     var callback = null;
                     var values = valueAccessor(), options = ko.unwrap(values), pathArray, updateScrollBar = function () {
                         var $scrollView = $(element).closest(".dx-scrollview");
-                        if ($scrollView.data("dxScrollView")) {
-                            var scrollView = $scrollView.dxScrollView("instance");
-                            scrollView && scrollView["update"]();
-                        }
+                        var scrollView = DevExpress.ui.dxScrollView["getInstance"]($scrollView.get(0));
+                        scrollView && scrollView["update"]();
                         if (options.onItemsVisibilityChanged) {
                             options.onItemsVisibilityChanged();
                         }
@@ -9694,31 +9699,31 @@ break;
 case 46:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
-                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-5].name, startColumn: $$[$0-5].col, startLine: $$[$0-5].line }), 
+                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-5].name, startColumn: $$[$0-5].col, startLine: $$[$0-5].line, originalPropertyLength: _$[$0-5].last_column - _$[$0-5].first_column + 1 }), 
                 $$[$0-3], $$[$0].type, $$[$0].expr
-            ); 
+            );
         
 break;
 case 47:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
-                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-4].name, startColumn: $$[$0-4].col, startLine: $$[$0-4].line }), 
+                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-4].name, startColumn: $$[$0-4].col, startLine: $$[$0-4].line, originalPropertyLength: _$[$0-4].last_column - _$[$0-4].first_column + 1 }), 
                 null, $$[$0].type, $$[$0].expr
-            ); 
+            );
         
 break;
 case 48:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
-                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
+                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line, originalPropertyLength: _$[$0-2].last_column - _$[$0-2].first_column }), 
                 null, $$[$0].type, $$[$0].expr
-            ); 
+            );
         
 break;
 case 49:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
-                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-3].name, startColumn: $$[$0-3].col, startLine: $$[$0-3].line }), 
+                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-3].name, startColumn: $$[$0-3].col, startLine: $$[$0-3].line, originalPropertyLength: _$[$0-3].last_column - _$[$0-3].first_column + 1 }), 
                 $$[$0-1], DevExpress.Analytics.Criteria.Aggregate.Exists, null
             );
         
@@ -9726,13 +9731,13 @@ break;
 case 50:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
-                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line }), 
+                DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line, originalPropertyLength: _$[$0-2].last_column - _$[$0-2].first_column + 1 }), 
                 null, DevExpress.Analytics.Criteria.Aggregate.Exists, null);
         
 break;
 case 51:
  
-            this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0].name, startColumn: $$[$0].col, startLine: $$[$0].line }); 
+            this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0].name, startColumn: $$[$0].col, startLine: $$[$0].line, originalPropertyLength: _$[$0].last_column - _$[$0].first_column });
         
 break;
 case 52:
@@ -10408,7 +10413,7 @@ case 57:return 5
 break;
 }
 },
-rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:\{[0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}\})/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:(?:\d*\.)?\d+)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:&)/i,/^(?:\|)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
+rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:\{[0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}\})/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:[0-9]+(\.[0-9]+([mfMF]{1})?|[bsiluBSILU]{1})?)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:&)/i,/^(?:\|)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
 conditions: {"fieldname":{"rules":[0,1,2,3,4],"inclusive":false},"INITIAL":{"rules":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57],"inclusive":true}}
 });
 return lexer;
@@ -15372,24 +15377,23 @@ var DevExpress;
                     this.option("value") && this._value(this.option("value"));
                     this.option("itemsProvider") && this._itemsProvider(this.option("itemsProvider"));
                     this.option("valueChangeEvent", "change");
-                    this._parentViewport = this["_$element"].parents(".dx-designer-viewport");
+                    this._parentViewport = $($element).parents(".dx-designer-viewport");
                 }
                 dxFieldListPicker.prototype._showDropDown = function () {
                     if (this._popup) {
-                        this._popup.option("width", this.element().width());
-                        var popupContent = this._popup.content() && this._popup.content()[0];
-                        popupContent.style.maxHeight = 'none';
-                        popupContent.style.height = 'auto';
-                        var elementBottom = this["_$element"][0].getBoundingClientRect();
-                        var viewportBottom = this._parentViewport[0].getBoundingClientRect().bottom;
-                        if (elementBottom + 200 > viewportBottom) {
-                            this._popup.option("position", $.extend(true, {}, this._defaultPosition, { my: "left bottom", at: "left top" }));
-                        }
-                        else {
-                            this._popup.option("position", this._defaultPosition);
-                        }
+                        var $element = $(this.element());
+                        this._popup.option("width", $element.width());
+                        var popupPosition = $.extend(true, {}, this._defaultPosition, { boundary: this._parentViewport[0], boundaryOffset: "0 20", collision: "none flip" });
+                        this._popup.option("position", popupPosition);
+                        this._popup.option("height", "auto");
+                        this._popup.option("maxHeight", this._getMaxHeight());
+                        this._popup.repaint();
                         this._popup._renderPosition();
                     }
+                };
+                dxFieldListPicker.prototype._getMaxHeight = function () {
+                    var $element = $(this.element()), offset = $element.offset(), windowHeight = $(window).height(), maxHeight = Math.max(offset.top, windowHeight - offset.top - $element.outerHeight());
+                    return Math.min(.5 * windowHeight, maxHeight);
                 };
                 dxFieldListPicker.prototype._closeOutsideDropDownHandler = function (e, ignoreContainerClicks) { _super.prototype._closeOutsideDropDownHandler.call(this, e, true); };
                 dxFieldListPicker.prototype._hideOnBlur = function () { return false; };
@@ -15430,7 +15434,7 @@ var DevExpress;
                     }
                 };
                 dxFieldListPicker.prototype._clearValueHandler = function () {
-                    this["_input"]().val(null);
+                    $(this["_input"]()).val(null);
                     _super.prototype["_clearValueHandler"].apply(this, arguments);
                 };
                 dxFieldListPicker.prototype._renderPopupContent = function () {
@@ -15451,11 +15455,13 @@ var DevExpress;
                             }
                         }
                     });
-                    var $scroll = $("<div>").addClass("dx-treelist-wrapper").dxScrollView({ scrollByThumb: true });
-                    var scroll = this["_createComponent"]($scroll, "dxScrollView");
+                    var element = $("<div>").addClass("dx-treelist-wrapper").get(0);
+                    var scroll = this["_createComponent"](element, "dxScrollView", { scrollByThumb: true });
                     var self = this;
-                    scroll.content().append('<div data-bind="treelist: options"></div>');
-                    var context = ko.contextFor(this.element()[0]);
+                    var $scrollContent = $(scroll["content"]());
+                    var $element = $(this.element());
+                    $scrollContent.append($('<div data-bind="treelist: options"></div>')[0]);
+                    var context = ko.contextFor($element.get(0));
                     var treeListController = this.option("treeListController");
                     var options = ko.computed(function () {
                         return {
@@ -15467,8 +15473,8 @@ var DevExpress;
                         };
                     });
                     var childContext = context.createChildContext({ options: options });
-                    ko.applyBindings(childContext, scroll.content()[0]);
-                    this._popup.content().append($scroll);
+                    ko.applyBindingsToDescendants(childContext, $scrollContent.get(0));
+                    $(this._popup.content()).append(element);
                 };
                 return dxFieldListPicker;
             })(DevExpress.ui.dxDropDownEditor);
@@ -15687,7 +15693,7 @@ var DevExpress;
                     this._disposables.push.apply(this._disposables, this.groups);
                 };
                 ControlProperties.prototype.searchBox = function ($element) {
-                    this._searchBox = $element.dxTextBox("instance");
+                    this._searchBox = DevExpress.ui.dxTextBox["getInstance"]($element.get(0));
                 };
                 return ControlProperties;
             })(Widgets.ObjectProperties);
@@ -17021,7 +17027,7 @@ var DevExpress;
                 'dx-expressioneditor-category-accordion': '<div class="dx-fieldset" style="margin: 0;">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dx-accordion-header dx-expressioneditor-tools-tab-accordion-header dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': $data.isSelected }, dxAction: function() { $data.updateContent($data.allItems(), $data.isSelected); $parent.click($data.content) }">                <div class=" dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dx-expressioneditor-tools-tab-header" data-bind="text: displayName"></span>            </div>            <div class="dx-accordion-content">                <!-- ko foreach: items-->                <div class="dx-expressioneditor-tools-tab-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="css: {\'dxd-state-selected\': isSelected }, text: $data.display, dxAction: function() { $parent.updateContent($data.data, $data.isSelected); $parents[1].click($parent.content); }"></div>                <!-- /ko -->            </div>        </div>    </div>',
                 'dx-expressioneditor-description': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <div class="dx-expressioneditor-description dxd-text-primary" data-bind="text: content"></div>    </div>',
                 'dx-expressioneditor-fields': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary " data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko if: fields -->        <div class="dx-treelist-wrapper" data-bind="treelist: fields"></div>        <!-- /ko -->        <!-- ko if: $data.parameters -->        <div class="dx-treelist-wrapper" data-bind="treelist: parameters"></div>        <!-- /ko -->    </div>',
-                'dx-ee-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="visible: visible, event: { dblclick: function() { actions[0].clickAction($element); }}, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-item-images">            <!-- ko if: hasItems -->            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>            <!-- /ko -->            <!-- ko ifnot: hasItems -->            <div class="dx-treelist-collapsedbutton"></div>            <!-- /ko -->            <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>        </div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
+                'dx-ee-treelist-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="visible: visible, event: { dblclick: function() { actions[0].clickAction($element); }}, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected }">        <div class="dx-treelist-item-images">            <!-- ko if: hasItems -->            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>            <!-- /ko -->            <!-- ko ifnot: hasItems -->            <div class="dx-treelist-collapsedbutton"></div>            <!-- /ko -->            <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>        </div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
                 'dx-expressioneditor-selectedcontent': '<!-- ko with: content -->    <!-- ko template: $data-->    <!-- /ko -->    <!-- /ko -->',
                 'dx-expressioneditor-collection': '<div class="dx-expressioneditor-tools-tab-content-wrapper dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko foreach: items -->        <div class="dx-expressioneditor-tools-tab-item dxd-list-item-back-color dxd-text-primary dxd-back-highlighted" data-bind="text: $data.displayName || $data.text, css: { \'dx-expressioneditor-state-selected dxd-state-selected\': $parent.selectedItem() === $data }, dxAction: function() { $parent.selectedItem($data); $parents[2].click($data); }, event: { dblclick: function() { $parents[2].dblclick($data, $element); } }"></div>        <!-- /ko -->    </div>',
                 'dx-expressioneditor-collection-function': '<div class="dx-expressioneditor-collection-function">        <div class="dx-expressioneditor-collection-function-search">            <div data-bind="dxTextBox: { value: textToSearch, showClearButton: true, valueChangeEvent: \'keyup\', placeholder: $parents[2].searchPlaceholder() }"></div>        </div>        <div class="dx-expressioneditor-collection-function-items dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">            <!-- ko foreach: availableItems -->            <div class="dx-expressioneditor-tools-tab-item dxd-list-item-back-color dxd-text-primary dxd-back-highlighted" data-bind="css: { \'dx-expressioneditor-state-selected dxd-state-selected\': $parent.selectedItem() === $data }, dxAction: function() { $parent.selectedItem($data); $parents[2].click($data); }, event: { dblclick: function() { $parents[2].dblclick($data, $element); } }, searchHighlighting: { text: $data.displayName || $data.text, textToSearch: $parent.textToSearch }"></div>            <!-- /ko -->        </div>    </div>',
@@ -17064,10 +17070,10 @@ var DevExpress;
                 'dx-treelist-item-actions-with-edit': '<!-- ko template: { name: \'dx-treelist-edit-action\', data: treeListEditAction() }  -->    <!-- /ko -->    <!-- ko template: \'dx-treelist-item-actions\'  -->    <!-- /ko -->',
                 'dx-treelist-item': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <!-- /ko -->    </div>',
                 'dx-treelist-accordion-item': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
-                'dx-treelist-header-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <!-- ko if: $data.hasItems-->        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>        <!-- /ko -->        <!-- ko ifnot: $data.hasItems-->        <div class="dx-treelist-collapsedbutton"></div>        <!-- /ko -->        <div class="dx-treelist-caption">            <!-- ko if: actions && actions.length > 0 -->            <div class="dx-treelist-action-container" data-bind="visible: isSelected">                <!-- ko template: actionsTemplate() -->                <!-- /ko -->            </div>            <!-- /ko  -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
+                'dx-treelist-header-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <!-- ko if: $data.hasItems-->        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>        <!-- /ko -->        <!-- ko ifnot: $data.hasItems-->        <div class="dx-treelist-collapsedbutton"></div>        <!-- /ko -->        <div class="dx-treelist-caption">            <!-- ko if: actions && actions.length > 0 -->            <div class="dx-treelist-action-container" data-bind="visible: isSelected">                <!-- ko template: actionsTemplate() -->                <!-- /ko -->            </div>            <!-- /ko  -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
                 'dx-treelist-item-with-hover': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->    </div>',
                 'dx-treelist-accordion-item-with-hover': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
-                'dx-treelist-header-item-with-hover': '<div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">        <div class="dx-treelist-item dx-fontsize-reestablished dxd-list-item-back-color" data-bind="event: {         dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() },         mouseenter: mouseenter,         mouseleave: mouseleave    }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected dxd-back-secondary\': isSelected() || isMultiSelected() }">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed, style: { \'visibility\': hasItems ? \'visible\' : \'hidden\' }"></div>            <div class="dx-treelist-caption">                <!-- ko if: actions && actions.length > 0 -->                <div class="dx-treelist-action-container" data-bind="visible: $data.isSelected() || $data.isHovered()">                    <!-- ko template: actionsTemplate() -->                    <!-- /ko -->                </div>                <!-- /ko  -->                <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>                    <div class="dx-treelist-text-wrapper">                        <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                    </div>                </div>            </div>        </div>    </div>',
+                'dx-treelist-header-item-with-hover': '<div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">        <div class="dx-treelist-item dx-fontsize-reestablished dxd-list-item-back-color" data-bind="event: {         dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() },         mouseenter: mouseenter,         mouseleave: mouseleave    }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected dxd-back-secondary\': isSelected() || isMultiSelected() }">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed, style: { \'visibility\': hasItems ? \'visible\' : \'hidden\' }"></div>            <div class="dx-treelist-caption">                <!-- ko if: actions && actions.length > 0 -->                <div class="dx-treelist-action-container" data-bind="visible: $data.isSelected() || $data.isHovered()">                    <!-- ko template: actionsTemplate() -->                    <!-- /ko -->                </div>                <!-- /ko  -->                <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                    <div class="dx-treelist-text-wrapper">                        <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                    </div>                </div>            </div>        </div>    </div>',
                 'dx-treelist': '<div class="dx-treelist dxd-text-primary">        <!-- ko foreach: items -->        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->        <!-- /ko -->        <div data-bind="visible: !collapsed()">            <!-- ko template: { name: \'dx-treelist\', data: $data } -->            <!-- /ko -->        </div>        <!-- /ko -->    </div>',
                 'dxrd-borders': '<div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>',
                 'dxrd-colorpicker': '<div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled }"></div>',
@@ -17087,15 +17093,15 @@ var DevExpress;
                 'dxd-snap-lines-holder': '<div class="dxd-snap-lines-holder">        <div class="dxd-snap-line dxd-snap-line-horizontal" data-bind="style: { transform: snapLineSurfaces[0].transform() }"></div>        <div class="dxd-snap-line dxd-snap-line-horizontal" data-bind="style: { transform: snapLineSurfaces[1].transform() }"></div>        <div class="dxd-snap-line dxd-snap-line-vertical" data-bind="style: { transform: snapLineSurfaces[2].transform() }"></div>        <div class="dxd-snap-line dxd-snap-line-vertical" data-bind="style: { transform: snapLineSurfaces[3].transform() }"></div>    </div>',
                 'dxrd-surface-template-base': '<!-- ko ifnot: isLoading -->    <!-- ko with: surface -->    <div class="dxrd-surface-wrapper" data-bind="template: templateName, click: function(_, e) { $root.selection.clickHandler($data, e); e.stopPropagation(); }">    </div>    <!-- /ko -->    <!-- /ko -->    <!-- ko if: isLoading -->    <div class="dxrd-surface-wrapper">        <div style="text-align: center; padding-top: 25%;">            <div data-bind="dxLoadIndicator: { visible: isLoading() }"></div>        </div>    </div>    <!-- /ko -->',
                 'dxrd-designer': '<div data-bind="css: surfaceClass($element)">        <div class="dxrd-designer-wrapper dx-editors dxd-surface-back-color dxd-scrollbar-color" data-bind="visible: (!$data.designMode || designMode()), cssArray: [ $data.rootStyle , { \'dx-rtl\' : $data.rtl, \'dx-ltr\': !$data.rtl } ]">            <!-- ko foreach: parts -->            <!-- ko template: { name: templateName, data: model }-->            <!-- /ko -->            <!-- /ko -->        </div>        <!-- ko if: ($data.addOns) -->        <!-- ko foreach: addOns -->        <!-- ko template: { name: templateName, data: model } -->        <!-- /ko -->        <!-- /ko -->        <!-- /ko -->    </div>',
-                'dxrd-collectionactions-template': '<div class="dxrd-action-items-container"></div>    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap($data.imageClassName) }, attr: { id: id, title: text }"></div>    <div data-bind="dxPopup: { width: 235, height: \'auto\',            position: { my: $root.rtl ? \'left top\': \'right top\', at: \'bottom\', of: (\'#\' + id) },            showTitle: false,            showCloseButton: false,            animation: {},            closeOnOutsideClick: true,            container: ($data.getContainer || function(_e, selector) { return selector; })($element, \'.dxrd-action-items-container\'),            shading: false,            visible: popoverVisible }">        <!-- ko foreach: actions -->        <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: clickAction, css: { \'dxrd-disabled-button\': disabled }">            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>        </div>        <!-- /ko -->    </div>',
-                'dxrd-menubutton-template-base': '<div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">        <div class="dxrd-menu-place" style="width:54px;"></div>        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: \'dxrd-svg-menu-menu\', css: {\'dxd-state-active\': appMenuVisible }"></div>        <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {                             width: 250,                             height: \'100%\' ,                             position: $data.rtl ? { my: \'right top\' , at: \'left top\' , offset: \'-10 0\' } : { my: \'left top\' , at: \'right top\' , offset: \'10 0\' },                             showTitle: false,                             showCloseButton: false,                             container: getMenuPopupContainer($element),                             target: getMenuPopupTarget($element),                             animation: {},                             closeOnOutsideClick: function(e) {                                var buttonClassName = \'dxrd-menu-button-image\';                                var parentClassList = e.target.parentNode && e.target.parentNode.parentNode && e.target.parentNode.parentNode.classList;                                stopPropagation = (e.target.classList && e.target.classList.contains(buttonClassName)) || (parentClassList && parentClassList.contains(buttonClassName));                                return true;                             },                             shading: false,                             focusStateEnabled: false,                             visible: appMenuVisible }">            <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>            <!-- ko foreach: actionLists.menuItems -->            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { \'dxrd-disabled-button\': disabled }, visible: visible">                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>            </div>            <!-- /ko -->        </div>    </div>',
-                'dxrd-top-grid': '<!-- ko if: popularVisible -->    <div class="dx-fieldset">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dxrd-group-header-text" data-bind="text: $root.actionsGroupTitle()"></span>            </div>            <div class="dx-accordion-content dxd-back-primary">                <!-- ko foreach: (contextActions || []) -->                <!-- ko if: $data.templateName -->                <!-- ko template: templateName  -->                <!-- /ko -->                <!-- /ko -->                <!-- ko if: !$data.templateName -->                <div class="dxrd-properties-grid-action" data-bind="dxAction: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { \'dxrd-disabled-button\': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>                </div>                <!-- /ko -->                <!-- /ko -->                <!-- ko with: popularProperties -->                <div style="position: relative" data-bind="template: { name: \'dx-propertieseditor\', data: $data }"></div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
+                'dxrd-collectionactions-template': '<div class="dxrd-action-items-container"></div>    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap($data.imageClassName) }, attr: { id: id, title: text }"></div>    <div data-bind="dxPopup: { width: 235, height: \'auto\',            position: { my: $root.rtl ? \'left top\': \'right top\', at: \'bottom\', of: (\'#\' + id) },            showTitle: false,            showCloseButton: false,            animation: {},            closeOnOutsideClick: true,            container: ($data.getContainer || function(_e, selector) { return selector; })($element, \'.dxrd-action-items-container\'),            shading: false,            visible: popoverVisible }">        <!-- ko foreach: actions -->        <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: clickAction, css: { \'dxrd-disabled-button\': disabled }">            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>        </div>        <!-- /ko -->    </div>',
+                'dxrd-menubutton-template-base': '<div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">        <div class="dxrd-menu-place" style="width:54px;"></div>        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: \'dxrd-svg-menu-menu\', css: {\'dxd-state-active\': appMenuVisible }"></div>        <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {                             width: 250,                             height: \'100%\' ,                             position: $data.rtl ? { my: \'right top\' , at: \'left top\' , offset: \'-10 0\' } : { my: \'left top\' , at: \'right top\' , offset: \'10 0\' },                             showTitle: false,                             showCloseButton: false,                             container: getMenuPopupContainer($element),                             target: getMenuPopupTarget($element),                             animation: {},                             closeOnOutsideClick: function(e) {                                var buttonClassName = \'dxrd-menu-button-image\';                                var parentClassList = e.target.parentNode && e.target.parentNode.parentNode && e.target.parentNode.parentNode.classList;                                stopPropagation = (e.target.classList && e.target.classList.contains(buttonClassName)) || (parentClassList && parentClassList.contains(buttonClassName));                                return true;                             },                             shading: false,                             focusStateEnabled: false,                             visible: appMenuVisible }">            <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>            <!-- ko foreach: actionLists.menuItems -->            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { \'dxrd-disabled-button\': disabled }, visible: visible">                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>            </div>            <!-- /ko -->        </div>    </div>',
+                'dxrd-top-grid': '<!-- ko if: popularVisible -->    <div class="dx-fieldset">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dxrd-group-header-text" data-bind="text: $root.actionsGroupTitle()"></span>            </div>            <div class="dx-accordion-content dxd-back-primary">                <!-- ko foreach: (contextActions || []) -->                <!-- ko if: $data.templateName -->                <!-- ko template: templateName  -->                <!-- /ko -->                <!-- /ko -->                <!-- ko if: !$data.templateName -->                <div class="dxrd-properties-grid-action" data-bind="dxAction: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { \'dxrd-disabled-button\': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                </div>                <!-- /ko -->                <!-- /ko -->                <!-- ko with: popularProperties -->                <div style="position: relative" data-bind="template: { name: \'dx-propertieseditor\', data: $data }"></div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
                 'dxrd-propertiestab': '<div class="dxrd-properties-wrapper" data-bind="visible: active() && visible()">    <div style="height:100%" class="dxd-text-primary">        <div class="dxrd-right-panel-header">            <span data-bind="text: text"></span>        </div>        <!-- ko with: model -->        <!-- ko if: $root.controlsStore.visible() -->        <div class="dx-property-grid-header">            <div class="dx-property-grid-header-content">                <div class="dx-property-grid-sorting-actions-group" data-bind="css: { \'dx-property-gread-search-collapsed\': isSearching }">                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>                    <div class="dx-property-grid-sorting-actions-container">                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: \'dxrd-svg-properties-sortingbyalphabet\', iconClass: \'image-sortingbyalphabet\' }"></div>                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: \'dxrd-svg-properties-sortingbygroups\', iconClass: \'image-sortingbygroups\' }"></div>                    </div>                </div>                <div class="dx-property-grid-search-group dx-property-gread-search-collapsed" data-bind="css: { \'dx-property-gread-search-collapsed\': !isSearching() }">                    <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active\': isSearching }, dxButtonWithTemplate: { onClick: switchSearchBox, icon: \'dxrd-svg-properties-search\', iconClass: \'image-search\' }"></div>                    <div class="dx-property-grid-search-box" data-bind="dxTextBox: { value: textToSearch, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true }, cacheElement: { action: function(element) { searchBox(element); } }"></div>                </div>            </div>        </div>        <!-- /ko -->        <div class="dxrd-properties-grid dxd-border-primary" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, styleunit: { top: $root.controlsStore.visible() ? 80 : 40 }">            <!-- ko template: { name: \'dxrd-top-grid\', data: { contextActions: $root.contextActions, popularProperties: $root.popularProperties, collapsed: ko.observable(false), popularVisible: $root.popularVisible() && isSortingByGroups(), actionsGroupTitle: $root.actionsGroupTitle } } -->            <!-- /ko -->            <div data-bind="visible: isSortingByGroups">                <!-- ko foreach: groups -->                <div class="dx-fieldset" data-bind="visible: visible">                    <div data-bind="dxdAccordion: { collapsed: collapsed }">                        <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                            <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                            <span class="dxrd-group-header-text" data-bind="text: displayName()"></span>                        </div>                        <div class="dx-accordion-content dxd-back-primary">                            <!-- ko ifnot: editorsCreated -->                            <div class="dx-accordion-content-loading-panel">                                <div data-bind="dxLoadIndicator: { visible: !editorsCreated() }"></div>                            </div>                            <!-- /ko -->                            <!-- ko if: $data.editorsRendered() -->                            <div data-bind="visible: editorsCreated">                                <div class="dx-editors">                                    <!-- ko foreach: editors -->                                    <!-- ko template: editorTemplate -->                                    <!-- /ko -->                                    <!-- ko if: ($index() === $parent.editors().length - 1 && $parent.editorsCreated(true)) -->                                    <!-- /ko -->                                    <!-- /ko -->                                </div>                            </div>                            <!-- /ko -->                        </div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dx-fieldset dxd-back-primary" data-bind="visible: !isSortingByGroups()">                <div data-bind="dxLoadIndicator: { visible: !allEditorsCreated() }"></div>                <!-- ko if: $data.editorsRendered() -->                <div data-bind="visible: allEditorsCreated">                    <div class="dx-editors">                        <!-- ko foreach: $data.getEditors() -->                        <!-- ko template: editorTemplate -->                        <!-- /ko -->                        <!-- ko if: ($index() === $parent._editors().length - 1 && $parent.allEditorsCreated(true)) -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>                <!-- /ko -->            </div>            <div data-bind="dxPopup: { width: 148, height: \'auto\',        position: $data.rtl ? { my: \'left top\', at: \'right top\', of: popupService.target } : { my: \'right top\', at: \'left top\', of: popupService.target },        container: \'.dx-designer-viewport\',        target: popupService.target,        showTitle: false,        showCloseButton: false,        animation: {},        closeOnOutsideClick: true,        shading: false,        visible: popupService.visible }">                <div data-options="dxTemplate: { name: \'content\' }">                    <!-- ko if: popupService.title -->                    <div class="dxrd-editor-menu-caption dxd-text-primary" data-bind="text: popupService.title"></div>                    <!-- /ko -->                    <!-- ko foreach: popupService.actions -->                    <!-- ko if: (!visible || visible && visible()) -->                    <div class="dxrd-editor-menu-item dxd-list-item-back-color dxd-back-highlighted dxd-state-normal" data-bind="dxAction: action">                        <div class="dxrd-menuitem-box dxd-property-grid-menu-box-color dxd-back-contrast">                            <div class="dxrd-menuitem-box-inside dxd-back-secondary"></div>                        </div>                        <span class="dxrd-editor-menu-title dxd-text-primary" data-bind="text: title"></span>                    </div>                    <!-- /ko -->                    <!-- /ko -->                </div>            </div>        </div>        <!-- /ko -->    </div></div>',
                 'dx-right-panel-lightweight': '<div class="dxrd-right-panel dx-shadow dxd-border-secondary dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'1px\', 325)">        <!-- ko foreach: tabPanel.tabs -->        <!-- ko lazy: { template: $data.template } -->        <!-- /ko -->        <!-- /ko -->    </div>',
-                'dxrd-right-panel-template-base': '<div class="dx-shadow dxd-border-secondary" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses({\'border\': !tabPanel.collapsed()})">        <div class="dxrd-right-panel-collapse dxd-back-primary dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses(), dxAction: function() { tabPanel.collapsed(!tabPanel.collapsed()); }, attr: { title: tabPanel.toggleCollapsedText }">            <div class="dxrd-right-panel-collapse-image" data-bind="css: tabPanel.toggleCollapsedImage().class, template: tabPanel.toggleCollapsedImage().template"></div>        </div>        <div class="dxrd-right-panel dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'50px\', 340)">            <!-- ko foreach: tabPanel.tabs -->            <!-- ko lazy: { template: $data.template } -->            <!-- /ko -->            <!-- /ko -->        </div>        <div class="dxrd-right-tabs dxd-side-panel-tabs-back-color dxd-back-contrast" data-bind="css: tabPanel.cssClasses()">            <!-- ko foreach: tabPanel.tabs -->            <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxAction: $parent.tabPanel.selectTab, css: { \'dxd-state-active dxd-state-no-hover\': active, \'dxrd-tab-item-disabled\': disabled }, attr: { title: text }, visible: visible">                <div class="dxrd-image-padding" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>            </div>            <!-- /ko -->        </div>    </div>',
+                'dxrd-right-panel-template-base': '<div class="dx-shadow dxd-border-secondary" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses({\'border\': !tabPanel.collapsed()})">        <div class="dxrd-right-panel-collapse dxd-back-primary dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses(), dxAction: function() { tabPanel.collapsed(!tabPanel.collapsed()); }, attr: { title: tabPanel.toggleCollapsedText }">            <div class="dxrd-right-panel-collapse-image" data-bind="css: tabPanel.toggleCollapsedImage().class, template: tabPanel.toggleCollapsedImage().template"></div>        </div>        <div class="dxrd-right-panel dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'50px\', 340)">            <!-- ko foreach: tabPanel.tabs -->            <!-- ko lazy: { template: $data.template } -->            <!-- /ko -->            <!-- /ko -->        </div>        <div class="dxrd-right-tabs dxd-side-panel-tabs-back-color dxd-back-contrast" data-bind="css: tabPanel.cssClasses()">            <!-- ko foreach: tabPanel.tabs -->            <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxAction: $parent.tabPanel.selectTab, css: { \'dxd-state-active dxd-state-no-hover\': active, \'dxrd-tab-item-disabled\': disabled }, attr: { title: text }, visible: visible">                <div class="dxrd-image-padding" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"> </div>            </div>            <!-- /ko -->        </div>    </div>',
                 'dxrd-toolbar-template-base': '<div class="dxrd-toolbar-wrapper">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }"></div>    </div>',
-                'dxrd-toolbar-tmplt': '<!-- ko foreach: $data -->    <!-- ko if: $data.templateName -->    <!-- ko template: templateName  -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: !$data.templateName -->    <div class="dxrd-toolbar-item" data-bind="visible: visible">        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: \'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted \' + (ko.unwrap($data.imageClassName) || \'\'), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === \'function\') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {\'dxrd-disabled-button\': disabled, \'dxd-state-active\': $data.selected }"></div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>    <!-- /ko -->    <!-- /ko -->',
-                'dxrd-toolbox-template-base': '<div class="dxrd-toolbox-wrapper dxd-toolbox-back-color dxd-back-primary2" data-bind="dxScrollView: { showScrollbar: \'onHover\', scrollByContent: false, bounceEnabled: false, useNative: false, scrollByThumb: true }">        <!-- ko foreach: toolboxItems -->        <div class="dxrd-toolbox-item" data-bind="attr: { title: displayName }">            <div class="dx-background-inheritor dxd-toolbox-item-back-color dxd-back-secondary">                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: $data.imageClassName, draggable: $root.toolboxDragHandler"></div>            </div>        </div>        <!-- /ko -->    </div>',
+                'dxrd-toolbar-tmplt': '<!-- ko foreach: $data -->    <!-- ko if: $data.templateName -->    <!-- ko template: templateName  -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: !$data.templateName -->    <div class="dxrd-toolbar-item" data-bind="visible: visible">        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: \'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted \' + (ko.unwrap($data.imageClassName) || \'\'), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === \'function\') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {\'dxrd-disabled-button\': disabled, \'dxd-state-active\': $data.selected }"> </div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>    <!-- /ko -->    <!-- /ko -->',
+                'dxrd-toolbox-template-base': '<div class="dxrd-toolbox-wrapper dxd-toolbox-back-color dxd-back-primary2" data-bind="dxScrollView: { showScrollbar: \'onHover\', scrollByContent: false, bounceEnabled: false, useNative: false, scrollByThumb: true }">        <!-- ko foreach: toolboxItems -->        <div class="dxrd-toolbox-item" data-bind="attr: { title: displayName }">            <div class="dx-background-inheritor dxd-toolbox-item-back-color dxd-back-secondary">                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: $data.imageClassName, draggable: $root.toolboxDragHandler"> </div>            </div>        </div>        <!-- /ko -->    </div>',
                 'dxrd-zoom-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomLevels, value: $data.zoom, displayExpr: function(val) { return Math.round((val || this.option(\'value\')) * 100) + \'%\'; }, displayCustomValue: true, disabled: disabled }"></div>    </div>',
                 'dxrd-bordereditor': '<div class="bordereditor-content">    <!-- ko with: value-->    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-none" data-bind="template: \'dxrd-svg-properties-borders-none\', css: { \'dxd-state-active\': (!bottom() && !left() && !top() && !right()), \'dxrd-disabled-button\': disabled }, click: function() { setNone() }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-all right-margin" data-bind="template: \'dxrd-svg-properties-borders-all\', css: { \'dxd-state-active\': (bottom() && left() && top() && right()), \'dxrd-disabled-button\': disabled  }, click: function() { setAll() }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-left" data-bind="template: \'dxrd-svg-properties-borders-left\', css: { \'dxd-state-active\': left(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'left\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-top" data-bind="template: \'dxrd-svg-properties-borders-top\', css: { \'dxd-state-active\': top(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'top\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-right" data-bind="template: \'dxrd-svg-properties-borders-right\', css: { \'dxd-state-active\': right(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'right\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-bottom" data-bind="template: \'dxrd-svg-properties-borders-bottom\', css: { \'dxd-state-active\': bottom(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'bottom\') }"></div>    <!-- /ko --></div>',
             });

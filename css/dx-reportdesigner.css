@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.css)
-* Version: 18.2.6
-* Build date: 2019-02-12
+* Version: 18.2.7
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2621,4 +2621,13 @@
 .dxrd-add-dataSource-popup-content .dx-popup-content .dxrd-list-item-ellipsis-text {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.dx-content-loading-panel {
+  position: absolute;
+  width: auto;
+  height: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }

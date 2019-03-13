@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.html)
-* Version: 18.2.6
-* Build date: 2019-02-12
+* Version: 18.2.7
+* Build date: 2019-03-13
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -311,7 +311,7 @@
             <!-- ko ifnot: hasItems -->
             <div class="dx-treelist-collapsedbutton"></div>
             <!-- /ko -->
-            <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+            <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>
         </div>
         <div class="dx-treelist-caption">
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">
@@ -889,7 +889,7 @@
             </div>
             <!-- /ko  -->
             <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">
-                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>
                 <div class="dx-treelist-text-wrapper">
                     <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>
                 </div>
@@ -939,7 +939,7 @@
                 </div>
                 <!-- /ko  -->
                 <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">
-                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"></div>
+                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>
                     <div class="dx-treelist-text-wrapper">
                         <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>
                     </div>
@@ -1096,7 +1096,7 @@
             visible: popoverVisible }">
         <!-- ko foreach: actions -->
         <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxAction: clickAction, css: { 'dxrd-disabled-button': disabled }">
-            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
         </div>
         <!-- /ko -->
     </div>
@@ -1128,7 +1128,7 @@
             <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>
             <!-- ko foreach: actionLists.menuItems -->
             <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxAction: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled }, visible: visible">
-                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
                 <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>
                 <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
             </div>
@@ -1153,7 +1153,7 @@
                 <!-- /ko -->
                 <!-- ko if: !$data.templateName -->
                 <div class="dxrd-properties-grid-action" data-bind="dxAction: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { 'dxrd-disabled-button': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">
-                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"></div>
+                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
                 </div>
                 <!-- /ko -->
                 <!-- /ko -->
@@ -1294,7 +1294,7 @@
         <div class="dxrd-right-tabs dxd-side-panel-tabs-back-color dxd-back-contrast" data-bind="css: tabPanel.cssClasses()">
             <!-- ko foreach: tabPanel.tabs -->
             <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxAction: $parent.tabPanel.selectTab, css: { 'dxd-state-active dxd-state-no-hover': active, 'dxrd-tab-item-disabled': disabled }, attr: { title: text }, visible: visible">
-                <div class="dxrd-image-padding" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"></div>
+                <div class="dxrd-image-padding" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"> </div>
             </div>
             <!-- /ko -->
         </div>
@@ -1315,7 +1315,7 @@
     <!-- /ko -->
     <!-- ko if: !$data.templateName -->
     <div class="dxrd-toolbar-item" data-bind="visible: visible">
-        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: 'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted ' + (ko.unwrap($data.imageClassName) || ''), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === 'function') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }"></div>
+        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: 'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted ' + (ko.unwrap($data.imageClassName) || ''), title: $data.displayText && $data.displayText() || text }, dxAction: function() { if((typeof $data.disabled === 'function') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }"> </div>
         <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
     </div>
     <!-- /ko -->
@@ -1327,7 +1327,7 @@
         <!-- ko foreach: toolboxItems -->
         <div class="dxrd-toolbox-item" data-bind="attr: { title: displayName }">
             <div class="dx-background-inheritor dxd-toolbox-item-back-color dxd-back-secondary">
-                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: $data.imageClassName, draggable: $root.toolboxDragHandler"></div>
+                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: $data.imageClassName, draggable: $root.toolboxDragHandler"> </div>
             </div>
         </div>
         <!-- /ko -->

@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.2.6
-* Build date: 2019-02-12
+* Version: 18.2.7
+* Build date: 2019-03-13
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -25,7 +25,7 @@
             <div data-options="dxTemplate: { name: 'content' }">
                 <div class="dx-picture-editing-toolbar" data-bind="foreach: $data.actions">
                     <div class="dx-picture-editing-toolbar-item" data-bind="dxAction: $data.action, attr: { title: title }">
-                        <div class="dx-picture-editing-toolbar-item-icon" data-bind="template: { name: icon, afterRender: $data.renderedHandler }"></div>
+                        <div class="dx-picture-editing-toolbar-item-icon" data-bind="template: { name: icon, afterRender: $data.renderedHandler }"> </div>
                     </div>
                     <!-- ko template: { if: $data.template, name: $data.template, data: $data.templateOptions }-->
                     <!-- /ko -->
@@ -295,7 +295,7 @@
             <!-- /ko -->
             <!--ko ifnot: $data.format -->
             <div class="dxrd-preview-export-item-image-wrapper">
-                <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: { name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}"></div>
+                <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: { name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}"> </div>
             </div>
             <div class="dx-menu-item-popout-container">
                 <div class="dx-menu-item-popout"></div>
@@ -317,8 +317,7 @@
     <div class="dxrdp-mobile-actions" data-bind="visible: visible">
         <div class="dxrdp-mobile-actions-content">
             <!-- ko foreach: actions -->
-            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, dxAction: clickAction">
-            </div>
+            <div class="dxrdp-mobile-action" data-bind="visible: visible, css: $data.imageClassName, template: { name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, dxAction: clickAction"> </div>
             <!-- ko if: $data.content -->
             <!-- ko template: $data.content -->
             <!-- /ko -->
@@ -530,7 +529,7 @@
                 <!-- /ko -->
                 <!--ko ifnot: $data.format -->
                 <div class="dxrd-preview-export-item-image-wrapper">
-                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"></div>
+                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"> </div>
                 </div>
                 <div class="dx-menu-item-popout-container">
                     <div class="dx-menu-item-popout"></div>
