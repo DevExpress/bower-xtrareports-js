@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8119,8 +8119,8 @@ if(window["ace"]) {
 }
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -24670,6 +24670,7 @@ var DevExpress;
                     var _this = this;
                     _super.call(this, control, context);
                     this.designTime = ko.observable(false);
+                    this.isLoading = ko.observable(false);
                     this.imageSrc = ko.observable("");
                     this.template = "dxrd-shape";
                     this.contenttemplate = "dxrd-shape-content";
@@ -24677,10 +24678,13 @@ var DevExpress;
                     this._disposables.push(ko.computed(function () {
                         if (!_this.designTime()) {
                             var _self = _this;
+                            _self.isLoading(true);
                             if (Designer.Report.HandlerUri) {
                                 Report.ReportRenderingService.getChartImage(_this).done(function (result) {
+                                    _self.isLoading(false);
                                     _self.imageSrc("data:image/x;base64," + result.Image);
                                 }).fail(function (jqXHR) {
+                                    _self.isLoading(false);
                                     Designer.NotifyAboutWarning("Impossible to get chart image.");
                                 });
                             }
@@ -35500,6 +35504,7 @@ var DevExpress;
                     this._lastRequest = ko.observable(null);
                     this._innerUpdate = ko.observable(false);
                     this.imageSrc = ko.observable("");
+                    this.isLoading = ko.observable(false);
                     this.template = "dxrd-shape";
                     this.contenttemplate = "dxrd-shape-content";
                     this._sendCallback();
@@ -35517,7 +35522,9 @@ var DevExpress;
                         this._lastRequest(propertyName);
                         var self = this;
                         var selfControl = this._control;
+                        self.isLoading(true);
                         Report.ReportRenderingService.getRichImage(this, propertyName).done(function (result) {
+                            self.isLoading(false);
                             if (propertyName === self._lastRequest()) {
                                 selfControl.root && selfControl.root["_update"] && selfControl.root["_update"](true);
                                 if (propertyName !== "height" && propertyName !== "width") {
@@ -35533,6 +35540,7 @@ var DevExpress;
                                 selfControl.root && selfControl.root["_update"] && selfControl.root["_update"](false);
                             }
                         }).fail(function (jqXHR) {
+                            self.isLoading(false);
                             Designer.NotifyAboutWarning("It is impossible to get richText");
                         });
                     }

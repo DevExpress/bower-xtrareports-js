@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.light.css)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3036,8 +3036,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.common.css)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3180,8 +3180,8 @@
 
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.light.css)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4261,8 +4261,8 @@
 
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer-light.css)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4735,8 +4735,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer-light.css)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5852,8 +5852,8 @@
 
 /**
 * DevExpress HTML/JS Reporting (report-designer-light.css)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -8928,4 +8928,13 @@
 .dxrd-add-dataSource-popup-content .dx-popup-content .dxrd-list-item-ellipsis-text {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.dx-content-loading-panel {
+  position: absolute;
+  width: auto;
+  height: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }

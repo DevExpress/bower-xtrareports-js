@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (dx-designer.html)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1341,8 +1341,8 @@
 <!--
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.html)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2371,8 +2371,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2573,8 +2573,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3074,8 +3074,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 18.1.9
-* Build date: 2019-02-12
+* Version: 18.1.10
+* Build date: 2019-03-11
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3876,7 +3876,7 @@
                                     <!-- ko foreach: $root.dragHelperContent.controls -->
                                     <div class="dxrd-drag-helper-control" data-bind="styleunit: { left: $data.left, top: $data.top, width: $data.width, height: $data.height }, css: $data.className">
                                         <!-- ko with: $root.dragHelperContent.customData() -->
-                                            <div data-bind="template: { name: $data.template, data: $data.data }"></div>
+                                            <div data-bind="template: { name: $data.template, data: $data.data }"> </div>
                                         <!-- /ko -->
                                     </div>
                                     <!-- /ko -->
@@ -3989,7 +3989,12 @@
 </script>
 
 <script type='text/html' id='dxrd-shape-content'>
-<img data-bind="attr: {src: imageSrc }, styleunit: { 'height': contentSizes().height / _context.zoom(), 'width': contentSizes().width / _context.zoom() }" /></script>
+<img data-bind="attr: {src: imageSrc }, styleunit: { 'height': contentSizes().height / _context.zoom(), 'width': contentSizes().width / _context.zoom() }" />
+<!-- ko if: $data.isLoading -->
+<div class="dx-content-loading-panel">
+    <div data-bind="dxLoadIndicator: { visible: isLoading() }"></div>
+</div>
+<!-- /ko --></script>
 
 <script type='text/html' id='dxrd-shape'>
 <div class="dxrd-control dxd-selectable" data-bind="styleunit: position, css: adorntemplate">
@@ -4493,8 +4498,9 @@
 </script>
 
 <script type="text/html" id="dxrd-richtext-loadfile">
-    <div data-bind="dxFileImagePicker: { value: value, format: format, useFormat: true, placeHolder: 'File', disabled: disabled }"></div>
+    <div data-bind="dxFileImagePicker: { value: value, format: format, useFormat: true, placeHolder: 'File', disabled: disabled, accept:'.rtf,.docx,.txt,.htm,.html' }"></div>
 </script>
+
 <script type='text/html' id='dxrd-page-columns'>
 <div class="dxrd-wizard-page dxrd-wizard-columns-page">
     <div class="dxrd-wizard-left-panel">
