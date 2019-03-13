@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 17.2.10
-* Build date: 2018-09-03
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.13
+* Build date: 2019-03-10
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -6126,9 +6126,9 @@ var DevExpress;
 //# sourceMappingURL=dx-query-builder-core.js.map
 /**
 * DevExpress HTML/JS Reporting (report-designer.js)
-* Version: 17.2.10
-* Build date: 2018-09-03
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 17.2.13
+* Build date: 2019-03-11
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -8173,11 +8173,8 @@ var DevExpress;
                 ChartControlViewModel.prototype._initSeries = function (series) {
                     var _this = this;
                     series["getPath"] = function (propertyName) {
-                        if (propertyName === "argumentDataMember" || propertyName === "colorDataMember") {
+                        if (propertyName === "argumentDataMember" || propertyName === "colorDataMember" || propertyName === "summaryFunction") {
                             return _this.getPath("seriesDataMember");
-                        }
-                        else if (propertyName === "summaryFunction") {
-                            return _this.getPath("dataMember");
                         }
                     };
                     series["isPropertyDisabled"] = function (name) {
@@ -12318,6 +12315,8 @@ var DevExpress;
                             _this.exportOptionsModel(deserializedExportOptions);
                             _this.originalParametersInfo(previewInitialize.parametersInfo);
                             if (previewInitialize.documentId) {
+                                _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
+                                _this.documentBuilding(true);
                                 var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
                                 doGetBuildStatusFunc(previewInitialize.documentId);
                             }
@@ -19137,7 +19136,7 @@ var DevExpress;
                 };
                 CalculatedFieldsSource.prototype.getActions = function (context) {
                     var result = [];
-                    if (context.hasItems && context.path.indexOf("Parameters") !== 0) {
+                    if (context.hasItems && (context.data.specifics === "List" || context.data.specifics === "ListSource") && context.path.indexOf("Parameters") !== 0) {
                         result.push(this.addAction);
                     }
                     if (context.data.specifics && context.data.specifics.indexOf("calc") === 0) {
@@ -24811,7 +24810,7 @@ var DevExpress;
             Report.segmentWidth = { propertyName: "segmentWidth", modelName: "@SegmentWidth", defaultVal: 4, from: Designer.floatFromModel, editor: DevExpress.JS.Widgets.editorTemplates.numeric, displayName: "Segment Width", localizationId: "DevExpress.XtraReports.UI.XRZipCode.SegmentWidth" };
             Report.zipCodeSerializationInfo = [
                 Report.foreColor, Report.segmentWidth, Report.keepTogether, Report.anchorVertical, Report.anchorHorizontal, Report.textControlScripts,
-                $.extend({}, Report.text, { defaultVal: "0" }, Report.textFormatString),
+                $.extend({}, Report.text, { defaultVal: "0" }), Report.textFormatString,
                 Report.dataBindings(["Bookmark", "NavigateUrl", "Tag", "Text"])
             ].concat(Report.createSinglePopularBindingInfos("Text"), Report.sizeLocation, Report.commonControlProperties, Report.navigationGroup);
             Report.popularPropertiesZipCode = ["text", "popularDataBinding", "popularExpression", "segmentWidth", "bookmark", "bookmarkParent"];
@@ -28726,12 +28725,12 @@ var DevExpress;
                     this.designerModel.openReport(url);
                 };
                 JSReportDesigner.prototype.ShowPreview = function () {
+                    var _this = this;
                     var reportPreview = this.designerModel.reportPreviewModel.reportPreview;
                     reportPreview.previewVisible(true);
-                    reportPreview.initialize(DevExpress.Designer.Report.ReportPreviewService.initializePreview(this.designerModel.model()));
-                    this.designerModel.model.subscribe(function (newVal) {
-                        reportPreview.initialize(DevExpress.Designer.Report.ReportPreviewService.initializePreview(newVal));
-                    });
+                    setTimeout(function () {
+                        reportPreview.initialize(DevExpress.Designer.Report.ReportPreviewService.initializePreview(_this.designerModel.model()));
+                    }, 1);
                 };
                 return JSReportDesigner;
             })();
