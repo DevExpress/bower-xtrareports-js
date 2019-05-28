@@ -14,8 +14,7 @@ To get started with HTML/JS DevExpress Reporting controls, see the following pag
 
 ## Demos
 
-Take a look at the [DevExpress Reporting web demos]
-(http://demos.devexpress.com/XtraReportsDemos/).
+Take a look at the [DevExpress Reporting web demos](http://demos.devexpress.com/XtraReportsDemos/).
 
 ## License
 
