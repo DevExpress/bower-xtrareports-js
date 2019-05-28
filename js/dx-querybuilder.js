@@ -1,11 +1,24 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.2.7
-* Build date: 2019-03-10
+* Version: 18.2.8
+* Build date: 2019-04-22
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -225,11 +238,6 @@ var DevExpress;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -239,14 +247,15 @@ var DevExpress;
             var ConnectingPointDragHandler = (function (_super) {
                 __extends(ConnectingPointDragHandler, _super);
                 function ConnectingPointDragHandler(surface, selection, undoEngine, snapHelper, dragHelperContent) {
-                    _super.call(this, surface, selection, undoEngine, snapHelper);
-                    this.startConnectingPoint = null;
-                    this.newConnector = null;
-                    this.cursor = 'arrow';
-                    this.containment = '.dxrd-ghost-container';
-                    this["helper"] = function (draggable) {
+                    var _this = _super.call(this, surface, selection, undoEngine, snapHelper) || this;
+                    _this.startConnectingPoint = null;
+                    _this.newConnector = null;
+                    _this.cursor = 'arrow';
+                    _this.containment = '.dxrd-ghost-container';
+                    _this["helper"] = function (draggable) {
                         dragHelperContent.update(draggable);
                     };
+                    return _this;
                 }
                 ConnectingPointDragHandler.prototype.startDrag = function (control) {
                     if (!(control instanceof Diagram.ConnectingPointSurface)) {
@@ -284,7 +293,7 @@ var DevExpress;
                     configurable: true
                 });
                 return ConnectingPointDragHandler;
-            })(Analytics.Internal.DragDropHandler);
+            }(Analytics.Internal.DragDropHandler));
             Diagram.ConnectingPointDragHandler = ConnectingPointDragHandler;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -298,13 +307,14 @@ var DevExpress;
             var ConnectionPointDragHandler = (function (_super) {
                 __extends(ConnectionPointDragHandler, _super);
                 function ConnectionPointDragHandler(surface, selection, undoEngine, snapHelper, dragHelperContent) {
-                    _super.call(this, surface, selection, undoEngine, snapHelper);
-                    this.currentConnectionPoint = null;
-                    this.cursor = 'arrow';
-                    this.containment = '.dxrd-ghost-container';
-                    this["helper"] = function (draggable) {
+                    var _this = _super.call(this, surface, selection, undoEngine, snapHelper) || this;
+                    _this.currentConnectionPoint = null;
+                    _this.cursor = 'arrow';
+                    _this.containment = '.dxrd-ghost-container';
+                    _this["helper"] = function (draggable) {
                         dragHelperContent.update(draggable);
                     };
+                    return _this;
                 }
                 ConnectionPointDragHandler.prototype.startDrag = function (control) {
                     if (!(control instanceof Diagram.ConnectionPointSurface)) {
@@ -343,7 +353,7 @@ var DevExpress;
                     }
                 };
                 return ConnectionPointDragHandler;
-            })(Analytics.Internal.DragDropHandler);
+            }(Analytics.Internal.DragDropHandler));
             Diagram.ConnectionPointDragHandler = ConnectionPointDragHandler;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -363,7 +373,6 @@ var DevExpress;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../metadata.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -373,32 +382,31 @@ var DevExpress;
             var DiagramElementBaseViewModel = (function (_super) {
                 __extends(DiagramElementBaseViewModel, _super);
                 function DiagramElementBaseViewModel(control, parent, serializer) {
-                    _super.call(this, control, parent, serializer);
+                    return _super.call(this, control, parent, serializer) || this;
                 }
                 DiagramElementBaseViewModel.prototype.getControlFactory = function () {
                     return Diagram.controlsFactory;
                 };
                 return DiagramElementBaseViewModel;
-            })(Analytics.ElementViewModel);
+            }(Analytics.ElementViewModel));
             Diagram.DiagramElementBaseViewModel = DiagramElementBaseViewModel;
             var DiagramElementViewModel = (function (_super) {
                 __extends(DiagramElementViewModel, _super);
                 function DiagramElementViewModel(control, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend({ "@ControlType": "DiagramElement" }, control), parent, serializer);
-                    this.connectingPoints = Analytics.Utils.deserializeArray(control && control.ConnectingPoints || [], function (item) { return new Diagram.ConnectingPointViewModel(item, _this, serializer); });
-                    if (this.text() === undefined) {
-                        this.text(this.name());
+                    var _this = _super.call(this, $.extend({ "@ControlType": "DiagramElement" }, control), parent, serializer) || this;
+                    _this.connectingPoints = Analytics.Utils.deserializeArray(control && control.ConnectingPoints || [], function (item) { return new Diagram.ConnectingPointViewModel(item, _this, serializer); });
+                    if (_this.text() === undefined) {
+                        _this.text(_this.name());
                     }
+                    return _this;
                 }
                 return DiagramElementViewModel;
-            })(DiagramElementBaseViewModel);
+            }(DiagramElementBaseViewModel));
             Diagram.DiagramElementViewModel = DiagramElementViewModel;
             Diagram.diagramElementSerializationInfo = [Diagram.size, Diagram.location, Diagram.name, Diagram.text, { propertyName: "type", modelName: "@Type" }];
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="diagramElementModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -408,9 +416,8 @@ var DevExpress;
             var ConnectingPointViewModel = (function (_super) {
                 __extends(ConnectingPointViewModel, _super);
                 function ConnectingPointViewModel(control, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend({ "@ControlType": "ConnectingPoint" }, control), parent, serializer);
-                    this.side = ko.pureComputed(function () {
+                    var _this = _super.call(this, $.extend({ "@ControlType": "ConnectingPoint" }, control), parent, serializer) || this;
+                    _this.side = ko.pureComputed(function () {
                         if (_this.percentOffsetY() >= _this.percentOffsetX()) {
                             if (_this.percentOffsetY() > 1 - _this.percentOffsetX()) {
                                 return Diagram.PointSide.South;
@@ -428,19 +435,20 @@ var DevExpress;
                             }
                         }
                     });
-                    this.size = new Analytics.Size(7, 7);
-                    this.location = new Analytics.Point(0, 0);
-                    this.location.x = ko.pureComputed(function () {
+                    _this.size = new Analytics.Size(7, 7);
+                    _this.location = new Analytics.Point(0, 0);
+                    _this.location.x = ko.pureComputed(function () {
                         var parentModel = _this.parentModel();
                         return parentModel.location.x() + parentModel.size.width() * _this.percentOffsetX();
                     });
-                    this.location.y = ko.pureComputed(function () {
+                    _this.location.y = ko.pureComputed(function () {
                         var parentModel = _this.parentModel();
                         return parentModel.location.y() + parentModel.size.height() * _this.percentOffsetY();
                     });
+                    return _this;
                 }
                 return ConnectingPointViewModel;
-            })(Diagram.DiagramElementBaseViewModel);
+            }(Diagram.DiagramElementBaseViewModel));
             Diagram.ConnectingPointViewModel = ConnectingPointViewModel;
             Diagram.connectingPointSerializationInfo = [
                 { propertyName: "percentOffsetX", modelName: "@PercentOffsetX", defaultVal: 0.5, from: Analytics.Utils.floatFromModel },
@@ -458,18 +466,18 @@ var DevExpress;
             var DiagramElementBaseSurface = (function (_super) {
                 __extends(DiagramElementBaseSurface, _super);
                 function DiagramElementBaseSurface(control, context, unitProperties) {
-                    var _this = this;
-                    _super.call(this, control, context, $.extend({}, DiagramElementBaseSurface._unitProperties, unitProperties));
-                    this.template = "dx-diagram-element";
-                    this.selectiontemplate = "dx-diagram-element-selection";
-                    this.contenttemplate = "dx-diagram-element-content";
-                    this.margin = ko.observable(0);
-                    this._disposables.push(this.positionWidthWithoutMargins = ko.pureComputed(function () {
+                    var _this = _super.call(this, control, context, $.extend({}, DiagramElementBaseSurface._unitProperties, unitProperties)) || this;
+                    _this.template = "dx-diagram-element";
+                    _this.selectiontemplate = "dx-diagram-element-selection";
+                    _this.contenttemplate = "dx-diagram-element-content";
+                    _this.margin = ko.observable(0);
+                    _this._disposables.push(_this.positionWidthWithoutMargins = ko.pureComputed(function () {
                         return _this["position"].width() - _this.margin() * 2;
                     }));
-                    this._disposables.push(this.positionLineHeightWithoutMargins = ko.pureComputed(function () {
+                    _this._disposables.push(_this.positionLineHeightWithoutMargins = ko.pureComputed(function () {
                         return _this["position"].lineHeight() - _this.margin() * 2;
                     }));
+                    return _this;
                 }
                 DiagramElementBaseSurface._unitProperties = {
                     _height: function (o) {
@@ -486,22 +494,22 @@ var DevExpress;
                     }
                 };
                 return DiagramElementBaseSurface;
-            })(Analytics.SurfaceElementBase);
+            }(Analytics.SurfaceElementBase));
             Diagram.DiagramElementBaseSurface = DiagramElementBaseSurface;
             var DiagramElementSurface = (function (_super) {
                 __extends(DiagramElementSurface, _super);
                 function DiagramElementSurface(control, context) {
-                    _super.call(this, control, context, null);
-                    this.contenttemplate = "dxdd-element-content-with-connecting-points";
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.contenttemplate = "dxdd-element-content-with-connecting-points";
+                    return _this;
                 }
                 DiagramElementSurface.prototype._getChildrenHolderName = function () { return "connectingPoints"; };
                 return DiagramElementSurface;
-            })(DiagramElementBaseSurface);
+            }(DiagramElementBaseSurface));
             Diagram.DiagramElementSurface = DiagramElementSurface;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="diagramElementSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -511,10 +519,11 @@ var DevExpress;
             var ConnectingPointSurface = (function (_super) {
                 __extends(ConnectingPointSurface, _super);
                 function ConnectingPointSurface(control, context) {
-                    _super.call(this, control, context, ConnectingPointSurface._unitProperties);
-                    this.template = "dxdd-connecting-point";
-                    this.selectiontemplate = "dxdd-connection-point-selection";
-                    this.contenttemplate = "";
+                    var _this = _super.call(this, control, context, ConnectingPointSurface._unitProperties) || this;
+                    _this.template = "dxdd-connecting-point";
+                    _this.selectiontemplate = "dxdd-connection-point-selection";
+                    _this.contenttemplate = "";
+                    return _this;
                 }
                 ConnectingPointSurface._unitProperties = {
                     _x: function (o) {
@@ -525,12 +534,11 @@ var DevExpress;
                     }
                 };
                 return ConnectingPointSurface;
-            })(Diagram.DiagramElementBaseSurface);
+            }(Diagram.DiagramElementBaseSurface));
             Diagram.ConnectingPointSurface = ConnectingPointSurface;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../diagramElementModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -540,10 +548,9 @@ var DevExpress;
             var ConnectionPointViewModel = (function (_super) {
                 __extends(ConnectionPointViewModel, _super);
                 function ConnectionPointViewModel(control, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend(control, { "@ControlType": "ConnectionPoint" }), parent, serializer);
-                    var _x = this.location.x, _y = this.location.y;
-                    this.location.x = ko.pureComputed({
+                    var _this = _super.call(this, $.extend(control, { "@ControlType": "ConnectionPoint" }), parent, serializer) || this;
+                    var _x = _this.location.x, _y = _this.location.y;
+                    _this.location.x = ko.pureComputed({
                         read: function () {
                             return _this.connectingPoint() && _this.connectingPoint().location.x() || _x();
                         },
@@ -552,7 +559,7 @@ var DevExpress;
                             _x(value);
                         }
                     });
-                    this.location.y = ko.pureComputed({
+                    _this.location.y = ko.pureComputed({
                         read: function () {
                             return _this.connectingPoint() && _this.connectingPoint().location.y() || _y();
                         },
@@ -561,9 +568,10 @@ var DevExpress;
                             _y(value);
                         }
                     });
+                    return _this;
                 }
                 return ConnectionPointViewModel;
-            })(Diagram.DiagramElementBaseViewModel);
+            }(Diagram.DiagramElementBaseViewModel));
             Diagram.ConnectionPointViewModel = ConnectionPointViewModel;
             Diagram.connectionPointSerializationInfo = [
                 Diagram.location,
@@ -581,16 +589,16 @@ var DevExpress;
             var ConnectionPointSurface = (function (_super) {
                 __extends(ConnectionPointSurface, _super);
                 function ConnectionPointSurface(control, context) {
-                    var _this = this;
-                    _super.call(this, control, context, ConnectionPointSurface._unitProperties);
-                    this.template = "dx-diagram-connection-point";
-                    this.selectiontemplate = "dx-diagram-connection-point";
-                    this.relativeX = ko.pureComputed(function () {
+                    var _this = _super.call(this, control, context, ConnectionPointSurface._unitProperties) || this;
+                    _this.template = "dx-diagram-connection-point";
+                    _this.selectiontemplate = "dx-diagram-connection-point";
+                    _this.relativeX = ko.pureComputed(function () {
                         return _this.rect().left - _this.parent.rect().left;
                     });
-                    this.relativeY = ko.pureComputed(function () {
+                    _this.relativeY = ko.pureComputed(function () {
                         return _this.rect().top - _this.parent.rect().top;
                     });
+                    return _this;
                 }
                 ConnectionPointSurface.prototype.container = function () {
                     return this.getRoot();
@@ -604,12 +612,11 @@ var DevExpress;
                     }
                 };
                 return ConnectionPointSurface;
-            })(Analytics.SurfaceElementBase);
+            }(Analytics.SurfaceElementBase));
             Diagram.ConnectionPointSurface = ConnectionPointSurface;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../diagramElementModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -619,12 +626,11 @@ var DevExpress;
             var ConnectorViewModel = (function (_super) {
                 __extends(ConnectorViewModel, _super);
                 function ConnectorViewModel(control, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend({ "@ControlType": "Connector" }, control), parent, serializer);
-                    this.startPoint(this.startPoint() || new Diagram.ConnectionPointViewModel({ "@Location": "0, 0" }, this, serializer));
-                    this.endPoint(this.endPoint() || new Diagram.ConnectionPointViewModel({ "@Location": "150, 75" }, this, serializer));
-                    this.location = new Analytics.Point(0, 0);
-                    this.location.x = ko.pureComputed({
+                    var _this = _super.call(this, $.extend({ "@ControlType": "Connector" }, control), parent, serializer) || this;
+                    _this.startPoint(_this.startPoint() || new Diagram.ConnectionPointViewModel({ "@Location": "0, 0" }, _this, serializer));
+                    _this.endPoint(_this.endPoint() || new Diagram.ConnectionPointViewModel({ "@Location": "150, 75" }, _this, serializer));
+                    _this.location = new Analytics.Point(0, 0);
+                    _this.location.x = ko.pureComputed({
                         read: function () {
                             return _this.getX();
                         },
@@ -635,7 +641,7 @@ var DevExpress;
                             _this.endPoint().location.x(_this.endPoint().location.x() + delta);
                         }
                     });
-                    this.location.y = ko.pureComputed({
+                    _this.location.y = ko.pureComputed({
                         read: function () {
                             return _this.getY();
                         },
@@ -646,8 +652,8 @@ var DevExpress;
                             _this.endPoint().location.y(_this.endPoint().location.y() + delta);
                         }
                     });
-                    this.size = new Analytics.Size(0, 0);
-                    this.size.width = ko.pureComputed({
+                    _this.size = new Analytics.Size(0, 0);
+                    _this.size.width = ko.pureComputed({
                         read: function () {
                             return _this.getWidth();
                         },
@@ -660,7 +666,7 @@ var DevExpress;
                             }
                         }
                     });
-                    this.size.height = ko.pureComputed({
+                    _this.size.height = ko.pureComputed({
                         read: function () {
                             return _this.getHeight();
                         },
@@ -673,6 +679,7 @@ var DevExpress;
                             }
                         }
                     });
+                    return _this;
                 }
                 ConnectorViewModel.prototype.getX = function () {
                     return this.startPoint().location.x() < this.endPoint().location.x() ? this.startPoint().location.x() : this.endPoint().location.x();
@@ -688,12 +695,11 @@ var DevExpress;
                 };
                 ConnectorViewModel.MIN_LINE_THICKNESS = 3;
                 return ConnectorViewModel;
-            })(Diagram.DiagramElementBaseViewModel);
+            }(Diagram.DiagramElementBaseViewModel));
             Diagram.ConnectorViewModel = ConnectorViewModel;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../diagramElementSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -703,18 +709,19 @@ var DevExpress;
             var ConnectorSurface = (function (_super) {
                 __extends(ConnectorSurface, _super);
                 function ConnectorSurface(control, context) {
-                    _super.call(this, control, context, null);
-                    this.template = "dxdd-connector";
-                    this.selectiontemplate = "dxdd-connector-selection";
-                    this.startPoint = ko.pureComputed(function () {
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.template = "dxdd-connector";
+                    _this.selectiontemplate = "dxdd-connector-selection";
+                    _this.startPoint = ko.pureComputed(function () {
                         return new Diagram.ConnectionPointSurface(control.startPoint(), context);
                     });
-                    this.endPoint = ko.pureComputed(function () {
+                    _this.endPoint = ko.pureComputed(function () {
                         return new Diagram.ConnectionPointSurface(control.endPoint(), context);
                     });
+                    return _this;
                 }
                 return ConnectorSurface;
-            })(Diagram.DiagramElementBaseSurface);
+            }(Diagram.DiagramElementBaseSurface));
             Diagram.ConnectorSurface = ConnectorSurface;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -728,10 +735,9 @@ var DevExpress;
             var RoutedConnectorViewModel = (function (_super) {
                 __extends(RoutedConnectorViewModel, _super);
                 function RoutedConnectorViewModel(control, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend({ "@ControlType": "RoutedConnector" }, control), parent, serializer);
-                    this._isUpdating = false;
-                    this._getPower = function (_n) {
+                    var _this = _super.call(this, $.extend({ "@ControlType": "RoutedConnector" }, control), parent, serializer) || this;
+                    _this._isUpdating = false;
+                    _this._getPower = function (_n) {
                         for (var i = 0; i < 10; i++) {
                             if (_n >= Math.pow(2, i) && _n < Math.pow(2, i + 1)) {
                                 return i + 1;
@@ -739,17 +745,17 @@ var DevExpress;
                         }
                         return 1;
                     };
-                    this.seriesNumber = ko.observable(1);
-                    this.routePoints = ko.observable([]);
-                    this.freezeRoute = ko.observable(false);
-                    this._disposables.push(ko.computed(function () {
+                    _this.seriesNumber = ko.observable(1);
+                    _this.routePoints = ko.observable([]);
+                    _this.freezeRoute = ko.observable(false);
+                    _this._disposables.push(ko.computed(function () {
                         var freezeRoute = !(1 + _this.startPoint().location.x() + _this.startPoint().location.y()
                             + _this.endPoint().location.x() + _this.endPoint().location.y());
                         if (!_this._isUpdating) {
                             _this.freezeRoute(freezeRoute);
                         }
                     }));
-                    this._disposables.push(ko.computed(function () {
+                    _this._disposables.push(ko.computed(function () {
                         if (!_this.freezeRoute()) {
                             var result = [];
                             var startPointSide = _this._getStartPointSide();
@@ -872,6 +878,7 @@ var DevExpress;
                             _this.routePoints(result);
                         }
                     }));
+                    return _this;
                 }
                 RoutedConnectorViewModel.prototype.getX = function () {
                     var result = _super.prototype.getX.call(this);
@@ -989,7 +996,7 @@ var DevExpress;
                 RoutedConnectorViewModel.prototype.endUpdate = function () { this._isUpdating = false; };
                 RoutedConnectorViewModel.GRID_SIZE = 10;
                 return RoutedConnectorViewModel;
-            })(Diagram.ConnectorViewModel);
+            }(Diagram.ConnectorViewModel));
             Diagram.RoutedConnectorViewModel = RoutedConnectorViewModel;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1003,39 +1010,39 @@ var DevExpress;
             var RoutedConnectorSurface = (function (_super) {
                 __extends(RoutedConnectorSurface, _super);
                 function RoutedConnectorSurface(control, context) {
-                    var _this = this;
-                    _super.call(this, control, context, null);
-                    this.template = "dxdd-routed-connector";
-                    this.selectiontemplate = "dxdd-routed-connector-selection";
-                    this.showArrow = ko.observable(false);
-                    this.isVisible = ko.observable(true);
-                    this.routePoints = ko.observableArray();
-                    this.routePointsSet = ko.pureComputed(function () {
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.template = "dxdd-routed-connector";
+                    _this.selectiontemplate = "dxdd-routed-connector-selection";
+                    _this.showArrow = ko.observable(false);
+                    _this.isVisible = ko.observable(true);
+                    _this.routePoints = ko.observableArray();
+                    _this.routePointsSet = ko.pureComputed(function () {
                         var points = [];
                         _this.routePoints().forEach(function (point) {
                             points.push(point.x() + " " + point.y());
                         });
                         return points.join(", ");
                     });
-                    this.routeLineWrappers = ko.pureComputed(function () {
+                    _this.routeLineWrappers = ko.pureComputed(function () {
                         var result = [];
                         for (var i = 1; i < _this.routePoints().length; i++) {
                             result.push(_this._createRouteLineWrapper(_this.routePoints()[i - 1], _this.routePoints()[i], i === 1 || i === _this.routePoints().length - 1));
                         }
                         return result;
                     });
-                    this.connectorID = function () { return _this._connectorID; };
-                    this._connectorID = RoutedConnectorSurface._connectorsCount++;
-                    this.startPoint = ko.pureComputed(function () {
+                    _this.connectorID = function () { return _this._connectorID; };
+                    _this._connectorID = RoutedConnectorSurface._connectorsCount++;
+                    _this.startPoint = ko.pureComputed(function () {
                         return new Diagram.ConnectionPointSurface(control.startPoint(), context);
                     });
-                    this.endPoint = ko.pureComputed(function () {
+                    _this.endPoint = ko.pureComputed(function () {
                         return new Diagram.ConnectionPointSurface(control.endPoint(), context);
                     });
-                    this._disposables.push(control.routePoints.subscribe(function (routePoints) {
+                    _this._disposables.push(control.routePoints.subscribe(function (routePoints) {
                         _this._updateRoutePoints();
                     }));
-                    this._updateRoutePoints();
+                    _this._updateRoutePoints();
+                    return _this;
                 }
                 RoutedConnectorSurface.prototype._createRoutePoint = function (point, base) {
                     var _this = this;
@@ -1106,7 +1113,7 @@ var DevExpress;
                 };
                 RoutedConnectorSurface._connectorsCount = 0;
                 return RoutedConnectorSurface;
-            })(Diagram.DiagramElementBaseSurface);
+            }(Diagram.DiagramElementBaseSurface));
             Diagram.RoutedConnectorSurface = RoutedConnectorSurface;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1120,17 +1127,19 @@ var DevExpress;
             var DiagramViewModel = (function (_super) {
                 __extends(DiagramViewModel, _super);
                 function DiagramViewModel(diagramSource) {
+                    var _this = this;
                     var serializer = new Analytics.Utils.ModelSerializer();
-                    _super.call(this, diagramSource, null, serializer);
-                    this.controlType = "Diagram";
-                    this.controls = ko.observableArray();
-                    this.name("Diagram");
+                    _this = _super.call(this, diagramSource, null, serializer) || this;
+                    _this.controlType = "Diagram";
+                    _this.controls = ko.observableArray();
+                    _this.name("Diagram");
+                    return _this;
                 }
                 DiagramViewModel.prototype.getInfo = function () {
                     return Diagram.diagramSerializationsInfo;
                 };
                 return DiagramViewModel;
-            })(Diagram.DiagramElementBaseViewModel);
+            }(Diagram.DiagramElementBaseViewModel));
             Diagram.DiagramViewModel = DiagramViewModel;
             Diagram.margins = { propertyName: "margins", modelName: "@Margins", from: Analytics.Margins.fromString, displayName: "Margins" };
             Diagram.pageWidth = { propertyName: "pageWidth", modelName: "@PageWidth", defaultVal: 850, from: Analytics.Utils.floatFromModel, displayName: "Page Width", editor: DevExpress.JS.Widgets.editorTemplates.numeric };
@@ -1149,24 +1158,25 @@ var DevExpress;
                 __extends(DiagramSurface, _super);
                 function DiagramSurface(diagram, zoom) {
                     if (zoom === void 0) { zoom = ko.observable(1); }
-                    _super.call(this, diagram, {
+                    var _this = _super.call(this, diagram, {
                         measureUnit: ko.observable("Pixels"),
                         zoom: zoom,
                         dpi: ko.observable(100)
-                    }, DiagramSurface._unitProperties);
-                    this.measureUnit = ko.observable("Pixels");
-                    this.dpi = ko.observable(100);
-                    this.controls = ko.observableArray();
-                    this.allowMultiselect = false;
-                    this.focused = ko.observable(false);
-                    this.selected = ko.observable(false);
-                    this.underCursor = ko.observable(new Analytics.Internal.HoverInfo());
-                    this.parent = null;
-                    this.templateName = "dx-diagram-surface";
-                    this.margins = { bottom: this["_bottom"], left: this["_left"], right: this["_right"], top: this["_top"] };
-                    this.zoom = zoom;
-                    this._context = this;
-                    Analytics.Utils.createObservableArrayMapCollection(diagram.controls, this.controls, this._createSurface);
+                    }, DiagramSurface._unitProperties) || this;
+                    _this.measureUnit = ko.observable("Pixels");
+                    _this.dpi = ko.observable(100);
+                    _this.controls = ko.observableArray();
+                    _this.allowMultiselect = false;
+                    _this.focused = ko.observable(false);
+                    _this.selected = ko.observable(false);
+                    _this.underCursor = ko.observable(new Analytics.Internal.HoverInfo());
+                    _this.parent = null;
+                    _this.templateName = "dx-diagram-surface";
+                    _this.margins = { bottom: _this["_bottom"], left: _this["_left"], right: _this["_right"], top: _this["_top"] };
+                    _this.zoom = zoom;
+                    _this._context = _this;
+                    Analytics.Utils.createObservableArrayMapCollection(diagram.controls, _this.controls, _this._createSurface);
+                    return _this;
                 }
                 DiagramSurface.prototype.checkParent = function (surfaceParent) { return false; };
                 DiagramSurface.prototype.getChildrenCollection = function () {
@@ -1183,7 +1193,7 @@ var DevExpress;
                     _top: function (o) { return o.margins.top; }
                 };
                 return DiagramSurface;
-            })(Analytics.SurfaceElementBase);
+            }(Analytics.SurfaceElementBase));
             Diagram.DiagramSurface = DiagramSurface;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1238,13 +1248,13 @@ var DevExpress;
     (function (Analytics) {
         var Diagram;
         (function (Diagram) {
+            var PointSide;
             (function (PointSide) {
                 PointSide[PointSide["East"] = 0] = "East";
                 PointSide[PointSide["South"] = 1] = "South";
                 PointSide[PointSide["North"] = 2] = "North";
                 PointSide[PointSide["West"] = 3] = "West";
-            })(Diagram.PointSide || (Diagram.PointSide = {}));
-            var PointSide = Diagram.PointSide;
+            })(PointSide = Diagram.PointSide || (Diagram.PointSide = {}));
             function determineConnectingPoints(startObject, endObject) {
                 var result = { start: null, end: null };
                 if (endObject.leftConnectionPoint.location.x() > startObject.rightConnectionPoint.location.x() + Diagram.RoutedConnectorViewModel.GRID_SIZE * 2) {
@@ -1273,24 +1283,6 @@ var DevExpress;
         })(Diagram = Analytics.Diagram || (Analytics.Diagram = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="dragDrop/connectingPointDragHandler.ts"/>
-/// <reference path="dragDrop/connectionPointDragHandler.ts"/>
-/// <reference path="elements/connectors/connectionPointModel.ts"/>
-/// <reference path="elements/connectors/connectionPointSurface.ts"/>
-/// <reference path="elements/connectors/connectorModel.ts"/>
-/// <reference path="elements/connectors/connectorSurface.ts"/>
-/// <reference path="elements/connectors/routedConnectorModel.ts"/>
-/// <reference path="elements/connectors/routedConnectorSurface.ts"/>
-/// <reference path="elements/connectingPointModel.ts"/>
-/// <reference path="elements/connectingPointSurface.ts"/>
-/// <reference path="elements/diagramElementModel.ts"/>
-/// <reference path="elements/diagramElementSurface.ts"/>
-/// <reference path="elements/diagramModel.ts"/>
-/// <reference path="elements/diagramSurface.ts"/>
-/// <reference path="controlsFactory.ts"/>
-/// <reference path="initializer.ts"/>
-/// <reference path="metadata.ts"/>
-/// <reference path="utils.ts"/>
 var DevExpress;
 (function (DevExpress) {
     var Designer;
@@ -1300,83 +1292,83 @@ var DevExpress;
             var ConnectingPointDragHandler = (function (_super) {
                 __extends(ConnectingPointDragHandler, _super);
                 function ConnectingPointDragHandler() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectingPointDragHandler;
-            })(DevExpress.Analytics.Diagram.ConnectingPointDragHandler);
+            }(DevExpress.Analytics.Diagram.ConnectingPointDragHandler));
             Diagram.ConnectingPointDragHandler = ConnectingPointDragHandler;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectingPointDragHandler");
             var ConnectionPointDragHandler = (function (_super) {
                 __extends(ConnectionPointDragHandler, _super);
                 function ConnectionPointDragHandler() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectionPointDragHandler;
-            })(DevExpress.Analytics.Diagram.ConnectionPointDragHandler);
+            }(DevExpress.Analytics.Diagram.ConnectionPointDragHandler));
             Diagram.ConnectionPointDragHandler = ConnectionPointDragHandler;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectionPointDragHandler");
             var ConnectionPointViewModel = (function (_super) {
                 __extends(ConnectionPointViewModel, _super);
                 function ConnectionPointViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectionPointViewModel;
-            })(DevExpress.Analytics.Diagram.ConnectionPointViewModel);
+            }(DevExpress.Analytics.Diagram.ConnectionPointViewModel));
             Diagram.ConnectionPointViewModel = ConnectionPointViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectionPointViewModel");
             var ConnectionPointSurface = (function (_super) {
                 __extends(ConnectionPointSurface, _super);
                 function ConnectionPointSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectionPointSurface;
-            })(DevExpress.Analytics.Diagram.ConnectionPointSurface);
+            }(DevExpress.Analytics.Diagram.ConnectionPointSurface));
             Diagram.ConnectionPointSurface = ConnectionPointSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectionPointSurface");
             var ConnectorViewModel = (function (_super) {
                 __extends(ConnectorViewModel, _super);
                 function ConnectorViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectorViewModel;
-            })(DevExpress.Analytics.Diagram.ConnectorViewModel);
+            }(DevExpress.Analytics.Diagram.ConnectorViewModel));
             Diagram.ConnectorViewModel = ConnectorViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectorViewModel");
             var ConnectorSurface = (function (_super) {
                 __extends(ConnectorSurface, _super);
                 function ConnectorSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectorSurface;
-            })(DevExpress.Analytics.Diagram.ConnectorSurface);
+            }(DevExpress.Analytics.Diagram.ConnectorSurface));
             Diagram.ConnectorSurface = ConnectorSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectorSurface");
             var RoutedConnectorViewModel = (function (_super) {
                 __extends(RoutedConnectorViewModel, _super);
                 function RoutedConnectorViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return RoutedConnectorViewModel;
-            })(DevExpress.Analytics.Diagram.RoutedConnectorViewModel);
+            }(DevExpress.Analytics.Diagram.RoutedConnectorViewModel));
             Diagram.RoutedConnectorViewModel = RoutedConnectorViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "RoutedConnectorViewModel");
             var RoutedConnectorSurface = (function (_super) {
                 __extends(RoutedConnectorSurface, _super);
                 function RoutedConnectorSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return RoutedConnectorSurface;
-            })(DevExpress.Analytics.Diagram.RoutedConnectorSurface);
+            }(DevExpress.Analytics.Diagram.RoutedConnectorSurface));
             Diagram.RoutedConnectorSurface = RoutedConnectorSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "RoutedConnectorSurface");
             ;
             var ConnectingPointViewModel = (function (_super) {
                 __extends(ConnectingPointViewModel, _super);
                 function ConnectingPointViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectingPointViewModel;
-            })(DevExpress.Analytics.Diagram.ConnectingPointViewModel);
+            }(DevExpress.Analytics.Diagram.ConnectingPointViewModel));
             Diagram.ConnectingPointViewModel = ConnectingPointViewModel;
             ;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectingPointViewModel");
@@ -1385,28 +1377,28 @@ var DevExpress;
             var ConnectingPointSurface = (function (_super) {
                 __extends(ConnectingPointSurface, _super);
                 function ConnectingPointSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConnectingPointSurface;
-            })(DevExpress.Analytics.Diagram.ConnectingPointSurface);
+            }(DevExpress.Analytics.Diagram.ConnectingPointSurface));
             Diagram.ConnectingPointSurface = ConnectingPointSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "ConnectingPointSurface");
             var DiagramElementBaseViewModel = (function (_super) {
                 __extends(DiagramElementBaseViewModel, _super);
                 function DiagramElementBaseViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DiagramElementBaseViewModel;
-            })(DevExpress.Analytics.Diagram.DiagramElementBaseViewModel);
+            }(DevExpress.Analytics.Diagram.DiagramElementBaseViewModel));
             Diagram.DiagramElementBaseViewModel = DiagramElementBaseViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "DiagramElementBaseViewModel");
             var DiagramElementViewModel = (function (_super) {
                 __extends(DiagramElementViewModel, _super);
                 function DiagramElementViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DiagramElementViewModel;
-            })(DevExpress.Analytics.Diagram.DiagramElementViewModel);
+            }(DevExpress.Analytics.Diagram.DiagramElementViewModel));
             Diagram.DiagramElementViewModel = DiagramElementViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "DiagramElementViewModel");
             Diagram.diagramElementSerializationInfo = DevExpress.Analytics.Diagram.diagramElementSerializationInfo;
@@ -1414,29 +1406,29 @@ var DevExpress;
             var DiagramElementBaseSurface = (function (_super) {
                 __extends(DiagramElementBaseSurface, _super);
                 function DiagramElementBaseSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DiagramElementBaseSurface;
-            })(DevExpress.Analytics.Diagram.DiagramElementBaseSurface);
+            }(DevExpress.Analytics.Diagram.DiagramElementBaseSurface));
             Diagram.DiagramElementBaseSurface = DiagramElementBaseSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "DiagramElementBaseSurface");
             var DiagramElementSurface = (function (_super) {
                 __extends(DiagramElementSurface, _super);
                 function DiagramElementSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DiagramElementSurface;
-            })(DevExpress.Analytics.Diagram.DiagramElementSurface);
+            }(DevExpress.Analytics.Diagram.DiagramElementSurface));
             Diagram.DiagramElementSurface = DiagramElementSurface;
             ;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "DiagramElementSurface");
             var DiagramViewModel = (function (_super) {
                 __extends(DiagramViewModel, _super);
                 function DiagramViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DiagramViewModel;
-            })(DevExpress.Analytics.Diagram.DiagramViewModel);
+            }(DevExpress.Analytics.Diagram.DiagramViewModel));
             Diagram.DiagramViewModel = DiagramViewModel;
             ;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "DiagramViewModel");
@@ -1451,10 +1443,10 @@ var DevExpress;
             var DiagramSurface = (function (_super) {
                 __extends(DiagramSurface, _super);
                 function DiagramSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DiagramSurface;
-            })(DevExpress.Analytics.Diagram.DiagramSurface);
+            }(DevExpress.Analytics.Diagram.DiagramSurface));
             Diagram.DiagramSurface = DiagramSurface;
             ;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Diagram, DevExpress.Analytics.Diagram, "DiagramSurface");
@@ -1485,12 +1477,20 @@ var DevExpress;
         })(Diagram = Designer.Diagram || (Designer.Diagram = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-diagram-designer.js.map
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -1502,22 +1502,22 @@ var DevExpress;
         var AccordionTabInfo = (function (_super) {
             __extends(AccordionTabInfo, _super);
             function AccordionTabInfo(query, itemPropertiesTabInfoModel, undoEngine, focused, showParameters) {
-                var _this = this;
-                _super.call(this, {
+                var _this = _super.call(this, {
                     text: "Properties",
                     template: "dxqb-properties-wrapper",
-                    model: this._createQBPropertyGrid(query, itemPropertiesTabInfoModel, undoEngine, showParameters)
-                });
-                this.active(true);
-                this._getGroupByName("Fields").collapsed(false);
-                this._disposables.push(focused.subscribe(function (newVal) {
+                    model: AccordionTabInfo._createQBPropertyGrid(query, itemPropertiesTabInfoModel, undoEngine, showParameters)
+                }) || this;
+                _this.active(true);
+                _this._getGroupByName("Fields").collapsed(false);
+                _this._disposables.push(focused.subscribe(function (newVal) {
                     if (!(newVal instanceof QueryBuilder.Elements.QueryViewModel)) {
                         var group = _this._getGroupByName("SelectedItem");
                         group.collapsed(false);
                     }
                 }));
+                return _this;
             }
-            AccordionTabInfo.prototype._getSelectedItemPropertyName = function (model) {
+            AccordionTabInfo._getSelectedItemPropertyName = function (model) {
                 var text = "Selection Properties";
                 var id = "ASPxReportsStringId.ReportDesigner_QueryBuilder_SelectionProperties";
                 switch (model && model.controlType) {
@@ -1540,7 +1540,7 @@ var DevExpress;
                 }
                 return DevExpress.Analytics.getLocalization(text, id);
             };
-            AccordionTabInfo.prototype._createWrappedObject = function (query, commonModel, undoEngine, showParameters) {
+            AccordionTabInfo._createWrappedObject = function (query, commonModel, undoEngine, showParameters) {
                 var modelProperties = new DevExpress.Analytics.Widgets.ObjectProperties(query, null, 1);
                 var modelValues = ko.computed(function () { return query() && query().parameters; });
                 var info = [queryInfo, selectedItemInfo, fieldsInfo];
@@ -1573,7 +1573,7 @@ var DevExpress;
                 object["getInfo"] = function () { return info; };
                 return object;
             };
-            AccordionTabInfo.prototype._createGroups = function (editableObject, showParameters) {
+            AccordionTabInfo._createGroups = function (editableObject, showParameters) {
                 var _this = this;
                 var groups = {
                     "Query": {
@@ -1596,7 +1596,7 @@ var DevExpress;
                     };
                 return groups;
             };
-            AccordionTabInfo.prototype._createQBPropertyGrid = function (query, commonModel, undoEngine, showParameters) {
+            AccordionTabInfo._createQBPropertyGrid = function (query, commonModel, undoEngine, showParameters) {
                 var object = this._createWrappedObject(query, commonModel, undoEngine, showParameters);
                 var grid = new DevExpress.Analytics.Widgets.ControlProperties(ko.observable(object), {
                     groups: this._createGroups(commonModel.editableObject, showParameters),
@@ -1608,7 +1608,7 @@ var DevExpress;
                 return this.model.groups.filter(function (x) { return x["_displayName"] === name; })[0];
             };
             return AccordionTabInfo;
-        })(DevExpress.Analytics.TabInfo);
+        }(DevExpress.Analytics.TabInfo));
         QueryBuilder.AccordionTabInfo = AccordionTabInfo;
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
@@ -1760,7 +1760,7 @@ var DevExpress;
                     configurable: true
                 });
                 return DataSourceParameterTypeValue;
-            })();
+            }());
             var tryParseDate = function (val) {
                 var date;
                 try {
@@ -1779,25 +1779,24 @@ var DevExpress;
             var DataSourceParameter = (function (_super) {
                 __extends(DataSourceParameter, _super);
                 function DataSourceParameter(model, serializer, _serializationsInfo) {
-                    var _this = this;
                     if (_serializationsInfo === void 0) { _serializationsInfo = Data.dsParameterSerializationInfo; }
-                    _super.call(this);
-                    this._serializationsInfo = _serializationsInfo;
-                    this._valueInfo = ko.observable(Data.parameterValueSerializationsInfo);
-                    this._parametersFunctions = DevExpress.QueryBuilder.Widgets.expressionFunctions;
-                    this.isValid = ko.observable(true);
+                    var _this = _super.call(this) || this;
+                    _this._serializationsInfo = _serializationsInfo;
+                    _this._valueInfo = ko.observable(Data.parameterValueSerializationsInfo);
+                    _this._parametersFunctions = DevExpress.QueryBuilder.Widgets.expressionFunctions;
+                    _this.isValid = ko.observable(true);
                     serializer = serializer || new DevExpress.Analytics.Utils.ModelSerializer();
-                    serializer.deserialize(this, $.extend(model, { "@ItemType": "Parameter" }));
-                    this.name = ko.pureComputed({
+                    serializer.deserialize(_this, $.extend(model, { "@ItemType": "Parameter" }));
+                    _this.name = ko.pureComputed({
                         read: function () { return _this._name(); },
                         write: function (value) { if (DataSourceParameter.validateName(value))
                             _this._name(value); }
                     });
-                    this._expressionValue = ko.observable({
-                        value: this._value,
-                        functions: this._parametersFunctions
+                    _this._expressionValue = ko.observable({
+                        value: _this._value,
+                        functions: _this._parametersFunctions
                     });
-                    this._disposables.push(this.type.subscribe(function (val) {
+                    _this._disposables.push(_this.type.subscribe(function (val) {
                         if (val === "DevExpress.DataAccess.Expression") {
                             _this.resultType(_this._previousResultType);
                         }
@@ -1807,10 +1806,10 @@ var DevExpress;
                         }
                         _this._updateValueInfo(val);
                     }));
-                    this._previousResultType = (this.type.peek() === "DevExpress.DataAccess.Expression")
-                        ? this.resultType()
-                        : this.type();
-                    this.value = ko.pureComputed({
+                    _this._previousResultType = (_this.type.peek() === "DevExpress.DataAccess.Expression")
+                        ? _this.resultType()
+                        : _this.type();
+                    _this.value = ko.pureComputed({
                         read: function () {
                             return _this.type() === "DevExpress.DataAccess.Expression" ? _this._expressionValue() : _this._value();
                         },
@@ -1818,7 +1817,8 @@ var DevExpress;
                             _this._value(val);
                         }
                     });
-                    this._updateValueInfo(this.type.peek());
+                    _this._updateValueInfo(_this.type.peek());
+                    return _this;
                 }
                 DataSourceParameter.prototype._getTypeValue = function (typeName) {
                     var result = DataSourceParameter.typeValues.filter(function (type) { return type.name === typeName; });
@@ -1907,7 +1907,7 @@ var DevExpress;
                     new DataSourceParameterTypeValue("System.Char", ""),
                 ];
                 return DataSourceParameter;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Data.DataSourceParameter = DataSourceParameter;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1918,6 +1918,7 @@ var DevExpress;
     (function (Analytics) {
         var Data;
         (function (Data) {
+            var DBColumnType;
             (function (DBColumnType) {
                 DBColumnType[DBColumnType["Unknown"] = 0] = "Unknown";
                 DBColumnType[DBColumnType["Boolean"] = 1] = "Boolean";
@@ -1938,8 +1939,7 @@ var DevExpress;
                 DBColumnType[DBColumnType["Guid"] = 16] = "Guid";
                 DBColumnType[DBColumnType["TimeSpan"] = 17] = "TimeSpan";
                 DBColumnType[DBColumnType["ByteArray"] = 18] = "ByteArray";
-            })(Data.DBColumnType || (Data.DBColumnType = {}));
-            var DBColumnType = Data.DBColumnType;
+            })(DBColumnType = Data.DBColumnType || (Data.DBColumnType = {}));
             var DBColumn = (function () {
                 function DBColumn(model) {
                     this.name = model["Name"];
@@ -2018,7 +2018,7 @@ var DevExpress;
                     }
                 };
                 return DBColumn;
-            })();
+            }());
             Data.DBColumn = DBColumn;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2037,7 +2037,7 @@ var DevExpress;
                     this.primaryKeyColumn = model["PrimaryKeyTableKeyColumns"][0];
                 }
                 return DBForeignKey;
-            })();
+            }());
             Data.DBForeignKey = DBForeignKey;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2068,7 +2068,7 @@ var DevExpress;
                     this.procedures = deserializeToCollection(model["StoredProcedures"], function (procModel) { return new Data.DBStoredProcedure(procModel); });
                 }
                 return DBSchema;
-            })();
+            }());
             Data.DBSchema = DBSchema;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2108,18 +2108,17 @@ var DevExpress;
             var DBSchemaProvider = (function (_super) {
                 __extends(DBSchemaProvider, _super);
                 function DBSchemaProvider(connection, _requestWrapper) {
-                    var _this = this;
                     if (_requestWrapper === void 0) { _requestWrapper = new DevExpress.QueryBuilder.Utils.RequestWrapper(); }
-                    _super.call(this);
-                    this._requestWrapper = _requestWrapper;
-                    this._tables = {};
-                    this.connection = connection;
-                    this._disposables.push(this.connection.name.subscribe(function () {
+                    var _this = _super.call(this) || this;
+                    _this._requestWrapper = _requestWrapper;
+                    _this._tables = {};
+                    _this.connection = connection;
+                    _this._disposables.push(_this.connection.name.subscribe(function () {
                         _this._tables = {};
                         _this._dbSchema = null;
                         _this._dbStoredProceduresSchema = null;
                     }));
-                    this.getItems = function (pathRequest) {
+                    _this.getItems = function (pathRequest) {
                         var result = $.Deferred();
                         if (!pathRequest.fullPath) {
                             _this.getDbSchema().done(function (dbSchema) {
@@ -2140,6 +2139,7 @@ var DevExpress;
                         }
                         return result.promise();
                     };
+                    return _this;
                 }
                 DBSchemaProvider.prototype._getDBSchema = function (table) {
                     return this._getDBSchemaCallback(this.connection, table);
@@ -2187,7 +2187,7 @@ var DevExpress;
                     return this._tables[tableName];
                 };
                 return DBSchemaProvider;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Data.DBSchemaProvider = DBSchemaProvider;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2204,14 +2204,14 @@ var DevExpress;
                     this.arguments = Data.deserializeToCollection(model["arguments"], function (argModel) { return new DBStoredProcedureArgument(argModel); });
                 }
                 return DBStoredProcedure;
-            })();
+            }());
             Data.DBStoredProcedure = DBStoredProcedure;
+            var DBStoredProcedureArgumentDirection;
             (function (DBStoredProcedureArgumentDirection) {
                 DBStoredProcedureArgumentDirection[DBStoredProcedureArgumentDirection["In"] = 0] = "In";
                 DBStoredProcedureArgumentDirection[DBStoredProcedureArgumentDirection["Out"] = 1] = "Out";
                 DBStoredProcedureArgumentDirection[DBStoredProcedureArgumentDirection["InOut"] = 2] = "InOut";
-            })(Data.DBStoredProcedureArgumentDirection || (Data.DBStoredProcedureArgumentDirection = {}));
-            var DBStoredProcedureArgumentDirection = Data.DBStoredProcedureArgumentDirection;
+            })(DBStoredProcedureArgumentDirection = Data.DBStoredProcedureArgumentDirection || (Data.DBStoredProcedureArgumentDirection = {}));
             var DBStoredProcedureArgument = (function () {
                 function DBStoredProcedureArgument(model) {
                     this.name = model["Name"];
@@ -2219,7 +2219,7 @@ var DevExpress;
                     this.direction = model["Direction"];
                 }
                 return DBStoredProcedureArgument;
-            })();
+            }());
             Data.DBStoredProcedureArgument = DBStoredProcedureArgument;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2238,7 +2238,7 @@ var DevExpress;
                     this.foreignKeys = Data.deserializeToCollection(model["foreignKeys"], function (columnModel) { return new Data.DBForeignKey(columnModel); });
                 }
                 return DBTable;
-            })();
+            }());
             Data.DBTable = DBTable;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2271,7 +2271,7 @@ var DevExpress;
                     return { "DataSet": serializer.serialize(value, resultSetSerializationInfo, refs) };
                 };
                 return ResultSet;
-            })();
+            }());
             Data.ResultSet = ResultSet;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2300,7 +2300,7 @@ var DevExpress;
                     return resultTableSerializationInfo;
                 };
                 return ResultTable;
-            })();
+            }());
             Data.ResultTable = ResultTable;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2327,7 +2327,7 @@ var DevExpress;
                     return connectionOptionsSerializationInfo;
                 };
                 return ConnectionOptions;
-            })();
+            }());
             Data.ConnectionOptions = ConnectionOptions;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2361,7 +2361,7 @@ var DevExpress;
                     return "CustomSqlQuery";
                 };
                 return CustomSqlQuery;
-            })();
+            }());
             Data.CustomSqlQuery = CustomSqlQuery;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2411,7 +2411,7 @@ var DevExpress;
                     return Data.masterDetailRelationSerializationsInfo;
                 };
                 return MasterDetailRelation;
-            })();
+            }());
             Data.MasterDetailRelation = MasterDetailRelation;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2440,7 +2440,7 @@ var DevExpress;
                     return sqlDataConnectionSerializationInfo;
                 };
                 return SqlDataConnection;
-            })();
+            }());
             Data.SqlDataConnection = SqlDataConnection;
             var sqlDataConnectionSerializationInfo = [
                 { propertyName: "name", modelName: "@Name" },
@@ -2467,19 +2467,18 @@ var DevExpress;
             var SqlDataSource = (function (_super) {
                 __extends(SqlDataSource, _super);
                 function SqlDataSource(model, serializer, requestWrapper) {
-                    var _this = this;
                     if (requestWrapper === void 0) { requestWrapper = new DevExpress.QueryBuilder.Utils.RequestWrapper(); }
-                    _super.call(this);
+                    var _this = _super.call(this) || this;
                     serializer = serializer || new Analytics.Utils.ModelSerializer();
-                    serializer.deserialize(this, $.extend(model, { "@ItemType": "SqlDataSource" }));
-                    var deprecateName = this["_model"]["Name"];
+                    serializer.deserialize(_this, $.extend(model, { "@ItemType": "SqlDataSource" }));
+                    var deprecateName = _this["_model"]["Name"];
                     if (deprecateName) {
-                        if (!this.name()) {
-                            this.name(deprecateName);
+                        if (!_this.name()) {
+                            _this.name(deprecateName);
                         }
-                        delete this["_model"]["Name"];
+                        delete _this["_model"]["Name"];
                     }
-                    this.queries = DevExpress.Analytics.Utils.deserializeArray(model["Queries"], function (item) {
+                    _this.queries = DevExpress.Analytics.Utils.deserializeArray(model["Queries"], function (item) {
                         if (item["@Type"] === Data.Utils.SqlQueryType.customSqlQuery) {
                             return new Data.CustomSqlQuery(item, _this, serializer);
                         }
@@ -2493,23 +2492,24 @@ var DevExpress;
                             throw new Error("Unknown sql query type.");
                         }
                     });
-                    this.relations = DevExpress.Analytics.Utils.deserializeArray(model["Relations"], function (item) {
+                    _this.relations = DevExpress.Analytics.Utils.deserializeArray(model["Relations"], function (item) {
                         return new Data.MasterDetailRelation(item, serializer);
                     });
-                    if (this.connection && model["ConnectionOptions"])
-                        this.connection.options = new Data.ConnectionOptions(model["ConnectionOptions"], serializer);
-                    this.dbSchemaProvider = new Data.DBSchemaProvider(this.connection, requestWrapper);
-                    this._disposables.push(this.connection.name.subscribe(function () {
+                    if (_this.connection && model["ConnectionOptions"])
+                        _this.connection.options = new Data.ConnectionOptions(model["ConnectionOptions"], serializer);
+                    _this.dbSchemaProvider = new Data.DBSchemaProvider(_this.connection, requestWrapper);
+                    _this._disposables.push(_this.connection.name.subscribe(function () {
                         _this.queries([]);
                         _this.relations([]);
                         _this.resultSet = null;
                     }));
+                    return _this;
                 }
                 SqlDataSource.prototype.getInfo = function () {
                     return sqlDataSourceSerializationInfo;
                 };
                 return SqlDataSource;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Data.SqlDataSource = SqlDataSource;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2546,7 +2546,7 @@ var DevExpress;
                     return this.procName() || "Query";
                 };
                 return StoredProcQuery;
-            })();
+            }());
             Data.StoredProcQuery = StoredProcQuery;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2591,7 +2591,7 @@ var DevExpress;
                     return this.tables().length > 0 ? (this.tables()[0].alias() || this.tables()[0].name()) : "SelectQuery";
                 };
                 return TableQuery;
-            })();
+            }());
             Data.TableQuery = TableQuery;
         })(Data = Analytics.Data || (Analytics.Data = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2628,17 +2628,18 @@ var DevExpress;
             var ColumnDragHandler = (function (_super) {
                 __extends(ColumnDragHandler, _super);
                 function ColumnDragHandler(querySurface, selection, undoEngine, snapHelper, dragHelperContent) {
-                    _super.call(this, querySurface, selection, undoEngine, snapHelper);
-                    this.querySurface = querySurface;
-                    this.undoEngine = undoEngine;
-                    this._dragColumn = ko.observable(null);
-                    this._dragConditionSurface = null;
-                    this.dragDropConnector = ko.observable(null);
-                    this.cursor = 'arrow';
-                    this.containment = '.dxrd-ghost-container';
-                    this["helper"] = function (draggable) {
+                    var _this = _super.call(this, querySurface, selection, undoEngine, snapHelper) || this;
+                    _this.querySurface = querySurface;
+                    _this.undoEngine = undoEngine;
+                    _this._dragColumn = ko.observable(null);
+                    _this._dragConditionSurface = null;
+                    _this.dragDropConnector = ko.observable(null);
+                    _this.cursor = 'arrow';
+                    _this.containment = '.dxrd-ghost-container';
+                    _this["helper"] = function (draggable) {
                         dragHelperContent.update(draggable);
                     };
+                    return _this;
                 }
                 ColumnDragHandler.prototype._needToCreateRelation = function () {
                     if (!(this.selection.dropTarget && this.selection.dropTarget instanceof QueryBuilder.Elements.ColumnSurface))
@@ -2717,7 +2718,7 @@ var DevExpress;
                     return this._dragColumn();
                 };
                 return ColumnDragHandler;
-            })(DevExpress.Analytics.Internal.DragDropHandler);
+            }(DevExpress.Analytics.Internal.DragDropHandler));
             Internal.ColumnDragHandler = ColumnDragHandler;
         })(Internal = QueryBuilder.Internal || (QueryBuilder.Internal = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -2731,23 +2732,23 @@ var DevExpress;
             var DbObjectDragDropHandler = (function (_super) {
                 __extends(DbObjectDragDropHandler, _super);
                 function DbObjectDragDropHandler(surface, selection, _undoEngine, snapHelper, dragHelperContent) {
-                    var _this = this;
-                    _super.call(this, surface, selection, _undoEngine, snapHelper);
-                    this._undoEngine = _undoEngine;
-                    this._query = function () { return _this._querySurface().getControlModel(); };
-                    this._querySurface = surface;
-                    this.cursor = 'arrow';
-                    this.containment = '.dxqb-designer';
-                    this["cursorAt"] = {
+                    var _this = _super.call(this, surface, selection, _undoEngine, snapHelper) || this;
+                    _this._undoEngine = _undoEngine;
+                    _this._query = function () { return _this._querySurface().getControlModel(); };
+                    _this._querySurface = surface;
+                    _this.cursor = 'arrow';
+                    _this.containment = '.dxqb-designer';
+                    _this["cursorAt"] = {
                         top: 0,
                         left: 0
                     };
-                    this["helper"] = function (draggable) {
+                    _this["helper"] = function (draggable) {
                         _super.prototype.helper.call(_this, draggable);
                         _this.recalculateSize(DevExpress.Analytics.Size.fromString("199, 123"));
                         dragHelperContent.setContent(new DevExpress.Analytics.Rectangle(0, 0, _this._size.width(), _this._size.height()));
                     };
-                    this._drop = DbObjectDragDropHandler.getDropCallback(this._undoEngine, false);
+                    _this._drop = DbObjectDragDropHandler.getDropCallback(_this._undoEngine, false);
+                    return _this;
                 }
                 DbObjectDragDropHandler.prototype.startDrag = function (draggable) {
                     if (draggable && draggable.name) {
@@ -2795,7 +2796,7 @@ var DevExpress;
                     return newControl;
                 }); };
                 return DbObjectDragDropHandler;
-            })(DevExpress.Analytics.Internal.DragDropHandler);
+            }(DevExpress.Analytics.Internal.DragDropHandler));
             Internal.DbObjectDragDropHandler = DbObjectDragDropHandler;
         })(Internal = QueryBuilder.Internal || (QueryBuilder.Internal = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -2809,7 +2810,7 @@ var DevExpress;
             var UndoEditor = (function (_super) {
                 __extends(UndoEditor, _super);
                 function UndoEditor(info, level, parentDisabled, textToSearch) {
-                    _super.call(this, info, level, parentDisabled, textToSearch);
+                    return _super.call(this, info, level, parentDisabled, textToSearch) || this;
                 }
                 UndoEditor.prototype.generateValue = function (undoEngine) {
                     var _this = this;
@@ -2828,12 +2829,11 @@ var DevExpress;
                     return this.undoValue;
                 };
                 return UndoEditor;
-            })(DevExpress.Analytics.Widgets.Editor);
+            }(DevExpress.Analytics.Widgets.Editor));
             Widgets.UndoEditor = UndoEditor;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="undoEditor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -2852,7 +2852,6 @@ var DevExpress;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="widgets/editorTemplates.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -2867,7 +2866,6 @@ var DevExpress;
         QueryBuilder.unknownSerializationsInfo = [QueryBuilder.name].concat(QueryBuilder.sizeLocation);
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../metadata.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -2877,18 +2875,17 @@ var DevExpress;
             var QueryElementBaseViewModel = (function (_super) {
                 __extends(QueryElementBaseViewModel, _super);
                 function QueryElementBaseViewModel(control, parent, serializer) {
-                    _super.call(this, control, parent, serializer);
+                    return _super.call(this, control, parent, serializer) || this;
                 }
                 QueryElementBaseViewModel.prototype.getControlFactory = function () {
                     return QueryBuilder.Utils.controlsFactory;
                 };
                 return QueryElementBaseViewModel;
-            })(DevExpress.Analytics.ElementViewModel);
+            }(DevExpress.Analytics.ElementViewModel));
             Elements.QueryElementBaseViewModel = QueryElementBaseViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="queryElementModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -2899,14 +2896,14 @@ var DevExpress;
             var AllColumnsViewModel = (function (_super) {
                 __extends(AllColumnsViewModel, _super);
                 function AllColumnsViewModel(parent, serializer) {
-                    _super.call(this, { "@ControlType": "Column" }, parent, serializer);
+                    var _this = _super.call(this, { "@ControlType": "Column" }, parent, serializer) || this;
                     var query = parent.parentModel();
                     var targetColumn = ko.pureComputed(function () {
                         return DevExpress.Analytics.Utils.findFirstItemMatchesCondition(query.columns(), function (item) {
                             return parent.actualName() === item.table() && Elements.ColumnType.AllColumns === item.itemType();
                         });
                     });
-                    this.selected = ko.pureComputed({
+                    _this.selected = ko.pureComputed({
                         read: function () { return !!targetColumn(); },
                         write: function (value) {
                             if (!!targetColumn() === value)
@@ -2920,13 +2917,14 @@ var DevExpress;
                         }
                     });
                     var name = DevExpress.Analytics.getLocalization("(All Columns)", "DataAccessStringId.QueryBuilder_AllColumns");
-                    this.name = ko.pureComputed(function () { return (name.charAt(0) === "*" ? name : "* " + name); });
+                    _this.name = ko.pureComputed(function () { return (name.charAt(0) === "*" ? name : "* " + name); });
+                    return _this;
                 }
                 AllColumnsViewModel.prototype.getInfo = function () {
                     return Elements.allColumnsSerializationInfo;
                 };
                 return AllColumnsViewModel;
-            })(Elements.QueryElementBaseViewModel);
+            }(Elements.QueryElementBaseViewModel));
             Elements.AllColumnsViewModel = AllColumnsViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -2940,32 +2938,31 @@ var DevExpress;
             var AllColumnsSurface = (function (_super) {
                 __extends(AllColumnsSurface, _super);
                 function AllColumnsSurface(control, context) {
-                    var _this = this;
-                    _super.call(this, control, context, null);
-                    this.template = "dxqb-table-asterisk-field";
-                    this.toggleSelected = function () {
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.template = "dxqb-table-asterisk-field";
+                    _this.toggleSelected = function () {
                         _this.getControlModel().selected(!_this.getControlModel().selected());
                     };
-                    this.selectedWrapper = ko.pureComputed(function () {
+                    _this.selectedWrapper = ko.pureComputed(function () {
                         return _this.getControlModel().selected();
                     });
-                    this.isOverAsterisk = ko.pureComputed(function () {
+                    _this.isOverAsterisk = ko.pureComputed(function () {
                         return _this.underCursor().isOver && !DevExpress.Analytics.Internal.DragDropHandler.started();
                     });
-                    this.cssClasses = function () {
+                    _this.cssClasses = function () {
                         return {
                             'dxd-state-active': _this.selected,
                             'dxd-state-hovered': _this.isOverAsterisk()
                         };
                     };
+                    return _this;
                 }
                 return AllColumnsSurface;
-            })(DevExpress.Analytics.SurfaceElementBase);
+            }(DevExpress.Analytics.SurfaceElementBase));
             Elements.AllColumnsSurface = AllColumnsSurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../widgets/editorTemplates.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -3014,42 +3011,41 @@ var DevExpress;
             var ColumnViewModel = (function (_super) {
                 __extends(ColumnViewModel, _super);
                 function ColumnViewModel(model, dbColumn, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend({ "@ControlType": "Column" }, model), parent, serializer);
-                    this.displayType = ko.pureComputed(function () {
+                    var _this = _super.call(this, $.extend({ "@ControlType": "Column" }, model), parent, serializer) || this;
+                    _this.displayType = ko.pureComputed(function () {
                         return DevExpress.Data.DBColumnType[dbColumn.type] + (dbColumn.size ? '(' + dbColumn.size + ')' : "");
                     });
-                    this.dataType = ko.pureComputed(function () {
+                    _this.dataType = ko.pureComputed(function () {
                         return DevExpress.Data.DBColumn.GetType(dbColumn.type);
                     });
-                    this.actualName = ko.pureComputed(function () {
+                    _this.actualName = ko.pureComputed(function () {
                         return _this.alias() || _this.name();
                     });
-                    var points = parent.getColumnConnectionPoints(this);
-                    this.rightConnectionPoint = {
+                    var points = parent.getColumnConnectionPoints(_this);
+                    _this.rightConnectionPoint = {
                         side: ko.observable(DevExpress.Analytics.Diagram.PointSide.East),
                         location: points.right
                     };
-                    this.leftConnectionPoint = {
+                    _this.leftConnectionPoint = {
                         side: ko.observable(DevExpress.Analytics.Diagram.PointSide.West),
                         location: points.left
                     };
                     var query = parent.parentModel();
                     var targetColumn = ko.pureComputed(function () { return QueryBuilder.Utils.ColumnExpressionCollectionHelper.find(query.columns, parent.actualName(), _this.name()); });
-                    this.aggregate = ko.pureComputed({
+                    _this.aggregate = ko.pureComputed({
                         read: function () { return targetColumn() ? targetColumn().aggregate() : Elements.AggregationType.None; },
                         write: function (value) {
                             targetColumn() && targetColumn().aggregate(value);
                         }
                     });
-                    this.alias = ko.pureComputed({
+                    _this.alias = ko.pureComputed({
                         read: function () { return targetColumn() ? targetColumn().alias() : ""; },
                         write: function (value) {
                             targetColumn() && targetColumn().alias(value || null);
                         }
                     });
                     var orderByItem = ko.pureComputed(function () { return QueryBuilder.Utils.ColumnExpressionCollectionHelper.find(query.sorting, parent.actualName(), _this.name()); });
-                    this.sortingType = ko.computed({
+                    _this.sortingType = ko.computed({
                         read: function () {
                             if (!orderByItem())
                                 return "Unsorted";
@@ -3070,7 +3066,7 @@ var DevExpress;
                             }
                         }
                     });
-                    this.sortOrder = ko.computed({
+                    _this.sortOrder = ko.computed({
                         read: function () {
                             var index = query.sorting().indexOf(orderByItem());
                             return index < 0 ? undefined : index + 1;
@@ -3086,7 +3082,7 @@ var DevExpress;
                         }
                     });
                     var groupByItem = ko.computed(function () { return QueryBuilder.Utils.ColumnExpressionCollectionHelper.find(query.grouping, parent.actualName(), _this.name()); });
-                    this.aggregate.subscribe(function (value) {
+                    _this.aggregate.subscribe(function (value) {
                         var parentTable = _this.parentModel();
                         if (value !== Elements.AggregationType.None) {
                             _this.groupBy(false);
@@ -3099,7 +3095,7 @@ var DevExpress;
                             _this.alias(null);
                         }
                     });
-                    this.groupBy = ko.computed({
+                    _this.groupBy = ko.computed({
                         read: function () { return !!groupByItem(); },
                         write: function (value) {
                             if (value) {
@@ -3111,7 +3107,7 @@ var DevExpress;
                             }
                         }
                     });
-                    this.selected = ko.pureComputed({
+                    _this.selected = ko.pureComputed({
                         read: function () { return !!targetColumn(); },
                         write: function (value) {
                             if (!!targetColumn() === value)
@@ -3125,6 +3121,7 @@ var DevExpress;
                             }
                         }
                     });
+                    return _this;
                 }
                 ColumnViewModel.prototype._isAliasAutoGenerated = function (addedTableName) {
                     if (addedTableName && this.alias() && this.alias().indexOf(addedTableName + '_') === 0) {
@@ -3163,12 +3160,11 @@ var DevExpress;
                     configurable: true
                 });
                 return ColumnViewModel;
-            })(Elements.QueryElementBaseViewModel);
+            }(Elements.QueryElementBaseViewModel));
             Elements.ColumnViewModel = ColumnViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="columnModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -3225,7 +3221,7 @@ var DevExpress;
                     return !!DevExpress.Analytics.Utils.findFirstItemMatchesCondition(this._dependedTables, function (depended) { return depended.actualName() === tableActualName; });
                 };
                 return ColumnExpression;
-            })();
+            }());
             Elements.ColumnExpression = ColumnExpression;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3239,23 +3235,22 @@ var DevExpress;
             var ColumnSurface = (function (_super) {
                 __extends(ColumnSurface, _super);
                 function ColumnSurface(control, context) {
-                    var _this = this;
-                    _super.call(this, control, context, null);
-                    this.template = "dxqb-table-field";
-                    this.toggleSelected = function () {
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.template = "dxqb-table-field";
+                    _this.toggleSelected = function () {
                         _this.getControlModel().selected(!_this.getControlModel().selected());
                     };
-                    this.selectedWrapper = ko.pureComputed(function () {
+                    _this.selectedWrapper = ko.pureComputed(function () {
                         return _this.getControlModel().selected();
                     });
-                    this.isAggregate = ko.pureComputed(function () { return QueryBuilder.Widgets.isAggregatedExpression(_this.getControlModel()); });
-                    this.isAscending = ko.pureComputed(function () {
+                    _this.isAggregate = ko.pureComputed(function () { return QueryBuilder.Widgets.isAggregatedExpression(_this.getControlModel()); });
+                    _this.isAscending = ko.pureComputed(function () {
                         return _this.getControlModel().sortingType() === "Ascending";
                     });
-                    this.isDescending = ko.pureComputed(function () {
+                    _this.isDescending = ko.pureComputed(function () {
                         return _this.getControlModel().sortingType() === "Descending";
                     });
-                    this.cssClasses = function (query, columnDragHandler, parent) {
+                    _this.cssClasses = function (query, columnDragHandler, parent) {
                         if (!_this._isJoined) {
                             _this._isJoined = ko.pureComputed(function () {
                                 return query.isJoined(_this) || _this.getControlModel() === columnDragHandler.getDragColumn();
@@ -3274,9 +3269,10 @@ var DevExpress;
                             'dxd-state-hovered': _this._isHovered,
                         };
                     };
+                    return _this;
                 }
                 return ColumnSurface;
-            })(DevExpress.Analytics.SurfaceElementBase);
+            }(DevExpress.Analytics.SurfaceElementBase));
             Elements.ColumnSurface = ColumnSurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3332,28 +3328,30 @@ var DevExpress;
             var JoinConditionViewModel = (function (_super) {
                 __extends(JoinConditionViewModel, _super);
                 function JoinConditionViewModel(control, relation, serializer) {
-                    var _this = this;
-                    this.startPoint = ko.observable();
-                    this.endPoint = ko.observable();
-                    _super.call(this, $.extend(control, { "@ControlType": "JoinCondition", "@ItemType": "KeyColumn" }), relation, serializer);
-                    this.parentColumn = ko.pureComputed(function () { return relation.parentTable().getColumn(_this.parentColumnName()); });
-                    this.nestedColumn = ko.pureComputed(function () { return relation.nestedTable().getColumn(_this.nestedColumnName()); });
-                    this.joinType = relation.joinType;
-                    this.left = ko.pureComputed(function () { return relation.parentTableName() + '.' + _this.parentColumnName(); });
-                    this.right = ko.pureComputed(function () { return relation.nestedTableName() + '.' + _this.nestedColumnName(); });
-                    this._disposables.push(ko.computed(function () {
+                    var _this = _super.call(this, $.extend(control, { "@ControlType": "JoinCondition", "@ItemType": "KeyColumn" }), relation, serializer) || this;
+                    _this.parentColumn = ko.pureComputed(function () { return relation.parentTable().getColumn(_this.parentColumnName()); });
+                    _this.nestedColumn = ko.pureComputed(function () { return relation.nestedTable().getColumn(_this.nestedColumnName()); });
+                    _this.joinType = relation.joinType;
+                    _this.left = ko.pureComputed(function () { return relation.parentTableName() + '.' + _this.parentColumnName(); });
+                    _this.right = ko.pureComputed(function () { return relation.nestedTableName() + '.' + _this.nestedColumnName(); });
+                    _this._disposables.push(ko.computed(function () {
                         if (_this.parentColumn() && _this.nestedColumn()) {
                             var result = DevExpress.Analytics.Diagram.determineConnectingPoints(_this.parentColumn(), _this.nestedColumn());
                             _this.startPoint().connectingPoint(result.start);
                             _this.endPoint().connectingPoint(result.end);
                         }
                     }));
+                    return _this;
                 }
                 JoinConditionViewModel.prototype.getControlFactory = function () {
                     return QueryBuilder.Utils.controlsFactory;
                 };
+                JoinConditionViewModel.prototype.preInitProperties = function () {
+                    this.startPoint = ko.observable();
+                    this.endPoint = ko.observable();
+                };
                 return JoinConditionViewModel;
-            })(DevExpress.Analytics.Diagram.RoutedConnectorViewModel);
+            }(DevExpress.Analytics.Diagram.RoutedConnectorViewModel));
             Elements.JoinConditionViewModel = JoinConditionViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3367,16 +3365,17 @@ var DevExpress;
             var JoinConditionSurface = (function (_super) {
                 __extends(JoinConditionSurface, _super);
                 function JoinConditionSurface(control, context) {
-                    _super.call(this, control, context);
-                    this.showArrow = ko.pureComputed(function () {
+                    var _this = _super.call(this, control, context) || this;
+                    _this.showArrow = ko.pureComputed(function () {
                         return control.joinType() === "LeftOuter";
                     });
+                    return _this;
                 }
                 JoinConditionSurface.prototype.container = function () {
                     return this.getRoot();
                 };
                 return JoinConditionSurface;
-            })(DevExpress.Analytics.Diagram.RoutedConnectorSurface);
+            }(DevExpress.Analytics.Diagram.RoutedConnectorSurface));
             Elements.JoinConditionSurface = JoinConditionSurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3395,7 +3394,7 @@ var DevExpress;
             var ParameterViewModel = (function (_super) {
                 __extends(ParameterViewModel, _super);
                 function ParameterViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 ParameterViewModel.prototype.getEditorType = function (type) {
                     if (type === "DevExpress.DataAccess.Expression")
@@ -3403,7 +3402,7 @@ var DevExpress;
                     return DevExpress.Analytics.Internal.getEditorType(type);
                 };
                 return ParameterViewModel;
-            })(DevExpress.Analytics.Data.DataSourceParameter);
+            }(DevExpress.Analytics.Data.DataSourceParameter));
             Elements.ParameterViewModel = ParameterViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3417,11 +3416,12 @@ var DevExpress;
             var QueryElementBaseSurface = (function (_super) {
                 __extends(QueryElementBaseSurface, _super);
                 function QueryElementBaseSurface(control, context, unitProperties) {
-                    _super.call(this, control, context, $.extend({}, QueryElementBaseSurface._unitProperties, unitProperties));
-                    this.template = "dx-diagram-element";
-                    this.selectiontemplate = "dx-diagram-element-selection";
-                    this.contenttemplate = "dx-diagram-element-content";
-                    this.margin = ko.observable(0);
+                    var _this = _super.call(this, control, context, $.extend({}, QueryElementBaseSurface._unitProperties, unitProperties)) || this;
+                    _this.template = "dx-diagram-element";
+                    _this.selectiontemplate = "dx-diagram-element-selection";
+                    _this.contenttemplate = "dx-diagram-element-content";
+                    _this.margin = ko.observable(0);
+                    return _this;
                 }
                 QueryElementBaseSurface._unitProperties = {
                     _height: function (o) {
@@ -3438,7 +3438,7 @@ var DevExpress;
                     }
                 };
                 return QueryElementBaseSurface;
-            })(DevExpress.Analytics.SurfaceElementBase);
+            }(DevExpress.Analytics.SurfaceElementBase));
             Elements.QueryElementBaseSurface = QueryElementBaseSurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3452,11 +3452,10 @@ var DevExpress;
             var QueryViewModel = (function (_super) {
                 __extends(QueryViewModel, _super);
                 function QueryViewModel(querySource, dbSchemaProvider, parametersMode, serializer) {
-                    var _this = this;
                     if (parametersMode === void 0) { parametersMode = Elements.ParametersMode.ReadWrite; }
-                    _super.call(this, $.extend(true, querySource, QueryViewModel.emptyModel, querySource), null, serializer);
-                    this.aggregatedColumnsCount = ko.observable(0);
-                    this._findAncestorsRelations = function (table) {
+                    var _this = _super.call(this, $.extend(true, querySource, QueryViewModel.emptyModel, querySource), null, serializer) || this;
+                    _this.aggregatedColumnsCount = ko.observable(0);
+                    _this._findAncestorsRelations = function (table) {
                         var relations;
                         var result = { inner: 0, outer: 0, relations: [] };
                         _this.relations().forEach(function (item) {
@@ -3471,26 +3470,26 @@ var DevExpress;
                         });
                         return result;
                     };
-                    this["type"]("SelectQuery");
-                    this.controlType = "Query";
-                    this.dbSchemaProvider = dbSchemaProvider;
-                    this.tables = DevExpress.Analytics.Utils.deserializeArray(querySource["Tables"]["SelectedTables"], function (item) { return new Elements.TableViewModel(item, _this, serializer); });
-                    this.columns = DevExpress.Analytics.Utils.deserializeArray(querySource["Columns"], function (item) { return new Elements.ColumnExpression(item, _this, serializer); });
-                    this.sorting = DevExpress.Analytics.Utils.deserializeArray(querySource["Sorting"], function (item) { return new Elements.ColumnExpression(item, _this, serializer); });
-                    this.grouping = DevExpress.Analytics.Utils.deserializeArray(querySource["Grouping"], function (item) { return new Elements.ColumnExpression(item, _this, serializer); });
-                    this.tables().forEach(function (table) { _this._initializeTable(table); });
-                    this.relations = DevExpress.Analytics.Utils.deserializeArray(querySource["Tables"]["Relations"], function (item) { return new Elements.RelationViewModel(item, _this, serializer); });
-                    this["_tablesObject"]["tables"] = this.tables;
-                    this["_tablesObject"]["relations"] = this.relations;
-                    this.tables().reduce(function (posX, tableModel) {
+                    _this["type"]("SelectQuery");
+                    _this.controlType = "Query";
+                    _this.dbSchemaProvider = dbSchemaProvider;
+                    _this.tables = DevExpress.Analytics.Utils.deserializeArray(querySource["Tables"]["SelectedTables"], function (item) { return new Elements.TableViewModel(item, _this, serializer); });
+                    _this.columns = DevExpress.Analytics.Utils.deserializeArray(querySource["Columns"], function (item) { return new Elements.ColumnExpression(item, _this, serializer); });
+                    _this.sorting = DevExpress.Analytics.Utils.deserializeArray(querySource["Sorting"], function (item) { return new Elements.ColumnExpression(item, _this, serializer); });
+                    _this.grouping = DevExpress.Analytics.Utils.deserializeArray(querySource["Grouping"], function (item) { return new Elements.ColumnExpression(item, _this, serializer); });
+                    _this.tables().forEach(function (table) { _this._initializeTable(table); });
+                    _this.relations = DevExpress.Analytics.Utils.deserializeArray(querySource["Tables"]["Relations"], function (item) { return new Elements.RelationViewModel(item, _this, serializer); });
+                    _this["_tablesObject"]["tables"] = _this.tables;
+                    _this["_tablesObject"]["relations"] = _this.relations;
+                    _this.tables().reduce(function (posX, tableModel) {
                         tableModel.location.x(posX);
                         tableModel.location.y(65);
                         return posX + tableModel.size.width() + tableModel.size.width() / 2;
                     }, 30);
                     var parameters = DevExpress.Analytics.Utils.deserializeArray(querySource["Parameters"], function (item) { return new Elements.ParameterViewModel(item, serializer); });
                     if (parametersMode === Elements.ParametersMode.ReadWrite) {
-                        this.parameters = parameters;
-                        this._disposables.push(this.parameters.subscribe(function (changes) {
+                        _this.parameters = parameters;
+                        _this._disposables.push(_this.parameters.subscribe(function (changes) {
                             changes.forEach(function (change) {
                                 if (change.status === "added" && !change.value.name())
                                     change.value.name(DevExpress.Analytics.Internal.getUniqueName(_this.parameters().filter(function (x) { return x !== change.value; }).map(function (x) { return x.name(); }), "parameter"));
@@ -3498,17 +3497,17 @@ var DevExpress;
                         }, null, "arrayChange"));
                     }
                     else {
-                        this.parameters = ko.computed(function () { return parameters(); });
+                        _this.parameters = ko.computed(function () { return parameters(); });
                     }
-                    this.editableName = ko.observable(this.name());
-                    this.name = ko.pureComputed({
-                        read: this.editableName,
+                    _this.editableName = ko.observable(_this.name());
+                    _this.name = ko.pureComputed({
+                        read: _this.editableName,
                         write: function (val) { }
                     });
-                    this.filterString = new QueryBuilder.Widgets.QBFilterStringOptions(this._filterString, null, ko.pureComputed(function () { return (_this.tables().length === 0) && (_this.filterString && _this.filterString.value().length === 0); }));
-                    this.filterString.initializeFilterStringHelper(this.parameters, parametersMode);
+                    _this.filterString = new QueryBuilder.Widgets.QBFilterStringOptions(_this._filterString, null, ko.pureComputed(function () { return (_this.tables().length === 0) && (_this.filterString && _this.filterString.value().length === 0); }));
+                    _this.filterString.initializeFilterStringHelper(_this.parameters, parametersMode);
                     var inProcess = false;
-                    this._disposables.push(ko.computed(function () {
+                    _this._disposables.push(ko.computed(function () {
                         if (!inProcess) {
                             inProcess = true;
                             var allColumns = _this.getAllColumns();
@@ -3527,10 +3526,10 @@ var DevExpress;
                             inProcess = false;
                         }
                     }));
-                    this.groupFilterString = new QueryBuilder.Widgets.QBFilterStringOptions(this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.Widgets.isAggregatedExpression) && (_this.groupFilterString && (_this.groupFilterString.value() || '').length === 0); }));
-                    this.groupFilterString.initializeFilterStringHelper(this.parameters, parametersMode, new QueryBuilder.Widgets.GroupFilterEditorSerializer(this.columns));
+                    _this.groupFilterString = new QueryBuilder.Widgets.QBFilterStringOptions(_this._groupFilterString, null, ko.pureComputed(function () { return !_this.columns().some(QueryBuilder.Widgets.isAggregatedExpression) && (_this.groupFilterString && (_this.groupFilterString.value() || '').length === 0); }));
+                    _this.groupFilterString.initializeFilterStringHelper(_this.parameters, parametersMode, new QueryBuilder.Widgets.GroupFilterEditorSerializer(_this.columns));
                     var _pageWidth = ko.observable(0);
-                    this.pageWidth = ko.pureComputed({
+                    _this.pageWidth = ko.pureComputed({
                         read: function () {
                             var result = 500;
                             _this.tables().forEach(function (table) {
@@ -3545,7 +3544,7 @@ var DevExpress;
                             _pageWidth(value);
                         }
                     });
-                    this.pageHeight = ko.pureComputed(function () {
+                    _this.pageHeight = ko.pureComputed(function () {
                         var result = 500;
                         _this.tables().forEach(function (table) {
                             var bottom = table.location.y() + table.size.height();
@@ -3555,10 +3554,10 @@ var DevExpress;
                         });
                         return result;
                     });
-                    this.margins = DevExpress.Analytics.Margins.fromString();
-                    this.isValid = ko.pureComputed(function () { return _this._validate(); });
+                    _this.margins = DevExpress.Analytics.Margins.fromString();
+                    _this.isValid = ko.pureComputed(function () { return _this._validate(); });
                     var isAllColumnsAllTablesExpression = function (column) { return !column.table() && column.itemType() === Elements.ColumnType.AllColumns; };
-                    this.allColumnsInTablesSelected = ko.computed({
+                    _this.allColumnsInTablesSelected = ko.computed({
                         read: function () { return _this.columns().some(isAllColumnsAllTablesExpression); },
                         write: function (value) {
                             if (value) {
@@ -3569,6 +3568,7 @@ var DevExpress;
                             }
                         }
                     });
+                    return _this;
                 }
                 QueryViewModel.prototype._initializeTable = function (table) {
                     this.dbSchemaProvider.getDbTable(table.name())
@@ -3804,7 +3804,7 @@ var DevExpress;
                 QueryViewModel.pageMargin = 20;
                 QueryViewModel.emptyModel = { "@ItemType": "Query", "Tables": { "SelectedTables": {}, "Relations": {} }, "Columns": {}, "Sorting": {}, "Grouping": {} };
                 return QueryViewModel;
-            })(Elements.QueryElementBaseViewModel);
+            }(Elements.QueryElementBaseViewModel));
             Elements.QueryViewModel = QueryViewModel;
             Elements.querySerializationsInfo = [
                 {
@@ -3842,30 +3842,29 @@ var DevExpress;
             var QuerySurface = (function (_super) {
                 __extends(QuerySurface, _super);
                 function QuerySurface(query, zoom) {
-                    var _this = this;
                     if (zoom === void 0) { zoom = ko.observable(1); }
-                    _super.call(this, query, {
+                    var _this = _super.call(this, query, {
                         measureUnit: ko.observable("Pixels"),
                         zoom: zoom,
                         dpi: ko.observable(100)
-                    }, QuerySurface._unitProperties);
-                    this.placeholder = function () { return DevExpress.Analytics.getLocalization('Drop a table or view here to create a query.', 'ASPxReportsStringId.QueryBuilder_SurfacePlaceholder'); };
-                    this.tables = ko.observableArray();
-                    this.relations = ko.observableArray();
-                    this.allowMultiselect = false;
-                    this.focused = ko.observable(false);
-                    this.selected = ko.observable(false);
-                    this.underCursor = ko.observable(new DevExpress.Analytics.Internal.HoverInfo());
-                    this.templateName = "dx-query-surface";
-                    this.rtl = ko.observable(false);
-                    this.measureUnit = this._context.measureUnit;
-                    this.dpi = this._context.dpi;
-                    this._context = this;
-                    this.margins = { bottom: this["_bottom"], left: this["_left"], right: this["_right"], top: this["_top"] };
-                    this.zoom = zoom;
-                    DevExpress.Analytics.Utils.createObservableArrayMapCollection(query.tables, this.tables, this._createSurface);
-                    DevExpress.Analytics.Utils.createObservableArrayMapCollection(query.relations, this.relations, this._createSurface);
-                    this._joinedColumns = ko.computed(function () {
+                    }, QuerySurface._unitProperties) || this;
+                    _this.placeholder = function () { return DevExpress.Analytics.getLocalization('Drop a table or view here to create a query.', 'ASPxReportsStringId.QueryBuilder_SurfacePlaceholder'); };
+                    _this.tables = ko.observableArray();
+                    _this.relations = ko.observableArray();
+                    _this.allowMultiselect = false;
+                    _this.focused = ko.observable(false);
+                    _this.selected = ko.observable(false);
+                    _this.underCursor = ko.observable(new DevExpress.Analytics.Internal.HoverInfo());
+                    _this.templateName = "dx-query-surface";
+                    _this.rtl = ko.observable(false);
+                    _this.measureUnit = _this._context.measureUnit;
+                    _this.dpi = _this._context.dpi;
+                    _this._context = _this;
+                    _this.margins = { bottom: _this["_bottom"], left: _this["_left"], right: _this["_right"], top: _this["_top"] };
+                    _this.zoom = zoom;
+                    DevExpress.Analytics.Utils.createObservableArrayMapCollection(query.tables, _this.tables, _this._createSurface);
+                    DevExpress.Analytics.Utils.createObservableArrayMapCollection(query.relations, _this.relations, _this._createSurface);
+                    _this._joinedColumns = ko.computed(function () {
                         var resultColumns = [];
                         _this.relations().forEach(function (relation) {
                             relation.conditions().forEach(function (condition) {
@@ -3876,6 +3875,7 @@ var DevExpress;
                         });
                         return resultColumns;
                     });
+                    return _this;
                 }
                 QuerySurface.prototype.checkParent = function (surfaceParent) { return false; };
                 QuerySurface.prototype.getChildrenCollection = function () {
@@ -3895,7 +3895,7 @@ var DevExpress;
                     _top: function (o) { return o.margins.top; }
                 };
                 return QuerySurface;
-            })(DevExpress.Analytics.SurfaceElementBase);
+            }(DevExpress.Analytics.SurfaceElementBase));
             Elements.QuerySurface = QuerySurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3916,15 +3916,15 @@ var DevExpress;
             var RelationViewModel = (function (_super) {
                 __extends(RelationViewModel, _super);
                 function RelationViewModel(model, query, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend(model, { "@ControlType": "Relation", "@ItemType": "Relation" }), query, serializer);
-                    this.parentTable = ko.observable(query.getTable(this.parentTableName.peek()));
-                    this.nestedTable = ko.observable(query.getTable(this.nestedTableName.peek()));
-                    this.parentTableName = ko.pureComputed(function () { return _this.parentTable().actualName(); });
-                    this.nestedTableName = ko.pureComputed(function () { return _this.nestedTable().actualName(); });
-                    this.conditions = DevExpress.Analytics.Utils.deserializeArray(model["KeyColumns"], function (item) {
+                    var _this = _super.call(this, $.extend(model, { "@ControlType": "Relation", "@ItemType": "Relation" }), query, serializer) || this;
+                    _this.parentTable = ko.observable(query.getTable(_this.parentTableName.peek()));
+                    _this.nestedTable = ko.observable(query.getTable(_this.nestedTableName.peek()));
+                    _this.parentTableName = ko.pureComputed(function () { return _this.parentTable().actualName(); });
+                    _this.nestedTableName = ko.pureComputed(function () { return _this.nestedTable().actualName(); });
+                    _this.conditions = DevExpress.Analytics.Utils.deserializeArray(model["KeyColumns"], function (item) {
                         return new Elements.JoinConditionViewModel(item, _this, serializer);
                     });
+                    return _this;
                 }
                 RelationViewModel.prototype._getConditionNumber = function () {
                     var result = this.conditions().length + 1;
@@ -3956,7 +3956,7 @@ var DevExpress;
                         this.parentModel().removeChild(this);
                 };
                 return RelationViewModel;
-            })(Elements.QueryElementBaseViewModel);
+            }(Elements.QueryElementBaseViewModel));
             Elements.RelationViewModel = RelationViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -3970,21 +3970,21 @@ var DevExpress;
             var RelationSurface = (function (_super) {
                 __extends(RelationSurface, _super);
                 function RelationSurface(control, context) {
-                    _super.call(this, control, context, null);
-                    this.conditions = ko.observableArray();
-                    this.template = "dxqb-relation";
-                    DevExpress.Analytics.Utils.createObservableArrayMapCollection(control.conditions, this.conditions, this._createSurface);
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.conditions = ko.observableArray();
+                    _this.template = "dxqb-relation";
+                    DevExpress.Analytics.Utils.createObservableArrayMapCollection(control.conditions, _this.conditions, _this._createSurface);
+                    return _this;
                 }
                 RelationSurface.prototype._getChildrenHolderName = function () {
                     return "conditions";
                 };
                 return RelationSurface;
-            })(DevExpress.Analytics.SurfaceElementBase);
+            }(DevExpress.Analytics.SurfaceElementBase));
             Elements.RelationSurface = RelationSurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../metadata.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -3997,18 +3997,17 @@ var DevExpress;
             var TableViewModel = (function (_super) {
                 __extends(TableViewModel, _super);
                 function TableViewModel(model, parent, serializer) {
-                    var _this = this;
-                    _super.call(this, $.extend(model, { "@ControlType": "Table", "@ItemType": "Table" }), parent, serializer);
-                    this.serializer = serializer;
-                    this._columnsConnectionPointLeftX = ko.pureComputed(function () { return _this.location.x(); });
-                    this._columnsConnectionPointRightX = ko.pureComputed(function () { return _this.location.x() + _this.size.width(); });
-                    this._columns = ko.observableArray();
-                    this._initialized = ko.observable(false);
-                    this.size = new DevExpress.Analytics.Size(199, 123);
-                    this.location = new DevExpress.Analytics.Point(0, 0);
-                    this.actualName = ko.pureComputed(function () { return _this.alias() || _this.name(); });
-                    this.isReady = ko.observable(false);
-                    this.allColumnsSelected = ko.computed({
+                    var _this = _super.call(this, $.extend(model, { "@ControlType": "Table", "@ItemType": "Table" }), parent, serializer) || this;
+                    _this.serializer = serializer;
+                    _this._columnsConnectionPointLeftX = ko.pureComputed(function () { return _this.location.x(); });
+                    _this._columnsConnectionPointRightX = ko.pureComputed(function () { return _this.location.x() + _this.size.width(); });
+                    _this._columns = ko.observableArray();
+                    _this._initialized = ko.observable(false);
+                    _this.size = new DevExpress.Analytics.Size(199, 123);
+                    _this.location = new DevExpress.Analytics.Point(0, 0);
+                    _this.actualName = ko.pureComputed(function () { return _this.alias() || _this.name(); });
+                    _this.isReady = ko.observable(false);
+                    _this.allColumnsSelected = ko.computed({
                         read: function () {
                             var selectedColumns = _this.columns().filter(function (item) { return item.selected(); });
                             if (selectedColumns.length === 0) {
@@ -4021,8 +4020,8 @@ var DevExpress;
                         },
                         deferEvaluation: true
                     });
-                    this.isInitialized = ko.pureComputed(function () { return _this._initialized(); });
-                    this.size.height = ko.pureComputed({
+                    _this.isInitialized = ko.pureComputed(function () { return _this._initialized(); });
+                    _this.size.height = ko.pureComputed({
                         read: function () {
                             if (_this._columns().length === 0) {
                                 return TableViewModel.TABLE_DEFAULT_HEIGHT;
@@ -4032,7 +4031,8 @@ var DevExpress;
                         write: function () {
                         }
                     });
-                    this.asterisk = new Elements.AllColumnsViewModel(this, this.serializer);
+                    _this.asterisk = new Elements.AllColumnsViewModel(_this, _this.serializer);
+                    return _this;
                 }
                 TableViewModel.prototype.columns = function () {
                     return this._columns();
@@ -4076,7 +4076,7 @@ var DevExpress;
                 TableViewModel.TABLE_MIN_WIDTH = 80;
                 TableViewModel.TABLE_DEFAULT_HEIGHT = 136;
                 return TableViewModel;
-            })(Elements.QueryElementBaseViewModel);
+            }(Elements.QueryElementBaseViewModel));
             Elements.TableViewModel = TableViewModel;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4090,21 +4090,21 @@ var DevExpress;
             var TableSurface = (function (_super) {
                 __extends(TableSurface, _super);
                 function TableSurface(control, context) {
-                    var _this = this;
-                    _super.call(this, control, context, null);
-                    this.contenttemplate = "dxqb-table";
-                    this.template = "dxqb-table-main";
-                    this.toggleSelected = function () {
+                    var _this = _super.call(this, control, context, null) || this;
+                    _this.contenttemplate = "dxqb-table";
+                    _this.template = "dxqb-table-main";
+                    _this.toggleSelected = function () {
                         _this.getControlModel().toggleSelectedColumns();
                     };
-                    this.selectedWrapper = ko.pureComputed(function () {
+                    _this.selectedWrapper = ko.pureComputed(function () {
                         return _this.getControlModel().allColumnsSelected();
                     });
-                    this.isInitialized = control.isInitialized;
-                    this.columns = ko.pureComputed(function () {
+                    _this.isInitialized = control.isInitialized;
+                    _this.columns = ko.pureComputed(function () {
                         return control.columns().map(function (columnVewModel) { return new Elements.ColumnSurface(columnVewModel, context); });
                     });
-                    this.asterisk = new Elements.AllColumnsSurface(control.asterisk, context);
+                    _this.asterisk = new Elements.AllColumnsSurface(control.asterisk, context);
+                    return _this;
                 }
                 TableSurface.prototype.resizable = function (resizeHandler, element) {
                     return $.extend({}, resizeHandler, {
@@ -4114,7 +4114,7 @@ var DevExpress;
                     });
                 };
                 return TableSurface;
-            })(Elements.QueryElementBaseSurface);
+            }(Elements.QueryElementBaseSurface));
             Elements.TableSurface = TableSurface;
         })(Elements = QueryBuilder.Elements || (QueryBuilder.Elements = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4163,7 +4163,6 @@ var DevExpress;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="widgets/ace/options.ts" />
 var DevExpress;
 (function (DevExpress) {
     var QueryBuilder;
@@ -4478,7 +4477,7 @@ var DevExpress;
                     collection.remove(function (item) { return item.column() === columnName && item.table() === tableName; });
                 };
                 return ColumnExpressionCollectionHelper;
-            })();
+            }());
             Utils.ColumnExpressionCollectionHelper = ColumnExpressionCollectionHelper;
         })(Utils = QueryBuilder.Utils || (QueryBuilder.Utils = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4560,21 +4559,22 @@ var DevExpress;
             var QueryBuilderTreeListController = (function (_super) {
                 __extends(QueryBuilderTreeListController, _super);
                 function QueryBuilderTreeListController(undoEngine, query, searchName) {
-                    _super.call(this);
+                    var _this = _super.call(this) || this;
                     var dropCallback = QueryBuilder.Internal.DbObjectDragDropHandler.getDropCallback(undoEngine, true);
-                    this.dblClickHandler = function (item) {
+                    _this.dblClickHandler = function (item) {
                         undoEngine().start();
                         dropCallback(item.data, query());
                         undoEngine().end();
                     };
                     var spanProtect = $("<span>"), spanSearch = $("<span>").addClass('dx-datagrid-search-text');
-                    this.searchName = searchName;
-                    this.itemsFilter = function (item) {
+                    _this.searchName = searchName;
+                    _this.itemsFilter = function (item) {
                         return !searchName() || !!DevExpress.Analytics.Utils.findMatchesInString(item.displayName, searchName());
                     };
+                    return _this;
                 }
                 return QueryBuilderTreeListController;
-            })(DevExpress.Analytics.Widgets.TreeListController);
+            }(DevExpress.Analytics.Widgets.TreeListController));
             Utils.QueryBuilderTreeListController = QueryBuilderTreeListController;
         })(Utils = QueryBuilder.Utils || (QueryBuilder.Utils = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4657,7 +4657,7 @@ var DevExpress;
                     return this.sendRequest("rebuildResultSchema", encodeURIComponent(requestJson));
                 };
                 return RequestWrapper;
-            })();
+            }());
             Utils.RequestWrapper = RequestWrapper;
         })(Utils = QueryBuilder.Utils || (QueryBuilder.Utils = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4671,13 +4671,13 @@ var DevExpress;
             var GroupFilterEditorSerializer = (function (_super) {
                 __extends(GroupFilterEditorSerializer, _super);
                 function GroupFilterEditorSerializer(_columns) {
-                    var _this = this;
-                    _super.call(this);
-                    this._columns = _columns;
-                    this._aggregatePropertyName = function (operand) {
+                    var _this = _super.call(this) || this;
+                    _this._columns = _columns;
+                    _this._aggregatePropertyName = function (operand) {
                         var itemColumnAggregate = _this._findAggregatedColumn(function (c) { return c.actualName() === operand.propertyName; });
                         return itemColumnAggregate ? _this._columnDisplayName(itemColumnAggregate) : operand.propertyName;
                     };
+                    return _this;
                 }
                 GroupFilterEditorSerializer.prototype._columnDisplayName = function (column) {
                     return column.table() + "." + column.actualName();
@@ -4703,7 +4703,7 @@ var DevExpress;
                     return _super.prototype.deserializeOperand.call(this, operand);
                 };
                 return GroupFilterEditorSerializer;
-            })(DevExpress.Analytics.Widgets.Internal.FilterEditorSerializer);
+            }(DevExpress.Analytics.Widgets.Internal.FilterEditorSerializer));
             Widgets.GroupFilterEditorSerializer = GroupFilterEditorSerializer;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4717,22 +4717,21 @@ var DevExpress;
             var OperandParameterQBSurface = (function (_super) {
                 __extends(OperandParameterQBSurface, _super);
                 function OperandParameterQBSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.createParameter = function () {
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.createParameter = function () {
                         if (_this.canCreateParameters) {
                             _this.model.parameterName = _this.parameterName();
                             _this._createParameter(_this.parameterName(), _this._parameterType);
                             _this.helper.onChange();
                         }
                     };
-                    this._parameterName = ko.observable("");
-                    this.isEditable = ko.observable(false);
-                    this.defaultDisplay = OperandParameterQBSurface.defaultDisplay;
-                    this._parameterName(operator.parameterName);
-                    this.canCreateParameters = this.helper.canCreateParameters;
-                    this.fieldsOptions = parent.leftPart.fieldsOptions;
-                    this.parameterName = ko.pureComputed({
+                    _this._parameterName = ko.observable("");
+                    _this.isEditable = ko.observable(false);
+                    _this.defaultDisplay = OperandParameterQBSurface.defaultDisplay;
+                    _this._parameterName(operator.parameterName);
+                    _this.canCreateParameters = _this.helper.canCreateParameters;
+                    _this.fieldsOptions = parent.leftPart.fieldsOptions;
+                    _this.parameterName = ko.pureComputed({
                         read: function () {
                             return _this._parameterName() || (_this.canCreateParameters && OperandParameterQBSurface.defaultDisplay() || "");
                         },
@@ -4743,9 +4742,10 @@ var DevExpress;
                             }
                         }
                     });
-                    if (this.canCreateParameters && !this.isDefaultTextDisplayed() && !ko.unwrap(this.fieldListProvider).hasParameter(operator.parameterName)) {
-                        this.createParameter();
+                    if (_this.canCreateParameters && !_this.isDefaultTextDisplayed() && !ko.unwrap(_this.fieldListProvider).hasParameter(operator.parameterName)) {
+                        _this.createParameter();
                     }
+                    return _this;
                 }
                 Object.defineProperty(OperandParameterQBSurface.prototype, "_parameterType", {
                     get: function () {
@@ -4765,7 +4765,7 @@ var DevExpress;
                 };
                 OperandParameterQBSurface.defaultDisplay = function () { return DevExpress.Analytics.getLocalization("Create new parameter", "ASPxReportsStringId.FilterEditor_Operand_CreateNewParameter"); };
                 return OperandParameterQBSurface;
-            })(DevExpress.Analytics.Widgets.OperandParameterSurface);
+            }(DevExpress.Analytics.Widgets.OperandParameterSurface));
             Widgets.OperandParameterQBSurface = OperandParameterQBSurface;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4779,7 +4779,7 @@ var DevExpress;
             var OperandPropertyQBSurface = (function (_super) {
                 __extends(OperandPropertyQBSurface, _super);
                 function OperandPropertyQBSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
+                    return _super.call(this, operator, parent, fieldListProvider, path) || this;
                 }
                 OperandPropertyQBSurface.prototype._updateSpecifics = function () {
                     OperandPropertyQBSurface.updateSpecifics(this);
@@ -4798,7 +4798,7 @@ var DevExpress;
                     }
                 };
                 return OperandPropertyQBSurface;
-            })(DevExpress.Analytics.Widgets.OperandPropertySurface);
+            }(DevExpress.Analytics.Widgets.OperandPropertySurface));
             Widgets.OperandPropertyQBSurface = OperandPropertyQBSurface;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4888,7 +4888,7 @@ var DevExpress;
                     getDataType: function (column) { return null; }
                 };
                 return QueryBuilderObjectsProvider;
-            })();
+            }());
             Widgets.QueryBuilderObjectsProvider = QueryBuilderObjectsProvider;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4911,7 +4911,7 @@ var DevExpress;
                     };
                 }
                 return KeyColumnSurface;
-            })();
+            }());
             Widgets.KeyColumnSurface = KeyColumnSurface;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -4981,7 +4981,7 @@ var DevExpress;
                     return DevExpress.Analytics.getLocalization('Master-Detail Relation Editor', DevExpress.Analytics.StringId.MasterDetailRelationsEditor);
                 };
                 return MasterDetailEditor;
-            })();
+            }());
             Widgets.MasterDetailEditor = MasterDetailEditor;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -5024,7 +5024,7 @@ var DevExpress;
                     });
                 };
                 return MasterDetailEditorPopupManager;
-            })();
+            }());
             Widgets.MasterDetailEditorPopupManager = MasterDetailEditorPopupManager;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -5058,7 +5058,7 @@ var DevExpress;
                     };
                 }
                 return MasterDetailRelationSurface;
-            })();
+            }());
             Widgets.MasterDetailRelationSurface = MasterDetailRelationSurface;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -5092,7 +5092,7 @@ var DevExpress;
                     };
                 }
                 return MasterQuerySurface;
-            })();
+            }());
             Widgets.MasterQuerySurface = MasterQuerySurface;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -5126,12 +5126,11 @@ var DevExpress;
                 WizardPage.prototype.commit = function (data) { };
                 WizardPage.prototype.reset = function () { };
                 return WizardPage;
-            })();
+            }());
             Wizard.WizardPage = WizardPage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../wizardPage.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5141,14 +5140,15 @@ var DevExpress;
             var MasterDetailRelationsPage = (function (_super) {
                 __extends(MasterDetailRelationsPage, _super);
                 function MasterDetailRelationsPage(wizard, sqlDataSourceResultSchema) {
-                    _super.call(this, wizard);
-                    this._relations = ko.observableArray([]);
-                    this.template = "dxrd-wizard-configure-relations-page";
-                    this.description = Analytics.getLocalization("Configure master-detail relationships.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations");
-                    this.relationsEditor = ko.observable(null);
-                    this.customResetOptions = $.noop;
-                    this._sqlDataSourceResultSchema = sqlDataSourceResultSchema;
-                    this.actionNext.isDisabled(true);
+                    var _this = _super.call(this, wizard) || this;
+                    _this._relations = ko.observableArray([]);
+                    _this.template = "dxrd-wizard-configure-relations-page";
+                    _this.description = Analytics.getLocalization("Configure master-detail relationships.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMasterDetailRelations");
+                    _this.relationsEditor = ko.observable(null);
+                    _this.customResetOptions = $.noop;
+                    _this._sqlDataSourceResultSchema = sqlDataSourceResultSchema;
+                    _this.actionNext.isDisabled(true);
+                    return _this;
                 }
                 MasterDetailRelationsPage.prototype._getResultSet = function (dataSource) {
                     var deferred = $.Deferred();
@@ -5192,13 +5192,11 @@ var DevExpress;
                     data.sqlDataSource.resultSet = this._resultSet;
                 };
                 return MasterDetailRelationsPage;
-            })(Wizard.WizardPage);
+            }(Wizard.WizardPage));
             Wizard.MasterDetailRelationsPage = MasterDetailRelationsPage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../wizardPage.ts" />
-/// <reference path="../../widgets/ace/options.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5208,28 +5206,27 @@ var DevExpress;
             var MultiQueryConfigurePage = (function (_super) {
                 __extends(MultiQueryConfigurePage, _super);
                 function MultiQueryConfigurePage(wizard, callbacks, disableCustomSql, rtl) {
-                    var _this = this;
                     if (callbacks === void 0) { callbacks = {}; }
                     if (disableCustomSql === void 0) { disableCustomSql = true; }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this, wizard);
-                    this._selectedPath = ko.observable(null);
-                    this._connection = "";
-                    this._itemsProvider = ko.observable();
-                    this._customQueries = ko.observableArray([]);
-                    this._chechedQueries = ko.observableArray([]);
-                    this._dataSource = function () {
+                    var _this = _super.call(this, wizard) || this;
+                    _this._selectedPath = ko.observable(null);
+                    _this._connection = "";
+                    _this._itemsProvider = ko.observable();
+                    _this._customQueries = ko.observableArray([]);
+                    _this._chechedQueries = ko.observableArray([]);
+                    _this._dataSource = function () {
                         return _this._data && _this._data.sqlDataSource;
                     };
-                    this._dataConnection = function () {
+                    _this._dataConnection = function () {
                         return _this._data && _this._data.sqlDataSource && _this._data.sqlDataSource.connection;
                     };
-                    this.template = "dxrd-wizard-add-queries-page";
-                    this.description = Analytics.getLocalization("Columns selected from specific tables and/or views will be automatically included into a separate query.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMultiQuery");
-                    this.scrollViewHeight = Wizard.WizardViewModel.WIZARD_DEFAULT_SCROLLVIEW_HEIGHT;
-                    this.isTablesGenerateColumnsCallBack = ko.observableArray([]);
-                    this.customizeDBSchemaTreeListActions = null;
-                    this.popupSelectStatment = ({
+                    _this.template = "dxrd-wizard-add-queries-page";
+                    _this.description = Analytics.getLocalization("Columns selected from specific tables and/or views will be automatically included into a separate query.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureMultiQuery");
+                    _this.scrollViewHeight = Wizard.WizardViewModel.WIZARD_DEFAULT_SCROLLVIEW_HEIGHT;
+                    _this.isTablesGenerateColumnsCallBack = ko.observableArray([]);
+                    _this.customizeDBSchemaTreeListActions = null;
+                    _this.popupSelectStatment = ({
                         isVisible: ko.observable(false),
                         title: function () { return Analytics.getLocalization("Custom SQL Editor", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_CustomSqlEditor"); },
                         query: null,
@@ -5248,15 +5245,15 @@ var DevExpress;
                             return $(element).closest(parentSelector);
                         }
                     });
-                    this.showStatementPopup = function (query) {
+                    _this.showStatementPopup = function (query) {
                         _this.popupSelectStatment.isVisible(true);
                         _this.popupSelectStatment.query = query;
                         _this.popupSelectStatment.data(query.sqlString());
                     };
-                    this.disableCustomSql = true;
-                    this.isDataLoadingInProcess = ko.observable(false);
-                    this.queryEditIndex = ko.observable(-1);
-                    this.showQbCallBack = function (name, isCustomQuery) {
+                    _this.disableCustomSql = true;
+                    _this.isDataLoadingInProcess = ko.observable(false);
+                    _this.queryEditIndex = ko.observable(-1);
+                    _this.showQbCallBack = function (name, isCustomQuery) {
                         if (name === void 0) { name = null; }
                         if (isCustomQuery === void 0) { isCustomQuery = false; }
                         if (name !== null) {
@@ -5281,21 +5278,21 @@ var DevExpress;
                             }
                         }
                     };
-                    this.customResetOptions = $.noop;
-                    this._callbacks = callbacks;
-                    this._sqlTextProvider = new Wizard.Utils.SelectQuerySqlTextProvider(DevExpress.QueryBuilder.Utils.wrapGetSelectStatement(this._callbacks.selectStatement), this._dataConnection);
-                    this.popupQueryBuilder = new Wizard.Utils.QueryBuilderPopup(function (newQuery, isInProcess) { return _this.setTableQuery(newQuery, isInProcess); }, rtl, callbacks.customizeQBInitData);
-                    this.fieldListModel = ko.observable(null);
-                    this.actionPrevious.isDisabled = ko.pureComputed(function () { return false; });
+                    _this.customResetOptions = $.noop;
+                    _this._callbacks = callbacks;
+                    _this._sqlTextProvider = new Wizard.Utils.SelectQuerySqlTextProvider(DevExpress.QueryBuilder.Utils.wrapGetSelectStatement(_this._callbacks.selectStatement), _this._dataConnection);
+                    _this.popupQueryBuilder = new Wizard.Utils.QueryBuilderPopup(function (newQuery, isInProcess) { return _this.setTableQuery(newQuery, isInProcess); }, rtl, callbacks.customizeQBInitData);
+                    _this.fieldListModel = ko.observable(null);
+                    _this.actionPrevious.isDisabled = ko.pureComputed(function () { return false; });
                     var isFinishDisabled = ko.pureComputed(function () { return !_this._itemsProvider() || !_this._itemsProvider().hasCheckedItems() || _this.isTablesGenerateColumnsCallBack().length > 0; });
-                    this.actionFinish.isDisabled = isFinishDisabled;
-                    this.actionNext.isDisabled = ko.pureComputed(function () { return _this._itemsProvider().nextButtonDisabled() || isFinishDisabled(); });
-                    this.hasParametersToEdit = ko.pureComputed(function () { return _this._itemsProvider().hasParametersToEdit(); });
-                    this.disableCustomSql = disableCustomSql;
-                    this.actionCancel.handler = function () {
+                    _this.actionFinish.isDisabled = isFinishDisabled;
+                    _this.actionNext.isDisabled = ko.pureComputed(function () { return _this._itemsProvider().nextButtonDisabled() || isFinishDisabled(); });
+                    _this.hasParametersToEdit = ko.pureComputed(function () { return _this._itemsProvider().hasParametersToEdit(); });
+                    _this.disableCustomSql = disableCustomSql;
+                    _this.actionCancel.handler = function () {
                         wizard.cancel();
                     };
-                    this.getItemsAfterCheck = function (node) {
+                    _this.getItemsAfterCheck = function (node) {
                         _this._resetDataSourceResult();
                         if (node.checked.peek() && node.isList) {
                             if (node.name === "tables" || node.name === "views") {
@@ -5315,6 +5312,7 @@ var DevExpress;
                             }
                         }
                     };
+                    return _this;
                 }
                 MultiQueryConfigurePage.prototype._addQueryAlgorithm = function (elements, specifics, dataSource, customQueries) {
                     if (!elements.unChecked() || specifics === "queries") {
@@ -5526,7 +5524,7 @@ var DevExpress;
                     data.sqlDataSource.queries.valueHasMutated();
                 };
                 return MultiQueryConfigurePage;
-            })(Wizard.WizardPage);
+            }(Wizard.WizardPage));
             Wizard.MultiQueryConfigurePage = MultiQueryConfigurePage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -5540,7 +5538,7 @@ var DevExpress;
             var CommonParametersPage = (function (_super) {
                 __extends(CommonParametersPage, _super);
                 function CommonParametersPage() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 CommonParametersPage.prototype.getParameters = function () {
                     return [];
@@ -5575,7 +5573,7 @@ var DevExpress;
                     this._validation && this._validation.dispose();
                 };
                 return CommonParametersPage;
-            })(Wizard.WizardPage);
+            }(Wizard.WizardPage));
             Wizard.CommonParametersPage = CommonParametersPage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -5601,13 +5599,11 @@ var DevExpress;
                     });
                 }
                 return MultiQueryDataSourceWizardModel;
-            })();
+            }());
             Wizard.MultiQueryDataSourceWizardModel = MultiQueryDataSourceWizardModel;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../commonParametersPage.ts" />
-/// <reference path="multiQueryWizardModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5623,15 +5619,14 @@ var DevExpress;
             var MultiQueryConfigureParametersPage = (function (_super) {
                 __extends(MultiQueryConfigureParametersPage, _super);
                 function MultiQueryConfigureParametersPage(wizard, parametersConverter) {
-                    var _this = this;
                     if (parametersConverter === void 0) { parametersConverter = {
                         createParameterViewModel: function (parameter) { return parameter; },
                         getParameterFromViewModel: function (parameterViewModel) { return parameterViewModel; }
                     }; }
-                    _super.call(this, wizard);
-                    this.parametersConverter = parametersConverter;
-                    this._selectedPath = ko.observable(null);
-                    this._createNewParameter = function (queryName, parameters) {
+                    var _this = _super.call(this, wizard) || this;
+                    _this.parametersConverter = parametersConverter;
+                    _this._selectedPath = ko.observable(null);
+                    _this._createNewParameter = function (queryName, parameters) {
                         var newParameter = new Analytics.Data.DataSourceParameter({
                             "@Name": Analytics.Internal.getUniqueNameForNamedObjectsArray(parameters, "parameter"),
                             "@Type": "System.Int32"
@@ -5639,12 +5634,13 @@ var DevExpress;
                         _this._selectedPath(queryName + "." + newParameter.name());
                         return _this.parametersConverter.createParameterViewModel(newParameter);
                     };
-                    this.template = "dxrd-configure-query-parameters-page";
-                    this.description = Analytics.getLocalization("Configure query parameters.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters");
-                    this.scrollViewHeight = Wizard.WizardViewModel.WIZARD_DEFAULT_SCROLLVIEW_HEIGHT;
-                    this.fieldListModel = ko.observable(null);
-                    this.actionPrevious.isDisabled(false);
-                    this.actionFinish.isDisabled(false);
+                    _this.template = "dxrd-configure-query-parameters-page";
+                    _this.description = Analytics.getLocalization("Configure query parameters.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters");
+                    _this.scrollViewHeight = Wizard.WizardViewModel.WIZARD_DEFAULT_SCROLLVIEW_HEIGHT;
+                    _this.fieldListModel = ko.observable(null);
+                    _this.actionPrevious.isDisabled(false);
+                    _this.actionFinish.isDisabled(false);
+                    return _this;
                 }
                 MultiQueryConfigureParametersPage.prototype._begin = function (data) {
                     var _this = this;
@@ -5702,7 +5698,7 @@ var DevExpress;
                     });
                 };
                 return MultiQueryConfigureParametersPage;
-            })(Wizard.CommonParametersPage);
+            }(Wizard.CommonParametersPage));
             Wizard.MultiQueryConfigureParametersPage = MultiQueryConfigureParametersPage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -5852,12 +5848,11 @@ var DevExpress;
                 WizardViewModel.WIZARD_DEFAULT_HEIGHT = "505";
                 WizardViewModel.WIZARD_DEFAULT_SCROLLVIEW_HEIGHT = "286";
                 return WizardViewModel;
-            })();
+            }());
             Wizard.WizardViewModel = WizardViewModel;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../wizardModel.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5870,26 +5865,27 @@ var DevExpress;
                     if (callbacks === void 0) { callbacks = {}; }
                     if (disableCustomSql === void 0) { disableCustomSql = false; }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this);
-                    this.connectionStrings = connectionStrings;
-                    this.height = ko.observable("443");
-                    this.title = Analytics.getLocalization("SQL Data Source Wizard", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_Title");
-                    this.extendCssClass = "dxrd-multiqueries-sqldatasource-wizard";
-                    this.container = Analytics.Utils.getParentContainer;
-                    this.finishCallback = callbacks.finishCallback;
-                    this.steps = [
-                        new Wizard.SelectConnectionString(this, connectionStrings, false),
-                        new Wizard.MultiQueryConfigurePage(this, callbacks, disableCustomSql, rtl),
-                        new Wizard.MultiQueryConfigureParametersPage(this),
-                        new Wizard.MasterDetailRelationsPage(this, DevExpress.QueryBuilder.Utils.wrapRebuildResultSchema(callbacks.sqlDataSourceResultSchema))
+                    var _this = _super.call(this) || this;
+                    _this.connectionStrings = connectionStrings;
+                    _this.height = ko.observable("443");
+                    _this.title = Analytics.getLocalization("SQL Data Source Wizard", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_Title");
+                    _this.extendCssClass = "dxrd-multiqueries-sqldatasource-wizard";
+                    _this.container = Analytics.Utils.getParentContainer;
+                    _this.finishCallback = callbacks.finishCallback;
+                    _this.steps = [
+                        new Wizard.SelectConnectionString(_this, connectionStrings, false),
+                        new Wizard.MultiQueryConfigurePage(_this, callbacks, disableCustomSql, rtl),
+                        new Wizard.MultiQueryConfigureParametersPage(_this),
+                        new Wizard.MasterDetailRelationsPage(_this, DevExpress.QueryBuilder.Utils.wrapRebuildResultSchema(callbacks.sqlDataSourceResultSchema))
                     ];
+                    return _this;
                 }
                 MultiQueryDataSourceWizard.prototype.start = function (wizardModel, finishCallback) {
                     this.wizardModel = wizardModel || new Wizard.MultiQueryDataSourceWizardModel();
                     _super.prototype.start.call(this, this.wizardModel, Wizard.WizardViewModel.chainCallbacks(finishCallback, this.finishCallback));
                 };
                 return MultiQueryDataSourceWizard;
-            })(Wizard.WizardViewModel);
+            }(Wizard.WizardViewModel));
             Wizard.MultiQueryDataSourceWizard = MultiQueryDataSourceWizard;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -5903,20 +5899,19 @@ var DevExpress;
             var ConfigureParametersPage = (function (_super) {
                 __extends(ConfigureParametersPage, _super);
                 function ConfigureParametersPage(wizard, parametersConverter) {
-                    var _this = this;
                     if (parametersConverter === void 0) { parametersConverter = {
                         createParameterViewModel: function (parameter) { return parameter; },
                         getParameterFromViewModel: function (parameterViewModel) { return parameterViewModel; }
                     }; }
-                    _super.call(this, wizard);
-                    this.parametersConverter = parametersConverter;
-                    this.template = "dxrd-page-configure-parameters";
-                    this.description = Analytics.getLocalization("Configure query parameters.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters");
-                    this.removeButtonTitle = Analytics.getLocalization("Remove", "DataAccessUIStringId.Button_Remove");
-                    this.actionPrevious.isDisabled(false);
-                    this.actionNext.isDisabled(true);
-                    this.actionFinish.isDisabled(false);
-                    this.parametersEditorOptions = {
+                    var _this = _super.call(this, wizard) || this;
+                    _this.parametersConverter = parametersConverter;
+                    _this.template = "dxrd-page-configure-parameters";
+                    _this.description = Analytics.getLocalization("Configure query parameters.", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageConfigureParameters");
+                    _this.removeButtonTitle = Analytics.getLocalization("Remove", "DataAccessUIStringId.Button_Remove");
+                    _this.actionPrevious.isDisabled(false);
+                    _this.actionNext.isDisabled(true);
+                    _this.actionFinish.isDisabled(false);
+                    _this.parametersEditorOptions = {
                         addHandler: function () {
                             return _this.parametersConverter.createParameterViewModel(new Analytics.Data.DataSourceParameter({
                                 "@Name": Analytics.Internal.getUniqueNameForNamedObjectsArray(_this.parametersEditorOptions.values.peek().peek(), "param"),
@@ -5938,6 +5933,7 @@ var DevExpress;
                         hideButtons: ko.observable(false),
                         collapsed: false
                     };
+                    return _this;
                 }
                 ConfigureParametersPage.prototype.getParameters = function () {
                     return this.parametersEditorOptions.values()();
@@ -5954,7 +5950,7 @@ var DevExpress;
                     data.sqlQuery.parameters(this.parametersEditorOptions.values()().map(function (item) { return _this.parametersConverter.getParameterFromViewModel(item); }));
                 };
                 return ConfigureParametersPage;
-            })(Wizard.CommonParametersPage);
+            }(Wizard.CommonParametersPage));
             Wizard.ConfigureParametersPage = ConfigureParametersPage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -5968,30 +5964,29 @@ var DevExpress;
             var CreateQueryPage = (function (_super) {
                 __extends(CreateQueryPage, _super);
                 function CreateQueryPage(wizard, callbacks, disableCustomSql, rtl) {
-                    var _this = this;
                     if (callbacks === void 0) { callbacks = {}; }
                     if (disableCustomSql === void 0) { disableCustomSql = false; }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this, wizard);
-                    this._dataSource = function () {
+                    var _this = _super.call(this, wizard) || this;
+                    _this._dataSource = function () {
                         return _this._data && _this._data.sqlDataSource;
                     };
-                    this._connection = function () {
+                    _this._connection = function () {
                         return _this._data && _this._data.sqlDataSource && _this._data.sqlDataSource.connection;
                     };
-                    this.template = "dxrd-wizard-create-query-page";
-                    this.description = DevExpress.Analytics.getLocalization("Create a query or select a stored procedure", DevExpress.Analytics.StringId.WizardPageConfigureQuery);
-                    this.queryTypeItems = [CreateQueryPage.QUERY_TEXT, CreateQueryPage.SP_TEXT];
-                    this.selectedQueryType = ko.observable();
-                    this.queryControl = ko.observable();
-                    this.runQueryBuilderBtnText = ko.pureComputed(function () {
+                    _this.template = "dxrd-wizard-create-query-page";
+                    _this.description = DevExpress.Analytics.getLocalization("Create a query or select a stored procedure", DevExpress.Analytics.StringId.WizardPageConfigureQuery);
+                    _this.queryTypeItems = [CreateQueryPage.QUERY_TEXT, CreateQueryPage.SP_TEXT];
+                    _this.selectedQueryType = ko.observable();
+                    _this.queryControl = ko.observable();
+                    _this.runQueryBuilderBtnText = ko.pureComputed(function () {
                         return (!_this._selectStatementControl.sqlString() || _this._selectStatementControl.getQuery().type() === Analytics.Data.Utils.SqlQueryType.tableQuery) ?
                             Analytics.getLocalization("Run Query Builder...", "DataAccessUIStringId.Button_QueryBuilder") :
                             Analytics.getLocalization("Create New Query...", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_CreateNewQuery");
                     });
-                    this._proceduresList = new Wizard.Utils.StoredProceduresQueryControl();
-                    this._selectStatementControl = new Wizard.Utils.SelectStatementQueryControl(new Wizard.Utils.SelectQuerySqlTextProvider(DevExpress.QueryBuilder.Utils.wrapGetSelectStatement(callbacks.selectStatement), this._connection), disableCustomSql);
-                    this.selectedQueryType.subscribe(function (value) {
+                    _this._proceduresList = new Wizard.Utils.StoredProceduresQueryControl();
+                    _this._selectStatementControl = new Wizard.Utils.SelectStatementQueryControl(new Wizard.Utils.SelectQuerySqlTextProvider(DevExpress.QueryBuilder.Utils.wrapGetSelectStatement(callbacks.selectStatement), _this._connection), disableCustomSql);
+                    _this.selectedQueryType.subscribe(function (value) {
                         if (value === CreateQueryPage.SP_TEXT) {
                             _this._wrapWizardIndicator(function () {
                                 return _this._dataSource().dbSchemaProvider.getDbStoredProcedures().done(function (procedures) {
@@ -6005,17 +6000,18 @@ var DevExpress;
                             _this.queryControl(_this._selectStatementControl);
                         }
                     });
-                    this.selectedQueryType(CreateQueryPage.QUERY_TEXT);
-                    this.popupQueryBuilder = new Wizard.Utils.QueryBuilderPopup(function (newQuery, isInProcess) {
+                    _this.selectedQueryType(CreateQueryPage.QUERY_TEXT);
+                    _this.popupQueryBuilder = new Wizard.Utils.QueryBuilderPopup(function (newQuery, isInProcess) {
                         return _this._selectStatementControl.setQuery(newQuery, isInProcess);
                     }, rtl, callbacks.customizeQBInitData);
-                    this.actionPrevious.isDisabled = ko.pureComputed(function () { return _this.wizard.indicatorVisible(); });
-                    this.actionNext.isDisabled = ko.pureComputed(function () { return _this.wizard.indicatorVisible() || _this.queryControl().isNextDisabled(); });
-                    this.actionFinish.isDisabled = ko.pureComputed(function () { return _this.wizard.indicatorVisible() || _this.queryControl().isFinishDisabled(); });
-                    this.actionCancel.handler = function () {
+                    _this.actionPrevious.isDisabled = ko.pureComputed(function () { return _this.wizard.indicatorVisible(); });
+                    _this.actionNext.isDisabled = ko.pureComputed(function () { return _this.wizard.indicatorVisible() || _this.queryControl().isNextDisabled(); });
+                    _this.actionFinish.isDisabled = ko.pureComputed(function () { return _this.wizard.indicatorVisible() || _this.queryControl().isFinishDisabled(); });
+                    _this.actionCancel.handler = function () {
                         _this.wizard.indicatorVisible(false);
                         wizard.cancel();
                     };
+                    return _this;
                 }
                 CreateQueryPage.prototype._wrapWizardIndicator = function (callBack) {
                     var _this = this;
@@ -6057,7 +6053,7 @@ var DevExpress;
                 CreateQueryPage.prototype.commit = function (data) {
                     var query = this.queryControl().getQuery();
                     if (query) {
-                        if (!query.name())
+                        if (!query.name() || !data.sqlQuery || data.sqlQuery.name() !== query.name())
                             query.name(Analytics.Data.Utils.generateQueryUniqueName(data.sqlDataSource.queries(), query));
                         data.sqlQuery = query;
                     }
@@ -6065,7 +6061,7 @@ var DevExpress;
                 CreateQueryPage.QUERY_TEXT = "Query";
                 CreateQueryPage.SP_TEXT = "Stored Procedure";
                 return CreateQueryPage;
-            })(Wizard.WizardPage);
+            }(Wizard.WizardPage));
             Wizard.CreateQueryPage = CreateQueryPage;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -6079,20 +6075,20 @@ var DevExpress;
             var SelectConnectionString = (function (_super) {
                 __extends(SelectConnectionString, _super);
                 function SelectConnectionString(wizard, connectionStrings, _showPageForSingleConnectionString) {
-                    var _this = this;
                     if (_showPageForSingleConnectionString === void 0) { _showPageForSingleConnectionString = false; }
-                    _super.call(this, wizard);
-                    this._showPageForSingleConnectionString = _showPageForSingleConnectionString;
-                    this.template = "dxrd-page-connectionstring";
-                    this.description = Analytics.getLocalization("Choose a data connection", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection");
-                    this.connectionStrings = ko.observableArray([]);
-                    this.selectedConnectionString = ko.observableArray([]);
-                    this.actionPrevious.isVisible(false);
-                    this.actionNext.isDisabled = ko.pureComputed(function () {
+                    var _this = _super.call(this, wizard) || this;
+                    _this._showPageForSingleConnectionString = _showPageForSingleConnectionString;
+                    _this.template = "dxrd-page-connectionstring";
+                    _this.description = Analytics.getLocalization("Choose a data connection", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_PageChooseConnection");
+                    _this.connectionStrings = ko.observableArray([]);
+                    _this.selectedConnectionString = ko.observableArray([]);
+                    _this.actionPrevious.isVisible(false);
+                    _this.actionNext.isDisabled = ko.pureComputed(function () {
                         return _this.selectedConnectionString().length === 0;
                     });
-                    this.actionFinish.isDisabled(true);
-                    this.connectionStrings = connectionStrings;
+                    _this.actionFinish.isDisabled(true);
+                    _this.connectionStrings = connectionStrings;
+                    return _this;
                 }
                 SelectConnectionString.prototype._begin = function (data) {
                     var connectionStrings = this.connectionStrings();
@@ -6118,7 +6114,7 @@ var DevExpress;
                     }
                 };
                 return SelectConnectionString;
-            })(Wizard.WizardPage);
+            }(Wizard.WizardPage));
             Wizard.SelectConnectionString = SelectConnectionString;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -6162,7 +6158,7 @@ var DevExpress;
                     return this._queryIndex;
                 };
                 return SqlDataSourceWizardModel;
-            })();
+            }());
             Wizard.SqlDataSourceWizardModel = SqlDataSourceWizardModel;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -6179,24 +6175,25 @@ var DevExpress;
                     if (callbacks === void 0) { callbacks = {}; }
                     if (disableCustomSql === void 0) { disableCustomSql = false; }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this);
-                    this.title = Analytics.getLocalization("SQL Data Source Wizard", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_Title");
-                    this.extendCssClass = "dxrd-sqldatasource-wizard";
-                    this.container = Analytics.Utils.getParentContainer;
-                    this.finishCallback = callbacks.finishCallback;
-                    this.steps = [
-                        new Wizard.SelectConnectionString(this, connectionStrings, false),
-                        new Wizard.CreateQueryPage(this, callbacks, disableCustomSql, rtl),
-                        new Wizard.ConfigureParametersPage(this)
+                    var _this = _super.call(this) || this;
+                    _this.title = Analytics.getLocalization("SQL Data Source Wizard", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_Title");
+                    _this.extendCssClass = "dxrd-sqldatasource-wizard";
+                    _this.container = Analytics.Utils.getParentContainer;
+                    _this.finishCallback = callbacks.finishCallback;
+                    _this.steps = [
+                        new Wizard.SelectConnectionString(_this, connectionStrings, false),
+                        new Wizard.CreateQueryPage(_this, callbacks, disableCustomSql, rtl),
+                        new Wizard.ConfigureParametersPage(_this)
                     ];
-                    this.connectionStrings = connectionStrings;
+                    _this.connectionStrings = connectionStrings;
+                    return _this;
                 }
                 SqlDataSourceWizard.prototype.start = function (wizardModel, finishCallback) {
                     this._wizardModel = wizardModel || new Wizard.SqlDataSourceWizardModel();
                     _super.prototype.start.call(this, this._wizardModel, Wizard.WizardViewModel.chainCallbacks(finishCallback, this.finishCallback));
                 };
                 return SqlDataSourceWizard;
-            })(Wizard.WizardViewModel);
+            }(Wizard.WizardViewModel));
             Wizard.SqlDataSourceWizard = SqlDataSourceWizard;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -6237,7 +6234,7 @@ var DevExpress;
                         return this.parent.query();
                     };
                     return ParametersTreeListItem;
-                })();
+                }());
                 Utils.ParametersTreeListItem = ParametersTreeListItem;
                 var ParametersTreeListRootItem = (function () {
                     function ParametersTreeListRootItem(query) {
@@ -6254,14 +6251,15 @@ var DevExpress;
                         return this._query;
                     };
                     return ParametersTreeListRootItem;
-                })();
+                }());
                 Utils.ParametersTreeListRootItem = ParametersTreeListRootItem;
                 var ParametersTreeListController = (function (_super) {
                     __extends(ParametersTreeListController, _super);
                     function ParametersTreeListController(rootItems, createNewParameter) {
-                        _super.call(this);
-                        this._createNewParameter = createNewParameter;
-                        this._rootItems = rootItems;
+                        var _this = _super.call(this) || this;
+                        _this._createNewParameter = createNewParameter;
+                        _this._rootItems = rootItems;
+                        return _this;
                     }
                     ParametersTreeListController.prototype.hasItems = function (item) {
                         return item.isList;
@@ -6303,7 +6301,7 @@ var DevExpress;
                         return true;
                     };
                     return ParametersTreeListController;
-                })(Analytics.Widgets.TreeListController);
+                }(Analytics.Widgets.TreeListController));
                 Utils.ParametersTreeListController = ParametersTreeListController;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -6456,7 +6454,7 @@ var DevExpress;
                         this._customQueries = customQueries;
                     }
                     return DBSchemaItemsProvider;
-                })();
+                }());
                 Utils.DBSchemaItemsProvider = DBSchemaItemsProvider;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -6473,8 +6471,9 @@ var DevExpress;
                 var DBSchemaTreeListController = (function (_super) {
                     __extends(DBSchemaTreeListController, _super);
                     function DBSchemaTreeListController(_customizeDBSchemaTreeListActions) {
-                        _super.call(this);
-                        this._customizeDBSchemaTreeListActions = _customizeDBSchemaTreeListActions;
+                        var _this = _super.call(this) || this;
+                        _this._customizeDBSchemaTreeListActions = _customizeDBSchemaTreeListActions;
+                        return _this;
                     }
                     DBSchemaTreeListController.prototype.getActions = function (value) {
                         if (!value.data)
@@ -6489,7 +6488,7 @@ var DevExpress;
                         return true;
                     };
                     return DBSchemaTreeListController;
-                })(Analytics.Widgets.TreeListController);
+                }(Analytics.Widgets.TreeListController));
                 Utils.DBSchemaTreeListController = DBSchemaTreeListController;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -6580,7 +6579,7 @@ var DevExpress;
                         actions.splice(0, actions.length, del, undo, redo);
                     };
                     return QueryBuilderPopup;
-                })();
+                }());
                 Utils.QueryBuilderPopup = QueryBuilderPopup;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -6608,13 +6607,12 @@ var DevExpress;
                         });
                     };
                     return SelectQuerySqlTextProvider;
-                })();
+                }());
                 Utils.SelectQuerySqlTextProvider = SelectQuerySqlTextProvider;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../../widgets/ace/options.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6690,7 +6688,7 @@ var DevExpress;
                         configurable: true
                     });
                     return SelectStatementQueryControl;
-                })();
+                }());
                 Utils.SelectStatementQueryControl = SelectStatementQueryControl;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -6707,20 +6705,19 @@ var DevExpress;
                 var StoredProceduresQueryControl = (function (_super) {
                     __extends(StoredProceduresQueryControl, _super);
                     function StoredProceduresQueryControl() {
-                        var _this = this;
-                        _super.call(this);
-                        this.template = "dxrd-procedures-control";
-                        this.storedProcedures = ko.observableArray([]);
-                        this.selectedProcedure = ko.observableArray([]);
-                        this.caption = function () { return DevExpress.Analytics.getLocalization("Select a stored procedure:", "DataAccessUIStringId.StoredProcControl_Caption"); };
-                        this.generateStoredProcedureDisplayName = function (procedure) { return StoredProceduresQueryControl.generateStoredProcedureDisplayName(procedure); };
-                        this.isNextDisabled = ko.pureComputed(function () {
+                        var _this = _super.call(this) || this;
+                        _this.template = "dxrd-procedures-control";
+                        _this.storedProcedures = ko.observableArray([]);
+                        _this.selectedProcedure = ko.observableArray([]);
+                        _this.caption = function () { return DevExpress.Analytics.getLocalization("Select a stored procedure:", "DataAccessUIStringId.StoredProcControl_Caption"); };
+                        _this.generateStoredProcedureDisplayName = function (procedure) { return StoredProceduresQueryControl.generateStoredProcedureDisplayName(procedure); };
+                        _this.isNextDisabled = ko.pureComputed(function () {
                             return !_this._selectedProcedure || !_this._needToProcessParameters(_this._selectedProcedure);
                         });
-                        this.isFinishDisabled = ko.pureComputed(function () {
+                        _this.isFinishDisabled = ko.pureComputed(function () {
                             return !_this._selectedProcedure || _this._needToProcessParameters(_this._selectedProcedure);
                         });
-                        this.storedProcedures.subscribe(function (newProcedures) {
+                        _this.storedProcedures.subscribe(function (newProcedures) {
                             if (!newProcedures) {
                                 _this._selectedProcedure = null;
                             }
@@ -6734,6 +6731,7 @@ var DevExpress;
                                 _this._selectedProcedure = newProcedures[0];
                             }
                         });
+                        return _this;
                     }
                     StoredProceduresQueryControl.prototype._needToProcessParameters = function (procedure) {
                         return procedure.arguments.some(StoredProceduresQueryControl._availableConvertToParameter);
@@ -6787,7 +6785,7 @@ var DevExpress;
                         configurable: true
                     });
                     return StoredProceduresQueryControl;
-                })(Analytics.Utils.Disposable);
+                }(Analytics.Utils.Disposable));
                 Utils.StoredProceduresQueryControl = StoredProceduresQueryControl;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -6824,29 +6822,29 @@ var DevExpress;
                         this._checked(value);
                     };
                     return TreeNodeBase;
-                })();
+                }());
                 Utils.TreeNodeBase = TreeNodeBase;
                 var TreeLeafNode = (function (_super) {
                     __extends(TreeLeafNode, _super);
                     function TreeLeafNode(name, displayName, specifics, isChecked, nodeArguments, afterCheckToggled) {
                         if (isChecked === void 0) { isChecked = false; }
                         if (nodeArguments === void 0) { nodeArguments = null; }
-                        _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled);
-                        this.name = name;
-                        this.displayName = displayName;
-                        this.specifics = specifics;
-                        this.hasQuery = false;
-                        this.arguments = nodeArguments;
+                        var _this = _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled) || this;
+                        _this.name = name;
+                        _this.displayName = displayName;
+                        _this.specifics = specifics;
+                        _this.hasQuery = false;
+                        _this.arguments = nodeArguments;
+                        return _this;
                     }
                     return TreeLeafNode;
-                })(TreeNodeBase);
+                }(TreeNodeBase));
                 Utils.TreeLeafNode = TreeLeafNode;
                 var TreeNode = (function (_super) {
                     __extends(TreeNode, _super);
                     function TreeNode(name, displayName, specifics, isChecked, afterCheckToggled) {
-                        var _this = this;
-                        _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled);
-                        this.countChecked = ko.pureComputed(function () {
+                        var _this = _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled) || this;
+                        _this.countChecked = ko.pureComputed(function () {
                             var count = 0;
                             for (var i = 0; i < _this.children().length; i++) {
                                 if (!_this.children()[i].unChecked()) {
@@ -6857,9 +6855,9 @@ var DevExpress;
                             }
                             return count;
                         });
-                        this.isList = true;
-                        this.children = ko.observableArray([]);
-                        this.checked = ko.pureComputed({
+                        _this.isList = true;
+                        _this.children = ko.observableArray([]);
+                        _this.checked = ko.pureComputed({
                             read: function () {
                                 if (!_this.initialized()) {
                                     return _this._checked();
@@ -6885,6 +6883,7 @@ var DevExpress;
                                 }
                             }
                         });
+                        return _this;
                     }
                     TreeNode.prototype.initialized = function () {
                         return this.children().length > 0;
@@ -6899,14 +6898,13 @@ var DevExpress;
                         this.children(children || []);
                     };
                     return TreeNode;
-                })(TreeNodeBase);
+                }(TreeNodeBase));
                 Utils.TreeNode = TreeNode;
                 var ParameterTreeNode = (function (_super) {
                     __extends(ParameterTreeNode, _super);
                     function ParameterTreeNode(name, displayName, specifics, isChecked, afterCheckToggled) {
-                        var _this = this;
-                        _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled);
-                        this.countChecked = ko.pureComputed(function () {
+                        var _this = _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled) || this;
+                        _this.countChecked = ko.pureComputed(function () {
                             var count = 0;
                             _this.hasParamsToEdit(false);
                             for (var i = 0; i < _this.children().length; i++) {
@@ -6923,17 +6921,17 @@ var DevExpress;
                             }
                             return count;
                         });
-                        this.hasParamsToEdit = ko.observable(false);
+                        _this.hasParamsToEdit = ko.observable(false);
+                        return _this;
                     }
                     return ParameterTreeNode;
-                })(TreeNode);
+                }(TreeNode));
                 Utils.ParameterTreeNode = ParameterTreeNode;
                 var QueriesTreeNode = (function (_super) {
                     __extends(QueriesTreeNode, _super);
                     function QueriesTreeNode(name, displayName, specifics, isChecked, callbacks, afterCheckToggled) {
-                        var _this = this;
-                        _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled);
-                        this.addAction = {
+                        var _this = _super.call(this, name, displayName, specifics, isChecked, afterCheckToggled) || this;
+                        _this.addAction = {
                             clickAction: function (item) {
                                 if (_this.disableCustomSql()) {
                                     return _this.addQuery();
@@ -6947,18 +6945,19 @@ var DevExpress;
                             templateName: "dx-treelist-action-with-popover",
                             text: Analytics.getLocalization("Add query", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_AddQuery")
                         };
-                        this.itemClickAction = function (e) {
+                        _this.itemClickAction = function (e) {
                             _this.popoverVisible(false);
                             e.itemData.addAction();
                         };
-                        this.popoverVisible = ko.observable(false);
-                        this.addQuery = function () {
+                        _this.popoverVisible = ko.observable(false);
+                        _this.addQuery = function () {
                             callbacks().showQbCallBack();
                         };
-                        this.addCustomQuery = function () {
+                        _this.addCustomQuery = function () {
                             callbacks().showQbCallBack(null, true);
                         };
-                        this.disableCustomSql = function () { return callbacks && callbacks().disableCustomSql; };
+                        _this.disableCustomSql = function () { return callbacks && callbacks().disableCustomSql; };
+                        return _this;
                     }
                     QueriesTreeNode.prototype.getActions = function (context) {
                         var result = [];
@@ -6977,20 +6976,20 @@ var DevExpress;
                             {
                                 name: Analytics.getLocalization("Write Custom SQL", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_WriteCustomSQL"),
                                 addAction: function () { return _this.addCustomQuery(); }
-                            }];
+                            }
+                        ];
                     };
                     QueriesTreeNode.prototype.showPopover = function () {
                         this.popoverVisible(true);
                     };
                     return QueriesTreeNode;
-                })(ParameterTreeNode);
+                }(ParameterTreeNode));
                 Utils.QueriesTreeNode = QueriesTreeNode;
                 var TreeQueryNode = (function (_super) {
                     __extends(TreeQueryNode, _super);
                     function TreeQueryNode(name, displayName, specifics, isChecked, parameters, callbacks, afterCheckToggled) {
-                        var _this = this;
-                        _super.call(this, name, displayName, specifics, isChecked, null, afterCheckToggled);
-                        this.editAction = {
+                        var _this = _super.call(this, name, displayName, specifics, isChecked, null, afterCheckToggled) || this;
+                        _this.editAction = {
                             clickAction: function (item) {
                                 return _this.editQuery();
                             },
@@ -6998,7 +6997,7 @@ var DevExpress;
                             imageTemplateName: "dxrd-svg-operations-edit",
                             text: Analytics.getLocalization("Edit query", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_EditQuery")
                         };
-                        this.removeAction = {
+                        _this.removeAction = {
                             clickAction: function (item) {
                                 _this.removeQuery({ model: item.data });
                             },
@@ -7006,14 +7005,15 @@ var DevExpress;
                             imageTemplateName: "dxrd-svg-operations-recycle_bin",
                             text: Analytics.getLocalization("Remove query", "ASPxReportsStringId.ReportDesigner_SqlDSWizard_RemoveQuery")
                         };
-                        this.parameters = parameters;
-                        this.removeQuery = function (e) {
+                        _this.parameters = parameters;
+                        _this.removeQuery = function (e) {
                             callbacks().deleteAction(e.model.name);
                         };
-                        this.editQuery = function (e) {
+                        _this.editQuery = function (e) {
                             callbacks().showQbCallBack(_this.name);
                         };
-                        this.hasQuery = true;
+                        _this.hasQuery = true;
+                        return _this;
                     }
                     TreeQueryNode.prototype.getActions = function (context) {
                         var result = [];
@@ -7022,7 +7022,7 @@ var DevExpress;
                         return result;
                     };
                     return TreeQueryNode;
-                })(TreeLeafNode);
+                }(TreeLeafNode));
                 Utils.TreeQueryNode = TreeQueryNode;
             })(Utils = Wizard.Utils || (Wizard.Utils = {}));
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
@@ -7091,7 +7091,7 @@ var DevExpress;
                     }
                 };
                 return LegacyPageDispathcer;
-            })();
+            }());
             Wizard.LegacyPageDispathcer = LegacyPageDispathcer;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -7110,86 +7110,11 @@ var DevExpress;
                     this.text = text;
                 }
                 return WizardAction;
-            })();
+            }());
             Wizard.WizardAction = WizardAction;
         })(Wizard = Analytics.Wizard || (Analytics.Wizard = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="dataSource/sql/connectionOptions.ts" />
-/// <reference path="dataSource/sql/customSqlQuery.ts" />
-/// <reference path="dataSource/sql/masterDetailRelation.ts" />
-/// <reference path="dataSource/sql/sqlDataConnection.ts" />
-/// <reference path="dataSource/sql/sqlDataSource.ts" />
-/// <reference path="dataSource/sql/storedProcQuery.ts" />
-/// <reference path="dataSource/sql/tableQuery.ts" />
-/// <reference path="dataSource/dataSourceParameter.ts" />
-/// <reference path="dataSource/dbColumn.ts" />
-/// <reference path="dataSource/dbForeignKey.ts" />
-/// <reference path="dataSource/dbSchema.ts" />
-/// <reference path="dataSource/dbSchemaProvider.ts" />
-/// <reference path="dataSource/dbStoredProcedure.ts" />
-/// <reference path="dataSource/dbTable.ts" />
-/// <reference path="dataSource/resultSet.ts" />
-/// <reference path="dataSource/resultTable.ts" />
-/// <reference path="dataSource/utils.ts" />
-/// <reference path="dragDrop/columnDragHandler.ts" />
-/// <reference path="dragDrop/dbObjectDragDropHandler.ts" />
-/// <reference path="elements/allColumnsModel.ts" />
-/// <reference path="elements/allColumnsSurface.ts" />
-/// <reference path="elements/columnExpression.ts" />
-/// <reference path="elements/columnModel.ts" />
-/// <reference path="elements/columnSurface.ts" />
-/// <reference path="elements/joinConditionModel.ts" />
-/// <reference path="elements/joinConditionSurface.ts" />
-/// <reference path="elements/queryElementModel.ts" />
-/// <reference path="elements/queryElementSurface.ts" />
-/// <reference path="elements/queryModel.ts" />
-/// <reference path="elements/querySurface.ts" />
-/// <reference path="elements/relationModel.ts" />
-/// <reference path="elements/relationSurface.ts" />
-/// <reference path="elements/tableModel.ts" />
-/// <reference path="elements/tableSurface.ts" />
-/// <reference path="utils/columnExpressionCollectionHelper.ts" />
-/// <reference path="utils/controlsFactory.ts" />
-/// <reference path="utils/queryBuilderTreeListController.ts" />
-/// <reference path="utils/requestwrapper.ts" />
-/// <reference path="widgets/filterEditor/groupFilterEditorSerializer.ts" />
-/// <reference path="widgets/filterEditor/operandParameterQBSurface.ts" />
-/// <reference path="widgets/filterEditor/operandPropertyQBSurface.ts" />
-/// <reference path="widgets/filterEditor/queryBuilderObjectsProvider.ts" />
-/// <reference path="widgets/masterdetaileditor/keyColumnSurface.ts" />
-/// <reference path="widgets/masterdetaileditor/masterDetailEditor.ts" />
-/// <reference path="widgets/masterdetaileditor/masterDetailEditorPopupManager.ts" />
-/// <reference path="widgets/masterdetaileditor/masterDetailRelationSurface.ts" />
-/// <reference path="widgets/masterdetaileditor/masterQuerySurface.ts" />
-/// <reference path="widgets/editorTemplates.ts" />
-/// <reference path="widgets/undoEditor.ts" />
-/// <reference path="wizard/multiQueryWizard/masterDetailRelationsPage.ts" />
-/// <reference path="wizard/multiQueryWizard/multiQueryConfigurePage.ts" />
-/// <reference path="wizard/multiQueryWizard/multiQueryConfigureParametersPage.ts" />
-/// <reference path="wizard/multiQueryWizard/multiQueryWizard.ts" />
-/// <reference path="wizard/multiQueryWizard/multiQueryWizardModel.ts" />
-/// <reference path="wizard/sqlDataSourceWizard/configureParametersPage.ts" />
-/// <reference path="wizard/sqlDataSourceWizard/createQueryPage.ts" />
-/// <reference path="wizard/sqlDataSourceWizard/selectConnectionString.ts" />
-/// <reference path="wizard/sqlDataSourceWizard/sqlDataSourceWizard.ts" />
-/// <reference path="wizard/sqlDataSourceWizard/sqlDataSourceWizardModel.ts" />
-/// <reference path="wizard/utils/configureParametersUtils.ts" />
-/// <reference path="wizard/utils/dbSchemaItemsProvider.ts" />
-/// <reference path="wizard/utils/dbSchemaTreeListController.ts" />
-/// <reference path="wizard/utils/queryBuilderPopup.ts" />
-/// <reference path="wizard/utils/selectQuerySqlTextProvider.ts" />
-/// <reference path="wizard/utils/selectStatementQueryControl.ts" />
-/// <reference path="wizard/utils/storedProceduresQueryControl.ts" />
-/// <reference path="wizard/utils/treeListNode.ts" />
-/// <reference path="wizard/commonParametersPage.ts" />
-/// <reference path="wizard/pageDispatcher.ts" />
-/// <reference path="wizard/wizardAction.ts" />
-/// <reference path="wizard/wizardModel.ts" />
-/// <reference path="wizard/wizardPage.ts" />
-/// <reference path="bindings.ts" />
-/// <reference path="initializer.ts" />
-/// <reference path="metadata.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Data;
@@ -7197,20 +7122,20 @@ var DevExpress;
         var ConnectionOptions = (function (_super) {
             __extends(ConnectionOptions, _super);
             function ConnectionOptions() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ConnectionOptions;
-        })(DevExpress.Analytics.Data.ConnectionOptions);
+        }(DevExpress.Analytics.Data.ConnectionOptions));
         Data.ConnectionOptions = ConnectionOptions;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "ConnectionOptions");
         var CustomSqlQuery = (function (_super) {
             __extends(CustomSqlQuery, _super);
             function CustomSqlQuery() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return CustomSqlQuery;
-        })(DevExpress.Analytics.Data.CustomSqlQuery);
+        }(DevExpress.Analytics.Data.CustomSqlQuery));
         Data.CustomSqlQuery = CustomSqlQuery;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "CustomSqlQuery");
@@ -7221,30 +7146,30 @@ var DevExpress;
         var MasterDetailRelation = (function (_super) {
             __extends(MasterDetailRelation, _super);
             function MasterDetailRelation() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return MasterDetailRelation;
-        })(DevExpress.Analytics.Data.MasterDetailRelation);
+        }(DevExpress.Analytics.Data.MasterDetailRelation));
         Data.MasterDetailRelation = MasterDetailRelation;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "MasterDetailRelation");
         var SqlDataConnection = (function (_super) {
             __extends(SqlDataConnection, _super);
             function SqlDataConnection() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SqlDataConnection;
-        })(DevExpress.Analytics.Data.SqlDataConnection);
+        }(DevExpress.Analytics.Data.SqlDataConnection));
         Data.SqlDataConnection = SqlDataConnection;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "SqlDataConnection");
         var SqlDataSource = (function (_super) {
             __extends(SqlDataSource, _super);
             function SqlDataSource() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SqlDataSource;
-        })(DevExpress.Analytics.Data.SqlDataSource);
+        }(DevExpress.Analytics.Data.SqlDataSource));
         Data.SqlDataSource = SqlDataSource;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "SqlDataSource");
         Data.storedProcQuerySerializationsInfo = DevExpress.Analytics.Data.storedProcQuerySerializationsInfo;
@@ -7252,10 +7177,10 @@ var DevExpress;
         var StoredProcQuery = (function (_super) {
             __extends(StoredProcQuery, _super);
             function StoredProcQuery() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return StoredProcQuery;
-        })(DevExpress.Analytics.Data.StoredProcQuery);
+        }(DevExpress.Analytics.Data.StoredProcQuery));
         Data.StoredProcQuery = StoredProcQuery;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "StoredProcQuery");
         Data.tableQuerySerializationsInfo = DevExpress.Analytics.Data.tableQuerySerializationsInfo;
@@ -7263,10 +7188,10 @@ var DevExpress;
         var TableQuery = (function (_super) {
             __extends(TableQuery, _super);
             function TableQuery() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return TableQuery;
-        })(DevExpress.Analytics.Data.TableQuery);
+        }(DevExpress.Analytics.Data.TableQuery));
         Data.TableQuery = TableQuery;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "TableQuery");
         Data.dsParameterNameValidationRules = DevExpress.Analytics.Data.dsParameterNameValidationRules;
@@ -7284,10 +7209,10 @@ var DevExpress;
         var DataSourceParameter = (function (_super) {
             __extends(DataSourceParameter, _super);
             function DataSourceParameter() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DataSourceParameter;
-        })(DevExpress.Analytics.Data.DataSourceParameter);
+        }(DevExpress.Analytics.Data.DataSourceParameter));
         Data.DataSourceParameter = DataSourceParameter;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DataSourceParameter");
         Data.DBColumnType = DevExpress.Analytics.Data.DBColumnType;
@@ -7295,29 +7220,29 @@ var DevExpress;
         var DBColumn = (function (_super) {
             __extends(DBColumn, _super);
             function DBColumn() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBColumn;
-        })(DevExpress.Analytics.Data.DBColumn);
+        }(DevExpress.Analytics.Data.DBColumn));
         Data.DBColumn = DBColumn;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBColumn");
         var DBForeignKey = (function (_super) {
             __extends(DBForeignKey, _super);
             function DBForeignKey() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBForeignKey;
-        })(DevExpress.Analytics.Data.DBForeignKey);
+        }(DevExpress.Analytics.Data.DBForeignKey));
         Data.DBForeignKey = DBForeignKey;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBForeignKey");
         var DBSchema = (function (_super) {
             __extends(DBSchema, _super);
             function DBSchema() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBSchema;
-        })(DevExpress.Analytics.Data.DBSchema);
+        }(DevExpress.Analytics.Data.DBSchema));
         Data.DBSchema = DBSchema;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBSchema");
         Data.getDBSchemaCallback = DevExpress.Analytics.Data.getDBSchemaCallback;
@@ -7325,19 +7250,19 @@ var DevExpress;
         var DBSchemaProvider = (function (_super) {
             __extends(DBSchemaProvider, _super);
             function DBSchemaProvider() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBSchemaProvider;
-        })(DevExpress.Analytics.Data.DBSchemaProvider);
+        }(DevExpress.Analytics.Data.DBSchemaProvider));
         Data.DBSchemaProvider = DBSchemaProvider;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBSchemaProvider");
         var DBStoredProcedure = (function (_super) {
             __extends(DBStoredProcedure, _super);
             function DBStoredProcedure() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBStoredProcedure;
-        })(DevExpress.Analytics.Data.DBStoredProcedure);
+        }(DevExpress.Analytics.Data.DBStoredProcedure));
         Data.DBStoredProcedure = DBStoredProcedure;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBStoredProcedure");
         Data.DBStoredProcedureArgumentDirection = DevExpress.Analytics.Data.DBStoredProcedureArgumentDirection;
@@ -7345,38 +7270,38 @@ var DevExpress;
         var DBStoredProcedureArgument = (function (_super) {
             __extends(DBStoredProcedureArgument, _super);
             function DBStoredProcedureArgument() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBStoredProcedureArgument;
-        })(DevExpress.Analytics.Data.DBStoredProcedureArgument);
+        }(DevExpress.Analytics.Data.DBStoredProcedureArgument));
         Data.DBStoredProcedureArgument = DBStoredProcedureArgument;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBStoredProcedureArgument");
         var DBTable = (function (_super) {
             __extends(DBTable, _super);
             function DBTable() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DBTable;
-        })(DevExpress.Analytics.Data.DBTable);
+        }(DevExpress.Analytics.Data.DBTable));
         Data.DBTable = DBTable;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "DBTable");
         var ResultSet = (function (_super) {
             __extends(ResultSet, _super);
             function ResultSet() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ResultSet;
-        })(DevExpress.Analytics.Data.ResultSet);
+        }(DevExpress.Analytics.Data.ResultSet));
         Data.ResultSet = ResultSet;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "ResultSet");
         var ResultTable = (function (_super) {
             __extends(ResultTable, _super);
             function ResultTable() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ResultTable;
-        })(DevExpress.Analytics.Data.ResultTable);
+        }(DevExpress.Analytics.Data.ResultTable));
         Data.ResultTable = ResultTable;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.Analytics.Data, "ResultTable");
         Data.SqlQueryType = DevExpress.Analytics.Data.Utils.SqlQueryType;
@@ -7386,52 +7311,51 @@ var DevExpress;
         var KeyColumnSurface = (function (_super) {
             __extends(KeyColumnSurface, _super);
             function KeyColumnSurface() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return KeyColumnSurface;
-        })(DevExpress.QueryBuilder.Widgets.KeyColumnSurface);
+        }(DevExpress.QueryBuilder.Widgets.KeyColumnSurface));
         Data.KeyColumnSurface = KeyColumnSurface;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.QueryBuilder.Widgets, "KeyColumnSurface");
         var MasterDetailEditor = (function (_super) {
             __extends(MasterDetailEditor, _super);
             function MasterDetailEditor() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return MasterDetailEditor;
-        })(DevExpress.QueryBuilder.Widgets.MasterDetailEditor);
+        }(DevExpress.QueryBuilder.Widgets.MasterDetailEditor));
         Data.MasterDetailEditor = MasterDetailEditor;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.QueryBuilder.Widgets, "MasterDetailEditor");
         var MasterDetailEditorPopupManager = (function (_super) {
             __extends(MasterDetailEditorPopupManager, _super);
             function MasterDetailEditorPopupManager() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return MasterDetailEditorPopupManager;
-        })(DevExpress.QueryBuilder.Widgets.MasterDetailEditorPopupManager);
+        }(DevExpress.QueryBuilder.Widgets.MasterDetailEditorPopupManager));
         Data.MasterDetailEditorPopupManager = MasterDetailEditorPopupManager;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.QueryBuilder.Widgets, "MasterDetailEditorPopupManager");
         var MasterDetailRelationSurface = (function (_super) {
             __extends(MasterDetailRelationSurface, _super);
             function MasterDetailRelationSurface() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return MasterDetailRelationSurface;
-        })(DevExpress.QueryBuilder.Widgets.MasterDetailRelationSurface);
+        }(DevExpress.QueryBuilder.Widgets.MasterDetailRelationSurface));
         Data.MasterDetailRelationSurface = MasterDetailRelationSurface;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.QueryBuilder.Widgets, "MasterDetailRelationSurface");
         var MasterQuerySurface = (function (_super) {
             __extends(MasterQuerySurface, _super);
             function MasterQuerySurface() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return MasterQuerySurface;
-        })(DevExpress.QueryBuilder.Widgets.MasterQuerySurface);
+        }(DevExpress.QueryBuilder.Widgets.MasterQuerySurface));
         Data.MasterQuerySurface = MasterQuerySurface;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Data, DevExpress.QueryBuilder.Widgets, "MasterQuerySurface");
     })(Data = DevExpress.Data || (DevExpress.Data = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
@@ -7440,19 +7364,19 @@ var DevExpress;
             var ColumnDragHandler = (function (_super) {
                 __extends(ColumnDragHandler, _super);
                 function ColumnDragHandler() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ColumnDragHandler;
-            })(DevExpress.QueryBuilder.Internal.ColumnDragHandler);
+            }(DevExpress.QueryBuilder.Internal.ColumnDragHandler));
             QueryBuilder.ColumnDragHandler = ColumnDragHandler;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Internal, "ColumnDragHandler");
             var DbObjectDragDropHandler = (function (_super) {
                 __extends(DbObjectDragDropHandler, _super);
                 function DbObjectDragDropHandler() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DbObjectDragDropHandler;
-            })(DevExpress.QueryBuilder.Internal.DbObjectDragDropHandler);
+            }(DevExpress.QueryBuilder.Internal.DbObjectDragDropHandler));
             QueryBuilder.DbObjectDragDropHandler = DbObjectDragDropHandler;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Internal, "DbObjectDragDropHandler");
             QueryBuilder.allColumnsSerializationInfo = DevExpress.QueryBuilder.Elements.allColumnsSerializationInfo;
@@ -7460,19 +7384,19 @@ var DevExpress;
             var AllColumnsViewModel = (function (_super) {
                 __extends(AllColumnsViewModel, _super);
                 function AllColumnsViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return AllColumnsViewModel;
-            })(DevExpress.QueryBuilder.Elements.AllColumnsViewModel);
+            }(DevExpress.QueryBuilder.Elements.AllColumnsViewModel));
             QueryBuilder.AllColumnsViewModel = AllColumnsViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "AllColumnsViewModel");
             var AllColumnsSurface = (function (_super) {
                 __extends(AllColumnsSurface, _super);
                 function AllColumnsSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return AllColumnsSurface;
-            })(DevExpress.QueryBuilder.Elements.AllColumnsSurface);
+            }(DevExpress.QueryBuilder.Elements.AllColumnsSurface));
             QueryBuilder.AllColumnsSurface = AllColumnsSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "AllColumnsSurface");
             QueryBuilder.ColumnType = DevExpress.QueryBuilder.Elements.ColumnType;
@@ -7482,19 +7406,19 @@ var DevExpress;
             var ColumnExpression = (function (_super) {
                 __extends(ColumnExpression, _super);
                 function ColumnExpression() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ColumnExpression;
-            })(DevExpress.QueryBuilder.Elements.ColumnExpression);
+            }(DevExpress.QueryBuilder.Elements.ColumnExpression));
             QueryBuilder.ColumnExpression = ColumnExpression;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "ColumnExpression");
             var ColumnExpressionCollectionHelper = (function (_super) {
                 __extends(ColumnExpressionCollectionHelper, _super);
                 function ColumnExpressionCollectionHelper() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ColumnExpressionCollectionHelper;
-            })(DevExpress.QueryBuilder.Utils.ColumnExpressionCollectionHelper);
+            }(DevExpress.QueryBuilder.Utils.ColumnExpressionCollectionHelper));
             QueryBuilder.ColumnExpressionCollectionHelper = ColumnExpressionCollectionHelper;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Utils, "ColumnExpressionCollectionHelper");
             QueryBuilder.AggregationType = DevExpress.QueryBuilder.Elements.AggregationType;
@@ -7504,19 +7428,19 @@ var DevExpress;
             var ColumnViewModel = (function (_super) {
                 __extends(ColumnViewModel, _super);
                 function ColumnViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ColumnViewModel;
-            })(DevExpress.QueryBuilder.Elements.ColumnViewModel);
+            }(DevExpress.QueryBuilder.Elements.ColumnViewModel));
             QueryBuilder.ColumnViewModel = ColumnViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "ColumnViewModel");
             var ColumnSurface = (function (_super) {
                 __extends(ColumnSurface, _super);
                 function ColumnSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ColumnSurface;
-            })(DevExpress.QueryBuilder.Elements.ColumnSurface);
+            }(DevExpress.QueryBuilder.Elements.ColumnSurface));
             QueryBuilder.ColumnSurface = ColumnSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "ColumnSurface");
             QueryBuilder.ConditionType = DevExpress.QueryBuilder.Elements.ConditionType;
@@ -7526,46 +7450,46 @@ var DevExpress;
             var JoinConditionViewModel = (function (_super) {
                 __extends(JoinConditionViewModel, _super);
                 function JoinConditionViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return JoinConditionViewModel;
-            })(DevExpress.QueryBuilder.Elements.JoinConditionViewModel);
+            }(DevExpress.QueryBuilder.Elements.JoinConditionViewModel));
             QueryBuilder.JoinConditionViewModel = JoinConditionViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "JoinConditionViewModel");
             var JoinConditionSurface = (function (_super) {
                 __extends(JoinConditionSurface, _super);
                 function JoinConditionSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return JoinConditionSurface;
-            })(DevExpress.QueryBuilder.Elements.JoinConditionSurface);
+            }(DevExpress.QueryBuilder.Elements.JoinConditionSurface));
             QueryBuilder.JoinConditionSurface = JoinConditionSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "JoinConditionSurface");
             var QueryElementBaseViewModel = (function (_super) {
                 __extends(QueryElementBaseViewModel, _super);
                 function QueryElementBaseViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return QueryElementBaseViewModel;
-            })(DevExpress.QueryBuilder.Elements.QueryElementBaseViewModel);
+            }(DevExpress.QueryBuilder.Elements.QueryElementBaseViewModel));
             QueryBuilder.QueryElementBaseViewModel = QueryElementBaseViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "QueryElementBaseViewModel");
             var QueryElementBaseSurface = (function (_super) {
                 __extends(QueryElementBaseSurface, _super);
                 function QueryElementBaseSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return QueryElementBaseSurface;
-            })(DevExpress.QueryBuilder.Elements.QueryElementBaseSurface);
+            }(DevExpress.QueryBuilder.Elements.QueryElementBaseSurface));
             QueryBuilder.QueryElementBaseSurface = QueryElementBaseSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "QueryElementBaseSurface");
             var QueryViewModel = (function (_super) {
                 __extends(QueryViewModel, _super);
                 function QueryViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return QueryViewModel;
-            })(DevExpress.QueryBuilder.Elements.QueryViewModel);
+            }(DevExpress.QueryBuilder.Elements.QueryViewModel));
             QueryBuilder.QueryViewModel = QueryViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "QueryViewModel");
             QueryBuilder.querySerializationsInfo = DevExpress.QueryBuilder.Elements.querySerializationsInfo;
@@ -7573,10 +7497,10 @@ var DevExpress;
             var QuerySurface = (function (_super) {
                 __extends(QuerySurface, _super);
                 function QuerySurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return QuerySurface;
-            })(DevExpress.QueryBuilder.Elements.QuerySurface);
+            }(DevExpress.QueryBuilder.Elements.QuerySurface));
             QueryBuilder.QuerySurface = QuerySurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "QuerySurface");
             QueryBuilder.relationSerializationInfo = DevExpress.QueryBuilder.Elements.relationSerializationInfo;
@@ -7584,19 +7508,19 @@ var DevExpress;
             var RelationViewModel = (function (_super) {
                 __extends(RelationViewModel, _super);
                 function RelationViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return RelationViewModel;
-            })(DevExpress.QueryBuilder.Elements.RelationViewModel);
+            }(DevExpress.QueryBuilder.Elements.RelationViewModel));
             QueryBuilder.RelationViewModel = RelationViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "RelationViewModel");
             var RelationSurface = (function (_super) {
                 __extends(RelationSurface, _super);
                 function RelationSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return RelationSurface;
-            })(DevExpress.QueryBuilder.Elements.RelationSurface);
+            }(DevExpress.QueryBuilder.Elements.RelationSurface));
             QueryBuilder.RelationSurface = RelationSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "RelationSurface");
             QueryBuilder.tableSerializationInfo = DevExpress.QueryBuilder.Elements.tableSerializationInfo;
@@ -7604,19 +7528,19 @@ var DevExpress;
             var TableViewModel = (function (_super) {
                 __extends(TableViewModel, _super);
                 function TableViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return TableViewModel;
-            })(DevExpress.QueryBuilder.Elements.TableViewModel);
+            }(DevExpress.QueryBuilder.Elements.TableViewModel));
             QueryBuilder.TableViewModel = TableViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "TableViewModel");
             var TableSurface = (function (_super) {
                 __extends(TableSurface, _super);
                 function TableSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return TableSurface;
-            })(DevExpress.QueryBuilder.Elements.TableSurface);
+            }(DevExpress.QueryBuilder.Elements.TableSurface));
             QueryBuilder.TableSurface = TableSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Elements, "TableSurface");
             QueryBuilder.controlsFactory = DevExpress.QueryBuilder.Utils.controlsFactory;
@@ -7626,19 +7550,19 @@ var DevExpress;
             var QueryBuilderTreeListController = (function (_super) {
                 __extends(QueryBuilderTreeListController, _super);
                 function QueryBuilderTreeListController() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return QueryBuilderTreeListController;
-            })(DevExpress.QueryBuilder.Utils.QueryBuilderTreeListController);
+            }(DevExpress.QueryBuilder.Utils.QueryBuilderTreeListController));
             QueryBuilder.QueryBuilderTreeListController = QueryBuilderTreeListController;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Utils, "QueryBuilderTreeListController");
             var RequestWrapper = (function (_super) {
                 __extends(RequestWrapper, _super);
                 function RequestWrapper() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return RequestWrapper;
-            })(DevExpress.QueryBuilder.Utils.RequestWrapper);
+            }(DevExpress.QueryBuilder.Utils.RequestWrapper));
             QueryBuilder.RequestWrapper = RequestWrapper;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Utils, "RequestWrapper");
             QueryBuilder.editorTemplates = DevExpress.QueryBuilder.Widgets.editorTemplates;
@@ -7646,37 +7570,37 @@ var DevExpress;
             var UndoEditor = (function (_super) {
                 __extends(UndoEditor, _super);
                 function UndoEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return UndoEditor;
-            })(DevExpress.QueryBuilder.Widgets.UndoEditor);
+            }(DevExpress.QueryBuilder.Widgets.UndoEditor));
             QueryBuilder.UndoEditor = UndoEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Widgets, "UndoEditor");
             var GroupFilterEditorSerializer = (function (_super) {
                 __extends(GroupFilterEditorSerializer, _super);
                 function GroupFilterEditorSerializer() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return GroupFilterEditorSerializer;
-            })(DevExpress.QueryBuilder.Widgets.GroupFilterEditorSerializer);
+            }(DevExpress.QueryBuilder.Widgets.GroupFilterEditorSerializer));
             QueryBuilder.GroupFilterEditorSerializer = GroupFilterEditorSerializer;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Widgets, "GroupFilterEditorSerializer");
             var OperandParameterQBSurface = (function (_super) {
                 __extends(OperandParameterQBSurface, _super);
                 function OperandParameterQBSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandParameterQBSurface;
-            })(DevExpress.QueryBuilder.Widgets.OperandParameterQBSurface);
+            }(DevExpress.QueryBuilder.Widgets.OperandParameterQBSurface));
             QueryBuilder.OperandParameterQBSurface = OperandParameterQBSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Widgets, "OperandParameterQBSurface");
             var OperandPropertyQBSurface = (function (_super) {
                 __extends(OperandPropertyQBSurface, _super);
                 function OperandPropertyQBSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandPropertyQBSurface;
-            })(DevExpress.QueryBuilder.Widgets.OperandPropertyQBSurface);
+            }(DevExpress.QueryBuilder.Widgets.OperandPropertyQBSurface));
             QueryBuilder.OperandPropertyQBSurface = OperandPropertyQBSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Widgets, "OperandPropertyQBSurface");
             QueryBuilder.isAggregatedExpression = DevExpress.QueryBuilder.Widgets.isAggregatedExpression;
@@ -7684,10 +7608,10 @@ var DevExpress;
             var QueryBuilderObjectsProvider = (function (_super) {
                 __extends(QueryBuilderObjectsProvider, _super);
                 function QueryBuilderObjectsProvider() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return QueryBuilderObjectsProvider;
-            })(DevExpress.QueryBuilder.Widgets.QueryBuilderObjectsProvider);
+            }(DevExpress.QueryBuilder.Widgets.QueryBuilderObjectsProvider));
             QueryBuilder.QueryBuilderObjectsProvider = QueryBuilderObjectsProvider;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.QueryBuilder, DevExpress.QueryBuilder.Widgets, "QueryBuilderObjectsProvider");
             QueryBuilder.ActionId = DevExpress.QueryBuilder.ActionId;
@@ -7721,7 +7645,6 @@ var DevExpress;
         })(QueryBuilder = Designer.QueryBuilder || (Designer.QueryBuilder = {}));
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
@@ -7732,271 +7655,271 @@ var DevExpress;
                 var CommonParametersPage = (function (_super) {
                     __extends(CommonParametersPage, _super);
                     function CommonParametersPage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return CommonParametersPage;
-                })(DevExpress.Analytics.Wizard.CommonParametersPage);
+                }(DevExpress.Analytics.Wizard.CommonParametersPage));
                 Wizard.CommonParametersPage = CommonParametersPage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "CommonParametersPage");
                 var LegacyPageDispathcer = (function (_super) {
                     __extends(LegacyPageDispathcer, _super);
                     function LegacyPageDispathcer() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return LegacyPageDispathcer;
-                })(DevExpress.Analytics.Wizard.LegacyPageDispathcer);
+                }(DevExpress.Analytics.Wizard.LegacyPageDispathcer));
                 Wizard.LegacyPageDispathcer = LegacyPageDispathcer;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "LegacyPageDispathcer");
                 var WizardAction = (function (_super) {
                     __extends(WizardAction, _super);
                     function WizardAction() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return WizardAction;
-                })(DevExpress.Analytics.Wizard.WizardAction);
+                }(DevExpress.Analytics.Wizard.WizardAction));
                 Wizard.WizardAction = WizardAction;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "WizardAction");
                 var WizardViewModel = (function (_super) {
                     __extends(WizardViewModel, _super);
                     function WizardViewModel() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return WizardViewModel;
-                })(DevExpress.Analytics.Wizard.WizardViewModel);
+                }(DevExpress.Analytics.Wizard.WizardViewModel));
                 Wizard.WizardViewModel = WizardViewModel;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "WizardViewModel");
                 var WizardPage = (function (_super) {
                     __extends(WizardPage, _super);
                     function WizardPage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return WizardPage;
-                })(DevExpress.Analytics.Wizard.WizardPage);
+                }(DevExpress.Analytics.Wizard.WizardPage));
                 Wizard.WizardPage = WizardPage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "WizardPage");
                 var MultiQueryConfigurePage = (function (_super) {
                     __extends(MultiQueryConfigurePage, _super);
                     function MultiQueryConfigurePage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return MultiQueryConfigurePage;
-                })(DevExpress.Analytics.Wizard.MultiQueryConfigurePage);
+                }(DevExpress.Analytics.Wizard.MultiQueryConfigurePage));
                 Wizard.MultiQueryConfigurePage = MultiQueryConfigurePage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "MultiQueryConfigurePage");
                 var MasterDetailRelationsPage = (function (_super) {
                     __extends(MasterDetailRelationsPage, _super);
                     function MasterDetailRelationsPage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return MasterDetailRelationsPage;
-                })(DevExpress.Analytics.Wizard.MasterDetailRelationsPage);
+                }(DevExpress.Analytics.Wizard.MasterDetailRelationsPage));
                 Wizard.MasterDetailRelationsPage = MasterDetailRelationsPage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "MasterDetailRelationsPage");
                 var MultiQueryConfigureParametersPage = (function (_super) {
                     __extends(MultiQueryConfigureParametersPage, _super);
                     function MultiQueryConfigureParametersPage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return MultiQueryConfigureParametersPage;
-                })(DevExpress.Analytics.Wizard.MultiQueryConfigureParametersPage);
+                }(DevExpress.Analytics.Wizard.MultiQueryConfigureParametersPage));
                 Wizard.MultiQueryConfigureParametersPage = MultiQueryConfigureParametersPage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "MultiQueryConfigureParametersPage");
                 var MultiQueryDataSourceWizard = (function (_super) {
                     __extends(MultiQueryDataSourceWizard, _super);
                     function MultiQueryDataSourceWizard() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return MultiQueryDataSourceWizard;
-                })(DevExpress.Analytics.Wizard.MultiQueryDataSourceWizard);
+                }(DevExpress.Analytics.Wizard.MultiQueryDataSourceWizard));
                 Wizard.MultiQueryDataSourceWizard = MultiQueryDataSourceWizard;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "MultiQueryDataSourceWizard");
                 var MultiQueryDataSourceWizardModel = (function (_super) {
                     __extends(MultiQueryDataSourceWizardModel, _super);
                     function MultiQueryDataSourceWizardModel() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return MultiQueryDataSourceWizardModel;
-                })(DevExpress.Analytics.Wizard.MultiQueryDataSourceWizardModel);
+                }(DevExpress.Analytics.Wizard.MultiQueryDataSourceWizardModel));
                 Wizard.MultiQueryDataSourceWizardModel = MultiQueryDataSourceWizardModel;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "MultiQueryDataSourceWizardModel");
                 var ConfigureParametersPage = (function (_super) {
                     __extends(ConfigureParametersPage, _super);
                     function ConfigureParametersPage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return ConfigureParametersPage;
-                })(DevExpress.Analytics.Wizard.ConfigureParametersPage);
+                }(DevExpress.Analytics.Wizard.ConfigureParametersPage));
                 Wizard.ConfigureParametersPage = ConfigureParametersPage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "ConfigureParametersPage");
                 var CreateQueryPage = (function (_super) {
                     __extends(CreateQueryPage, _super);
                     function CreateQueryPage() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return CreateQueryPage;
-                })(DevExpress.Analytics.Wizard.CreateQueryPage);
+                }(DevExpress.Analytics.Wizard.CreateQueryPage));
                 Wizard.CreateQueryPage = CreateQueryPage;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "CreateQueryPage");
                 var SqlDataSourceWizardModel = (function (_super) {
                     __extends(SqlDataSourceWizardModel, _super);
                     function SqlDataSourceWizardModel() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return SqlDataSourceWizardModel;
-                })(DevExpress.Analytics.Wizard.SqlDataSourceWizardModel);
+                }(DevExpress.Analytics.Wizard.SqlDataSourceWizardModel));
                 Wizard.SqlDataSourceWizardModel = SqlDataSourceWizardModel;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "SqlDataSourceWizardModel");
                 var SelectConnectionString = (function (_super) {
                     __extends(SelectConnectionString, _super);
                     function SelectConnectionString() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return SelectConnectionString;
-                })(DevExpress.Analytics.Wizard.SelectConnectionString);
+                }(DevExpress.Analytics.Wizard.SelectConnectionString));
                 Wizard.SelectConnectionString = SelectConnectionString;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "SelectConnectionString");
                 var SqlDataSourceWizard = (function (_super) {
                     __extends(SqlDataSourceWizard, _super);
                     function SqlDataSourceWizard() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return SqlDataSourceWizard;
-                })(DevExpress.Analytics.Wizard.SqlDataSourceWizard);
+                }(DevExpress.Analytics.Wizard.SqlDataSourceWizard));
                 Wizard.SqlDataSourceWizard = SqlDataSourceWizard;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard, "SqlDataSourceWizard");
                 var ParametersTreeListItem = (function (_super) {
                     __extends(ParametersTreeListItem, _super);
                     function ParametersTreeListItem() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return ParametersTreeListItem;
-                })(DevExpress.Analytics.Wizard.Utils.ParametersTreeListItem);
+                }(DevExpress.Analytics.Wizard.Utils.ParametersTreeListItem));
                 Wizard.ParametersTreeListItem = ParametersTreeListItem;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "ParametersTreeListItem");
                 var ParametersTreeListRootItem = (function (_super) {
                     __extends(ParametersTreeListRootItem, _super);
                     function ParametersTreeListRootItem() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return ParametersTreeListRootItem;
-                })(DevExpress.Analytics.Wizard.Utils.ParametersTreeListRootItem);
+                }(DevExpress.Analytics.Wizard.Utils.ParametersTreeListRootItem));
                 Wizard.ParametersTreeListRootItem = ParametersTreeListRootItem;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "ParametersTreeListRootItem");
                 var ParametersTreeListController = (function (_super) {
                     __extends(ParametersTreeListController, _super);
                     function ParametersTreeListController() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return ParametersTreeListController;
-                })(DevExpress.Analytics.Wizard.Utils.ParametersTreeListController);
+                }(DevExpress.Analytics.Wizard.Utils.ParametersTreeListController));
                 Wizard.ParametersTreeListController = ParametersTreeListController;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "ParametersTreeListController");
                 var DBSchemaItemsProvider = (function (_super) {
                     __extends(DBSchemaItemsProvider, _super);
                     function DBSchemaItemsProvider() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return DBSchemaItemsProvider;
-                })(DevExpress.Analytics.Wizard.Utils.DBSchemaItemsProvider);
+                }(DevExpress.Analytics.Wizard.Utils.DBSchemaItemsProvider));
                 Wizard.DBSchemaItemsProvider = DBSchemaItemsProvider;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "DBSchemaItemsProvider");
                 var DBSchemaTreeListController = (function (_super) {
                     __extends(DBSchemaTreeListController, _super);
                     function DBSchemaTreeListController() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return DBSchemaTreeListController;
-                })(DevExpress.Analytics.Wizard.Utils.DBSchemaTreeListController);
+                }(DevExpress.Analytics.Wizard.Utils.DBSchemaTreeListController));
                 Wizard.DBSchemaTreeListController = DBSchemaTreeListController;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "DBSchemaTreeListController");
                 var QueryBuilderPopup = (function (_super) {
                     __extends(QueryBuilderPopup, _super);
                     function QueryBuilderPopup() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return QueryBuilderPopup;
-                })(DevExpress.Analytics.Wizard.Utils.QueryBuilderPopup);
+                }(DevExpress.Analytics.Wizard.Utils.QueryBuilderPopup));
                 Wizard.QueryBuilderPopup = QueryBuilderPopup;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "QueryBuilderPopup");
                 var SelectQuerySqlTextProvider = (function (_super) {
                     __extends(SelectQuerySqlTextProvider, _super);
                     function SelectQuerySqlTextProvider() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return SelectQuerySqlTextProvider;
-                })(DevExpress.Analytics.Wizard.Utils.SelectQuerySqlTextProvider);
+                }(DevExpress.Analytics.Wizard.Utils.SelectQuerySqlTextProvider));
                 Wizard.SelectQuerySqlTextProvider = SelectQuerySqlTextProvider;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "SelectQuerySqlTextProvider");
                 var SelectStatementQueryControl = (function (_super) {
                     __extends(SelectStatementQueryControl, _super);
                     function SelectStatementQueryControl() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return SelectStatementQueryControl;
-                })(DevExpress.Analytics.Wizard.Utils.SelectStatementQueryControl);
+                }(DevExpress.Analytics.Wizard.Utils.SelectStatementQueryControl));
                 Wizard.SelectStatementQueryControl = SelectStatementQueryControl;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "SelectStatementQueryControl");
                 var StoredProceduresQueryControl = (function (_super) {
                     __extends(StoredProceduresQueryControl, _super);
                     function StoredProceduresQueryControl() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return StoredProceduresQueryControl;
-                })(DevExpress.Analytics.Wizard.Utils.StoredProceduresQueryControl);
+                }(DevExpress.Analytics.Wizard.Utils.StoredProceduresQueryControl));
                 Wizard.StoredProceduresQueryControl = StoredProceduresQueryControl;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "StoredProceduresQueryControl");
                 var TreeNodeBase = (function (_super) {
                     __extends(TreeNodeBase, _super);
                     function TreeNodeBase() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return TreeNodeBase;
-                })(DevExpress.Analytics.Wizard.Utils.TreeNodeBase);
+                }(DevExpress.Analytics.Wizard.Utils.TreeNodeBase));
                 Wizard.TreeNodeBase = TreeNodeBase;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "TreeNodeBase");
                 var TreeLeafNode = (function (_super) {
                     __extends(TreeLeafNode, _super);
                     function TreeLeafNode() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return TreeLeafNode;
-                })(DevExpress.Analytics.Wizard.Utils.TreeLeafNode);
+                }(DevExpress.Analytics.Wizard.Utils.TreeLeafNode));
                 Wizard.TreeLeafNode = TreeLeafNode;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "TreeLeafNode");
                 var TreeNode = (function (_super) {
                     __extends(TreeNode, _super);
                     function TreeNode() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return TreeNode;
-                })(DevExpress.Analytics.Wizard.Utils.TreeNode);
+                }(DevExpress.Analytics.Wizard.Utils.TreeNode));
                 Wizard.TreeNode = TreeNode;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "TreeNode");
                 var ParameterTreeNode = (function (_super) {
                     __extends(ParameterTreeNode, _super);
                     function ParameterTreeNode() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return ParameterTreeNode;
-                })(DevExpress.Analytics.Wizard.Utils.ParameterTreeNode);
+                }(DevExpress.Analytics.Wizard.Utils.ParameterTreeNode));
                 Wizard.ParameterTreeNode = ParameterTreeNode;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "ParameterTreeNode");
                 var QueriesTreeNode = (function (_super) {
                     __extends(QueriesTreeNode, _super);
                     function QueriesTreeNode() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return QueriesTreeNode;
-                })(DevExpress.Analytics.Wizard.Utils.QueriesTreeNode);
+                }(DevExpress.Analytics.Wizard.Utils.QueriesTreeNode));
                 Wizard.QueriesTreeNode = QueriesTreeNode;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "QueriesTreeNode");
                 var TreeQueryNode = (function (_super) {
                     __extends(TreeQueryNode, _super);
                     function TreeQueryNode() {
-                        _super.apply(this, arguments);
+                        return _super !== null && _super.apply(this, arguments) || this;
                     }
                     return TreeQueryNode;
-                })(DevExpress.Analytics.Wizard.Utils.TreeQueryNode);
+                }(DevExpress.Analytics.Wizard.Utils.TreeQueryNode));
                 Wizard.TreeQueryNode = TreeQueryNode;
                 DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Report.Wizard, DevExpress.Analytics.Wizard.Utils, "TreeQueryNode");
             })(Wizard = Report.Wizard || (Report.Wizard = {}));
@@ -8026,20 +7949,19 @@ var DevExpress;
             var QBFilterEditorHelper = (function (_super) {
                 __extends(QBFilterEditorHelper, _super);
                 function QBFilterEditorHelper(parametersMode) {
-                    var _this = this;
-                    _super.call(this);
-                    this.handlers.changeParameter = function (criteria, popupService) {
+                    var _this = _super.call(this) || this;
+                    _this.handlers.changeParameter = function (criteria, popupService) {
                         return {
                             data: new DevExpress.Analytics.Widgets.Internal.FilterEditorAddOn(criteria, popupService, "changeParameter", "items", "dxqb-filtereditor-parameterspopup"),
                             templateName: "dxqb-filtereditor-changeparameter"
                         };
                     };
-                    this.mapper.Parameter = Widgets.OperandParameterQBSurface;
-                    this.mapper.Property = Widgets.OperandPropertyQBSurface;
+                    _this.mapper.Parameter = Widgets.OperandParameterQBSurface;
+                    _this.mapper.Property = Widgets.OperandPropertyQBSurface;
                     if (parametersMode === QueryBuilder.Elements.ParametersMode.ReadWrite) {
-                        this.canCreateParameters = true;
-                        this.newParameters = ko.observableArray([]);
-                        this.onEditorFocusOut = function (criteria) {
+                        _this.canCreateParameters = true;
+                        _this.newParameters = ko.observableArray([]);
+                        _this.onEditorFocusOut = function (criteria) {
                             if (!criteria)
                                 return;
                             var parameters = _this.newParameters();
@@ -8063,15 +7985,16 @@ var DevExpress;
                             }
                             _this.newParameters.valueHasMutated();
                         };
-                        this.onClosing = function () {
+                        _this.onClosing = function () {
                             _this.newParameters([]);
                         };
                     }
-                    this.canSelectLists = false;
-                    this.getDisplayPropertyName = function () { return $.Deferred().resolve("").promise(); };
+                    _this.canSelectLists = false;
+                    _this.getDisplayPropertyName = function () { return $.Deferred().resolve("").promise(); };
+                    return _this;
                 }
                 return QBFilterEditorHelper;
-            })(DevExpress.Analytics.Widgets.FilterEditorHelper);
+            }(DevExpress.Analytics.Widgets.FilterEditorHelper));
             Widgets.QBFilterEditorHelper = QBFilterEditorHelper;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -8085,7 +8008,7 @@ var DevExpress;
             var QBFilterStringOptions = (function (_super) {
                 __extends(QBFilterStringOptions, _super);
                 function QBFilterStringOptions(filterString, dataMember, disabled, title) {
-                    _super.call(this, filterString, dataMember, disabled, title);
+                    return _super.call(this, filterString, dataMember, disabled, title) || this;
                 }
                 QBFilterStringOptions.prototype.initializeFilterStringHelper = function (parameters, parametersMode, serializer) {
                     var _this = this;
@@ -8121,7 +8044,7 @@ var DevExpress;
                     this.helper = helper;
                 };
                 return QBFilterStringOptions;
-            })(DevExpress.Analytics.Widgets.FilterStringOptions);
+            }(DevExpress.Analytics.Widgets.FilterStringOptions));
             Widgets.QBFilterStringOptions = QBFilterStringOptions;
         })(Widgets = QueryBuilder.Widgets || (QueryBuilder.Widgets = {}));
     })(QueryBuilder = DevExpress.QueryBuilder || (DevExpress.QueryBuilder = {}));
@@ -8201,7 +8124,7 @@ var DevExpress;
         })(Templates = Analytics.Templates || (Analytics.Templates = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-query-builder-core.js.map
+
 if(window["ace"]) {
     var _define = window["ace"].define || define;
     _define("ace/mode/doc_comment_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(require, exports, module) {

@@ -1,11 +1,24 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 18.2.7
-* Build date: 2019-03-10
+* Version: 18.2.8
+* Build date: 2019-04-22
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -64,7 +77,7 @@ var DevExpress;
                     });
                 };
                 return Disposable;
-            })();
+            }());
             Utils.Disposable = Disposable;
             function deserializeArray(model, creator) {
                 var result = [];
@@ -204,8 +217,6 @@ var DevExpress;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-/// <reference path="serializationInfo.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -406,19 +417,11 @@ var DevExpress;
                     return result;
                 };
                 return ModelSerializer;
-            })();
+            }());
             Utils.ModelSerializer = ModelSerializer;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="serializer.ts" />
-/// <reference path="serializationInfo.ts" />
-/// <reference path="utils.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -429,10 +432,10 @@ var DevExpress;
             var ModelSerializer = (function (_super) {
                 __extends(ModelSerializer, _super);
                 function ModelSerializer() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ModelSerializer;
-            })(DevExpress.Analytics.Utils.ModelSerializer);
+            }(DevExpress.Analytics.Utils.ModelSerializer));
             Utils.ModelSerializer = ModelSerializer;
             Utils.serializeDate = DevExpress.Analytics.Utils.serializeDate;
             Utils.extend = DevExpress.Analytics.Utils.extend;
@@ -456,7 +459,20 @@ DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.An
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "isEmptyObject");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "getPropertyValues");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "knockoutArrayWrapper");
-//# sourceMappingURL=dx-ko-serializer.js.map
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -473,14 +489,20 @@ var DevExpress;
                 return Localization.messages[val];
             }
             Localization.localize = localize;
-            function parseDate(val) {
+            function formatDate(val) {
+                return DevExpress.localization["formatDate"](val, "shortDate");
+            }
+            Localization.formatDate = formatDate;
+            function parseDate(val, useDefault, format) {
+                if (useDefault === void 0) { useDefault = true; }
+                if (!useDefault)
+                    return format ? DevExpress.localization["parseDate"](val, format) : DevExpress.localization["parseDate"](val);
                 if (val) {
                     if (val instanceof Date)
                         return val;
-                    var enGlobalize = new Localization.Globalize("en");
-                    var date = enGlobalize["parseDate"](val, { raw: "MM/dd/yyyy HH:mm:ss" });
+                    var date = DevExpress.localization["parseDate"](val, "MM/dd/yyyy HH:mm:ss");
                     if (!date)
-                        date = enGlobalize["parseDate"](val, { raw: "yyyy-MM-dd" });
+                        date = DevExpress.localization["parseDate"](val, "yyyy-MM-dd");
                     return date;
                 }
                 return null;
@@ -497,7 +519,6 @@ var DevExpress;
         })(Localization = Analytics.Localization || (Analytics.Localization = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
@@ -524,7 +545,6 @@ var DevExpress;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
@@ -538,11 +558,14 @@ var DevExpress;
         Analytics.isCustomizedWithUpdateLocalizationMethod = isCustomizedWithUpdateLocalizationMethod;
         function getLocalization(text, id) {
             if (id === void 0) { id = null; }
-            var result;
-            if (id && !isCustomizedWithUpdateLocalizationMethod(text)) {
-                result = Analytics.Localization.localize(id);
+            var _localizedText = id && Analytics.Localization.localize(id) || _getLocalization(text);
+            if (isCustomizedWithUpdateLocalizationMethod(_localizedText)) {
+                text = _localizedText;
             }
-            return result || _getLocalization(text);
+            if (!isCustomizedWithUpdateLocalizationMethod(text)) {
+                return _localizedText;
+            }
+            return _getLocalization(text);
         }
         Analytics.getLocalization = getLocalization;
         function updateLocalization(object) {
@@ -639,14 +662,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="editorsInfo.ts" />
-/// <reference path="../utils.ts" />
-///<reference path="../Localization/localization.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -657,35 +672,34 @@ var DevExpress;
             var Editor = (function (_super) {
                 __extends(Editor, _super);
                 function Editor(modelPropertyInfo, level, parentDisabled, textToSearch) {
-                    var _this = this;
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
                     if (textToSearch === void 0) { textToSearch = undefined; }
-                    _super.call(this);
-                    this._model = ko.observable();
-                    this.isVisibleByContent = ko.observable(true);
-                    this.isSearchedProperty = ko.observable(true);
-                    this.isParentSearched = ko.observable(false);
-                    this.rtl = DevExpress.config().rtlEnabled;
-                    this._cachedValue = undefined;
-                    this.isEditorSelected = ko.observable(false);
-                    this.isPropertyModified = ko.computed(function () {
+                    var _this = _super.call(this) || this;
+                    _this._model = ko.observable();
+                    _this.isVisibleByContent = ko.observable(true);
+                    _this.isSearchedProperty = ko.observable(true);
+                    _this.isParentSearched = ko.observable(false);
+                    _this.rtl = DevExpress.config().rtlEnabled;
+                    _this._cachedValue = undefined;
+                    _this.isEditorSelected = ko.observable(false);
+                    _this.isPropertyModified = ko.computed(function () {
                         return _this._model() && _this._model().isPropertyModified && _this._model().isPropertyModified(_this.name);
                     });
-                    this.collapsed = ko.observable(true);
-                    this.info = ko.observable(modelPropertyInfo);
-                    this._disposables.push(this.displayName = ko.computed(function () {
+                    _this.collapsed = ko.observable(true);
+                    _this.info = ko.observable(modelPropertyInfo);
+                    _this._disposables.push(_this.displayName = ko.computed(function () {
                         var info = _this.info();
                         return info && DevExpress.Analytics.getLocalization(info.displayName, info["localizationId"]);
                     }));
                     if (textToSearch) {
-                        this.textToSearch = textToSearch;
-                        this._disposables.push(this.isSearchedProperty = ko.computed(function () {
+                        _this.textToSearch = textToSearch;
+                        _this._disposables.push(_this.isSearchedProperty = ko.computed(function () {
                             return _this.isParentSearched() || !!Analytics.Utils.findMatchesInString(_this.displayName(), textToSearch());
                         }));
                     }
-                    this.padding = this._setPadding(this.rtl ? "right" : "left", level * Widgets.propertiesGridEditorsPaddingLeft);
+                    _this.padding = _this._setPadding(_this.rtl ? "right" : "left", level * Widgets.propertiesGridEditorsPaddingLeft);
                     var defaultValue = ko.observable(null), propertyName = modelPropertyInfo.propertyName;
-                    this.editorOptions = modelPropertyInfo.editorOptions;
+                    _this.editorOptions = modelPropertyInfo.editorOptions;
                     if (modelPropertyInfo.defaultVal !== undefined) {
                         defaultValue = ko.observable(modelPropertyInfo.defaultVal);
                     }
@@ -695,7 +709,7 @@ var DevExpress;
                     if (modelPropertyInfo.array) {
                         defaultValue = ko.observableArray();
                     }
-                    this._disposables.push(this.values = ko.computed(function () {
+                    _this._disposables.push(_this.values = ko.computed(function () {
                         var _values = _this.info().valueStore || _this.info().valuesArray;
                         if (_values) {
                             return _values;
@@ -707,8 +721,8 @@ var DevExpress;
                             });
                         }
                     }));
-                    this.level = level;
-                    this._init(modelPropertyInfo.editor, defaultValue, propertyName);
+                    _this.level = level;
+                    _this._init(modelPropertyInfo.editor, defaultValue, propertyName);
                     var calculateAccessibleByPropertyInfo = function (model, propertyInfo, defaultValue) {
                         var result;
                         if (ko.isObservable(propertyInfo)) {
@@ -722,21 +736,22 @@ var DevExpress;
                         }
                         return result;
                     };
-                    this._disposables.push(this.disabled = ko.computed(function () {
+                    _this._disposables.push(_this.disabled = ko.computed(function () {
                         var model = _this._model(), result = parentDisabled() || model && (model.isPropertyDisabled && model.isPropertyDisabled(_this.name));
                         if (!result) {
                             result = calculateAccessibleByPropertyInfo(model, _this.info().disabled, false);
                         }
                         return result;
                     }));
-                    this._disposables.push(this.visible = ko.computed(function () {
+                    _this._disposables.push(_this.visible = ko.computed(function () {
                         var model = _this._model(), result = _this.isSearchedProperty() && ((model && model.isPropertyVisible) ? model.isPropertyVisible(_this.name) : _this.isVisibleByContent());
                         if (result) {
                             result = calculateAccessibleByPropertyInfo(model, _this.info().visible, true);
                         }
                         return result;
                     }));
-                    this._disposables.push(this.isPropertyModified);
+                    _this._disposables.push(_this.isPropertyModified);
+                    return _this;
                 }
                 Editor.prototype._setPadding = function (position, value) {
                     var obj = {};
@@ -842,13 +857,11 @@ var DevExpress;
                     configurable: true
                 });
                 return Editor;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.Editor = Editor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-/// <reference path="widgets/editor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -858,29 +871,29 @@ var DevExpress;
             var ObjectProperties = (function (_super) {
                 __extends(ObjectProperties, _super);
                 function ObjectProperties(target, editorsInfo, level, parentDisabled, recreateEditors, textToSearch) {
-                    var _this = this;
                     if (level === void 0) { level = 0; }
                     if (parentDisabled === void 0) { parentDisabled = ko.observable(false); }
                     if (recreateEditors === void 0) { recreateEditors = false; }
-                    _super.call(this);
-                    this._targetSubscription = null;
-                    this._infoSubscription = null;
-                    this._getInfoComputed = null;
-                    this.level = 0;
-                    this.rtl = DevExpress['config']()['rtlEnabled'];
-                    this._editors = ko.observableArray([]);
-                    this.level = level;
-                    this._parentDisabled = parentDisabled;
-                    this._textToSearch = textToSearch;
-                    this._disposables.push(this.visible = ko.computed(function () {
+                    var _this = _super.call(this) || this;
+                    _this._targetSubscription = null;
+                    _this._infoSubscription = null;
+                    _this._getInfoComputed = null;
+                    _this.level = 0;
+                    _this.rtl = DevExpress['config']()['rtlEnabled'];
+                    _this._editors = ko.observableArray([]);
+                    _this.level = level;
+                    _this._parentDisabled = parentDisabled;
+                    _this._textToSearch = textToSearch;
+                    _this._disposables.push(_this.visible = ko.computed(function () {
                         return _this._editors().some(function (editor) { return editor.visible(); });
                     }));
-                    this._targetSubscription = target.subscribe(function (newVal) {
+                    _this._targetSubscription = target.subscribe(function (newVal) {
                         _this._infoSubscription && _this._infoSubscription.dispose();
                         _this._getInfoComputed && _this._getInfoComputed.dispose();
                         _this._update(newVal, editorsInfo, recreateEditors);
                     });
-                    this._update(target(), editorsInfo, recreateEditors);
+                    _this._update(target(), editorsInfo, recreateEditors);
+                    return _this;
                 }
                 ObjectProperties.prototype.update = function (viewModel) {
                     if (viewModel) {
@@ -965,7 +978,7 @@ var DevExpress;
                     return this._editors();
                 };
                 return ObjectProperties;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.ObjectProperties = ObjectProperties;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1013,16 +1026,12 @@ var DevExpress;
                     return deferred.promise();
                 };
                 return CodeResolver;
-            })();
+            }());
             Internal.CodeResolver = CodeResolver;
             Internal.globalResolver = new CodeResolver();
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-/// <reference path="propertygrid.ts" />
-/// <reference path="Localization/localization.ts" />
-/// <reference path="internal/codeResolver.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1081,8 +1090,11 @@ var DevExpress;
             ko.bindingHandlers["dxdAccordion"] = {
                 init: function (element, valueAccessor) {
                     var options = valueAccessor(), $element = $(element), $accordionContent = $element.find(".dx-accordion-content").first(), scrollUpdateCallback = function () {
-                        var scrollView = DevExpress.ui.dxScrollView["getInstance"]($element.parents(".dx-scrollview").get(0));
-                        scrollView && scrollView["update"]();
+                        var $scroll = $element.parents(".dx-scrollview");
+                        if ($scroll.length > 0) {
+                            var scrollView = DevExpress.ui.dxScrollView["getInstance"]($scroll.get(0));
+                            scrollView && scrollView["update"]();
+                        }
                     };
                     var accordionButton = $element
                         .find(".dx-accordion-header,.dx-accordion-button").get(0);
@@ -1100,8 +1112,11 @@ var DevExpress;
             ko.bindingHandlers["dxdAccordionExt"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var options = valueAccessor(), $element = $(element), scrollUpdateCallback = function () {
-                        var scrollView = DevExpress.ui.dxScrollView["getInstance"]($element.parents(".dx-scrollview").get(0));
-                        scrollView && scrollView["update"]();
+                        var $scroll = $element.parents(".dx-scrollview");
+                        if ($scroll.length > 0) {
+                            var scrollView = DevExpress.ui.dxScrollView["getInstance"]($scroll.get(0));
+                            scrollView && scrollView["update"]();
+                        }
                     }, $accordionContent = $element.find(".dx-accordion-content").first(), accordionContentHTML = null;
                     if (options.collapsed() && options.lazyContentRendering === true) {
                         accordionContentHTML = $accordionContent.html();
@@ -1173,7 +1188,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../utils.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1189,14 +1203,11 @@ var DevExpress;
                     this.target = ko.observable();
                 }
                 return PopupService;
-            })();
+            }());
             Internal.PopupService = PopupService;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../widgets/editor.ts" />
-/// <reference path="../utils.ts" />
-/// <reference path="popupService.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1206,27 +1217,27 @@ var DevExpress;
             var EditorAddOn = (function (_super) {
                 __extends(EditorAddOn, _super);
                 function EditorAddOn(editor, popupService) {
-                    var _this = this;
-                    _super.call(this);
-                    this.showPopup = function (args) {
+                    var _this = _super.call(this) || this;
+                    _this.showPopup = function (args) {
                         _this._popupService.title(_this._editor.displayName());
                         _this._updateActions(_this._editor._model());
                         _this._popupService.target(args.element);
                         _this._popupService.visible(true);
                     };
-                    this.templateName = "dx-editor-addons";
-                    this._editor = editor;
-                    this._popupService = popupService;
-                    this._disposables.push(this.visible = ko["pureComputed"](function () {
+                    _this.templateName = "dx-editor-addons";
+                    _this._editor = editor;
+                    _this._popupService = popupService;
+                    _this._disposables.push(_this.visible = ko["pureComputed"](function () {
                         if (editor.disabled()) {
                             return false;
                         }
                         var actions = editor._model() && editor._model().actions;
                         return actions && actions.length > 0 && actions.some(function (x) { return x.visible(editor.name); });
                     }));
-                    this._disposables.push(this.editorMenuButtonCss = ko["pureComputed"](function () {
+                    _this._disposables.push(_this.editorMenuButtonCss = ko["pureComputed"](function () {
                         return editor._model() && editor._model()["getActionClassName"] && editor._model()["getActionClassName"](editor.name) || "";
                     }));
+                    return _this;
                 }
                 EditorAddOn.prototype._updateActions = function (viewModel) {
                     var _this = this;
@@ -1247,12 +1258,11 @@ var DevExpress;
                     }
                 };
                 return EditorAddOn;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.EditorAddOn = EditorAddOn;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="editor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1280,20 +1290,17 @@ var DevExpress;
             var GuidEditor = (function (_super) {
                 __extends(GuidEditor, _super);
                 function GuidEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 GuidEditor.prototype.getValidationRules = function () {
                     return (_super.prototype.getValidationRules.call(this) || []).concat(Widgets.guidValidationRules).concat((this.editorOptions && this.editorOptions.isNullable) ? [] : Widgets.guidRequiredValidationRules);
                 };
                 return GuidEditor;
-            })(Widgets.Editor);
+            }(Widgets.Editor));
             Widgets.GuidEditor = GuidEditor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="editor.ts" />
-/// <reference path="editorsInfo.ts" />
-/// <reference path="../propertygrid.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1303,28 +1310,27 @@ var DevExpress;
             var PropertyGridEditor = (function (_super) {
                 __extends(PropertyGridEditor, _super);
                 function PropertyGridEditor(info, level, parentDisabled, textToSearch) {
-                    var _this = this;
-                    _super.call(this, info, level, parentDisabled, textToSearch);
-                    this.editorCreated = ko.observable(false);
-                    this.viewmodel = this.createObjectProperties();
-                    this._disposables.push(this.viewmodel);
-                    var subscription = this.collapsed.subscribe(function (newVal) {
+                    var _this = _super.call(this, info, level, parentDisabled, textToSearch) || this;
+                    _this.editorCreated = ko.observable(false);
+                    _this.viewmodel = _this.createObjectProperties();
+                    _this._disposables.push(_this.viewmodel);
+                    var subscription = _this.collapsed.subscribe(function (newVal) {
                         if (!newVal) {
                             subscription.dispose();
                             _this.editorCreated(true);
                         }
                     });
-                    this._disposables.push(subscription);
+                    _this._disposables.push(subscription);
                     if (textToSearch) {
-                        this._disposables.push(this.visibleByName = ko.computed(function () {
+                        _this._disposables.push(_this.visibleByName = ko.computed(function () {
                             var visible = !!Analytics.Utils.findMatchesInString(_this.displayName(), textToSearch());
                             if (!$.isEmptyObject(_this.viewmodel)) {
                                 _this.viewmodel._editors().forEach(function (editor) { return editor.isParentSearched(visible); });
                             }
                             return visible;
                         }));
-                        this.isSearchedProperty["dispose"] && this.isSearchedProperty["dispose"]();
-                        this._disposables.push(this.isSearchedProperty = ko.computed(function () {
+                        _this.isSearchedProperty["dispose"] && _this.isSearchedProperty["dispose"]();
+                        _this._disposables.push(_this.isSearchedProperty = ko.computed(function () {
                             if (_this.visibleByName())
                                 return true;
                             var visibleByEditors = _this.viewmodel.visible();
@@ -1332,21 +1338,19 @@ var DevExpress;
                             return visibleByEditors;
                         }));
                     }
+                    return _this;
                 }
                 PropertyGridEditor.prototype.createObjectProperties = function () {
                     var _this = this;
                     return new Widgets.ObjectProperties(this.value, { editors: ko.computed(function () { return _this.info().info; }) }, this.level + 1, this.disabled, undefined, this.textToSearch);
                 };
                 return PropertyGridEditor;
-            })(Widgets.Editor);
+            }(Widgets.Editor));
             Widgets.PropertyGridEditor = PropertyGridEditor;
             Widgets.editorTemplates["objecteditor"] = { header: "dx-emptyHeader", content: "dx-objectEditorContent", editorType: PropertyGridEditor };
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../../utils.ts" />
-///<reference path="../../Localization/localization.ts" />
-///<reference path="../editor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1374,7 +1378,7 @@ var DevExpress;
                     });
                 }
                 return CollectionItemWrapper;
-            })();
+            }());
             Widgets.CollectionItemWrapper = CollectionItemWrapper;
             var CollectionEditorViewModel = (function () {
                 function CollectionEditorViewModel(options, disabled) {
@@ -1479,12 +1483,11 @@ var DevExpress;
                     return new CollectionItemWrapper(grandfather, this.values, index, this.displayPropertyName);
                 };
                 return CollectionEditorViewModel;
-            })();
+            }());
             Widgets.CollectionEditorViewModel = CollectionEditorViewModel;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="editor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1510,7 +1513,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../../utils.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1521,7 +1523,7 @@ var DevExpress;
             var dxEllipsisEditor = (function (_super) {
                 __extends(dxEllipsisEditor, _super);
                 function dxEllipsisEditor(element, options) {
-                    _super.call(this, element, options);
+                    return _super.call(this, element, options) || this;
                 }
                 dxEllipsisEditor.prototype._init = function () {
                     _super.prototype._init.call(this);
@@ -1566,14 +1568,12 @@ var DevExpress;
                     _super.prototype._optionChanged.apply(this, arguments);
                 };
                 return dxEllipsisEditor;
-            })(DevExpress.ui.dxTextBox);
+            }(DevExpress.ui.dxTextBox));
             Widgets.dxEllipsisEditor = dxEllipsisEditor;
             DevExpress.registerComponent("dxEllipsisEditor", dxEllipsisEditor);
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../ellipsiseditor/editor.ts" />
-///<reference path="../../Localization/localization.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1584,11 +1584,13 @@ var DevExpress;
             var dxFileImagePicker = (function (_super) {
                 __extends(dxFileImagePicker, _super);
                 function dxFileImagePicker(element, options) {
+                    var _this_1 = this;
                     options.placeholder = options.placeholder || DevExpress.Analytics.getLocalization("(none)", "ChartStringId.WizNoBackImage");
-                    _super.call(this, element, options);
+                    _this_1 = _super.call(this, element, options) || this;
+                    return _this_1;
                 }
                 dxFileImagePicker.prototype._handleFiles = function (filesHolder) {
-                    var _this = this;
+                    var _this_1 = this;
                     var files = filesHolder.files;
                     for (var i = 0; i < files.length; i++) {
                         var file = files[i];
@@ -1601,19 +1603,19 @@ var DevExpress;
                         var fr = new FileReader();
                         if (this.option("readMode") !== "text") {
                             fr.onload = function (args) {
-                                if (_this.option("useFormat")) {
-                                    _this.option("format", _this._filesinput[0].files[0].name.split('.').pop());
+                                if (_this_1.option("useFormat")) {
+                                    _this_1.option("format", _this_1._filesinput[0].files[0].name.split('.').pop());
                                 }
                                 var encodedContent = fr.result.replace(/^data:[^,]+,/, '');
-                                _this.option("value", encodedContent);
-                                _this._filesinput.val("");
+                                _this_1.option("value", encodedContent);
+                                _this_1._filesinput.val("");
                             };
                             fr.readAsDataURL(file);
                         }
                         else {
                             fr.onload = function (args) {
-                                _this.option("value", fr.result);
-                                _this._filesinput.val("");
+                                _this_1.option("value", fr.result);
+                                _this_1._filesinput.val("");
                             };
                             fr.readAsText(file);
                         }
@@ -1638,14 +1640,14 @@ var DevExpress;
                     _super.prototype._renderInput.call(this, inputContainer);
                 };
                 dxFileImagePicker.prototype._attachButtonEvents = function () {
-                    var _this = this;
+                    var _this_1 = this;
                     this._$button.off("click");
                     if (!this.option("disabled")) {
                         this._$button.on("click", function (e) {
-                            if (!_this.option("value")) {
-                                _this._filesinput.val("");
+                            if (!_this_1.option("value")) {
+                                _this_1._filesinput.val("");
                             }
-                            _this._filesinput.click();
+                            _this_1._filesinput.click();
                         });
                     }
                 };
@@ -1659,7 +1661,7 @@ var DevExpress;
                     _super.prototype._renderValue.call(this);
                 };
                 return dxFileImagePicker;
-            })(Widgets.dxEllipsisEditor);
+            }(Widgets.dxEllipsisEditor));
             Widgets.dxFileImagePicker = dxFileImagePicker;
             DevExpress.registerComponent("dxFileImagePicker", dxFileImagePicker);
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
@@ -1682,31 +1684,31 @@ var DevExpress;
             var FontModel = (function (_super) {
                 __extends(FontModel, _super);
                 function FontModel(value) {
-                    var _this = this;
-                    _super.call(this);
-                    this.family = ko.observable("Times New Roman");
-                    this.unit = ko.observable("pt");
-                    this.isUpdateModel = false;
-                    this.size = ko.observable(9);
-                    this.modificators = {
+                    var _this = _super.call(this) || this;
+                    _this.family = ko.observable("Times New Roman");
+                    _this.unit = ko.observable("pt");
+                    _this.isUpdateModel = false;
+                    _this.size = ko.observable(9);
+                    _this.modificators = {
                         bold: ko.observable(false),
                         italic: ko.observable(false),
                         strikeout: ko.observable(false),
                         underline: ko.observable(false)
                     };
-                    this.updateModel(value());
-                    this._disposables.push(value.subscribe(function (newVal) {
+                    _this.updateModel(value());
+                    _this._disposables.push(value.subscribe(function (newVal) {
                         _this.isUpdateModel = true;
                         _this.updateModel(newVal);
                         _this.isUpdateModel = false;
                     }));
-                    this._disposables.push(this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); }));
-                    this._disposables.push(this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); }));
-                    this._disposables.push(this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); }));
-                    this._disposables.push(this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); }));
-                    this._disposables.push(this.family.subscribe(function (newVal) { return _this.updateValue(value); }));
-                    this._disposables.push(this.size.subscribe(function (newVal) { return _this.updateValue(value); }));
-                    this._disposables.push(this.unit.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.modificators.bold.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.modificators.italic.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.modificators.strikeout.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.modificators.underline.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.family.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.size.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    _this._disposables.push(_this.unit.subscribe(function (newVal) { return _this.updateValue(value); }));
+                    return _this;
                 }
                 FontModel.prototype.updateModel = function (value) {
                     if (value) {
@@ -1742,7 +1744,7 @@ var DevExpress;
                     }
                 };
                 return FontModel;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.FontModel = FontModel;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -1775,11 +1777,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="model.ts" />
-/// <reference path="fonts.ts" />
-/// <reference path="../propertygrideditor.ts" />
-/// <reference path="../editorsInfo.ts" />
-/// <reference path="../../propertygrid.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -1789,7 +1786,7 @@ var DevExpress;
             var FontEditor = (function (_super) {
                 __extends(FontEditor, _super);
                 function FontEditor(info, level, parentDisabled, textToSearch) {
-                    _super.call(this, info, level, parentDisabled, textToSearch);
+                    return _super.call(this, info, level, parentDisabled, textToSearch) || this;
                 }
                 FontEditor.prototype.createObjectProperties = function () {
                     var model = new Widgets.FontModel(this.value);
@@ -1797,7 +1794,7 @@ var DevExpress;
                     return new Widgets.ObjectProperties(ko.observable(model), { editors: Widgets.fontInfo }, this.level + 1, this.disabled, undefined, this.textToSearch);
                 };
                 return FontEditor;
-            })(Widgets.PropertyGridEditor);
+            }(Widgets.PropertyGridEditor));
             Widgets.FontEditor = FontEditor;
             Widgets.fontInfo = [
                 {
@@ -1815,25 +1812,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="internal/addon.ts" />
-/// <reference path="internal/codeResolver.ts" />
-/// <reference path="internal/popupService.ts" />
-/// <reference path="Localization/localization.ts" />
-/// <reference path="Localization/localizationStringIds.ts" />
-/// <reference path="bindings.ts" />
-/// <reference path="propertygrid.ts" />
-/// <reference path="utils.ts" />
-/// <reference path="widgets/editor.ts" />
-/// <reference path="widgets/editorsInfo.ts" />
-/// <reference path="widgets/guideditor.ts" />
-/// <reference path="widgets/propertygrideditor.ts" />
-/// <reference path="widgets/collectioneditor/bindings.ts" />
-/// <reference path="widgets/collectioneditor/editor.ts" />
-/// <reference path="widgets/ellipsiseditor/editor.ts" />
-/// <reference path="widgets/fileimageeditor/editor.ts" />
-/// <reference path="widgets/fonteditor/editor.ts" />
-/// <reference path="widgets/fonteditor/fonts.ts" />
-/// <reference path="widgets/fonteditor/model.ts" />
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -1851,16 +1829,15 @@ var DevExpress;
             var PopupService = (function (_super) {
                 __extends(PopupService, _super);
                 function PopupService() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return PopupService;
-            })(DevExpress.Analytics.Internal.PopupService);
+            }(DevExpress.Analytics.Internal.PopupService));
             Utils.PopupService = PopupService;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Internal, "PopupService");
         })(Utils = JS.Utils || (JS.Utils = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
@@ -1869,46 +1846,46 @@ var DevExpress;
             var CollectionItemWrapper = (function (_super) {
                 __extends(CollectionItemWrapper, _super);
                 function CollectionItemWrapper() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CollectionItemWrapper;
-            })(DevExpress.Analytics.Widgets.CollectionItemWrapper);
+            }(DevExpress.Analytics.Widgets.CollectionItemWrapper));
             Widgets.CollectionItemWrapper = CollectionItemWrapper;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "CollectionItemWrapper");
             var CollectionEditorViewModel = (function (_super) {
                 __extends(CollectionEditorViewModel, _super);
                 function CollectionEditorViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CollectionEditorViewModel;
-            })(DevExpress.Analytics.Widgets.CollectionEditorViewModel);
+            }(DevExpress.Analytics.Widgets.CollectionEditorViewModel));
             Widgets.CollectionEditorViewModel = CollectionEditorViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "CollectionEditorViewModel");
             var dxEllipsisEditor = (function (_super) {
                 __extends(dxEllipsisEditor, _super);
                 function dxEllipsisEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return dxEllipsisEditor;
-            })(DevExpress.Analytics.Widgets.dxEllipsisEditor);
+            }(DevExpress.Analytics.Widgets.dxEllipsisEditor));
             Widgets.dxEllipsisEditor = dxEllipsisEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "dxEllipsisEditor");
             var dxFileImagePicker = (function (_super) {
                 __extends(dxFileImagePicker, _super);
                 function dxFileImagePicker() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return dxFileImagePicker;
-            })(DevExpress.Analytics.Widgets.dxFileImagePicker);
+            }(DevExpress.Analytics.Widgets.dxFileImagePicker));
             Widgets.dxFileImagePicker = dxFileImagePicker;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "dxFileImagePicker");
             var FontEditor = (function (_super) {
                 __extends(FontEditor, _super);
                 function FontEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FontEditor;
-            })(DevExpress.Analytics.Widgets.FontEditor);
+            }(DevExpress.Analytics.Widgets.FontEditor));
             Widgets.FontEditor = FontEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FontEditor");
             Widgets.fontInfo = DevExpress.Analytics.Widgets.fontInfo;
@@ -1920,10 +1897,10 @@ var DevExpress;
             var FontModel = (function (_super) {
                 __extends(FontModel, _super);
                 function FontModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FontModel;
-            })(DevExpress.Analytics.Widgets.FontModel);
+            }(DevExpress.Analytics.Widgets.FontModel));
             Widgets.FontModel = FontModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FontModel");
             Widgets.propertiesGridEditorsPaddingLeft = DevExpress.Analytics.Widgets.propertiesGridEditorsPaddingLeft;
@@ -1931,10 +1908,10 @@ var DevExpress;
             var Editor = (function (_super) {
                 __extends(Editor, _super);
                 function Editor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return Editor;
-            })(DevExpress.Analytics.Widgets.Editor);
+            }(DevExpress.Analytics.Widgets.Editor));
             Widgets.Editor = Editor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "Editor");
             Widgets.editorTemplates = DevExpress.Analytics.Widgets.editorTemplates;
@@ -1946,37 +1923,37 @@ var DevExpress;
             var GuidEditor = (function (_super) {
                 __extends(GuidEditor, _super);
                 function GuidEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return GuidEditor;
-            })(DevExpress.Analytics.Widgets.GuidEditor);
+            }(DevExpress.Analytics.Widgets.GuidEditor));
             Widgets.GuidEditor = GuidEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "GuidEditor");
             var PropertyGridEditor = (function (_super) {
                 __extends(PropertyGridEditor, _super);
                 function PropertyGridEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return PropertyGridEditor;
-            })(DevExpress.Analytics.Widgets.PropertyGridEditor);
+            }(DevExpress.Analytics.Widgets.PropertyGridEditor));
             Widgets.PropertyGridEditor = PropertyGridEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "PropertyGridEditor");
             var EditorAddOn = (function (_super) {
                 __extends(EditorAddOn, _super);
                 function EditorAddOn() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return EditorAddOn;
-            })(DevExpress.Analytics.Internal.EditorAddOn);
+            }(DevExpress.Analytics.Internal.EditorAddOn));
             Widgets.EditorAddOn = EditorAddOn;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Internal, "EditorAddOn");
             var ObjectProperties = (function (_super) {
                 __extends(ObjectProperties, _super);
                 function ObjectProperties() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ObjectProperties;
-            })(DevExpress.Analytics.Widgets.ObjectProperties);
+            }(DevExpress.Analytics.Widgets.ObjectProperties));
             Widgets.ObjectProperties = ObjectProperties;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "ObjectProperties");
             Widgets.compareEditorInfo = DevExpress.Analytics.Utils.compareEditorInfo;
@@ -1984,7 +1961,6 @@ var DevExpress;
         })(Widgets = JS.Widgets || (JS.Widgets = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
@@ -2007,17 +1983,16 @@ var DevExpress;
         })(Localization = JS.Localization || (JS.Localization = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
         var CodeResolver = (function (_super) {
             __extends(CodeResolver, _super);
             function CodeResolver() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return CodeResolver;
-        })(DevExpress.Analytics.Internal.CodeResolver);
+        }(DevExpress.Analytics.Internal.CodeResolver));
         JS.CodeResolver = CodeResolver;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.JS, DevExpress.Analytics.Internal, "CodeResolver");
@@ -2025,7 +2000,6 @@ var DevExpress;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.JS, DevExpress.Analytics.Internal, "globalResolver");
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
@@ -2166,8 +2140,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="extendedSvgTemplates.ts" />
-/// <reference path="svgTemplates.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -2199,7 +2171,7 @@ var DevExpress;
                         this._templates[this.templateName] = value;
                     };
                     return SvgTemplateSource;
-                })();
+                }());
                 var SvgTemplatesEngine = (function () {
                     function SvgTemplatesEngine() {
                         var _this = this;
@@ -2247,7 +2219,7 @@ var DevExpress;
                         return SvgTemplatesEngine.Instance._hasTemplate(name) ? name : undefined;
                     };
                     return SvgTemplatesEngine;
-                })();
+                }());
                 Internal.SvgTemplatesEngine = SvgTemplatesEngine;
                 function getTemplate(id) {
                     var id = id[0] === '#' ? id.substr(1) : id;
@@ -2260,7 +2232,20 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-ko-propertygrid.js.map
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -2297,12 +2282,6 @@ var DevExpress;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -2316,41 +2295,40 @@ var DevExpress;
             var UndoEngine = (function (_super) {
                 __extends(UndoEngine, _super);
                 function UndoEngine(target, ignoredProperties, getInfoMethodName) {
-                    var _this = this;
                     if (ignoredProperties === void 0) { ignoredProperties = ["surface"]; }
-                    _super.call(this);
-                    this._groupObservers = [];
-                    this._getInfoMethodName = null;
-                    this._groupPosition = -1;
-                    this._observers = [];
-                    this._subscriptions = [];
-                    this._visited = [];
-                    this._position = ko.observable(-1);
-                    this._lockedPosition = ko.observable(-1);
-                    this._inUndoRedo = false;
-                    this.redoEnabled = ko.observable(false);
-                    this.undoEnabled = ko.observable(false);
-                    this.isIngroup = -1;
-                    this.isDirty = ko.computed({
+                    var _this = _super.call(this) || this;
+                    _this._groupObservers = [];
+                    _this._getInfoMethodName = null;
+                    _this._groupPosition = -1;
+                    _this._observers = [];
+                    _this._subscriptions = [];
+                    _this._visited = [];
+                    _this._position = ko.observable(-1);
+                    _this._lockedPosition = ko.observable(-1);
+                    _this._inUndoRedo = false;
+                    _this.redoEnabled = ko.observable(false);
+                    _this.undoEnabled = ko.observable(false);
+                    _this.isIngroup = -1;
+                    _this.isDirty = ko.computed({
                         read: function () { return _this._position() !== _this._lockedPosition(); },
                         write: function (value) { value ? _this._lockedPosition("forcibly marked as dirty") : _this._lockedPosition(_this._position()); }
                     });
-                    this._model = ko.unwrap(target);
-                    this._getInfoMethodName = getInfoMethodName;
-                    this._ignoredProperties = ignoredProperties;
-                    if (this._getInfoMethodName) {
+                    _this._model = ko.unwrap(target);
+                    _this._getInfoMethodName = getInfoMethodName;
+                    _this._ignoredProperties = ignoredProperties;
+                    if (_this._getInfoMethodName) {
                         if (ko.isSubscribable(target)) {
-                            this._targetSubscription = this.subscribeProperty(target, true);
+                            _this._targetSubscription = _this.subscribeProperty(target, true);
                         }
                         else {
-                            this._createDisposeFunction(target);
+                            _this._createDisposeFunction(target);
                         }
                     }
                     else {
-                        var innerSubscriptions = this.subscribe(this._model);
+                        var innerSubscriptions = _this.subscribe(_this._model);
                         if (ko.isSubscribable(target)) {
                             var prevVal = target();
-                            this._targetSubscription = target.subscribe(function (newTargetValue) {
+                            _this._targetSubscription = target.subscribe(function (newTargetValue) {
                                 _this._removePropertiesSubscriptions();
                                 if (!_this._inUndoRedo) {
                                     _this.properyChanged({
@@ -2364,7 +2342,8 @@ var DevExpress;
                             });
                         }
                     }
-                    this._disposables.push(this.isDirty);
+                    _this._disposables.push(_this.isDirty);
+                    return _this;
                 }
                 UndoEngine.tryGetUndoEngine = function (object) {
                     return object[UndoEngine._disposeUndoEngineSubscriptionsName] && object[UndoEngine._disposeUndoEngineSubscriptionsName].instance;
@@ -2749,13 +2728,11 @@ var DevExpress;
                 };
                 UndoEngine._disposeUndoEngineSubscriptionsName = "___dispose___UndoEngine___Subscriptions___";
                 return UndoEngine;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.UndoEngine = UndoEngine;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="utils.ts" />
-/// <reference path="undoengine.ts" />
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -2765,10 +2742,10 @@ var DevExpress;
             var UndoEngine = (function (_super) {
                 __extends(UndoEngine, _super);
                 function UndoEngine() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return UndoEngine;
-            })(DevExpress.Analytics.Utils.UndoEngine);
+            }(DevExpress.Analytics.Utils.UndoEngine));
             Utils.UndoEngine = UndoEngine;
             ;
             Utils.DEBUG = false;
@@ -2779,7 +2756,20 @@ var DevExpress;
 })(DevExpress || (DevExpress = {}));
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "UndoEngine");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "propertiesVisitor");
-//# sourceMappingURL=dx-ko-undoengine.js.map
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -2805,7 +2795,7 @@ var DevExpress;
                     }
                 }
                 return PathRequest;
-            })();
+            }());
             Utils.PathRequest = PathRequest;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -2875,6 +2865,7 @@ var DevExpress;
                         };
                     };
                     ValueEditorHelper._validate = function (value, minValue, maxValue) {
+                        var _a, _b, _c, _d;
                         if (!/^(0|(-?(([1-9]\d*)|(0\.\d+)|([1-9]\d*\.\d+)|(\d*\.\d+[eE][+\-]?\d+))))$/.test(value))
                             return false;
                         if (!maxValue)
@@ -2907,7 +2898,6 @@ var DevExpress;
                         if (valIntPart + valFracPart > boundIntPart + boundFracPart)
                             return false;
                         return true;
-                        var _a, _b, _c, _d;
                     };
                     ValueEditorHelper.validateWidgetValue = function (e, validate, defaultVal) {
                         var currentValue = e.component.option("value");
@@ -3045,14 +3035,12 @@ var DevExpress;
                         }
                     };
                     return ValueEditorHelper;
-                })();
+                }());
                 Internal.ValueEditorHelper = ValueEditorHelper;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="common/pathRequest.ts" />
-///<reference path="internal/valueEditorHelper.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -3142,7 +3130,6 @@ var DevExpress;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../utils.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -3333,7 +3320,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="operatorNames.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -3513,10 +3499,12 @@ var DevExpress;
                             Insert: [{ paramCount: 3, text: "Insert('', , '')", descriptionStringId: 'ExpressionEditorStringId.Function_Insert' }],
                             CharIndex: [
                                 { paramCount: 2, text: "CharIndex('','')", descriptionStringId: 'ExpressionEditorStringId.Function_CharIndex' },
-                                { paramCount: 3, text: "CharIndex('','', )", descriptionStringId: 'ExpressionEditorStringId.Function_CharIndex_3' }],
+                                { paramCount: 3, text: "CharIndex('','', )", descriptionStringId: 'ExpressionEditorStringId.Function_CharIndex_3' }
+                            ],
                             Remove: [
                                 { paramCount: 2, text: "Remove('', )", descriptionStringId: 'ExpressionEditorStringId.Function_Remove' },
-                                { paramCount: 3, text: "Remove('', , )", descriptionStringId: 'ExpressionEditorStringId.Function_Remove_3' }],
+                                { paramCount: 3, text: "Remove('', , )", descriptionStringId: 'ExpressionEditorStringId.Function_Remove_3' }
+                            ],
                             PadLeft: [
                                 { paramCount: 2, text: "PadLeft(, )", descriptionStringId: 'ExpressionEditorStringId.Function_PadLeft' },
                                 { paramCount: 3, text: "PadLeft(, , '')", descriptionStringId: 'ExpressionEditorStringId.Function_PadLeft_3' }
@@ -3530,7 +3518,8 @@ var DevExpress;
                             Contains: [{ paramCount: 0, text: "Contains('', '')", descriptionStringId: 'ExpressionEditorStringId.Function_Contains' }],
                             Join: [
                                 { paramCount: 1, text: "Join()", descriptionStringId: "ExpressionEditorStringId.Function_Join" },
-                                { paramCount: 2, text: "Join(, '')", descriptionStringId: "ExpressionEditorStringId.Function_Join_2" }],
+                                { paramCount: 2, text: "Join(, '')", descriptionStringId: "ExpressionEditorStringId.Function_Join_2" }
+                            ],
                         }
                     }
                 ];
@@ -3719,21 +3708,11 @@ var DevExpress;
                 };
                 CriteriaOperator.prototype.accept = function (visitor) { throw "Not implemented"; };
                 return CriteriaOperator;
-            })();
+            }());
             Criteria.CriteriaOperator = CriteriaOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../utils.ts" />
-/// <reference path="../expressioneditor/tools/functions.ts" />
-/// <reference path="../expressioneditor/tools/operatorNames.ts" />
-/// <reference path="../criteria/operators/criteriaOperator.ts" />
-/// <reference path="pathRequest.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -3743,19 +3722,19 @@ var DevExpress;
             var CodeCompletor = (function (_super) {
                 __extends(CodeCompletor, _super);
                 function CodeCompletor(_options) {
-                    var _this = this;
-                    _super.call(this);
-                    this._options = _options;
-                    this._contextPath = null;
-                    this._isInContext = function () { return _this._contextPath !== null; };
-                    this._getPath = function () { return _this._contextPath ? _this._path() + "." + _this._contextPath : _this._path(); };
-                    this.identifierRegexps = [/\./, /\[/];
-                    this._fieldListProvider = _options.fieldListProvider;
-                    this._path = _options.path;
-                    this._editor = _options.editor;
-                    this._functions = ko.computed(function () { return ko.unwrap(_options.functions) || Widgets.Internal.functionDisplay; });
-                    this._rootItems = _options.rootItems || [{ name: "Parameters", needPrefix: true }];
-                    this._disposables.push(this._functions);
+                    var _this = _super.call(this) || this;
+                    _this._options = _options;
+                    _this._contextPath = null;
+                    _this._isInContext = function () { return _this._contextPath !== null; };
+                    _this._getPath = function () { return _this._contextPath ? _this._path() + "." + _this._contextPath : _this._path(); };
+                    _this.identifierRegexps = [/\./, /\[/];
+                    _this._fieldListProvider = _options.fieldListProvider;
+                    _this._path = _options.path;
+                    _this._editor = _options.editor;
+                    _this._functions = ko.computed(function () { return ko.unwrap(_options.functions) || Widgets.Internal.functionDisplay; });
+                    _this._rootItems = _options.rootItems || [{ name: "Parameters", needPrefix: true }];
+                    _this._disposables.push(_this._functions);
+                    return _this;
                 }
                 CodeCompletor.prototype._previousSymbol = function () {
                     var cursorPosition = this._editor.getCursorPosition();
@@ -4134,7 +4113,7 @@ var DevExpress;
                     }
                 };
                 return CodeCompletor;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.CodeCompletor = CodeCompletor;
             function createFunctionCompletion(fnInfo, name, insertValue) {
                 if (insertValue === void 0) { insertValue = null; }
@@ -4210,7 +4189,6 @@ var DevExpress;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -4224,11 +4202,12 @@ var DevExpress;
                     if (startColumn === void 0) { startColumn = -1; }
                     if (startLine === void 0) { startLine = -1; }
                     if (originalPropertyLength === void 0) { originalPropertyLength = 0; }
-                    _super.call(this);
-                    this.type = "Property";
-                    this.propertyName = propertyName;
-                    this.originalPropertyLength = originalPropertyLength;
-                    this.startPosition = { column: startColumn, line: startLine };
+                    var _this = _super.call(this) || this;
+                    _this.type = "Property";
+                    _this.propertyName = propertyName;
+                    _this.originalPropertyLength = originalPropertyLength;
+                    _this.startPosition = { column: startColumn, line: startLine };
+                    return _this;
                 }
                 Object.defineProperty(OperandProperty.prototype, "displayType", {
                     get: function () {
@@ -4243,15 +4222,11 @@ var DevExpress;
                         : new OperandProperty(this.propertyName);
                 };
                 return OperandProperty;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.OperandProperty = OperandProperty;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../criteria/operators/criteriaOperator.ts" />
-///<reference path="../criteria/utils.ts" />
-///<reference path="../utils.ts" />
-///<reference path="../criteria/operators/property.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -4309,7 +4284,10 @@ var DevExpress;
                                 for (var j = 0, delta = 0; j < operands.length; j++) {
                                     var column = operands[j].operand.startPosition.column;
                                     var propertyName = operands[j].operand.propertyName;
-                                    var deltaName = operands[j].operand.originalPropertyLength - serializer.serialize(operands[j].operand, false).length;
+                                    var deltaName = 0;
+                                    if (operands[j].operand.originalPropertyLength !== propertyName.length) {
+                                        deltaName = operands[j].operand.originalPropertyLength - serializer.serialize(operands[j].operand, false).length;
+                                    }
                                     var convertedName = operands[j].convertedName;
                                     if (!propertyName || column < 0)
                                         continue;
@@ -4330,12 +4308,11 @@ var DevExpress;
                     return this._replaceNames(path, expression, false);
                 };
                 return DisplayExpressionConverter;
-            })();
+            }());
             Utils.DisplayExpressionConverter = DisplayExpressionConverter;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="operators/criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -4441,19 +4418,19 @@ var DevExpress;
                     return operand;
                 };
                 return CriteriaOperatorPreprocessor;
-            })();
+            }());
             Criteria.CriteriaOperatorPreprocessor = CriteriaOperatorPreprocessor;
             Criteria.criteriaCreator = new CriteriaOperatorPreprocessor();
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
         var Criteria;
         (function (Criteria) {
+            var Aggregate;
             (function (Aggregate) {
                 Aggregate[Aggregate["Count"] = 0] = "Count";
                 Aggregate[Aggregate["Exists"] = 1] = "Exists";
@@ -4462,14 +4439,12 @@ var DevExpress;
                 Aggregate[Aggregate["Avg"] = 4] = "Avg";
                 Aggregate[Aggregate["Sum"] = 5] = "Sum";
                 Aggregate[Aggregate["Single"] = 6] = "Single";
-            })(Criteria.Aggregate || (Criteria.Aggregate = {}));
-            var Aggregate = Criteria.Aggregate;
+            })(Aggregate = Criteria.Aggregate || (Criteria.Aggregate = {}));
             var AggregateOperand = (function (_super) {
                 __extends(AggregateOperand, _super);
                 function AggregateOperand(property, aggregatedExpression, aggregateType, condition) {
-                    var _this = this;
-                    _super.call(this);
-                    this.change = function (operationType, item) {
+                    var _this = _super.call(this) || this;
+                    _this.change = function (operationType, item) {
                         var operator = null;
                         if (operationType.type === Criteria.GroupOperatorType) {
                             operator = Criteria.CriteriaOperator.create(operationType);
@@ -4483,7 +4458,7 @@ var DevExpress;
                         }
                         return operator;
                     };
-                    this.assignLeftPart = function (criteriaOperator) {
+                    _this.assignLeftPart = function (criteriaOperator) {
                         if (criteriaOperator.leftPart instanceof AggregateOperand) {
                             _this.assignFrom(criteriaOperator.leftPart);
                         }
@@ -4500,26 +4475,27 @@ var DevExpress;
                             }
                         }
                     };
-                    this.type = "Aggregate";
-                    this.property = property;
+                    _this.type = "Aggregate";
+                    _this.property = property;
                     if (condition instanceof Criteria.GroupOperator) {
-                        this.condition = condition;
+                        _this.condition = condition;
                     }
                     else {
                         if (condition instanceof Criteria.UnaryOperator && condition.operatorType === Criteria.UnaryOperatorType.Not) {
                             if (condition.operand instanceof Criteria.GroupOperator) {
-                                this.condition = new Criteria.UnaryOperator(Criteria.UnaryOperatorType.Not, condition.operand);
+                                _this.condition = new Criteria.UnaryOperator(Criteria.UnaryOperatorType.Not, condition.operand);
                             }
                             else {
-                                this.condition = new Criteria.UnaryOperator(Criteria.UnaryOperatorType.Not, new Criteria.GroupOperator(Criteria.GroupOperatorType.And, condition.operand ? [condition.operand] : []));
+                                _this.condition = new Criteria.UnaryOperator(Criteria.UnaryOperatorType.Not, new Criteria.GroupOperator(Criteria.GroupOperatorType.And, condition.operand ? [condition.operand] : []));
                             }
                         }
                         else {
-                            this.condition = new Criteria.GroupOperator(Criteria.GroupOperatorType.And, condition ? [condition] : []);
+                            _this.condition = new Criteria.GroupOperator(Criteria.GroupOperatorType.And, condition ? [condition] : []);
                         }
                     }
-                    this.operatorType = aggregateType;
-                    this.aggregatedExpression = aggregatedExpression;
+                    _this.operatorType = aggregateType;
+                    _this.aggregatedExpression = aggregatedExpression;
+                    return _this;
                 }
                 Object.defineProperty(AggregateOperand.prototype, "displayType", {
                     get: function () {
@@ -4554,12 +4530,11 @@ var DevExpress;
                         : new AggregateOperand(this.property && this.property.accept(visitor), this.aggregatedExpression && this.aggregatedExpression.accept(visitor), this.operatorType, this.condition && this.condition.accept(visitor));
                 };
                 return AggregateOperand;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.AggregateOperand = AggregateOperand;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -4569,16 +4544,15 @@ var DevExpress;
             var BetweenOperator = (function (_super) {
                 __extends(BetweenOperator, _super);
                 function BetweenOperator(property, begin, end) {
-                    var _this = this;
-                    _super.call(this);
-                    this.resetRightPart = function (newVal) {
+                    var _this = _super.call(this) || this;
+                    _this.resetRightPart = function (newVal) {
                         _this.begin = new Criteria.OperandValue(newVal);
                         _this.end = new Criteria.OperandValue(newVal);
                     };
-                    this.assignLeftPart = function (criteriaOperator) {
+                    _this.assignLeftPart = function (criteriaOperator) {
                         _this.property = criteriaOperator.leftPart;
                     };
-                    this.assignRightPart = function (criteriaOperator) {
+                    _this.assignRightPart = function (criteriaOperator) {
                         if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
                             if (criteriaOperator.rightPart.length) {
                                 _this.begin = criteriaOperator.rightPart[0];
@@ -4594,11 +4568,12 @@ var DevExpress;
                             _this.end = new Criteria.OperandValue();
                         }
                     };
-                    this.operatorType = "Between";
-                    this.type = "Between";
-                    this.property = property;
-                    this.begin = begin || new Criteria.OperandValue();
-                    this.end = end || new Criteria.OperandValue();
+                    _this.operatorType = "Between";
+                    _this.type = "Between";
+                    _this.property = property;
+                    _this.begin = begin || new Criteria.OperandValue();
+                    _this.end = end || new Criteria.OperandValue();
+                    return _this;
                 }
                 Object.defineProperty(BetweenOperator.prototype, "leftPart", {
                     get: function () {
@@ -4634,18 +4609,18 @@ var DevExpress;
                         : new BetweenOperator(this.property && this.property.accept(visitor), this.begin && this.begin.accept(visitor), this.end && this.end.accept(visitor));
                 };
                 return BetweenOperator;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.BetweenOperator = BetweenOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
         var Criteria;
         (function (Criteria) {
+            var BinaryOperatorType;
             (function (BinaryOperatorType) {
                 BinaryOperatorType[BinaryOperatorType["Equal"] = 0] = "Equal";
                 BinaryOperatorType[BinaryOperatorType["NotEqual"] = 1] = "NotEqual";
@@ -4662,17 +4637,15 @@ var DevExpress;
                 BinaryOperatorType[BinaryOperatorType["Multiply"] = 12] = "Multiply";
                 BinaryOperatorType[BinaryOperatorType["Plus"] = 13] = "Plus";
                 BinaryOperatorType[BinaryOperatorType["Minus"] = 14] = "Minus";
-            })(Criteria.BinaryOperatorType || (Criteria.BinaryOperatorType = {}));
-            var BinaryOperatorType = Criteria.BinaryOperatorType;
+            })(BinaryOperatorType = Criteria.BinaryOperatorType || (Criteria.BinaryOperatorType = {}));
             var BinaryOperator = (function (_super) {
                 __extends(BinaryOperator, _super);
                 function BinaryOperator(left, right, operatorType) {
-                    var _this = this;
-                    _super.call(this);
-                    this.assignLeftPart = function (criteriaOperator) {
+                    var _this = _super.call(this) || this;
+                    _this.assignLeftPart = function (criteriaOperator) {
                         _this.leftOperand = criteriaOperator.leftPart;
                     };
-                    this.assignRightPart = function (criteriaOperator) {
+                    _this.assignRightPart = function (criteriaOperator) {
                         if (criteriaOperator.rightPart.length !== null && criteriaOperator.rightPart.length !== undefined) {
                             if (criteriaOperator.rightPart.length) {
                                 _this.rightOperand = criteriaOperator.rightPart[0];
@@ -4682,10 +4655,11 @@ var DevExpress;
                             _this.rightOperand = criteriaOperator.rightPart;
                         }
                     };
-                    this.type = "Binary";
-                    this.leftOperand = left || new Criteria.CriteriaOperator();
-                    this.rightOperand = right || new Criteria.CriteriaOperator();
-                    this.operatorType = operatorType;
+                    _this.type = "Binary";
+                    _this.leftOperand = left || new Criteria.CriteriaOperator();
+                    _this.rightOperand = right || new Criteria.CriteriaOperator();
+                    _this.operatorType = operatorType;
+                    return _this;
                 }
                 Object.defineProperty(BinaryOperator.prototype, "leftPart", {
                     get: function () {
@@ -4721,12 +4695,11 @@ var DevExpress;
                         : new BinaryOperator(this.leftOperand && this.leftOperand.accept(visitor), this.rightOperand && this.rightOperand.accept(visitor), this.operatorType);
                 };
                 return BinaryOperator;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.BinaryOperator = BinaryOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -4736,11 +4709,11 @@ var DevExpress;
             var OperandValue = (function (_super) {
                 __extends(OperandValue, _super);
                 function OperandValue(value) {
-                    _super.call(this);
-                    this.type = "Value";
+                    var _this = _super.call(this) || this;
+                    _this.type = "Value";
                     var result = value !== null && value !== undefined ? value : "";
                     if (value && value["length"] && ((value[0] === "'" && value[value.length - 1] === "'") || Analytics.Widgets.validateGuid(value))) {
-                        result = value.slice(1, value.length - 1);
+                        result = _this._processStringValue(value);
                     }
                     else if (value && value["length"] && value[0] === "#" && value[value.length - 1] === "#") {
                         result = value.slice(1, value.length - 1);
@@ -4752,8 +4725,15 @@ var DevExpress;
                     else if (String(value).toLowerCase() === "true" || String(value).toLowerCase() === "false") {
                         result = String(value).toLowerCase() === "true" ? "True" : "False";
                     }
-                    this.value = result;
+                    _this.value = result;
+                    return _this;
                 }
+                OperandValue.prototype._processStringValue = function (value) {
+                    var result = value.slice(1, value.length - 1);
+                    if (result.indexOf("''") !== -1)
+                        result = result.replace("''", "'");
+                    return result;
+                };
                 Object.defineProperty(OperandValue.prototype, "displayType", {
                     get: function () {
                         return this.value || "?";
@@ -4762,12 +4742,11 @@ var DevExpress;
                     configurable: true
                 });
                 return OperandValue;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.OperandValue = OperandValue;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="value.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -4777,7 +4756,7 @@ var DevExpress;
             var ConstantValue = (function (_super) {
                 __extends(ConstantValue, _super);
                 function ConstantValue(value) {
-                    _super.call(this, value);
+                    return _super.call(this, value) || this;
                 }
                 ConstantValue.prototype.accept = function (visitor) {
                     return visitor.visitConstantValue
@@ -4785,18 +4764,18 @@ var DevExpress;
                         : new ConstantValue(this.value);
                 };
                 return ConstantValue;
-            })(Criteria.OperandValue);
+            }(Criteria.OperandValue));
             Criteria.ConstantValue = ConstantValue;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
         var Criteria;
         (function (Criteria) {
+            var FunctionOperatorType;
             (function (FunctionOperatorType) {
                 FunctionOperatorType[FunctionOperatorType["None"] = 0] = "None";
                 FunctionOperatorType[FunctionOperatorType["Custom"] = 1] = "Custom";
@@ -4913,23 +4892,21 @@ var DevExpress;
                 FunctionOperatorType[FunctionOperatorType["AddMonths"] = 112] = "AddMonths";
                 FunctionOperatorType[FunctionOperatorType["AddYears"] = 113] = "AddYears";
                 FunctionOperatorType[FunctionOperatorType["OrderDescToken"] = 114] = "OrderDescToken";
-            })(Criteria.FunctionOperatorType || (Criteria.FunctionOperatorType = {}));
-            var FunctionOperatorType = Criteria.FunctionOperatorType;
+            })(FunctionOperatorType = Criteria.FunctionOperatorType || (Criteria.FunctionOperatorType = {}));
             var FunctionOperator = (function (_super) {
                 __extends(FunctionOperator, _super);
                 function FunctionOperator(operatorType, operands) {
-                    var _this = this;
-                    _super.call(this);
-                    this.toString = function (reverse) {
+                    var _this = _super.call(this) || this;
+                    _this.toString = function (reverse) {
                         var result = (Criteria.Utils.operatorTokens[_this.displayType] || _this.displayType) + '(' + _this.operands.map(function (operand) {
                             return operand.toString();
                         }).join(", ") + ')';
                         return reverse ? "Not " + result : result;
                     };
-                    this.assignLeftPart = function (criteriaOperator) {
+                    _this.assignLeftPart = function (criteriaOperator) {
                         _this.operands = [criteriaOperator.leftPart];
                     };
-                    this.assignRightPart = function (criteriaOperator) {
+                    _this.assignRightPart = function (criteriaOperator) {
                         if (_this.operatorType !== FunctionOperatorType.IsNullOrEmpty &&
                             _this.operatorType !== FunctionOperatorType.IsOutlookIntervalBeyondThisYear &&
                             _this.operatorType !== FunctionOperatorType.IsOutlookIntervalLaterThisYear &&
@@ -4957,11 +4934,12 @@ var DevExpress;
                             }
                         }
                     };
-                    this.operands = [];
-                    this.type = "Function";
-                    this.operatorType = operatorType;
+                    _this.operands = [];
+                    _this.type = "Function";
+                    _this.operatorType = operatorType;
                     operands = operands || [new Criteria.CriteriaOperator()];
                     operands.forEach(function (operand) { return _this.operands.push(operand); });
+                    return _this;
                 }
                 Object.defineProperty(FunctionOperator.prototype, "leftPart", {
                     get: function () {
@@ -4997,30 +4975,27 @@ var DevExpress;
                         : new FunctionOperator(this.operatorType, this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
                 };
                 return FunctionOperator;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.FunctionOperator = FunctionOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
-///<reference path="../criteriaOperatorPreprocessor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
         var Criteria;
         (function (Criteria) {
+            var GroupOperatorType;
             (function (GroupOperatorType) {
                 GroupOperatorType[GroupOperatorType["And"] = 0] = "And";
                 GroupOperatorType[GroupOperatorType["Or"] = 1] = "Or";
-            })(Criteria.GroupOperatorType || (Criteria.GroupOperatorType = {}));
-            var GroupOperatorType = Criteria.GroupOperatorType;
+            })(GroupOperatorType = Criteria.GroupOperatorType || (Criteria.GroupOperatorType = {}));
             var GroupOperator = (function (_super) {
                 __extends(GroupOperator, _super);
                 function GroupOperator(operation, operands) {
-                    var _this = this;
-                    _super.call(this);
-                    this.create = function (isGroup, property, specifics) {
+                    var _this = _super.call(this) || this;
+                    _this.create = function (isGroup, property, specifics) {
                         var operator = new Criteria.BinaryOperator(property, new Criteria.OperandValue(""), Criteria.BinaryOperatorType.Equal);
                         if (isGroup) {
                             operator = new GroupOperator(GroupOperatorType.And, []);
@@ -5031,7 +5006,7 @@ var DevExpress;
                         _this.operands.push(operator);
                         return _this.operands[_this.operands.indexOf(operator)];
                     };
-                    this.change = function (operationType, item, incorrectSpecificsForAggregate) {
+                    _this.change = function (operationType, item, incorrectSpecificsForAggregate) {
                         if (incorrectSpecificsForAggregate === void 0) { incorrectSpecificsForAggregate = false; }
                         var position = _this.operands.indexOf(item);
                         if (position !== -1) {
@@ -5050,17 +5025,18 @@ var DevExpress;
                         item = null;
                         return _this.operands[position];
                     };
-                    this.remove = function (operator) {
+                    _this.remove = function (operator) {
                         _this.operands.splice(_this.operands.indexOf(operator), 1);
                     };
-                    this.assignLeftPart = function (operator) {
+                    _this.assignLeftPart = function (operator) {
                         _this.operands = operator.operands;
                     };
-                    this.operands = [];
-                    this.type = "Group";
-                    this.operatorType = operation;
+                    _this.operands = [];
+                    _this.type = "Group";
+                    _this.operatorType = operation;
                     operands = operands || [new Criteria.CriteriaOperator(), new Criteria.CriteriaOperator()];
                     operands.forEach(function (operand) { return _this.operands.push(operand); });
+                    return _this;
                 }
                 GroupOperator.combine = function (operation, operands) {
                     var combinedOperands = [];
@@ -5100,12 +5076,11 @@ var DevExpress;
                         : new GroupOperator(this.operatorType, this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
                 };
                 return GroupOperator;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.GroupOperator = GroupOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5115,19 +5090,19 @@ var DevExpress;
             var InOperator = (function (_super) {
                 __extends(InOperator, _super);
                 function InOperator(criteriaOperator, operands) {
-                    var _this = this;
-                    _super.call(this);
-                    this.assignLeftPart = function (criteriaOperator) {
+                    var _this = _super.call(this) || this;
+                    _this.assignLeftPart = function (criteriaOperator) {
                         _this.criteriaOperator = criteriaOperator.leftPart;
                     };
-                    this.assignRightPart = function (criteriaOperator) {
+                    _this.assignRightPart = function (criteriaOperator) {
                         _this.operands = [].concat(criteriaOperator.rightPart);
                     };
-                    this.operatorType = "In";
-                    this.type = "In";
-                    this.operands = [];
-                    this.criteriaOperator = criteriaOperator || new Criteria.CriteriaOperator();
+                    _this.operatorType = "In";
+                    _this.type = "In";
+                    _this.operands = [];
+                    _this.criteriaOperator = criteriaOperator || new Criteria.CriteriaOperator();
                     (operands || []).forEach(function (operand) { return _this.operands.push(operand); });
+                    return _this;
                 }
                 Object.defineProperty(InOperator.prototype, "leftPart", {
                     get: function () {
@@ -5163,12 +5138,11 @@ var DevExpress;
                         : new InOperator(this.criteriaOperator && this.criteriaOperator.accept(visitor), this.operands && this.operands.map(function (op) { return op.accept(visitor); }));
                 };
                 return InOperator;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.InOperator = InOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5178,12 +5152,13 @@ var DevExpress;
             var JoinOperand = (function (_super) {
                 __extends(JoinOperand, _super);
                 function JoinOperand(joinTypeName, condition, type, aggregated) {
-                    _super.call(this);
-                    this.type = "Join";
-                    this.joinTypeName = joinTypeName;
-                    this.condition = condition;
-                    this.operatorType = type;
-                    this.aggregatedExpression = aggregated;
+                    var _this = _super.call(this) || this;
+                    _this.type = "Join";
+                    _this.joinTypeName = joinTypeName;
+                    _this.condition = condition;
+                    _this.operatorType = type;
+                    _this.aggregatedExpression = aggregated;
+                    return _this;
                 }
                 JoinOperand.joinOrAggregate = function (collectionProperty, condition, type, aggregated) {
                     if (collectionProperty === null || collectionProperty.propertyName.length < 2 || collectionProperty.propertyName[0] != '<' || collectionProperty.propertyName[collectionProperty.propertyName.length - 1] != '>') {
@@ -5209,12 +5184,11 @@ var DevExpress;
                         : new JoinOperand(this.joinTypeName, this.condition && this.condition.accept(visitor), this.operatorType, this.aggregatedExpression && this.aggregatedExpression.accept(visitor));
                 };
                 return JoinOperand;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.JoinOperand = JoinOperand;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5224,9 +5198,10 @@ var DevExpress;
             var OperandParameter = (function (_super) {
                 __extends(OperandParameter, _super);
                 function OperandParameter(parameterName, value) {
-                    _super.call(this, value);
-                    this.type = "Parameter";
-                    this.parameterName = parameterName || "";
+                    var _this = _super.call(this, value) || this;
+                    _this.type = "Parameter";
+                    _this.parameterName = parameterName || "";
+                    return _this;
                 }
                 Object.defineProperty(OperandParameter.prototype, "displayType", {
                     get: function () {
@@ -5241,33 +5216,33 @@ var DevExpress;
                         : new OperandParameter(this.parameterName, this.value);
                 };
                 return OperandParameter;
-            })(Criteria.OperandValue);
+            }(Criteria.OperandValue));
             Criteria.OperandParameter = OperandParameter;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
     (function (Analytics) {
         var Criteria;
         (function (Criteria) {
+            var UnaryOperatorType;
             (function (UnaryOperatorType) {
                 UnaryOperatorType[UnaryOperatorType["Minus"] = 0] = "Minus";
                 UnaryOperatorType[UnaryOperatorType["Plus"] = 1] = "Plus";
                 UnaryOperatorType[UnaryOperatorType["BitwiseNot"] = 2] = "BitwiseNot";
                 UnaryOperatorType[UnaryOperatorType["Not"] = 3] = "Not";
                 UnaryOperatorType[UnaryOperatorType["IsNull"] = 4] = "IsNull";
-            })(Criteria.UnaryOperatorType || (Criteria.UnaryOperatorType = {}));
-            var UnaryOperatorType = Criteria.UnaryOperatorType;
+            })(UnaryOperatorType = Criteria.UnaryOperatorType || (Criteria.UnaryOperatorType = {}));
             var UnaryOperator = (function (_super) {
                 __extends(UnaryOperator, _super);
                 function UnaryOperator(operatorType, operand) {
-                    _super.call(this);
-                    this.type = "Unary";
-                    this.operand = operand || new Criteria.CriteriaOperator();
-                    this.operatorType = operatorType;
+                    var _this = _super.call(this) || this;
+                    _this.type = "Unary";
+                    _this.operand = operand || new Criteria.CriteriaOperator();
+                    _this.operatorType = operatorType;
+                    return _this;
                 }
                 Object.defineProperty(UnaryOperator.prototype, "leftPart", {
                     get: function () {
@@ -5314,12 +5289,11 @@ var DevExpress;
                         : new UnaryOperator(this.operatorType, this.operand && this.operand.accept(visitor));
                 };
                 return UnaryOperator;
-            })(Criteria.CriteriaOperator);
+            }(Criteria.CriteriaOperator));
             Criteria.UnaryOperator = UnaryOperator;
         })(Criteria = Analytics.Criteria || (Analytics.Criteria = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../expressioneditor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5331,13 +5305,12 @@ var DevExpress;
                 var Tools = (function (_super) {
                     __extends(Tools, _super);
                     function Tools(onClick, parametersOptions, options, fieldListOptions) {
-                        var _this = this;
-                        _super.call(this);
-                        this.searchPlaceholder = function () { return Analytics.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
-                        this._categories = ko.observableArray([]);
-                        this.toolBox = [];
-                        this.description = ko.observable();
-                        this._defaultClick = onClick;
+                        var _this = _super.call(this) || this;
+                        _this.searchPlaceholder = function () { return Analytics.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
+                        _this._categories = ko.observableArray([]);
+                        _this.toolBox = [];
+                        _this.description = ko.observable();
+                        _this._defaultClick = onClick;
                         Internal.operatorNames.filter(function (item) { return !!item.descriptionStringId; }).forEach(function (item) { return _this._initDescription(item); });
                         var functionGroups = ko.computed(function () {
                             return options() && ko.unwrap(options().functions) || Internal.functionDisplay;
@@ -5364,24 +5337,32 @@ var DevExpress;
                             _this._categories(defaultCategories);
                             resetCategoriesSelection();
                         };
-                        this.resetCategoriesSelection = resetCategoriesSelection;
+                        _this.resetCategoriesSelection = resetCategoriesSelection;
                         [functionGroups, functions].forEach(function (x) { return _this._disposables.push(x); });
-                        this._disposables.push(options.subscribe(function (newOptions) {
+                        _this._disposables.push(options.subscribe(function (newOptions) {
                             updateCategories(newOptions);
                         }));
                         updateCategories(options());
-                        this._disposables.push(this.showDescription = ko.computed(function () { return selectedContent() && selectedContent().showDescription; }));
-                        this.toolBox = [
-                            this._generateTab(this._categories, "dx-expressioneditor-categories", "170px", function (item) {
+                        _this._disposables.push(_this.showDescription = ko.computed(function () { return selectedContent() && selectedContent().showDescription; }));
+                        _this.toolBox = [
+                            _this._generateTab(_this._categories, "dx-expressioneditor-categories", "170px", function (item) {
+                                if (item.data && item.data.selectedItem && item.data.selectedItem() && item.data.items.indexOf(item.data.selectedItem()) !== -1) {
+                                    var contentItem = item.data.selectedItem();
+                                    _this.description(_this._localizedExpressionEditorItem(contentItem));
+                                }
+                                else {
+                                    _this.description(undefined);
+                                }
                                 if (selectedContent() === item)
                                     return;
                                 selectedContent().isSelected(false);
                                 item.isSelected(true);
                                 selectedContent(item);
                             }),
-                            this._generateTab(selectedContent, "dx-expressioneditor-selectedcontent", ko.computed(function () { return _this.showDescription() ? "248px" : "435px"; }), function (item) { _this.description(Analytics.getLocalization(item.text, item.descriptionStringId)); }, this._defaultClick),
-                            this._generateTab(this.description, "dx-expressioneditor-description", undefined, undefined, undefined, this.showDescription)
+                            _this._generateTab(selectedContent, "dx-expressioneditor-selectedcontent", ko.computed(function () { return _this.showDescription() ? "248px" : "435px"; }), function (item) { _this.description(_this._localizedExpressionEditorItem(item)); }, _this._defaultClick),
+                            _this._generateTab(_this.description, "dx-expressioneditor-description", undefined, undefined, undefined, _this.showDescription)
                         ];
+                        return _this;
                     }
                     Tools.prototype._generateTab = function (content, templateName, width, click, dblclick, visible) {
                         if (templateName === void 0) { templateName = null; }
@@ -5394,8 +5375,11 @@ var DevExpress;
                             visible: visible || true
                         };
                     };
+                    Tools.prototype._localizedExpressionEditorItem = function (item) {
+                        return Analytics.getLocalization(item.text, item.descriptionStringId);
+                    };
                     Tools.prototype._initDescription = function (expressionEditorItem) {
-                        expressionEditorItem.description = DevExpress.Analytics.getLocalization(expressionEditorItem.text, expressionEditorItem.descriptionStringId);
+                        expressionEditorItem.description = this._localizedExpressionEditorItem(expressionEditorItem);
                     };
                     Tools.prototype._createFieldsCategory = function (fields, parameters) {
                         var category = {
@@ -5453,7 +5437,7 @@ var DevExpress;
                         return result;
                     };
                     Tools.prototype._createFunctionsCategory = function (items) {
-                        var textToSearch = ko.observable(""), disposables = [], isSelected = ko.observable(false), timeout = null, allItems = ko.computed(function () { return (_a = []).concat.apply(_a, items().map(function (x) { return x.data; })); var _a; }), content = this._createFunctionsCategoryContent(textToSearch, isSelected, allItems()), category = {
+                        var textToSearch = ko.observable(""), disposables = [], isSelected = ko.observable(false), timeout = null, allItems = ko.computed(function () { return [].concat.apply([], items().map(function (x) { return x.data; })); }), content = this._createFunctionsCategoryContent(textToSearch, isSelected, allItems()), category = {
                             displayName: Analytics.getLocalization("Functions", "DataAccessStringId.ExpressionEditor_DocumentationCategory_Functions"),
                             items: items, allItems: allItems, isSelected: isSelected, content: content,
                             collapsed: ko.observable(true),
@@ -5487,13 +5471,12 @@ var DevExpress;
                         this._disposeCategories();
                     };
                     return Tools;
-                })(Analytics.Utils.Disposable);
+                }(Analytics.Utils.Disposable));
                 Internal.Tools = Tools;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../common/pathRequest.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5510,34 +5493,33 @@ var DevExpress;
             var TreeListItemViewModel = (function (_super) {
                 __extends(TreeListItemViewModel, _super);
                 function TreeListItemViewModel(options, path, onItemsVisibilityChanged, rtl, resolver) {
-                    var _this = this;
                     if (path === void 0) { path = []; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
                     if (resolver === void 0) { resolver = new Analytics.Internal.CodeResolver(); }
-                    _super.call(this);
-                    this.resolver = resolver;
-                    this._rtl = false;
-                    this._data = ko.observable(null);
-                    this._actions = ko.observable([]);
-                    this._actionsSubscription = null;
-                    this._iconName = function () { return (ko.unwrap((_this.data && _this.data.icon) || (_this.data && _this.data.specifics)) || "default").toLowerCase(); };
-                    this.level = -1;
-                    this.items = ko.observableArray();
-                    this.collapsed = ko.observable(true);
-                    this.isSelected = ko.observable(false);
-                    this.isHovered = ko.observable(false);
-                    this.isMultiSelected = ko.observable(false);
-                    this._path = path;
-                    this._rtl = rtl;
-                    this._treeListController = options.treeListController;
-                    this._templateName = options.templateName;
-                    this._onItemsVisibilityChanged = onItemsVisibilityChanged;
-                    this.dragDropHandler = options.treeListController.dragDropHandler;
-                    this.getItems = function () {
+                    var _this = _super.call(this) || this;
+                    _this.resolver = resolver;
+                    _this._rtl = false;
+                    _this._data = ko.observable(null);
+                    _this._actions = ko.observable([]);
+                    _this._actionsSubscription = null;
+                    _this._iconName = function () { return (ko.unwrap((_this.data && _this.data.icon) || (_this.data && _this.data.specifics)) || "default").toLowerCase(); };
+                    _this.level = -1;
+                    _this.items = ko.observableArray();
+                    _this.collapsed = ko.observable(true);
+                    _this.isSelected = ko.observable(false);
+                    _this.isHovered = ko.observable(false);
+                    _this.isMultiSelected = ko.observable(false);
+                    _this._path = path;
+                    _this._rtl = rtl;
+                    _this._treeListController = options.treeListController;
+                    _this._templateName = options.templateName;
+                    _this._onItemsVisibilityChanged = onItemsVisibilityChanged;
+                    _this.dragDropHandler = options.treeListController.dragDropHandler;
+                    _this.getItems = function () {
                         return _this._loadItems(options);
                     };
-                    this.toggleSelected = function (_, event) {
+                    _this.toggleSelected = function (_, event) {
                         if ((event.shiftKey || event.ctrlKey) && _this.selectedItems().length > 0 && _this._treeListController.canMultiSelect && _this._treeListController.canMultiSelect(_this)) {
                             options.selectedPath("");
                             _this._treeListController.multiSelect(_this, event.shiftKey, event.ctrlKey);
@@ -5548,11 +5530,11 @@ var DevExpress;
                         }
                     };
                     if (options.treeListController.dblClickHandler) {
-                        this.dblClickHandler = function (item) {
+                        _this.dblClickHandler = function (item) {
                             options.treeListController.dblClickHandler && options.treeListController.dblClickHandler(item);
                         };
                     }
-                    this.toggleCollapsed = function () {
+                    _this.toggleCollapsed = function () {
                         if (_this.hasItems) {
                             _this.collapsed(!_this.collapsed.peek());
                             if (!_this.collapsed.peek() && _this.items().length === 0) {
@@ -5563,7 +5545,8 @@ var DevExpress;
                             }
                         }
                     };
-                    this.nodeImageClass = this._getNodeImageClassName();
+                    _this.nodeImageClass = _this._getNodeImageClassName();
+                    return _this;
                 }
                 TreeListItemViewModel.prototype._equal = function (obj1, obj2) {
                     var ignore = ["innerActions", "noDragable", "dragData"];
@@ -5875,24 +5858,24 @@ var DevExpress;
                     return this._treeListController.selectedItems && this._treeListController.selectedItems() || [];
                 };
                 return TreeListItemViewModel;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.TreeListItemViewModel = TreeListItemViewModel;
             var TreeListRootItemViewModel = (function (_super) {
                 __extends(TreeListRootItemViewModel, _super);
                 function TreeListRootItemViewModel(options, path, onItemsVisibilityChanged, rtl) {
-                    var _this = this;
                     if (path === void 0) { path = []; }
                     if (onItemsVisibilityChanged === void 0) { onItemsVisibilityChanged = $.noop; }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this, options, path, onItemsVisibilityChanged, rtl);
-                    this._selectedPathSubscription = null;
-                    this.resolver.done(function () {
+                    var _this = _super.call(this, options, path, onItemsVisibilityChanged, rtl) || this;
+                    _this._selectedPathSubscription = null;
+                    _this.resolver.done(function () {
                         onItemsVisibilityChanged();
                     });
-                    this._selectedPathSubscription = options.selectedPath.subscribe(function (newPath) {
+                    _this._selectedPathSubscription = options.selectedPath.subscribe(function (newPath) {
                         _this._selectItem(!!_this.path ? newPath.substr(_this.path.length + 1) : newPath);
                     });
-                    this._selectItem(!!this.path ? this.path + "." + options.selectedPath() : options.selectedPath());
+                    _this._selectItem(!!_this.path ? _this.path + "." + options.selectedPath() : options.selectedPath());
+                    return _this;
                 }
                 TreeListRootItemViewModel.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
@@ -5900,13 +5883,11 @@ var DevExpress;
                     this._selectedPathSubscription = null;
                 };
                 return TreeListRootItemViewModel;
-            })(TreeListItemViewModel);
+            }(TreeListItemViewModel));
             Widgets.TreeListRootItemViewModel = TreeListRootItemViewModel;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../utils.ts" />
-///<reference path="treelistItem.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5937,13 +5918,11 @@ var DevExpress;
                     }
                 };
                 return TreeListController;
-            })();
+            }());
             Widgets.TreeListController = TreeListController;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../../treelist/treelistItem.ts" />
-///<reference path="../../treelist/treelistController.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -5953,10 +5932,11 @@ var DevExpress;
             var ExpressionEditorTreeListController = (function (_super) {
                 __extends(ExpressionEditorTreeListController, _super);
                 function ExpressionEditorTreeListController(fieldName, putSelectionHandler, selectionHandler) {
-                    _super.call(this);
-                    this.fieldName = fieldName;
-                    this.putSelectionHandler = putSelectionHandler;
-                    this.selectionHandler = selectionHandler;
+                    var _this = _super.call(this) || this;
+                    _this.fieldName = fieldName;
+                    _this.putSelectionHandler = putSelectionHandler;
+                    _this.selectionHandler = selectionHandler;
+                    return _this;
                 }
                 ExpressionEditorTreeListController.prototype.itemsFilter = function (item) {
                     return item.specifics !== "none" && item.name !== "ReportItems";
@@ -5975,15 +5955,16 @@ var DevExpress;
                     return true;
                 };
                 return ExpressionEditorTreeListController;
-            })(Widgets.TreeListController);
+            }(Widgets.TreeListController));
             Widgets.ExpressionEditorTreeListController = ExpressionEditorTreeListController;
             var ExpressionEditorParametersTreeListController = (function (_super) {
                 __extends(ExpressionEditorParametersTreeListController, _super);
                 function ExpressionEditorParametersTreeListController(customFilter, putSelectionHandler, selectionHandler) {
-                    _super.call(this);
-                    this.customFilter = customFilter;
-                    this.putSelectionHandler = putSelectionHandler;
-                    this.selectionHandler = selectionHandler;
+                    var _this = _super.call(this) || this;
+                    _this.customFilter = customFilter;
+                    _this.putSelectionHandler = putSelectionHandler;
+                    _this.selectionHandler = selectionHandler;
+                    return _this;
                 }
                 ExpressionEditorParametersTreeListController.prototype.itemsFilter = function (item) {
                     return item.specifics !== "none" && (!this.customFilter || this.customFilter(item));
@@ -6004,19 +5985,11 @@ var DevExpress;
                     return true;
                 };
                 return ExpressionEditorParametersTreeListController;
-            })(Widgets.TreeListController);
+            }(Widgets.TreeListController));
             Widgets.ExpressionEditorParametersTreeListController = ExpressionEditorParametersTreeListController;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="tools/tools.ts" />
-/// <reference path="tools/functions.ts" />
-/// <reference path="../criteria/operators/criteriaOperator.ts" />
-/// <reference path="../common/pathRequest.ts" />
-/// <reference path="../common/displayNameProvider.ts" />
-/// <reference path="../common/codeCompletor.ts" />
-/// <reference path="tools/treeListControllers.ts" />
-/// <reference path="../ace/binding.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6099,13 +6072,12 @@ var DevExpress;
             var ExpressionEditor = (function (_super) {
                 __extends(ExpressionEditor, _super);
                 function ExpressionEditor(options, fieldListProvider, disabled, rtl, _displayNameProvider) {
-                    var _this = this;
                     if (disabled === void 0) { disabled = ko.observable(false); }
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this);
-                    this.options = options;
-                    this._displayNameProvider = _displayNameProvider;
-                    this._updateTextAreaValue = function (item, element) {
+                    var _this = _super.call(this) || this;
+                    _this.options = options;
+                    _this._displayNameProvider = _displayNameProvider;
+                    _this._updateTextAreaValue = function (item, element) {
                         var textArea = _this._getTextArea(element), textAreaValue = _this.textAreaValue().toString(), cursorPosition = textArea && textArea.selectionStart || textAreaValue.length, newAddedText = textAreaValue[cursorPosition - 1] == " " ? (item.val || item.text || item) + " " : " " + (item.val || item.text || item) + " ";
                         _this.textAreaValue([textAreaValue.slice(0, cursorPosition), newAddedText, textAreaValue.slice(cursorPosition)].join(''));
                         if (textArea && textArea.setSelectionRange) {
@@ -6114,7 +6086,7 @@ var DevExpress;
                             textArea.setSelectionRange(posisition, posisition);
                         }
                     };
-                    this._updateAceValue = function (item, element) {
+                    _this._updateAceValue = function (item, element) {
                         var editor = _this.editorContainer(), _a = editor.getCursorPosition(), row = _a.row, col = _a.column, insertion = (item.val || item.text || item) + " ";
                         if (col && editor.getSession().getValue().split("\n")[row][col - 1] !== " ")
                             insertion = " " + insertion;
@@ -6122,17 +6094,17 @@ var DevExpress;
                         editor.focus();
                         Analytics.Utils.setCursorInFunctionParameter(item.paramCount, editor, insertion);
                     };
-                    this._updateValue = function (item, element) {
+                    _this._updateValue = function (item, element) {
                         _this.aceAvailable ? _this._updateAceValue(item, $(element)) : _this._updateTextAreaValue(item, $(element));
                     };
-                    this.patchFieldName = function (fieldName) { return fieldName; };
-                    this._parametersPutSelectionHandler = function (selectedItemPath, element) {
+                    _this.patchFieldName = function (fieldName) { return fieldName; };
+                    _this._parametersPutSelectionHandler = function (selectedItemPath, element) {
                         var parentPath = "Parameters";
                         var proposedFieldName = selectedItemPath.substring(parentPath.length + 1);
                         var newAddedString = '?' + _this.patchFieldName(proposedFieldName);
                         _this._updateValue(newAddedString, element);
                     };
-                    this._fieldsPutSelectionHandler = function (selectedItemPath, element) {
+                    _this._fieldsPutSelectionHandler = function (selectedItemPath, element) {
                         var path = _this.koOptions.peek().path.peek();
                         var proposedFieldName = selectedItemPath.substring(path.length + 1);
                         var newAddedString = '[' + _this.patchFieldName(proposedFieldName) + ']';
@@ -6145,12 +6117,12 @@ var DevExpress;
                             _this._updateValue(newAddedString, element);
                         }
                     };
-                    this.aceAvailable = Widgets.aceAvailable;
-                    this.popupVisible = ko.observable(false);
-                    this.title = function () { return DevExpress.Analytics.getLocalization('Expression Editor', 'ReportStringId.ExpressionEditor_ExpressionCaption'); };
-                    this.value = ko.observable("");
-                    this.textAreaValue = ko.observable("");
-                    this.languageHelper = {
+                    _this.aceAvailable = Widgets.aceAvailable;
+                    _this.popupVisible = ko.observable(false);
+                    _this.title = function () { return DevExpress.Analytics.getLocalization('Expression Editor', 'ReportStringId.ExpressionEditor_ExpressionCaption'); };
+                    _this.value = ko.observable("");
+                    _this.textAreaValue = ko.observable("");
+                    _this.languageHelper = {
                         getLanguageMode: function () { return "ace/mode/criteria"; },
                         createCompleters: function (editor, bindingContext, viewModel) {
                             var path = ko.computed(function () { return viewModel.koOptions() && ko.unwrap(viewModel.koOptions().path) || ""; }), functions = ko.computed(function () { return viewModel.koOptions() && ko.unwrap(viewModel.koOptions().functions) || []; }), completor = new Widgets.CodeCompletor({
@@ -6168,7 +6140,7 @@ var DevExpress;
                             return [completor];
                         }
                     };
-                    this.aceOptions = {
+                    _this.aceOptions = {
                         showLineNumbers: false,
                         showPrintMargin: false,
                         enableBasicAutocompletion: true,
@@ -6176,7 +6148,7 @@ var DevExpress;
                         showFoldWidgets: false,
                         highlightActiveLine: false
                     };
-                    this.additionalOptions = {
+                    _this.additionalOptions = {
                         onChange: function (session) {
                             var value = session.getValue();
                             try {
@@ -6195,27 +6167,27 @@ var DevExpress;
                             }
                         }
                     };
-                    this.callbacks = {
+                    _this.callbacks = {
                         focus: $.noop
                     };
-                    this.koOptions = ko.observable(null);
-                    this.editorContainer = ko.observable();
-                    this.isValid = ko.observable(true);
-                    this.buttonItems = [];
-                    this.rtl = false;
-                    this.modelValueValid = ko.computed(function () {
+                    _this.koOptions = ko.observable(null);
+                    _this.editorContainer = ko.observable();
+                    _this.isValid = ko.observable(true);
+                    _this.buttonItems = [];
+                    _this.rtl = false;
+                    _this.modelValueValid = ko.computed(function () {
                         if (_this.koOptions() && _this.koOptions().isValid) {
                             return _this.koOptions().isValid();
                         }
                         return true;
                     });
-                    this.getPopupContainer = Analytics.Utils.getParentContainer;
-                    this.koOptions(options);
-                    this.patchFieldName = function (fieldName) {
+                    _this.getPopupContainer = Analytics.Utils.getParentContainer;
+                    _this.koOptions(options);
+                    _this.patchFieldName = function (fieldName) {
                         return _this.koOptions().patchFieldName && _this.koOptions().patchFieldName(fieldName) || fieldName;
                     };
-                    this.theme = this.koOptions() && this.koOptions().theme;
-                    this._disposables.push(this.value = ko.computed({
+                    _this.theme = _this.koOptions() && _this.koOptions().theme;
+                    _this._disposables.push(_this.value = ko.computed({
                         read: function () {
                             var value = _this.koOptions() && ko.unwrap(_this.koOptions().value);
                             return (value && value.toString()) || "";
@@ -6223,15 +6195,15 @@ var DevExpress;
                         write: function (newVal) { return _this.koOptions() && _this.koOptions().value(newVal); }
                     }));
                     if (_displayNameProvider && options.path) {
-                        this.displayExpressionConverter = new Analytics.Utils.DisplayExpressionConverter(_displayNameProvider);
+                        _this.displayExpressionConverter = new Analytics.Utils.DisplayExpressionConverter(_displayNameProvider);
                         var pathFunc = ko.pureComputed(function () { return _this.koOptions() && _this.koOptions().path && _this.koOptions().path(); });
-                        this.displayValue = wrapExpressionValue(pathFunc, this.value, this.displayExpressionConverter, this._disposables);
-                        this._disposables.push(pathFunc);
+                        _this.displayValue = wrapExpressionValue(pathFunc, _this.value, _this.displayExpressionConverter, _this._disposables);
+                        _this._disposables.push(pathFunc);
                     }
                     else {
-                        this.displayValue = this.value;
+                        _this.displayValue = _this.value;
                     }
-                    this.rtl = rtl;
+                    _this.rtl = rtl;
                     var validate = function (value, sender) {
                         try {
                             Analytics.Criteria.CriteriaOperator.parse(value);
@@ -6245,7 +6217,7 @@ var DevExpress;
                             _this.isValid(false);
                         }
                     };
-                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
+                    _this._disposables.push(_this.popupVisible.subscribe(function (newVal) {
                         if (!newVal)
                             return;
                         _this.tools.resetCategoriesSelection && _this.tools.resetCategoriesSelection();
@@ -6260,10 +6232,10 @@ var DevExpress;
                         }
                     }));
                     var fieldName = ko.computed(function () { return _this.koOptions() && _this.koOptions().fieldName && _this.koOptions().fieldName(); });
-                    this._disposables.push(this.fieldListProvider = createExpressionEditorFieldListProvider(fieldListProvider, fieldName));
-                    this.disabled = disabled;
-                    var self = this;
-                    this.save = function (sender) {
+                    _this._disposables.push(_this.fieldListProvider = createExpressionEditorFieldListProvider(fieldListProvider, fieldName));
+                    _this.disabled = disabled;
+                    var self = _this;
+                    _this.save = function (sender) {
                         var value = _this.textAreaValue();
                         if (_this.aceAvailable) {
                             var editor = _this.editorContainer();
@@ -6286,13 +6258,14 @@ var DevExpress;
                     var fieldsTreeListOptions = ko.pureComputed(function () {
                         return _this.koOptions() && _this.koOptions().path && _this.koOptions().path() && _this._createToolsOptions(_this.koOptions().path(), _this.fieldListProvider(), new Widgets.ExpressionEditorTreeListController(fieldName, function (data, element) { _this._fieldsPutSelectionHandler(data.path, element); }, selectionHandler));
                     });
-                    this.parametersTreeListController = new Widgets.ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !Analytics.Utils.isList(item); }, this._parametersPutSelectionHandler, selectionHandler);
+                    _this.parametersTreeListController = new Widgets.ExpressionEditorParametersTreeListController(function (item) { return item.specifics === "parameters" || !Analytics.Utils.isList(item); }, _this._parametersPutSelectionHandler, selectionHandler);
                     var parametersTreeListOptions = ko.pureComputed(function () {
                         return _this._createToolsOptions("", _this.fieldListProvider(), _this.parametersTreeListController);
                     });
-                    this._disposables.push(this.tools = new Widgets.Internal.Tools(this._updateValue, parametersTreeListOptions, this.koOptions, fieldsTreeListOptions));
-                    this._createMainPopupButtons();
+                    _this._disposables.push(_this.tools = new Widgets.Internal.Tools(_this._updateValue, parametersTreeListOptions, _this.koOptions, fieldsTreeListOptions));
+                    _this._createMainPopupButtons();
                     [fieldName, fieldsTreeListOptions, parametersTreeListOptions].forEach(function (x) { return _this._disposables.push(x); });
+                    return _this;
                 }
                 ExpressionEditor.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
@@ -6323,12 +6296,11 @@ var DevExpress;
                     this.callbacks.focus();
                 };
                 return ExpressionEditor;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.ExpressionEditor = ExpressionEditor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="expressioneditor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6364,7 +6336,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../../criteria/operators/criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6374,23 +6345,23 @@ var DevExpress;
             var CriteriaOperatorSurface = (function (_super) {
                 __extends(CriteriaOperatorSurface, _super);
                 function CriteriaOperatorSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this);
-                    this.canRemove = true;
-                    this.operatorType = ko.observable(null);
-                    this.templateName = "dx-filtereditor-common";
-                    this.isSelected = ko.observable(false);
-                    this.operatorClass = "criteria-operator-item-operator dxd-filter-editor-operator-back-color dxd-filter-editor-text-color";
-                    this.popupService = parent.popupService || { visible: ko.observable(false) };
-                    this.model = operator;
-                    this.helper = parent.helper;
-                    this.fieldListProvider = fieldListProvider;
-                    this.path = path;
-                    this.parent = parent;
-                    this.operatorType(operator.operatorType);
-                    this._disposables.push(this.operatorType.subscribe(function (newVal) {
+                    var _this = _super.call(this) || this;
+                    _this.canRemove = true;
+                    _this.operatorType = ko.observable(null);
+                    _this.templateName = "dx-filtereditor-common";
+                    _this.isSelected = ko.observable(false);
+                    _this.operatorClass = "criteria-operator-item-operator dxd-filter-editor-operator-back-color dxd-filter-editor-text-color";
+                    _this.popupService = parent.popupService || { visible: ko.observable(false) };
+                    _this.model = operator;
+                    _this.helper = parent.helper;
+                    _this.fieldListProvider = fieldListProvider;
+                    _this.path = path;
+                    _this.parent = parent;
+                    _this.operatorType(operator.operatorType);
+                    _this._disposables.push(_this.operatorType.subscribe(function (newVal) {
                         _this.model.assignType(newVal);
                     }));
+                    return _this;
                 }
                 CriteriaOperatorSurface.prototype._createLeftPartProperty = function (value) {
                     var _this = this;
@@ -6480,12 +6451,11 @@ var DevExpress;
                     this.helper.onChange();
                 };
                 return CriteriaOperatorSurface;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.CriteriaOperatorSurface = CriteriaOperatorSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../operators/criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6535,13 +6505,12 @@ var DevExpress;
                         }
                     };
                     return FilterEditorAddOn;
-                })();
+                }());
                 Internal.FilterEditorAddOn = FilterEditorAddOn;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../../criteria/operators/criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6550,12 +6519,12 @@ var DevExpress;
         (function (Widgets) {
             var Internal;
             (function (Internal) {
+                var CriteriaSurfaceValidatorState;
                 (function (CriteriaSurfaceValidatorState) {
                     CriteriaSurfaceValidatorState[CriteriaSurfaceValidatorState["Left"] = 0] = "Left";
                     CriteriaSurfaceValidatorState[CriteriaSurfaceValidatorState["Right"] = 1] = "Right";
                     CriteriaSurfaceValidatorState[CriteriaSurfaceValidatorState["Unary"] = 2] = "Unary";
-                })(Internal.CriteriaSurfaceValidatorState || (Internal.CriteriaSurfaceValidatorState = {}));
-                var CriteriaSurfaceValidatorState = Internal.CriteriaSurfaceValidatorState;
+                })(CriteriaSurfaceValidatorState = Internal.CriteriaSurfaceValidatorState || (Internal.CriteriaSurfaceValidatorState = {}));
                 var CriteriaSurfaceValidator = (function () {
                     function CriteriaSurfaceValidator() {
                     }
@@ -6625,13 +6594,12 @@ var DevExpress;
                         }
                     };
                     return CriteriaSurfaceValidator;
-                })();
+                }());
                 Internal.CriteriaSurfaceValidator = CriteriaSurfaceValidator;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../../criteria/operators/criteriaOperator.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6686,6 +6654,9 @@ var DevExpress;
                         }
                         else if (Widgets.validateGuid(result)) {
                             return '{' + result + '}';
+                        }
+                        if (result.indexOf("'") !== -1) {
+                            result = result.replace("'", "''");
                         }
                         return result ? "'" + result + "'" : "?";
                     };
@@ -6785,14 +6756,12 @@ var DevExpress;
                         return new Analytics.Criteria.GroupOperator(Analytics.Criteria.GroupOperatorType.And, operand ? [operand] : []);
                     };
                     return FilterEditorSerializer;
-                })();
+                }());
                 Internal.FilterEditorSerializer = FilterEditorSerializer;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="../../treelist/treelistItem.ts" />
-///<reference path="../../treelist/treelistController.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6802,8 +6771,9 @@ var DevExpress;
             var FilterEditorTreeListController = (function (_super) {
                 __extends(FilterEditorTreeListController, _super);
                 function FilterEditorTreeListController(selectedItem) {
-                    _super.call(this);
-                    this.selectedItem = selectedItem;
+                    var _this = _super.call(this) || this;
+                    _this.selectedItem = selectedItem;
+                    return _this;
                 }
                 FilterEditorTreeListController.prototype.itemsFilter = function (item) {
                     return true;
@@ -6821,12 +6791,11 @@ var DevExpress;
                     }
                 };
                 return FilterEditorTreeListController;
-            })(Widgets.TreeListController);
+            }(Widgets.TreeListController));
             Widgets.FilterEditorTreeListController = FilterEditorTreeListController;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6836,31 +6805,30 @@ var DevExpress;
             var AggregateOperandSurface = (function (_super) {
                 __extends(AggregateOperandSurface, _super);
                 function AggregateOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-aggregate";
-                    this.property = ko.observable(null);
-                    this.aggregatedExpression = ko.observable(null);
-                    this.condition = ko.observable(null);
-                    this.property(this._createLeftPartProperty(operator.property));
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.contentTemplateName = "dx-filtereditor-aggregate";
+                    _this.property = ko.observable(null);
+                    _this.aggregatedExpression = ko.observable(null);
+                    _this.condition = ko.observable(null);
+                    _this.property(_this._createLeftPartProperty(operator.property));
                     var childPath = ko.computed(function () {
                         return _this.path() + "." + _this.property().propertyName();
                     });
-                    this._disposables.push(childPath);
+                    _this._disposables.push(childPath);
                     if (operator.aggregatedExpression) {
-                        this.aggregatedExpression(this.createChildSurface(operator.aggregatedExpression, childPath));
-                        this.templateName = "dx-filtereditor-aggregate-common";
+                        _this.aggregatedExpression(_this.createChildSurface(operator.aggregatedExpression, childPath));
+                        _this.templateName = "dx-filtereditor-aggregate-common";
                     }
                     if (operator.operatorType === Analytics.Criteria.Aggregate.Count) {
-                        this.templateName = "dx-filtereditor-aggregate-common";
+                        _this.templateName = "dx-filtereditor-aggregate-common";
                     }
-                    var surface = this.createChildSurface(operator.condition, childPath);
+                    var surface = _this.createChildSurface(operator.condition, childPath);
                     surface.canRemove = false;
                     if (surface instanceof Widgets.UnaryOperandSurface) {
                         surface.operand().canRemove = false;
                     }
-                    this.condition(surface);
-                    this.change = function (type, surface) {
+                    _this.condition(surface);
+                    _this.change = function (type, surface) {
                         if (surface) {
                             var newModel = _this.model.change(type, surface.model);
                             var condition = _this.createChildSurface(newModel, childPath);
@@ -6885,6 +6853,7 @@ var DevExpress;
                         }
                         _this.helper.onChange();
                     };
+                    return _this;
                 }
                 Object.defineProperty(AggregateOperandSurface.prototype, "leftPart", {
                     get: function () {
@@ -6907,12 +6876,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return AggregateOperandSurface;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.AggregateOperandSurface = AggregateOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6922,14 +6890,15 @@ var DevExpress;
             var BetweenOperandSurface = (function (_super) {
                 __extends(BetweenOperandSurface, _super);
                 function BetweenOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.property = ko.observable(null);
-                    this.end = ko.observable(null);
-                    this.begin = ko.observable(null);
-                    this.contentTemplateName = "dx-filtereditor-between";
-                    this.property(this._createLeftPartProperty(operator.property));
-                    this.begin(this.createChildSurface(operator.begin));
-                    this.end(this.createChildSurface(operator.end));
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.property = ko.observable(null);
+                    _this.end = ko.observable(null);
+                    _this.begin = ko.observable(null);
+                    _this.contentTemplateName = "dx-filtereditor-between";
+                    _this.property(_this._createLeftPartProperty(operator.property));
+                    _this.begin(_this.createChildSurface(operator.begin));
+                    _this.end(_this.createChildSurface(operator.end));
+                    return _this;
                 }
                 Object.defineProperty(BetweenOperandSurface.prototype, "leftPart", {
                     get: function () {
@@ -6952,12 +6921,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return BetweenOperandSurface;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.BetweenOperandSurface = BetweenOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -6967,12 +6935,13 @@ var DevExpress;
             var BinaryOperandSurface = (function (_super) {
                 __extends(BinaryOperandSurface, _super);
                 function BinaryOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-binary";
-                    this.leftOperand = ko.observable(null);
-                    this.rightOperand = ko.observable(null);
-                    this.leftOperand(this._createLeftPartProperty(operator.leftOperand));
-                    this.rightOperand(this.createChildSurface(operator.rightOperand));
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.contentTemplateName = "dx-filtereditor-binary";
+                    _this.leftOperand = ko.observable(null);
+                    _this.rightOperand = ko.observable(null);
+                    _this.leftOperand(_this._createLeftPartProperty(operator.leftOperand));
+                    _this.rightOperand(_this.createChildSurface(operator.rightOperand));
+                    return _this;
                 }
                 Object.defineProperty(BinaryOperandSurface.prototype, "leftPart", {
                     get: function () {
@@ -6994,12 +6963,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return BinaryOperandSurface;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.BinaryOperandSurface = BinaryOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7009,11 +6977,10 @@ var DevExpress;
             var OperandSurfaceBase = (function (_super) {
                 __extends(OperandSurfaceBase, _super);
                 function OperandSurfaceBase(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.canChange = true;
-                    this.canRemove = false;
-                    this.changeValueType = function (type) {
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.canChange = true;
+                    _this.canRemove = false;
+                    _this.changeValueType = function (type) {
                         var parent = _this.getRealParent(_this.parent);
                         var property = _this.getRealProperty(_this);
                         var propertyLocation = _this.getPropertyName(parent, property);
@@ -7028,6 +6995,7 @@ var DevExpress;
                         }
                         _this.helper.onChange();
                     };
+                    return _this;
                 }
                 OperandSurfaceBase.prototype.getRealParent = function (parent) {
                     if (parent instanceof Widgets.UnaryOperandSurface) {
@@ -7098,12 +7066,11 @@ var DevExpress;
                     configurable: true
                 });
                 return OperandSurfaceBase;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.OperandSurfaceBase = OperandSurfaceBase;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="operandSurfaceBase.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7113,26 +7080,27 @@ var DevExpress;
             var FunctionOperandSurface = (function (_super) {
                 __extends(FunctionOperandSurface, _super);
                 function FunctionOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.canRemove = true;
-                    this.contentTemplateName = "dx-filtereditor-function";
-                    this.operands = ko.observableArray([]);
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.canRemove = true;
+                    _this.contentTemplateName = "dx-filtereditor-function";
+                    _this.operands = ko.observableArray([]);
                     if (operator.operands.length === 0) {
                         if (parent instanceof Widgets.UnaryOperandSurface) {
-                            this.specifics = parent.parent.specifics;
+                            _this.specifics = parent.parent.specifics;
                         }
                         else {
-                            this.specifics = parent.specifics;
+                            _this.specifics = parent.specifics;
                         }
-                        this.contentTemplateName = "dx-filtereditor-function-lightweight";
-                        this.canRemove = false;
+                        _this.contentTemplateName = "dx-filtereditor-function-lightweight";
+                        _this.canRemove = false;
                     }
                     else {
-                        this.operands.push(this._createLeftPartProperty(operator.operands[0]));
+                        _this.operands.push(_this._createLeftPartProperty(operator.operands[0]));
                         for (var i = 1; i < operator.operands.length; i++) {
-                            this.operands.push(this.createChildSurface(operator.operands[i]));
+                            _this.operands.push(_this.createChildSurface(operator.operands[i]));
                         }
                     }
+                    return _this;
                 }
                 Object.defineProperty(FunctionOperandSurface.prototype, "leftPart", {
                     get: function () {
@@ -7172,12 +7140,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return FunctionOperandSurface;
-            })(Widgets.OperandSurfaceBase);
+            }(Widgets.OperandSurfaceBase));
             Widgets.FunctionOperandSurface = FunctionOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7187,21 +7154,21 @@ var DevExpress;
             var GroupOperandSurface = (function (_super) {
                 __extends(GroupOperandSurface, _super);
                 function GroupOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.templateName = "dx-filtereditor-group";
-                    this.operatorClass = "criteria-operator-item-group dxd-filter-editor-group-back-color dxd-filter-editor-text-color";
-                    this.operands = ko.observableArray([]);
-                    this.createItems = null;
-                    this.createItems = [
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.templateName = "dx-filtereditor-group";
+                    _this.operatorClass = "criteria-operator-item-group dxd-filter-editor-group-back-color dxd-filter-editor-text-color";
+                    _this.operands = ko.observableArray([]);
+                    _this.createItems = null;
+                    _this.createItems = [
                         { name: "Add group", value: true, localizationId: "StringId.FilterMenuGroupAdd" },
                         { name: "Add condition", value: false, localizationId: "StringId.FilterMenuConditionAdd" }
                     ];
-                    this.createItems.forEach(Widgets.initDisplayText);
-                    this.operands((operator.operands || []).map(function (operand) {
+                    _this.createItems.forEach(Widgets.initDisplayText);
+                    _this.operands((operator.operands || []).map(function (operand) {
                         return _this.createChildSurface(operand);
                     }));
-                    this.specifics = ko.observable("group");
+                    _this.specifics = ko.observable("group");
+                    return _this;
                 }
                 GroupOperandSurface.prototype.change = function (type, surface) {
                     if (surface) {
@@ -7258,12 +7225,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return GroupOperandSurface;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.GroupOperandSurface = GroupOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7273,20 +7239,20 @@ var DevExpress;
             var InOperandSurface = (function (_super) {
                 __extends(InOperandSurface, _super);
                 function InOperandSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-in";
-                    this.operands = ko.observableArray([]);
-                    this.criteriaOperator = ko.observable(null);
-                    this.criteriaOperator(this._createLeftPartProperty(operator.criteriaOperator));
-                    this.operands((operator.operands || []).map(function (operand) {
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.contentTemplateName = "dx-filtereditor-in";
+                    _this.operands = ko.observableArray([]);
+                    _this.criteriaOperator = ko.observable(null);
+                    _this.criteriaOperator(_this._createLeftPartProperty(operator.criteriaOperator));
+                    _this.operands((operator.operands || []).map(function (operand) {
                         return _this.createChildSurface(operand);
                     }));
-                    this.addValue = function () {
+                    _this.addValue = function () {
                         var value = new Analytics.Criteria.OperandValue(null);
                         _this.model.operands.push(value);
                         _this.operands.push(_this.createChildSurface(value));
                     };
+                    return _this;
                 }
                 Object.defineProperty(InOperandSurface.prototype, "leftPart", {
                     get: function () {
@@ -7308,12 +7274,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return InOperandSurface;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.InOperandSurface = InOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="operandSurfaceBase.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7323,18 +7288,18 @@ var DevExpress;
             var OperandParameterSurface = (function (_super) {
                 __extends(OperandParameterSurface, _super);
                 function OperandParameterSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.changeParameter = function (item) {
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.changeParameter = function (item) {
                         _this.model.parameterName = item.name;
                         _this.parameterName(item.name);
                         _this.helper.onChange();
                     };
-                    this.operatorClass = "criteria-operator-item-parameter dxd-filter-editor-parameter-back-color dxd-filter-editor-text-color";
-                    this.parameterName = ko.observable("");
-                    this.templateName = "dx-filtereditor-parameter";
-                    this.specifics = parent.specifics;
-                    this.parameterName(operator.parameterName);
+                    _this.operatorClass = "criteria-operator-item-parameter dxd-filter-editor-parameter-back-color dxd-filter-editor-text-color";
+                    _this.parameterName = ko.observable("");
+                    _this.templateName = "dx-filtereditor-parameter";
+                    _this.specifics = parent.specifics;
+                    _this.parameterName(operator.parameterName);
+                    return _this;
                 }
                 Object.defineProperty(OperandParameterSurface.prototype, "items", {
                     get: function () {
@@ -7351,13 +7316,11 @@ var DevExpress;
                     configurable: true
                 });
                 return OperandParameterSurface;
-            })(Widgets.OperandSurfaceBase);
+            }(Widgets.OperandSurfaceBase));
             Widgets.OperandParameterSurface = OperandParameterSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="operandSurfaceBase.ts" />
-/// <reference path="../../common/pathRequest.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7367,34 +7330,33 @@ var DevExpress;
             var OperandPropertySurface = (function (_super) {
                 __extends(OperandPropertySurface, _super);
                 function OperandPropertySurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this._displayName = ko.observable("");
-                    this.propertyName = ko.observable("");
-                    this.specifics = ko.observable("integer");
-                    this.dataType = ko.observable("");
-                    this.valueType = ko.observable("");
-                    this.changeProperty = function (item) {
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this._displayName = ko.observable("");
+                    _this.propertyName = ko.observable("");
+                    _this.specifics = ko.observable("integer");
+                    _this.dataType = ko.observable("");
+                    _this.valueType = ko.observable("");
+                    _this.changeProperty = function (item) {
                         _this.fieldsOptions().selected(item);
                     };
-                    this.templateName = "dx-filtereditor-property";
-                    this.operatorClass = "criteria-operator-item-field dxd-filter-editor-field-back-color dxd-filter-editor-field-back-color dxd-filter-editor-text-color";
-                    this.propertyName(operator.propertyName);
-                    var options = this.helper.generateTreelistOptions(fieldListProvider, path);
+                    _this.templateName = "dx-filtereditor-property";
+                    _this.operatorClass = "criteria-operator-item-field dxd-filter-editor-field-back-color dxd-filter-editor-field-back-color dxd-filter-editor-text-color";
+                    _this.propertyName(operator.propertyName);
+                    var options = _this.helper.generateTreelistOptions(fieldListProvider, path);
                     if (options.options && options.subscription) {
-                        this.fieldsOptions = options.options;
-                        this._disposables.push(options.subscription);
+                        _this.fieldsOptions = options.options;
+                        _this._disposables.push(options.subscription);
                     }
                     else {
-                        this.fieldsOptions = options;
+                        _this.fieldsOptions = options;
                     }
-                    this._disposables.push(this.fieldsOptions().selectedPath.subscribe(function (newVal) {
+                    _this._disposables.push(_this.fieldsOptions().selectedPath.subscribe(function (newVal) {
                         var realName = _this.fieldsOptions().selectedPath().substr(_this.path && _this.path().length > 0 ? _this.path().length + 1 : 0);
                         _this.propertyName(realName);
                         _this.model.propertyName = realName;
                         _this.popupService.visible(false);
                     }));
-                    this._disposables.push(this.fieldsOptions().selected.subscribe(function (newVal) {
+                    _this._disposables.push(_this.fieldsOptions().selected.subscribe(function (newVal) {
                         _this._updateDisplayName(path, _this.propertyName(), newVal.displayName);
                         var specifics = newVal.specifics.toLowerCase();
                         if (specifics.indexOf("calc") === 0) {
@@ -7407,11 +7369,12 @@ var DevExpress;
                         }
                         _this.helper.onChange();
                     }));
-                    this.fieldsOptions().selectedPath(this.path && !!ko.unwrap(this.path) ? [ko.unwrap(this.path), this.propertyName()].join('.') : this.propertyName());
-                    this._updateSpecifics();
-                    this._disposables.push(this.displayName = ko.computed(function () {
+                    _this.fieldsOptions().selectedPath(_this.path && !!ko.unwrap(_this.path) ? [ko.unwrap(_this.path), _this.propertyName()].join('.') : _this.propertyName());
+                    _this._updateSpecifics();
+                    _this._disposables.push(_this.displayName = ko.computed(function () {
                         return _this._displayName() || _this.propertyName();
                     }));
+                    return _this;
                 }
                 OperandPropertySurface.prototype._updateDisplayName = function (path, propertyName, displayName) {
                     var _this = this;
@@ -7465,13 +7428,11 @@ var DevExpress;
                     configurable: true
                 });
                 return OperandPropertySurface;
-            })(Widgets.OperandSurfaceBase);
+            }(Widgets.OperandSurfaceBase));
             Widgets.OperandPropertySurface = OperandPropertySurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="operandSurfaceBase.ts" />
-/// <reference path="../../internal/valueEditorHelper.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7481,10 +7442,9 @@ var DevExpress;
             var OperandValueSurface = (function (_super) {
                 __extends(OperandValueSurface, _super);
                 function OperandValueSurface(operator, parent, fieldListProvider, path) {
-                    var _this = this;
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this._value = ko.observable(null);
-                    this._updateDate = function (specifics) {
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this._value = ko.observable(null);
+                    _this._updateDate = function (specifics) {
                         if (specifics === "date") {
                             if (!(this._value() instanceof Date)) {
                                 this._value(new Date(new Date().setHours(0, 0, 0, 0)));
@@ -7494,7 +7454,7 @@ var DevExpress;
                             this._value("");
                         }
                     };
-                    this.changeValue = function () {
+                    _this.changeValue = function () {
                         var parent = _this.getRealParent(_this.parent);
                         var property = _this.getRealProperty(_this);
                         var propertyLocation = _this.getPropertyName(parent, property);
@@ -7508,15 +7468,15 @@ var DevExpress;
                             parent[propertyLocation.name](parent.createChildSurface(model));
                         }
                     };
-                    this.dataType = ko.observable("");
-                    this.values = ko.observable([]);
-                    this.isEditable = ko.observable(false);
-                    this.templateName = "dx-filtereditor-value";
-                    this.getNumberEditorOptions = function () {
+                    _this.dataType = ko.observable("");
+                    _this.values = ko.observable([]);
+                    _this.isEditable = ko.observable(false);
+                    _this.templateName = "dx-filtereditor-value";
+                    _this.getNumberEditorOptions = function () {
                         return DevExpress.Analytics.Widgets.Internal.ValueEditorHelper.getNumberEditorOptions(_this.dataType(), _this.specifics(), { value: _this._value, onFocusOut: function () { _this.isEditable(false); } });
                     };
                     var dataSource = null;
-                    this._disposables.push(this.dataSource = ko.computed(function () {
+                    _this._disposables.push(_this.dataSource = ko.computed(function () {
                         dataSource && dataSource.dispose();
                         dataSource = new DevExpress.data.DataSource({
                             store: _this.values(),
@@ -7526,33 +7486,33 @@ var DevExpress;
                         return dataSource;
                     }));
                     if (parent instanceof Widgets.UnaryOperandSurface) {
-                        this.specifics = parent.parent.specifics;
-                        this.dataType = parent.parent.dataType;
+                        _this.specifics = parent.parent.specifics;
+                        _this.dataType = parent.parent.dataType;
                         if (parent.model.operatorType === Analytics.Criteria.UnaryOperatorType.Minus) {
-                            this.reverse = true;
+                            _this.reverse = true;
                         }
                     }
                     else {
-                        this.specifics = parent.specifics;
-                        this.dataType = parent.dataType;
+                        _this.specifics = parent.specifics;
+                        _this.dataType = parent.dataType;
                     }
-                    this._disposables.push(this.specifics.subscribe(function (newVal) {
+                    _this._disposables.push(_this.specifics.subscribe(function (newVal) {
                         operator.specifics = newVal;
                         _this._updateDate(newVal);
                     }));
-                    this._value(operator.value);
-                    this._disposables.push(this._value.subscribe(function (newVal) {
+                    _this._value(operator.value);
+                    _this._disposables.push(_this._value.subscribe(function (newVal) {
                         _this.model.value = newVal;
                         _this.helper.onChange();
                     }));
-                    if (this._value() === null || this._value() === undefined || this._value() === "") {
-                        this._updateDate(this.specifics());
+                    if (_this._value() === null || _this._value() === undefined || _this._value() === "") {
+                        _this._updateDate(_this.specifics());
                     }
-                    this._disposables.push(this.value = ko.computed({
+                    _this._disposables.push(_this.value = ko.computed({
                         read: function () {
                             var value = _this._value();
                             if (value instanceof Date) {
-                                value = Analytics.Localization.Globalize["formatDate"](value);
+                                value = DevExpress.Analytics.Localization.formatDate(value);
                             }
                             if (_this.items.length > 0) {
                                 var result = _this.items.filter(function (item) { return item.value === value; })[0];
@@ -7576,7 +7536,7 @@ var DevExpress;
                             }
                         }
                     }));
-                    this._disposables.push(ko.computed(function () {
+                    _this._disposables.push(ko.computed(function () {
                         var itemsProvider = ko.unwrap(fieldListProvider);
                         if (itemsProvider && itemsProvider.getValues && _this.parent.leftPart instanceof Widgets.OperandPropertySurface) {
                             if (_this.parent.leftPart.propertyName()) {
@@ -7586,7 +7546,8 @@ var DevExpress;
                             }
                         }
                     }));
-                    operator.specifics = this.specifics();
+                    operator.specifics = _this.specifics();
+                    return _this;
                 }
                 Object.defineProperty(OperandValueSurface.prototype, "items", {
                     get: function () {
@@ -7610,12 +7571,11 @@ var DevExpress;
                         OperandValueSurface._defaultValue = Analytics.getLocalization("Enter a value", "StringId.FilterEmptyEnter");
                 };
                 return OperandValueSurface;
-            })(Widgets.OperandSurfaceBase);
+            }(Widgets.OperandSurfaceBase));
             Widgets.OperandValueSurface = OperandValueSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="criteriaOperatorSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7625,20 +7585,21 @@ var DevExpress;
             var UnaryOperandSurface = (function (_super) {
                 __extends(UnaryOperandSurface, _super);
                 function UnaryOperandSurface(operator, parent, fieldListProvider, path) {
-                    _super.call(this, operator, parent, fieldListProvider, path);
-                    this.contentTemplateName = "dx-filtereditor-unary";
-                    this.operand = ko.observable(null);
-                    var operand = this.createChildSurface(operator.operand);
+                    var _this = _super.call(this, operator, parent, fieldListProvider, path) || this;
+                    _this.contentTemplateName = "dx-filtereditor-unary";
+                    _this.operand = ko.observable(null);
+                    var operand = _this.createChildSurface(operator.operand);
                     if (operator.operatorType === Analytics.Criteria.UnaryOperatorType.Not) {
-                        this.templateName = "dx-filtereditor-not";
+                        _this.templateName = "dx-filtereditor-not";
                         operand.reverse = true;
-                        this.specifics = operand.specifics;
+                        _this.specifics = operand.specifics;
                     }
                     else {
                         operand.dispose();
-                        operand = this._createLeftPartProperty(operator.operand);
+                        operand = _this._createLeftPartProperty(operator.operand);
                     }
-                    this.operand(operand);
+                    _this.operand(operand);
+                    return _this;
                 }
                 Object.defineProperty(UnaryOperandSurface.prototype, "leftPart", {
                     get: function () {
@@ -7663,24 +7624,11 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                 };
                 return UnaryOperandSurface;
-            })(Widgets.CriteriaOperatorSurface);
+            }(Widgets.CriteriaOperatorSurface));
             Widgets.UnaryOperandSurface = UnaryOperandSurface;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="serializer.ts" />
-/// <reference path="addon.ts" />
-/// <reference path="treelistController.ts" />
-/// <reference path="../operators/aggregateOperandSurface.ts" />
-/// <reference path="../operators/betweenOperandSurface.ts" />
-/// <reference path="../operators/binaryOperandSurface.ts" />
-/// <reference path="../operators/functionOperandSurface.ts" />
-/// <reference path="../operators/groupOperandSurface.ts" />
-/// <reference path="../operators/inOperandSurface.ts" />
-/// <reference path="../operators/operandParameterSurface.ts" />
-/// <reference path="../operators/operandPropertySurface.ts" />
-/// <reference path="../operators/operandValueSurface.ts" />
-/// <reference path="../operators/unaryOperandSurface.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7715,7 +7663,8 @@ var DevExpress;
                             { name: "Is less than or equal to", insertVal: "<=", value: Analytics.Criteria.BinaryOperatorType.LessOrEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseLessOrEqual" },
                             { name: "Is greater than", reverse: true, hidden: true, value: Analytics.Criteria.BinaryOperatorType.LessOrEqual, type: Analytics.Criteria.BinaryOperatorType, localizationId: "StringId.FilterClauseGreater" },
                             { name: "Is between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: Analytics.Criteria.BetweenOperator, localizationId: "StringId.FilterClauseBetween" },
-                            { name: "Is not between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: Analytics.Criteria.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }],
+                            { name: "Is not between", value: "Between", insertVal: "Between(, )", paramCount: 1, type: Analytics.Criteria.BetweenOperator, reverse: true, localizationId: "StringId.FilterClauseNotBetween" }
+                        ],
                         string: [],
                         guid: [],
                         integer: [],
@@ -7874,15 +7823,12 @@ var DevExpress;
                     };
                 };
                 return FilterEditorHelper;
-            })();
+            }());
             Widgets.FilterEditorHelper = FilterEditorHelper;
             Widgets.DefaultFilterEditorHelper = FilterEditorHelper;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../../common/codeCompletor.ts" />
-/// <reference path="helper.ts" />
-/// <reference path="../../common/pathRequest.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7894,7 +7840,7 @@ var DevExpress;
                 var FilterEditorCodeCompletor = (function (_super) {
                     __extends(FilterEditorCodeCompletor, _super);
                     function FilterEditorCodeCompletor(options) {
-                        _super.call(this, options);
+                        var _this = _super.call(this, options) || this;
                         var helper = new Widgets.FilterEditorHelper();
                         var functions = [];
                         var aggregate = [];
@@ -7916,7 +7862,8 @@ var DevExpress;
                                 }
                             });
                         });
-                        this.filterEditorAvailable = { operators: operators, aggregate: aggregate, functions: functions };
+                        _this.filterEditorAvailable = { operators: operators, aggregate: aggregate, functions: functions };
+                        return _this;
                     }
                     FilterEditorCodeCompletor.prototype.getFunctionsCompletions = function () {
                         var functions = [];
@@ -7942,17 +7889,12 @@ var DevExpress;
                         return operators;
                     };
                     return FilterEditorCodeCompletor;
-                })(Widgets.CodeCompletor);
+                }(Widgets.CodeCompletor));
                 Internal.FilterEditorCodeCompletor = FilterEditorCodeCompletor;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-///<reference path="helpers/addon.ts" />
-///<reference path="helpers/validator.ts" />
-///<reference path="helpers/codeCompletor.ts" />
-///<reference path="../common/displayNameProvider.ts" />
-///<reference path="../ace/binding.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -7962,14 +7904,13 @@ var DevExpress;
             var FilterEditor = (function (_super) {
                 __extends(FilterEditor, _super);
                 function FilterEditor(options, fieldListProvider, rtl, _displayNameProvider) {
-                    var _this = this;
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this);
-                    this._displayNameProvider = _displayNameProvider;
-                    this._advancedMode = ko.observable(false);
-                    this.textFocused = ko.observable(false);
-                    this.aceAvailable = Widgets.aceAvailable;
-                    this.languageHelper = {
+                    var _this = _super.call(this) || this;
+                    _this._displayNameProvider = _displayNameProvider;
+                    _this._advancedMode = ko.observable(false);
+                    _this.textFocused = ko.observable(false);
+                    _this.aceAvailable = Widgets.aceAvailable;
+                    _this.languageHelper = {
                         getLanguageMode: function () { return "ace/mode/criteria"; },
                         createCompleters: function (editor, bindingContext, viewModel) {
                             var path = ko.computed(function () { return _this.path && _this.path(); }), completor = new Widgets.Internal.FilterEditorCodeCompletor({
@@ -7985,27 +7926,27 @@ var DevExpress;
                             return [completor];
                         }
                     };
-                    this.aceOptions = {
+                    _this.aceOptions = {
                         showLineNumbers: false,
                         showPrintMargin: false,
                         enableBasicAutocompletion: true,
                         enableLiveAutocompletion: true,
                         showGutter: false
                     };
-                    this.additionalOptions = {
+                    _this.additionalOptions = {
                         onChange: function (session) { return _this.onValueChange(session.getValue()); },
                         changeTimeout: 200,
                         onFocus: function (_) { return _this.onFocus(); },
                         onBlur: function (_) { return _this.onBlur(); }
                     };
-                    this.editorContainer = ko.observable();
-                    this.textVisible = ko.observable(false);
-                    this.getPopupContainer = function (el) {
+                    _this.editorContainer = ko.observable();
+                    _this.textVisible = ko.observable(false);
+                    _this.getPopupContainer = function (el) {
                         return Analytics.Utils.getParentContainer(el, _this.options()["popupContainer"]);
                     };
-                    this.timeout = null;
-                    this.animationTimeout = null;
-                    this.advancedMode = ko.computed({
+                    _this.timeout = null;
+                    _this.animationTimeout = null;
+                    _this.advancedMode = ko.computed({
                         read: function () {
                             return _this._advancedMode();
                         },
@@ -8030,22 +7971,22 @@ var DevExpress;
                             }
                         },
                     });
-                    this.invalidMessage = function () { return DevExpress.Analytics.getLocalization("Cannot create a tree for this expression", "ASPxReportsStringId.FilterEditor_TreeCreationError"); };
-                    this.advancedModeText = function () { return DevExpress.Analytics.getLocalization("Advanced Mode", "ASPxReportsStringId.FilterEditor_AdvancedMode"); };
-                    this.operandSurface = ko.observable(null);
-                    this.operand = null;
-                    this.popupVisible = ko.observable(false);
-                    this.buttonItems = [];
-                    this.popupService = new Analytics.Internal.PopupService();
-                    this.rtl = rtl;
+                    _this.invalidMessage = function () { return DevExpress.Analytics.getLocalization("Cannot create a tree for this expression", "ASPxReportsStringId.FilterEditor_TreeCreationError"); };
+                    _this.advancedModeText = function () { return DevExpress.Analytics.getLocalization("Advanced Mode", "ASPxReportsStringId.FilterEditor_AdvancedMode"); };
+                    _this.operandSurface = ko.observable(null);
+                    _this.operand = null;
+                    _this.popupVisible = ko.observable(false);
+                    _this.buttonItems = [];
+                    _this.popupService = new Analytics.Internal.PopupService();
+                    _this.rtl = rtl;
                     options() && options().helper && (options().helper.rtl = rtl);
-                    this.options = options;
-                    this._disposables.push(this.disabled = ko.computed(function () {
+                    _this.options = options;
+                    _this._disposables.push(_this.disabled = ko.computed(function () {
                         return ko.unwrap(_this.options() && _this.options().disabled());
                     }));
-                    this.value = ko.observable("");
-                    this.displayExpressionConverter = _displayNameProvider && new Analytics.Utils.DisplayExpressionConverter(_displayNameProvider);
-                    this.save = function () {
+                    _this.value = ko.observable("");
+                    _this.displayExpressionConverter = _displayNameProvider && new Analytics.Utils.DisplayExpressionConverter(_displayNameProvider);
+                    _this.save = function () {
                         _this.helper.onSave(_this.value());
                         if (_this.operandSurface() && _this.isSurfaceValid()) {
                             var value = options().helper.serializer.serialize(_this.operand, false);
@@ -8056,7 +7997,7 @@ var DevExpress;
                         }
                         _this.popupVisible(false);
                     };
-                    this.displayValue = Widgets.wrapExpressionValue(this.path, this.value, this.displayExpressionConverter, this._disposables);
+                    _this.displayValue = Widgets.wrapExpressionValue(_this.path, _this.value, _this.displayExpressionConverter, _this._disposables);
                     var modelValue = ko.computed({
                         read: function () {
                             var options = _this.options();
@@ -8067,15 +8008,15 @@ var DevExpress;
                             options && options.value(newVal);
                         }
                     });
-                    this.modelDisplayValue = Widgets.wrapExpressionValue(this.path, modelValue, this.displayExpressionConverter, this._disposables);
-                    this.fieldListProvider = fieldListProvider;
-                    this.modelValueIsValid = ko.computed(function () {
+                    _this.modelDisplayValue = Widgets.wrapExpressionValue(_this.path, modelValue, _this.displayExpressionConverter, _this._disposables);
+                    _this.fieldListProvider = fieldListProvider;
+                    _this.modelValueIsValid = ko.computed(function () {
                         return options() && _this._validateValue(options().value());
                     });
-                    this.isValid = ko.computed(function () {
+                    _this.isValid = ko.computed(function () {
                         return _this._validateValue(_this.value());
                     });
-                    this.isSurfaceValid = ko.computed(function () {
+                    _this.isSurfaceValid = ko.computed(function () {
                         try {
                             return _this.options() && _this.isValid() && _this.options().helper.criteriaTreeValidator.validateModel(_this.options().helper.serializer.deserialize(_this.value()));
                         }
@@ -8083,11 +8024,11 @@ var DevExpress;
                             return false;
                         }
                     });
-                    this._disposables.push(modelValue);
-                    this._disposables.push(this.modelValueIsValid);
-                    this._disposables.push(this.isValid);
-                    this._disposables.push(this.isSurfaceValid);
-                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
+                    _this._disposables.push(modelValue);
+                    _this._disposables.push(_this.modelValueIsValid);
+                    _this._disposables.push(_this.isValid);
+                    _this._disposables.push(_this.isSurfaceValid);
+                    _this._disposables.push(_this.popupVisible.subscribe(function (newVal) {
                         if (newVal) {
                             _this.value(_this.options().value());
                             if (_this.isSurfaceValid()) {
@@ -8111,15 +8052,16 @@ var DevExpress;
                             _this.operand = null;
                         }
                     }));
-                    this.createAddButton = function (criteria) { return options().helper.handlers.create(criteria, _this.popupService); };
-                    this.createChangeType = function (criteria) { return options().helper.handlers.change(criteria, _this.popupService); };
-                    this.createChangeProperty = function (criteria) { return options().helper.handlers.changeProperty(criteria, _this.popupService); };
-                    this.createChangeParameter = function (criteria) { return options().helper.handlers.changeParameter(criteria, _this.popupService); };
-                    this.createChangeValueType = function (criteria) { return options().helper.handlers.changeValueType(criteria, _this.popupService); };
+                    _this.createAddButton = function (criteria) { return options().helper.handlers.create(criteria, _this.popupService); };
+                    _this.createChangeType = function (criteria) { return options().helper.handlers.change(criteria, _this.popupService); };
+                    _this.createChangeProperty = function (criteria) { return options().helper.handlers.changeProperty(criteria, _this.popupService); };
+                    _this.createChangeParameter = function (criteria) { return options().helper.handlers.changeParameter(criteria, _this.popupService); };
+                    _this.createChangeValueType = function (criteria) { return options().helper.handlers.changeValueType(criteria, _this.popupService); };
                     var saveDisabled = ko.computed(function () { return !_this.isValid(); });
-                    this._disposables.push(saveDisabled);
-                    this._disposables.push(this.advancedMode);
-                    this._createMainPopupButtons(saveDisabled);
+                    _this._disposables.push(saveDisabled);
+                    _this._disposables.push(_this.advancedMode);
+                    _this._createMainPopupButtons(saveDisabled);
+                    return _this;
                 }
                 FilterEditor.prototype._createMainPopupButtons = function (saveDisabled) {
                     var self = this;
@@ -8261,7 +8203,7 @@ var DevExpress;
                         focusFn(this.editorContainer());
                 };
                 return FilterEditor;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.FilterEditor = FilterEditor;
             ko.bindingHandlers['dxFilterEditor'] = {
                 init: function (element, valueAccessor) {
@@ -8295,19 +8237,18 @@ var DevExpress;
             var FilterEditorPlain = (function (_super) {
                 __extends(FilterEditorPlain, _super);
                 function FilterEditorPlain(element, options, fieldListProvider, rtl, _displayNameProvider) {
-                    var _this = this;
                     if (rtl === void 0) { rtl = false; }
-                    _super.call(this, options, fieldListProvider, rtl, _displayNameProvider);
-                    this.element = element;
-                    this._contentMargins = 20;
-                    this._topOffset = 30;
-                    this._defaultActiveTextContentHeightPerc = 25;
-                    this._defaultActiveTreeContentHeightPerc = 75;
-                    this._currentActiveTextContentHeightPerc = this._defaultActiveTextContentHeightPerc;
-                    this._currentActiveTreeContentHeightPerc = this._defaultActiveTreeContentHeightPerc;
-                    this.plainContentHeightPerc = ko.observable("100%");
-                    this.textContentHeightPerc = ko.observable(null);
-                    this.treeContentHeightPerc = ko.observable(null);
+                    var _this = _super.call(this, options, fieldListProvider, rtl, _displayNameProvider) || this;
+                    _this.element = element;
+                    _this._contentMargins = 20;
+                    _this._topOffset = 30;
+                    _this._defaultActiveTextContentHeightPerc = 25;
+                    _this._defaultActiveTreeContentHeightPerc = 75;
+                    _this._currentActiveTextContentHeightPerc = _this._defaultActiveTextContentHeightPerc;
+                    _this._currentActiveTreeContentHeightPerc = _this._defaultActiveTreeContentHeightPerc;
+                    _this.plainContentHeightPerc = ko.observable("100%");
+                    _this.textContentHeightPerc = ko.observable(null);
+                    _this.treeContentHeightPerc = ko.observable(null);
                     var $element = $(element);
                     var updateHeight = function () {
                         var currentHeight = $element.height();
@@ -8321,7 +8262,7 @@ var DevExpress;
                         }
                     };
                     updateHeight();
-                    this._disposables.push(this.advancedMode.subscribe(function (newVal) {
+                    _this._disposables.push(_this.advancedMode.subscribe(function (newVal) {
                         if (newVal) {
                             _this.treeContentHeightPerc(_this._currentActiveTreeContentHeightPerc + "%");
                             _this.textContentHeightPerc(_this._currentActiveTextContentHeightPerc + "%");
@@ -8336,9 +8277,10 @@ var DevExpress;
                         window.removeEventListener("resize", updateHeight);
                         _this.dispose();
                     });
+                    return _this;
                 }
                 return FilterEditorPlain;
-            })(FilterEditor);
+            }(FilterEditor));
             Widgets.FilterEditorPlain = FilterEditorPlain;
             ko.components.register("dx-filtereditor-plain", {
                 viewModel: {
@@ -8408,7 +8350,7 @@ var DevExpress;
                     this._title = ko.observable(title || { text: DevExpress.Analytics.getLocalization("Filter Editor", "DataAccessUIStringId.FiltersView") });
                 }
                 return FilterStringOptions;
-            })();
+            }());
             Widgets.FilterStringOptions = FilterStringOptions;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -8433,8 +8375,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="patterns.ts" />
-/// <reference path="../utils.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -8444,18 +8384,18 @@ var DevExpress;
             var FormatStringEditor = (function (_super) {
                 __extends(FormatStringEditor, _super);
                 function FormatStringEditor(value, disabled, defaultPatterns, customPatterns, actions, rtl, popupContainer) {
-                    _super.call(this);
-                    this.currentType = ko.observable();
-                    this.patternList = ko.observableArray([]);
-                    this.canAddCustomFormat = ko.observable(false);
-                    this.formatPrefix = ko.observable("");
-                    this.formatSuffix = ko.observable("");
-                    this.previewString = ko.observable("Preview string");
-                    this.formatResult = ko.observable("");
-                    this.selectedFormats = ko.observable([]);
-                    this.selectedTypes = ko.observable([]);
-                    this.popupVisible = ko.observable(false);
-                    this.localizationIdMap = {
+                    var _this = _super.call(this) || this;
+                    _this.currentType = ko.observable();
+                    _this.patternList = ko.observableArray([]);
+                    _this.canAddCustomFormat = ko.observable(false);
+                    _this.formatPrefix = ko.observable("");
+                    _this.formatSuffix = ko.observable("");
+                    _this.previewString = ko.observable("Preview string");
+                    _this.formatResult = ko.observable("");
+                    _this.selectedFormats = ko.observable([]);
+                    _this.selectedTypes = ko.observable([]);
+                    _this.popupVisible = ko.observable(false);
+                    _this.localizationIdMap = {
                         'title': { text: 'FormatString Editor', localizationId: 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Title' },
                         'category': { text: 'Category', localizationId: 'DevExpress.XtraPrinting.XlDocumentOptions.Category' },
                         'preview': { text: 'Preview', localizationId: 'ASPxReportsStringId.ReportDesigner_TooltipButtons_Preview' },
@@ -8464,16 +8404,16 @@ var DevExpress;
                         'prefix': { text: 'Prefix', localizationId: 'DevExpress.XtraPrinting.Recipient.Prefix' },
                         'suffix': { text: 'Suffix', localizationId: 'ASPxReportsStringId.ReportDesigner_FormatStringEditor_Suffix' }
                     };
-                    this.option("value", value);
-                    this.option("disabled", disabled || false);
-                    this.option("rtl", rtl || false);
-                    this.option("popupContainer", popupContainer || ".dx-designer-viewport");
-                    var self = this;
-                    this.popupService = new Analytics.Internal.PopupService();
-                    this._standardPatternSource = defaultPatterns || Widgets.Internal.formatStringStandardPatterns;
-                    this._customPatternSource = customPatterns || {};
-                    this.types = this._convertArray(Object.keys(this._standardPatternSource));
-                    this._disposables.push(this.currentType.subscribe(function (newVal) {
+                    _this.option("value", value);
+                    _this.option("disabled", disabled || false);
+                    _this.option("rtl", rtl || false);
+                    _this.option("popupContainer", popupContainer || ".dx-designer-viewport");
+                    var self = _this;
+                    _this.popupService = new Analytics.Internal.PopupService();
+                    _this._standardPatternSource = defaultPatterns || Widgets.Internal.formatStringStandardPatterns;
+                    _this._customPatternSource = customPatterns || {};
+                    _this.types = _this._convertArray(Object.keys(_this._standardPatternSource));
+                    _this._disposables.push(_this.currentType.subscribe(function (newVal) {
                         if (self.isGeneralType) {
                             self.formatResult("");
                             self.selectedFormats([]);
@@ -8482,33 +8422,33 @@ var DevExpress;
                             self._updateFormatList();
                         }
                     }));
-                    this.currentType(this.types[0].name);
-                    this._disposables.push(this.formatResult.subscribe(function (newVal) {
+                    _this.currentType(_this.types[0].name);
+                    _this._disposables.push(_this.formatResult.subscribe(function (newVal) {
                         self._updateCanAddCustomFormat(newVal);
                         self._updatePreview();
                     }));
-                    this._disposables.push(this.formatPrefix.subscribe(function (newVal) {
+                    _this._disposables.push(_this.formatPrefix.subscribe(function (newVal) {
                         self._updatePreview();
                     }));
-                    this._disposables.push(this.formatSuffix.subscribe(function (newVal) {
+                    _this._disposables.push(_this.formatSuffix.subscribe(function (newVal) {
                         self._updatePreview();
                     }));
-                    this._disposables.push(this.popupVisible.subscribe(function (newVal) {
+                    _this._disposables.push(_this.popupVisible.subscribe(function (newVal) {
                         if (!newVal)
                             return;
                         self._initEditor(value());
                         self.selectedTypes(self.types.filter(function (item) { return item.name === self.currentType(); }));
                     }));
-                    this._createMainPopupButtons();
-                    actions && actions.updatePreview && (this.updatePreview = actions.updatePreview);
-                    this.setType = function (e) {
+                    _this._createMainPopupButtons();
+                    actions && actions.updatePreview && (_this.updatePreview = actions.updatePreview);
+                    _this.setType = function (e) {
                         self.currentType(e.itemData.name);
                         self._updateSelection();
                     };
-                    this.setFormat = function (e) {
+                    _this.setFormat = function (e) {
                         self.formatResult(e.itemData.name);
                     };
-                    this.addCustomFormat = function () {
+                    _this.addCustomFormat = function () {
                         if (self.formatResult() && self.canAddCustomFormat()) {
                             self.customPatterns.push(self.formatResult());
                             self._updateFormatList();
@@ -8518,7 +8458,7 @@ var DevExpress;
                             self.canAddCustomFormat(false);
                         }
                     };
-                    this.removeCustomFormat = function (data) {
+                    _this.removeCustomFormat = function (data) {
                         var currentSelection = self.selectedFormats()[0];
                         var patternList = self.patternList();
                         var removedItemIndex = patternList.map(function (item) { return item.name; }).indexOf(data.name);
@@ -8532,6 +8472,7 @@ var DevExpress;
                             self.selectedFormats(self.patternList().filter(function (item) { return item.name === currentSelection.name; }));
                         }
                     };
+                    return _this;
                 }
                 FormatStringEditor.prototype.okAction = function () {
                     var result = this.isGeneralType ? this._getGeneralPreview('{0}') : this._wrapFormat();
@@ -8685,12 +8626,11 @@ var DevExpress;
                     return $(el).closest(this.option("popupContainer"));
                 };
                 return FormatStringEditor;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.FormatStringEditor = FormatStringEditor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="formatstringeditor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -8724,7 +8664,7 @@ var DevExpress;
                 var dxPopupWithAutoHeight = (function (_super) {
                     __extends(dxPopupWithAutoHeight, _super);
                     function dxPopupWithAutoHeight(element, options) {
-                        _super.call(this, element, options);
+                        return _super.call(this, element, options) || this;
                     }
                     dxPopupWithAutoHeight.prototype._setContentHeight = function () {
                         this["_$popupContent"].css({
@@ -8732,7 +8672,7 @@ var DevExpress;
                         });
                     };
                     return dxPopupWithAutoHeight;
-                })(DevExpress.ui.dxPopup);
+                }(DevExpress.ui.dxPopup));
                 Internal.dxPopupWithAutoHeight = dxPopupWithAutoHeight;
                 DevExpress.registerComponent("dxPopupWithAutoHeight", dxPopupWithAutoHeight);
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
@@ -8769,20 +8709,20 @@ var DevExpress;
             var HighlightEngine = (function (_super) {
                 __extends(HighlightEngine, _super);
                 function HighlightEngine(options) {
-                    var _this = this;
-                    _super.call(this);
-                    this._$spanProtect = $("<span>");
-                    this._$spanSearch = $("<span>").addClass('dx-datagrid-search-text');
-                    this.content = ko.observable("");
+                    var _this = _super.call(this) || this;
+                    _this._$spanProtect = $("<span>");
+                    _this._$spanSearch = $("<span>").addClass('dx-datagrid-search-text');
+                    _this.content = ko.observable("");
                     if (ko.isSubscribable(options.text)) {
-                        this._disposables.push(options.text.subscribe(function (newText) {
+                        _this._disposables.push(options.text.subscribe(function (newText) {
                             _this.content(_this._getHighlightContent(newText, ko.unwrap(options.textToSearch)));
                         }));
                     }
-                    this._disposables.push(options.textToSearch.subscribe(function (newFind) {
+                    _this._disposables.push(options.textToSearch.subscribe(function (newFind) {
                         _this.content(_this._getHighlightContent(ko.unwrap(options.text), newFind));
                     }));
-                    this.content(this._getHighlightContent(ko.unwrap(options.text), ko.unwrap(options.textToSearch)));
+                    _this.content(_this._getHighlightContent(ko.unwrap(options.text), ko.unwrap(options.textToSearch)));
+                    return _this;
                 }
                 HighlightEngine.prototype._getHighlightContent = function (text, textToSearch) {
                     var _this = this;
@@ -8818,7 +8758,7 @@ var DevExpress;
                     return result;
                 };
                 return HighlightEngine;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.HighlightEngine = HighlightEngine;
             ko.bindingHandlers["searchHighlighting"] = {
                 init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -8828,8 +8768,6 @@ var DevExpress;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="treelistController.ts" />
-/// <reference path="treelistItem.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -8904,62 +8842,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="ace/binding.ts" />
-/// <reference path="common/codeCompletor.ts" />
-/// <reference path="common/displayNameProvider.ts" />
-/// <reference path="common/pathRequest.ts" />
-/// <reference path="criteria/operators/aggregate.ts" />
-/// <reference path="criteria/operators/between.ts" />
-/// <reference path="criteria/operators/binary.ts" />
-/// <reference path="criteria/operators/constant.ts" />
-/// <reference path="criteria/operators/criteriaOperator.ts" />
-/// <reference path="criteria/operators/function.ts" />
-/// <reference path="criteria/operators/group.ts" />
-/// <reference path="criteria/operators/in.ts" />
-/// <reference path="criteria/operators/join.ts" />
-/// <reference path="criteria/operators/parameter.ts" />
-/// <reference path="criteria/operators/property.ts" />
-/// <reference path="criteria/operators/unary.ts" />
-/// <reference path="criteria/operators/value.ts" />
-/// <reference path="criteria/criteriaOperatorPreprocessor.ts" />
-/// <reference path="criteria/utils.ts" />
-/// <reference path="expressioneditor/tools/functions.ts" />
-/// <reference path="expressioneditor/tools/operatorNames.ts" />
-/// <reference path="expressioneditor/tools/tools.ts" />
-/// <reference path="expressioneditor/tools/treeListControllers.ts" />
-/// <reference path="expressioneditor/bindings.ts" />
-/// <reference path="expressioneditor/expressioneditor.ts" />
-/// <reference path="filtereditor/helpers/addon.ts" />
-/// <reference path="filtereditor/helpers/codeCompletor.ts" />
-/// <reference path="filtereditor/helpers/helper.ts" />
-/// <reference path="filtereditor/helpers/serializer.ts" />
-/// <reference path="filtereditor/helpers/treelistController.ts" />
-/// <reference path="filtereditor/helpers/validator.ts" />
-/// <reference path="filtereditor/operators/aggregateOperandSurface.ts" />
-/// <reference path="filtereditor/operators/betweenOperandSurface.ts" />
-/// <reference path="filtereditor/operators/binaryOperandSurface.ts" />
-/// <reference path="filtereditor/operators/criteriaOperatorSurface.ts" />
-/// <reference path="filtereditor/operators/functionOperandSurface.ts" />
-/// <reference path="filtereditor/operators/groupOperandSurface.ts" />
-/// <reference path="filtereditor/operators/inOperandSurface.ts" />
-/// <reference path="filtereditor/operators/operandParameterSurface.ts" />
-/// <reference path="filtereditor/operators/operandPropertySurface.ts" />
-/// <reference path="filtereditor/operators/operandSurfaceBase.ts" />
-/// <reference path="filtereditor/operators/operandValueSurface.ts" />
-/// <reference path="filtereditor/operators/unaryOperandSurface.ts" />
-/// <reference path="filtereditor/filtereditor.ts" />
-/// <reference path="filtereditor/filtereditoroptions.ts" />
-/// <reference path="formatstring/binding.ts" />
-/// <reference path="formatstring/formatstringeditor.ts" />
-/// <reference path="formatstring/patterns.ts" />
-/// <reference path="internal/popupwithautoheight.ts" />
-/// <reference path="internal/valueEditorHelper.ts" />
-/// <reference path="bindings.ts" />
-/// <reference path="utils.ts" />
-/// <reference path="searchHighlighting.ts" />
-/// <reference path="treelist/binding.ts" />
-/// <reference path="treelist/treelistController.ts" />
-/// <reference path="treelist/treelistItem.ts" />
 var DevExpress;
 (function (DevExpress) {
     var JS;
@@ -8969,26 +8851,26 @@ var DevExpress;
             var DisplayExpressionConverter = (function (_super) {
                 __extends(DisplayExpressionConverter, _super);
                 function DisplayExpressionConverter() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DisplayExpressionConverter;
-            })(DevExpress.Analytics.Utils.DisplayExpressionConverter);
+            }(DevExpress.Analytics.Utils.DisplayExpressionConverter));
             Utils.DisplayExpressionConverter = DisplayExpressionConverter;
             var HighlightEngine = (function (_super) {
                 __extends(HighlightEngine, _super);
                 function HighlightEngine() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return HighlightEngine;
-            })(DevExpress.Analytics.Internal.HighlightEngine);
+            }(DevExpress.Analytics.Internal.HighlightEngine));
             Utils.HighlightEngine = HighlightEngine;
             var Disposable = (function (_super) {
                 __extends(Disposable, _super);
                 function Disposable() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return Disposable;
-            })(DevExpress.Analytics.Utils.Disposable);
+            }(DevExpress.Analytics.Utils.Disposable));
             Utils.Disposable = Disposable;
             Utils.integerValueConverter = DevExpress.Analytics.Utils.integerValueConverter;
             Utils.floatValueConverter = DevExpress.Analytics.Utils.floatValueConverter;
@@ -9010,7 +8892,6 @@ DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.An
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "floatValueConverter");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "setCursorInFunctionParameter");
 DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Utils, DevExpress.Analytics.Utils, "isList");
-var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
@@ -9022,10 +8903,10 @@ var DevExpress;
             var PathRequest = (function (_super) {
                 __extends(PathRequest, _super);
                 function PathRequest() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return PathRequest;
-            })(DevExpress.Analytics.Utils.PathRequest);
+            }(DevExpress.Analytics.Utils.PathRequest));
             Widgets.PathRequest = PathRequest;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Utils, "PathRequest");
             Widgets.ace = DevExpress.Analytics.Widgets.ace;
@@ -9035,10 +8916,10 @@ var DevExpress;
             var CodeCompletor = (function (_super) {
                 __extends(CodeCompletor, _super);
                 function CodeCompletor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CodeCompletor;
-            })(DevExpress.Analytics.Widgets.CodeCompletor);
+            }(DevExpress.Analytics.Widgets.CodeCompletor));
             Widgets.CodeCompletor = CodeCompletor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "CodeCompletor");
             Widgets.createFunctionCompletion = DevExpress.Analytics.Widgets.createFunctionCompletion;
@@ -9050,28 +8931,28 @@ var DevExpress;
             var Tools = (function (_super) {
                 __extends(Tools, _super);
                 function Tools() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return Tools;
-            })(DevExpress.Analytics.Widgets.Internal.Tools);
+            }(DevExpress.Analytics.Widgets.Internal.Tools));
             Widgets.Tools = Tools;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "Tools");
             var ExpressionEditorTreeListController = (function (_super) {
                 __extends(ExpressionEditorTreeListController, _super);
                 function ExpressionEditorTreeListController() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ExpressionEditorTreeListController;
-            })(DevExpress.Analytics.Widgets.ExpressionEditorTreeListController);
+            }(DevExpress.Analytics.Widgets.ExpressionEditorTreeListController));
             Widgets.ExpressionEditorTreeListController = ExpressionEditorTreeListController;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "ExpressionEditorTreeListController");
             var ExpressionEditorParametersTreeListController = (function (_super) {
                 __extends(ExpressionEditorParametersTreeListController, _super);
                 function ExpressionEditorParametersTreeListController() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ExpressionEditorParametersTreeListController;
-            })(DevExpress.Analytics.Widgets.ExpressionEditorParametersTreeListController);
+            }(DevExpress.Analytics.Widgets.ExpressionEditorParametersTreeListController));
             Widgets.ExpressionEditorParametersTreeListController = ExpressionEditorParametersTreeListController;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "ExpressionEditorParametersTreeListController");
             Widgets.wrapExpressionValue = DevExpress.Analytics.Widgets.wrapExpressionValue;
@@ -9079,28 +8960,28 @@ var DevExpress;
             var ExpressionEditor = (function (_super) {
                 __extends(ExpressionEditor, _super);
                 function ExpressionEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ExpressionEditor;
-            })(DevExpress.Analytics.Widgets.ExpressionEditor);
+            }(DevExpress.Analytics.Widgets.ExpressionEditor));
             Widgets.ExpressionEditor = ExpressionEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "ExpressionEditor");
             var FilterEditorAddOn = (function (_super) {
                 __extends(FilterEditorAddOn, _super);
                 function FilterEditorAddOn() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterEditorAddOn;
-            })(DevExpress.Analytics.Widgets.Internal.FilterEditorAddOn);
+            }(DevExpress.Analytics.Widgets.Internal.FilterEditorAddOn));
             Widgets.FilterEditorAddOn = FilterEditorAddOn;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "FilterEditorAddOn");
             var FilterEditorCodeCompletor = (function (_super) {
                 __extends(FilterEditorCodeCompletor, _super);
                 function FilterEditorCodeCompletor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterEditorCodeCompletor;
-            })(DevExpress.Analytics.Widgets.Internal.FilterEditorCodeCompletor);
+            }(DevExpress.Analytics.Widgets.Internal.FilterEditorCodeCompletor));
             Widgets.FilterEditorCodeCompletor = FilterEditorCodeCompletor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "FilterEditorCodeCompletor");
             Widgets.initDisplayText = DevExpress.Analytics.Widgets.initDisplayText;
@@ -9108,10 +8989,10 @@ var DevExpress;
             var FilterEditorHelper = (function (_super) {
                 __extends(FilterEditorHelper, _super);
                 function FilterEditorHelper() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterEditorHelper;
-            })(DevExpress.Analytics.Widgets.FilterEditorHelper);
+            }(DevExpress.Analytics.Widgets.FilterEditorHelper));
             Widgets.FilterEditorHelper = FilterEditorHelper;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FilterEditorHelper");
             Widgets.DefaultFilterEditorHelper = DevExpress.Analytics.Widgets.DefaultFilterEditorHelper;
@@ -9119,19 +9000,19 @@ var DevExpress;
             var FilterEditorSerializer = (function (_super) {
                 __extends(FilterEditorSerializer, _super);
                 function FilterEditorSerializer() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterEditorSerializer;
-            })(DevExpress.Analytics.Widgets.Internal.FilterEditorSerializer);
+            }(DevExpress.Analytics.Widgets.Internal.FilterEditorSerializer));
             Widgets.FilterEditorSerializer = FilterEditorSerializer;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "FilterEditorSerializer");
             var FilterEditorTreeListController = (function (_super) {
                 __extends(FilterEditorTreeListController, _super);
                 function FilterEditorTreeListController() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterEditorTreeListController;
-            })(DevExpress.Analytics.Widgets.FilterEditorTreeListController);
+            }(DevExpress.Analytics.Widgets.FilterEditorTreeListController));
             Widgets.FilterEditorTreeListController = FilterEditorTreeListController;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FilterEditorTreeListController");
             Widgets.CriteriaSurfaceValidatorState = DevExpress.Analytics.Widgets.Internal.CriteriaSurfaceValidatorState;
@@ -9139,145 +9020,145 @@ var DevExpress;
             var CriteriaSurfaceValidator = (function (_super) {
                 __extends(CriteriaSurfaceValidator, _super);
                 function CriteriaSurfaceValidator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CriteriaSurfaceValidator;
-            })(DevExpress.Analytics.Widgets.Internal.CriteriaSurfaceValidator);
+            }(DevExpress.Analytics.Widgets.Internal.CriteriaSurfaceValidator));
             Widgets.CriteriaSurfaceValidator = CriteriaSurfaceValidator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "CriteriaSurfaceValidator");
             var AggregateOperandSurface = (function (_super) {
                 __extends(AggregateOperandSurface, _super);
                 function AggregateOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return AggregateOperandSurface;
-            })(DevExpress.Analytics.Widgets.AggregateOperandSurface);
+            }(DevExpress.Analytics.Widgets.AggregateOperandSurface));
             Widgets.AggregateOperandSurface = AggregateOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "AggregateOperandSurface");
             var BetweenOperandSurface = (function (_super) {
                 __extends(BetweenOperandSurface, _super);
                 function BetweenOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return BetweenOperandSurface;
-            })(DevExpress.Analytics.Widgets.BetweenOperandSurface);
+            }(DevExpress.Analytics.Widgets.BetweenOperandSurface));
             Widgets.BetweenOperandSurface = BetweenOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "BetweenOperandSurface");
             var BinaryOperandSurface = (function (_super) {
                 __extends(BinaryOperandSurface, _super);
                 function BinaryOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return BinaryOperandSurface;
-            })(DevExpress.Analytics.Widgets.BinaryOperandSurface);
+            }(DevExpress.Analytics.Widgets.BinaryOperandSurface));
             Widgets.BinaryOperandSurface = BinaryOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "BinaryOperandSurface");
             var CriteriaOperatorSurface = (function (_super) {
                 __extends(CriteriaOperatorSurface, _super);
                 function CriteriaOperatorSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CriteriaOperatorSurface;
-            })(DevExpress.Analytics.Widgets.CriteriaOperatorSurface);
+            }(DevExpress.Analytics.Widgets.CriteriaOperatorSurface));
             Widgets.CriteriaOperatorSurface = CriteriaOperatorSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "CriteriaOperatorSurface");
             var FunctionOperandSurface = (function (_super) {
                 __extends(FunctionOperandSurface, _super);
                 function FunctionOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FunctionOperandSurface;
-            })(DevExpress.Analytics.Widgets.FunctionOperandSurface);
+            }(DevExpress.Analytics.Widgets.FunctionOperandSurface));
             Widgets.FunctionOperandSurface = FunctionOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FunctionOperandSurface");
             var GroupOperandSurface = (function (_super) {
                 __extends(GroupOperandSurface, _super);
                 function GroupOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return GroupOperandSurface;
-            })(DevExpress.Analytics.Widgets.GroupOperandSurface);
+            }(DevExpress.Analytics.Widgets.GroupOperandSurface));
             Widgets.GroupOperandSurface = GroupOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "GroupOperandSurface");
             var InOperandSurface = (function (_super) {
                 __extends(InOperandSurface, _super);
                 function InOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return InOperandSurface;
-            })(DevExpress.Analytics.Widgets.InOperandSurface);
+            }(DevExpress.Analytics.Widgets.InOperandSurface));
             Widgets.InOperandSurface = InOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "InOperandSurface");
             var OperandParameterSurface = (function (_super) {
                 __extends(OperandParameterSurface, _super);
                 function OperandParameterSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandParameterSurface;
-            })(DevExpress.Analytics.Widgets.OperandParameterSurface);
+            }(DevExpress.Analytics.Widgets.OperandParameterSurface));
             Widgets.OperandParameterSurface = OperandParameterSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "OperandParameterSurface");
             var OperandPropertySurface = (function (_super) {
                 __extends(OperandPropertySurface, _super);
                 function OperandPropertySurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandPropertySurface;
-            })(DevExpress.Analytics.Widgets.OperandPropertySurface);
+            }(DevExpress.Analytics.Widgets.OperandPropertySurface));
             Widgets.OperandPropertySurface = OperandPropertySurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "OperandPropertySurface");
             var OperandSurfaceBase = (function (_super) {
                 __extends(OperandSurfaceBase, _super);
                 function OperandSurfaceBase() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandSurfaceBase;
-            })(DevExpress.Analytics.Widgets.OperandSurfaceBase);
+            }(DevExpress.Analytics.Widgets.OperandSurfaceBase));
             Widgets.OperandSurfaceBase = OperandSurfaceBase;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "OperandSurfaceBase");
             var OperandValueSurface = (function (_super) {
                 __extends(OperandValueSurface, _super);
                 function OperandValueSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandValueSurface;
-            })(DevExpress.Analytics.Widgets.OperandValueSurface);
+            }(DevExpress.Analytics.Widgets.OperandValueSurface));
             Widgets.OperandValueSurface = OperandValueSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "OperandValueSurface");
             var UnaryOperandSurface = (function (_super) {
                 __extends(UnaryOperandSurface, _super);
                 function UnaryOperandSurface() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return UnaryOperandSurface;
-            })(DevExpress.Analytics.Widgets.UnaryOperandSurface);
+            }(DevExpress.Analytics.Widgets.UnaryOperandSurface));
             Widgets.UnaryOperandSurface = UnaryOperandSurface;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "UnaryOperandSurface");
             var FilterEditor = (function (_super) {
                 __extends(FilterEditor, _super);
                 function FilterEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterEditor;
-            })(DevExpress.Analytics.Widgets.FilterEditor);
+            }(DevExpress.Analytics.Widgets.FilterEditor));
             Widgets.FilterEditor = FilterEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FilterEditor");
             var FilterStringOptions = (function (_super) {
                 __extends(FilterStringOptions, _super);
                 function FilterStringOptions() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FilterStringOptions;
-            })(DevExpress.Analytics.Widgets.FilterStringOptions);
+            }(DevExpress.Analytics.Widgets.FilterStringOptions));
             Widgets.FilterStringOptions = FilterStringOptions;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FilterStringOptions");
             var FormatStringEditor = (function (_super) {
                 __extends(FormatStringEditor, _super);
                 function FormatStringEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FormatStringEditor;
-            })(DevExpress.Analytics.Widgets.FormatStringEditor);
+            }(DevExpress.Analytics.Widgets.FormatStringEditor));
             Widgets.FormatStringEditor = FormatStringEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "FormatStringEditor");
             Widgets.formatStringStandardPatterns = DevExpress.Analytics.Widgets.Internal.formatStringStandardPatterns;
@@ -9285,28 +9166,28 @@ var DevExpress;
             var dxPopupWithAutoHeight = (function (_super) {
                 __extends(dxPopupWithAutoHeight, _super);
                 function dxPopupWithAutoHeight() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return dxPopupWithAutoHeight;
-            })(DevExpress.Analytics.Widgets.Internal.dxPopupWithAutoHeight);
+            }(DevExpress.Analytics.Widgets.Internal.dxPopupWithAutoHeight));
             Widgets.dxPopupWithAutoHeight = dxPopupWithAutoHeight;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "dxPopupWithAutoHeight");
             var ValueEditorHelper = (function (_super) {
                 __extends(ValueEditorHelper, _super);
                 function ValueEditorHelper() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ValueEditorHelper;
-            })(DevExpress.Analytics.Widgets.Internal.ValueEditorHelper);
+            }(DevExpress.Analytics.Widgets.Internal.ValueEditorHelper));
             Widgets.ValueEditorHelper = ValueEditorHelper;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets.Internal, "ValueEditorHelper");
             var TreeListController = (function (_super) {
                 __extends(TreeListController, _super);
                 function TreeListController() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return TreeListController;
-            })(DevExpress.Analytics.Widgets.TreeListController);
+            }(DevExpress.Analytics.Widgets.TreeListController));
             Widgets.TreeListController = TreeListController;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "TreeListController");
             Widgets.treeListEditAction = DevExpress.Analytics.Widgets.treeListEditAction;
@@ -9314,25 +9195,24 @@ var DevExpress;
             var TreeListItemViewModel = (function (_super) {
                 __extends(TreeListItemViewModel, _super);
                 function TreeListItemViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return TreeListItemViewModel;
-            })(DevExpress.Analytics.Widgets.TreeListItemViewModel);
+            }(DevExpress.Analytics.Widgets.TreeListItemViewModel));
             Widgets.TreeListItemViewModel = TreeListItemViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "TreeListItemViewModel");
             var TreeListRootItemViewModel = (function (_super) {
                 __extends(TreeListRootItemViewModel, _super);
                 function TreeListRootItemViewModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return TreeListRootItemViewModel;
-            })(DevExpress.Analytics.Widgets.TreeListRootItemViewModel);
+            }(DevExpress.Analytics.Widgets.TreeListRootItemViewModel));
             Widgets.TreeListRootItemViewModel = TreeListRootItemViewModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Widgets, DevExpress.Analytics.Widgets, "TreeListRootItemViewModel");
         })(Widgets = JS.Widgets || (JS.Widgets = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var JS;
     (function (JS) {
@@ -9343,19 +9223,19 @@ var DevExpress;
             var AggregateOperand = (function (_super) {
                 __extends(AggregateOperand, _super);
                 function AggregateOperand() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return AggregateOperand;
-            })(DevExpress.Analytics.Criteria.AggregateOperand);
+            }(DevExpress.Analytics.Criteria.AggregateOperand));
             Data.AggregateOperand = AggregateOperand;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "AggregateOperand");
             var BetweenOperator = (function (_super) {
                 __extends(BetweenOperator, _super);
                 function BetweenOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return BetweenOperator;
-            })(DevExpress.Analytics.Criteria.BetweenOperator);
+            }(DevExpress.Analytics.Criteria.BetweenOperator));
             Data.BetweenOperator = BetweenOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "BetweenOperator");
             Data.BinaryOperatorType = DevExpress.Analytics.Criteria.BinaryOperatorType;
@@ -9363,28 +9243,28 @@ var DevExpress;
             var BinaryOperator = (function (_super) {
                 __extends(BinaryOperator, _super);
                 function BinaryOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return BinaryOperator;
-            })(DevExpress.Analytics.Criteria.BinaryOperator);
+            }(DevExpress.Analytics.Criteria.BinaryOperator));
             Data.BinaryOperator = BinaryOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "BinaryOperator");
             var ConstantValue = (function (_super) {
                 __extends(ConstantValue, _super);
                 function ConstantValue() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ConstantValue;
-            })(DevExpress.Analytics.Criteria.ConstantValue);
+            }(DevExpress.Analytics.Criteria.ConstantValue));
             Data.ConstantValue = ConstantValue;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "ConstantValue");
             var CriteriaOperator = (function (_super) {
                 __extends(CriteriaOperator, _super);
                 function CriteriaOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CriteriaOperator;
-            })(DevExpress.Analytics.Criteria.CriteriaOperator);
+            }(DevExpress.Analytics.Criteria.CriteriaOperator));
             Data.CriteriaOperator = CriteriaOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "CriteriaOperator");
             Data.FunctionOperatorType = DevExpress.Analytics.Criteria.FunctionOperatorType;
@@ -9392,10 +9272,10 @@ var DevExpress;
             var FunctionOperator = (function (_super) {
                 __extends(FunctionOperator, _super);
                 function FunctionOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FunctionOperator;
-            })(DevExpress.Analytics.Criteria.FunctionOperator);
+            }(DevExpress.Analytics.Criteria.FunctionOperator));
             Data.FunctionOperator = FunctionOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "FunctionOperator");
             Data.GroupOperatorType = DevExpress.Analytics.Criteria.GroupOperatorType;
@@ -9403,46 +9283,46 @@ var DevExpress;
             var GroupOperator = (function (_super) {
                 __extends(GroupOperator, _super);
                 function GroupOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return GroupOperator;
-            })(DevExpress.Analytics.Criteria.GroupOperator);
+            }(DevExpress.Analytics.Criteria.GroupOperator));
             Data.GroupOperator = GroupOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "GroupOperator");
             var InOperator = (function (_super) {
                 __extends(InOperator, _super);
                 function InOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return InOperator;
-            })(DevExpress.Analytics.Criteria.InOperator);
+            }(DevExpress.Analytics.Criteria.InOperator));
             Data.InOperator = InOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "InOperator");
             var JoinOperand = (function (_super) {
                 __extends(JoinOperand, _super);
                 function JoinOperand() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return JoinOperand;
-            })(DevExpress.Analytics.Criteria.JoinOperand);
+            }(DevExpress.Analytics.Criteria.JoinOperand));
             Data.JoinOperand = JoinOperand;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "JoinOperand");
             var OperandParameter = (function (_super) {
                 __extends(OperandParameter, _super);
                 function OperandParameter() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandParameter;
-            })(DevExpress.Analytics.Criteria.OperandParameter);
+            }(DevExpress.Analytics.Criteria.OperandParameter));
             Data.OperandParameter = OperandParameter;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "OperandParameter");
             var OperandProperty = (function (_super) {
                 __extends(OperandProperty, _super);
                 function OperandProperty() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandProperty;
-            })(DevExpress.Analytics.Criteria.OperandProperty);
+            }(DevExpress.Analytics.Criteria.OperandProperty));
             Data.OperandProperty = OperandProperty;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "OperandProperty");
             Data.UnaryOperatorType = DevExpress.Analytics.Criteria.UnaryOperatorType;
@@ -9450,28 +9330,28 @@ var DevExpress;
             var UnaryOperator = (function (_super) {
                 __extends(UnaryOperator, _super);
                 function UnaryOperator() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return UnaryOperator;
-            })(DevExpress.Analytics.Criteria.UnaryOperator);
+            }(DevExpress.Analytics.Criteria.UnaryOperator));
             Data.UnaryOperator = UnaryOperator;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "UnaryOperator");
             var OperandValue = (function (_super) {
                 __extends(OperandValue, _super);
                 function OperandValue() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return OperandValue;
-            })(DevExpress.Analytics.Criteria.OperandValue);
+            }(DevExpress.Analytics.Criteria.OperandValue));
             Data.OperandValue = OperandValue;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "OperandValue");
             var CriteriaOperatorPreprocessor = (function (_super) {
                 __extends(CriteriaOperatorPreprocessor, _super);
                 function CriteriaOperatorPreprocessor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return CriteriaOperatorPreprocessor;
-            })(DevExpress.Analytics.Criteria.CriteriaOperatorPreprocessor);
+            }(DevExpress.Analytics.Criteria.CriteriaOperatorPreprocessor));
             Data.CriteriaOperatorPreprocessor = CriteriaOperatorPreprocessor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.JS.Data, DevExpress.Analytics.Criteria, "CriteriaOperatorPreprocessor");
             Data.criteriaCreator = DevExpress.Analytics.Criteria.criteriaCreator;
@@ -9483,7 +9363,7 @@ var DevExpress;
         })(Data = JS.Data || (JS.Data = {}));
     })(JS = DevExpress.JS || (DevExpress.JS = {}));
 })(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-ko-widgets.js.map
+
 /* parser generated by jison 0.4.18 */
 /*
   Returns a Parser object of the following structure:
@@ -9559,7 +9439,7 @@ var DevExpress;
 */
 var criteriaparser = (function(){
 var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,29],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,24],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,23],$Vk=[1,26],$Vl=[1,28],$Vm=[1,27],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[1,51],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VJ=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50,51,52,54,55,56],$VK=[1,58],$VL=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VM=[5,26,27,29,35,51],$VN=[1,111],$VO=[1,112],$VP=[1,106],$VQ=[1,108],$VR=[1,109],$VS=[1,107],$VT=[1,110],$VU=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,36,51,59],$VV=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VW=[5,18,19,24,25,26,27,29,30,35,51],$VX=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,51],$VY=[29,35];
-var parser = {trace: function trace() { },
+var parser = {trace: function trace () { },
 yy: {},
 symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"GUID":48,"property":49,"[":50,"]":51,".":52,"agg":53,"FIELD_END":54,"CH":55,"ESC_CH":56,"FIELD_START":57,"paramName":58,"NAME_SOFT":59,"?":60,"commaseparated":61,"$accept":0,"$end":1},
 terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",48:"GUID",50:"[",51:"]",52:".",54:"FIELD_END",55:"CH",56:"ESC_CH",57:"FIELD_START",59:"NAME_SOFT",60:"?"},
@@ -9821,7 +9701,7 @@ break;
 },
 table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{1:[3]},{5:[1,30],9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH},o($VI,[2,2]),o($VI,[2,3]),o($VI,[2,4]),{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:56,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VJ,[2,69],{33:57,28:$VK}),{28:$VK,33:59},{28:$VK,33:60},{28:$VK,33:61},{28:$VK,33:62},{28:$VK,33:63},{28:$VK,33:64},{28:$VK,33:65},o($VI,[2,40]),o($VI,[2,41]),o($VI,[2,42]),o($VI,[2,43]),o($VI,[2,44]),o($VI,[2,45]),o($VI,[2,51],{50:[1,66],52:[1,67],54:[1,68],55:[1,69],56:[1,70]}),{51:[1,71]},o($VI,[2,76],{58:72,36:[1,73],59:[1,74]}),o($VJ,[2,68]),o($VJ,[2,70]),{1:[2,1]},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{24:[1,90]},{4:91,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:92,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{25:[1,94],31:[1,93]},{28:$VK,33:95},{28:[1,96]},o($VI,[2,13]),o($VI,[2,14]),o($VL,[2,15],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o($VM,[2,24],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,97],30:$VF,32:$VG,34:$VH},o($VI,[2,32]),{4:100,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,98],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm,61:99},o($VI,[2,33]),o($VI,[2,34]),o($VI,[2,35]),o($VI,[2,36]),o($VI,[2,37]),o($VI,[2,38]),o($VI,[2,39]),{4:101,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,51:[1,102],57:$Vl,60:$Vm},{36:[1,105],37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:103,57:[1,104]},o($VJ,[2,63]),o($VJ,[2,64]),o($VJ,[2,65]),{52:[1,113]},o($VI,[2,75],{36:[1,114],59:[1,115]}),o($VU,[2,71]),o($VU,[2,72]),o($VI,[2,5]),o($VI,[2,6]),o($VV,[2,7],{9:$Vn,10:$Vo,13:$Vr}),o($VV,[2,8],{9:$Vn,10:$Vo,13:$Vr}),o($VI,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,10],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt,16:$Vu}),o($VL,[2,11],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,12],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt}),o($VW,[2,16],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VW,[2,17],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VX,[2,18],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,19],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,20],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,21],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,22],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),{4:116,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VM,[2,25],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,30:$VF,32:$VG,34:$VH}),o([5,27,29,35,51],[2,26],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,30:$VF,32:$VG,34:$VH}),o($VI,[2,28]),{31:[1,117]},o($VI,[2,30]),{4:118,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,27]),o($VI,[2,77]),{29:[1,119],35:[1,120]},o($VY,[2,79],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,51:[1,121]},o($VI,[2,50],{52:[1,122]}),o($VI,[2,48]),o($VJ,[2,66]),o($VJ,[2,67]),o($VI,[2,54],{28:[1,123]}),o($VI,[2,56],{28:[1,124]}),{28:[1,125]},{28:[1,126]},{28:[1,127]},{28:[1,128]},{28:[1,129]},{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:130},o($VU,[2,73]),o($VU,[2,74]),o($VW,[2,23],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VI,[2,29]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,35:[1,131]},o($VI,[2,78]),{4:132,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,49],{52:[1,133]}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:134},{29:[1,135]},{29:[1,136]},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:140,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,139],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:141,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:142,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,52]),{4:143,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VY,[2,80],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:144},o($VI,[2,47]),o($VI,[2,53]),o($VI,[2,55]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,145],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,146],30:$VF,32:$VG,34:$VH},o($VI,[2,59]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,147],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,148],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,149],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,150],30:$VF,32:$VG,34:$VH},o($VI,[2,46]),o($VI,[2,57]),o($VI,[2,58]),o($VI,[2,60]),o($VI,[2,61]),o($VI,[2,62]),o($VI,[2,31])],
 defaultActions: {30:[2,1]},
-parseError: function parseError(str, hash) {
+parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
@@ -10109,7 +9989,7 @@ showPosition:function () {
     },
 
 // test the lexed token: return FALSE when not a match, otherwise return token
-test_match:function (match, indexed_rule) {
+test_match:function(match, indexed_rule) {
         var token,
             lines,
             backup;
@@ -10239,7 +10119,7 @@ next:function () {
     },
 
 // return next match that has a token
-lex:function lex() {
+lex:function lex () {
         var r = this.next();
         if (r) {
             return r;
@@ -10249,12 +10129,12 @@ lex:function lex() {
     },
 
 // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
-begin:function begin(condition) {
+begin:function begin (condition) {
         this.conditionStack.push(condition);
     },
 
 // pop the previously active lexer condition state off the condition stack
-popState:function popState() {
+popState:function popState () {
         var n = this.conditionStack.length - 1;
         if (n > 0) {
             return this.conditionStack.pop();
@@ -10264,7 +10144,7 @@ popState:function popState() {
     },
 
 // produce the lexer rule set which is active for the currently active lexer condition state
-_currentRules:function _currentRules() {
+_currentRules:function _currentRules () {
         if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
             return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
         } else {
@@ -10273,7 +10153,7 @@ _currentRules:function _currentRules() {
     },
 
 // return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
-topState:function topState(n) {
+topState:function topState (n) {
         n = this.conditionStack.length - 1 - Math.abs(n || 0);
         if (n >= 0) {
             return this.conditionStack[n];
@@ -10283,7 +10163,7 @@ topState:function topState(n) {
     },
 
 // alias for begin(condition)
-pushState:function pushState(condition) {
+pushState:function pushState (condition) {
         this.begin(condition);
     },
 
@@ -10413,7 +10293,7 @@ case 57:return 5
 break;
 }
 },
-rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\\\']|(?:\\.))*')/i,/^(?:\{[0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}\})/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:[0-9]+(\.[0-9]+([mfMF]{1})?|[bsiluBSILU]{1})?)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:&)/i,/^(?:\|)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
+rules: [/^(?:\]\s*\[)/i,/^(?:\])/i,/^(?:\\.)/i,/^(?:.)/i,/^(?:$)/i,/^(?:'(?:[^\']|(?:('').))*')/i,/^(?:\{[0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}\})/i,/^(?:#(?:[^\\\#]|(?:\\.))*#)/i,/^(?:[0-9]+(\.[0-9]+([mfMF]{1})?|[bsiluBSILU]{1})?)/i,/^(?:True\b)/i,/^(?:False\b)/i,/^(?:\s+)/i,/^(?:Between\b)/i,/^(?:In\b)/i,/^(?:Not\b)/i,/^(?:Is\b)/i,/^(?:Null\b)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:-)/i,/^(?:\+)/i,/^(?:\^)/i,/^(?:~)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:%)/i,/^(?:<>)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:Avg\b)/i,/^(?:Max\b)/i,/^(?:Min\b)/i,/^(?:Single\b)/i,/^(?:Count\b)/i,/^(?:Exists\b)/i,/^(?:Sum\b)/i,/^(?:==)/i,/^(?:=)/i,/^(?:Like\b)/i,/^(?:And\b)/i,/^(?:Or\b)/i,/^(?:&)/i,/^(?:\|)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\()/i,/^(?:\))/i,/^(?:\.)/i,/^(?:,)/i,/^(?:\?)/i,/^(?:\w[\w\d]*)/i,/^(?:[_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\d_\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376-\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0-\u08B4\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0CF1-\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32-\u0E33\u0E40-\u0E46\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5-\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183-\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3006\u3031-\u3035\u303B-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FD5\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7AD\uA7B0-\uA7B7\uA7F7-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5-\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB65\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*)/i,/^(?:.)/i,/^(?:$)/i],
 conditions: {"fieldname":{"rules":[0,1,2,3,4],"inclusive":false},"INITIAL":{"rules":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57],"inclusive":true}}
 });
 return lexer;
@@ -10526,6 +10406,19 @@ if(window["ace"]) {
 }
 
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -10553,7 +10446,7 @@ var DevExpress;
                     return true;
                 };
                 return BaseActionsProvider;
-            })();
+            }());
             Internal.BaseActionsProvider = BaseActionsProvider;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -10579,16 +10472,10 @@ var DevExpress;
                 this.height(height);
             }
             return Rectangle;
-        })();
+        }());
         Analytics.Rectangle = Rectangle;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-/// <reference path="../elements/rectangle.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -10598,20 +10485,20 @@ var DevExpress;
             var DragDropHandler = (function (_super) {
                 __extends(DragDropHandler, _super);
                 function DragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent) {
-                    var _this = this;
-                    _super.call(this);
-                    this._size = new Analytics.Size(0, 0);
-                    this.alwaysAlt = false;
-                    this.surface = surface;
-                    this.selection = selection;
-                    this.snapHelper = snapHelper;
-                    this.dragHelperContent = dragHelperContent;
-                    this.stopDrag = function (ui, draggable, event) {
+                    var _this = _super.call(this) || this;
+                    _this._size = new Analytics.Size(0, 0);
+                    _this.alwaysAlt = false;
+                    _this.surface = surface;
+                    _this.selection = selection;
+                    _this.snapHelper = snapHelper;
+                    _this.dragHelperContent = dragHelperContent;
+                    _this.stopDrag = function (ui, draggable, event) {
                         undoEngine().start();
                         _this.doStopDrag(ui, draggable, event);
                         undoEngine().end();
                         snapHelper && snapHelper.deactivateSnapLines();
                     };
+                    return _this;
                 }
                 DragDropHandler.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
@@ -10679,7 +10566,7 @@ var DevExpress;
                 DragDropHandler.prototype.doStopDrag = function (ui, draggable, event) { };
                 DragDropHandler.started = ko.observable(false);
                 return DragDropHandler;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.DragDropHandler = DragDropHandler;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -10764,7 +10651,7 @@ var DevExpress;
                     this._undoEngine && this._undoEngine().end();
                 };
                 return KeyboardHelper;
-            })();
+            }());
             Internal.KeyboardHelper = KeyboardHelper;
             var KeyDownHandlersManager = (function () {
                 function KeyDownHandlersManager(targetElement) {
@@ -10798,13 +10685,11 @@ var DevExpress;
                     ko.utils.domNodeDisposal.addDisposeCallback(element, function () { _this._removeHandler(handler); });
                 };
                 return KeyDownHandlersManager;
-            })();
+            }());
             Internal.KeyDownHandlersManager = KeyDownHandlersManager;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="dragDrop/dragDropHandler.ts" />
-/// <reference path="tools/keyboardHelper.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -11014,11 +10899,12 @@ var DevExpress;
             var DragHelperContent = (function (_super) {
                 __extends(DragHelperContent, _super);
                 function DragHelperContent(selectionProvider) {
-                    _super.call(this);
-                    this.controls = ko.observableArray([]);
-                    this.customData = ko.observable({});
-                    this.isLocked = ko.observable(false);
-                    this._selectionProvider = selectionProvider;
+                    var _this = _super.call(this) || this;
+                    _this.controls = ko.observableArray([]);
+                    _this.customData = ko.observable({});
+                    _this.isLocked = ko.observable(false);
+                    _this._selectionProvider = selectionProvider;
+                    return _this;
                 }
                 DragHelperContent.prototype.update = function (surface) {
                     var _this = this;
@@ -11046,7 +10932,7 @@ var DevExpress;
                     this.customData(customData);
                 };
                 return DragHelperContent;
-            })(Analytics.Rectangle);
+            }(Analytics.Rectangle));
             Internal.DragHelperContent = DragHelperContent;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -11060,15 +10946,14 @@ var DevExpress;
             var SelectionDragDropHandler = (function (_super) {
                 __extends(SelectionDragDropHandler, _super);
                 function SelectionDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent) {
-                    var _this = this;
-                    _super.call(this, surface, selection, undoEngine, snapHelper, dragHelperContent);
-                    this.ajustLocation = function (adjustedTarget, item) {
+                    var _this = _super.call(this, surface, selection, undoEngine, snapHelper, dragHelperContent) || this;
+                    _this.ajustLocation = function (adjustedTarget, item) {
                         var left = adjustedTarget.underCursor().x + item.underCursor().offsetX, top = adjustedTarget.underCursor().y + item.underCursor().offsetY;
                         item.rect({ left: left > 0 ? left : 0, top: top > 0 ? top : 0 });
                     };
-                    this.cursor = 'move';
-                    this.containment = '.dxrd-ghost-container';
-                    this["helper"] = function (draggable) {
+                    _this.cursor = 'move';
+                    _this.containment = '.dxrd-ghost-container';
+                    _this["helper"] = function (draggable) {
                         _super.prototype.helper.call(_this, draggable);
                         if (_this.selection.selectedItems.indexOf(draggable) === -1) {
                             _this.selection.updateSelection(draggable);
@@ -11077,6 +10962,7 @@ var DevExpress;
                         _this._size.width(dragHelperContent.width());
                         _this._size.height(dragHelperContent.height());
                     };
+                    return _this;
                 }
                 SelectionDragDropHandler.prototype.adjustDropTarget = function (dropTargetSurface) {
                     var selectedItemInTree = dropTargetSurface;
@@ -11153,7 +11039,7 @@ var DevExpress;
                     }
                 };
                 return SelectionDragDropHandler;
-            })(Internal.DragDropHandler);
+            }(Internal.DragDropHandler));
             Internal.SelectionDragDropHandler = SelectionDragDropHandler;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -11167,14 +11053,15 @@ var DevExpress;
             var ToolboxDragDropHandler = (function (_super) {
                 __extends(ToolboxDragDropHandler, _super);
                 function ToolboxDragDropHandler(surface, selection, undoEngine, snapHelper, dragHelperContent, controlsFactory) {
-                    _super.call(this, surface, selection, undoEngine, snapHelper, dragHelperContent);
-                    this.cursor = 'arrow';
-                    this._controlsFactory = controlsFactory;
-                    this.containment = '.dxrd-designer';
-                    this["cursorAt"] = {
+                    var _this = _super.call(this, surface, selection, undoEngine, snapHelper, dragHelperContent) || this;
+                    _this.cursor = 'arrow';
+                    _this._controlsFactory = controlsFactory;
+                    _this.containment = '.dxrd-designer';
+                    _this["cursorAt"] = {
                         top: 0,
                         left: 0
                     };
+                    return _this;
                 }
                 ToolboxDragDropHandler.prototype.helper = function (draggable) {
                     _super.prototype.helper.call(this, draggable);
@@ -11198,7 +11085,7 @@ var DevExpress;
                     }
                 };
                 return ToolboxDragDropHandler;
-            })(Internal.DragDropHandler);
+            }(Internal.DragDropHandler));
             Internal.ToolboxDragDropHandler = ToolboxDragDropHandler;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -11211,25 +11098,25 @@ var DevExpress;
         var SurfaceElementArea = (function (_super) {
             __extends(SurfaceElementArea, _super);
             function SurfaceElementArea(control, context, unitProperties) {
-                var _this = this;
-                _super.call(this);
-                this._createSurface = function (item) {
+                var _this = _super.call(this) || this;
+                _this._createSurface = function (item) {
                     return item["surface"] || new (item.getControlFactory()).controlsMap[item.controlType].surfaceType(item, _this._context);
                 };
-                this._control = control;
-                this._context = context;
-                control["surface"] = this;
-                if (this._context) {
-                    Analytics.Utils.createUnitProperties(control, this, unitProperties, this._context.measureUnit, this._context.zoom, function (property) { _this._disposables.push(property); });
+                _this.preInitProperties(control, context, unitProperties);
+                _this._control = control;
+                _this._context = context;
+                control["surface"] = _this;
+                if (_this._context) {
+                    Analytics.Utils.createUnitProperties(control, _this, unitProperties, _this._context.measureUnit, _this._context.zoom, function (property) { _this._disposables.push(property); });
                 }
-                this._x = this._x || ko.observable(0);
-                this._y = this._y || ko.observable(0);
-                this._width = this._width || ko.observable(0);
-                this._height = this._height || ko.observable(0);
+                _this._x = _this._x || ko.observable(0);
+                _this._y = _this._y || ko.observable(0);
+                _this._width = _this._width || ko.observable(0);
+                _this._height = _this._height || ko.observable(0);
                 var container = ko.pureComputed(function () { return _this.container(); });
-                this._disposables.push(container);
-                this._container = container();
-                this._disposables.push(container.subscribe(function (value) {
+                _this._disposables.push(container);
+                _this._container = container();
+                _this._disposables.push(container.subscribe(function (value) {
                     if (_this._container !== value && _this.rtlLayout()) {
                         var x = _this._getX();
                         _this._container = value;
@@ -11244,22 +11131,22 @@ var DevExpress;
                     write: function (value) {
                         _this._setX(value);
                     }
-                }), y = this._y, width = this._width, height = this._height;
-                this["position"] = {
+                }), y = _this._y, width = _this._width, height = _this._height;
+                _this["position"] = {
                     top: y,
                     left: x,
                     width: width,
                     height: height,
                     lineHeight: height
                 };
-                this._disposables.push(x);
+                _this._disposables.push(x);
                 var _rect = ko.observable();
-                this._disposables.push(ko.computed(function () {
+                _this._disposables.push(ko.computed(function () {
                     if (!_this._control.update()) {
                         _rect({ top: y(), left: x(), right: x() + width(), bottom: y() + height(), width: width(), height: height() });
                     }
                 }));
-                this._disposables.push(this.rect = ko.pureComputed({
+                _this._disposables.push(_this.rect = ko.pureComputed({
                     read: function () {
                         return _rect();
                     },
@@ -11300,6 +11187,7 @@ var DevExpress;
                         }
                     }
                 }));
+                return _this;
             }
             SurfaceElementArea.prototype._getX = function () {
                 if (this.rtlLayout() && this._container) {
@@ -11321,6 +11209,7 @@ var DevExpress;
             SurfaceElementArea.prototype.getRoot = function () {
                 return this._context;
             };
+            SurfaceElementArea.prototype.preInitProperties = function (control, context, unitProperties) { };
             SurfaceElementArea.prototype.container = function () {
                 return this["parent"];
             };
@@ -11336,33 +11225,32 @@ var DevExpress;
                 return this._control;
             };
             return SurfaceElementArea;
-        })(Analytics.Utils.Disposable);
+        }(Analytics.Utils.Disposable));
         Analytics.SurfaceElementArea = SurfaceElementArea;
         var SurfaceElementBase = (function (_super) {
             __extends(SurfaceElementBase, _super);
             function SurfaceElementBase(control, context, unitProperties) {
-                var _this = this;
-                _super.call(this, control, context, unitProperties);
-                this._countSelectedChildren = ko.observable(0);
-                this.focused = ko.observable(false);
-                this.selected = ko.observable(false);
-                this.underCursor = ko.observable(new Analytics.Internal.HoverInfo());
-                this.allowMultiselect = true;
-                this.absolutePosition = new Analytics.Point(0, 0);
-                this.getControlModel = function () {
+                var _this = _super.call(this, control, context, unitProperties) || this;
+                _this._countSelectedChildren = ko.observable(0);
+                _this.focused = ko.observable(false);
+                _this.selected = ko.observable(false);
+                _this.underCursor = ko.observable(new Analytics.Internal.HoverInfo());
+                _this.allowMultiselect = true;
+                _this.absolutePosition = new Analytics.Point(0, 0);
+                _this.getControlModel = function () {
                     return control;
                 };
-                this.cssCalculator = new Analytics.Internal.CssCalculator(control, context.rtl);
-                if (this._getChildrenHolderName() && control[this._getChildrenHolderName()]) {
+                _this.cssCalculator = new Analytics.Internal.CssCalculator(control, context.rtl);
+                if (_this._getChildrenHolderName() && control[_this._getChildrenHolderName()]) {
                     var collection = ko.observableArray();
-                    if (this._getChildrenHolderName() === "controls") {
-                        this._disposables.push(Analytics.Utils.createObservableReverseArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface));
+                    if (_this._getChildrenHolderName() === "controls") {
+                        _this._disposables.push(Analytics.Utils.createObservableReverseArrayMapCollection(control[_this._getChildrenHolderName()], collection, _this._createSurface));
                     }
                     else {
-                        this._disposables.push(Analytics.Utils.createObservableArrayMapCollection(control[this._getChildrenHolderName()], collection, this._createSurface));
+                        _this._disposables.push(Analytics.Utils.createObservableArrayMapCollection(control[_this._getChildrenHolderName()], collection, _this._createSurface));
                     }
-                    this[this._getChildrenHolderName()] = collection;
-                    this._disposables.push(this.isSelected = ko.pureComputed(function () {
+                    _this[_this._getChildrenHolderName()] = collection;
+                    _this._disposables.push(_this.isSelected = ko.pureComputed(function () {
                         if (!(_this.focused() || _this.selected())) {
                             return collection().some(function (item) {
                                 return item.isSelected();
@@ -11372,24 +11260,25 @@ var DevExpress;
                     }));
                 }
                 else {
-                    this._disposables.push(this.isSelected = ko.pureComputed(function () {
+                    _this._disposables.push(_this.isSelected = ko.pureComputed(function () {
                         return _this.focused() || _this.selected();
                     }));
                 }
-                this._disposables.push(this.css = ko.pureComputed(function () {
+                _this._disposables.push(_this.css = ko.pureComputed(function () {
                     return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.backGroundCss(), _this.cssCalculator.textAlignmentCss());
                 }));
-                this._disposables.push(this.contentCss = ko.pureComputed(function () {
+                _this._disposables.push(_this.contentCss = ko.pureComputed(function () {
                     return $.extend({}, _this.cssCalculator.fontCss(), _this.cssCalculator.foreColorCss(), _this.cssCalculator.textAlignmentCss(), _this.cssCalculator.angle(), _this.cssCalculator.wordWrapCss(), _this.cssCalculator.paddingsCss());
                 }));
-                this._disposables.push(ko.computed(function () {
+                _this._disposables.push(ko.computed(function () {
                     _this.updateAbsolutePosition();
                 }));
-                this._disposables.push(this.absoluteRect = ko.pureComputed(function () {
+                _this._disposables.push(_this.absoluteRect = ko.pureComputed(function () {
                     var controlRect = _this.rect(), absolutePositionY = _this.absolutePosition.y(), absolutePositionX = _this.absolutePosition.x();
                     return { top: absolutePositionY, left: absolutePositionX, right: absolutePositionX + controlRect.width, bottom: absolutePositionY + controlRect.height, width: controlRect.width, height: controlRect.height };
                 }));
-                this.locked = control["lockedInUserDesigner"] ? control["lockedInUserDesigner"]() : false;
+                _this.locked = control["lockedInUserDesigner"] ? control["lockedInUserDesigner"]() : false;
+                return _this;
             }
             Object.defineProperty(SurfaceElementBase.prototype, "parent", {
                 get: function () {
@@ -11421,7 +11310,7 @@ var DevExpress;
             SurfaceElementBase.prototype.afterUpdateAbsolutePosition = function () {
             };
             return SurfaceElementBase;
-        })(SurfaceElementArea);
+        }(SurfaceElementArea));
         Analytics.SurfaceElementBase = SurfaceElementBase;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11432,22 +11321,22 @@ var DevExpress;
         var ElementViewModel = (function (_super) {
             __extends(ElementViewModel, _super);
             function ElementViewModel(model, parent, serializer) {
-                var _this = this;
-                _super.call(this);
-                this.actions = [];
-                this.update = ko.observable(false);
-                this.parentModel = ko.observable(parent);
-                this.controlType = this.controlType || this.getControlFactory().getControlType(model);
+                var _this = _super.call(this) || this;
+                _this.actions = [];
+                _this.update = ko.observable(false);
+                _this.preInitProperties(model, parent, serializer);
+                _this.parentModel = ko.observable(parent);
+                _this.controlType = _this.controlType || _this.getControlFactory().getControlType(model);
                 serializer = serializer || new Analytics.Utils.ModelSerializer();
-                serializer.deserialize(this, model);
-                this._disposables.push(this["displayName"] = ko.pureComputed(function () {
+                serializer.deserialize(_this, model);
+                _this._disposables.push(_this["displayName"] = ko.pureComputed(function () {
                     var result = _this.name && _this.name();
                     if (!result) {
                         result = "unnamed " + _this.controlType;
                     }
                     return result;
                 }));
-                this.resetValue = function (propertyName) {
+                _this.resetValue = function (propertyName) {
                     if (_this[propertyName].resetValue) {
                         _this[propertyName].resetValue();
                     }
@@ -11461,7 +11350,8 @@ var DevExpress;
                         }
                     }
                 };
-                this.actions.push({ action: this.resetValue, title: Analytics.getLocalization("Reset", "ASPxReportsStringId.ReportDesigner_PropertyGrid_PopupMenu_Reset"), visible: this.isResettableProperty });
+                _this.actions.push({ action: _this.resetValue, title: Analytics.getLocalization("Reset", "ASPxReportsStringId.ReportDesigner_PropertyGrid_PopupMenu_Reset"), visible: _this.isResettableProperty });
+                return _this;
             }
             ElementViewModel.prototype.getPropertyDefaultValue = function (propertyName) {
                 var info = this.getPropertyInfo(propertyName);
@@ -11480,6 +11370,7 @@ var DevExpress;
                 _super.prototype.dispose.call(this);
                 this.surface && this.surface.dispose();
             };
+            ElementViewModel.prototype.preInitProperties = function (model, parent, serializer) { };
             ElementViewModel.prototype.getNearestParent = function (target) {
                 return target.getMetaData().isContainer ? target : target.getNearestParent(target.parentModel());
             };
@@ -11578,7 +11469,7 @@ var DevExpress;
                 return false;
             };
             return ElementViewModel;
-        })(Analytics.Utils.Disposable);
+        }(Analytics.Utils.Disposable));
         Analytics.ElementViewModel = ElementViewModel;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11611,7 +11502,7 @@ var DevExpress;
             Margins.defaultVal = "100, 100, 100, 100";
             Margins.unitProperties = ["left", "right"];
             return Margins;
-        })();
+        }());
         Analytics.Margins = Margins;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11626,18 +11517,17 @@ var DevExpress;
         var PaddingModel = (function (_super) {
             __extends(PaddingModel, _super);
             function PaddingModel(left, right, top, bottom, dpi) {
-                var _this = this;
                 if (left === void 0) { left = ko.observable(null); }
                 if (right === void 0) { right = ko.observable(null); }
                 if (top === void 0) { top = ko.observable(null); }
                 if (bottom === void 0) { bottom = ko.observable(null); }
                 if (dpi === void 0) { dpi = ko.observable(100); }
-                _super.call(this);
-                this.left = left;
-                this.right = right;
-                this.top = top;
-                this.bottom = bottom;
-                this.dpi = dpi;
+                var _this = _super.call(this) || this;
+                _this.left = left;
+                _this.right = right;
+                _this.top = top;
+                _this.bottom = bottom;
+                _this.dpi = dpi;
                 ["left", "right", "top", "bottom"].forEach(function (propertyName) {
                     _this['_' + propertyName] = ko.observable(_this[propertyName]());
                     _this._disposables.push(_this[propertyName] = ko.computed({
@@ -11651,7 +11541,7 @@ var DevExpress;
                 });
                 var isUpdating = ko.observable(false);
                 var oldValue = null;
-                this._disposables.push(this.all = ko.computed({
+                _this._disposables.push(_this.all = ko.computed({
                     read: function () {
                         if (isUpdating())
                             return oldValue;
@@ -11667,6 +11557,7 @@ var DevExpress;
                         isUpdating(false);
                     }
                 }));
+                return _this;
             }
             PaddingModel.prototype.getInfo = function () {
                 return Analytics.paddingSerializationsInfo;
@@ -11705,7 +11596,7 @@ var DevExpress;
             PaddingModel.defaultVal = "0, 0, 0, 0, 100";
             PaddingModel.unitProperties = ["left", "right", "top", "bottom"];
             return PaddingModel;
-        })(Analytics.Utils.Disposable);
+        }(Analytics.Utils.Disposable));
         Analytics.PaddingModel = PaddingModel;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11731,7 +11622,7 @@ var DevExpress;
             };
             Point.unitProperties = ["x", "y"];
             return Point;
-        })();
+        }());
         Analytics.Point = Point;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11742,17 +11633,20 @@ var DevExpress;
         var SerializableModel = (function (_super) {
             __extends(SerializableModel, _super);
             function SerializableModel(model, serializer, info) {
-                _super.call(this);
+                var _this = _super.call(this) || this;
+                _this.preInitProperties(model, serializer, info);
                 if (info) {
-                    this.getInfo = function () {
+                    _this.getInfo = function () {
                         return info;
                     };
                 }
                 serializer = serializer || new Analytics.Utils.ModelSerializer();
-                serializer.deserialize(this, model, info);
+                serializer.deserialize(_this, model, info);
+                return _this;
             }
+            SerializableModel.prototype.preInitProperties = function (model, serializer, info) { };
             return SerializableModel;
-        })(Analytics.Utils.Disposable);
+        }(Analytics.Utils.Disposable));
         Analytics.SerializableModel = SerializableModel;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11779,7 +11673,7 @@ var DevExpress;
             };
             Size.unitProperties = ["width", "height"];
             return Size;
-        })();
+        }());
         Analytics.Size = Size;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -11797,7 +11691,7 @@ var DevExpress;
                     return $.ajax($.extend({}, this.ajaxSettings, settings));
                 };
                 return AjaxSetup;
-            })();
+            }());
             Internal.AjaxSetup = AjaxSetup;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -11811,20 +11705,19 @@ var DevExpress;
             var DesignControlsHelper = (function (_super) {
                 __extends(DesignControlsHelper, _super);
                 function DesignControlsHelper(target, handlers, collectionNames) {
-                    var _this = this;
-                    _super.call(this);
-                    this.target = target;
-                    this.collectionNames = collectionNames;
-                    this._handlers = [];
-                    this._setText = false;
-                    this._visitedCollections = [];
-                    this._subscriptions = [];
-                    this.added = function (value) {
+                    var _this = _super.call(this) || this;
+                    _this.target = target;
+                    _this.collectionNames = collectionNames;
+                    _this._handlers = [];
+                    _this._setText = false;
+                    _this._visitedCollections = [];
+                    _this._subscriptions = [];
+                    _this.added = function (value) {
                         _this._setText = true;
                         _this._collectControls(value);
                         _this._setText = false;
                     };
-                    this.deleted = function (value) {
+                    _this.deleted = function (value) {
                         var allControls = _this.allControls();
                         var index = allControls.indexOf(value);
                         allControls.splice(index, 1);
@@ -11835,10 +11728,10 @@ var DevExpress;
                         });
                         _this.allControls.valueHasMutated();
                     };
-                    this.allControls = ko.observableArray();
+                    _this.allControls = ko.observableArray();
                     var unwrappedTarget = target;
                     if (ko.isSubscribable(target)) {
-                        this._disposables.push(target.subscribe(function (newTarget) {
+                        _this._disposables.push(target.subscribe(function (newTarget) {
                             _this._visitedCollections = [];
                             for (var i = 0, len = _this._subscriptions.length; i < len; i++) {
                                 _this._subscriptions[i].dispose();
@@ -11851,15 +11744,16 @@ var DevExpress;
                         }));
                         unwrappedTarget = target.peek();
                     }
-                    this._disposables.push(this.allControls.subscribe(function (args) {
+                    _this._disposables.push(_this.allControls.subscribe(function (args) {
                         var addedItems = args.filter(function (x) { return x.status === "added"; });
                         for (var i = 0; i < addedItems.length; i++) {
                             _this._setName(addedItems[i].value);
                         }
                         ;
                     }, null, "arrayChange"));
-                    unwrappedTarget && this._collectControls(unwrappedTarget);
-                    this._handlers.push.apply(this._handlers, handlers);
+                    unwrappedTarget && _this._collectControls(unwrappedTarget);
+                    _this._handlers.push.apply(_this._handlers, handlers);
+                    return _this;
                 }
                 DesignControlsHelper.prototype.getNameProperty = function (model) {
                     return model.name;
@@ -11923,7 +11817,7 @@ var DevExpress;
                     return controls;
                 };
                 return DesignControlsHelper;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.DesignControlsHelper = DesignControlsHelper;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12214,7 +12108,7 @@ var DevExpress;
                 };
                 CssCalculator.DEFAULT_BORDER = "none";
                 return CssCalculator;
-            })();
+            }());
             Internal.CssCalculator = CssCalculator;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12228,9 +12122,8 @@ var DevExpress;
             var ColorPickerEditor = (function (_super) {
                 __extends(ColorPickerEditor, _super);
                 function ColorPickerEditor(info, level, parentDisabled, textToSearch) {
-                    var _this = this;
-                    _super.call(this, info, level, parentDisabled, textToSearch);
-                    this._disposables.push(this.displayValue = ko.pureComputed({
+                    var _this = _super.call(this, info, level, parentDisabled, textToSearch) || this;
+                    _this._disposables.push(_this.displayValue = ko.pureComputed({
                         read: function () {
                             var value = ko.unwrap(_this.value);
                             if (value && value.toLowerCase() === "transparent") {
@@ -12246,9 +12139,10 @@ var DevExpress;
                             _this.value(val);
                         }
                     }));
+                    return _this;
                 }
                 return ColorPickerEditor;
-            })(Widgets.Editor);
+            }(Widgets.Editor));
             Widgets.ColorPickerEditor = ColorPickerEditor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12262,22 +12156,21 @@ var DevExpress;
             var FieldListEditor = (function (_super) {
                 __extends(FieldListEditor, _super);
                 function FieldListEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
-                    var _this = this;
-                    _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
-                    this.path = ko.pureComputed(function () {
+                    var _this = _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch) || this;
+                    _this.path = ko.pureComputed(function () {
                         return _this._model() && _this._model()["getPath"] && _this._model()["getPath"](_this.name) || "";
                     });
-                    this.treeListController = new Widgets.TreeListController();
-                    this._disposables.push(this.path);
-                    this._disposables.push(this.treeListController);
+                    _this.treeListController = new Widgets.TreeListController();
+                    _this._disposables.push(_this.path);
+                    _this._disposables.push(_this.treeListController);
+                    return _this;
                 }
                 return FieldListEditor;
-            })(Widgets.Editor);
+            }(Widgets.Editor));
             Widgets.FieldListEditor = FieldListEditor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="fieldListEditor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -12309,24 +12202,22 @@ var DevExpress;
                     }
                 };
                 return DataMemberTreeListController;
-            })();
+            }());
             Widgets.DataMemberTreeListController = DataMemberTreeListController;
             var DataMemberEditor = (function (_super) {
                 __extends(DataMemberEditor, _super);
                 function DataMemberEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
-                    _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch);
-                    this.treeListController = new DataMemberTreeListController();
-                    this._disposables.push(this.treeListController);
+                    var _this = _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch) || this;
+                    _this.treeListController = new DataMemberTreeListController();
+                    _this._disposables.push(_this.treeListController);
+                    return _this;
                 }
                 return DataMemberEditor;
-            })(Widgets.FieldListEditor);
+            }(Widgets.FieldListEditor));
             Widgets.DataMemberEditor = DataMemberEditor;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="colorPickerEditor.ts" />
-/// <reference path="fieldListEditor.ts" />
-/// <reference path="dataMemberEditor.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -12336,26 +12227,26 @@ var DevExpress;
             var RequiredNullableEditor = (function (_super) {
                 __extends(RequiredNullableEditor, _super);
                 function RequiredNullableEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 RequiredNullableEditor.prototype.getValidationRules = function () {
                     return (_super.prototype.getValidationRules.call(this) || []).concat(this.editorOptions.showClearButton && ko.unwrap(this.editorOptions.showClearButton) ? [] : Widgets.requiredValidationRules);
                 };
                 return RequiredNullableEditor;
-            })(Widgets.Editor);
+            }(Widgets.Editor));
             Widgets.RequiredNullableEditor = RequiredNullableEditor;
             function createNumericEditor(dotNetTypeFullName, specifics) {
                 var DynamicNumberEditor = (function (_super) {
                     __extends(DynamicNumberEditor, _super);
                     function DynamicNumberEditor(info, level, parentDisabled, textToSearch) {
-                        _super.call(this, info, level, parentDisabled, textToSearch);
+                        return _super.call(this, info, level, parentDisabled, textToSearch) || this;
                     }
                     DynamicNumberEditor.prototype.getOptions = function (templateOptions) {
                         var options = _super.prototype.getOptions.call(this, templateOptions);
                         return Widgets.Internal.ValueEditorHelper.getNumberEditorOptions(dotNetTypeFullName, specifics, options);
                     };
                     return DynamicNumberEditor;
-                })(RequiredNullableEditor);
+                }(RequiredNullableEditor));
                 return {
                     header: "dx-number-editor",
                     editorType: DynamicNumberEditor
@@ -12393,7 +12284,6 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="../widgets/editorsInfo.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Analytics;
@@ -12542,7 +12432,7 @@ var DevExpress;
                     configurable: true
                 });
                 return HoverInfo;
-            })();
+            }());
             Internal.HoverInfo = HoverInfo;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12567,12 +12457,11 @@ var DevExpress;
             var InlineTextEdit = (function (_super) {
                 __extends(InlineTextEdit, _super);
                 function InlineTextEdit(selection) {
-                    var _this = this;
-                    _super.call(this);
-                    this._showInline = ko.observable(false);
-                    this.text = ko.observable();
+                    var _this = _super.call(this) || this;
+                    _this._showInline = ko.observable(false);
+                    _this.text = ko.observable();
                     var _controlText;
-                    this._disposables.push(selection.focused.subscribe(function () {
+                    _this._disposables.push(selection.focused.subscribe(function () {
                         if (_this._showInline() && _controlText) {
                             _controlText(_this.text());
                             _this._showInline(false);
@@ -12580,10 +12469,10 @@ var DevExpress;
                         var controlModel = selection.focused() && selection.focused().getControlModel();
                         _controlText = controlModel && (controlModel.textEditableProperty || controlModel.text);
                     }));
-                    this._disposables.push(this.visible = ko.pureComputed(function () {
+                    _this._disposables.push(_this.visible = ko.pureComputed(function () {
                         return _this._showInline();
                     }));
-                    this.show = function (element) {
+                    _this.show = function (element) {
                         if (_this._showInline()) {
                             return;
                         }
@@ -12600,7 +12489,7 @@ var DevExpress;
                             _this._showInline(false);
                         }
                     };
-                    this.keypressAction = function (args) {
+                    _this.keypressAction = function (args) {
                         processTextEditorHotKeys(args.event, {
                             esc: function () { _this._showInline(false); },
                             ctrlEnter: function () {
@@ -12609,9 +12498,10 @@ var DevExpress;
                             }
                         });
                     };
+                    return _this;
                 }
                 return InlineTextEdit;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.InlineTextEdit = InlineTextEdit;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12651,7 +12541,7 @@ var DevExpress;
                     return true;
                 };
                 return ObjectStructureTreeListController;
-            })();
+            }());
             Internal.ObjectStructureTreeListController = ObjectStructureTreeListController;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -12665,9 +12555,10 @@ var DevExpress;
             var ObjectStructureProviderBase = (function (_super) {
                 __extends(ObjectStructureProviderBase, _super);
                 function ObjectStructureProviderBase() {
-                    _super.apply(this, arguments);
-                    this.selectedPath = ko.observable("");
-                    this.selectedMember = ko.observable();
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.selectedPath = ko.observable("");
+                    _this.selectedMember = ko.observable();
+                    return _this;
                 }
                 ObjectStructureProviderBase.prototype.getClassName = function (instance) {
                     if (instance.className && instance.className()) {
@@ -12727,17 +12618,16 @@ var DevExpress;
                     }
                 };
                 return ObjectStructureProviderBase;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.ObjectStructureProviderBase = ObjectStructureProviderBase;
             var ObjectExplorerProvider = (function (_super) {
                 __extends(ObjectExplorerProvider, _super);
                 function ObjectExplorerProvider(rootITems, listPropertyNames, member, getPathByMember) {
-                    var _this = this;
-                    _super.call(this);
-                    this.path = ko.observable("");
-                    this.getPathByMember = getPathByMember;
-                    this.listPropertyNames = listPropertyNames || [];
-                    this.getItems = function (pathRequest) {
+                    var _this = _super.call(this) || this;
+                    _this.path = ko.observable("");
+                    _this.getPathByMember = getPathByMember;
+                    _this.listPropertyNames = listPropertyNames || [];
+                    _this.getItems = function (pathRequest) {
                         var result = $.Deferred();
                         if (!pathRequest.fullPath) {
                             result.resolve((rootITems || []).map(function (item) {
@@ -12750,7 +12640,7 @@ var DevExpress;
                         }
                         return result.promise();
                     };
-                    this._disposables.push(this.selectedPath = ko.computed({
+                    _this._disposables.push(_this.selectedPath = ko.computed({
                         read: function () {
                             if (member()) {
                                 if (_this.path.peek()) {
@@ -12777,6 +12667,7 @@ var DevExpress;
                             }
                         }
                     }));
+                    return _this;
                 }
                 ObjectExplorerProvider.prototype.createArrayItem = function (currentTarget, result, propertyName) {
                     for (var i = 0; i < currentTarget.length; i++) {
@@ -12812,14 +12703,13 @@ var DevExpress;
                     }
                 };
                 return ObjectExplorerProvider;
-            })(ObjectStructureProviderBase);
+            }(ObjectStructureProviderBase));
             Internal.ObjectExplorerProvider = ObjectExplorerProvider;
             var ObjectStructureProvider = (function (_super) {
                 __extends(ObjectStructureProvider, _super);
                 function ObjectStructureProvider(target, displayName, localizationId) {
-                    var _this = this;
-                    _super.call(this);
-                    this.getItems = function (pathRequest) {
+                    var _this = _super.call(this) || this;
+                    _this.getItems = function (pathRequest) {
                         var result = $.Deferred();
                         if (!pathRequest.fullPath) {
                             result.resolve([{ name: displayName || ko.unwrap(target["name"]), displayName: Analytics.getLocalization(displayName || ko.unwrap(target["name"]), localizationId), isList: true, specifics: target.className && target.className(), dragData: { noDragable: true } }]);
@@ -12829,12 +12719,13 @@ var DevExpress;
                         }
                         return result.promise();
                     };
-                    this._disposables.push(this.selectedPath.subscribe(function (path) {
+                    _this._disposables.push(_this.selectedPath.subscribe(function (path) {
                         _this.selectedMember(ko.unwrap(_this.getMemberByPath(ko.unwrap(target), path)));
                     }));
+                    return _this;
                 }
                 return ObjectStructureProvider;
-            })(ObjectStructureProviderBase);
+            }(ObjectStructureProviderBase));
             Internal.ObjectStructureProvider = ObjectStructureProvider;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13150,7 +13041,7 @@ var DevExpress;
                 __extends(CustomSortedArrayStore, _super);
                 function CustomSortedArrayStore(items, sortPropertyName) {
                     if (sortPropertyName === void 0) { sortPropertyName = 'name'; }
-                    _super.call(this, CustomSortedArrayStore._createOptions(items, sortPropertyName));
+                    return _super.call(this, CustomSortedArrayStore._createOptions(items, sortPropertyName)) || this;
                 }
                 CustomSortedArrayStore._sortItems = function (items, sortPropertyName) {
                     return items.sort(function (a, b) {
@@ -13183,28 +13074,29 @@ var DevExpress;
                     };
                 };
                 return CustomSortedArrayStore;
-            })(DevExpress.data.CustomStore);
+            }(DevExpress.data.CustomStore));
             Internal.CustomSortedArrayStore = CustomSortedArrayStore;
             var SortedArrayStore = (function (_super) {
                 __extends(SortedArrayStore, _super);
                 function SortedArrayStore(options, sortPropertyName) {
                     if (sortPropertyName === void 0) { sortPropertyName = 'name'; }
+                    var _this = this;
                     if (options instanceof Array) {
                         CustomSortedArrayStore._sortItems(options, sortPropertyName);
                     }
-                    _super.call(this, options);
+                    _this = _super.call(this, options) || this;
+                    return _this;
                 }
                 return SortedArrayStore;
-            })(DevExpress.data.ArrayStore);
+            }(DevExpress.data.ArrayStore));
             Internal.SortedArrayStore = SortedArrayStore;
             var ControlsStore = (function (_super) {
                 __extends(ControlsStore, _super);
                 function ControlsStore(allControls) {
-                    var _this = this;
-                    _super.call(this);
-                    this._filter = ko.observable(null);
+                    var _this = _super.call(this) || this;
+                    _this._filter = ko.observable(null);
                     var dataSource = null;
-                    this._disposables.push(this.dataSource = ko.computed(function () {
+                    _this._disposables.push(_this.dataSource = ko.computed(function () {
                         dataSource && dataSource.dispose();
                         dataSource = new DevExpress.data.DataSource({
                             store: new CustomSortedArrayStore(allControls()),
@@ -13214,9 +13106,10 @@ var DevExpress;
                         });
                         return dataSource;
                     }));
-                    this._disposables.push(this.visible = ko.computed(function () {
+                    _this._disposables.push(_this.visible = ko.computed(function () {
                         return allControls().length > 0;
                     }));
+                    return _this;
                 }
                 ControlsStore.prototype.setFilter = function (filter) {
                     this._filter(filter);
@@ -13225,7 +13118,7 @@ var DevExpress;
                     this._filter(null);
                 };
                 return ControlsStore;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.ControlsStore = ControlsStore;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13483,7 +13376,7 @@ var DevExpress;
                     });
                 };
                 return CombinedObject;
-            })();
+            }());
             Internal.CombinedObject = CombinedObject;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13497,14 +13390,13 @@ var DevExpress;
             var SurfaceSelection = (function (_super) {
                 __extends(SurfaceSelection, _super);
                 function SurfaceSelection(ignoreMultiSelectProperties) {
-                    var _this = this;
                     if (ignoreMultiSelectProperties === void 0) { ignoreMultiSelectProperties = ["name"]; }
-                    _super.call(this);
-                    this.ignoreMultiSelectProperties = ignoreMultiSelectProperties;
-                    this._focused = ko.observable(null);
-                    this._selectedControls = ko.observableArray();
-                    this._selectedControlsInner = [];
-                    this.focused = ko.pureComputed({
+                    var _this = _super.call(this) || this;
+                    _this.ignoreMultiSelectProperties = ignoreMultiSelectProperties;
+                    _this._focused = ko.observable(null);
+                    _this._selectedControls = ko.observableArray();
+                    _this._selectedControlsInner = [];
+                    _this.focused = ko.pureComputed({
                         read: function () {
                             return _this._focused();
                         },
@@ -13517,10 +13409,11 @@ var DevExpress;
                             }
                         }
                     });
-                    this.dropTarget = null;
-                    this.expectClick = false;
-                    this.disabled = ko.observable(false);
-                    this._disposables.push(this.focused);
+                    _this.dropTarget = null;
+                    _this.expectClick = false;
+                    _this.disabled = ko.observable(false);
+                    _this._disposables.push(_this.focused);
+                    return _this;
                 }
                 SurfaceSelection.prototype.dispose = function () {
                     this.reset();
@@ -13676,7 +13569,7 @@ var DevExpress;
                     }
                 };
                 return SurfaceSelection;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.SurfaceSelection = SurfaceSelection;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13796,7 +13689,7 @@ var DevExpress;
                     };
                 };
                 return SnapLinesCollector;
-            })();
+            }());
             Internal.SnapLinesCollector = SnapLinesCollector;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13935,7 +13828,7 @@ var DevExpress;
                 };
                 SnapLinesHelper.snapTolerance = 10;
                 return SnapLinesHelper;
-            })();
+            }());
             Internal.SnapLinesHelper = SnapLinesHelper;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13962,7 +13855,7 @@ var DevExpress;
                 };
                 SnapLineSurface._blankPosition = { top: 0, left: 0, width: 0, height: 0, };
                 return SnapLineSurface;
-            })();
+            }());
             Internal.SnapLineSurface = SnapLineSurface;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -13993,9 +13886,10 @@ var DevExpress;
             var ActionListsBase = (function (_super) {
                 __extends(ActionListsBase, _super);
                 function ActionListsBase(enabled) {
-                    _super.call(this);
-                    this.toolbarItems = [];
-                    this.enabled = enabled || ko.observable(true);
+                    var _this = _super.call(this) || this;
+                    _this.toolbarItems = [];
+                    _this.enabled = enabled || ko.observable(true);
+                    return _this;
                 }
                 ActionListsBase.prototype.processShortcut = function (actions, e) {
                     for (var i = 0; i < actions.length; i++) {
@@ -14017,22 +13911,21 @@ var DevExpress;
                     return false;
                 };
                 return ActionListsBase;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Internal.ActionListsBase = ActionListsBase;
             var ActionLists = (function (_super) {
                 __extends(ActionLists, _super);
                 function ActionLists(surfaceContext, selection, undoEngine, customizeActions, enabled, copyPasteStrategy, zoomStep) {
-                    var _this = this;
                     if (zoomStep === void 0) { zoomStep = ko.observable(0.01); }
-                    _super.call(this, enabled);
-                    this.menuItems = [];
+                    var _this = _super.call(this, enabled) || this;
+                    _this.menuItems = [];
                     var copyPasteHandler = new Internal.CopyPasteHandler(selection, copyPasteStrategy), actions = [];
                     if (selection) {
                         var selectionControlsLocked = ko.computed(function () {
                             return selection.selectedItems.some(function (item) { return item.locked; });
                         });
-                        this._disposables.push(selectionControlsLocked);
-                        this._keyboardHelper = new Internal.KeyboardHelper(selection, undoEngine);
+                        _this._disposables.push(selectionControlsLocked);
+                        _this._keyboardHelper = new Internal.KeyboardHelper(selection, undoEngine);
                         actions.push({
                             id: Analytics.ActionId.Cut,
                             text: "Cut",
@@ -14196,6 +14089,7 @@ var DevExpress;
                         }
                         _this._registerAction(action["container"] === "menu" ? _this.menuItems : ko.unwrap(_this.toolbarItems), action);
                     });
+                    return _this;
                 }
                 ActionLists.prototype._registerAction = function (container, action) {
                     if (action["index"]) {
@@ -14217,7 +14111,7 @@ var DevExpress;
                     }
                 };
                 return ActionLists;
-            })(ActionListsBase);
+            }(ActionListsBase));
             Internal.ActionLists = ActionLists;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -14321,7 +14215,7 @@ var DevExpress;
                     }
                 };
                 return CopyPasteHandler;
-            })();
+            }());
             Internal.CopyPasteHandler = CopyPasteHandler;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -14333,16 +14227,15 @@ var DevExpress;
         var TabPanel = (function (_super) {
             __extends(TabPanel, _super);
             function TabPanel(options) {
-                var _this = this;
-                _super.call(this);
-                this.tabs = [];
-                this.collapsed = ko.observable(false);
-                this.position = ko.observable(TabPanel.Position.Right);
-                this.toggleCollapsedText = ko.pureComputed(function () {
+                var _this = _super.call(this) || this;
+                _this.tabs = [];
+                _this.collapsed = ko.observable(false);
+                _this.position = ko.observable(TabPanel.Position.Right);
+                _this.toggleCollapsedText = ko.pureComputed(function () {
                     var actionString = _this.collapsed() ? "Open" : "Collapse";
                     return DevExpress.Analytics.getLocalization(actionString, "ASPxReportsStringId.SidePanel_" + actionString);
                 });
-                this.cssClasses = function (extendOptions) {
+                _this.cssClasses = function (extendOptions) {
                     return Analytics.Utils.extend({
                         "dxrd-tab-panel-left": _this.position() === TabPanel.Position.Left,
                         "dxrd-tab-panel-right": _this.position() === TabPanel.Position.Right,
@@ -14352,14 +14245,14 @@ var DevExpress;
                 var tabs = options.tabs;
                 var autoSelectTab = options.autoSelectTab;
                 if (options.rtl)
-                    this.position(TabPanel.Position.Left);
-                var _self = this;
-                this.tabs = tabs;
+                    _this.position(TabPanel.Position.Left);
+                var _self = _this;
+                _this.tabs = tabs;
                 if (tabs && tabs.length)
-                    this._disposables.push(this.isEmpty = ko.computed(function () { return _this.tabs.every(function (tab) { return !tab.visible(); }); }));
+                    _this._disposables.push(_this.isEmpty = ko.computed(function () { return _this.tabs.every(function (tab) { return !tab.visible(); }); }));
                 else
-                    this.isEmpty = ko.observable(true);
-                this._disposables.push(ko.computed(function () {
+                    _this.isEmpty = ko.observable(true);
+                _this._disposables.push(ko.computed(function () {
                     var visibleTabs = tabs.filter(function (tab) { return tab.visible(); });
                     if (visibleTabs.length !== 0) {
                         if (visibleTabs.filter(function (tab) { return tab.active.peek(); }).length === 0) {
@@ -14373,7 +14266,7 @@ var DevExpress;
                         _this.collapsed(true);
                     }
                 }));
-                this._disposables.push(ko.computed(function () {
+                _this._disposables.push(ko.computed(function () {
                     var disabledTabs = tabs.filter(function (tab) { return tab.disabled(); });
                     if (disabledTabs.length !== 0) {
                         if (disabledTabs.filter(function (tab) { return tab.active.peek(); }).length !== 0) {
@@ -14386,7 +14279,7 @@ var DevExpress;
                     }
                 }));
                 if (autoSelectTab) {
-                    this.tabs.forEach(function (tab) {
+                    _this.tabs.forEach(function (tab) {
                         _this._disposables.push(tab.active.subscribe(function (newVal) {
                             if (newVal) {
                                 _this.selectTab({ model: tab });
@@ -14394,7 +14287,7 @@ var DevExpress;
                         }));
                     });
                 }
-                this.selectTab = function (e) {
+                _this.selectTab = function (e) {
                     var selectedTab = e.model;
                     if (!selectedTab.disabled()) {
                         _this.tabs.forEach(function (tab) {
@@ -14404,13 +14297,13 @@ var DevExpress;
                     }
                 };
                 var _width = ko.observable(340);
-                this._disposables.push(this.width = ko.pureComputed({
+                _this._disposables.push(_this.width = ko.pureComputed({
                     read: function () { return _this.collapsed() ? 0 : _width(); },
                     write: function (newWidth) { _width(newWidth); }
                 }));
-                this._disposables.push(this.headerWidth = ko.pureComputed(function () { return _this.isEmpty() ? 0 : (50 + (_this.collapsed() ? 0 : _this.width())); }));
-                var self = this;
-                this.getResizableOptions = function ($element, panelOffset, minWidth) {
+                _this._disposables.push(_this.headerWidth = ko.pureComputed(function () { return _this.isEmpty() ? 0 : (50 + (_this.collapsed() ? 0 : _this.width())); }));
+                var self = _this;
+                _this.getResizableOptions = function ($element, panelOffset, minWidth) {
                     if (!_this._resizableOptions || _this._resizableOptions.$element !== $element) {
                         _this._resizableOptions = {
                             starting: function () {
@@ -14436,11 +14329,12 @@ var DevExpress;
                     ;
                     return _this._resizableOptions;
                 };
-                this._disposables.push(this.toggleCollapsedImage = ko.pureComputed(function () {
+                _this._disposables.push(_this.toggleCollapsedImage = ko.pureComputed(function () {
                     var postfix = _this.collapsed() ? "-expand" : "-collapse";
                     return { class: "dxrd-image-propertygrid" + postfix, template: "dxrd-svg-tabs" + postfix };
                 }));
-                this._disposables.push(this.toggleCollapsedText);
+                _this._disposables.push(_this.toggleCollapsedText);
+                return _this;
             }
             TabPanel.prototype.dispose = function () {
                 _super.prototype.dispose.call(this);
@@ -14451,37 +14345,37 @@ var DevExpress;
                 Right: "Right"
             };
             return TabPanel;
-        })(Analytics.Utils.Disposable);
+        }(Analytics.Utils.Disposable));
         Analytics.TabPanel = TabPanel;
         var TabInfo = (function (_super) {
             __extends(TabInfo, _super);
             function TabInfo(options) {
-                var _this = this;
-                _super.call(this);
-                this.active = ko.observable(false);
-                this.visible = ko.observable();
-                this.disabled = ko.observable();
+                var _this = _super.call(this) || this;
+                _this.active = ko.observable(false);
+                _this.visible = ko.observable();
+                _this.disabled = ko.observable();
                 var imageBaseName = options.imageClassName || options.text.toLowerCase();
-                this._text = options.text;
-                this._localizationId = options.localizationId;
-                this._disposables.push(this.imageClassName = ko.pureComputed(function () {
+                _this._text = options.text;
+                _this._localizationId = options.localizationId;
+                _this._disposables.push(_this.imageClassName = ko.pureComputed(function () {
                     return "dxrd-image-" + imageBaseName;
                 }));
-                this.imageTemplateName = options.imageTemplateName || Analytics.Widgets.Internal.SvgTemplatesEngine.getExistingTemplate("dxrd-svg-tabs-" + options.text.toLowerCase());
-                this.template = options.template;
-                this._disposables.push(options.model);
+                _this.imageTemplateName = options.imageTemplateName || Analytics.Widgets.Internal.SvgTemplatesEngine.getExistingTemplate("dxrd-svg-tabs-" + options.text.toLowerCase());
+                _this.template = options.template;
+                _this._disposables.push(options.model);
                 var computedVisible = options.visible;
                 var computedDisabled = options.disabled;
-                this._disposables.push(this.visible = ko.pureComputed(function () { return computedVisible !== undefined ? computedVisible() : true; }));
-                this._disposables.push(this.disabled = ko.pureComputed(function () { return computedDisabled !== undefined ? computedDisabled() : false; }));
-                this._disposables.push(this.visible.subscribe(function (visibility) {
+                _this._disposables.push(_this.visible = ko.pureComputed(function () { return computedVisible !== undefined ? computedVisible() : true; }));
+                _this._disposables.push(_this.disabled = ko.pureComputed(function () { return computedDisabled !== undefined ? computedDisabled() : false; }));
+                _this._disposables.push(_this.visible.subscribe(function (visibility) {
                     if (!visibility) {
                         _this.active(false);
                     }
                 }));
-                computedVisible && this._disposables.push(computedVisible);
-                computedDisabled && this._disposables.push(computedDisabled);
-                this.model = options.model;
+                computedVisible && _this._disposables.push(computedVisible);
+                computedDisabled && _this._disposables.push(computedDisabled);
+                _this.model = options.model;
+                return _this;
             }
             Object.defineProperty(TabInfo.prototype, "text", {
                 get: function () {
@@ -14491,7 +14385,7 @@ var DevExpress;
                 configurable: true
             });
             return TabInfo;
-        })(Analytics.Utils.Disposable);
+        }(Analytics.Utils.Disposable));
         Analytics.TabInfo = TabInfo;
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
@@ -14541,7 +14435,7 @@ var DevExpress;
                 configurable: true
             });
             return ToolboxItem;
-        })();
+        }());
         Analytics.ToolboxItem = ToolboxItem;
         function getToolboxItems(controlsMap) {
             var toolboxItems = [];
@@ -14767,7 +14661,7 @@ var DevExpress;
                     return this._getPropertyInfo(this.controlsMap[controlType].info, properties, 0);
                 };
                 return ControlsFactory;
-            })();
+            }());
             Utils.ControlsFactory = ControlsFactory;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -14830,7 +14724,7 @@ var DevExpress;
                     this._extenders && this._extenders.forEach(function (extender) { extender.afterItemsFilled && extender.afterItemsFilled(request, items); });
                 };
                 return FieldListProvider;
-            })();
+            }());
             Utils.FieldListProvider = FieldListProvider;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -14851,7 +14745,7 @@ var DevExpress;
                 var getWrappedMethod = function (methodName) { return (function () {
                     var args = [];
                     for (var _i = 0; _i < arguments.length; _i++) {
-                        args[_i - 0] = arguments[_i];
+                        args[_i] = arguments[_i];
                     }
                     if (console && $.isFunction(console[methodName])) {
                         console[methodName].apply(console, arguments);
@@ -15157,7 +15051,7 @@ var DevExpress;
             function ajax() {
                 var params = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
-                    params[_i - 0] = arguments[_i];
+                    params[_i] = arguments[_i];
                 }
                 if (params.length > 1) {
                     return _ajax.apply(this, params);
@@ -15367,17 +15261,18 @@ var DevExpress;
             var dxFieldListPicker = (function (_super) {
                 __extends(dxFieldListPicker, _super);
                 function dxFieldListPicker($element, options) {
-                    _super.call(this, $element, $.extend(options, { showClearButton: true }));
-                    this._path = ko.observable("");
-                    this._value = ko.observable("");
-                    this._parentViewport = null;
-                    this._itemsProvider = ko.observable(null);
-                    this._defaultPosition = null;
-                    this.option("path") && this._path(this.option("path"));
-                    this.option("value") && this._value(this.option("value"));
-                    this.option("itemsProvider") && this._itemsProvider(this.option("itemsProvider"));
-                    this.option("valueChangeEvent", "change");
-                    this._parentViewport = $($element).parents(".dx-designer-viewport");
+                    var _this = _super.call(this, $element, $.extend(options, { showClearButton: true })) || this;
+                    _this._path = ko.observable("");
+                    _this._value = ko.observable("");
+                    _this._parentViewport = null;
+                    _this._itemsProvider = ko.observable(null);
+                    _this._defaultPosition = null;
+                    _this.option("path") && _this._path(_this.option("path"));
+                    _this.option("value") && _this._value(_this.option("value"));
+                    _this.option("itemsProvider") && _this._itemsProvider(_this.option("itemsProvider"));
+                    _this.option("valueChangeEvent", "change");
+                    _this._parentViewport = $($element).parents(".dx-designer-viewport");
+                    return _this;
                 }
                 dxFieldListPicker.prototype._showDropDown = function () {
                     if (this._popup) {
@@ -15477,7 +15372,7 @@ var DevExpress;
                     $(this._popup.content()).append(element);
                 };
                 return dxFieldListPicker;
-            })(DevExpress.ui.dxDropDownEditor);
+            }(DevExpress.ui.dxDropDownEditor));
             Widgets.dxFieldListPicker = dxFieldListPicker;
             DevExpress.registerComponent("dxFieldListPicker", dxFieldListPicker);
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
@@ -15509,19 +15404,19 @@ var DevExpress;
             var BordersModel = (function (_super) {
                 __extends(BordersModel, _super);
                 function BordersModel(object, disabled) {
-                    var _this = this;
                     if (disabled === void 0) { disabled = ko.observable(false); }
-                    _super.call(this);
-                    this.left = ko.observable(false);
-                    this.right = ko.observable(false);
-                    this.top = ko.observable(false);
-                    this.bottom = ko.observable(false);
-                    this.disabled = disabled;
-                    this.value = object.value;
-                    this.updateModel(object.value());
-                    this._disposables.push(object.value.subscribe(function (newVal) {
+                    var _this = _super.call(this) || this;
+                    _this.left = ko.observable(false);
+                    _this.right = ko.observable(false);
+                    _this.top = ko.observable(false);
+                    _this.bottom = ko.observable(false);
+                    _this.disabled = disabled;
+                    _this.value = object.value;
+                    _this.updateModel(object.value());
+                    _this._disposables.push(object.value.subscribe(function (newVal) {
                         _this.updateModel(newVal);
                     }));
+                    return _this;
                 }
                 BordersModel.prototype._setAllValues = function (value) {
                     this.left(value), this.bottom(value), this.right(value), this.top(value);
@@ -15576,7 +15471,7 @@ var DevExpress;
                     this.value(result.join(','));
                 };
                 return BordersModel;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.BordersModel = BordersModel;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -15590,19 +15485,18 @@ var DevExpress;
             var ControlProperties = (function (_super) {
                 __extends(ControlProperties, _super);
                 function ControlProperties(target, editorsInfo, level, addAddons) {
-                    var _this = this;
                     if (level === void 0) { level = 0; }
                     if (addAddons === void 0) { addAddons = true; }
-                    _super.call(this, target, editorsInfo, level, undefined, undefined, ko.observable(""));
-                    this.focusedItem = ko.observable();
-                    this.editorsRendered = ko.observable(false);
-                    this.isSortingByGroups = ko.observable(true);
-                    this.isSearching = ko.observable(false);
-                    this.allEditorsCreated = ko.observable(false);
-                    this.textToSearch = ko.observable("");
-                    this._searchBox = null;
-                    this.searchPlaceholder = function () { return Analytics.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
-                    this.switchSearchBox = function () {
+                    var _this = _super.call(this, target, editorsInfo, level, undefined, undefined, ko.observable("")) || this;
+                    _this.focusedItem = ko.observable();
+                    _this.editorsRendered = ko.observable(false);
+                    _this.isSortingByGroups = ko.observable(true);
+                    _this.isSearching = ko.observable(false);
+                    _this.allEditorsCreated = ko.observable(false);
+                    _this.textToSearch = ko.observable("");
+                    _this._searchBox = null;
+                    _this.searchPlaceholder = function () { return Analytics.getLocalization("Enter text to search...", "ASPxReportsStringId.ReportDesigner_QueryBuilder_SearchBox_EmptyText"); };
+                    _this.switchSearchBox = function () {
                         if (_this.isSearching()) {
                             _this.isSearching(false);
                             _this.textToSearch("");
@@ -15613,7 +15507,7 @@ var DevExpress;
                         }
                     };
                     if (addAddons) {
-                        this.createEditorAddOn = function (editor) {
+                        _this.createEditorAddOn = function (editor) {
                             var editorAddOn = new Analytics.Internal.EditorAddOn(editor, _this.popupService);
                             editor._disposables.push(editorAddOn);
                             return {
@@ -15622,29 +15516,30 @@ var DevExpress;
                             };
                         };
                     }
-                    this.popupService = new Analytics.Internal.PopupService();
-                    this.createGroups(editorsInfo.groups);
-                    this.update(target());
-                    this._disposables.push(this.focusedImageClassName = ko.pureComputed(function () {
+                    _this.popupService = new Analytics.Internal.PopupService();
+                    _this.createGroups(editorsInfo.groups);
+                    _this.update(target());
+                    _this._disposables.push(_this.focusedImageClassName = ko.pureComputed(function () {
                         return Analytics.Internal.getImageClassName(target() && target().controlType);
                     }));
-                    var subscription = this.isSortingByGroups.subscribe(function (newVal) {
+                    var subscription = _this.isSortingByGroups.subscribe(function (newVal) {
                         if (!newVal) {
                             _this.editorsRendered(true);
                             subscription.dispose();
                         }
                     });
-                    this._disposables.push(subscription);
-                    this.focusedItem = target;
-                    this.displayExpr = function (value) { return DevExpress.Analytics.Internal.getControlFullName(value); };
+                    _this._disposables.push(subscription);
+                    _this.focusedItem = target;
+                    _this.displayExpr = function (value) { return DevExpress.Analytics.Internal.getControlFullName(value); };
                     var timeout = null;
-                    this._disposables.push(this.textToSearch.subscribe(function (newValue) {
+                    _this._disposables.push(_this.textToSearch.subscribe(function (newValue) {
                         timeout && clearTimeout(timeout);
                         timeout = setTimeout(function () {
                             _this._textToSearch(newValue);
                             newValue && _this.groups.forEach(function (group) { return group.collapsed() && group.editors().some(function (editor) { return editor.isSearchedProperty(); }) && group.collapsed(false); });
                         }, 200);
                     }));
+                    return _this;
                 }
                 ControlProperties.prototype.getEditors = function () {
                     var editors = _super.prototype.getEditors.call(this);
@@ -15696,7 +15591,7 @@ var DevExpress;
                     this._searchBox = DevExpress.ui.dxTextBox["getInstance"]($element.get(0));
                 };
                 return ControlProperties;
-            })(Widgets.ObjectProperties);
+            }(Widgets.ObjectProperties));
             Widgets.ControlProperties = ControlProperties;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -15710,31 +15605,31 @@ var DevExpress;
             var Group = (function (_super) {
                 __extends(Group, _super);
                 function Group(name, serializationsInfo, createEditors, collapsed, displayName) {
-                    var _this = this;
                     if (collapsed === void 0) { collapsed = true; }
-                    _super.call(this);
-                    this.editors = ko.observableArray([]);
-                    this.editorsCreated = ko.observable(false);
-                    this.editorsRendered = ko.observable(false);
-                    this._displayName = name;
-                    this.displayName = displayName || (function () { return Analytics.getLocalization(name); });
-                    this._serializationsInfo = serializationsInfo;
-                    this.collapsed = ko.observable(collapsed);
+                    var _this = _super.call(this) || this;
+                    _this.editors = ko.observableArray([]);
+                    _this.editorsCreated = ko.observable(false);
+                    _this.editorsRendered = ko.observable(false);
+                    _this._displayName = name;
+                    _this.displayName = displayName || (function () { return Analytics.getLocalization(name); });
+                    _this._serializationsInfo = serializationsInfo;
+                    _this.collapsed = ko.observable(collapsed);
                     if (collapsed) {
-                        var subscription = this.collapsed.subscribe(function (newVal) {
+                        var subscription = _this.collapsed.subscribe(function (newVal) {
                             subscription.dispose();
                             _this.editorsRendered(true);
                         });
-                        this._disposables.push(subscription);
+                        _this._disposables.push(subscription);
                     }
-                    this.recreate = function () {
+                    _this.recreate = function () {
                         _this.editors(createEditors(serializationsInfo));
                     };
-                    this.editors(createEditors(serializationsInfo));
-                    this.visible = ko.computed(function () {
+                    _this.editors(createEditors(serializationsInfo));
+                    _this.visible = ko.computed(function () {
                         return _this.editors().some(function (editor) { return editor.visible(); });
                     });
-                    this._disposables.push(this.visible);
+                    _this._disposables.push(_this.visible);
+                    return _this;
                 }
                 Group.prototype.resetEditors = function () {
                     this.disposeObservableArray(this.editors);
@@ -15753,7 +15648,7 @@ var DevExpress;
                     });
                 };
                 return Group;
-            })(Analytics.Utils.Disposable);
+            }(Analytics.Utils.Disposable));
             Widgets.Group = Group;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -15775,64 +15670,6 @@ var DevExpress;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-/// <reference path="dragDrop/dragDropHandler.ts" />
-/// <reference path="dragDrop/dragHelperContent.ts" />
-/// <reference path="dragDrop/selectionDragDropHandler.ts" />
-/// <reference path="dragDrop/toolboxDragDropHandler.ts" />
-/// <reference path="elements/baseSurface.ts" />
-/// <reference path="elements/elementViewModel.ts" />
-/// <reference path="elements/margins.ts" />
-/// <reference path="elements/paddingModel.ts" />
-/// <reference path="elements/point.ts" />
-/// <reference path="elements/rectangle.ts" />
-/// <reference path="elements/serializableModel.ts" />
-/// <reference path="elements/size.ts" />
-/// <reference path="internal/controlsHelper.ts" />
-/// <reference path="internal/cssCalculator.ts" />
-/// <reference path="internal/editorTypeMapper.ts" />
-/// <reference path="internal/getNameHelpers.ts" />
-/// <reference path="internal/globalize.ts" />
-/// <reference path="internal/hoverInfo.ts" />
-/// <reference path="internal/inlineTextEdit.ts" />
-/// <reference path="internal/objectStructureControllers.ts" />
-/// <reference path="internal/objectStructureProviders.ts" />
-/// <reference path="internal/papperKindMapper.ts" />
-/// <reference path="internal/processError.ts" />
-/// <reference path="internal/stores.ts" />
-/// <reference path="internal/surfaceHelpers.ts" />
-/// <reference path="internal/validation.ts" />
-/// <reference path="selection/combinedObj.ts" />
-/// <reference path="selection/selection.ts" />
-/// <reference path="selection/selectionHelpers.ts" />
-/// <reference path="snapLines/snapLinesCollector.ts" />
-/// <reference path="snapLines/snapLinesHelper.ts" />
-/// <reference path="snapLines/snapLineSurface.ts" />
-/// <reference path="tools/actionId.ts" />
-/// <reference path="tools/actionList.ts" />
-/// <reference path="tools/copyPaste.ts" />
-/// <reference path="tools/keyboardHelper.ts" />
-/// <reference path="tools/tabPanel.ts" />
-/// <reference path="tools/toolbox.ts" />
-/// <reference path="utils/arrayutils.ts" />
-/// <reference path="utils/controlsFactory.ts" />
-/// <reference path="utils/fieldListProvider.ts" />
-/// <reference path="utils/infoMessageHelpers.ts" />
-/// <reference path="utils/parsers.ts" />
-/// <reference path="utils/units.ts" />
-/// <reference path="utils/utils.ts" />
-/// <reference path="utils/visitors.ts" />
-/// <reference path="widgets/colorPickerEditor.ts" />
-/// <reference path="widgets/dataMemberEditor.ts" />
-/// <reference path="widgets/editorsInfo.ts" />
-/// <reference path="widgets/fieldListEditor.ts" />
-/// <reference path="widgets/fieldlistpicker.ts" />
-/// <reference path="widgets/bordereditor/binding.ts" />
-/// <reference path="widgets/bordereditor/bordereditor.ts" />
-/// <reference path="widgets/propertygrid/controlProperties.ts" />
-/// <reference path="widgets/propertygrid/group.ts" />
-/// <reference path="actionProvider.ts" />
-/// <reference path="bindings.ts" />
-/// <reference path="metadata.ts" />
 var DevExpress;
 (function (DevExpress) {
     var Designer;
@@ -15840,150 +15677,150 @@ var DevExpress;
         var DragDropHandler = (function (_super) {
             __extends(DragDropHandler, _super);
             function DragDropHandler() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DragDropHandler;
-        })(DevExpress.Analytics.Internal.DragDropHandler);
+        }(DevExpress.Analytics.Internal.DragDropHandler));
         Designer.DragDropHandler = DragDropHandler;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "DragDropHandler");
         var DragHelperContent = (function (_super) {
             __extends(DragHelperContent, _super);
             function DragHelperContent() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DragHelperContent;
-        })(DevExpress.Analytics.Internal.DragHelperContent);
+        }(DevExpress.Analytics.Internal.DragHelperContent));
         Designer.DragHelperContent = DragHelperContent;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "DragHelperContent");
         var SelectionDragDropHandler = (function (_super) {
             __extends(SelectionDragDropHandler, _super);
             function SelectionDragDropHandler() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SelectionDragDropHandler;
-        })(DevExpress.Analytics.Internal.SelectionDragDropHandler);
+        }(DevExpress.Analytics.Internal.SelectionDragDropHandler));
         Designer.SelectionDragDropHandler = SelectionDragDropHandler;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SelectionDragDropHandler");
         var ToolboxDragDropHandler = (function (_super) {
             __extends(ToolboxDragDropHandler, _super);
             function ToolboxDragDropHandler() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ToolboxDragDropHandler;
-        })(DevExpress.Analytics.Internal.ToolboxDragDropHandler);
+        }(DevExpress.Analytics.Internal.ToolboxDragDropHandler));
         Designer.ToolboxDragDropHandler = ToolboxDragDropHandler;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ToolboxDragDropHandler");
         var SurfaceElementArea = (function (_super) {
             __extends(SurfaceElementArea, _super);
             function SurfaceElementArea() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SurfaceElementArea;
-        })(DevExpress.Analytics.SurfaceElementArea);
+        }(DevExpress.Analytics.SurfaceElementArea));
         Designer.SurfaceElementArea = SurfaceElementArea;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "SurfaceElementArea");
         var SurfaceElementBase = (function (_super) {
             __extends(SurfaceElementBase, _super);
             function SurfaceElementBase() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SurfaceElementBase;
-        })(DevExpress.Analytics.SurfaceElementBase);
+        }(DevExpress.Analytics.SurfaceElementBase));
         Designer.SurfaceElementBase = SurfaceElementBase;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "SurfaceElementBase");
         var Disposable = (function (_super) {
             __extends(Disposable, _super);
             function Disposable() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return Disposable;
-        })(DevExpress.Analytics.Utils.Disposable);
+        }(DevExpress.Analytics.Utils.Disposable));
         Designer.Disposable = Disposable;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Utils, "Disposable");
         var ElementViewModel = (function (_super) {
             __extends(ElementViewModel, _super);
             function ElementViewModel() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ElementViewModel;
-        })(DevExpress.Analytics.ElementViewModel);
+        }(DevExpress.Analytics.ElementViewModel));
         Designer.ElementViewModel = ElementViewModel;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "ElementViewModel");
         var SerializableModel = (function (_super) {
             __extends(SerializableModel, _super);
             function SerializableModel() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SerializableModel;
-        })(DevExpress.Analytics.SerializableModel);
+        }(DevExpress.Analytics.SerializableModel));
         Designer.SerializableModel = SerializableModel;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "SerializableModel");
         var CombinedObject = (function (_super) {
             __extends(CombinedObject, _super);
             function CombinedObject() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return CombinedObject;
-        })(DevExpress.Analytics.Internal.CombinedObject);
+        }(DevExpress.Analytics.Internal.CombinedObject));
         Designer.CombinedObject = CombinedObject;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "CombinedObject");
         var SurfaceSelection = (function (_super) {
             __extends(SurfaceSelection, _super);
             function SurfaceSelection() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SurfaceSelection;
-        })(DevExpress.Analytics.Internal.SurfaceSelection);
+        }(DevExpress.Analytics.Internal.SurfaceSelection));
         Designer.SurfaceSelection = SurfaceSelection;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SurfaceSelection");
         var SnapLinesCollector = (function (_super) {
             __extends(SnapLinesCollector, _super);
             function SnapLinesCollector() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SnapLinesCollector;
-        })(DevExpress.Analytics.Internal.SnapLinesCollector);
+        }(DevExpress.Analytics.Internal.SnapLinesCollector));
         Designer.SnapLinesCollector = SnapLinesCollector;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SnapLinesCollector");
         var SnapLinesHelper = (function (_super) {
             __extends(SnapLinesHelper, _super);
             function SnapLinesHelper() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SnapLinesHelper;
-        })(DevExpress.Analytics.Internal.SnapLinesHelper);
+        }(DevExpress.Analytics.Internal.SnapLinesHelper));
         Designer.SnapLinesHelper = SnapLinesHelper;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SnapLinesHelper");
         var CopyPasteHandler = (function (_super) {
             __extends(CopyPasteHandler, _super);
             function CopyPasteHandler() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return CopyPasteHandler;
-        })(DevExpress.Analytics.Internal.CopyPasteHandler);
+        }(DevExpress.Analytics.Internal.CopyPasteHandler));
         Designer.CopyPasteHandler = CopyPasteHandler;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "CopyPasteHandler");
         var SnapLineSurface = (function (_super) {
             __extends(SnapLineSurface, _super);
             function SnapLineSurface() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SnapLineSurface;
-        })(DevExpress.Analytics.Internal.SnapLineSurface);
+        }(DevExpress.Analytics.Internal.SnapLineSurface));
         Designer.SnapLineSurface = SnapLineSurface;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SnapLineSurface");
@@ -15992,260 +15829,260 @@ var DevExpress;
         var ActionListsBase = (function (_super) {
             __extends(ActionListsBase, _super);
             function ActionListsBase() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ActionListsBase;
-        })(DevExpress.Analytics.Internal.ActionListsBase);
+        }(DevExpress.Analytics.Internal.ActionListsBase));
         Designer.ActionListsBase = ActionListsBase;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ActionListsBase");
         var ActionLists = (function (_super) {
             __extends(ActionLists, _super);
             function ActionLists() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ActionLists;
-        })(DevExpress.Analytics.Internal.ActionLists);
+        }(DevExpress.Analytics.Internal.ActionLists));
         Designer.ActionLists = ActionLists;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ActionLists");
         var KeyboardHelper = (function (_super) {
             __extends(KeyboardHelper, _super);
             function KeyboardHelper() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return KeyboardHelper;
-        })(DevExpress.Analytics.Internal.KeyboardHelper);
+        }(DevExpress.Analytics.Internal.KeyboardHelper));
         Designer.KeyboardHelper = KeyboardHelper;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "KeyboardHelper");
         var KeyDownHandlersManager = (function (_super) {
             __extends(KeyDownHandlersManager, _super);
             function KeyDownHandlersManager() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return KeyDownHandlersManager;
-        })(DevExpress.Analytics.Internal.KeyDownHandlersManager);
+        }(DevExpress.Analytics.Internal.KeyDownHandlersManager));
         Designer.KeyDownHandlersManager = KeyDownHandlersManager;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "KeyDownHandlersManager");
         var TabPanel = (function (_super) {
             __extends(TabPanel, _super);
             function TabPanel() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return TabPanel;
-        })(DevExpress.Analytics.TabPanel);
+        }(DevExpress.Analytics.TabPanel));
         Designer.TabPanel = TabPanel;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "TabPanel");
         var TabInfo = (function (_super) {
             __extends(TabInfo, _super);
             function TabInfo() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return TabInfo;
-        })(DevExpress.Analytics.TabInfo);
+        }(DevExpress.Analytics.TabInfo));
         Designer.TabInfo = TabInfo;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "TabInfo");
         var ToolboxItem = (function (_super) {
             __extends(ToolboxItem, _super);
             function ToolboxItem() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ToolboxItem;
-        })(DevExpress.Analytics.ToolboxItem);
+        }(DevExpress.Analytics.ToolboxItem));
         Designer.ToolboxItem = ToolboxItem;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "ToolboxItem");
         var ControlsFactory = (function (_super) {
             __extends(ControlsFactory, _super);
             function ControlsFactory() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ControlsFactory;
-        })(DevExpress.Analytics.Utils.ControlsFactory);
+        }(DevExpress.Analytics.Utils.ControlsFactory));
         Designer.ControlsFactory = ControlsFactory;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Utils, "ControlsFactory");
         var DesignControlsHelper = (function (_super) {
             __extends(DesignControlsHelper, _super);
             function DesignControlsHelper() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DesignControlsHelper;
-        })(DevExpress.Analytics.Internal.DesignControlsHelper);
+        }(DevExpress.Analytics.Internal.DesignControlsHelper));
         Designer.DesignControlsHelper = DesignControlsHelper;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "DesignControlsHelper");
         var CssCalculator = (function (_super) {
             __extends(CssCalculator, _super);
             function CssCalculator() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return CssCalculator;
-        })(DevExpress.Analytics.Internal.CssCalculator);
+        }(DevExpress.Analytics.Internal.CssCalculator));
         Designer.CssCalculator = CssCalculator;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "CssCalculator");
         var FieldListProvider = (function (_super) {
             __extends(FieldListProvider, _super);
             function FieldListProvider() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return FieldListProvider;
-        })(DevExpress.Analytics.Utils.FieldListProvider);
+        }(DevExpress.Analytics.Utils.FieldListProvider));
         Designer.FieldListProvider = FieldListProvider;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Utils, "FieldListProvider");
         var HoverInfo = (function (_super) {
             __extends(HoverInfo, _super);
             function HoverInfo() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return HoverInfo;
-        })(DevExpress.Analytics.Internal.HoverInfo);
+        }(DevExpress.Analytics.Internal.HoverInfo));
         Designer.HoverInfo = HoverInfo;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "HoverInfo");
         var InlineTextEdit = (function (_super) {
             __extends(InlineTextEdit, _super);
             function InlineTextEdit() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return InlineTextEdit;
-        })(DevExpress.Analytics.Internal.InlineTextEdit);
+        }(DevExpress.Analytics.Internal.InlineTextEdit));
         Designer.InlineTextEdit = InlineTextEdit;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "InlineTextEdit");
         var Margins = (function (_super) {
             __extends(Margins, _super);
             function Margins() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return Margins;
-        })(DevExpress.Analytics.Margins);
+        }(DevExpress.Analytics.Margins));
         Designer.Margins = Margins;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "Margins");
         var ObjectStructureTreeListController = (function (_super) {
             __extends(ObjectStructureTreeListController, _super);
             function ObjectStructureTreeListController() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ObjectStructureTreeListController;
-        })(DevExpress.Analytics.Internal.ObjectStructureTreeListController);
+        }(DevExpress.Analytics.Internal.ObjectStructureTreeListController));
         Designer.ObjectStructureTreeListController = ObjectStructureTreeListController;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ObjectStructureTreeListController");
         var DataMemberTreeListController = (function (_super) {
             __extends(DataMemberTreeListController, _super);
             function DataMemberTreeListController() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return DataMemberTreeListController;
-        })(DevExpress.Analytics.Widgets.DataMemberTreeListController);
+        }(DevExpress.Analytics.Widgets.DataMemberTreeListController));
         Designer.DataMemberTreeListController = DataMemberTreeListController;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Widgets, "DataMemberTreeListController");
         var ObjectStructureProviderBase = (function (_super) {
             __extends(ObjectStructureProviderBase, _super);
             function ObjectStructureProviderBase() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ObjectStructureProviderBase;
-        })(DevExpress.Analytics.Internal.ObjectStructureProviderBase);
+        }(DevExpress.Analytics.Internal.ObjectStructureProviderBase));
         Designer.ObjectStructureProviderBase = ObjectStructureProviderBase;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ObjectStructureProviderBase");
         var ObjectExplorerProvider = (function (_super) {
             __extends(ObjectExplorerProvider, _super);
             function ObjectExplorerProvider() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ObjectExplorerProvider;
-        })(DevExpress.Analytics.Internal.ObjectExplorerProvider);
+        }(DevExpress.Analytics.Internal.ObjectExplorerProvider));
         Designer.ObjectExplorerProvider = ObjectExplorerProvider;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ObjectExplorerProvider");
         var ObjectStructureProvider = (function (_super) {
             __extends(ObjectStructureProvider, _super);
             function ObjectStructureProvider() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ObjectStructureProvider;
-        })(DevExpress.Analytics.Internal.ObjectStructureProvider);
+        }(DevExpress.Analytics.Internal.ObjectStructureProvider));
         Designer.ObjectStructureProvider = ObjectStructureProvider;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ObjectStructureProvider");
         var Point = (function (_super) {
             __extends(Point, _super);
             function Point() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return Point;
-        })(DevExpress.Analytics.Point);
+        }(DevExpress.Analytics.Point));
         Designer.Point = Point;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "Point");
         var Rectangle = (function (_super) {
             __extends(Rectangle, _super);
             function Rectangle() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return Rectangle;
-        })(DevExpress.Analytics.Rectangle);
+        }(DevExpress.Analytics.Rectangle));
         Designer.Rectangle = Rectangle;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "Rectangle");
         var Size = (function (_super) {
             __extends(Size, _super);
             function Size() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return Size;
-        })(DevExpress.Analytics.Size);
+        }(DevExpress.Analytics.Size));
         Designer.Size = Size;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics, "Size");
         var SortedArrayStore = (function (_super) {
             __extends(SortedArrayStore, _super);
             function SortedArrayStore() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return SortedArrayStore;
-        })(DevExpress.Analytics.Internal.SortedArrayStore);
+        }(DevExpress.Analytics.Internal.SortedArrayStore));
         Designer.SortedArrayStore = SortedArrayStore;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "SortedArrayStore");
         var ControlsStore = (function (_super) {
             __extends(ControlsStore, _super);
             function ControlsStore() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return ControlsStore;
-        })(DevExpress.Analytics.Internal.ControlsStore);
+        }(DevExpress.Analytics.Internal.ControlsStore));
         Designer.ControlsStore = ControlsStore;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "ControlsStore");
         var dxFieldListPicker = (function (_super) {
             __extends(dxFieldListPicker, _super);
             function dxFieldListPicker() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return dxFieldListPicker;
-        })(DevExpress.Analytics.Widgets.dxFieldListPicker);
+        }(DevExpress.Analytics.Widgets.dxFieldListPicker));
         Designer.dxFieldListPicker = dxFieldListPicker;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Widgets, "dxFieldListPicker");
         var BaseActionsProvider = (function (_super) {
             __extends(BaseActionsProvider, _super);
             function BaseActionsProvider() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
             return BaseActionsProvider;
-        })(DevExpress.Analytics.Internal.BaseActionsProvider);
+        }(DevExpress.Analytics.Internal.BaseActionsProvider));
         Designer.BaseActionsProvider = BaseActionsProvider;
         ;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Internal, "BaseActionsProvider");
@@ -16387,7 +16224,6 @@ var DevExpress;
         DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer, DevExpress.Analytics.Utils, "DesignerBaseElements");
     })(Designer = DevExpress.Designer || (DevExpress.Designer = {}));
 })(DevExpress || (DevExpress = {}));
-var DevExpress;
 (function (DevExpress) {
     var Designer;
     (function (Designer) {
@@ -16410,64 +16246,64 @@ var DevExpress;
             var PaddingModel = (function (_super) {
                 __extends(PaddingModel, _super);
                 function PaddingModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return PaddingModel;
-            })(DevExpress.Analytics.PaddingModel);
+            }(DevExpress.Analytics.PaddingModel));
             Widgets.PaddingModel = PaddingModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics, "PaddingModel");
             var BordersModel = (function (_super) {
                 __extends(BordersModel, _super);
                 function BordersModel() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return BordersModel;
-            })(DevExpress.Analytics.Widgets.BordersModel);
+            }(DevExpress.Analytics.Widgets.BordersModel));
             Widgets.BordersModel = BordersModel;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "BordersModel");
             var ControlProperties = (function (_super) {
                 __extends(ControlProperties, _super);
                 function ControlProperties() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ControlProperties;
-            })(DevExpress.Analytics.Widgets.ControlProperties);
+            }(DevExpress.Analytics.Widgets.ControlProperties));
             Widgets.ControlProperties = ControlProperties;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "ControlProperties");
             var Group = (function (_super) {
                 __extends(Group, _super);
                 function Group() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return Group;
-            })(DevExpress.Analytics.Widgets.Group);
+            }(DevExpress.Analytics.Widgets.Group));
             Widgets.Group = Group;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "Group");
             var ColorPickerEditor = (function (_super) {
                 __extends(ColorPickerEditor, _super);
                 function ColorPickerEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return ColorPickerEditor;
-            })(DevExpress.Analytics.Widgets.ColorPickerEditor);
+            }(DevExpress.Analytics.Widgets.ColorPickerEditor));
             Widgets.ColorPickerEditor = ColorPickerEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "ColorPickerEditor");
             var DataMemberEditor = (function (_super) {
                 __extends(DataMemberEditor, _super);
                 function DataMemberEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return DataMemberEditor;
-            })(DevExpress.Analytics.Widgets.DataMemberEditor);
+            }(DevExpress.Analytics.Widgets.DataMemberEditor));
             Widgets.DataMemberEditor = DataMemberEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "DataMemberEditor");
             var FieldListEditor = (function (_super) {
                 __extends(FieldListEditor, _super);
                 function FieldListEditor() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 return FieldListEditor;
-            })(DevExpress.Analytics.Widgets.FieldListEditor);
+            }(DevExpress.Analytics.Widgets.FieldListEditor));
             Widgets.FieldListEditor = FieldListEditor;
             DevExpress.Analytics.Internal._defineProperty(DevExpress.Designer.Widgets, DevExpress.Analytics.Widgets, "FieldListEditor");
         })(Widgets = Designer.Widgets || (Designer.Widgets = {}));
@@ -16501,7 +16337,7 @@ var DevExpress;
                     return this._context;
                 };
                 return DesignerContextGeneratorInternal;
-            })();
+            }());
             Utils.DesignerContextGeneratorInternal = DesignerContextGeneratorInternal;
             var DesignerContextGenerator = (function () {
                 function DesignerContextGenerator(_rtl) {
@@ -16511,12 +16347,12 @@ var DevExpress;
                     return new DesignerContextGeneratorInternal({ model: model }, this._rtl);
                 };
                 return DesignerContextGenerator;
-            })();
+            }());
             Utils.DesignerContextGenerator = DesignerContextGenerator;
             var ResizeSettings = (function (_super) {
                 __extends(ResizeSettings, _super);
                 function ResizeSettings() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 Object.defineProperty(ResizeSettings.prototype, "handler", {
                     get: function () { return this._handler; },
@@ -16535,12 +16371,12 @@ var DevExpress;
                     return result;
                 };
                 return ResizeSettings;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.ResizeSettings = ResizeSettings;
             var ContextActionsSettings = (function (_super) {
                 __extends(ContextActionsSettings, _super);
                 function ContextActionsSettings() {
-                    _super.apply(this, arguments);
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 ContextActionsSettings.prototype._actionUndoEngineWrappingFunction = function (contextActions, undoEngine) {
                     return Utils.createActionWrappingFunction("WrapWithUndoEngine", function (model, handler) {
@@ -16591,13 +16427,14 @@ var DevExpress;
                     return result;
                 };
                 return ContextActionsSettings;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.ContextActionsSettings = ContextActionsSettings;
             var DragDropSettings = (function (_super) {
                 __extends(DragDropSettings, _super);
                 function DragDropSettings() {
-                    _super.apply(this, arguments);
-                    this._model = {};
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this._model = {};
+                    return _this;
                 }
                 Object.defineProperty(DragDropSettings.prototype, "dragHelperContent", {
                     get: function () {
@@ -16634,15 +16471,16 @@ var DevExpress;
                     return result;
                 };
                 return DragDropSettings;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.DragDropSettings = DragDropSettings;
             var ControlsHelperSettings = (function (_super) {
                 __extends(ControlsHelperSettings, _super);
                 function ControlsHelperSettings(_selection, _context) {
-                    _super.call(this);
-                    this._selection = _selection;
-                    this._context = _context;
-                    this._model = {};
+                    var _this = _super.call(this) || this;
+                    _this._selection = _selection;
+                    _this._context = _context;
+                    _this._model = {};
+                    return _this;
                 }
                 ControlsHelperSettings.prototype.generate = function () {
                     var result = this._model;
@@ -16666,13 +16504,14 @@ var DevExpress;
                     return this;
                 };
                 return ControlsHelperSettings;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.ControlsHelperSettings = ControlsHelperSettings;
             var MenuSettings = (function (_super) {
                 __extends(MenuSettings, _super);
                 function MenuSettings() {
-                    _super.apply(this, arguments);
-                    this.stopPropagation = false;
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.stopPropagation = false;
+                    return _this;
                 }
                 MenuSettings.prototype.generate = function () {
                     var result = {};
@@ -16699,14 +16538,15 @@ var DevExpress;
                     configurable: true
                 });
                 return MenuSettings;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.MenuSettings = MenuSettings;
             var SelectionSettings = (function (_super) {
                 __extends(SelectionSettings, _super);
                 function SelectionSettings() {
-                    _super.apply(this, arguments);
-                    this._dragDropSettings = new DragDropSettings();
-                    this._resizeSettings = new ResizeSettings();
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this._dragDropSettings = new DragDropSettings();
+                    _this._resizeSettings = new ResizeSettings();
+                    return _this;
                 }
                 SelectionSettings.prototype.dispose = function () {
                     this._editableObject(null);
@@ -16765,21 +16605,21 @@ var DevExpress;
                     return Utils.extend(result, this._dragDropSettings.generate(), this._resizeSettings.generate());
                 };
                 return SelectionSettings;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.SelectionSettings = SelectionSettings;
             var CommonDesignerGenerator = (function (_super) {
                 __extends(CommonDesignerGenerator, _super);
                 function CommonDesignerGenerator(_context, _rtl) {
-                    var _this = this;
-                    _super.call(this);
-                    this._context = _context;
-                    this._rtl = _rtl;
-                    this._model = {};
-                    this._selectionSettings = new SelectionSettings();
-                    this._model.rtl = this._rtl;
-                    this._model.dispose = function () {
+                    var _this = _super.call(this) || this;
+                    _this._context = _context;
+                    _this._rtl = _rtl;
+                    _this._model = {};
+                    _this._selectionSettings = new SelectionSettings();
+                    _this._model.rtl = _this._rtl;
+                    _this._model.dispose = function () {
                         _this.dispose();
                     };
+                    return _this;
                 }
                 CommonDesignerGenerator.prototype._createPopularProperties = function (info, popularProperties) {
                     var properties = [];
@@ -16937,7 +16777,7 @@ var DevExpress;
                     return this;
                 };
                 return CommonDesignerGenerator;
-            })(Utils.Disposable);
+            }(Utils.Disposable));
             Utils.CommonDesignerGenerator = CommonDesignerGenerator;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
@@ -16968,8 +16808,10 @@ var DevExpress;
             var dxButtonWithTemplate = (function (_super) {
                 __extends(dxButtonWithTemplate, _super);
                 function dxButtonWithTemplate(element, options) {
+                    var _this = this;
                     options["template"] = editor_template;
-                    _super.call(this, element, options);
+                    _this = _super.call(this, element, options) || this;
+                    return _this;
                 }
                 dxButtonWithTemplate.prototype._getContentData = function () {
                     var data = _super.prototype._getContentData.call(this);
@@ -16986,7 +16828,7 @@ var DevExpress;
                     }
                 };
                 return dxButtonWithTemplate;
-            })(DevExpress.ui.dxButton);
+            }(DevExpress.ui.dxButton));
             Widgets.dxButtonWithTemplate = dxButtonWithTemplate;
             DevExpress.registerComponent("dxButtonWithTemplate", dxButtonWithTemplate);
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
@@ -17108,4 +16950,3 @@ var DevExpress;
         })(Templates = Analytics.Templates || (Analytics.Templates = {}));
     })(Analytics = DevExpress.Analytics || (DevExpress.Analytics = {}));
 })(DevExpress || (DevExpress = {}));
-//# sourceMappingURL=dx-designer-core.js.map
