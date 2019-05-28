@@ -18,7 +18,7 @@ Take a look at the [DevExpress Reporting web demos](http://demos.devexpress.com/
 
 ## License
 
-A Commercial license for DevExpress DXperience is required to use this bower package. Please visit [https://devexpress.com](https://devexpress.com) to buy a [license](https://www.devexpress.com/Support/LicensingFAQ.xml) if you do not own one yet. 
+A Commercial license for DevExpress ASP.NET controls is required to use this bower package. Please visit [https://devexpress.com](https://devexpress.com) to buy a [license](https://www.devexpress.com/Support/LicensingFAQ.xml) if you do not own one yet. 
 
 ## Support
 
