@@ -3,7 +3,7 @@
 To install with `bower`, run the following command:
 
 ```shell
-bower install xtrareportsjs
+bower install xtrareportsjs@18.2
 ```
 
 ## Documentation
@@ -14,12 +14,11 @@ To get started with HTML/JS DevExpress Reporting controls, see the following pag
 
 ## Demos
 
-Take a look at the [DevExpress Reporting web demos]
-(http://demos.devexpress.com/XtraReportsDemos/).
+Take a look at the [DevExpress Reporting web demos](http://demos.devexpress.com/XtraReportsDemos/).
 
 ## License
 
-A Commercial license for DevExpress DXperience is required to use this bower package. Please visit [https://devexpress.com](https://devexpress.com) to buy a [license](https://www.devexpress.com/Support/LicensingFAQ.xml) if you do not own one yet. 
+A commercial license for DevExpress ASP.NET controls is required to use this bower package. Please visit [https://devexpress.com](https://devexpress.com) to buy a [license](https://www.devexpress.com/Support/LicensingFAQ.xml) if you do not own one yet. 
 
 ## Support
 

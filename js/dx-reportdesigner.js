@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.js)
-* Version: 18.2.8
-* Build date: 2019-04-22
+* Version: 18.2.9
+* Build date: 2019-06-04
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -741,7 +741,7 @@ var DevExpress;
             Chart.SecondaryAxisViewModel = SecondaryAxisViewModel;
             var minValue = { propertyName: "minValue", modelName: "@MinValueSerializable", displayName: "Min Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric, localizationId: 'DevExpress.XtraCharts.AxisRange.MinValue' }, maxValue = { propertyName: "maxValue", modelName: "@MaxValueSerializable", displayName: "Max Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric, localizationId: 'DevExpress.XtraCharts.Range.MaxValue' }, auto = { propertyName: "auto", modelName: "@Auto", displayName: "Auto", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, localizationId: 'DevExpress.XtraReports.UI.DocumentExportMode.Auto' }, autoSideMargins = { propertyName: "autoSideMargins", modelName: "@AutoSideMargins", displayName: "Auto Side Margins", defaultVal: true, editor: DevExpress.JS.Widgets.editorTemplates.bool, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.Range.AutoSideMargins' }, sideMarginsValue = { propertyName: "sideMarginsValue", modelName: "@SideMarginsValue", displayName: "Side Margins Value", editor: DevExpress.JS.Widgets.editorTemplates.numeric, localizationId: 'DevExpress.XtraCharts.Range.SideMarginsValue' };
             Chart.visualRangeSerializationsInfo = [auto, autoSideMargins, minValue, maxValue, sideMarginsValue], Chart.visualRange = { propertyName: "visualRange", modelName: "VisualRange", displayName: "Visual Range", info: Chart.visualRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, localizationId: 'DevExpress.XtraCharts.AxisBase.VisualRange' };
-            var alwaysShowZeroLevel = { propertyName: "alwaysShowZeroLevel", modelName: "@AlwaysShowZeroLevel", displayName: "Always Show Zero Level", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: false, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.WholeRange.AlwaysShowZeroLevel' };
+            var alwaysShowZeroLevel = { propertyName: "alwaysShowZeroLevel", modelName: "@AlwaysShowZeroLevel", displayName: "Always Show Zero Level", editor: DevExpress.JS.Widgets.editorTemplates.bool, defaultVal: true, from: Designer.parseBool, localizationId: 'DevExpress.XtraCharts.WholeRange.AlwaysShowZeroLevel' };
             Chart.wholeRangeSerializationsInfo = Chart.visualRangeSerializationsInfo.concat(alwaysShowZeroLevel), Chart.wholeRange = { propertyName: "wholeRange", modelName: "WholeRange", displayName: "Whole Range", info: Chart.wholeRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, localizationId: 'DevExpress.XtraCharts.AxisBase.WholeRange' };
             Chart.radarWholeRange = { propertyName: "radarWholeRange", modelName: "WholeRange", displayName: "Whole Range", info: Chart.visualRangeSerializationsInfo, editor: DevExpress.JS.Widgets.editorTemplates.objecteditor, localizationId: 'DevExpress.XtraCharts.AxisBase.WholeRange' };
             var dashStyle = {
@@ -2544,7 +2544,7 @@ var DevExpress;
                         }
                     }
                 };
-                DevExpress.Analytics.Utils.appendStaticContextToRootViewModel(designerModel);
+                DevExpress.Analytics.Utils.appendStaticContextToRootViewModel(designerModel, DevExpress);
                 if (options.data.chartSource) {
                     chartSourceSubscription = options.data.chartSource.subscribe(function (newValue) {
                         init(newValue);
@@ -3545,7 +3545,8 @@ var DevExpress;
                     return '?' + path.substring(parentParametersPath.length);
                 }
                 var dataSourceInfo = Report.getDataSourceDataMember(container);
-                path = (dataSourceInfo.dataMember && path.indexOf(dataSourceInfo.dataMember) === 0) ? path.slice(dataSourceInfo.dataMember.length + 1) : path;
+                var prefix = dataSourceInfo.dataMember && (dataSourceInfo.dataMember + ".");
+                path = (prefix && path.indexOf(prefix) === 0) ? path.slice(prefix.length) : path;
                 return '[' + path + ']';
             }
             Report.getExpressionPath = getExpressionPath;
@@ -18476,7 +18477,10 @@ var DevExpress;
                                     new Report.Wizard.ChooseReportStylePage(_this)
                                 ];
                         _this.steps = [
-                            new Report.Wizard.ChooseReportTypePage(_this),
+                            new Report.Wizard.ChooseReportTypePage(_this, function () {
+                                return _this._selectDataSourcePage.availableDataSources().length > 0 ||
+                                    connectionStrings().length > 0;
+                            }),
                             new Report.Wizard.SelectPredefinedLabelsPage(_this),
                             new Report.Wizard.CustomizeLabelPage(_this),
                             _this._selectDataSourcePage,
@@ -18939,8 +18943,9 @@ var DevExpress;
                 Wizard.ReportTypeItem = ReportTypeItem;
                 var ChooseReportTypePage = (function (_super) {
                     __extends(ChooseReportTypePage, _super);
-                    function ChooseReportTypePage(wizard) {
+                    function ChooseReportTypePage(wizard, _canCreateDatabound) {
                         var _this = _super.call(this, wizard) || this;
+                        _this._canCreateDatabound = _canCreateDatabound;
                         _this.template = "dxrd-page-reportType";
                         _this.description = Designer.getLocalization("Select the report type you wish to create.", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Message");
                         _this.selectedItem = ko.observable();
@@ -18956,17 +18961,26 @@ var DevExpress;
                         _this.actionFinish.isDisabled = ko.pureComputed(function () {
                             return _this.selectedItem() === null || _this.selectedItem().reportType !== ReportType.Empty;
                         });
-                        _this.reportTypeItems = [
-                            new ReportTypeItem("Empty Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_EmptyReport", "emptyReport", ReportType.Empty),
-                            new ReportTypeItem("Data-bound Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_DataBoundReport", "databoundReport", ReportType.Databound),
-                            new ReportTypeItem("Label Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_LabelReport", "labelReport", ReportType.Label)
-                        ];
+                        _this.reportTypeItems = ko.observableArray(_this.getItems());
                         _this.actionPrevious.isVisible(false);
                         return _this;
                     }
+                    ChooseReportTypePage.prototype.getItems = function (canCreateDatabound) {
+                        if (canCreateDatabound === void 0) { canCreateDatabound = this._canCreateDatabound(); }
+                        var items = [
+                            new ReportTypeItem("Empty Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_EmptyReport", "emptyReport", ReportType.Empty),
+                            new ReportTypeItem("Label Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_LabelReport", "labelReport", ReportType.Label)
+                        ];
+                        if (canCreateDatabound) {
+                            items.splice(1, 0, new ReportTypeItem("Data-bound Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_DataBoundReport", "databoundReport", ReportType.Databound));
+                        }
+                        return items;
+                    };
                     ChooseReportTypePage.prototype._begin = function (data) {
                         var reportType = data.reportType || ReportType.Databound;
-                        this.selectedItem(Designer.findFirstItemMatchesCondition(this.reportTypeItems, function (item) { return item.reportType === reportType; }));
+                        this.reportTypeItems(this.getItems());
+                        var item = Designer.findFirstItemMatchesCondition(this.reportTypeItems(), function (item) { return item.reportType === reportType; });
+                        this.selectedItem(item || this.reportTypeItems()[0]);
                     };
                     ChooseReportTypePage.prototype.commit = function (data) {
                         data.reportType = this.selectedItem().reportType;
@@ -21934,7 +21948,7 @@ var DevExpress;
                     return this;
                 };
                 ReportDesignerInitializer.prototype.addStaticContext = function () {
-                    DevExpress.Designer.appendStaticContextToRootViewModel(this.buildingModel);
+                    DevExpress.Designer.appendStaticContextToRootViewModel(this.buildingModel, DevExpress);
                     return this;
                 };
                 ReportDesignerInitializer.prototype.tryApplyBindings = function (applyBindings, element) {
@@ -22232,7 +22246,7 @@ var DevExpress;
                         {
                             propertyName: "editorName", modelName: "@EditorName", displayName: "Editor Name", localizationId: "DevExpress.XtraReports.UI.ImageEditOptions.EditorName", defaultVal: "",
                             editor: { header: "dxrd-editOptionsEditorName", editorType: Report.EditOptionsEditorNameEditorModel },
-                            editorOptions: { categories: [DevExpress.Report.Categories.Image()] }
+                            editorOptions: { acceptCustomValue: true, categories: [DevExpress.Report.Categories.Image()] }
                         }
                     ]);
                 };
@@ -22250,7 +22264,7 @@ var DevExpress;
                         {
                             propertyName: "editorName", modelName: "@EditorName", displayName: "Editor Name", localizationId: "DevExpress.XtraReports.UI.TextEditOptions.EditorName", defaultVal: "",
                             editor: { header: "dxrd-editOptionsEditorName", editorType: Report.EditOptionsEditorNameEditorModel },
-                            editorOptions: { excludeCategories: [categories.Image()] }
+                            editorOptions: { acceptCustomValue: true, excludeCategories: [categories.Image()] }
                         }
                     ]);
                 };
@@ -25586,7 +25600,7 @@ var DevExpress;
                 'dx-chart-surface': '<div class="dxrd-surface" data-bind="styleunit: { \'width\': Math.min(width(), $root.surfaceSize()) }, click: function(_, e) { e.stopPropagation(); }">        <div class="dxrd-viewport" data-bind="styleunit: { minWidth: Math.min(width() + 60, $root.surfaceSize()), maxWidth: width() + 60,  maxHeight: height() + 60 }">            <div class="dxrd-control" style="border:none; background: none;">                <div data-bind="zoom: zoom, styleunit: { \'height\': height() / zoom(), \'width\': width() / zoom() }">                    <img data-bind="attr: {src: imageSrc }, styleunit: { \'height\': height() / zoom(), \'width\': width() / zoom() }" />                </div>            </div>        </div>    </div>',
                 'dxcd-collection-lookup-header': '<div data-bind="dxSelectBox: { items: array, displayExpr: \'name\', value: selectedItem, disabled: disabled,  placeholder: $root.dx.Analytics.Localization.selectPlaceholder(), noDataText: $root.dx.Analytics.Localization.noDataText() }"></div>',
                 'dxcd-collection-item': '<!-- ko if: selectedItem -->    <div data-bind="dxPropertyGrid: { target: selectedItem, editorsInfo: { editors: editors }, level: 1 }"></div>    <!--/ko -->',
-                'dxcd-field': '<div data-bind="dxFieldListPicker: { path: path, value: value, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>',
+                'dxcd-field': '<div data-bind="dxFieldListPicker: { path: path, acceptCustomValue: true, value: value, itemsProvider: $root.dataBindingsProvider(), treeListController: treeListController, disabled: disabled }"></div>',
                 'dxrd-propertygridtab': '<div class="dxrd-right-panel-header dxd-text-primary">        <span data-bind="text: text"></span>    </div>    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko template: { name: \'dx-propertieseditor\', data: model }-->        <!-- /ko -->    </div>',
                 'dxcd-panes-editor': '<div data-bind="dxSelectBox: { dataSource: $root.panes, value: value, disabled: disabled }"></div>',
                 'dxcd-legends-editor': '<div data-bind="dxSelectBox: { dataSource: $root.legends, value: value, disabled: disabled }"></div>',
@@ -25700,13 +25714,13 @@ var DevExpress;
                 'dxrd-style': '<div data-bind="dxSelectBox: new $root.dx.Designer.Report.StylesEditorHeaderModel(value, $root.styles(), disabled)"></div>',
                 'dxrd-styleContent': '<!-- ko if: value-->    <div data-bind="dxStylesEditor: { styleName: value, styles: $root.styles() }"></div>    <!--/ko -->',
                 'dxrd-dataBindings': ' ',
-                'dxrd-dataBinding': '<!-- ko with: value -->    <!-- ko if: visible -->    <!-- ko displayNameExtender: { dataSource: dataSource, dataMember: displayExpr } -->    <div data-bind="dxFieldListPicker: {    displayValue: $displayName,    itemsProvider: $root.dataBindingsProvider(),    treeListController: $parent.treeListController,    value: $data.generateValue($root.undoEngine(), $root.dataSourceHelper(), $root.fieldListDataSources()),    disabled: $parent.disabled }"></div>    <!--/ko -->    <!--/ko -->    <!--/ko -->',
-                'dxrd-chartValueBinding': '<div data-bind="dxFieldListPicker: {    displayValue: generateDisplayValue($root.reportDataSource),    itemsProvider: $root.reportDataBindingsProvider,    treeListController: treeListController,    value: generateValue($root.undoEngine(), $root.reportParameters, $root.reportDataSource),    disabled: disabled }"></div>',
-                'dxrd-reportexplorer-editor': '<div data-bind="dxFieldListPicker: { value: itemsProvider.selectedPath, displayValue: displayExpr, itemsProvider: itemsProvider, path: itemsProvider.path, disabled: disabled, treeListController: treeListController }"></div>',
+                'dxrd-dataBinding': '<!-- ko with: value -->    <!-- ko if: visible -->    <!-- ko displayNameExtender: { dataSource: dataSource, dataMember: displayExpr } -->    <div data-bind="dxFieldListPicker: {    acceptCustomValue: true,    displayValue: $displayName,    itemsProvider: $root.dataBindingsProvider(),    treeListController: $parent.treeListController,    value: $data.generateValue($root.undoEngine(), $root.dataSourceHelper(), $root.fieldListDataSources()),    disabled: $parent.disabled }"></div>    <!--/ko -->    <!--/ko -->    <!--/ko -->',
+                'dxrd-chartValueBinding': '<div data-bind="dxFieldListPicker: {    acceptCustomValue: true,     displayValue: generateDisplayValue($root.reportDataSource),    itemsProvider: $root.reportDataBindingsProvider,    treeListController: treeListController,    value: generateValue($root.undoEngine(), $root.reportParameters, $root.reportDataSource),    disabled: disabled }"></div>',
+                'dxrd-reportexplorer-editor': '<div data-bind="dxFieldListPicker: { value: itemsProvider.selectedPath, acceptCustomValue: true, displayValue: displayExpr, itemsProvider: itemsProvider, path: itemsProvider.path, disabled: disabled, treeListController: treeListController }"></div>',
                 'dxrd-dataBindingsContent': '<div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>',
                 'dxrd-dataBindingContent': '<div class="dx-field dxd-back-primary">        <div class="dx-field-label dx-accordion-header dxd-text-primary" data-bind="styleunit: padding">            <div class="propertygrid-editor-displayName" data-bind="text: $root.getLocalization(\'Format String\', \'DevExpress.XtraReports.UI.XRBinding.FormatString\')"></div>        </div>        <div class="dx-field-value">            <!-- ko if: value() -->            <!-- ko with: value() -->            <!-- ko template: { name: \'dxrd-formatstring\', data: { value: $data.formatString, disabled: $data.disabled } } -->            <!-- /ko -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
                 'dxrd-scriptsbox': '<div data-bind="dxEventDropDownEditor: { items: $root.events, value: value, editEnabled: true, disabled: disabled, secondAction: function() { $root.gotoEvent && $root.gotoEvent($data.value(), name, $parents[1]._model && $parents[1]._model()); }, placeholder: $root.dx.Analytics.Localization.selectPlaceholder(), noDataText: $root.dx.Analytics.Localization.noDataText() }"></div>',
-                'dxrd-collection-item-group': '<div class="dx-field dxd-back-primary" data-bind="styleunit: { \'marginLeft\' : $parents[1].padding }">        <div class="dx-field-label dxd-text-primary">            <div class="propertygrid-editor-displayName" data-bind="text: $parents[1].options.info().getChildCaption(index()) + \':\'"></div>        </div>        <div class="dx-field-value">            <div class="dxrd-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: value().changeSortOrder, icon: value().sortOrderClass().template, iconClass: value().sortOrderClass().class, disabled: editor.disabled }"></div>            <!-- ko displayNameExtender: { path: function() { return $data.editor._model() && $data.editor._model().getPath(\'groupFields\') || \'\' }, dataMember: value().fieldName } -->            <div class="dxrd-collectioneditor-picker" data-bind="dxFieldListPicker: {    displayValue: $displayName,    value: value().fieldName,    path: editor._model() && editor._model().getPath(\'groupFields\') || \'\',    itemsProvider: $root.dataBindingsProvider(),    treeListController: new $root.dx.Analytics.Widgets.TreeListController(),    disabled: editor.disabled}"></div>            <!--/ko -->        </div>    </div>',
+                'dxrd-collection-item-group': '<div class="dx-field dxd-back-primary" data-bind="styleunit: { \'marginLeft\' : $parents[1].padding }">        <div class="dx-field-label dxd-text-primary">            <div class="propertygrid-editor-displayName" data-bind="text: $parents[1].options.info().getChildCaption(index()) + \':\'"></div>        </div>        <div class="dx-field-value">            <div class="dxrd-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: value().changeSortOrder, icon: value().sortOrderClass().template, iconClass: value().sortOrderClass().class, disabled: editor.disabled }"></div>            <!-- ko displayNameExtender: { path: function() { return $data.editor._model() && $data.editor._model().getPath(\'groupFields\') || \'\' }, dataMember: value().fieldName } -->            <div class="dxrd-collectioneditor-picker" data-bind="dxFieldListPicker: {    displayValue: $displayName,    acceptCustomValue: true,    value: value().fieldName,    path: editor._model() && editor._model().getPath(\'groupFields\') || \'\',    itemsProvider: $root.dataBindingsProvider(),    treeListController: new $root.dx.Analytics.Widgets.TreeListController(),    disabled: editor.disabled}"></div>            <!--/ko -->        </div>    </div>',
                 'dxrd-lookUpValues': '<div class="dxrd-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, addHandler: $root.dx.Designer.Report.LookUpValue.createNew, undoEngine: $root.undoEngine, level: level, displayName: $root.getLocalization(displayName), info: info }">            <div data-bind="dxPropertyGrid: { target: $data.value, level: editor.level + 1 }"></div>        </div>    </div>',
                 'dxrd-parameterContent': '<div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>',
                 'dxrd-calculatedFields': '<div class="dxrd-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, displayName: $root.getLocalization(displayName), level: level, info: info, addHandler: function() { return $root.calculatedFieldsSource().createCalculatedField(\'\'); } }">        </div>    </div>',

@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 18.2.8
-* Build date: 2019-04-22
+* Version: 18.2.9
+* Build date: 2019-06-04
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4237,7 +4237,7 @@ var DevExpress;
         }
         function updateQueryBuilderSurfaceContentSize($root, surfaceSize, surface, updateLayoutCallbacks) {
             return function () {
-                var rightAreaWidth = $root.find(".dxrd-right-panel").outerWidth();
+                var rightAreaWidth = $root.find(".dxrd-right-panel:visible").outerWidth() || 0;
                 var surfaceWidth = $root.width() - (rightAreaWidth + 5);
                 $root.find(".dxrd-surface-wrapper").css(surface().rtl() ?
                     { "left": rightAreaWidth, "right": 0, "width": surfaceWidth } :
@@ -4335,7 +4335,17 @@ var DevExpress;
             designerModel.connectionPointDragHandler = designerModel.columnDragHandler;
             designerModel.resizeHandler["handles"] = "e, w";
             designerModel.columnsLoadingMsg = function () { return DevExpress.Analytics.getLocalization("Loading...", "DataAccessWebStringId.QueryBuilder_ColumnsLoading"); };
-            var searchName = ko.observable("");
+            var _searchName = ko.observable("");
+            var searchTimeout = null;
+            var searchName = ko.computed({
+                read: function () { return _searchName(); },
+                write: function (newVal) {
+                    searchTimeout && clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(function () {
+                        _searchName(newVal);
+                    }, 500);
+                }
+            });
             designerModel.searchName = searchName;
             var init = function (querySource) {
                 initQuery(querySource);
@@ -4343,6 +4353,7 @@ var DevExpress;
                     itemsProvider: data.dbSchemaProvider(),
                     treeListController: new QueryBuilder.Utils.QueryBuilderTreeListController(designerModel.undoEngine, query, searchName),
                     selectedPath: ko.observable(),
+                    pageSize: 100,
                     templateName: "dxqb-treelist-item-with-search"
                 });
             };
@@ -4383,7 +4394,7 @@ var DevExpress;
             designerModel.editableObject.subscribe(function (newValue) {
                 tablesTop.notifySubscribers(null);
             });
-            DevExpress.Designer.appendStaticContextToRootViewModel(designerModel);
+            DevExpress.Designer.appendStaticContextToRootViewModel(designerModel, DevExpress);
             callbacks.beforeRender && callbacks.beforeRender(designerModel);
             $(element).empty();
             ko.cleanNode(element);
@@ -4429,7 +4440,9 @@ var DevExpress;
                 designerModel.selectStatmentPreview.isLoading(true);
                 designerModel.selectStatmentPreview.isVisible(true);
                 wrapper.getSelectStatement(data.dbSchemaProvider().connection, JSON.stringify(query().serialize(true))).done(function (data) {
-                    designerModel.selectStatmentPreview.data.value(data["sqlSelectStatement"]);
+                    if (data.errorMessage)
+                        DevExpress.Analytics.Utils.ShowMessage(data.errorMessage);
+                    designerModel.selectStatmentPreview.data.value(data.sqlSelectStatement);
                     designerModel.selectStatmentPreview.isLoading(false);
                 }).fail(function (data) {
                     designerModel.selectStatmentPreview.isVisible(false);
@@ -4566,7 +4579,6 @@ var DevExpress;
                         dropCallback(item.data, query());
                         undoEngine().end();
                     };
-                    var spanProtect = $("<span>"), spanSearch = $("<span>").addClass('dx-datagrid-search-text');
                     _this.searchName = searchName;
                     _this.itemsFilter = function (item) {
                         return !searchName() || !!DevExpress.Analytics.Utils.findMatchesInString(item.displayName, searchName());
@@ -6667,6 +6679,8 @@ var DevExpress;
                             isInProcess && isInProcess(true);
                             return this._sqlTextProvider.getQuerySqlText(query)
                                 .done(function (response) {
+                                if (response.errorMessage)
+                                    Analytics.Utils.ShowMessage(response.errorMessage);
                                 _this._tableQueryString(response.sqlSelectStatement);
                                 _this._query(query);
                             })

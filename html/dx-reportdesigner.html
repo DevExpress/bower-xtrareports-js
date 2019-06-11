@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 18.2.8
-* Build date: 2019-04-25
+* Version: 18.2.9
+* Build date: 2019-06-04
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1457,6 +1457,7 @@
     <!-- ko if: visible -->
     <!-- ko displayNameExtender: { dataSource: dataSource, dataMember: displayExpr } -->
     <div data-bind="dxFieldListPicker: {
+    acceptCustomValue: true,
     displayValue: $displayName,
     itemsProvider: $root.dataBindingsProvider(),
     treeListController: $parent.treeListController,
@@ -1469,6 +1470,7 @@
 
 <script type="text/html" id="dxrd-chartValueBinding">
     <div data-bind="dxFieldListPicker: {
+    acceptCustomValue: true, 
     displayValue: generateDisplayValue($root.reportDataSource),
     itemsProvider: $root.reportDataBindingsProvider,
     treeListController: treeListController,
@@ -1477,7 +1479,7 @@
 </script>
 
 <script type="text/html" id="dxrd-reportexplorer-editor">
-    <div data-bind="dxFieldListPicker: { value: itemsProvider.selectedPath, displayValue: displayExpr, itemsProvider: itemsProvider, path: itemsProvider.path, disabled: disabled, treeListController: treeListController }"></div>
+    <div data-bind="dxFieldListPicker: { value: itemsProvider.selectedPath, acceptCustomValue: true, displayValue: displayExpr, itemsProvider: itemsProvider, path: itemsProvider.path, disabled: disabled, treeListController: treeListController }"></div>
 </script>
 
 <script type="text/html" id="dxrd-dataBindingsContent">
@@ -1514,6 +1516,7 @@
             <!-- ko displayNameExtender: { path: function() { return $data.editor._model() && $data.editor._model().getPath('groupFields') || '' }, dataMember: value().fieldName } -->
             <div class="dxrd-collectioneditor-picker" data-bind="dxFieldListPicker: {
     displayValue: $displayName,
+    acceptCustomValue: true,
     value: value().fieldName,
     path: editor._model() && editor._model().getPath('groupFields') || '',
     itemsProvider: $root.dataBindingsProvider(),

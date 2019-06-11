@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 18.2.8
-* Build date: 2019-04-22
+* Version: 18.2.9
+* Build date: 2019-06-04
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -5490,6 +5490,22 @@ var DevExpress;
                 clickAction: $.noop,
                 displayText: function () { return DevExpress.Analytics.getLocalization("Edit", "ReportStringId.UD_Group_Edit"); }
             };
+            var TreeListEllipsisButton = (function () {
+                function TreeListEllipsisButton(_availableItemsCount, padding, pageSize) {
+                    this._availableItemsCount = _availableItemsCount;
+                    this.padding = padding;
+                    this.pageSize = pageSize;
+                    this.templateName = "dx-treelist-item-ellipsis";
+                    this.collapsed = function () { return true; };
+                    this.visibleItems = function () { return []; };
+                    this.text = function () { return Analytics.getLocalization("Show more...", "AnalyticsCoreStringId.QueryBuilder_Tables_ShowMore"); };
+                }
+                TreeListEllipsisButton.prototype.renderNext = function () {
+                    this._availableItemsCount(this._availableItemsCount() + this.pageSize);
+                };
+                return TreeListEllipsisButton;
+            }());
+            Widgets.TreeListEllipsisButton = TreeListEllipsisButton;
             var TreeListItemViewModel = (function (_super) {
                 __extends(TreeListItemViewModel, _super);
                 function TreeListItemViewModel(options, path, onItemsVisibilityChanged, rtl, resolver) {
@@ -5502,6 +5518,7 @@ var DevExpress;
                     _this._rtl = false;
                     _this._data = ko.observable(null);
                     _this._actions = ko.observable([]);
+                    _this._pageSize = -1;
                     _this._actionsSubscription = null;
                     _this._iconName = function () { return (ko.unwrap((_this.data && _this.data.icon) || (_this.data && _this.data.specifics)) || "default").toLowerCase(); };
                     _this.level = -1;
@@ -5510,6 +5527,7 @@ var DevExpress;
                     _this.isSelected = ko.observable(false);
                     _this.isHovered = ko.observable(false);
                     _this.isMultiSelected = ko.observable(false);
+                    _this._pageSize = options.pageSize || -1;
                     _this._path = path;
                     _this._rtl = rtl;
                     _this._treeListController = options.treeListController;
@@ -5519,6 +5537,7 @@ var DevExpress;
                     _this.getItems = function () {
                         return _this._loadItems(options);
                     };
+                    _this._initPaginate();
                     _this.toggleSelected = function (_, event) {
                         if ((event.shiftKey || event.ctrlKey) && _this.selectedItems().length > 0 && _this._treeListController.canMultiSelect && _this._treeListController.canMultiSelect(_this)) {
                             options.selectedPath("");
@@ -5728,6 +5747,22 @@ var DevExpress;
                     padding["padding-" + position] = value;
                     return padding;
                 };
+                TreeListItemViewModel.prototype._initPaginate = function () {
+                    var _this = this;
+                    if (this._pageSize === -1)
+                        return;
+                    this.maxItemsCount = ko.observable(this._pageSize);
+                    this.visibleItems = ko.computed(function () {
+                        if (_this.items().length === 0)
+                            return [];
+                        var result = _this.items().filter(function (x) { return x.visible; });
+                        if (result.length > _this.maxItemsCount()) {
+                            result = result.slice(0, _this.maxItemsCount());
+                            result.push(new TreeListEllipsisButton(_this.maxItemsCount, result[0].padding, _this._pageSize));
+                        }
+                        return result;
+                    });
+                };
                 Object.defineProperty(TreeListItemViewModel.prototype, "hasItems", {
                     get: function () {
                         if (!this.data) {
@@ -5836,6 +5871,7 @@ var DevExpress;
                 TreeListItemViewModel.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
                     this._actions([]);
+                    this.visibleItems && this.visibleItems.dispose();
                     this._actionsSubscription && this._actionsSubscription.dispose();
                     this.disposeObservableArray(this.items);
                     this.resetObservableArray(this.items);
@@ -8793,6 +8829,7 @@ var DevExpress;
                             options.treeListController.dragDropHandler = bindingContext.$root.fieldDragHandler;
                         }
                         options.itemsProvider = ko.unwrap(options.itemsProvider);
+                        options.pageSize = options.pageSize || -1;
                         treeListViewModel && treeListViewModel.dispose();
                         if (!options || !options.itemsProvider)
                             return;
@@ -13182,8 +13219,8 @@ var DevExpress;
                 if (rtl === void 0) { rtl = false; }
                 return function () {
                     var $root = $(root).find(".dxrd-designer").eq(0);
-                    var rightAreaWidth = $root.find(".dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
-                    var otherWidth = rightAreaWidth + $root.find(".dxrd-toolbox-wrapper").outerWidth(), surfaceWidth = $root.width() - (otherWidth);
+                    var rightAreaWidth = ($root.find(".dxrd-right-panel:visible").outerWidth() || 0) + ($root.find(".dxrd-right-tabs:visible").outerWidth() || 0);
+                    var otherWidth = rightAreaWidth + ($root.find(".dxrd-toolbox-wrapper").outerWidth() || 0), surfaceWidth = $root.width() - (otherWidth);
                     $root.find(".dxrd-surface-wrapper").eq(0).css({
                         "left": rtl ? rightAreaWidth : 64,
                         "right": !rtl ? rightAreaWidth : 64,
@@ -14991,8 +15028,8 @@ var DevExpress;
                 return $.when.apply($.when, promises);
             }
             Utils.loadTemplates = loadTemplates;
-            function appendStaticContextToRootViewModel(root) {
-                root.dx = DevExpress;
+            function appendStaticContextToRootViewModel(root, dx) {
+                root.dx = dx || DevExpress;
                 root.getLocalization = function () {
                     return Analytics.getLocalization.apply(DevExpress.Analytics, arguments);
                 };
@@ -15271,6 +15308,7 @@ var DevExpress;
                     _this.option("value") && _this._value(_this.option("value"));
                     _this.option("itemsProvider") && _this._itemsProvider(_this.option("itemsProvider"));
                     _this.option("valueChangeEvent", "change");
+                    _this.option("displayValue", options.displayValue);
                     _this._parentViewport = $($element).parents(".dx-designer-viewport");
                     return _this;
                 }
@@ -15283,6 +15321,7 @@ var DevExpress;
                         this._popup.option("height", "auto");
                         this._popup.option("maxHeight", this._getMaxHeight());
                         this._popup.repaint();
+                        $(this._popup.content())[0].style.height = "auto";
                         this._popup._renderPosition();
                     }
                 };
@@ -15319,7 +15358,7 @@ var DevExpress;
                             this._itemsProvider(newValue);
                             break;
                         case "displayValue":
-                            this["_renderInputValue"]();
+                            $(this["_input"]()).val(newValue);
                             break;
                         default:
                             _super.prototype._optionChanged.apply(this, arguments);
@@ -15372,7 +15411,7 @@ var DevExpress;
                     $(this._popup.content()).append(element);
                 };
                 return dxFieldListPicker;
-            }(DevExpress.ui.dxDropDownEditor));
+            }(DevExpress.ui.dxDropDownBox));
             Widgets.dxFieldListPicker = dxFieldListPicker;
             DevExpress.registerComponent("dxFieldListPicker", dxFieldListPicker);
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
@@ -16910,17 +16949,20 @@ var DevExpress;
                 'dx-treelist-item-actions': '<!-- ko foreach: actions -->    <!-- ko if: $data.templateName -->    <!-- ko template: templateName  -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: !$data.templateName -->    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: function() { clickAction($parent); }, icon: ko.unwrap($data.imageTemplateName), iconClass: $data.imageClassName, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible), disabled: $data.disabled && $data.disabled() }, attr: { title: $data.displayText && $data.displayText() || text }"></div>    <!-- /ko -->    <!-- /ko -->',
                 'dx-treelist-edit-action': '<div class="dx-treelist-action-edit dx-accordion-button" data-bind="dxButtonWithTemplate: { icon: \'dxrd-svg-operations-edit\', iconClass: \'dx-image-edit\',  onClick: function() { $parent.collapsed(!$parent.collapsed()); } }, visible: $parent.hasContent, attr: { title: $data.displayText() }"></div>',
                 'dx-treelist-item-actions-with-edit': '<!-- ko template: { name: \'dx-treelist-edit-action\', data: treeListEditAction() }  -->    <!-- /ko -->    <!-- ko template: \'dx-treelist-item-actions\'  -->    <!-- /ko -->',
+                'dx-treelist-item-ellipsis': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="styleunit: padding, click: renderNext">        <div class="dx-treelist-collapsedbutton"></div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-ellipsis-text dxd-text-accented dxd-hyperlink-color" data-bind="text: $data.text()"></div>                </div>            </div>        </div>    </div>',
                 'dx-treelist-item': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <!-- /ko -->    </div>',
                 'dx-treelist-accordion-item': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
                 'dx-treelist-header-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <!-- ko if: $data.hasItems-->        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>        <!-- /ko -->        <!-- ko ifnot: $data.hasItems-->        <div class="dx-treelist-collapsedbutton"></div>        <!-- /ko -->        <div class="dx-treelist-caption">            <!-- ko if: actions && actions.length > 0 -->            <div class="dx-treelist-action-container" data-bind="visible: isSelected">                <!-- ko template: actionsTemplate() -->                <!-- /ko -->            </div>            <!-- /ko  -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
                 'dx-treelist-item-with-hover': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->    </div>',
                 'dx-treelist-accordion-item-with-hover': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
                 'dx-treelist-header-item-with-hover': '<div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">        <div class="dx-treelist-item dx-fontsize-reestablished dxd-list-item-back-color" data-bind="event: {         dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() },         mouseenter: mouseenter,         mouseleave: mouseleave    }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected dxd-back-secondary\': isSelected() || isMultiSelected() }">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed, style: { \'visibility\': hasItems ? \'visible\' : \'hidden\' }"></div>            <div class="dx-treelist-caption">                <!-- ko if: actions && actions.length > 0 -->                <div class="dx-treelist-action-container" data-bind="visible: $data.isSelected() || $data.isHovered()">                    <!-- ko template: actionsTemplate() -->                    <!-- /ko -->                </div>                <!-- /ko  -->                <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                    <div class="dx-treelist-text-wrapper">                        <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                    </div>                </div>            </div>        </div>    </div>',
-                'dx-treelist': '<div class="dx-treelist dxd-text-primary">        <!-- ko foreach: items -->        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->        <!-- /ko -->        <div data-bind="visible: !collapsed()">            <!-- ko template: { name: \'dx-treelist\', data: $data } -->            <!-- /ko -->        </div>        <!-- /ko -->    </div>',
+                'dx-treelist': '<div class="dx-treelist dxd-text-primary">        <!-- ko template: $data.visibleItems !== undefined ? \'dx-treelist-paginate\' : \'dx-treelist-common\' -->        <!-- /ko -->    </div>',
+                'dx-treelist-common': '<!-- ko foreach: items -->    <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->    <!-- /ko -->    <div data-bind="visible: !collapsed()">        <!-- ko template: { name: \'dx-treelist\', data: $data } -->        <!-- /ko -->    </div>    <!-- /ko -->',
+                'dx-treelist-paginate': '<!-- ko foreach: visibleItems -->    <!-- ko template: templateName -->    <!-- /ko -->    <div data-bind="visible: !collapsed()">        <!-- ko template: { name: \'dx-treelist\', data: $data } -->        <!-- /ko -->    </div>    <!-- /ko -->',
                 'dxrd-borders': '<div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>',
                 'dxrd-colorpicker': '<div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled }"></div>',
                 'dxrd-expressionstring': '<!-- ko if: $data.value() -->    <div data-bind="dxExpressionEditor: getOptions({ options: value, fieldListProvider: $root.dataBindingsProvider, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() })"></div>    <!-- /ko -->',
-                'dxrd-field': '<!-- ko displayNameExtender: { path: path, dataMember: value } -->    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>    <!-- /ko -->',
+                'dxrd-field': '<!-- ko displayNameExtender: { path: path, dataMember: value } -->    <div data-bind="dxFieldListPicker: { path: path, acceptCustomValue: true, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>    <!-- /ko -->',
                 'dxrd-filterstring': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
                 'dxrd-filterstringgroup': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
                 'dxrd-formatstring': '<div data-bind="dxFormatEditor: { value: value, disabled: disabled }"></div>',

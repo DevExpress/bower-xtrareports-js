@@ -1,8 +1,8 @@
 <!--
 /**
-* DevExpress HTML/JS Analytics Core (dx-analytics-core.html)
-* Version: 18.2.8
-* Build date: 2019-04-24
+* DevExpress HTML/JS Analytics Core (templates.html)
+* Version: 18.2.9
+* Build date: 2019-06-04
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -847,6 +847,19 @@
     <!-- /ko -->
 </script>
 
+<script type="text/html" id="dx-treelist-item-ellipsis">
+    <div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="styleunit: padding, click: renderNext">
+        <div class="dx-treelist-collapsedbutton"></div>
+        <div class="dx-treelist-caption">
+            <div class="dx-treelist-selectedcontent">
+                <div class="dx-treelist-text-wrapper">
+                    <div class="dx-treelist-ellipsis-text dxd-text-accented dxd-hyperlink-color" data-bind="text: $data.text()"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type="text/html" id="dx-treelist-item">
     <div data-bind="visible: visible">
         <!-- ko if: hasContent -->
@@ -950,17 +963,32 @@
 </script>
 <script type="text/html" id="dx-treelist">
     <div class="dx-treelist dxd-text-primary">
-        <!-- ko foreach: items -->
-        <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->
-        <!-- /ko -->
-        <div data-bind="visible: !collapsed()">
-            <!-- ko template: { name: 'dx-treelist', data: $data } -->
-            <!-- /ko -->
-        </div>
+        <!-- ko template: $data.visibleItems !== undefined ? 'dx-treelist-paginate' : 'dx-treelist-common' -->
         <!-- /ko -->
     </div>
 </script>
 
+<script type="text/html" id="dx-treelist-common">
+    <!-- ko foreach: items -->
+    <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->
+    <!-- /ko -->
+    <div data-bind="visible: !collapsed()">
+        <!-- ko template: { name: 'dx-treelist', data: $data } -->
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</script>
+
+<script type="text/html" id="dx-treelist-paginate">
+    <!-- ko foreach: visibleItems -->
+    <!-- ko template: templateName -->
+    <!-- /ko -->
+    <div data-bind="visible: !collapsed()">
+        <!-- ko template: { name: 'dx-treelist', data: $data } -->
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</script>
 <script type="text/html" id="dxrd-borders">
     <div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>
 </script>
@@ -976,7 +1004,7 @@
 
 <script type="text/html" id="dxrd-field">
     <!-- ko displayNameExtender: { path: path, dataMember: value } -->
-    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>
+    <div data-bind="dxFieldListPicker: { path: path, acceptCustomValue: true, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>
     <!-- /ko -->
 </script>
 <script type="text/html" id="dxrd-filterstring">

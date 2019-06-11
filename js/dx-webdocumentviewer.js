@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 18.2.8
-* Build date: 2019-04-22
+* Version: 18.2.9
+* Build date: 2019-06-04
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -150,7 +150,9 @@ var DevExpress;
                 },
                 multiValueEditable: { custom: "dxrd-multivalue-editable" },
                 multiValueSelectBox: { header: "dxrd-multivalue-selectbox", editorType: Preview.MultiValueEditor },
-                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header, extendedOptions: { placeholder: function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "PreviewStringId.ExportOption_CsvSeparator_UsingSystem"); } } },
+                csvSeparator: { header: DevExpress.JS.Widgets.editorTemplates.text.header,
+                    extendedOptions: { placeholder: ko.pureComputed(function () { return (DevExpress.Report.Preview.cultureInfo["csvTextSeparator"] || "") + " " + DevExpress.Designer.getLocalization("(Using System Separator)", "PreviewStringId.ExportOption_CsvSeparator_UsingSystem"); }) }
+                },
                 selectBox: { header: "dx-selectbox" }
             };
         })(Preview = Report.Preview || (Report.Preview = {}));
@@ -2356,7 +2358,7 @@ var DevExpress;
                     if (!parameter.isMultiValue && (parameter.lookUpValues() || this.isEnumType(parameter))) {
                         info.editorOptions.searchEnabled = true;
                     }
-                    if ((parameter.type === "System.DateTime" || parameter.isTypesCurrentType(parameter.intTypes.concat(parameter.floatTypes), parameter.type)) && !parameter.allowNull) {
+                    if ((parameter.type === "System.DateTime" || parameter.isTypesCurrentType(parameter.intTypes.concat(parameter.floatTypes), parameter.type)) && !parameter.allowNull && !parameter.isMultiValue && !parameter.isMultiValueWithLookUp) {
                         info.validationRules = DevExpress.Analytics.Widgets.requiredValidationRules;
                     }
                     else if (parameter.type === "System.Guid") {
@@ -3620,11 +3622,14 @@ var DevExpress;
                 return ReportPreview;
             }(DevExpress.Designer.Disposable));
             Preview.ReportPreview = ReportPreview;
+            function _getRightAreaWidth($container) {
+                var rightAreaWidth = ($container.find(".dxrd-right-panel:visible").outerWidth() || 0) + ($container.find(".dxrd-right-tabs:visible").outerWidth() || 0);
+                return isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
+            }
             function updatePreviewContentSize(previewSize, root, rtl) {
                 return function (tabPanelPosition) {
                     var $root = $(root).find(".dxrd-preview");
-                    var rightAreaWidth = $root.find(".dxrd-right-panel").outerWidth() + $root.find(".dxrd-right-tabs").outerWidth();
-                    rightAreaWidth = isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
+                    var rightAreaWidth = _getRightAreaWidth($root);
                     var surfaceWidth = $root.width() - rightAreaWidth - 10;
                     var cssStyleData = (rtl || tabPanelPosition === DevExpress.Analytics.TabPanel.Position.Left) ? { 'right': '', 'left': rightAreaWidth } : { 'right': rightAreaWidth, 'left': '' };
                     $root.find(".dxrd-preview-wrapper").css(cssStyleData);
@@ -3643,9 +3648,7 @@ var DevExpress;
                 if ($previewWrapper.length === 0 || $preview.length === 0) {
                     return 1;
                 }
-                var rightAreaWidth = $preview.find(".dxrd-right-panel").outerWidth() + $preview.find(".dxrd-right-tabs").outerWidth();
-                rightAreaWidth = isNaN(rightAreaWidth) ? 0 : rightAreaWidth;
-                var surfaceWidth = $preview.width() - rightAreaWidth - 10;
+                var surfaceWidth = $preview.width() - _getRightAreaWidth($preview) - 10;
                 var topAreaHeight = parseFloat($previewWrapper.css("top").split("px")[0]);
                 var designerHeight = $preview.outerHeight();
                 var surfaceHeight = designerHeight - topAreaHeight;
@@ -3729,7 +3732,7 @@ var DevExpress;
                     updatePreviewContentSize_(tabPanel.position());
                 };
                 updatePreviewContentSize_(tabPanel.position());
-                DevExpress.Designer.appendStaticContextToRootViewModel(designerModel);
+                DevExpress.Designer.appendStaticContextToRootViewModel(designerModel, DevExpress);
                 if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
                     callbacks.beforeRender && callbacks.beforeRender(designerModel);
                     $(element).children().remove();
@@ -6671,7 +6674,7 @@ var DevExpress;
                     if (reportPreview.actionsVisible())
                         updateMobilePreviewActionsPosition_(element);
                 });
-                DevExpress.Designer.appendStaticContextToRootViewModel(designerModel);
+                DevExpress.Designer.appendStaticContextToRootViewModel(designerModel, DevExpress);
                 if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
                     callbacks.beforeRender && callbacks.beforeRender(designerModel);
                     $(element).children().remove();
