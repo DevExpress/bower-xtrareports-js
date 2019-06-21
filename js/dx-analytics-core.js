@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 19.1.3
-* Build date: 2019-05-24
+* Version: 19.1.4
+* Build date: 2019-06-17
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -607,6 +607,10 @@ var DevExpress;
                 $.extend(Internal.messages, json.messages);
             }
             Utils.addCultureInfo = addCultureInfo;
+            function _stringEndsWith(string, searchString) {
+                return string.indexOf(searchString, this.length - searchString.length) !== -1;
+            }
+            Utils._stringEndsWith = _stringEndsWith;
             function getLocalization(text, id, _removeWinSymbols) {
                 if (id === void 0) { id = null; }
                 if (_removeWinSymbols === void 0) { _removeWinSymbols = Internal.removeWinSymbols; }
@@ -769,6 +773,7 @@ var DevExpress;
                     _this_1.isSearchedProperty = ko.observable(true);
                     _this_1.isParentSearched = ko.observable(false);
                     _this_1.rtl = DevExpress.config().rtlEnabled;
+                    _this_1._onValidatedHandler = undefined;
                     _this_1._cachedValue = undefined;
                     _this_1.isEditorSelected = ko.observable(false);
                     _this_1.isPropertyModified = ko.computed(function () {
@@ -851,6 +856,28 @@ var DevExpress;
                     _super.prototype.dispose.call(this);
                     this._cachedValue = null;
                     this._model(null);
+                    this.onValidatedHandler = null;
+                    this.validatorInstance && this.validatorInstance.dispose();
+                    this.validatorInstance = null;
+                };
+                Editor.prototype._assignValue = function (modelValue, model, newValue, name) {
+                    if (ko.isObservable(modelValue)) {
+                        modelValue(newValue);
+                    }
+                    else {
+                        model[name] = newValue;
+                    }
+                };
+                Editor.prototype._isValid = function (validationRules, newValue) {
+                    var _this_1 = this;
+                    this.onValidatedHandler = undefined;
+                    if (this.validatorInstance) {
+                        (validationRules || []).forEach(function (rule) { return rule && (rule.validator = _this_1.validatorInstance); });
+                        return this.validatorInstance.validate();
+                    }
+                    else {
+                        return DevExpress.validationEngine.validate(newValue, validationRules, this.displayName());
+                    }
                 };
                 Editor.prototype._init = function (editorTemplate, value, name) {
                     var _this_1 = this;
@@ -876,20 +903,31 @@ var DevExpress;
                                 return _this_1._cachedValue;
                             }
                         },
-                        write: function (val) {
+                        write: function (newValue) {
                             var model = _this_1._model();
                             if (!model) {
                                 return;
                             }
                             var modelValue = model[name];
-                            if (!DevExpress["validationEngine"].validate(val, _this_1.validationRules, _this_1.displayName()).isValid) {
+                            var validationRules = _this_1.validationRules;
+                            var assignValueFirst = validationRules.some(function (x) { return x.assignValueFirst; });
+                            if (assignValueFirst) {
+                                _this_1._assignValue(modelValue, model, newValue, name);
+                            }
+                            var validationResult = _this_1._isValid(validationRules, newValue);
+                            if (!validationResult.isValid) {
+                                if (validationResult.brokenRule && validationResult.brokenRule['isDeferred']) {
+                                    _this_1.onValidatedHandler = function (result) {
+                                        _this_1.onValidatedHandler = undefined;
+                                        if (!result.isValid)
+                                            return;
+                                        _this_1._assignValue(modelValue, model, newValue, name);
+                                    };
+                                }
                                 return;
                             }
-                            if (ko.isObservable(modelValue)) {
-                                modelValue(val);
-                            }
-                            else {
-                                model[name] = val;
+                            if (!assignValueFirst) {
+                                _this_1._assignValue(modelValue, model, newValue, name);
                             }
                         }
                     }));
@@ -933,9 +971,50 @@ var DevExpress;
                 Editor.prototype.getValidationRules = function () {
                     return !!this.info && !!this.info() && this.info().validationRules || (this.info().validationRules === null ? null : []);
                 };
+                Object.defineProperty(Editor.prototype, "validatorInstance", {
+                    get: function () {
+                        return this._validatorInstance;
+                    },
+                    set: function (newValue) {
+                        if (this._validatorInstance && this.onValidatedHandler) {
+                            this._validatorInstance.off("validated", this._onValidatedHandler);
+                        }
+                        this._validatorInstance = newValue;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(Editor.prototype, "onValidatedHandler", {
+                    get: function () {
+                        return this._onValidatedHandler;
+                    },
+                    set: function (newValue) {
+                        if (this._onValidatedHandler && this.validatorInstance) {
+                            this.validatorInstance.off("validated", this._onValidatedHandler);
+                            this._onValidatedHandler = newValue;
+                            if (newValue) {
+                                this.validatorInstance.on("validated", this._onValidatedHandler);
+                            }
+                        }
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 Object.defineProperty(Editor.prototype, "validationRules", {
                     get: function () {
                         return this.getValidationRules();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(Editor.prototype, "onValidatorInitialized", {
+                    get: function () {
+                        var _this_1 = this;
+                        var validationRuleSet = this.validationRules;
+                        if (!validationRuleSet || !validationRuleSet.length) {
+                            return undefined;
+                        }
+                        return function (e) { _this_1.validatorInstance = e && e.component; };
                     },
                     enumerable: true,
                     configurable: true
@@ -1267,6 +1346,15 @@ var DevExpress;
                             return Analytics.Utils.getLocalization(value, value.localizationId);
                         return Analytics.Utils.getLocalization($.isFunction(prevDisplayExpr) ? prevDisplayExpr(value) : value[prevDisplayExpr], value.localizationId);
                     };
+                    options.itemTemplate = function (itemData, itemIndex, itemElement) {
+                        var context = bindingContext.createChildContext({
+                            display: options.displayExpr(itemData)
+                        });
+                        $(itemElement).children().remove();
+                        var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('item-with-title'), $element = $(itemElement).append(templateHtml);
+                        ko.applyBindingsToDescendants(context, $element[0]);
+                        return itemElement;
+                    };
                     var extendedOptions = viewModel.getOptions ? viewModel.getOptions(options) : options;
                     ko.bindingHandlers["dxSelectBox"].init(element, function () { return extendedOptions; }, allBindings, viewModel, bindingContext);
                     return { controlsDescendantBindings: true };
@@ -1554,7 +1642,7 @@ var DevExpress;
                     dxEllipsisEditor.prototype._renderButton = function () {
                         this._$button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
                         this._attachButtonEvents();
-                        this._$buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS).height("100%").append(ko.utils.parseHtmlFragment(Analytics.Widgets.Internal.SvgTemplatesEngine.templates[EDITOR_BUTTON_ICON_TEMPLATE])).appendTo(this._$button);
+                        this._$buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS).height("100%").append(Analytics.Widgets.Internal.SvgTemplatesEngine.templates[EDITOR_BUTTON_ICON_TEMPLATE]).appendTo(this._$button);
                         ko.applyBindingsToDescendants(this._koContext, this._$buttonIcon[0]);
                         var buttonsContainer = _super.prototype._buttonsContainer.call(this);
                         this._$button.prependTo(buttonsContainer);
@@ -1592,7 +1680,14 @@ var DevExpress;
                     __extends(dxFileImagePicker, _super);
                     function dxFileImagePicker(element, options) {
                         var _this_1 = this;
-                        options.placeholder = options.placeholder || DevExpress.Analytics.Utils.getLocalization("(none)", "DxDesignerStringId.None");
+                        var knownPlaceholders = {
+                            "Image": "AnalyticsCoreStringId.ImagePicker_Placeholder",
+                            "File": "AnalyticsCoreStringId.FilePicker_Placeholder",
+                            "(none)": "DxDesignerStringId.None"
+                        };
+                        var displayValue = options.placeholderId || "(none)";
+                        var localizationId = knownPlaceholders[displayValue];
+                        options.placeholder = options.placeholder || Utils.getLocalization(displayValue, localizationId);
                         _this_1 = _super.call(this, element, options) || this;
                         return _this_1;
                     }
@@ -2028,18 +2123,19 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-commonCollection': '<div class="dx-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, displayName: displayName, level: level, info: info }">        </div>    </div>',
     'dx-commonCollectionItem': '<div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1, parentDisabled: editor.disabled }"></div>',
     'dx-color': '<div data-bind="dxColorBox: { value: value, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled }"></div>',
-    'dx-combobox': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>',
+    'item-with-title': '<div class="dx-listitem-with-title" data-bind="text: $data.display, attr: { title: $data.display }"></div>',
+    'dx-combobox': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }">    </div>',
     'dx-combobox-editable': '<div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', disabled: disabled, placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), acceptCustomValue: true, onCustomItemCreating: function(arg) { return { value: arg.text, displayValue: arg.text }; } })"></div>',
-    'dx-combobox-undo': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>',
+    'dx-combobox-undo': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }">    </div>',
     'dx-property-editor': '<div class="dx-editor" data-bind="visible: visible">        <div class="dx-group" data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dx-editor-header">                <div class="dx-field">                    <div class="dx-field-label dx-accordion-header dxd-text-primary" data-bind="styleunit: padding, css: { \'dx-accordion-empty\': templateName === \'dx-emptyHeader\' }">                        <!-- ko if: isComplexEditor -->                        <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }"></div>                        <!-- ko if: !!$data.textToSearch -->                        <div class="dx-group-header-font" data-bind="searchHighlighting: { text: displayName, textToSearch: textToSearch }, attr: { \'title\': displayName }"></div>                        <!-- /ko -->                        <!-- ko ifnot: !!$data.textToSearch -->                        <div class="dx-group-header-font" data-bind="text: displayName, attr: { \'title\': displayName }"></div>                        <!-- /ko -->                        <!-- /ko -->                        <!-- ko if: !isComplexEditor -->                        <!-- ko if: !!$data.textToSearch -->                        <div class="propertygrid-editor-displayName" data-bind="searchHighlighting: { text: displayName, textToSearch: textToSearch }, attr: { \'title\': displayName }, style: { fontWeight: isPropertyModified() ? \'Bold\' : \'\'}"></div>                        <!-- /ko -->                        <!-- ko ifnot: !!$data.textToSearch -->                        <div class="propertygrid-editor-displayName" data-bind="text: displayName, attr: { \'title\': displayName }, style: { fontWeight: isPropertyModified() ? \'Bold\' : \'\'}"></div>                        <!-- /ko -->                        <!-- /ko -->                    </div>                    <div class="dx-field-value">                        <div data-bind="service: { name: \'createEditorAddOn\' }"></div>                        <!-- ko if: templateName !== \'dx-emptyHeader\' -->                        <!-- ko lazy: { template: templateName } -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>            </div>            <!-- ko if: isComplexEditor -->            <div class="dx-editor-content dx-accordion-content">                <!-- ko if: (!$data.editorCreated || editorCreated) -->                <!-- ko template: contentTemplateName -->                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->        </div>    </div>',
     'dx-emptyHeader': ' ',
     'dx-date': '<div class="dx-datebox-container">        <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: \'datetime\', disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>    </div>',
-    'dx-file': '<div data-bind="dxFileImagePicker: { value: value, placeHolder: \'File\', disabled: disabled }"></div>',
+    'dx-file': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'File\', disabled: disabled }"></div>',
     'dx-modificators': '<div class="dx-font-content">        <div class="dx-field">            <div class="dx-field-label dxd-text-primary" data-bind="styleunit: { \'paddingLeft\': padding }"></div>            <!-- ko with: value -->            <div class="dx-field-value">                <div class="dx-font-styles-content">                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-bold" data-bind="css: { \'dxd-state-active\': bold(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { bold(!bold()); } }"><!-- ko template: \'dxrd-svg-fontstyle-bold\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-italic" data-bind="css: { \'dxd-state-active\': italic(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { italic(!italic()); } }"><!-- ko template: \'dxrd-svg-fontstyle-italic\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-underline" data-bind="css: { \'dxd-state-active\': underline(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { underline(!underline()); } }"><!-- ko template: \'dxrd-svg-fontstyle-underline\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-strikeout" data-bind="css: { \'dxd-state-active\': strikeout(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { strikeout(!strikeout()); } }"><!-- ko template: \'dxrd-svg-fontstyle-strikeout\'--><!-- /ko --></div>                </div>            </div>            <!-- /ko -->        </div>    </div>',
-    'dx-image': '<div data-bind="dxFileImagePicker: { value: value, placeHolder: \'Image\', accept: \'image/*\', type: \'img\', disabled: disabled }"></div>',
+    'dx-image': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'Image\', accept: \'image/*\', type: \'img\', disabled: disabled }"></div>',
     'dx-numeric': '<div data-bind="dxNumberBox: getOptions({ value:value, showSpinButtons:true, disabled:disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
     'dx-number-editor': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
-    'dx-text': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), $data.validationRules !== null && dxValidator: { validationRules: validationRules || [] }"></div>',
+    'dx-text': '<!-- ko if: $data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [], onInitialized: $data.onValidatorInitialized  }"></div>    <!-- /ko -->    <!-- ko if: !$data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled })"></div>    <!-- /ko -->',
     'dx-string-array': '<div class="dx-field">        <div class="dx-string-array-container dx-texteditor dx-multiline">            <textarea class="dx-string-array-textarea dx-texteditor-input" data-bind="value: value, disable: disabled"></textarea>        </div>    </div>',
     'dx-propertieseditor': '<div data-bind="css: { \'dx-rtl\' : rtl }">        <div class="dx-editors">            <div class="dx-fieldset">                <!-- ko foreach: getEditors() -->                <!-- ko template: editorTemplate -->                <!-- /ko -->                <!-- /ko -->            </div>        </div>    </div>',
     'dx-objectEditorContent': '<!-- ko if: visible -->    <div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>    <!-- /ko -->',
@@ -2094,7 +2190,8 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-treelist-item-ellipsis': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="styleunit: padding, click: renderNext">        <div class="dx-treelist-collapsedbutton"></div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent">                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-ellipsis-text dxd-text-accented dxd-hyperlink-color" data-bind="text: $data.text()"></div>                </div>            </div>        </div>    </div>',
     'dx-treelist-item': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <!-- /ko -->    </div>',
     'dx-treelist-accordion-item': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
-    'dx-treelist-header-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <!-- ko if: $data.hasItems-->        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>        <!-- /ko -->        <!-- ko ifnot: $data.hasItems-->        <div class="dx-treelist-collapsedbutton"></div>        <!-- /ko -->        <div class="dx-treelist-caption">            <!-- ko if: actions && actions.length > 0 -->            <div class="dx-treelist-action-container" data-bind="visible: isSelected">                <!-- ko template: actionsTemplate() -->                <!-- /ko -->            </div>            <!-- /ko  -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                <div class="dx-treelist-text-wrapper">                    <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                </div>            </div>        </div>    </div>',
+    'dx-treelist-header-item': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <!-- ko if: $data.hasItems-->        <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed"></div>        <!-- /ko -->        <!-- ko ifnot: $data.hasItems-->        <div class="dx-treelist-collapsedbutton"></div>        <!-- /ko -->        <div class="dx-treelist-caption">            <!-- ko if: actions && actions.length > 0 -->            <div class="dx-treelist-action-container" data-bind="visible: isSelected">                <!-- ko template: actionsTemplate() -->                <!-- /ko -->            </div>            <!-- /ko  -->            <!-- ko if: isDraggable -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected, draggable: dragDropHandler">                <!-- ko template: { name: \'dx-treelist-header-item-caption-content\' } -->                <!-- /ko -->            </div>            <!-- /ko -->            <!-- ko ifnot: isDraggable -->            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected">                <!-- ko template: { name: \'dx-treelist-header-item-caption-content\' } -->                <!-- /ko -->            </div>            <!-- /ko -->        </div>    </div>',
+    'dx-treelist-header-item-caption-content': '<div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>    <div class="dx-treelist-text-wrapper">        <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>    </div>',
     'dx-treelist-item-with-hover': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <!-- /ko -->    </div>',
     'dx-treelist-accordion-item-with-hover': '<div data-bind="dxdAccordionExt: { collapsed: collapsed, lazyContentRendering: true }">        <!-- ko template: "dx-treelist-header-item-with-hover" -->        <!-- /ko -->        <div class="dx-fieldset dx-accordion-content dxd-back-primary">            <!-- ko with: data -->            <!-- ko template: { name: contenttemplate } -->            <!-- /ko -->            <!-- /ko -->        </div>    </div>',
     'dx-treelist-header-item-with-hover': '<div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">        <div class="dx-treelist-item dx-fontsize-reestablished dxd-list-item-back-color" data-bind="event: {         dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() },         mouseenter: mouseenter,         mouseleave: mouseleave    }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected dxd-back-secondary\': isSelected() || isMultiSelected() }">            <div class="dx-treelist-collapsedbutton" data-bind="css: nodeImageClass, template: \'dxrd-svg-collapsed\', click: toggleCollapsed, style: { \'visibility\': hasItems ? \'visible\' : \'hidden\' }"></div>            <div class="dx-treelist-caption">                <!-- ko if: actions && actions.length > 0 -->                <div class="dx-treelist-action-container" data-bind="visible: $data.isSelected() || $data.isHovered()">                    <!-- ko template: actionsTemplate() -->                    <!-- /ko -->                </div>                <!-- /ko  -->                <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                    <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                    <div class="dx-treelist-text-wrapper">                        <div class="dx-treelist-text" data-bind="text: text, attr: { title: text }"></div>                    </div>                </div>            </div>        </div>    </div>',
@@ -2104,7 +2201,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-borders': '<div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>',
     'dxrd-colorpicker': '<div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled }"></div>',
     'dxrd-expressionstring': '<!-- ko if: $data.value() -->    <div data-bind="dxExpressionEditor: getOptions({ options: value, fieldListProvider: $root.dataBindingsProvider, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() })"></div>    <!-- /ko -->',
-    'dxrd-field': '<!-- ko displayNameExtender: { path: path, dataMember: value } -->    <div data-bind="dxFieldListPicker: { path: path, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>    <!-- /ko -->',
+    'dxrd-field': '<!-- ko displayNameExtender: { path: path, dataMember: value } -->    <div data-bind="dxFieldListPicker: { path: path, acceptCustomValue: true, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>    <!-- /ko -->',
     'dxrd-filterstring': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
     'dxrd-filterstringgroup': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsGroupProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
     'dxrd-formatstring': '<div data-bind="dxFormatEditor: { value: value, disabled: disabled }"></div>',
@@ -2122,13 +2219,13 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-collectionactions-template': '<div class="dxrd-action-items-container"></div>    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap($data.imageClassName) }, attr: { id: id, title: text }"></div>    <div data-bind="dxPopup: { width: 235, height: \'auto\',            position: { my: $root.rtl ? \'left top\': \'right top\', at: \'bottom\', of: (\'#\' + id) },            showTitle: false,            showCloseButton: false,            animation: {},            closeOnOutsideClick: true,            container: ($data.getContainer || function(_e, selector) { return selector; })($element, \'.dxrd-action-items-container\'),            shading: false,            visible: popoverVisible }">        <!-- ko foreach: actions -->        <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: clickAction, css: { \'dxrd-disabled-button\': disabled }">            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>        </div>        <!-- /ko -->    </div>',
     'dxrd-menubutton-template-base': '<div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">        <div class="dxrd-menu-place" style="width:54px;"></div>        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: \'dxrd-svg-menu-menu\', css: {\'dxd-state-active\': appMenuVisible }"></div>        <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {                             width: 250,                             height: \'100%\' ,                             position: $data.rtl ? { my: \'right top\' , at: \'left top\' , offset: \'-10 0\' } : { my: \'left top\' , at: \'right top\' , offset: \'10 0\' },                             showTitle: false,                             showCloseButton: false,                             container: getMenuPopupContainer($element),                             target: getMenuPopupTarget($element),                             animation: {},                             closeOnOutsideClick: function(e) {                                var buttonClassName = \'dxrd-menu-button-image\';                                var parentClassList = e.target.parentNode && e.target.parentNode.parentNode && e.target.parentNode.parentNode.classList;                                stopPropagation = (e.target.classList && e.target.classList.contains(buttonClassName)) || (parentClassList && parentClassList.contains(buttonClassName));                                return true;                             },                             shading: false,                             focusStateEnabled: false,                             visible: appMenuVisible }">            <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>            <!-- ko foreach: actionLists.menuItems -->            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { \'dxrd-disabled-button\': disabled }, visible: visible">                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>            </div>            <!-- /ko -->        </div>    </div>',
     'dxrd-top-grid': '<!-- ko if: popularVisible -->    <div class="dx-fieldset">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dxrd-group-header-text" data-bind="text: $root.actionsGroupTitle()"></span>            </div>            <div class="dx-accordion-content dxd-back-primary">                <!-- ko foreach: (contextActions || []) -->                <!-- ko if: $data.templateName -->                <!-- ko template: templateName  -->                <!-- /ko -->                <!-- /ko -->                <!-- ko if: !$data.templateName -->                <div class="dxrd-properties-grid-action" data-bind="dxclick: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { \'dxrd-disabled-button\': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                </div>                <!-- /ko -->                <!-- /ko -->                <!-- ko with: popularProperties -->                <div style="position: relative" data-bind="template: { name: \'dx-propertieseditor\', data: $data }"></div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
-    'dxrd-propertiestab': '<div class="dxrd-properties-wrapper" data-bind="visible: active() && visible()">    <div style="height:100%" class="dxd-text-primary">        <div class="dxrd-right-panel-header">            <span data-bind="text: text"></span>        </div>        <!-- ko with: model -->        <!-- ko if: $root.controlsStore.visible() -->        <div class="dx-property-grid-header">            <div class="dx-property-grid-header-content">                <div class="dx-property-grid-sorting-actions-group" data-bind="css: { \'dx-property-gread-search-collapsed\': isSearching }">                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>                    <div class="dx-property-grid-sorting-actions-container">                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: \'dxrd-svg-properties-sortingbyalphabet\', iconClass: \'image-sortingbyalphabet\' }"></div>                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: \'dxrd-svg-properties-sortingbygroups\', iconClass: \'image-sortingbygroups\' }"></div>                    </div>                </div>                <div class="dx-property-grid-search-group dx-property-gread-search-collapsed" data-bind="css: { \'dx-property-gread-search-collapsed\': !isSearching() }">                    <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active\': isSearching }, dxButtonWithTemplate: { onClick: switchSearchBox, icon: \'dxrd-svg-properties-search\', iconClass: \'image-search\' }"></div>                    <div class="dx-property-grid-search-box" data-bind="dxTextBox: { value: textToSearch, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true }, cacheElement: { action: function(element) { searchBox(element); } }"></div>                </div>            </div>        </div>        <!-- /ko -->        <div class="dxrd-properties-grid dxd-border-primary" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, styleunit: { top: $root.controlsStore.visible() ? 80 : 40 }">            <!-- ko template: { name: \'dxrd-top-grid\', data: { contextActions: $root.contextActions, popularProperties: $root.popularProperties, collapsed: ko.observable(false), popularVisible: $root.popularVisible() && isSortingByGroups(), actionsGroupTitle: $root.actionsGroupTitle } } -->            <!-- /ko -->            <div data-bind="visible: isSortingByGroups">                <!-- ko foreach: groups -->                <div class="dx-fieldset" data-bind="visible: visible">                    <div data-bind="dxdAccordion: { collapsed: collapsed }">                        <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                            <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                            <span class="dxrd-group-header-text" data-bind="text: displayName()"></span>                        </div>                        <div class="dx-accordion-content dxd-back-primary">                            <!-- ko ifnot: editorsCreated -->                            <div class="dx-accordion-content-loading-panel">                                <div data-bind="dxLoadIndicator: { visible: !editorsCreated() }"></div>                            </div>                            <!-- /ko -->                            <!-- ko if: $data.editorsRendered() -->                            <div data-bind="visible: editorsCreated">                                <div class="dx-editors">                                    <!-- ko foreach: editors -->                                    <!-- ko template: editorTemplate -->                                    <!-- /ko -->                                    <!-- ko if: ($index() === $parent.editors().length - 1 && $parent.editorsCreated(true)) -->                                    <!-- /ko -->                                    <!-- /ko -->                                </div>                            </div>                            <!-- /ko -->                        </div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dx-fieldset dxd-back-primary" data-bind="visible: !isSortingByGroups()">                <div data-bind="dxLoadIndicator: { visible: !allEditorsCreated() }"></div>                <!-- ko if: $data.editorsRendered() -->                <div data-bind="visible: allEditorsCreated">                    <div class="dx-editors">                        <!-- ko foreach: $data.getEditors() -->                        <!-- ko template: editorTemplate -->                        <!-- /ko -->                        <!-- ko if: ($index() === $parent._editors().length - 1 && $parent.allEditorsCreated(true)) -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>                <!-- /ko -->            </div>            <div data-bind="dxPopup: { width: 148, height: \'auto\',        position: $data.rtl ? { my: \'left top\', at: \'right top\', of: popupService.target } : { my: \'right top\', at: \'left top\', of: popupService.target },        container: \'.dx-designer-viewport\',        target: popupService.target,        showTitle: false,        showCloseButton: false,        animation: {},        closeOnOutsideClick: true,        shading: false,        visible: popupService.visible }">                <div data-options="dxTemplate: { name: \'content\' }">                    <!-- ko if: popupService.title -->                    <div class="dxrd-editor-menu-caption dxd-text-primary" data-bind="text: popupService.title"></div>                    <!-- /ko -->                    <!-- ko foreach: popupService.actions -->                    <!-- ko if: (!visible || visible && visible()) -->                    <div class="dxrd-editor-menu-item dxd-list-item-back-color dxd-back-highlighted dxd-state-normal" data-bind="dxclick: action">                        <div class="dxrd-menuitem-box dxd-property-grid-menu-box-color dxd-back-contrast">                            <div class="dxrd-menuitem-box-inside dxd-back-secondary"></div>                        </div>                        <span class="dxrd-editor-menu-title dxd-text-primary" data-bind="text: title"></span>                    </div>                    <!-- /ko -->                    <!-- /ko -->                </div>            </div>        </div>        <!-- /ko -->    </div></div>',
+    'dxrd-propertiestab': '<div class="dxrd-properties-wrapper" data-bind="visible: active() && visible()">    <div style="height:100%" class="dxd-text-primary">        <div class="dxrd-right-panel-header">            <span data-bind="text: text"></span>        </div>        <!-- ko with: model -->        <!-- ko if: $root.controlsStore.visible() -->        <div class="dx-property-grid-header">            <div class="dx-property-grid-header-content">                <div class="dx-property-grid-sorting-actions-group" data-bind="css: { \'dx-property-gread-search-collapsed\': isSearching }">                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>                    <div class="dx-property-grid-sorting-actions-container">                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: \'dxrd-svg-properties-sortingbyalphabet\', iconClass: \'image-sortingbyalphabet\' }"></div>                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: \'dxrd-svg-properties-sortingbygroups\', iconClass: \'image-sortingbygroups\' }"></div>                    </div>                </div>                <div class="dx-property-grid-search-group dx-property-gread-search-collapsed" data-bind="css: { \'dx-property-gread-search-collapsed\': !isSearching() }">                    <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active\': isSearching }, dxButtonWithTemplate: { onClick: switchSearchBox, icon: \'dxrd-svg-properties-search\', iconClass: \'image-search\' }"></div>                    <div class="dx-property-grid-search-box" data-bind="dxTextBox: { value: textToSearch, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true }, cacheElement: { action: function(element) { searchBox(element); } }"></div>                </div>            </div>        </div>        <!-- /ko -->        <div class="dxrd-properties-grid dxd-border-primary" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, styleunit: { top: $root.controlsStore.visible() ? 80 : 40 }">            <!-- ko template: { name: \'dxrd-top-grid\', data: { contextActions: $root.contextActions, popularProperties: $root.popularProperties, collapsed: ko.observable(false), popularVisible: $root.popularVisible() && isSortingByGroups(), actionsGroupTitle: $root.actionsGroupTitle } } -->            <!-- /ko -->            <div data-bind="visible: isSortingByGroups">                <!-- ko foreach: groups -->                <div class="dx-fieldset" data-bind="visible: visible">                    <div data-bind="dxdAccordion: { collapsed: collapsed }">                        <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                            <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                            <span class="dxrd-group-header-text" data-bind="text: displayName()"></span>                        </div>                        <div class="dx-accordion-content dxd-back-primary">                            <!-- ko ifnot: editorsCreated -->                            <div class="dx-accordion-content-loading-panel">                                <div data-bind="dxLoadIndicator: { visible: !editorsCreated() }"></div>                            </div>                            <!-- /ko -->                            <!-- ko if: $data.editorsRendered() -->                            <div data-bind="visible: editorsCreated">                                <div class="dx-editors">                                    <!-- ko foreach: editors -->                                    <!-- ko template: editorTemplate -->                                    <!-- /ko -->                                    <!-- ko if: ($index() === $parent.editors().length - 1 && $parent.editorsCreated(true)) -->                                    <!-- /ko -->                                    <!-- /ko -->                                </div>                            </div>                            <!-- /ko -->                        </div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dx-fieldset dxd-back-primary" data-bind="visible: !isSortingByGroups()">                <div data-bind="dxLoadIndicator: { visible: !allEditorsCreated() }"></div>                <!-- ko if: $data.editorsRendered() -->                <div data-bind="visible: allEditorsCreated">                    <div class="dx-editors">                        <!-- ko foreach: $data.getEditors() -->                        <!-- ko template: editorTemplate -->                        <!-- /ko -->                        <!-- ko if: ($index() === $parent._editors().length - 1 && $parent.allEditorsCreated(true)) -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>                <!-- /ko -->            </div>            <div data-bind="dxPopup: { width: 148, height: \'auto\',        position: $data.rtl ? { my: \'left top\', at: \'right top\', of: popupService.target } : { my: \'right top\', at: \'left top\', of: popupService.target },        container: \'.dx-designer-viewport\',        target: popupService.target,        showTitle: false,        showCloseButton: false,        animation: {},        closeOnOutsideClick: true,        shading: false,        visible: popupService.visible }">                <div data-options="dxTemplate: { name: \'content\' }">                    <!-- ko if: popupService.title -->                    <div class="dxrd-editor-menu-caption dxd-text-primary" data-bind="text: popupService.title"></div>                    <!-- /ko -->                    <!-- ko foreach: popupService.actions -->                    <!-- ko if: (!visible || visible()) -->                    <div class="dxrd-editor-menu-item dxd-list-item-back-color dxd-back-highlighted dxd-state-normal" data-bind="dxclick: action">                        <div class="dxrd-menuitem-box dxd-property-grid-menu-box-color dxd-back-contrast">                            <div class="dxrd-menuitem-box-inside dxd-back-secondary"></div>                        </div>                        <span class="dxrd-editor-menu-title dxd-text-primary" data-bind="text: title"></span>                    </div>                    <!-- /ko -->                    <!-- /ko -->                </div>            </div>        </div>        <!-- /ko -->    </div></div>',
     'dx-right-panel-lightweight': '<div class="dxrd-right-panel dx-shadow dxd-border-secondary dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'1px\', 325)">        <!-- ko foreach: tabPanel.tabs -->        <!-- ko lazy: { template: $data.template } -->        <!-- /ko -->        <!-- /ko -->    </div>',
     'dxrd-right-panel-template-base': '<div class="dx-shadow dxd-border-secondary" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses({\'border\': !tabPanel.collapsed()})">        <div class="dxrd-right-panel-collapse dxd-back-primary dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: tabPanel.headerWidth }, css: tabPanel.cssClasses(), dxclick: function() { tabPanel.collapsed(!tabPanel.collapsed()); }, attr: { title: tabPanel.toggleCollapsedText }">            <div class="dxrd-right-panel-collapse-image" data-bind="css: tabPanel.toggleCollapsedImage().class, template: tabPanel.toggleCollapsedImage().template"></div>        </div>        <div class="dxrd-right-panel dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'50px\', 340)">            <!-- ko foreach: tabPanel.tabs -->            <!-- ko lazy: { template: $data.template } -->            <!-- /ko -->            <!-- /ko -->        </div>        <div class="dxrd-right-tabs dxd-side-panel-tabs-back-color dxd-back-contrast" data-bind="css: tabPanel.cssClasses()">            <!-- ko foreach: tabPanel.tabs -->            <div class="dxrd-tab-item dxd-side-panel-tab-back-color dxd-back-highlighted" data-bind="dxclick: function(s) { $parent.tabPanel.selectTab({ model: s }) }, css: { \'dxd-state-active dxd-state-no-hover\': active, \'dxrd-tab-item-disabled\': disabled }, attr: { title: text }, visible: visible">                <div class="dxrd-image-padding" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}"> </div>            </div>            <!-- /ko -->        </div>    </div>',
     'dxrd-toolbar-template-base': '<div class="dxrd-toolbar-wrapper">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }"></div>    </div>',
     'dxrd-toolbar-tmplt': '<!-- ko foreach: $data -->    <!-- ko if: $data.templateName -->    <!-- ko template: templateName  -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: !$data.templateName -->    <div class="dxrd-toolbar-item" data-bind="visible: visible">        <div data-bind="template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { class: \'dxrd-toolbar-item-image dxd-button-back-color dxd-state-normal dxd-back-highlighted \' + (ko.unwrap($data.imageClassName) || \'\'), title: $data.displayText && $data.displayText() || text }, dxclick: function() { if((typeof $data.disabled === \'function\') && !disabled() || !disabled) { clickAction($root.model && $root.model()); } }, css: {\'dxrd-disabled-button\': disabled, \'dxd-state-active\': $data.selected }"> </div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>    <!-- /ko -->    <!-- /ko -->',
     'dxrd-toolbox-template-base': '<div class="dxrd-toolbox-wrapper dxd-toolbox-back-color dxd-back-primary2" data-bind="dxScrollView: { showScrollbar: \'onHover\', scrollByContent: false, bounceEnabled: false, useNative: false, scrollByThumb: true }">        <!-- ko foreach: toolboxItems -->        <div class="dxrd-toolbox-item" data-bind="attr: { title: displayName }">            <div class="dx-background-inheritor dxd-toolbox-item-back-color dxd-back-secondary">                <div class="dxrd-image-padding dx-fontsize-reestablished" data-bind="template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, css: $data.imageClassName, draggable: $root.toolboxDragHandler"> </div>            </div>        </div>        <!-- /ko -->    </div>',
-    'dxrd-zoom-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomLevels, value: $data.zoom, displayExpr: function(val) { return Math.round((val || this.option(\'value\')) * 100) + \'%\'; }, displayCustomValue: true, disabled: disabled }"></div>    </div>',
+    'dxrd-zoom-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomLevels, value: $data.zoom, displayExpr: function(val) { return Math.round((val || this.option(\'value\')) * 100) + \'%\'; }, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating, disabled: disabled }"></div>    </div>',
     'dxrd-bordereditor': '<div class="bordereditor-content">    <!-- ko with: value-->    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-none" data-bind="template: \'dxrd-svg-properties-borders-none\', css: { \'dxd-state-active\': (!bottom() && !left() && !top() && !right()), \'dxrd-disabled-button\': disabled }, click: function() { setNone() }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-all right-margin" data-bind="template: \'dxrd-svg-properties-borders-all\', css: { \'dxd-state-active\': (bottom() && left() && top() && right()), \'dxrd-disabled-button\': disabled  }, click: function() { setAll() }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-left" data-bind="template: \'dxrd-svg-properties-borders-left\', css: { \'dxd-state-active\': left(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'left\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-top" data-bind="template: \'dxrd-svg-properties-borders-top\', css: { \'dxd-state-active\': top(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'top\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-right" data-bind="template: \'dxrd-svg-properties-borders-right\', css: { \'dxd-state-active\': right(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'right\') }"></div>    <div class="bordereditor-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dxrd-image-borders-bottom" data-bind="template: \'dxrd-svg-properties-borders-bottom\', css: { \'dxd-state-active\': bottom(), \'dxrd-disabled-button\': disabled }, click: function() { setValue(\'bottom\') }"></div>    <!-- /ko --></div>',
 });
 
@@ -8452,12 +8549,12 @@ DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "JS.Data.crite
   }
 */
 var criteriaparser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,29],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,24],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,23],$Vk=[1,26],$Vl=[1,28],$Vm=[1,27],$Vn=[1,31],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[1,51],$VI=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VJ=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,50,51,52,54,55,56],$VK=[1,58],$VL=[5,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VM=[5,26,27,29,35,51],$VN=[1,111],$VO=[1,112],$VP=[1,106],$VQ=[1,108],$VR=[1,109],$VS=[1,107],$VT=[1,110],$VU=[5,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,36,51,59],$VV=[5,11,12,14,15,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],$VW=[5,18,19,24,25,26,27,29,30,35,51],$VX=[5,18,19,20,21,22,23,24,25,26,27,29,30,35,51],$VY=[29,35];
-var parser = {trace: function trace () { },
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,6],$V2=[1,30],$V3=[1,8],$V4=[1,9],$V5=[1,10],$V6=[1,11],$V7=[1,25],$V8=[1,12],$V9=[1,13],$Va=[1,14],$Vb=[1,15],$Vc=[1,16],$Vd=[1,17],$Ve=[1,18],$Vf=[1,19],$Vg=[1,20],$Vh=[1,21],$Vi=[1,22],$Vj=[1,23],$Vk=[1,24],$Vl=[1,27],$Vm=[1,29],$Vn=[1,28],$Vo=[1,32],$Vp=[1,33],$Vq=[1,34],$Vr=[1,35],$Vs=[1,36],$Vt=[1,37],$Vu=[1,38],$Vv=[1,39],$Vw=[1,40],$Vx=[1,41],$Vy=[1,42],$Vz=[1,43],$VA=[1,44],$VB=[1,45],$VC=[1,46],$VD=[1,47],$VE=[1,48],$VF=[1,49],$VG=[1,50],$VH=[1,51],$VI=[1,52],$VJ=[5,9,10,11,12,13,14,15,16,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,52],$VK=[5,9,10,11,12,13,14,15,16,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,51,52,53,55,56,57],$VL=[1,60],$VM=[5,14,15,16,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,52],$VN=[5,27,28,30,36,52],$VO=[1,113],$VP=[1,114],$VQ=[1,108],$VR=[1,110],$VS=[1,111],$VT=[1,109],$VU=[1,112],$VV=[5,9,10,11,12,13,14,15,16,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,37,52,60],$VW=[5,11,12,14,15,16,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,52],$VX=[5,19,20,25,26,27,28,30,31,36,52],$VY=[5,19,20,21,22,23,24,25,26,27,28,30,31,36,52],$VZ=[30,36];
+var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"~":17,"OP_EQ":18,"OP_NE":19,"OP_GT":20,"OP_LT":21,"OP_GE":22,"OP_LE":23,"OP_LIKE":24,"NOT":25,"AND":26,"OR":27,"(":28,")":29,"IS":30,"NULL":31,"OP_IN":32,"arguments":33,"OP_BETWEEN":34,",":35,"NAME_LATIN":36,"AGG_MIN":37,"AGG_MAX":38,"AGG_COUNT":39,"AGG_AVG":40,"AGG_SUM":41,"AGG_EXISTS":42,"AGG_SINGLE":43,"STRING":44,"NUMBER":45,"OBJECT":46,"BOOLEAN":47,"GUID":48,"property":49,"[":50,"]":51,".":52,"agg":53,"FIELD_END":54,"CH":55,"ESC_CH":56,"FIELD_START":57,"paramName":58,"NAME_SOFT":59,"?":60,"commaseparated":61,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"~",18:"OP_EQ",19:"OP_NE",20:"OP_GT",21:"OP_LT",22:"OP_GE",23:"OP_LE",24:"OP_LIKE",25:"NOT",26:"AND",27:"OR",28:"(",29:")",30:"IS",31:"NULL",32:"OP_IN",34:"OP_BETWEEN",35:",",36:"NAME_LATIN",37:"AGG_MIN",38:"AGG_MAX",39:"AGG_COUNT",40:"AGG_AVG",41:"AGG_SUM",42:"AGG_EXISTS",43:"AGG_SINGLE",44:"STRING",45:"NUMBER",46:"OBJECT",47:"BOOLEAN",48:"GUID",50:"[",51:"]",52:".",54:"FIELD_END",55:"CH",56:"ESC_CH",57:"FIELD_START",59:"NAME_SOFT",60:"?"},
-productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[53,3],[53,1],[53,3],[53,1],[53,4],[53,4],[53,3],[53,4],[53,4],[53,4],[49,2],[49,2],[49,2],[49,3],[49,3],[49,1],[49,1],[49,1],[58,1],[58,1],[58,2],[58,2],[8,2],[8,1],[33,2],[33,3],[61,1],[61,3]],
+symbols_: {"error":2,"expressions":3,"exp":4,"EOF":5,"const":6,"propertyWithAgg":7,"parameter":8,"*":9,"/":10,"+":11,"-":12,"%":13,"|":14,"&":15,"^":16,"!":17,"~":18,"OP_EQ":19,"OP_NE":20,"OP_GT":21,"OP_LT":22,"OP_GE":23,"OP_LE":24,"OP_LIKE":25,"NOT":26,"AND":27,"OR":28,"(":29,")":30,"IS":31,"NULL":32,"OP_IN":33,"arguments":34,"OP_BETWEEN":35,",":36,"NAME_LATIN":37,"AGG_MIN":38,"AGG_MAX":39,"AGG_COUNT":40,"AGG_AVG":41,"AGG_SUM":42,"AGG_EXISTS":43,"AGG_SINGLE":44,"STRING":45,"NUMBER":46,"OBJECT":47,"BOOLEAN":48,"GUID":49,"property":50,"[":51,"]":52,".":53,"agg":54,"FIELD_END":55,"CH":56,"ESC_CH":57,"FIELD_START":58,"paramName":59,"NAME_SOFT":60,"?":61,"commaseparated":62,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",9:"*",10:"/",11:"+",12:"-",13:"%",14:"|",15:"&",16:"^",17:"!",18:"~",19:"OP_EQ",20:"OP_NE",21:"OP_GT",22:"OP_LT",23:"OP_GE",24:"OP_LE",25:"OP_LIKE",26:"NOT",27:"AND",28:"OR",29:"(",30:")",31:"IS",32:"NULL",33:"OP_IN",35:"OP_BETWEEN",36:",",37:"NAME_LATIN",38:"AGG_MIN",39:"AGG_MAX",40:"AGG_COUNT",41:"AGG_AVG",42:"AGG_SUM",43:"AGG_EXISTS",44:"AGG_SINGLE",45:"STRING",46:"NUMBER",47:"OBJECT",48:"BOOLEAN",49:"GUID",51:"[",52:"]",53:".",55:"FIELD_END",56:"CH",57:"ESC_CH",58:"FIELD_START",60:"NAME_SOFT",61:"?"},
+productions_: [0,[3,2],[4,1],[4,1],[4,1],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,2],[4,2],[4,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,4],[4,2],[4,3],[4,3],[4,3],[4,3],[4,4],[4,3],[4,7],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[4,2],[6,1],[6,1],[6,1],[6,1],[6,1],[6,1],[7,6],[7,5],[7,3],[7,4],[7,3],[7,1],[7,4],[54,3],[54,1],[54,3],[54,1],[54,4],[54,4],[54,3],[54,4],[54,4],[54,4],[50,2],[50,2],[50,2],[50,3],[50,3],[50,1],[50,1],[50,1],[59,1],[59,1],[59,2],[59,2],[8,2],[8,1],[34,2],[34,3],[62,1],[62,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -8469,7 +8566,7 @@ break;
 case 2:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("const", { value: $$[$0] }); 
 break;
-case 3: case 4: case 40: case 41: case 42: case 43: case 44:
+case 3: case 4: case 41: case 42: case 43: case 44: case 45:
  this.$ = $$[$0]; 
 break;
 case 5:
@@ -8502,31 +8599,34 @@ break;
 case 14:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.Plus, operator: $$[$0] }); 
 break;
-case 15:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.BitwiseNot, operator: $$[$0] }); 
+case 15: case 25:
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.Not, operator: $$[$0] }); 
 break;
 case 16:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Equal }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.BitwiseNot, operator: $$[$0] }); 
 break;
 case 17:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.NotEqual }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Equal }); 
 break;
 case 18:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Greater }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.NotEqual }); 
 break;
 case 19:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Less }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Greater }); 
 break;
 case 20:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.GreaterOrEqual }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Less }); 
 break;
 case 21:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.LessOrEqual }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.GreaterOrEqual }); 
 break;
 case 22:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Like }); 
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.LessOrEqual }); 
 break;
 case 23:
+ this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("binary",  { left: $$[$0-2], right: $$[$0], operatorType: DevExpress.Analytics.Criteria.BinaryOperatorType.Like }); 
+break;
+case 24:
 
             this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { 
                 operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.Not, 
@@ -8534,22 +8634,19 @@ case 23:
             });
         
 break;
-case 24:
- this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.Not, operator: $$[$0] }); 
-break;
-case 25:
+case 26:
  this.$ = DevExpress.Analytics.Criteria.GroupOperator.combine(DevExpress.Analytics.Criteria.GroupOperatorType.And, [$$[$0-2], $$[$0]]); 
 break;
-case 26:
+case 27:
  this.$ = DevExpress.Analytics.Criteria.GroupOperator.combine(DevExpress.Analytics.Criteria.GroupOperatorType.Or, [$$[$0-2], $$[$0]]); 
 break;
-case 27: case 63: case 78:
+case 28: case 64: case 79:
  this.$ = $$[$0-1]; 
 break;
-case 28:
+case 29:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.IsNull, operator: $$[$0-2] }); 
 break;
-case 29:
+case 30:
  
             this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("unary", { 
                 operatorType: DevExpress.Analytics.Criteria.UnaryOperatorType.Not,
@@ -8557,40 +8654,40 @@ case 29:
             }); 
         
 break;
-case 30:
+case 31:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("in", { criteriaOperator: $$[$0-2], operands: $$[$0] }); 
 break;
-case 31:
+case 32:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("between", { property: $$[$0-6], begin: $$[$0-3], end: $$[$0-1] }); 
 break;
-case 32:
+case 33:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType[$$[$0-1]] || $$[$0-1], operands: $$[$0] }); 
 break;
-case 33:
+case 34:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType.Min, operands: $$[$0] }); 
 break;
-case 34:
+case 35:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType.Max, operands: $$[$0] }); 
 break;
-case 35:
+case 36:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType["Count"] || "Count", operands: $$[$0] }); 
 break;
-case 36:
+case 37:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType["Avg"] || "Avg", operands: $$[$0] }); 
 break;
-case 37:
+case 38:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType["Sum"] || "Sum", operands: $$[$0] }); 
 break;
-case 38:
+case 39:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType["Exists"] || "Exists", operands: $$[$0] }); 
 break;
-case 39:
+case 40:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("function", { operatorType: DevExpress.Analytics.Criteria.FunctionOperatorType["Single"] || "Single", operands: $$[$0] }); 
 break;
-case 45:
+case 46:
  this.$ = null; 
 break;
-case 46:
+case 47:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-5].name, startColumn: $$[$0-5].col, startLine: $$[$0-5].line, originalPropertyLength: _$[$0-5].last_column - _$[$0-5].first_column + 1 }), 
@@ -8598,7 +8695,7 @@ case 46:
             );
         
 break;
-case 47:
+case 48:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-4].name, startColumn: $$[$0-4].col, startLine: $$[$0-4].line, originalPropertyLength: _$[$0-4].last_column - _$[$0-4].first_column + 1 }), 
@@ -8606,7 +8703,7 @@ case 47:
             );
         
 break;
-case 48:
+case 49:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line, originalPropertyLength: _$[$0-2].last_column - _$[$0-2].first_column }), 
@@ -8614,7 +8711,7 @@ case 48:
             );
         
 break;
-case 49:
+case 50:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-3].name, startColumn: $$[$0-3].col, startLine: $$[$0-3].line, originalPropertyLength: _$[$0-3].last_column - _$[$0-3].first_column + 1 }), 
@@ -8622,19 +8719,19 @@ case 49:
             );
         
 break;
-case 50:
+case 51:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0-2].name, startColumn: $$[$0-2].col, startLine: $$[$0-2].line, originalPropertyLength: _$[$0-2].last_column - _$[$0-2].first_column + 1 }), 
                 null, DevExpress.Analytics.Criteria.Aggregate.Exists, null);
         
 break;
-case 51:
+case 52:
  
             this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: $$[$0].name, startColumn: $$[$0].col, startLine: $$[$0].line, originalPropertyLength: _$[$0].last_column - _$[$0].first_column });
         
 break;
-case 52:
+case 53:
  
             this.$ = DevExpress.Analytics.Criteria.JoinOperand.joinOrAggregate(
                 DevExpress.Analytics.Criteria.criteriaCreator.process("property", { }), 
@@ -8642,80 +8739,80 @@ case 52:
             ); 
         
 break;
-case 53:
+case 54:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Count  };  
 break;
-case 54:
+case 55:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Count };   
 break;
-case 55: case 56:
+case 56: case 57:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Exists }; 
 break;
-case 57:
+case 58:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Avg, expr: $$[$0-1] }; 
 break;
-case 58:
+case 59:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Sum, expr: $$[$0-1] }; 
 break;
-case 59:
+case 60:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Single, expr: DevExpress.Analytics.Criteria.criteriaCreator.process("property", { propertyName: "This" }) }; 
 break;
-case 60:
+case 61:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Single, expr: $$[$0-1] }; 
 break;
-case 61:
+case 62:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Min, expr: $$[$0-1] }; 
 break;
-case 62:
+case 63:
  this.$ = { type:  DevExpress.Analytics.Criteria.Aggregate.Max, expr: $$[$0-1] }; 
 break;
-case 64:
+case 65:
  this.$ = { name: $$[$0-1].name + $$[$0], line: $$[$0-1].line, col: $$[$0-1].col }; 
 break;
-case 65:
+case 66:
  this.$ = { name: $$[$0-1].name +$$[$0].substr(1), line: $$[$0-1].line, col: $$[$0-1].col }; 
 break;
-case 66:
+case 67:
  this.$ = { name: $$[$0-2].name + ".", line: $$[$0-2].line, col: $$[$0-2].col }; 
 break;
-case 67:
+case 68:
  this.$ = { name: $$[$0-2].name + "." + $$[$0], line: $$[$0-2].line, col: $$[$0-2].col }; 
 break;
-case 68:
+case 69:
  this.$ = { name: "", line: _$[$0].first_line - 1, col: _$[$0].first_column + 1 }; 
 break;
-case 69:
+case 70:
  this.$ = { name: $$[$0], line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
 break;
-case 70:
+case 71:
  this.$ = { name: "^", line: _$[$0].first_line - 1, col: _$[$0].first_column }; 
 break;
-case 71: case 72:
+case 72: case 73:
  this.$ = $$[$0] 
 break;
-case 73: case 74:
+case 74: case 75:
  this.$ = $$[$0-1] + $$[$0] 
 break;
-case 75:
+case 76:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("parameter", { parameterName: $$[$0] }); 
 break;
-case 76:
+case 77:
  this.$ = DevExpress.Analytics.Criteria.criteriaCreator.process("value", { }); 
 break;
-case 77:
+case 78:
  this.$ = []; 
 break;
-case 79:
+case 80:
  this.$ = [$$[$0]]; 
 break;
-case 80:
+case 81:
  this.$ = $$[$0-2].concat($$[$0]); 
 break;
 }
 },
-table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{1:[3]},{5:[1,30],9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH},o($VI,[2,2]),o($VI,[2,3]),o($VI,[2,4]),{4:52,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:56,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VJ,[2,69],{33:57,28:$VK}),{28:$VK,33:59},{28:$VK,33:60},{28:$VK,33:61},{28:$VK,33:62},{28:$VK,33:63},{28:$VK,33:64},{28:$VK,33:65},o($VI,[2,40]),o($VI,[2,41]),o($VI,[2,42]),o($VI,[2,43]),o($VI,[2,44]),o($VI,[2,45]),o($VI,[2,51],{50:[1,66],52:[1,67],54:[1,68],55:[1,69],56:[1,70]}),{51:[1,71]},o($VI,[2,76],{58:72,36:[1,73],59:[1,74]}),o($VJ,[2,68]),o($VJ,[2,70]),{1:[2,1]},{4:75,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:76,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{24:[1,90]},{4:91,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:92,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{25:[1,94],31:[1,93]},{28:$VK,33:95},{28:[1,96]},o($VI,[2,13]),o($VI,[2,14]),o($VL,[2,15],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o($VM,[2,24],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,97],30:$VF,32:$VG,34:$VH},o($VI,[2,32]),{4:100,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,98],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm,61:99},o($VI,[2,33]),o($VI,[2,34]),o($VI,[2,35]),o($VI,[2,36]),o($VI,[2,37]),o($VI,[2,38]),o($VI,[2,39]),{4:101,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,51:[1,102],57:$Vl,60:$Vm},{36:[1,105],37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:103,57:[1,104]},o($VJ,[2,63]),o($VJ,[2,64]),o($VJ,[2,65]),{52:[1,113]},o($VI,[2,75],{36:[1,114],59:[1,115]}),o($VU,[2,71]),o($VU,[2,72]),o($VI,[2,5]),o($VI,[2,6]),o($VV,[2,7],{9:$Vn,10:$Vo,13:$Vr}),o($VV,[2,8],{9:$Vn,10:$Vo,13:$Vr}),o($VI,[2,9]),o([5,14,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,10],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt,16:$Vu}),o($VL,[2,11],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr}),o([5,14,16,18,19,20,21,22,23,24,25,26,27,29,30,32,34,35,51],[2,12],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,15:$Vt}),o($VW,[2,16],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VW,[2,17],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VX,[2,18],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,19],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,20],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VX,[2,21],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,32:$VG,34:$VH}),o($VW,[2,22],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),{4:116,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VM,[2,25],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,30:$VF,32:$VG,34:$VH}),o([5,27,29,35,51],[2,26],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,30:$VF,32:$VG,34:$VH}),o($VI,[2,28]),{31:[1,117]},o($VI,[2,30]),{4:118,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,27]),o($VI,[2,77]),{29:[1,119],35:[1,120]},o($VY,[2,79],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,51:[1,121]},o($VI,[2,50],{52:[1,122]}),o($VI,[2,48]),o($VJ,[2,66]),o($VJ,[2,67]),o($VI,[2,54],{28:[1,123]}),o($VI,[2,56],{28:[1,124]}),{28:[1,125]},{28:[1,126]},{28:[1,127]},{28:[1,128]},{28:[1,129]},{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:130},o($VU,[2,73]),o($VU,[2,74]),o($VW,[2,23],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,20:$Vx,21:$Vy,22:$Vz,23:$VA,32:$VG,34:$VH}),o($VI,[2,29]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH,35:[1,131]},o($VI,[2,78]),{4:132,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,49],{52:[1,133]}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:134},{29:[1,135]},{29:[1,136]},{4:137,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:138,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:140,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,29:[1,139],31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:141,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},{4:142,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VI,[2,52]),{4:143,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,25:$V4,28:$V5,31:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:25,50:$Vk,57:$Vl,60:$Vm},o($VY,[2,80],{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,30:$VF,32:$VG,34:$VH}),{37:$VN,38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,53:144},o($VI,[2,47]),o($VI,[2,53]),o($VI,[2,55]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,145],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,146],30:$VF,32:$VG,34:$VH},o($VI,[2,59]),{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,147],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,148],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,149],30:$VF,32:$VG,34:$VH},{9:$Vn,10:$Vo,11:$Vp,12:$Vq,13:$Vr,14:$Vs,15:$Vt,16:$Vu,18:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,29:[1,150],30:$VF,32:$VG,34:$VH},o($VI,[2,46]),o($VI,[2,57]),o($VI,[2,58]),o($VI,[2,60]),o($VI,[2,61]),o($VI,[2,62]),o($VI,[2,31])],
-defaultActions: {30:[2,1]},
-parseError: function parseError (str, hash) {
+table: [{3:1,4:2,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{1:[3]},{5:[1,31],9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,31:$VG,33:$VH,35:$VI},o($VJ,[2,2]),o($VJ,[2,3]),o($VJ,[2,4]),{4:53,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:54,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:55,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:56,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:57,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:58,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},o($VK,[2,70],{34:59,29:$VL}),{29:$VL,34:61},{29:$VL,34:62},{29:$VL,34:63},{29:$VL,34:64},{29:$VL,34:65},{29:$VL,34:66},{29:$VL,34:67},o($VJ,[2,41]),o($VJ,[2,42]),o($VJ,[2,43]),o($VJ,[2,44]),o($VJ,[2,45]),o($VJ,[2,46]),o($VJ,[2,52],{51:[1,68],53:[1,69],55:[1,70],56:[1,71],57:[1,72]}),{52:[1,73]},o($VJ,[2,77],{59:74,37:[1,75],60:[1,76]}),o($VK,[2,69]),o($VK,[2,71]),{1:[2,1]},{4:77,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:78,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:79,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:80,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:81,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:82,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:83,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:84,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:85,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:86,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:87,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:88,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:89,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:90,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:91,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{25:[1,92]},{4:93,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:94,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{26:[1,96],32:[1,95]},{29:$VL,34:97},{29:[1,98]},o($VJ,[2,13]),o($VJ,[2,14]),o($VJ,[2,15]),o($VM,[2,16],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs}),o($VN,[2,25],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,31:$VG,33:$VH,35:$VI}),{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,99],31:$VG,33:$VH,35:$VI},o($VJ,[2,33]),{4:102,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,30:[1,100],32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn,62:101},o($VJ,[2,34]),o($VJ,[2,35]),o($VJ,[2,36]),o($VJ,[2,37]),o($VJ,[2,38]),o($VJ,[2,39]),o($VJ,[2,40]),{4:103,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,52:[1,104],58:$Vm,61:$Vn},{37:[1,107],38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,44:$VU,54:105,58:[1,106]},o($VK,[2,64]),o($VK,[2,65]),o($VK,[2,66]),{53:[1,115]},o($VJ,[2,76],{37:[1,116],60:[1,117]}),o($VV,[2,72]),o($VV,[2,73]),o($VJ,[2,5]),o($VJ,[2,6]),o($VW,[2,7],{9:$Vo,10:$Vp,13:$Vs}),o($VW,[2,8],{9:$Vo,10:$Vp,13:$Vs}),o($VJ,[2,9]),o([5,14,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,52],[2,10],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,15:$Vu,16:$Vv}),o($VM,[2,11],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs}),o([5,14,16,19,20,21,22,23,24,25,26,27,28,30,31,33,35,36,52],[2,12],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,15:$Vu}),o($VX,[2,17],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,21:$Vy,22:$Vz,23:$VA,24:$VB,33:$VH,35:$VI}),o($VX,[2,18],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,21:$Vy,22:$Vz,23:$VA,24:$VB,33:$VH,35:$VI}),o($VY,[2,19],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,33:$VH,35:$VI}),o($VY,[2,20],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,33:$VH,35:$VI}),o($VY,[2,21],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,33:$VH,35:$VI}),o($VY,[2,22],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,33:$VH,35:$VI}),o($VX,[2,23],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,21:$Vy,22:$Vz,23:$VA,24:$VB,33:$VH,35:$VI}),{4:118,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},o($VN,[2,26],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,31:$VG,33:$VH,35:$VI}),o([5,28,30,36,52],[2,27],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,31:$VG,33:$VH,35:$VI}),o($VJ,[2,29]),{32:[1,119]},o($VJ,[2,31]),{4:120,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},o($VJ,[2,28]),o($VJ,[2,78]),{30:[1,121],36:[1,122]},o($VZ,[2,80],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,31:$VG,33:$VH,35:$VI}),{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,31:$VG,33:$VH,35:$VI,52:[1,123]},o($VJ,[2,51],{53:[1,124]}),o($VJ,[2,49]),o($VK,[2,67]),o($VK,[2,68]),o($VJ,[2,55],{29:[1,125]}),o($VJ,[2,57],{29:[1,126]}),{29:[1,127]},{29:[1,128]},{29:[1,129]},{29:[1,130]},{29:[1,131]},{38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,44:$VU,54:132},o($VV,[2,74]),o($VV,[2,75]),o($VX,[2,24],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,21:$Vy,22:$Vz,23:$VA,24:$VB,33:$VH,35:$VI}),o($VJ,[2,30]),{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,31:$VG,33:$VH,35:$VI,36:[1,133]},o($VJ,[2,79]),{4:134,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},o($VJ,[2,50],{53:[1,135]}),{38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,44:$VU,54:136},{30:[1,137]},{30:[1,138]},{4:139,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:140,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:142,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,30:[1,141],32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:143,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},{4:144,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},o($VJ,[2,53]),{4:145,6:3,7:4,8:5,11:$V0,12:$V1,16:$V2,17:$V3,18:$V4,26:$V5,29:$V6,32:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc,42:$Vd,43:$Ve,44:$Vf,45:$Vg,46:$Vh,47:$Vi,48:$Vj,49:$Vk,50:26,51:$Vl,58:$Vm,61:$Vn},o($VZ,[2,81],{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,31:$VG,33:$VH,35:$VI}),{38:$VO,39:$VP,40:$VQ,41:$VR,42:$VS,43:$VT,44:$VU,54:146},o($VJ,[2,48]),o($VJ,[2,54]),o($VJ,[2,56]),{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,147],31:$VG,33:$VH,35:$VI},{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,148],31:$VG,33:$VH,35:$VI},o($VJ,[2,60]),{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,149],31:$VG,33:$VH,35:$VI},{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,150],31:$VG,33:$VH,35:$VI},{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,151],31:$VG,33:$VH,35:$VI},{9:$Vo,10:$Vp,11:$Vq,12:$Vr,13:$Vs,14:$Vt,15:$Vu,16:$Vv,19:$Vw,20:$Vx,21:$Vy,22:$Vz,23:$VA,24:$VB,25:$VC,26:$VD,27:$VE,28:$VF,30:[1,152],31:$VG,33:$VH,35:$VI},o($VJ,[2,47]),o($VJ,[2,58]),o($VJ,[2,59]),o($VJ,[2,61]),o($VJ,[2,62]),o($VJ,[2,63]),o($VJ,[2,32])],
+defaultActions: {31:[2,1]},
+parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
@@ -9003,7 +9100,7 @@ showPosition:function () {
     },
 
 // test the lexed token: return FALSE when not a match, otherwise return token
-test_match:function(match, indexed_rule) {
+test_match:function (match, indexed_rule) {
         var token,
             lines,
             backup;
@@ -9133,7 +9230,7 @@ next:function () {
     },
 
 // return next match that has a token
-lex:function lex () {
+lex:function lex() {
         var r = this.next();
         if (r) {
             return r;
@@ -9143,12 +9240,12 @@ lex:function lex () {
     },
 
 // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
-begin:function begin (condition) {
+begin:function begin(condition) {
         this.conditionStack.push(condition);
     },
 
 // pop the previously active lexer condition state off the condition stack
-popState:function popState () {
+popState:function popState() {
         var n = this.conditionStack.length - 1;
         if (n > 0) {
             return this.conditionStack.pop();
@@ -9158,7 +9255,7 @@ popState:function popState () {
     },
 
 // produce the lexer rule set which is active for the currently active lexer condition state
-_currentRules:function _currentRules () {
+_currentRules:function _currentRules() {
         if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
             return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
         } else {
@@ -9167,7 +9264,7 @@ _currentRules:function _currentRules () {
     },
 
 // return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
-topState:function topState (n) {
+topState:function topState(n) {
         n = this.conditionStack.length - 1 - Math.abs(n || 0);
         if (n >= 0) {
             return this.conditionStack[n];
@@ -9177,7 +9274,7 @@ topState:function topState (n) {
     },
 
 // alias for begin(condition)
-pushState:function pushState (condition) {
+pushState:function pushState(condition) {
         this.begin(condition);
     },
 
@@ -9189,39 +9286,39 @@ options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0: this.begin('INITIAL'); return 50; 
+case 0: this.begin('INITIAL'); return 51; 
 break;
-case 1: this.begin('INITIAL'); return 54; 
+case 1: this.begin('INITIAL'); return 55; 
 break;
-case 2:return 56;
+case 2:return 57;
 break;
-case 3:return 55;
+case 3:return 56;
 break;
 case 4:return 'INVALID';
 break;
-case 5:return 44
+case 5:return 45
 break;
-case 6:return 48
+case 6:return 49
 break;
-case 7:return 46
+case 7:return 47
 break;
-case 8:return 45
+case 8:return 46
 break;
-case 9:return 47
+case 9:return 48
 break;
-case 10:return 47
+case 10:return 48
 break;
 case 11:/* skip whitespace */
 break;
-case 12:return 34
+case 12:return 35
 break;
-case 13:return 32
+case 13:return 33
 break;
-case 14:return 25
+case 14:return 26
 break;
-case 15:return 30
+case 15:return 31
 break;
-case 16:return 31
+case 16:return 32
 break;
 case 17:return 9
 break;
@@ -9233,73 +9330,73 @@ case 20:return 11
 break;
 case 21:return 16
 break;
-case 22:return 17
+case 22:return 18
 break;
-case 23:return 19
+case 23:return 20
 break;
-case 24:return '!'
+case 24:return 17
 break;
 case 25:return 13
 break;
-case 26:return 19
+case 26:return 20
 break;
-case 27:return 22
+case 27:return 23
 break;
-case 28:return 23
+case 28:return 24
 break;
-case 29:return 20
+case 29:return 21
 break;
-case 30:return 21
+case 30:return 22
 break;
-case 31:return 27
+case 31:return 28
 break;
-case 32:return 26
+case 32:return 27
 break;
-case 33:return 40
+case 33:return 41
 break;
-case 34:return 38
+case 34:return 39
 break;
-case 35:return 37
+case 35:return 38
 break;
-case 36:return 43
+case 36:return 44
 break;
-case 37:return 39
+case 37:return 40
 break;
-case 38:return 42
+case 38:return 43
 break;
-case 39:return 41
+case 39:return 42
 break;
-case 40:return 18
+case 40:return 19
 break;
-case 41:return 18
+case 41:return 19
 break;
-case 42:return 24
+case 42:return 25
 break;
-case 43:return 26
+case 43:return 27
 break;
-case 44:return 27
+case 44:return 28
 break;
 case 45:return 15
 break;
 case 46:return 14
 break;
-case 47: this.begin('fieldname'); return 57; 
+case 47: this.begin('fieldname'); return 58; 
 break;
-case 48:return 51;
+case 48:return 52;
 break;
-case 49:return 28
+case 49:return 29
 break;
-case 50:return 29
+case 50:return 30
 break;
-case 51:return 52
+case 51:return 53
 break;
-case 52:return 35
+case 52:return 36
 break;
-case 53:return 60
+case 53:return 61
 break;
-case 54:return 36
+case 54:return 37
 break;
-case 55:return 59
+case 55:return 60
 break;
 case 56:return 'INVALID'
 break;
@@ -9725,7 +9822,7 @@ var DevExpress;
                     this._size.height(Internal.unitsToPixel(ko.unwrap(size.height) * surface.dpi() / 100, surface.measureUnit(), surface.zoom()));
                 };
                 DragDropHandler.prototype.helper = function (draggable, event) {
-                    this.snapHelper && this.snapHelper.updateSnapLines();
+                    this.snapHelper && this.snapHelper.updateSnapLines(this.selection.dropTarget || null);
                 };
                 DragDropHandler.prototype.startDrag = function (draggable) { };
                 DragDropHandler.prototype.drag = function (event, ui) {
@@ -10067,6 +10164,17 @@ var DevExpress;
                     }
                 };
             })();
+            ko.extenders.dxdnum = function (target, value) {
+                target.subscribe(function (newValue) {
+                    if (value.max) {
+                        target(Math.min(newValue, value.max));
+                    }
+                    else if (value.min) {
+                        target(Math.max(newValue, value.min));
+                    }
+                });
+                return target;
+            };
             var DragHelperControlRectangle = (function (_super) {
                 __extends(DragHelperControlRectangle, _super);
                 function DragHelperControlRectangle(position, left, top, width, height) {
@@ -10948,8 +11056,8 @@ var DevExpress;
             var Size = (function () {
                 function Size(width, height) {
                     this.isPropertyDisabled = function (name) { return void 0; };
-                    this.width = ko.observable(width);
-                    this.height = ko.observable(height);
+                    this.height = ko.observable(height).extend({ "dxdnum": { min: 2 } });
+                    this.width = ko.observable(width).extend({ "dxdnum": { min: 2 } });
                 }
                 Size.prototype.getInfo = function () {
                     return Internal.sizeFake;
@@ -13015,7 +13123,10 @@ var DevExpress;
                         zoom: ko.pureComputed({
                             read: function () { return surfaceContext() && surfaceContext().zoom(); },
                             write: function (val) { surfaceContext().zoom(val); }
-                        })
+                        }),
+                        onCustomItemCreating: function (e) {
+                            e.customItem = Internal.parseZoom(e.text);
+                        }
                     });
                     actions.push({
                         id: Tools.ActionId.ZoomIn,
@@ -13956,6 +14067,17 @@ var DevExpress;
                 return value;
             }
             Internal.localizeNoneString = localizeNoneString;
+            function parseZoom(val) {
+                var _value = Math.round(parseInt(val.replace('%', ''))) / 100;
+                if (!_value)
+                    return 1;
+                if (_value >= 5)
+                    return 5;
+                if (_value <= 0.1)
+                    return 0.1;
+                return _value;
+            }
+            Internal.parseZoom = parseZoom;
             function objectsVisitor(target, visitor, visited, skip) {
                 if (visited === void 0) { visited = []; }
                 if (skip === void 0) { skip = ["surface", "reportSource"]; }
@@ -14015,6 +14137,7 @@ var DevExpress;
                         _this.option("valueChangeEvent", "change");
                         _this.option("openOnFieldClick", _this.option("acceptCustomValue") === false);
                         _this._parentViewport = _$element.parents(".dx-designer-viewport");
+                        _this.option("displayValue", options.displayValue);
                         _this._setTitle(_this.option("displayValue"));
                         return _this;
                     }
@@ -14369,8 +14492,8 @@ var DevExpress;
             }(Utils.Disposable));
             Internal.Group = Group;
             Internal.sizeFake = [
-                { propertyName: "height", displayName: "Height", localizationId: "AnalyticsCoreStringId.SizeF.Height", editor: Widgets.editorTemplates.numeric },
-                { propertyName: "width", displayName: "Width", localizationId: "AnalyticsCoreStringId.SizeF.Width", editor: Widgets.editorTemplates.numeric }
+                { propertyName: "height", displayName: "Height", localizationId: "AnalyticsCoreStringId.SizeF.Height", editor: Widgets.editorTemplates.numeric, editorOptions: { min: 2 } },
+                { propertyName: "width", displayName: "Width", localizationId: "AnalyticsCoreStringId.SizeF.Width", editor: Widgets.editorTemplates.numeric, editorOptions: { min: 2 } }
             ];
             Internal.locationFake = [
                 { propertyName: "x", displayName: "X", editor: Widgets.editorTemplates.numeric },

@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 19.1.3
-* Build date: 2019-05-24
+* Version: 19.1.4
+* Build date: 2019-06-17
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1519,6 +1519,8 @@ var DevExpress;
                 __extends(JsonParameter, _super);
                 function JsonParameter(model, serializer) {
                     var _this = _super.call(this) || this;
+                    _this.namePlaceholder = function () { return Analytics.Utils.getLocalization("Name", "AnalyticsCoreStringId.CollectionEditor_Name_Placeholder"); };
+                    _this.valuePlaceholder = function () { return Analytics.Utils.getLocalization("Value", "AnalyticsCoreStringId.CollectionEditor_Value_Placeholder"); };
                     serializer = serializer || new Analytics.Utils.ModelSerializer();
                     serializer.deserialize(_this, model);
                     return _this;
@@ -2389,15 +2391,26 @@ var DevExpress;
             Wizard.JsonDataSourceWizardPageId = {
                 ChooseJsonSourcePage: "chooseJsonSourcePage",
                 ChooseJsonSchemaPage: "chooseJsonSchemaPage",
-                ChooseConnectionPage: "chooseJsonConnectionPage"
+                ChooseConnectionPage: "chooseJsonConnectionPage",
+                SpecifyJsonConnectionPage: "specifyJsonConnectionPage"
             };
             Wizard.FullscreenDataSourceWizardPageId = {
+                ChooseDataSourceTypePage: Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage,
                 SpecifySqlDataSourceSettingsPage: "specifySqlDataSourceSettingsPage",
                 SpecifyJsonDataSourceSettingsPage: "specifyJsonDataSourceSettingsPage"
             };
-            function restoreSqlDataSourceFromState(state, requestWrapper, dataSourceId) {
+            Wizard.FullscreenDataSourceWizardSectionId = {
+                SpecifyJsonConnectionPage: Wizard.JsonDataSourceWizardPageId.SpecifyJsonConnectionPage,
+                ChooseJsonSchemaPage: Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage,
+                ChooseJsonSourcePage: Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage,
+                ChooseSqlConnectionPage: Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage,
+                ConfigureQueryPage: Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage,
+                ConfigureQueryParametersPage: Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage,
+                ConfigureMasterDetailRelationshipsPage: Wizard.DataSourceWizardPageId.ConfigureMasterDetailRelationshipsPage
+            };
+            function _restoreSqlDataSourceFromState(state, requestWrapper, dataSourceId) {
                 var _a, _b;
-                var wrapper = new SQLDataSourceWrapper(state.sqlDataSourceJSON, state.queryName, requestWrapper);
+                var wrapper = new _SqlDataSourceWrapper(state.sqlDataSourceJSON, state.queryName, requestWrapper);
                 state.name && wrapper.sqlDataSource.connection.name(state.name);
                 var serializer = new Analytics.Utils.ModelSerializer();
                 if (state.customQueries && state.customQueries.length > 0) {
@@ -2414,8 +2427,8 @@ var DevExpress;
                 wrapper.sqlDataSource.id = dataSourceId || Analytics.Internal.guid().replace(/-/g, "");
                 return wrapper;
             }
-            Wizard.restoreSqlDataSourceFromState = restoreSqlDataSourceFromState;
-            function restoreJsonDataSourceFromState(state, requestWrapper, dataSourceId) {
+            Wizard._restoreSqlDataSourceFromState = _restoreSqlDataSourceFromState;
+            function _restoreJsonDataSourceFromState(state, requestWrapper, dataSourceId) {
                 var jsonDataSource = new Data.JsonDataSource({
                     "@Name": state.dataSourceName || "JsonDataSource",
                     "Source": state.jsonSource && JSON.parse(state.jsonSource) || {},
@@ -2426,10 +2439,10 @@ var DevExpress;
                 jsonDataSource.id = dataSourceId || Analytics.Internal.guid().replace(/-/g, "");
                 return jsonDataSource;
             }
-            Wizard.restoreJsonDataSourceFromState = restoreJsonDataSourceFromState;
-            function createDefaultDataSourceWizardState(sqlDataSourceWizardState, jsonDataSourceWizardState) {
+            Wizard._restoreJsonDataSourceFromState = _restoreJsonDataSourceFromState;
+            function _createDefaultDataSourceWizardState(sqlDataSourceWizardState, jsonDataSourceWizardState) {
                 if (sqlDataSourceWizardState === void 0) { sqlDataSourceWizardState = {}; }
-                if (jsonDataSourceWizardState === void 0) { jsonDataSourceWizardState = {}; }
+                if (jsonDataSourceWizardState === void 0) { jsonDataSourceWizardState = { jsonSource: "" }; }
                 return {
                     dataSourceType: DataSourceType.Sql,
                     jsonDataSourceWizard: jsonDataSourceWizardState,
@@ -2437,7 +2450,7 @@ var DevExpress;
                     dataSourceId: Analytics.Internal.guid().replace(/-/g, "")
                 };
             }
-            Wizard.createDefaultDataSourceWizardState = createDefaultDataSourceWizardState;
+            Wizard._createDefaultDataSourceWizardState = _createDefaultDataSourceWizardState;
             var WizardPageBase = (function (_super) {
                 __extends(WizardPageBase, _super);
                 function WizardPageBase() {
@@ -2467,9 +2480,9 @@ var DevExpress;
                 return WizardPageBase;
             }(Analytics.Utils.Disposable));
             Wizard.WizardPageBase = WizardPageBase;
-            var WrappedWizardPage = (function (_super) {
-                __extends(WrappedWizardPage, _super);
-                function WrappedWizardPage(pageId, page, template, description) {
+            var _WrappedWizardPage = (function (_super) {
+                __extends(_WrappedWizardPage, _super);
+                function _WrappedWizardPage(pageId, page, template, description) {
                     var _this = _super.call(this) || this;
                     _this.pageId = pageId;
                     _this.page = page;
@@ -2482,22 +2495,22 @@ var DevExpress;
                     }
                     return _this;
                 }
-                WrappedWizardPage.prototype.dispose = function () {
+                _WrappedWizardPage.prototype.dispose = function () {
                     this.onChange = null;
                     this[BaseWizard.__loadingStateFunctionName] = null;
                     this.page.dispose();
                 };
-                WrappedWizardPage.prototype.resetCommitedState = function () {
+                _WrappedWizardPage.prototype.resetCommitedState = function () {
                     this._lastCommitedState = null;
                 };
-                WrappedWizardPage.prototype.commit = function () {
+                _WrappedWizardPage.prototype.commit = function () {
                     var _this = this;
                     return this.page.commit().done(function (result) {
                         _this.isChanged = JSON.stringify(_this._lastCommitedState) !== JSON.stringify(result);
                         _this._lastCommitedState = result;
                     });
                 };
-                WrappedWizardPage.prototype.initialize = function (state, force) {
+                _WrappedWizardPage.prototype.initialize = function (state, force) {
                     var _this = this;
                     if (force === void 0) { force = false; }
                     if (!this._isInitialized || force) {
@@ -2508,9 +2521,9 @@ var DevExpress;
                     }
                     return $.Deferred().resolve().promise();
                 };
-                return WrappedWizardPage;
+                return _WrappedWizardPage;
             }(Analytics.Utils.Disposable));
-            Wizard.WrappedWizardPage = WrappedWizardPage;
+            Wizard._WrappedWizardPage = _WrappedWizardPage;
             var DataSourceType;
             (function (DataSourceType) {
                 DataSourceType[DataSourceType["NoData"] = 0] = "NoData";
@@ -2529,23 +2542,24 @@ var DevExpress;
             Wizard.TypeItem = TypeItem;
             var ChooseDataSourceTypePage = (function (_super) {
                 __extends(ChooseDataSourceTypePage, _super);
-                function ChooseDataSourceTypePage(jsonAvailable) {
+                function ChooseDataSourceTypePage(dataSourceTypeOptions) {
                     var _this = _super.call(this) || this;
-                    _this.itemClick = function (item) {
+                    _this._itemClick = function (item) {
                         _this.selectedItem(item);
                     };
-                    _this.IsSelected = function (item) {
+                    _this._IsSelected = function (item) {
                         return _this.selectedItem().type === item.type;
                     };
                     _this.selectedItem = ko.observable();
-                    _this.typeItems = [
-                        new TypeItem("Database", "DataAccessUIStringId.DSTypeSql", "sqldatasource", "dxrd-svg-wizard-SqlDataSource", DataSourceType.Sql)
-                    ];
-                    if (jsonAvailable) {
+                    _this.typeItems = [];
+                    if (dataSourceTypeOptions.sqlDataSourceAvailable) {
+                        _this.typeItems.push(new TypeItem("Database", "DataAccessUIStringId.DSTypeSql", "sqldatasource", "dxrd-svg-wizard-SqlDataSource", DataSourceType.Sql));
+                    }
+                    if (dataSourceTypeOptions.jsonDataSourceAvailable) {
                         _this.typeItems.push(new TypeItem("JSON", "DataAccessUIStringId.DSTypeJson", "jsondatasource", "dxrd-svg-wizard-JsonDataSource", DataSourceType.Json));
                     }
                     _this._disposables.push(_this.selectedItem.subscribe(function () { return _this._onChange(); }));
-                    _this.extendCssClass = $.noop;
+                    _this._extendCssClass = $.noop;
                     return _this;
                 }
                 ChooseDataSourceTypePage.prototype.canNext = function () {
@@ -2554,7 +2568,7 @@ var DevExpress;
                 ChooseDataSourceTypePage.prototype.canFinish = function () {
                     return false;
                 };
-                ChooseDataSourceTypePage.prototype.goToNextPage = function () {
+                ChooseDataSourceTypePage.prototype._goToNextPage = function () {
                     this[BaseWizard.__nextActionFunctionName] && this[BaseWizard.__nextActionFunctionName]();
                 };
                 ChooseDataSourceTypePage.prototype.commit = function () {
@@ -2568,8 +2582,7 @@ var DevExpress;
                 return ChooseDataSourceTypePage;
             }(WizardPageBase));
             Wizard.ChooseDataSourceTypePage = ChooseDataSourceTypePage;
-            function registerChooseDataSourceTypePage(factory, jsonAvailable) {
-                if (jsonAvailable === void 0) { jsonAvailable = true; }
+            function _registerChooseDataSourceTypePage(factory, dataSourceTypeOptions) {
                 factory.registerMetadata(Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage, {
                     setState: function (data, state) {
                         state.dataSourceType = data.dataSourceType;
@@ -2581,42 +2594,42 @@ var DevExpress;
                         state.dataSourceType = DataSourceType.Sql;
                     },
                     create: function () {
-                        return new ChooseDataSourceTypePage(jsonAvailable);
+                        return new ChooseDataSourceTypePage(dataSourceTypeOptions);
                     },
                     description: Analytics.Utils.getLocalization("Select the data source type.", "AnalyticsCoreStringId.Wizard_SelectDataSourceType_Description"),
                     template: "dxrd-page-choose-datasource-type"
                 });
             }
-            Wizard.registerChooseDataSourceTypePage = registerChooseDataSourceTypePage;
+            Wizard._registerChooseDataSourceTypePage = _registerChooseDataSourceTypePage;
             var ChooseSqlConnectionPage = (function (_super) {
                 __extends(ChooseSqlConnectionPage, _super);
                 function ChooseSqlConnectionPage(connectionStrings) {
                     var _this = _super.call(this) || this;
-                    _this.connectionStrings = ko.observableArray([]);
-                    _this.selectedConnectionString = ko.observableArray([]);
-                    _this.connectionStrings = connectionStrings;
-                    _this._disposables.push(_this.selectedConnectionString.subscribe(function () { return _this._onChange(); }));
+                    _this._connectionStrings = ko.observableArray([]);
+                    _this._selectedConnectionString = ko.observableArray([]);
+                    _this._connectionStrings = connectionStrings;
+                    _this._disposables.push(_this._selectedConnectionString.subscribe(function () { return _this._onChange(); }));
                     return _this;
                 }
                 ChooseSqlConnectionPage.prototype.initialize = function (state) {
-                    var connectionStrings = this.connectionStrings();
+                    var connectionStrings = this._connectionStrings();
                     if (connectionStrings.length === 1) {
-                        this.selectedConnectionString([connectionStrings[0]]);
+                        this._selectedConnectionString([connectionStrings[0]]);
                     }
                     else {
                         var selectedString = Analytics.Internal.getFirstItemByPropertyValue(connectionStrings, "name", state.name) || connectionStrings[0];
-                        this.selectedConnectionString(selectedString ? [selectedString] : []);
+                        this._selectedConnectionString(selectedString ? [selectedString] : []);
                     }
                     return $.Deferred().resolve().promise();
                 };
                 ChooseSqlConnectionPage.prototype.canNext = function () {
-                    return this.selectedConnectionString().length !== 0;
+                    return this._selectedConnectionString().length !== 0;
                 };
                 ChooseSqlConnectionPage.prototype.commit = function () {
                     var deferred = $.Deferred();
-                    if (this.selectedConnectionString()[0]) {
+                    if (this._selectedConnectionString()[0]) {
                         deferred.resolve({
-                            name: this.selectedConnectionString()[0].name
+                            name: this._selectedConnectionString()[0].name
                         });
                     }
                     else {
@@ -2627,7 +2640,7 @@ var DevExpress;
                 return ChooseSqlConnectionPage;
             }(WizardPageBase));
             Wizard.ChooseSqlConnectionPage = ChooseSqlConnectionPage;
-            function registerChooseSqlConnectionPage(factory, connectionStrings) {
+            function _registerChooseSqlConnectionPage(factory, connectionStrings) {
                 factory.registerMetadata(Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage, {
                     create: function () {
                         return new ChooseSqlConnectionPage(connectionStrings);
@@ -2645,12 +2658,12 @@ var DevExpress;
                     description: Analytics.Utils.getLocalization("Choose a data connection", "AnalyticsCoreStringId.SqlDSWizard_PageChooseConnection")
                 });
             }
-            Wizard.registerChooseSqlConnectionPage = registerChooseSqlConnectionPage;
+            Wizard._registerChooseSqlConnectionPage = _registerChooseSqlConnectionPage;
             var ChooseAvailableItemPage = (function (_super) {
                 __extends(ChooseAvailableItemPage, _super);
-                function ChooseAvailableItemPage(items, isNewCreationAvailable) {
+                function ChooseAvailableItemPage(items, canCreateNew) {
                     var _a;
-                    if (isNewCreationAvailable === void 0) { isNewCreationAvailable = true; }
+                    if (canCreateNew === void 0) { canCreateNew = true; }
                     var _this = _super.call(this) || this;
                     _this.items = items;
                     _this.selectedItems = ko.observableArray([]);
@@ -2659,8 +2672,8 @@ var DevExpress;
                         { text: _this.createNewOperationText, createNew: true }
                     ];
                     _this.selectedOperation = ko.observable(_this.operations[0]);
-                    _this.createNew = ko.pureComputed(function () { return _this.selectedOperation().createNew; });
-                    _this.isNewCreationAvailable = ko.observable(isNewCreationAvailable);
+                    _this._createNew = ko.pureComputed(function () { return _this.selectedOperation().createNew; });
+                    _this.canCreateNew = ko.observable(canCreateNew);
                     (_a = _this._disposables).push.apply(_a, Internal.subscribeProperties([_this.selectedOperation, _this.selectedItems], function () { return _this._onChange(); }));
                     return _this;
                 }
@@ -2668,14 +2681,14 @@ var DevExpress;
                     return this.selectedItems().length !== 0 || this.selectedOperation().createNew;
                 };
                 ChooseAvailableItemPage.prototype.initialize = function (state) {
-                    var item = this.getSelectedItem(state);
+                    var item = this._getSelectedItem(state);
                     this.selectedItems(item ? [item] : []);
                     return $.Deferred().resolve(this).promise();
                 };
-                ChooseAvailableItemPage.prototype.displayExpr = function (item) {
+                ChooseAvailableItemPage.prototype._displayExpr = function (item) {
                     return item.description || item.name;
                 };
-                ChooseAvailableItemPage.prototype.getSelectedItem = function (state) {
+                ChooseAvailableItemPage.prototype._getSelectedItem = function (state) {
                     return this.items()[0];
                 };
                 Object.defineProperty(ChooseAvailableItemPage.prototype, "createNewOperationText", {
@@ -2705,8 +2718,8 @@ var DevExpress;
                         connectionName: !this.selectedOperation().createNew ? this.selectedItems()[0].name : null
                     }).promise();
                 };
-                ChooseJsonConnectionPage.prototype.getSelectedItem = function (data) {
-                    return Analytics.Internal.getFirstItemByPropertyValue(this.items(), "name", data.connectionName) || _super.prototype.getSelectedItem.call(this);
+                ChooseJsonConnectionPage.prototype._getSelectedItem = function (data) {
+                    return Analytics.Internal.getFirstItemByPropertyValue(this.items(), "name", data.connectionName) || _super.prototype._getSelectedItem.call(this);
                 };
                 Object.defineProperty(ChooseJsonConnectionPage.prototype, "createNewOperationText", {
                     get: function () {
@@ -2725,10 +2738,10 @@ var DevExpress;
                 return ChooseJsonConnectionPage;
             }(ChooseAvailableItemPage));
             Wizard.ChooseJsonConnectionPage = ChooseJsonConnectionPage;
-            function registerChooseJsonConnectionPage(factory, connections, canCreateNewJsonDataSource) {
+            function _registerChooseJsonConnectionPage(factory, wizardOptions) {
                 factory.registerMetadata(Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage, {
                     create: function () {
-                        return new ChooseJsonConnectionPage(connections, canCreateNewJsonDataSource);
+                        return new ChooseJsonConnectionPage(wizardOptions.connectionStrings && wizardOptions.connectionStrings.json, wizardOptions.canCreateNewJsonDataSource);
                     },
                     description: Analytics.Utils.getLocalization("Do you want to use an existing data connection?", "AnalyticsCoreStringId.JsonDSWizard_ChooseConnection_Description"),
                     getState: function (state) { return state.jsonDataSourceWizard; },
@@ -2737,57 +2750,162 @@ var DevExpress;
                     template: "dxrd-page-selectitems"
                 });
             }
-            Wizard.registerChooseJsonConnectionPage = registerChooseJsonConnectionPage;
+            Wizard._registerChooseJsonConnectionPage = _registerChooseJsonConnectionPage;
+            var SpecifyJsonConnectionPage = (function (_super) {
+                __extends(SpecifyJsonConnectionPage, _super);
+                function SpecifyJsonConnectionPage(connections, canCreateNewJsonDataSource) {
+                    var _this = _super.call(this, connections, canCreateNewJsonDataSource) || this;
+                    _this._disposables.push(_this._specifySourceData = new ChooseJsonSourcePage());
+                    _this._specifySourceData.onChange(function () { return _this._onChange(); });
+                    return _this;
+                }
+                SpecifyJsonConnectionPage.prototype.commit = function () {
+                    var deffered = $.Deferred();
+                    var _promise;
+                    if (this._createNew()) {
+                        _promise = this._specifySourceData.commit();
+                    }
+                    else {
+                        _promise = _super.prototype.commit.call(this);
+                    }
+                    _promise.done(function (state) {
+                        deffered.resolve(state);
+                    });
+                    return deffered.promise();
+                };
+                SpecifyJsonConnectionPage.prototype.canNext = function () {
+                    if (this._createNew()) {
+                        return this._specifySourceData.canNext();
+                    }
+                    else {
+                        return _super.prototype.canNext.call(this);
+                    }
+                };
+                SpecifyJsonConnectionPage.prototype.initialize = function (state) {
+                    var _this = this;
+                    var deffered = $.Deferred();
+                    _super.prototype.initialize.call(this, state).done(function () {
+                        _this._specifySourceData.initialize(state).done(function () {
+                            deffered.resolve(_this);
+                        });
+                    });
+                    return deffered.promise();
+                };
+                return SpecifyJsonConnectionPage;
+            }(ChooseJsonConnectionPage));
+            Wizard.SpecifyJsonConnectionPage = SpecifyJsonConnectionPage;
+            function _registerSpecifyJsonConnectionPage(factory, connections, canCreateNewJsonDataSource) {
+                factory.registerMetadata(Wizard.JsonDataSourceWizardPageId.SpecifyJsonConnectionPage, {
+                    create: function () { return new SpecifyJsonConnectionPage(connections, canCreateNewJsonDataSource); },
+                    description: Analytics.Utils.getLocalization("Do you want to use an existing data connection?", "AnalyticsCoreStringId.JsonDSWizard_ChooseConnection_Description"),
+                    getState: function (state) { return state.jsonDataSourceWizard; },
+                    setState: function (data, state) {
+                        state.connectionName = data.connectionName;
+                        state.jsonSource = data.jsonSource;
+                        state.newConnectionName = data.newConnectionName;
+                    },
+                    resetState: function (state) {
+                        delete state.connectionName;
+                        state.jsonSource = "";
+                        delete state.newConnectionName;
+                    },
+                    template: "dxrd-page-specify-connection"
+                });
+            }
+            Wizard._registerSpecifyJsonConnectionPage = _registerSpecifyJsonConnectionPage;
             var ChooseJsonSourcePage = (function (_super) {
                 __extends(ChooseJsonSourcePage, _super);
                 function ChooseJsonSourcePage() {
                     var _this = _super.call(this) || this;
                     _this._requestWrapper = new QueryBuilder.Utils.RequestWrapper();
-                    _this.jsonSourceTitle = Analytics.Utils.getLocalization("JSON Source", "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType");
-                    _this.jsonConnectionTitle = Analytics.Utils.getLocalization("Connection Name", "TODO");
-                    _this.connectionName = ko.observable("");
-                    _this.sources = [];
-                    _this.selectedSource = ko.observable();
+                    _this.__validationGroup = null;
+                    _this.__validationSummary = null;
+                    _this._jsonSourceTitle = Analytics.Utils.getLocalization("JSON Source:", "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType");
+                    _this._jsonConnectionTitle = Analytics.Utils.getLocalization("Connection Name:", "AnalyticsCoreStringId.ReportDesigner_Wizard_Json_ConnectionName");
+                    _this._connectionNameValidationRules = [{
+                            type: "required",
+                            message: Internal.getLocalizedValidationErrorMessage(null, _this._jsonConnectionTitle)
+                        }];
+                    _this._connectionName = ko.observable("");
+                    _this._validationGroup = {
+                        onInitialized: function (args) { return _this._onValidationGroupInitialized(args); },
+                        onDisposing: function (args) { return _this._onValidationGroupDisposing(args); }
+                    };
+                    _this._validationSummary = {
+                        onInitialized: function (args) { return _this._onValidationSummaryInitialized(args); },
+                        onDisposing: function (args) { return _this._onValidationSummaryDisposing(args); }
+                    };
+                    _this._sources = [];
                     _this._disposables.push(_this._jsonStringSettings = new Analytics.Wizard.Internal.JsonDataSourceJsonSourcePageStringSettings());
                     _this._jsonStringSettings.onChange(function () { return _this._onChange(); });
                     _this._disposables.push(_this._jsonUriSetting = new Analytics.Wizard.Internal.JsonDataSourceJsonSourcePageUriSettings(_this._requestWrapper));
                     _this._jsonUriSetting.onChange(function () { return _this._onChange(); });
-                    _this.sources = [
+                    _this._sources = [
                         { value: _this._jsonUriSetting, displayValue: "Web Service Endpoint (URI)", localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType_Uri" },
                         { value: _this._jsonStringSettings, displayValue: "JSON String", localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType_Custom" }
                     ];
-                    _this.selectedSource(_this.sources[0].value);
-                    _this._disposables.push(_this.connectionName.subscribe(function () { return _this._onChange(); }));
-                    _this.grid = new Analytics.Widgets.ObjectProperties(_this.selectedSource);
+                    var selectedSource = ko.observable();
+                    _this._selectedSource = ko.pureComputed({
+                        read: function () { return selectedSource(); },
+                        write: function (newVal) {
+                            if (selectedSource() === newVal)
+                                return;
+                            selectedSource(newVal);
+                        }
+                    });
+                    _this._selectedSource(_this._sources[0].value);
+                    _this._disposables.push(_this._connectionName.subscribe(function () { return _this._onChange(); }));
+                    _this._disposables.push(_this._selectedSource);
                     return _this;
                 }
+                ChooseJsonSourcePage.prototype._onValidationGroupInitialized = function (e) {
+                    this.__validationGroup = e.component;
+                };
+                ChooseJsonSourcePage.prototype._onValidationGroupDisposing = function (e) {
+                    this.__validationGroup = null;
+                };
+                ChooseJsonSourcePage.prototype._onValidationSummaryInitialized = function (e) {
+                    var _this = this;
+                    this.__validationSummary = e.component;
+                    this.__validationGroup && this.__validationSummary && setTimeout(function () {
+                        _this.__validationGroup && _this.__validationGroup.validate();
+                    }, 1);
+                };
+                ChooseJsonSourcePage.prototype._onValidationSummaryDisposing = function (e) {
+                    this.__validationSummary = null;
+                };
                 ChooseJsonSourcePage.prototype.canNext = function () {
-                    return this.selectedSource().isValid() && !this.selectedSource().isEmpty();
+                    var connectionNameNotEmpty = !!this._connectionName();
+                    var isCurrentSourceValid = this._selectedSource().isValid();
+                    var isCurrentSourceEmpty = this._selectedSource().isEmpty();
+                    return connectionNameNotEmpty && isCurrentSourceValid && !isCurrentSourceEmpty;
                 };
                 ChooseJsonSourcePage.prototype.commit = function () {
                     var jsonDataSource = new Data.JsonDataSource({});
-                    this.selectedSource().applySettings(jsonDataSource);
+                    this._selectedSource().applySettings(jsonDataSource);
                     var serialized = new Analytics.Utils.ModelSerializer().serialize(jsonDataSource);
                     return $.Deferred().resolve({
                         jsonSource: JSON.stringify(serialized.Source),
-                        newConnectionName: this.connectionName()
+                        newConnectionName: this._connectionName()
                     }).promise();
                 };
                 ChooseJsonSourcePage.prototype.initialize = function (state) {
-                    var jsonDataSource = Wizard.restoreJsonDataSourceFromState(state);
+                    this.__validationGroup = null;
+                    this.__validationSummary = null;
+                    var jsonDataSource = Wizard._restoreJsonDataSourceFromState(state);
                     if (jsonDataSource.source.uri()) {
-                        this.selectedSource(this._jsonUriSetting);
+                        this._selectedSource(this._jsonUriSetting);
                     }
                     else if (jsonDataSource.source.json()) {
-                        this.selectedSource(this._jsonStringSettings);
+                        this._selectedSource(this._jsonStringSettings);
                     }
-                    this.selectedSource().setValue(jsonDataSource);
+                    this._selectedSource().setValue(jsonDataSource);
                     return $.Deferred().resolve().promise();
                 };
                 return ChooseJsonSourcePage;
             }(WizardPageBase));
             Wizard.ChooseJsonSourcePage = ChooseJsonSourcePage;
-            function registerChooseJsonSourcePage(factory) {
+            function _registerChooseJsonSourcePage(factory) {
                 factory.registerMetadata(Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage, {
                     setState: function (data, state) {
                         state.jsonSource = data.jsonSource;
@@ -2806,7 +2924,7 @@ var DevExpress;
                     template: "dxrd-page-jsonsource"
                 });
             }
-            Wizard.registerChooseJsonSourcePage = registerChooseJsonSourcePage;
+            Wizard._registerChooseJsonSourcePage = _registerChooseJsonSourcePage;
             var ChooseJsonSchemaPage = (function (_super) {
                 __extends(ChooseJsonSchemaPage, _super);
                 function ChooseJsonSchemaPage() {
@@ -2828,13 +2946,13 @@ var DevExpress;
                         _this._disposables.push(node.checked.subscribe(function () { return _this._onChange(); }));
                         return node;
                     };
-                    _this.rootElementTitle = Analytics.Utils.getLocalization("Root element:", "DataAccessUIStringId.WizardPageChooseJsonSchema_RootElement");
-                    _this.rootElementList = ko.observable([]);
-                    _this.selectedRootElement = ko.observable(null);
+                    _this._rootElementTitle = Analytics.Utils.getLocalization("Root element:", "DataAccessUIStringId.WizardPageChooseJsonSchema_RootElement");
+                    _this._rootElementList = ko.observable([]);
+                    _this._selectedRootElement = ko.observable(null);
                     var rootElementSubscription = null;
-                    _this._disposables.push(_this.rootElementList.subscribe(function (rootElements) {
+                    _this._disposables.push(_this._rootElementList.subscribe(function (rootElements) {
                         rootElementSubscription && rootElementSubscription.dispose();
-                        rootElementSubscription = _this.selectedRootElement.subscribe(function (selectedPath) {
+                        rootElementSubscription = _this._selectedRootElement.subscribe(function (selectedPath) {
                             if (!selectedPath)
                                 return _this._rootItems([]);
                             var rootNode = _this._getSchemaToDataMemberInfo(selectedPath);
@@ -2848,12 +2966,12 @@ var DevExpress;
                                     }]);
                             }
                         });
-                        _this.selectedRootElement(rootElements[0]);
+                        _this._selectedRootElement(rootElements[0]);
                     }));
                     var fieldListProvider = new Analytics.Internal.FieldListProvider(_this._createFieldListCallback(), _this._rootItems);
                     _this._fieldListItemsProvider(new Internal.JsonTreeNodeItemsProvider(fieldListProvider, _this._rootItems, _this._createTreeNode, _this._createLeafTreeNode));
                     _this._disposables.push(_this._fieldListItemsProvider());
-                    _this.fieldListModel = {
+                    _this._fieldListModel = {
                         expandRootItems: true,
                         itemsProvider: _this._fieldListItemsProvider(),
                         selectedPath: _this._fieldSelectedPath,
@@ -2865,8 +2983,8 @@ var DevExpress;
                 ChooseJsonSchemaPage.prototype._clear = function () {
                     this._rootItems([]);
                     this._fieldSelectedPath("");
-                    this.rootElementList([]);
-                    this.selectedRootElement(null);
+                    this._rootElementList([]);
+                    this._selectedRootElement(null);
                     this._dataSource && this._dataSource.jsonSchemaProvider.reset();
                 };
                 ChooseJsonSchemaPage.prototype._createFieldListCallback = function () {
@@ -2928,17 +3046,17 @@ var DevExpress;
                         connectionName: state.connectionName,
                         jsonSource: state.jsonSource
                     };
-                    this._dataSource = Wizard.restoreJsonDataSourceFromState(state);
+                    this._dataSource = Wizard._restoreJsonDataSourceFromState(state);
                     return this._dataSource.getSchema()
                         .done(function (jsonSchema) {
                         var rootElementList = jsonSchema.getRootElementPartList();
-                        if (_this.rootElementList() !== rootElementList) {
-                            _this.rootElementList(rootElementList);
+                        if (_this._rootElementList() !== rootElementList) {
+                            _this._rootElementList(rootElementList);
                         }
                         if (_this._dataSource.rootElement()) {
                             var dataSourceRootElementPath = ["root", _this._dataSource.rootElement()].join('.');
-                            var rootElementToSelect = _this.rootElementList().filter(function (item) { return item.fullPath === dataSourceRootElementPath; })[0] || _this.rootElementList()[0];
-                            _this.selectedRootElement(rootElementToSelect);
+                            var rootElementToSelect = _this._rootElementList().filter(function (item) { return item.fullPath === dataSourceRootElementPath; })[0] || _this._rootElementList()[0];
+                            _this._selectedRootElement(rootElementToSelect);
                         }
                         _this._onChange();
                     });
@@ -2980,7 +3098,7 @@ var DevExpress;
                     var currentRootPath = currentRootNode.name();
                     var pathFromCurrentRoot = { fullPath: currentRootPath, path: "", id: currentRootPath, pathParts: [currentRootPath] };
                     this._mapJsonSchema(this._rootItems()[0].data, pathFromCurrentRoot);
-                    var selectedRootElementPath = this.selectedRootElement().pathParts.slice(1).join('.');
+                    var selectedRootElementPath = this._selectedRootElement().pathParts.slice(1).join('.');
                     this._dataSource.rootElement(selectedRootElementPath);
                     var serialized = new Analytics.Utils.ModelSerializer().serialize(this._dataSource);
                     return $.Deferred().resolve({
@@ -2999,7 +3117,7 @@ var DevExpress;
                 return ChooseJsonSchemaPage;
             }(WizardPageBase));
             Wizard.ChooseJsonSchemaPage = ChooseJsonSchemaPage;
-            function registerChooseJsonSchemaPage(factory) {
+            function _registerChooseJsonSchemaPage(factory) {
                 factory.registerMetadata(Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage, {
                     setState: function (data, state) {
                         state.dataSourceName = data.dataSourceName;
@@ -3021,9 +3139,9 @@ var DevExpress;
                     template: "dxrd-jsondatasource-fields-page"
                 });
             }
-            Wizard.registerChooseJsonSchemaPage = registerChooseJsonSchemaPage;
-            var SQLDataSourceWrapper = (function () {
-                function SQLDataSourceWrapper(sqlDataSourceJSON, queryName, requestWrapper) {
+            Wizard._registerChooseJsonSchemaPage = _registerChooseJsonSchemaPage;
+            var _SqlDataSourceWrapper = (function () {
+                function _SqlDataSourceWrapper(sqlDataSourceJSON, queryName, requestWrapper) {
                     var _this = this;
                     this.sqlDataSourceJSON = sqlDataSourceJSON;
                     this.customQueries = [];
@@ -3041,7 +3159,7 @@ var DevExpress;
                         this._queryIndex = this.sqlDataSource.queries().length;
                     }
                 }
-                Object.defineProperty(SQLDataSourceWrapper.prototype, "sqlQuery", {
+                Object.defineProperty(_SqlDataSourceWrapper.prototype, "sqlQuery", {
                     get: function () {
                         return this.sqlDataSource.queries()[this._queryIndex];
                     },
@@ -3053,24 +3171,21 @@ var DevExpress;
                     enumerable: true,
                     configurable: true
                 });
-                SQLDataSourceWrapper.prototype.saveCustomQueries = function () {
+                _SqlDataSourceWrapper.prototype.saveCustomQueries = function () {
                     var serializer = new Analytics.Utils.ModelSerializer();
                     return this.customQueries.length > 0 && this.customQueries.map(function (x) { return JSON.stringify(serializer.serialize(x)); });
                 };
-                SQLDataSourceWrapper.prototype.save = function () {
+                _SqlDataSourceWrapper.prototype.save = function () {
                     return JSON.stringify(new Analytics.Utils.ModelSerializer().serialize(this.sqlDataSource));
                 };
-                return SQLDataSourceWrapper;
+                return _SqlDataSourceWrapper;
             }());
-            Wizard.SQLDataSourceWrapper = SQLDataSourceWrapper;
+            Wizard._SqlDataSourceWrapper = _SqlDataSourceWrapper;
             var ConfigureQueryPage = (function (_super) {
                 __extends(ConfigureQueryPage, _super);
-                function ConfigureQueryPage(callbacks, disableCustomSql, _queryName, _requestWrapper) {
-                    if (callbacks === void 0) { callbacks = {}; }
-                    if (disableCustomSql === void 0) { disableCustomSql = false; }
+                function ConfigureQueryPage(_options) {
                     var _this = _super.call(this) || this;
-                    _this._queryName = _queryName;
-                    _this._requestWrapper = _requestWrapper;
+                    _this._options = _options;
                     _this._connection = function () {
                         return _this._dataSource().connection;
                     };
@@ -3086,7 +3201,7 @@ var DevExpress;
                     _this.queryTypeItems = [ConfigureQueryPage.QUERY_TEXT, ConfigureQueryPage.SP_TEXT];
                     _this.selectedQueryType = ko.observable();
                     _this._proceduresList = new Analytics.Wizard.Internal.StoredProceduresQueryControl();
-                    _this._selectStatementControl = new Analytics.Wizard.Internal.SelectStatementQueryControl(new Analytics.Wizard.Internal.SelectQuerySqlTextProvider(QueryBuilder.Internal.wrapGetSelectStatement(callbacks.selectStatement), _this._connection), disableCustomSql);
+                    _this._selectStatementControl = new Analytics.Wizard.Internal.SelectStatementQueryControl(new Analytics.Wizard.Internal.SelectQuerySqlTextProvider(QueryBuilder.Internal.wrapGetSelectStatement(_this._options.callbacks.selectStatement), _this._connection), _this._options.disableCustomSql);
                     _this._disposables.push(_this.selectedQueryType.subscribe(function (value) {
                         if (value === ConfigureQueryPage.SP_TEXT) {
                             _this._dataSource().dbSchemaProvider.getDbStoredProcedures().done(function (procedures) {
@@ -3102,7 +3217,7 @@ var DevExpress;
                     _this.selectedQueryType(ConfigureQueryPage.QUERY_TEXT);
                     _this.popupQueryBuilder = new Analytics.Wizard.Internal.QueryBuilderPopup(function (newQuery, isInProcess) {
                         return _this._selectStatementControl.setQuery(newQuery, isInProcess);
-                    }, false, callbacks.customizeQBInitData);
+                    }, false, _this._options.callbacks.customizeQBInitData);
                     return _this;
                 }
                 ConfigureQueryPage.prototype.canNext = function () {
@@ -3129,7 +3244,7 @@ var DevExpress;
                         Analytics.Utils.getLocalization(ConfigureQueryPage.SP_TEXT, "DataAccessUIStringId.WizardPageConfigureQuery_StoredProcedure");
                 };
                 ConfigureQueryPage.prototype.initialize = function (state) {
-                    this._dataSourceWrapper = Wizard.restoreSqlDataSourceFromState(state, this._requestWrapper);
+                    this._dataSourceWrapper = Wizard._restoreSqlDataSourceFromState(state, this._options.requestWrapper);
                     if (!this._dataSourceWrapper.sqlQuery) {
                         this._proceduresList.setQuery(new Data.StoredProcQuery({}, this._dataSource()));
                         this._selectStatementControl.setQuery(new Data.CustomSqlQuery({}, this._dataSource()));
@@ -3159,12 +3274,10 @@ var DevExpress;
                 return ConfigureQueryPage;
             }(WizardPageBase));
             Wizard.ConfigureQueryPage = ConfigureQueryPage;
-            function registerConfigureQueryPage(factory, callbacks, disableCustomSql, queryName, requestWrapper) {
-                if (callbacks === void 0) { callbacks = {}; }
-                if (disableCustomSql === void 0) { disableCustomSql = false; }
+            function _registerConfigureQueryPage(factory, dataSourceWizardOptions) {
                 factory.registerMetadata(Wizard.SqlDataSourceWizardPageId.ConfigureQueryPage, {
                     create: function () {
-                        return new ConfigureQueryPage(callbacks, disableCustomSql, queryName, requestWrapper);
+                        return new ConfigureQueryPage(dataSourceWizardOptions);
                     },
                     setState: function (data, state) {
                         state.queryName = data.queryName;
@@ -3181,10 +3294,10 @@ var DevExpress;
                     description: DevExpress.Analytics.Utils.getLocalization("Create a query or select a stored procedure", DevExpress.Analytics.Internal.StringId.WizardPageConfigureQuery)
                 });
             }
-            Wizard.registerConfigureQueryPage = registerConfigureQueryPage;
-            var ConfigureParametersPage = (function (_super) {
-                __extends(ConfigureParametersPage, _super);
-                function ConfigureParametersPage(parametersConverter, _requestWrapper) {
+            Wizard._registerConfigureQueryPage = _registerConfigureQueryPage;
+            var ConfigureQueryParametersPage = (function (_super) {
+                __extends(ConfigureQueryParametersPage, _super);
+                function ConfigureQueryParametersPage(parametersConverter, _requestWrapper) {
                     if (parametersConverter === void 0) { parametersConverter = {
                         createParameterViewModel: function (parameter) { return parameter; },
                         getParameterFromViewModel: function (parameterViewModel) { return parameterViewModel; }
@@ -3192,7 +3305,7 @@ var DevExpress;
                     var _this = _super.call(this) || this;
                     _this.parametersConverter = parametersConverter;
                     _this._requestWrapper = _requestWrapper;
-                    _this._sqlDataSourceWrapper = new SQLDataSourceWrapper(undefined, undefined, _this._requestWrapper);
+                    _this._sqlDataSourceWrapper = new _SqlDataSourceWrapper(undefined, undefined, _this._requestWrapper);
                     _this.removeButtonTitle = Analytics.Utils.getLocalization("Remove", "DataAccessUIStringId.Button_Remove");
                     _this.parametersEditorOptions = {
                         addHandler: function () {
@@ -3218,40 +3331,40 @@ var DevExpress;
                     };
                     return _this;
                 }
-                ConfigureParametersPage.prototype._isParametersValid = function () {
+                ConfigureQueryParametersPage.prototype._isParametersValid = function () {
                     return this.getParameters().every(function (x) { return x.isValid(); });
                 };
-                ConfigureParametersPage.prototype.canNext = function () {
+                ConfigureQueryParametersPage.prototype.canNext = function () {
                     return false;
                 };
-                ConfigureParametersPage.prototype.canFinish = function () {
+                ConfigureQueryParametersPage.prototype.canFinish = function () {
                     return this._isParametersValid();
                 };
-                ConfigureParametersPage.prototype.getParameters = function () {
+                ConfigureQueryParametersPage.prototype.getParameters = function () {
                     return this.parametersEditorOptions.values()();
                 };
-                ConfigureParametersPage.prototype.initialize = function (data) {
+                ConfigureQueryParametersPage.prototype.initialize = function (data) {
                     var _this = this;
-                    this._sqlDataSourceWrapper = Wizard.restoreSqlDataSourceFromState(data, this._requestWrapper);
+                    this._sqlDataSourceWrapper = Wizard._restoreSqlDataSourceFromState(data, this._requestWrapper);
                     this.parametersEditorOptions.hideButtons(this._sqlDataSourceWrapper.sqlQuery.type() === Data.Utils.SqlQueryType.storedProcQuery);
                     setTimeout(function () {
                         _this.parametersEditorOptions.values(ko.observableArray(_this._sqlDataSourceWrapper.sqlQuery.parameters().map(function (item) { return _this.parametersConverter.createParameterViewModel(item); })));
                     }, 100);
                     return $.Deferred().resolve().promise();
                 };
-                ConfigureParametersPage.prototype.commit = function () {
+                ConfigureQueryParametersPage.prototype.commit = function () {
                     var _this = this;
                     this._sqlDataSourceWrapper.sqlQuery.parameters(this.parametersEditorOptions.values()().map(function (item) { return _this.parametersConverter.getParameterFromViewModel(item); }));
                     return $.Deferred().resolve({
                         sqlDataSourceJSON: this._sqlDataSourceWrapper.save()
                     }).promise();
                 };
-                return ConfigureParametersPage;
+                return ConfigureQueryParametersPage;
             }(WizardPageBase));
-            Wizard.ConfigureParametersPage = ConfigureParametersPage;
-            function registerConfigureParametersPage(factory, requestWrapper, parametersConverter) {
+            Wizard.ConfigureQueryParametersPage = ConfigureQueryParametersPage;
+            function _registerConfigureParametersPage(factory, requestWrapper, parametersConverter) {
                 factory.registerMetadata(Wizard.SqlDataSourceWizardPageId.ConfigureParametersPage, {
-                    create: function () { return new ConfigureParametersPage(parametersConverter, requestWrapper); },
+                    create: function () { return new ConfigureQueryParametersPage(parametersConverter, requestWrapper); },
                     getState: function (state) { return state.sqlDataSourceWizard; },
                     setState: function (result, state) { return state.sqlDataSourceJSON = result.sqlDataSourceJSON; },
                     resetState: function () { return void 0; },
@@ -3259,123 +3372,120 @@ var DevExpress;
                     description: Analytics.Utils.getLocalization("Configure query parameters.", "AnalyticsCoreStringId.SqlDSWizard_PageConfigureParameters")
                 });
             }
-            Wizard.registerConfigureParametersPage = registerConfigureParametersPage;
+            Wizard._registerConfigureParametersPage = _registerConfigureParametersPage;
             var MultiQueryConfigurePage = (function (_super) {
                 __extends(MultiQueryConfigurePage, _super);
-                function MultiQueryConfigurePage(callbacks, disableCustomSql, rtl, _requestWrapper) {
-                    if (callbacks === void 0) { callbacks = {}; }
-                    if (disableCustomSql === void 0) { disableCustomSql = true; }
-                    if (rtl === void 0) { rtl = false; }
+                function MultiQueryConfigurePage(_options) {
                     var _this = _super.call(this) || this;
-                    _this._requestWrapper = _requestWrapper;
+                    _this._options = _options;
                     _this._selectedPath = ko.observable(null);
                     _this._connection = "";
                     _this._itemsProvider = ko.observable();
                     _this._customQueries = ko.observableArray([]);
                     _this._checkedQueries = ko.observableArray([]);
-                    _this._sqlDataSourceWrapper = new SQLDataSourceWrapper(undefined, undefined, undefined);
+                    _this._sqlDataSourceWrapper = new _SqlDataSourceWrapper(undefined, undefined, undefined);
                     _this._dataSource = function () {
                         return _this._sqlDataSourceWrapper && _this._sqlDataSourceWrapper.sqlDataSource;
                     };
                     _this._dataConnection = function () {
                         return _this._dataSource() && _this._dataSource().connection;
                     };
-                    _this.showStatementPopup = function (query) {
-                        _this.popupSelectStatment.isVisible(true);
-                        _this.popupSelectStatment.query = query;
-                        _this.popupSelectStatment.data(query.sqlString());
+                    _this._showStatementPopup = function (query) {
+                        _this._popupSelectStatement.isVisible(true);
+                        _this._popupSelectStatement.query = query;
+                        _this._popupSelectStatement.data(query.sqlString());
                     };
-                    _this.showQbCallBack = function (name, isCustomQuery) {
+                    _this._showQbCallBack = function (name, isCustomQuery) {
                         if (name === void 0) { name = null; }
                         if (isCustomQuery === void 0) { isCustomQuery = false; }
                         if (name !== null) {
                             var query = Analytics.Internal.findFirstItemMatchesCondition(_this._customQueries(), function (item) { return name === (item.name() || item.generateName()); });
                             if (query.type() === Data.Utils.SqlQueryType.customSqlQuery) {
-                                _this.queryEditIndex(_this._customQueries().indexOf(query));
-                                _this.showStatementPopup(query);
+                                _this._queryEditIndex(_this._customQueries().indexOf(query));
+                                _this._showStatementPopup(query);
                             }
                             else {
-                                _this.queryEditIndex(_this._customQueries().indexOf(query));
-                                _this.popupQueryBuilder.show(query, _this._dataSource());
+                                _this._queryEditIndex(_this._customQueries().indexOf(query));
+                                _this._popupQueryBuilder.show(query, _this._dataSource());
                             }
                         }
                         else {
-                            _this.queryEditIndex(-1);
+                            _this._queryEditIndex(-1);
                             if (isCustomQuery) {
-                                _this.showStatementPopup(new Data.CustomSqlQuery({ "@Name": null }, _this._dataSource()));
+                                _this._showStatementPopup(new Data.CustomSqlQuery({ "@Name": null }, _this._dataSource()));
                             }
                             else {
                                 var queryNew = new Data.TableQuery({ "@Name": null }, _this._dataSource());
-                                _this.popupQueryBuilder.show(queryNew, _this._dataSource());
+                                _this._popupQueryBuilder.show(queryNew, _this._dataSource());
                             }
                         }
                     };
-                    _this.popupSelectStatment = ({
+                    _this._popupSelectStatement = ({
                         isVisible: ko.observable(false),
                         title: function () { return Analytics.Utils.getLocalization("Custom SQL Editor", "AnalyticsCoreStringId.SqlDSWizard_CustomSqlEditor"); },
                         query: null,
                         data: ko.observable(),
                         okButtonText: function () { return DevExpress.Analytics.Utils.getLocalization('OK', 'DataAccessUIStringId.Button_OK'); },
                         okButtonHandler: function (e) {
-                            _this.popupSelectStatment.query.sqlString(e.model.data());
-                            _this.setCustomSqlQuery(_this.popupSelectStatment.query);
+                            _this._popupSelectStatement.query.sqlString(e.model.data());
+                            _this._setCustomSqlQuery(_this._popupSelectStatement.query);
                             e.model.isVisible(false);
                         },
                         aceOptions: QueryBuilder.Widgets.Internal.createDefaultSQLAceOptions(),
                         aceAvailable: Analytics.Widgets.Internal.aceAvailable,
-                        additionalOptions: QueryBuilder.Widgets.Internal.createDefaultSQLAdditionalOptions(function (newVal) { _this.popupSelectStatment.data(newVal); }),
+                        additionalOptions: QueryBuilder.Widgets.Internal.createDefaultSQLAdditionalOptions(function (newVal) { _this._popupSelectStatement.data(newVal); }),
                         languageHelper: QueryBuilder.Widgets.Internal.createDefaultSQLLanguageHelper(),
                         closest: function (element, parentSelector) {
                             return $(element).closest(parentSelector);
                         }
                     });
-                    _this.customResetOptions = $.noop;
-                    _this.queryEditIndex = ko.observable(-1);
+                    _this._customResetOptions = $.noop;
+                    _this._queryEditIndex = ko.observable(-1);
                     _this.disableCustomSql = true;
-                    _this.scrollViewHeight = "100%";
-                    _this.customizeDBSchemaTreeListActions = null;
-                    _this.isDataLoadingInProcess = ko.observable(false);
-                    _this._callbacks = callbacks;
+                    _this._scrollViewHeight = "100%";
+                    _this._customizeDBSchemaTreeListActions = null;
+                    _this._isDataLoadingInProcess = ko.observable(false);
+                    _this._callbacks = _this._options.callbacks;
                     _this._sqlTextProvider = new Analytics.Wizard.Internal.SelectQuerySqlTextProvider(QueryBuilder.Internal.wrapGetSelectStatement(_this._callbacks.selectStatement), _this._dataConnection);
-                    _this.popupQueryBuilder = new Analytics.Wizard.Internal.QueryBuilderPopup(function (newQuery, isInProcess) { return _this.setTableQuery(newQuery, isInProcess); }, rtl, callbacks.customizeQBInitData);
-                    _this.fieldListModel = ko.observable(null);
-                    _this._disposables.push(_this.hasParametersToEdit = ko.pureComputed(function () { return _this._itemsProvider().hasParametersToEdit(); }));
-                    _this._disposables.push(_this.isDataLoadingInProcess.subscribe(function (newVal) {
+                    _this._popupQueryBuilder = new Analytics.Wizard.Internal.QueryBuilderPopup(function (newQuery, isInProcess) { return _this._setTableQuery(newQuery, isInProcess); }, _this._options.rtl, _this._options.callbacks.customizeQBInitData);
+                    _this._fieldListModel = ko.observable(null);
+                    _this._disposables.push(_this._hasParametersToEdit = ko.pureComputed(function () { return _this._itemsProvider().hasParametersToEdit(); }));
+                    _this._disposables.push(_this._isDataLoadingInProcess.subscribe(function (newVal) {
                         if (!newVal)
                             _this._onChange();
                         _this[BaseWizard.__loadingStateFunctionName] && _this[BaseWizard.__loadingStateFunctionName](newVal);
                     }));
-                    _this.disableCustomSql = disableCustomSql;
-                    _this.getItemsAfterCheck = function (node) {
+                    _this.disableCustomSql = _this._options.disableCustomSql;
+                    _this._getItemsAfterCheck = function (node) {
                         _this._resetDataSourceResult();
-                        _this.isDataLoadingInProcess(true);
+                        _this._isDataLoadingInProcess(true);
                         if (node.checked.peek() && node.isList) {
                             if (node.name === "tables" || node.name === "views") {
                                 _this._itemsProvider().getItems(new DevExpress.Analytics.Utils.PathRequest(node.name)).done(function () {
                                     if (node.isList && node.children.peek().length > 0) {
                                         $.when.apply($, node.children.peek().map(function (item) {
                                             return _this._getItemsPromise(new DevExpress.Analytics.Utils.PathRequest(node.name + "." + item.name));
-                                        })).always(function () { return _this.isDataLoadingInProcess(false); });
+                                        })).always(function () { return _this._isDataLoadingInProcess(false); });
                                     }
                                     else {
-                                        _this.isDataLoadingInProcess(false);
+                                        _this._isDataLoadingInProcess(false);
                                     }
                                 });
                             }
                             else if (node.specifics === "table" || node.specifics === "view") {
                                 _this["_itemsProvider"]().getItems(new DevExpress.Analytics.Utils.PathRequest(node.specifics + "." + node.name))
-                                    .always(function () { return _this.isDataLoadingInProcess(false); });
+                                    .always(function () { return _this._isDataLoadingInProcess(false); });
                             }
                             else if (node.name === "procedures") {
                                 _this["_itemsProvider"]().getItems(new DevExpress.Analytics.Utils.PathRequest(node.name))
-                                    .always(function () { return _this.isDataLoadingInProcess(false); });
+                                    .always(function () { return _this._isDataLoadingInProcess(false); });
                             }
                             else {
-                                _this.isDataLoadingInProcess(false);
+                                _this._isDataLoadingInProcess(false);
                             }
                         }
                         else {
-                            _this.isDataLoadingInProcess(false);
+                            _this._isDataLoadingInProcess(false);
                         }
                     };
                     return _this;
@@ -3397,7 +3507,7 @@ var DevExpress;
                     }
                     else {
                         elements.children().forEach(function (node) {
-                            MultiQueryConfigurePage.removeQuery(dataSource.queries, node);
+                            MultiQueryConfigurePage._removeQuery(dataSource.queries, node);
                         });
                     }
                 };
@@ -3434,10 +3544,10 @@ var DevExpress;
                                     };
                                 }
                             }
-                            MultiQueryConfigurePage.pushQuery(new Data.TableQuery(queryJSON, dataSource), table, dataSource.queries);
+                            MultiQueryConfigurePage._pushQuery(new Data.TableQuery(queryJSON, dataSource), table, dataSource.queries);
                         }
                         else {
-                            MultiQueryConfigurePage.removeQuery(dataSource.queries, table);
+                            MultiQueryConfigurePage._removeQuery(dataSource.queries, table);
                         }
                     }
                 };
@@ -3449,10 +3559,10 @@ var DevExpress;
                             procedure.arguments.forEach(function (arg) {
                                 newQuery.parameters.push(new Data.DataSourceParameter({ "@Name": arg.name, "@Type": Data.DBColumn.GetType(arg.type) }, null, Data.Metadata.storedProcParameterSerializationsInfo(Data.DBColumn.GetType(arg.type))));
                             });
-                            MultiQueryConfigurePage.pushQuery(newQuery, procedure, dataSource.queries);
+                            MultiQueryConfigurePage._pushQuery(newQuery, procedure, dataSource.queries);
                         }
                         else {
-                            MultiQueryConfigurePage.removeQuery(dataSource.queries, procedure);
+                            MultiQueryConfigurePage._removeQuery(dataSource.queries, procedure);
                         }
                     }
                 };
@@ -3470,14 +3580,14 @@ var DevExpress;
                     return this._itemsProvider().getItems(pathRequest);
                 };
                 MultiQueryConfigurePage.prototype._resetDataSourceResult = function () {
-                    this.customResetOptions();
+                    this._customResetOptions();
                     this._dataSource().relations([]);
                     this._dataSource().resultSet = null;
                     this._onChange();
                 };
                 MultiQueryConfigurePage.prototype._setQueryCore = function (query) {
-                    var provider = this.fieldListModel().itemsProvider;
-                    var queryEditIndex = this.queryEditIndex();
+                    var provider = this._fieldListModel().itemsProvider;
+                    var queryEditIndex = this._queryEditIndex();
                     if (queryEditIndex >= 0) {
                         this._itemsProvider().queries().children()[queryEditIndex].name = query.name();
                         provider.customQueries().splice(queryEditIndex, 1, query);
@@ -3493,14 +3603,14 @@ var DevExpress;
                     }
                     this._resetDataSourceResult();
                 };
-                MultiQueryConfigurePage.pushQuery = function (newQuery, node, queries) {
+                MultiQueryConfigurePage._pushQuery = function (newQuery, node, queries) {
                     if (!Analytics.Internal.findFirstItemMatchesCondition(queries.peek(), function (item) { return item.name() === (newQuery.name() || newQuery.generateName()); })) {
                         newQuery.name(Data.Internal.generateQueryUniqueName(queries.peek(), newQuery));
                         queries.push(newQuery);
                     }
                     node.hasQuery = true;
                 };
-                MultiQueryConfigurePage.removeQuery = function (queries, node) {
+                MultiQueryConfigurePage._removeQuery = function (queries, node) {
                     if (node.hasQuery) {
                         var queryIndex = -1;
                         var existUncheck = queries.peek().some(function (value, index) {
@@ -3520,16 +3630,16 @@ var DevExpress;
                     return !this._itemsProvider().nextButtonDisabled() && this.canFinish();
                 };
                 MultiQueryConfigurePage.prototype.canFinish = function () {
-                    return this._itemsProvider() && this._itemsProvider().hasCheckedItems() && !this.isDataLoadingInProcess();
+                    return this._itemsProvider() && this._itemsProvider().hasCheckedItems() && !this._isDataLoadingInProcess();
                 };
-                MultiQueryConfigurePage.prototype.AddQueryWithBuilder = function () {
+                MultiQueryConfigurePage.prototype._AddQueryWithBuilder = function () {
                 };
-                MultiQueryConfigurePage.prototype.runQueryBuilder = function () {
+                MultiQueryConfigurePage.prototype._runQueryBuilder = function () {
                 };
-                MultiQueryConfigurePage.prototype.loadPanelViewModel = function (element) {
-                    return PopupWizard.getLoadPanelViewModel(element, this.isDataLoadingInProcess);
+                MultiQueryConfigurePage.prototype._loadPanelViewModel = function (element) {
+                    return PopupWizard._getLoadPanelViewModel(element, this._isDataLoadingInProcess);
                 };
-                MultiQueryConfigurePage.prototype.setTableQuery = function (query, isInProcess) {
+                MultiQueryConfigurePage.prototype._setTableQuery = function (query, isInProcess) {
                     var _this = this;
                     isInProcess && isInProcess(true);
                     return this._sqlTextProvider.getQuerySqlText(query)
@@ -3538,7 +3648,7 @@ var DevExpress;
                         isInProcess && isInProcess(false);
                     });
                 };
-                MultiQueryConfigurePage.prototype.setCustomSqlQuery = function (query) {
+                MultiQueryConfigurePage.prototype._setCustomSqlQuery = function (query) {
                     this._setQueryCore(query);
                 };
                 MultiQueryConfigurePage.prototype.commit = function () {
@@ -3564,7 +3674,7 @@ var DevExpress;
                 };
                 MultiQueryConfigurePage.prototype.initialize = function (state) {
                     var _this = this;
-                    this._sqlDataSourceWrapper = Wizard.restoreSqlDataSourceFromState(state, this._requestWrapper);
+                    this._sqlDataSourceWrapper = Wizard._restoreSqlDataSourceFromState(state, this._options.requestWrapper);
                     var customQueriesPromise = this._callbacks.customQueriesPreset
                         ? this._callbacks.customQueriesPreset(this._dataSource())
                         : $.Deferred().resolve([]).promise();
@@ -3572,15 +3682,15 @@ var DevExpress;
                     customQueriesPromise.done(function (queries) {
                         _this._customQueries(queries);
                         _this._selectedPath("");
-                        _this._itemsProvider(new Analytics.Wizard.Internal.DBSchemaItemsProvider(_this._dataSource().dbSchemaProvider, _this._customQueries, _this.showQbCallBack, _this.disableCustomSql, _this.getItemsAfterCheck));
+                        _this._itemsProvider(new Analytics.Wizard.Internal.DBSchemaItemsProvider(_this._dataSource().dbSchemaProvider, _this._customQueries, _this._showQbCallBack, _this.disableCustomSql, _this._getItemsAfterCheck));
                         _this._getItemsPromise(new DevExpress.Analytics.Utils.PathRequest("queries"));
-                        _this.fieldListModel({
+                        _this._fieldListModel({
                             itemsProvider: _this._itemsProvider(),
                             selectedPath: _this._selectedPath,
-                            treeListController: new Analytics.Wizard.Internal.DBSchemaTreeListController(_this.customizeDBSchemaTreeListActions),
+                            treeListController: new Analytics.Wizard.Internal.DBSchemaTreeListController(_this._customizeDBSchemaTreeListActions),
                             templateName: "dxrd-treelist-with-checkbox"
                         });
-                        _this.popupQueryBuilder.isVisible(false);
+                        _this._popupQueryBuilder.isVisible(false);
                         _this._dataSource()
                             .dbSchemaProvider.getDbSchema()
                             .done(function () {
@@ -3594,12 +3704,10 @@ var DevExpress;
                 return MultiQueryConfigurePage;
             }(WizardPageBase));
             Wizard.MultiQueryConfigurePage = MultiQueryConfigurePage;
-            function registerMultiQueryConfigurePage(factory, callbacks, disableCustomSql, requestWrapper) {
-                if (callbacks === void 0) { callbacks = {}; }
-                if (disableCustomSql === void 0) { disableCustomSql = false; }
+            function _registerMultiQueryConfigurePage(factory, wizardOptions) {
                 factory.registerMetadata(Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage, {
                     create: function () {
-                        return new MultiQueryConfigurePage(callbacks, disableCustomSql, undefined, requestWrapper);
+                        return new MultiQueryConfigurePage(wizardOptions);
                     },
                     setState: function (data, state) {
                         state.sqlDataSourceJSON = data.sqlDataSourceJSON;
@@ -3616,14 +3724,14 @@ var DevExpress;
                     template: "dxrd-wizard-add-queries-page"
                 });
             }
-            Wizard.registerMultiQueryConfigurePage = registerMultiQueryConfigurePage;
-            function canEditQueryParameters(query, customQueries) {
+            Wizard._registerMultiQueryConfigurePage = _registerMultiQueryConfigurePage;
+            function _canEditQueryParameters(query, customQueries) {
                 if (query.type() === Data.Utils.SqlQueryType.tableQuery || query.type() === Data.Utils.SqlQueryType.customSqlQuery) {
                     return customQueries.indexOf(query) > -1;
                 }
                 return query.type() === Data.Utils.SqlQueryType.storedProcQuery && query.parameters().length > 0;
             }
-            Wizard.canEditQueryParameters = canEditQueryParameters;
+            Wizard._canEditQueryParameters = _canEditQueryParameters;
             var MultiQueryConfigureParametersPage = (function (_super) {
                 __extends(MultiQueryConfigureParametersPage, _super);
                 function MultiQueryConfigureParametersPage(parametersConverter, _requestWrapper) {
@@ -3634,7 +3742,7 @@ var DevExpress;
                     var _this = _super.call(this) || this;
                     _this.parametersConverter = parametersConverter;
                     _this._requestWrapper = _requestWrapper;
-                    _this._sqlDataSourceWrapper = new SQLDataSourceWrapper(undefined, undefined, _this._requestWrapper);
+                    _this._sqlDataSourceWrapper = new _SqlDataSourceWrapper(undefined, undefined, _this._requestWrapper);
                     _this._selectedPath = ko.observable(null);
                     _this._rootItems = ko.observableArray();
                     _this._createNewParameter = function (queryName, parameters) {
@@ -3645,9 +3753,9 @@ var DevExpress;
                         _this._selectedPath(queryName + "." + newParameter.name());
                         return _this.parametersConverter.createParameterViewModel(newParameter);
                     };
-                    _this.scrollViewHeight = "100%";
-                    _this.fieldListModel = ko.observable(null);
-                    _this.removeButtonTitle = Analytics.Utils.getLocalization("Remove", "DataAccessUIStringId.Button_Remove");
+                    _this._scrollViewHeight = "100%";
+                    _this._fieldListModel = ko.observable(null);
+                    _this._removeButtonTitle = Analytics.Utils.getLocalization("Remove", "DataAccessUIStringId.Button_Remove");
                     var callback = function () { return _this._onChange(); };
                     _this._disposables.push(Internal.subscribeArray(_this._rootItems, function (item) {
                         _this._disposables.push(Internal.subscribeArray(item.parameters, function (parameter) {
@@ -3657,10 +3765,10 @@ var DevExpress;
                             }, callback));
                         }, callback));
                     }, callback));
-                    _this.parametersEditorOptions = {
+                    _this._parametersEditorOptions = {
                         addHandler: function () {
                             return _this.parametersConverter.createParameterViewModel(new Data.DataSourceParameter({
-                                "@Name": Analytics.Internal.getUniqueNameForNamedObjectsArray(_this.parametersEditorOptions.values.peek().peek(), "param"),
+                                "@Name": Analytics.Internal.getUniqueNameForNamedObjectsArray(_this._parametersEditorOptions.values.peek().peek(), "param"),
                                 "@Type": "System.Int32"
                             }));
                         },
@@ -3682,7 +3790,7 @@ var DevExpress;
                     return _this;
                 }
                 MultiQueryConfigureParametersPage.prototype._isParametersValid = function () {
-                    return this.getParameters().every(function (x) { return x.isValid(); });
+                    return this._getParameters().every(function (x) { return x.isValid(); });
                 };
                 MultiQueryConfigureParametersPage.prototype.canNext = function () {
                     return this._isParametersValid() && this._sqlDataSourceWrapper.sqlDataSource.queries().length > 1;
@@ -3690,7 +3798,7 @@ var DevExpress;
                 MultiQueryConfigureParametersPage.prototype.canFinish = function () {
                     return this._isParametersValid() && this._sqlDataSourceWrapper.sqlDataSource.queries().length >= 1;
                 };
-                MultiQueryConfigureParametersPage.prototype.getParameters = function () {
+                MultiQueryConfigureParametersPage.prototype._getParameters = function () {
                     return [].concat.apply([], (this._rootItems() || []).map(function (x) {
                         return x.parameters().map(function (param) {
                             return param.dataSourceParameter();
@@ -3701,9 +3809,9 @@ var DevExpress;
                     var _this = this;
                     var newRootItemsWithParameters = [];
                     var rootItems = this._rootItems();
-                    this._sqlDataSourceWrapper = Wizard.restoreSqlDataSourceFromState(state, this._requestWrapper);
+                    this._sqlDataSourceWrapper = Wizard._restoreSqlDataSourceFromState(state, this._requestWrapper);
                     this._sqlDataSourceWrapper.sqlDataSource.queries().forEach(function (query) {
-                        if (Analytics.Wizard.canEditQueryParameters(query, _this._sqlDataSourceWrapper.customQueries)) {
+                        if (Analytics.Wizard._canEditQueryParameters(query, _this._sqlDataSourceWrapper.customQueries)) {
                             var parent = new Analytics.Wizard.Internal.ParametersTreeListRootItem(query);
                             parent.parameters(query.parameters().map(function (parameterModel) {
                                 return new Analytics.Wizard.Internal.ParametersTreeListItem(_this.parametersConverter.createParameterViewModel(parameterModel), parent);
@@ -3726,7 +3834,7 @@ var DevExpress;
                         }
                     });
                     this._rootItems.valueHasMutated();
-                    this.fieldListModel({
+                    this._fieldListModel({
                         itemsProvider: {
                             getItems: function (pathRequest) {
                                 var result = $.Deferred();
@@ -3761,7 +3869,7 @@ var DevExpress;
                 return MultiQueryConfigureParametersPage;
             }(WizardPageBase));
             Wizard.MultiQueryConfigureParametersPage = MultiQueryConfigureParametersPage;
-            function registerMultiQueryConfigureParametersPage(factory, requestWrapper, parametersConverter) {
+            function _registerMultiQueryConfigureParametersPage(factory, requestWrapper, parametersConverter) {
                 factory.registerMetadata(Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage, {
                     create: function () { return new MultiQueryConfigureParametersPage(parametersConverter, requestWrapper); },
                     getState: function (state) { return state.sqlDataSourceWizard; },
@@ -3771,15 +3879,15 @@ var DevExpress;
                     template: "dxrd-configure-query-parameters-page"
                 });
             }
-            Wizard.registerMultiQueryConfigureParametersPage = registerMultiQueryConfigureParametersPage;
+            Wizard._registerMultiQueryConfigureParametersPage = _registerMultiQueryConfigureParametersPage;
             var ConfigureMasterDetailRelationshipsPage = (function (_super) {
                 __extends(ConfigureMasterDetailRelationshipsPage, _super);
                 function ConfigureMasterDetailRelationshipsPage(_sqlDataSourceResultSchema) {
                     var _this = _super.call(this) || this;
                     _this._sqlDataSourceResultSchema = _sqlDataSourceResultSchema;
                     _this._relations = ko.observableArray([]);
-                    _this.customResetOptions = $.noop;
-                    _this.relationsEditor = ko.observable(null);
+                    _this._customResetOptions = $.noop;
+                    _this._relationsEditor = ko.observable(null);
                     var callback = function () { return _this._onChange(); };
                     _this._disposables.push(Internal.subscribeArray(_this._relations, function (relation) {
                         var _a;
@@ -3840,20 +3948,20 @@ var DevExpress;
                 ConfigureMasterDetailRelationshipsPage.prototype.initialize = function (state) {
                     var _this = this;
                     this.relationsSubscription && this.relationsSubscription.dispose();
-                    this._sqlDataSourceWrapper = Wizard.restoreSqlDataSourceFromState(state);
+                    this._sqlDataSourceWrapper = Wizard._restoreSqlDataSourceFromState(state);
                     this._disposables.push(this.relationsSubscription = this._relations.subscribe(function (changes) {
                         var isRelationsChanged = changes.some(function (change) {
                             return !change["moved"] && change["moved"] !== 0;
                         });
                         if (isRelationsChanged) {
-                            _this.customResetOptions();
+                            _this._customResetOptions();
                         }
                     }, null, "arrayChange"));
                     return this._getResultSet(this._sqlDataSourceWrapper.sqlDataSource)
                         .done(function (result) {
                         _this._resultSet = result;
                         _this._updateRelations();
-                        _this.relationsEditor(new QueryBuilder.Widgets.Internal.MasterDetailEditor(_this._relations, _this._resultSet, $.noop));
+                        _this._relationsEditor(new QueryBuilder.Widgets.Internal.MasterDetailEditor(_this._relations, _this._resultSet, $.noop));
                     })
                         .fail(function (result) {
                         if (Analytics.Internal.getErrorMessage(result))
@@ -3874,7 +3982,7 @@ var DevExpress;
                 return ConfigureMasterDetailRelationshipsPage;
             }(WizardPageBase));
             Wizard.ConfigureMasterDetailRelationshipsPage = ConfigureMasterDetailRelationshipsPage;
-            function registerConfigureMasterDetailRelationshipsPage(factory, sqlDataSourceResultSchema) {
+            function _registerConfigureMasterDetailRelationshipsPage(factory, sqlDataSourceResultSchema) {
                 factory.registerMetadata(Wizard.DataSourceWizardPageId.ConfigureMasterDetailRelationshipsPage, {
                     create: function () {
                         return new ConfigureMasterDetailRelationshipsPage(sqlDataSourceResultSchema);
@@ -3892,7 +4000,7 @@ var DevExpress;
                     template: "dxrd-wizard-configure-relations-page"
                 });
             }
-            Wizard.registerConfigureMasterDetailRelationshipsPage = registerConfigureMasterDetailRelationshipsPage;
+            Wizard._registerConfigureMasterDetailRelationshipsPage = _registerConfigureMasterDetailRelationshipsPage;
             var PageFactory = (function () {
                 function PageFactory() {
                     this.metadata = {};
@@ -3955,7 +4063,7 @@ var DevExpress;
                     this._pages.forEach(function (x) { return x.dispose(); });
                     this._pages = [];
                 };
-                PageIterator.prototype._resetPages = function (fromIndex) {
+                PageIterator.prototype.__resetPages = function (fromIndex) {
                     if (fromIndex < this._pages.length) {
                         for (var index = this._pages.length - 1; index >= fromIndex; index--) {
                             this.stateManager.resetPageState(this._pages[index].pageId);
@@ -3971,30 +4079,30 @@ var DevExpress;
                     deferred.resolve(this._pages[this._currentIndex]);
                     return deferred.promise();
                 };
-                PageIterator.prototype.resetPages = function () {
-                    this._resetPages(this._currentIndex + 1);
+                PageIterator.prototype._resetPages = function () {
+                    this.__resetPages(this._currentIndex + 1);
                 };
                 PageIterator.prototype._getNextNewPage = function (nextPageId) {
                     this._currentIndex += 1;
                     var deferred = $.Deferred();
-                    this._resetPages(this._currentIndex);
+                    this.__resetPages(this._currentIndex);
                     var pageMetadata = this.pageFactory.getMetadata(nextPageId);
-                    var newPage = new WrappedWizardPage(nextPageId, pageMetadata.create(), pageMetadata.template, pageMetadata.description);
+                    var newPage = new _WrappedWizardPage(nextPageId, pageMetadata.create(), pageMetadata.template, pageMetadata.description);
                     this._pages.push(newPage);
                     deferred.resolve(newPage);
                     return deferred.promise();
                 };
-                PageIterator.prototype.getStartPage = function (pageId) {
+                PageIterator.prototype._getStartPage = function (pageId) {
                     pageId = pageId || this.getNextPageId();
                     var pageMetadata = this.pageFactory.getMetadata(pageId);
-                    var startPage = new WrappedWizardPage(pageId, pageMetadata.create(), pageMetadata.template, pageMetadata.description);
+                    var startPage = new _WrappedWizardPage(pageId, pageMetadata.create(), pageMetadata.template, pageMetadata.description);
                     this._pages.push(startPage);
                     return startPage;
                 };
-                PageIterator.prototype.getNextPage = function () {
-                    var currentPage = this.getCurrentPage();
+                PageIterator.prototype._getNextPage = function () {
+                    var currentPage = this._getCurrentPage();
                     if (currentPage.isChanged) {
-                        var nextPageId = this.getNextPageId(this.getCurrentPage().pageId);
+                        var nextPageId = this.getNextPageId(this._getCurrentPage().pageId);
                         if (!nextPageId)
                             return $.Deferred().reject().promise();
                         currentPage.isChanged = false;
@@ -4003,7 +4111,7 @@ var DevExpress;
                     else
                         return this._getNextExistingPage();
                 };
-                PageIterator.prototype.getPreviousPage = function () {
+                PageIterator.prototype._getPreviousPage = function () {
                     var deferred = $.Deferred();
                     if (this._currentIndex - 1 < 0) {
                         deferred.reject(null);
@@ -4014,7 +4122,7 @@ var DevExpress;
                     }
                     return deferred.promise();
                 };
-                PageIterator.prototype.goToPage = function (pageId) {
+                PageIterator.prototype._goToPage = function (pageId) {
                     var deferred = $.Deferred();
                     var page = this._pages.filter(function (page) { return page.pageId === pageId; })[0];
                     if (page) {
@@ -4026,10 +4134,10 @@ var DevExpress;
                     }
                     return deferred.promise();
                 };
-                PageIterator.prototype.getCurrentPage = function () {
+                PageIterator.prototype._getCurrentPage = function () {
                     return this._pages[this._currentIndex];
                 };
-                PageIterator.prototype.getCurrentState = function () {
+                PageIterator.prototype._getCurrentState = function () {
                     return this.stateManager.getCurrentState();
                 };
                 PageIterator.prototype.getNextPageId = function (pageId) {
@@ -4046,7 +4154,7 @@ var DevExpress;
                     _this.events = new Analytics.Utils.EventManager();
                     _this._loadingTimeout = null;
                     _this.isLoading = ko.observable(false);
-                    _this.currentPage = ko.observable();
+                    _this._currentPage = ko.observable();
                     _this.isVisible = ko.observable(false);
                     _this._finishCallback = finishCallback;
                     _this._disposables.push(_this.events);
@@ -4063,13 +4171,6 @@ var DevExpress;
                     if (!page[BaseWizard.__nextActionFunctionName]) {
                         page[BaseWizard.__nextActionFunctionName] = function () { return _this.nextAction(); };
                     }
-                };
-                BaseWizard.prototype._createPageEventArgs = function (page) {
-                    return {
-                        page: page.page,
-                        pageId: page.pageId,
-                        wizard: this
-                    };
                 };
                 BaseWizard.prototype._loadingState = function (active) {
                     var _this = this;
@@ -4089,22 +4190,22 @@ var DevExpress;
                 };
                 BaseWizard.prototype.initialize = function (state, createIterator) {
                     if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new PageIterator(pageFactory, stateManager); }; }
-                    this.events.call("beforeInitialize", { wizard: this });
+                    this.events.call("beforeInitialize", { wizard: this, state: state });
                     this.stateManager = new StateManager(state, this.pageFactory);
                     this.iterator = createIterator(this.pageFactory, this.stateManager);
                     this.events.call("afterInitialize", { wizard: this });
                 };
                 BaseWizard.prototype.isFirstPage = function () {
-                    return this.currentPage() && this.currentPage().pageId == this.iterator.getNextPageId();
+                    return this._currentPage() && this._currentPage().pageId == this.iterator.getNextPageId();
                 };
                 BaseWizard.prototype.canNext = function () {
-                    return this.currentPage() && this.pageFactory.getMetadata(this.currentPage().pageId).canNext(this.currentPage().page);
+                    return this._currentPage() && this.pageFactory.getMetadata(this._currentPage().pageId).canNext(this._currentPage().page);
                 };
                 BaseWizard.prototype.canFinish = function () {
-                    return this.currentPage() && this.pageFactory.getMetadata(this.currentPage().pageId).canFinish(this.currentPage().page);
+                    return this._currentPage() && this.pageFactory.getMetadata(this._currentPage().pageId).canFinish(this._currentPage().page);
                 };
-                BaseWizard.prototype.initPage = function (page) {
-                    this.events.call("beforePageInitialize", this._createPageEventArgs(page));
+                BaseWizard.prototype._initPage = function (page) {
+                    this.events.call("beforePageInitialize", Internal._createBeforeInitializePageEventArgs(page, this));
                     this._createLoadingState(page.page);
                     this._createNextAction(page.page);
                     return page.initialize(this.stateManager.getPageState(page.pageId));
@@ -4113,28 +4214,31 @@ var DevExpress;
                     var _this = this;
                     this.events.call("beforeStart", { wizard: this });
                     this._loadingState(true);
-                    var startPage = this.iterator.getStartPage();
-                    this.initPage(startPage).done(function () {
-                        _this.currentPage(startPage);
-                        _this.events.call("afterPageInitialize", _this._createPageEventArgs(startPage));
+                    var startPage = this.iterator._getStartPage();
+                    this._initPage(startPage).done(function () {
+                        _this._currentPage(startPage);
+                        _this.events.call("afterPageInitialize", Internal._createPageEventArgs(startPage, _this));
                     }).always(function () { return _this._loadingState(false); }).fail(function () {
                         _this.isVisible(false);
                     });
+                };
+                BaseWizard.prototype.canRunWizard = function () {
+                    return true;
                 };
                 BaseWizard.prototype.nextAction = function () {
                     var _this = this;
                     if (!this.canNext())
                         return;
-                    var currentPage = this.iterator.getCurrentPage();
+                    var currentPage = this.iterator._getCurrentPage();
                     this._loadingState(true);
                     currentPage.commit().done(function (result) {
                         if (currentPage.isChanged)
                             _this.stateManager.setPageState(currentPage.pageId, result);
-                        _this.iterator.getNextPage().done(function (page) {
+                        _this.iterator._getNextPage().done(function (page) {
                             if (page) {
-                                _this.initPage(page).done(function () {
-                                    _this.currentPage(page);
-                                    _this.events.call("afterPageInitialize", _this._createPageEventArgs(page));
+                                _this._initPage(page).done(function () {
+                                    _this._currentPage(page);
+                                    _this.events.call("afterPageInitialize", Internal._createPageEventArgs(page, _this));
                                     _this._loadingState(false);
                                 }).fail(function () { return _this._loadingState(false); });
                             }
@@ -4148,18 +4252,18 @@ var DevExpress;
                     if (this.isFirstPage())
                         return;
                     this._loadingState(true);
-                    this.iterator.getPreviousPage().done(function (page) {
+                    this.iterator._getPreviousPage().done(function (page) {
                         if (page) {
-                            _this.currentPage(page);
+                            _this._currentPage(page);
                         }
                     }).always(function () { return _this._loadingState(false); });
                 };
                 BaseWizard.prototype.goToPage = function (pageId) {
                     var _this = this;
                     this._loadingState(true);
-                    this.iterator.goToPage(pageId).done(function (page) {
+                    this.iterator._goToPage(pageId).done(function (page) {
                         if (page) {
-                            _this.currentPage(page);
+                            _this._currentPage(page);
                         }
                     }).always(function () { return _this._loadingState(false); });
                 };
@@ -4168,10 +4272,10 @@ var DevExpress;
                     if (!this.canFinish())
                         return;
                     this._loadingState(true);
-                    var currentPage = this.iterator.getCurrentPage();
+                    var currentPage = this.iterator._getCurrentPage();
                     currentPage.commit().done(function (result) {
                         _this.stateManager.setPageState(currentPage.pageId, result);
-                        _this.iterator.resetPages();
+                        _this.iterator._resetPages();
                         if (_this._finishCallback) {
                             _this._finishCallback(_this.stateManager.getCurrentState())
                                 .done(function (result) {
@@ -4213,7 +4317,7 @@ var DevExpress;
                         return _this;
                     }
                     return WrappedWizardPageSection;
-                }(WrappedWizardPage));
+                }(_WrappedWizardPage));
                 Internal.WrappedWizardPageSection = WrappedWizardPageSection;
                 var WizardPageSection = (function () {
                     function WizardPageSection(pageId, metadata) {
@@ -4373,13 +4477,6 @@ var DevExpress;
                         if (!page[BaseWizard.__nextActionFunctionName])
                             page[BaseWizard.__nextActionFunctionName] = function () { return _this._extendedNextAction(); };
                     };
-                    WizardPageProcessor.prototype._createPageEventArgs = function (page) {
-                        return {
-                            page: page.page,
-                            pageId: page.pageId,
-                            wizard: this
-                        };
-                    };
                     WizardPageProcessor.prototype._loadingState = function (active) {
                         var _this = this;
                         if (active) {
@@ -4401,7 +4498,7 @@ var DevExpress;
                     WizardPageProcessor.prototype.initialize = function (state, createIterator) {
                         var _this = this;
                         if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new WizardPageSectionIterator(pageFactory, stateManager, function (pageId) { return _this._resetPageById(pageId); }); }; }
-                        this.events.call("beforeInitialize", { wizard: this });
+                        this.events.call("beforeInitialize", { wizard: this, state: state });
                         this.stateManager = new StateManager(state, this.pageFactory);
                         this.iterator = createIterator(this.pageFactory, this.stateManager);
                         this.sections = [];
@@ -4441,10 +4538,10 @@ var DevExpress;
                         this.events.call("beforeStart", { wizard: this });
                         this._loadingState(true);
                         var page = this.iterator.getStartPage();
-                        this.events.call("beforePageInitialize", this._createPageEventArgs(page));
+                        this.events.call("beforePageInitialize", Internal._createBeforeInitializePageEventArgs(page, this));
                         this._initPage(page).done(function () {
                             _this.getPageById(page.pageId).setPage(page);
-                            _this.events.call("afterPageInitialize", _this._createPageEventArgs(page));
+                            _this.events.call("afterPageInitialize", Internal._createPageEventArgs(page, _this));
                             _this._nextAction(page);
                         });
                     };
@@ -4484,10 +4581,10 @@ var DevExpress;
                                         pages.forEach(function (page) {
                                             var containedPage = _this.getPageById(page.pageId);
                                             var page = containedPage && containedPage.page() || page;
-                                            _this.events.call("beforePageInitialize", _this._createPageEventArgs(page));
+                                            _this.events.call("beforePageInitialize", Internal._createBeforeInitializePageEventArgs(page, _this));
                                             _this._initPage(page, !!containedPage.page()).done(function () {
                                                 _this.getPageById(page.pageId).setPage(page);
-                                                _this.events.call("afterPageInitialize", _this._createPageEventArgs(page));
+                                                _this.events.call("afterPageInitialize", Internal._createPageEventArgs(page, _this));
                                                 _this._nextAction(page, currentPage.isChanged);
                                             });
                                         });
@@ -4512,8 +4609,8 @@ var DevExpress;
                     var _this = _super.call(this, pageFactory, finishCallback) || this;
                     _this.height = ko.observable(505);
                     _this.width = ko.observable(690);
-                    _this.extendCssClass = "";
-                    _this.container = Analytics.Internal.getParentContainer;
+                    _this._extendCssClass = "";
+                    _this._container = Analytics.Internal.getParentContainer;
                     _this.nextButton = {
                         text: Analytics.Utils.getLocalization("Next", "AnalyticsCoreStringId.Wizard_Next"),
                         disabled: ko.computed(function () { return !_this.canNext(); }),
@@ -4535,11 +4632,11 @@ var DevExpress;
                         }),
                         onClick: function () { return _this.finishAction(); }
                     };
-                    _this.titleTemplate = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-wizard-headerNew');
+                    _this._titleTemplate = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-wizard-headerNew');
                     _this.title = "Popup Wizard";
                     return _this;
                 }
-                PopupWizard.getLoadPanelViewModel = function (element, observableVisible) {
+                PopupWizard._getLoadPanelViewModel = function (element, observableVisible) {
                     var $container = $(element).closest('.dxrd-wizard-content');
                     return {
                         animation: {
@@ -4559,72 +4656,109 @@ var DevExpress;
                     _super.prototype.start.call(this);
                     this.isVisible(true);
                 };
-                PopupWizard.prototype.wizardPopupPosition = function (element) {
+                PopupWizard.prototype._wizardPopupPosition = function (element) {
                     return {
                         of: Analytics.Internal.getParentContainer(element)
                     };
                 };
-                PopupWizard.prototype.loadPanelViewModel = function (element) {
-                    return this.getLoadPanelViewModel(element, this.isLoading);
+                PopupWizard.prototype._loadPanelViewModel = function (element) {
+                    return this._getLoadPanelViewModel(element, this.isLoading);
                 };
-                PopupWizard.prototype.getLoadPanelViewModel = function (element, observableVisible) {
-                    return PopupWizard.getLoadPanelViewModel(element, observableVisible);
+                PopupWizard.prototype._getLoadPanelViewModel = function (element, observableVisible) {
+                    return PopupWizard._getLoadPanelViewModel(element, observableVisible);
                 };
                 return PopupWizard;
             }(BaseWizard));
             Wizard.PopupWizard = PopupWizard;
-            var IDataSourceWizardSettings = (function () {
-                function IDataSourceWizardSettings() {
+            var _DataSourceWizardOptionsBase = (function () {
+                function _DataSourceWizardOptionsBase() {
+                    this.connectionStrings = {
+                        json: ko.observableArray([]),
+                        sql: ko.observableArray([])
+                    };
+                    this.callbacks = {};
+                    this.rtl = false;
+                    this.disableCustomSql = false;
+                    this.wizardSettings = new DataSourceWizardSettings().createDefault();
+                    this.canCreateNewJsonDataSource = false;
                 }
-                return IDataSourceWizardSettings;
+                Object.defineProperty(_DataSourceWizardOptionsBase.prototype, "jsonDataSourceAvailable", {
+                    get: function () {
+                        return this.wizardSettings.enableJsonDataSource && (this.canCreateNewJsonDataSource || (ko.unwrap(this.connectionStrings.json) || []).length > 0);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(_DataSourceWizardOptionsBase.prototype, "sqlDataSourceAvailable", {
+                    get: function () {
+                        return this.wizardSettings.enableSqlDataSource && (ko.unwrap(this.connectionStrings.sql) || []).length > 0;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return _DataSourceWizardOptionsBase;
             }());
-            Wizard.IDataSourceWizardSettings = IDataSourceWizardSettings;
+            Wizard._DataSourceWizardOptionsBase = _DataSourceWizardOptionsBase;
+            var _DataSourceWizardOptions = (function (_super) {
+                __extends(_DataSourceWizardOptions, _super);
+                function _DataSourceWizardOptions() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                return _DataSourceWizardOptions;
+            }(_DataSourceWizardOptionsBase));
+            Wizard._DataSourceWizardOptions = _DataSourceWizardOptions;
             var DataSourceWizardSettings = (function () {
                 function DataSourceWizardSettings() {
                 }
-                DataSourceWizardSettings.prototype.createDefault = function () {
-                    return { enableJsonDataSource: true, enableSqlDataSource: true };
+                DataSourceWizardSettings.prototype.createDefault = function (settings) {
+                    var newSettings = { enableJsonDataSource: true, enableSqlDataSource: true };
+                    if (!settings)
+                        return newSettings;
+                    if (settings.enableJsonDataSource !== undefined)
+                        newSettings.enableJsonDataSource = settings.enableJsonDataSource;
+                    if (settings.enableSqlDataSource !== undefined)
+                        newSettings.enableSqlDataSource = settings.enableSqlDataSource;
+                    return newSettings;
                 };
                 return DataSourceWizardSettings;
             }());
             Wizard.DataSourceWizardSettings = DataSourceWizardSettings;
             var DataSourceWizardPageIterator = (function (_super) {
                 __extends(DataSourceWizardPageIterator, _super);
-                function DataSourceWizardPageIterator(pageFactory, stateManager, _connectionStrings, _canCreateNewJsonDataSource) {
+                function DataSourceWizardPageIterator(pageFactory, stateManager, _dataSourceWizardOptions) {
                     var _this = _super.call(this, pageFactory, stateManager) || this;
-                    _this._connectionStrings = _connectionStrings;
-                    _this._canCreateNewJsonDataSource = _canCreateNewJsonDataSource;
+                    _this._dataSourceWizardOptions = _dataSourceWizardOptions;
                     return _this;
                 }
                 DataSourceWizardPageIterator.prototype.getNextPageId = function (pageId) {
-                    if (!pageId && (this._canCreateNewJsonDataSource || (!!this._connectionStrings.json && this._connectionStrings.json().length > 0))) {
+                    if (!pageId && this._dataSourceWizardOptions.jsonDataSourceAvailable && this._dataSourceWizardOptions.sqlDataSourceAvailable) {
                         return Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage;
                     }
                     else if (!pageId) {
                         return this.getNextPageId(Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage);
                     }
-                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === DataSourceType.Sql) {
+                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === DataSourceType.Sql) {
                         return Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage;
                     }
-                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === DataSourceType.Json && this._connectionStrings.json().length > 0) {
+                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === DataSourceType.Json && this._dataSourceWizardOptions.connectionStrings.json().length > 0) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage;
                     }
-                    else if (this._canCreateNewJsonDataSource && pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === DataSourceType.Json) {
+                    else if (this._dataSourceWizardOptions.canCreateNewJsonDataSource && pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === DataSourceType.Json) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage;
                     }
-                    else if (pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && this.getCurrentState().jsonDataSourceWizard.connectionName) {
+                    else if (pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && this._getCurrentState().jsonDataSourceWizard.connectionName) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
                     }
-                    else if (this._canCreateNewJsonDataSource && pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && !this.getCurrentState().jsonDataSourceWizard.connectionName) {
+                    else if (this._dataSourceWizardOptions.canCreateNewJsonDataSource && pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && !this._getCurrentState().jsonDataSourceWizard.connectionName) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage;
                     }
                     else if (pageId === Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
                     }
-                    else if (pageId === Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage && this.getCurrentState().sqlDataSourceWizard.name) {
+                    else if (pageId === Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage && this._getCurrentState().sqlDataSourceWizard.name) {
                         return Wizard.SqlDataSourceWizardPageId.ConfigureQueryPage;
                     }
-                    else if (pageId === Wizard.SqlDataSourceWizardPageId.ConfigureQueryPage && this.getCurrentState().sqlDataSourceWizard.sqlDataSourceJSON) {
+                    else if (pageId === Wizard.SqlDataSourceWizardPageId.ConfigureQueryPage && this._getCurrentState().sqlDataSourceWizard.sqlDataSourceJSON) {
                         return Wizard.SqlDataSourceWizardPageId.ConfigureParametersPage;
                     }
                 };
@@ -4633,63 +4767,78 @@ var DevExpress;
             Wizard.DataSourceWizardPageIterator = DataSourceWizardPageIterator;
             var DataSourceWizard = (function (_super) {
                 __extends(DataSourceWizard, _super);
-                function DataSourceWizard(pageFactory, finishCallback, _connectionStrings, _canCreateNewJsonDataSource) {
-                    if (_canCreateNewJsonDataSource === void 0) { _canCreateNewJsonDataSource = false; }
-                    var _this = _super.call(this, pageFactory, finishCallback) || this;
-                    _this._connectionStrings = _connectionStrings;
-                    _this._canCreateNewJsonDataSource = _canCreateNewJsonDataSource;
-                    _this.extendCssClass = "dxrd-sqldatasource-wizard";
+                function DataSourceWizard(pageFactory, _wizardOptions) {
+                    var _this = _super.call(this, pageFactory, _wizardOptions.callbacks.finishCallback) || this;
+                    _this._wizardOptions = _wizardOptions;
+                    _this._extendCssClass = "dxrd-sqldatasource-wizard";
                     _this.title = "Data Source Wizard";
                     return _this;
                 }
                 DataSourceWizard.prototype.initialize = function (state, createIterator) {
                     var _this = this;
-                    if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new DataSourceWizardPageIterator(pageFactory, stateManager, _this._connectionStrings, _this._canCreateNewJsonDataSource); }; }
+                    if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new DataSourceWizardPageIterator(pageFactory, stateManager, _this._wizardOptions); }; }
+                    if (this._wizardOptions.sqlDataSourceAvailable || !Analytics.Internal.isEmptyObject(state.sqlDataSourceWizard)) {
+                        state.dataSourceType = DataSourceType.Sql;
+                    }
+                    else if (this._wizardOptions.jsonDataSourceAvailable || state.jsonDataSourceWizard.jsonSource) {
+                        state.dataSourceType = DataSourceType.Json;
+                    }
                     _super.prototype.initialize.call(this, state, createIterator);
+                };
+                DataSourceWizard.prototype.canRunWizard = function () {
+                    return this._wizardOptions.jsonDataSourceAvailable || this._wizardOptions.sqlDataSourceAvailable;
                 };
                 return DataSourceWizard;
             }(PopupWizard));
             Wizard.DataSourceWizard = DataSourceWizard;
-            function registerSqlDataSourceWizardPages(factory, connectionStrings, wizardSettings, callbacks, disabledCustomSql, queryName, requestWrapper, canCreateNewJsonDataSource) {
+            function _registerSqlDataSourceWizardPages(factory, dataSourceWizardOptions) {
                 if (factory === void 0) { factory = new PageFactory(); }
-                if (connectionStrings === void 0) { connectionStrings = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
-                if (disabledCustomSql === void 0) { disabledCustomSql = false; }
-                if (canCreateNewJsonDataSource === void 0) { canCreateNewJsonDataSource = false; }
-                var jsonAvailable = wizardSettings.enableJsonDataSource && (canCreateNewJsonDataSource || (ko.unwrap(connectionStrings.json) || []).length > 0);
-                registerChooseDataSourceTypePage(factory, jsonAvailable);
-                if (wizardSettings.enableJsonDataSource) {
-                    canCreateNewJsonDataSource && registerChooseJsonSourcePage(factory);
-                    registerChooseJsonConnectionPage(factory, connectionStrings.json, canCreateNewJsonDataSource);
-                    registerChooseJsonSchemaPage(factory);
-                }
-                registerConfigureQueryPage(factory, callbacks, disabledCustomSql, queryName, requestWrapper);
-                registerChooseSqlConnectionPage(factory, connectionStrings.sql);
-                registerConfigureParametersPage(factory, requestWrapper);
+                _registerChooseDataSourceTypePage(factory, dataSourceWizardOptions);
+                _registerChooseJsonSourcePage(factory);
+                _registerChooseJsonConnectionPage(factory, dataSourceWizardOptions);
+                _registerChooseJsonSchemaPage(factory);
+                _registerConfigureQueryPage(factory, dataSourceWizardOptions);
+                _registerChooseSqlConnectionPage(factory, dataSourceWizardOptions.connectionStrings.sql);
+                _registerConfigureParametersPage(factory, dataSourceWizardOptions.requestWrapper);
                 return factory;
             }
-            Wizard.registerSqlDataSourceWizardPages = registerSqlDataSourceWizardPages;
-            function createSqlDataSourceWizard(factory, connectionStrings, wizardSettings, callbacks, disabledCustomSql, queryName, requestWrapper, canCreateNewJsonDataSource) {
+            Wizard._registerSqlDataSourceWizardPages = _registerSqlDataSourceWizardPages;
+            function _createSqlDataSourceWizard(factory, dataSourceWizardOptions) {
                 if (factory === void 0) { factory = new PageFactory(); }
-                if (connectionStrings === void 0) { connectionStrings = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
-                if (wizardSettings === void 0) { wizardSettings = DataSourceWizardSettings.prototype.createDefault(); }
-                factory = registerSqlDataSourceWizardPages(factory, connectionStrings, wizardSettings, callbacks, disabledCustomSql, queryName, requestWrapper, canCreateNewJsonDataSource);
-                return new DataSourceWizard(factory, callbacks.finishCallback, connectionStrings, canCreateNewJsonDataSource);
+                factory = _registerSqlDataSourceWizardPages(factory, dataSourceWizardOptions);
+                return new DataSourceWizard(factory, dataSourceWizardOptions);
             }
-            Wizard.createSqlDataSourceWizard = createSqlDataSourceWizard;
+            Wizard._createSqlDataSourceWizard = _createSqlDataSourceWizard;
+            var _MultiQueryDataSourceWizardOptions = (function (_super) {
+                __extends(_MultiQueryDataSourceWizardOptions, _super);
+                function _MultiQueryDataSourceWizardOptions() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                return _MultiQueryDataSourceWizardOptions;
+            }(_DataSourceWizardOptionsBase));
+            Wizard._MultiQueryDataSourceWizardOptions = _MultiQueryDataSourceWizardOptions;
             var MultiQueryDataSourceWizard = (function (_super) {
                 __extends(MultiQueryDataSourceWizard, _super);
-                function MultiQueryDataSourceWizard(pageFactory, finishCallback, _connectionStrings, _canCreateNewJsonDataSource) {
-                    var _this = _super.call(this, pageFactory, finishCallback) || this;
-                    _this._connectionStrings = _connectionStrings;
-                    _this._canCreateNewJsonDataSource = _canCreateNewJsonDataSource;
+                function MultiQueryDataSourceWizard(pageFactory, _wizardOptions) {
+                    var _this = _super.call(this, pageFactory, _wizardOptions.callbacks.finishCallback) || this;
+                    _this._wizardOptions = _wizardOptions;
                     _this.title = Analytics.Utils.getLocalization("SQL Data Source Wizard", "AnalyticsCoreStringId.SqlDSWizard_Title");
-                    _this.extendCssClass = "dxrd-multiqueries-sqldatasource-wizard";
+                    _this._extendCssClass = "dxrd-multiqueries-sqldatasource-wizard";
                     _this.height(443);
                     return _this;
                 }
+                MultiQueryDataSourceWizard.prototype.canRunWizard = function () {
+                    return this._wizardOptions.jsonDataSourceAvailable || this._wizardOptions.sqlDataSourceAvailable;
+                };
                 MultiQueryDataSourceWizard.prototype.initialize = function (state, createIterator) {
                     var _this = this;
-                    if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new MultiQueryDataSourceWizardPageIterator(pageFactory, stateManager, _this._connectionStrings, _this._canCreateNewJsonDataSource); }; }
+                    if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new MultiQueryDataSourceWizardPageIterator(pageFactory, stateManager, _this._wizardOptions); }; }
+                    if (this._wizardOptions.sqlDataSourceAvailable || !Analytics.Internal.isEmptyObject(state.sqlDataSourceWizard)) {
+                        state.dataSourceType = DataSourceType.Sql;
+                    }
+                    else if (this._wizardOptions.jsonDataSourceAvailable || state.jsonDataSourceWizard.jsonSource) {
+                        state.dataSourceType = DataSourceType.Json;
+                    }
                     _super.prototype.initialize.call(this, state, createIterator);
                 };
                 return MultiQueryDataSourceWizard;
@@ -4697,46 +4846,44 @@ var DevExpress;
             Wizard.MultiQueryDataSourceWizard = MultiQueryDataSourceWizard;
             var MultiQueryDataSourceWizardPageIterator = (function (_super) {
                 __extends(MultiQueryDataSourceWizardPageIterator, _super);
-                function MultiQueryDataSourceWizardPageIterator(pagesFactory, stateManager, _connectionStrings, _canCreateNewJsonDataSource) {
-                    if (_canCreateNewJsonDataSource === void 0) { _canCreateNewJsonDataSource = false; }
+                function MultiQueryDataSourceWizardPageIterator(pagesFactory, stateManager, _wizardOptions) {
                     var _this = _super.call(this, pagesFactory, stateManager) || this;
-                    _this._connectionStrings = _connectionStrings;
-                    _this._canCreateNewJsonDataSource = _canCreateNewJsonDataSource;
+                    _this._wizardOptions = _wizardOptions;
                     return _this;
                 }
                 MultiQueryDataSourceWizardPageIterator.prototype.getNextPageId = function (pageId) {
-                    if (!pageId && (this._canCreateNewJsonDataSource || (!!this._connectionStrings.json && this._connectionStrings.json().length > 0))) {
+                    if (!pageId && this._wizardOptions.jsonDataSourceAvailable && this._wizardOptions.sqlDataSourceAvailable) {
                         return Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage;
                     }
                     else if (!pageId) {
                         return this.getNextPageId(Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage);
                     }
-                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === DataSourceType.Sql) {
+                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === DataSourceType.Sql) {
                         return Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage;
                     }
-                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === DataSourceType.Json && this._connectionStrings.json().length > 0) {
+                    else if (pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === DataSourceType.Json && this._wizardOptions.connectionStrings.json().length > 0) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage;
                     }
-                    else if (this._canCreateNewJsonDataSource && pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === DataSourceType.Json) {
+                    else if (this._wizardOptions.canCreateNewJsonDataSource && pageId === Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === DataSourceType.Json) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage;
                     }
-                    else if (pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && this.getCurrentState().jsonDataSourceWizard.connectionName) {
+                    else if (pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && this._getCurrentState().jsonDataSourceWizard.connectionName) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
                     }
-                    else if (this._canCreateNewJsonDataSource && pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && !this.getCurrentState().jsonDataSourceWizard.connectionName) {
+                    else if (this._wizardOptions.canCreateNewJsonDataSource && pageId === Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && !this._getCurrentState().jsonDataSourceWizard.connectionName) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage;
                     }
                     else if (pageId === Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage) {
                         return Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
                     }
-                    else if (pageId === Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage && this.getCurrentState().sqlDataSourceWizard.name) {
+                    else if (pageId === Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage && this._getCurrentState().sqlDataSourceWizard.name) {
                         return Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage;
                     }
-                    else if (this.getCurrentState().sqlDataSourceWizard.sqlDataSourceJSON && pageId === Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage && this.getCurrentState().sqlDataSourceWizard.customQueries.length > 0) {
+                    else if (this._getCurrentState().sqlDataSourceWizard.sqlDataSourceJSON && pageId === Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage && this._getCurrentState().sqlDataSourceWizard.customQueries.length > 0) {
                         return Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage;
                     }
                     else if (pageId === Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage || pageId === Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage) {
-                        var sqlDataSourceWrapped = Wizard.restoreSqlDataSourceFromState(this.getCurrentState().sqlDataSourceWizard);
+                        var sqlDataSourceWrapped = Wizard._restoreSqlDataSourceFromState(this._getCurrentState().sqlDataSourceWizard);
                         if (sqlDataSourceWrapped.sqlDataSource.queries().length > 1) {
                             return Wizard.DataSourceWizardPageId.ConfigureMasterDetailRelationshipsPage;
                         }
@@ -4745,35 +4892,25 @@ var DevExpress;
                 return MultiQueryDataSourceWizardPageIterator;
             }(PageIterator));
             Wizard.MultiQueryDataSourceWizardPageIterator = MultiQueryDataSourceWizardPageIterator;
-            function registerMultiQueryDataSourcePages(factory, connectionStrings, wizardSettings, callbacks, requestWrapper, disableCustomSql, canCreateNewJsonDataSource) {
+            function _registerMultiQueryDataSourcePages(factory, dataSourceWizardOptions) {
                 if (factory === void 0) { factory = new PageFactory(); }
-                if (connectionStrings === void 0) { connectionStrings = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
-                if (callbacks === void 0) { callbacks = {}; }
-                if (disableCustomSql === void 0) { disableCustomSql = false; }
-                if (canCreateNewJsonDataSource === void 0) { canCreateNewJsonDataSource = false; }
-                var jsonAvailable = wizardSettings.enableJsonDataSource && (canCreateNewJsonDataSource || (ko.unwrap(connectionStrings.json) || []).length > 0);
-                registerChooseDataSourceTypePage(factory, jsonAvailable);
-                if (wizardSettings.enableJsonDataSource) {
-                    registerChooseJsonConnectionPage(factory, connectionStrings.json, canCreateNewJsonDataSource);
-                    canCreateNewJsonDataSource && registerChooseJsonSourcePage(factory);
-                    registerChooseJsonSchemaPage(factory);
-                }
-                registerChooseSqlConnectionPage(factory, connectionStrings.sql);
-                registerMultiQueryConfigurePage(factory, callbacks, disableCustomSql, requestWrapper);
-                registerMultiQueryConfigureParametersPage(factory, requestWrapper);
-                registerConfigureMasterDetailRelationshipsPage(factory, QueryBuilder.Internal.wrapRebuildResultSchema(callbacks.sqlDataSourceResultSchema));
+                _registerChooseDataSourceTypePage(factory, dataSourceWizardOptions);
+                _registerChooseJsonConnectionPage(factory, dataSourceWizardOptions);
+                _registerChooseJsonSourcePage(factory);
+                _registerChooseJsonSchemaPage(factory);
+                _registerChooseSqlConnectionPage(factory, dataSourceWizardOptions.connectionStrings.sql);
+                _registerMultiQueryConfigurePage(factory, dataSourceWizardOptions);
+                _registerMultiQueryConfigureParametersPage(factory, dataSourceWizardOptions.requestWrapper);
+                _registerConfigureMasterDetailRelationshipsPage(factory, QueryBuilder.Internal.wrapRebuildResultSchema(dataSourceWizardOptions.callbacks.sqlDataSourceResultSchema));
                 return factory;
             }
-            Wizard.registerMultiQueryDataSourcePages = registerMultiQueryDataSourcePages;
-            function createMultiQueryDataSourceWizard(factory, connectionStrings, wizardSettings, callbacks, requestWrapper, disabledCustomSql, canCreateNewJsonDataSource) {
+            Wizard._registerMultiQueryDataSourcePages = _registerMultiQueryDataSourcePages;
+            function _createMultiQueryDataSourceWizard(factory, dataSourceWizardOptions) {
                 if (factory === void 0) { factory = new PageFactory(); }
-                if (connectionStrings === void 0) { connectionStrings = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
-                if (wizardSettings === void 0) { wizardSettings = DataSourceWizardSettings.prototype.createDefault(); }
-                if (callbacks === void 0) { callbacks = {}; }
-                registerMultiQueryDataSourcePages(factory, connectionStrings, wizardSettings, callbacks, requestWrapper, disabledCustomSql, canCreateNewJsonDataSource);
-                return new MultiQueryDataSourceWizard(factory, callbacks.finishCallback, connectionStrings, canCreateNewJsonDataSource);
+                _registerMultiQueryDataSourcePages(factory, dataSourceWizardOptions);
+                return new MultiQueryDataSourceWizard(factory, dataSourceWizardOptions);
             }
-            Wizard.createMultiQueryDataSourceWizard = createMultiQueryDataSourceWizard;
+            Wizard._createMultiQueryDataSourceWizard = _createMultiQueryDataSourceWizard;
             var FullscreenWizardPageFactory = (function (_super) {
                 __extends(FullscreenWizardPageFactory, _super);
                 function FullscreenWizardPageFactory() {
@@ -4808,43 +4945,52 @@ var DevExpress;
                     _this._sectionsToUnregister = [];
                     _this._sectionsToRegister = [];
                     _this._sectionPositions = [];
-                    _this.isInitInProgress = ko.observable(false);
-                    _this.defaultMargin = 30;
-                    _this.parentMarginOffset = _this.defaultMargin + _this.defaultMargin / 2;
-                    _this.pageCss = {};
+                    _this._initInProgress = ko.observable(false);
+                    _this._defaultMargin = 30;
+                    _this._parentMarginOffset = _this._defaultMargin + _this._defaultMargin / 2;
+                    _this._pageCss = {};
                     _this.events = new Analytics.Utils.EventManager();
-                    _this.factory = new Analytics.Wizard.Internal.WizardPageSectionFactory();
-                    _this.sectionsProcessor = new Analytics.Wizard.Internal.WizardPageProcessor(_this.factory, function (state) {
+                    _this._factory = new Analytics.Wizard.Internal.WizardPageSectionFactory();
+                    _this._sectionsProcessor = new Analytics.Wizard.Internal.WizardPageProcessor(_this._factory, function (state) {
                         _this[BaseWizard.__loadingStateFunctionName] && _this[BaseWizard.__loadingStateFunctionName](state);
                     }, function () { return _this[BaseWizard.__nextActionFunctionName] && _this[BaseWizard.__nextActionFunctionName](); });
-                    _this.sectionsProcessor.events.addHandler("beforeStart", function () {
-                        _this.sections = _this.sectionsProcessor.sections;
-                        _this.beforeStart();
+                    _this._sectionsProcessor.events.addHandler("beforeStart", function () {
+                        _this._sections = _this._sectionsProcessor.sections;
+                        _this._beforeStart();
                         _this._patchOnChange();
                     });
-                    _this.sectionsProcessor.events.addHandler("beforePageInitialize", function (args) {
-                        _this.events.call("beforeSectionInitialize", args);
+                    _this._sectionsProcessor.events.addHandler("beforePageInitialize", function (args) {
+                        _this.events.call("beforeSectionInitialize", {
+                            section: args.page,
+                            sectionId: args.pageId,
+                            page: _this,
+                            state: args.state
+                        });
                     });
-                    _this.sectionsProcessor.events.addHandler("afterPageInitialize", function (args) {
-                        _this.events.call("afterSectionInitialize", args);
+                    _this._sectionsProcessor.events.addHandler("afterPageInitialize", function (args) {
+                        _this.events.call("afterSectionInitialize", {
+                            section: args.page,
+                            sectionId: args.pageId,
+                            page: _this
+                        });
                     });
                     return _this;
                 }
                 FullscreenWizardPage.prototype.dispose = function () {
-                    this.sectionsProcessor.dispose();
-                    this.factory.reset();
-                    this.sections = [];
+                    this._sectionsProcessor.dispose();
+                    this._factory.reset();
+                    this._sections = [];
                 };
                 FullscreenWizardPage.prototype._patchOnChange = function () {
                     var _this = this;
-                    Object.keys(this.factory.metadata).forEach(function (key) {
-                        _this.factory.metadata[key].onChange = function () { return _this._onChange(); };
+                    Object.keys(this._factory.metadata).forEach(function (key) {
+                        _this._factory.metadata[key].onChange = function () { return _this._onChange(); };
                     });
                 };
                 FullscreenWizardPage.prototype._getPageStyle = function (position, isVisible) {
                     if (isVisible === void 0) { isVisible = true; }
                     var _clearStyle = "inherit";
-                    var _defaultHalfMargin = "-" + (this.defaultMargin / 2) + "px";
+                    var _defaultHalfMargin = "-" + (this._defaultMargin / 2) + "px";
                     var _fullSize = 100;
                     var _defaultSize = _fullSize / 2;
                     var _inPercent = function (size) {
@@ -4880,124 +5026,114 @@ var DevExpress;
                     this._sectionsToRegister = [];
                 };
                 FullscreenWizardPage.prototype._setSectionPosition = function (pageId, position) {
-                    this.pageCss[pageId] = ko.observable(this._getPageStyle(position));
+                    this._pageCss[pageId] = ko.observable(this._getPageStyle(position));
                 };
-                FullscreenWizardPage.prototype.registerPages = function () { };
+                FullscreenWizardPage.prototype.registerSections = function () { };
                 FullscreenWizardPage.prototype.canNext = function () {
-                    return this.sectionsProcessor.sections.every(function (x) { return !x.page() || x.metadata.canNext(x.page().page); });
+                    return this._sectionsProcessor.sections.every(function (x) { return !x.page() || x.metadata.canNext(x.page().page); });
                 };
                 FullscreenWizardPage.prototype.canFinish = function () {
-                    for (var i = this.sections.length - 1; i >= 0; i--) {
-                        if (this.sections[i].page() && this.sections[i].metadata.canFinish(this.sections[i].page().page))
+                    for (var i = this._sections.length - 1; i >= 0; i--) {
+                        if (this._sections[i].page() && this._sections[i].metadata.canFinish(this._sections[i].page().page))
                             return true;
                     }
                     return false;
                 };
-                FullscreenWizardPage.prototype.setSectionPosition = function (pageId, position) {
+                FullscreenWizardPage.prototype.setSectionPosition = function (sectionId, position) {
                     var _this = this;
                     this._sectionPositions.push(function () {
-                        _this._setSectionPosition(pageId, position);
+                        _this._setSectionPosition(sectionId, position);
                     });
                 };
-                FullscreenWizardPage.prototype.registerSection = function (pageId, metadata) {
+                FullscreenWizardPage.prototype.registerSection = function (sectionId, metadata) {
                     var _this = this;
                     this._sectionsToRegister.push(function () {
-                        _this.factory.registerMetadata(pageId, metadata);
+                        _this._factory.registerMetadata(sectionId, metadata);
                     });
                 };
-                FullscreenWizardPage.prototype.unregisterSection = function (pageId) {
+                FullscreenWizardPage.prototype.unregisterSection = function (sectionId) {
                     var _this = this;
-                    this._sectionsToUnregister.push(function () { return _this.factory.unregisterMetadata(pageId); });
+                    this._sectionsToUnregister.push(function () { return _this._factory.unregisterMetadata(sectionId); });
                 };
-                FullscreenWizardPage.prototype.loadPanelViewModel = function (element) {
+                FullscreenWizardPage.prototype._loadPanelViewModel = function (element) {
                     return false;
                 };
-                FullscreenWizardPage.prototype.getNextPageId = function (pageId) { return undefined; };
+                FullscreenWizardPage.prototype.getNextSectionId = function (sectionId) { return undefined; };
                 FullscreenWizardPage.prototype.initialize = function (state) {
                     var _this = this;
-                    this.registerPages();
+                    this.registerSections();
                     this._applyCustomizations();
-                    this.sectionsProcessor.initialize($.extend(true, {}, state));
-                    this.stateManager = this.sectionsProcessor.stateManager;
-                    this.sectionsProcessor.iterator.getNextPageId = function (pageId) { return _this.getNextPageId(pageId); };
-                    this.sectionsProcessor.start();
+                    this._sectionsProcessor.initialize($.extend(true, {}, state));
+                    this._stateManager = this._sectionsProcessor.stateManager;
+                    this._sectionsProcessor.iterator.getNextPageId = function (pageId) { return _this.getNextSectionId(pageId); };
+                    this._sectionsProcessor.start();
                     return $.Deferred().resolve().promise();
                 };
-                FullscreenWizardPage.prototype.beforeStart = function () { };
+                FullscreenWizardPage.prototype._beforeStart = function () { };
                 FullscreenWizardPage.prototype.commit = function () {
                     var _this = this;
                     var deferred = $.Deferred();
-                    this.sectionsProcessor.finishAction().done(function () {
-                        deferred.resolve($.extend(true, {}, _this.stateManager.getCurrentState()));
+                    this._sectionsProcessor.finishAction().done(function () {
+                        deferred.resolve($.extend(true, {}, _this._stateManager.getCurrentState()));
                     });
                     return deferred.promise();
                 };
-                FullscreenWizardPage.prototype.getPageDescription = function (index, page) {
+                FullscreenWizardPage.prototype._getPageDescription = function (index, page) {
                     return (index + 1) + ". " + page.metadata.description;
                 };
-                FullscreenWizardPage.prototype.isShowPageDescription = function () {
-                    return this.sections.length > 1;
+                FullscreenWizardPage.prototype._showPageDescription = function () {
+                    return this._sections.length > 1;
                 };
                 return FullscreenWizardPage;
             }(Analytics.Wizard.WizardPageBase));
             Wizard.FullscreenWizardPage = FullscreenWizardPage;
             var SpecifyJsonDataSourceSettingsPage = (function (_super) {
                 __extends(SpecifyJsonDataSourceSettingsPage, _super);
-                function SpecifyJsonDataSourceSettingsPage(connectionStrings, _callbacks, canCreateNewJsonDataSource) {
-                    if (connectionStrings === void 0) { connectionStrings = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
+                function SpecifyJsonDataSourceSettingsPage(_dataSourceWizardOptions) {
                     var _this = _super.call(this) || this;
-                    _this.connectionStrings = connectionStrings;
-                    _this._callbacks = _callbacks;
-                    _this.canCreateNewJsonDataSource = canCreateNewJsonDataSource;
+                    _this._dataSourceWizardOptions = _dataSourceWizardOptions;
                     return _this;
                 }
-                SpecifyJsonDataSourceSettingsPage.prototype.registerPages = function () {
-                    if (this.connectionStrings.json().length > 0) {
-                        Analytics.Wizard.registerChooseJsonConnectionPage(this.factory, this.connectionStrings.json, this.canCreateNewJsonDataSource);
-                        this._setSectionPosition(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage, WizardSectionPosition.Left);
+                SpecifyJsonDataSourceSettingsPage.prototype.registerSections = function () {
+                    if (this._dataSourceWizardOptions.connectionStrings.json().length > 0) {
+                        Analytics.Wizard._registerSpecifyJsonConnectionPage(this._factory, this._dataSourceWizardOptions.connectionStrings.json, this._dataSourceWizardOptions.canCreateNewJsonDataSource);
+                        this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.SpecifyJsonConnectionPage, WizardSectionPosition.Left);
                     }
-                    if (this.canCreateNewJsonDataSource) {
-                        Analytics.Wizard.registerChooseJsonSourcePage(this.factory);
-                        if (this.connectionStrings.json().length > 0) {
-                            this._setSectionPosition(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage, WizardSectionPosition.TopLeft);
-                            this._setSectionPosition(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage, WizardSectionPosition.BottomLeft);
+                    if (this._dataSourceWizardOptions.canCreateNewJsonDataSource) {
+                        if (this._dataSourceWizardOptions.connectionStrings.json().length === 0) {
+                            Analytics.Wizard._registerChooseJsonSourcePage(this._factory);
+                            this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage, WizardSectionPosition.Left);
+                            var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage);
+                            meta["disabledText"] = Analytics.Utils.getLocalization("To create a data connection, select \"No, I'd like to create a new data connection\".", "AnalyticsCoreStringId.JsonDSWizard_CreateNewConnectionPage_Placeholder");
                         }
-                        else {
-                            this._setSectionPosition(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage, WizardSectionPosition.Left);
-                        }
-                        var meta = this.factory.getMetadata(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage);
-                        meta["disabledText"] = Analytics.Utils.getLocalization("To create a data connection, select \"No, I'd like to create a new data connection\".", "AnalyticsCoreStringId.JsonDSWizard_CreateNewConnectionPage_Placeholder");
                     }
-                    Analytics.Wizard.registerChooseJsonSchemaPage(this.factory);
-                    this._setSectionPosition(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage, WizardSectionPosition.Right);
-                    var meta = this.factory.getMetadata(Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage);
+                    Analytics.Wizard._registerChooseJsonSchemaPage(this._factory);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage, WizardSectionPosition.Right);
+                    var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage);
                     meta["disabledText"] = Analytics.Utils.getLocalization("To select data fields, choose or create a data connection.", "AnalyticsCoreStringId.JsonDSWizard_ChooseJsonSchemaPage_Placeholder");
                 };
-                SpecifyJsonDataSourceSettingsPage.prototype.getNextPageId = function (pageId) {
-                    if (!pageId && this.connectionStrings.json().length > 0) {
-                        return Analytics.Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage;
+                SpecifyJsonDataSourceSettingsPage.prototype.getNextSectionId = function (sectionId) {
+                    if (!sectionId && this._dataSourceWizardOptions.connectionStrings.json().length > 0) {
+                        return Analytics.Wizard.FullscreenDataSourceWizardSectionId.SpecifyJsonConnectionPage;
                     }
-                    else if (!pageId) {
-                        return Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage;
+                    else if (!sectionId) {
+                        return Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage;
                     }
-                    else if (this.canCreateNewJsonDataSource) {
-                        if (pageId === Analytics.Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage && !this.stateManager.getCurrentState().jsonDataSourceWizard.connectionName)
-                            return Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage;
-                        else if (pageId === Analytics.Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage)
-                            return Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
-                        else if (pageId === Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSourcePage)
-                            return Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
+                    else if (this._dataSourceWizardOptions.canCreateNewJsonDataSource) {
+                        if (sectionId === Analytics.Wizard.FullscreenDataSourceWizardSectionId.SpecifyJsonConnectionPage)
+                            return Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage;
+                        else if (sectionId === Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage)
+                            return Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage;
                     }
                     else {
-                        if (pageId === Analytics.Wizard.JsonDataSourceWizardPageId.ChooseConnectionPage)
-                            return Analytics.Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage;
+                        if (sectionId === Analytics.Wizard.FullscreenDataSourceWizardSectionId.SpecifyJsonConnectionPage)
+                            return Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage;
                     }
                 };
                 return SpecifyJsonDataSourceSettingsPage;
             }(FullscreenWizardPage));
             Wizard.SpecifyJsonDataSourceSettingsPage = SpecifyJsonDataSourceSettingsPage;
-            function registerSpecifyJsonDataSourceSettingsPage(factory, connections, canCreateNewJsonDataSource, callbacks) {
-                if (connections === void 0) { connections = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
+            function _registerSpecifyJsonDataSourceSettingsPage(factory, dataSourceWizardOptions) {
                 factory.registerMetadata(Wizard.FullscreenDataSourceWizardPageId.SpecifyJsonDataSourceSettingsPage, {
                     setState: function (data, state) {
                         state.jsonDataSourceWizard.connectionName = data.jsonDataSourceWizard.connectionName;
@@ -5017,73 +5153,63 @@ var DevExpress;
                         delete state.jsonDataSourceWizard.rootElement;
                     },
                     create: function () {
-                        return new SpecifyJsonDataSourceSettingsPage(connections, callbacks, canCreateNewJsonDataSource);
+                        return new SpecifyJsonDataSourceSettingsPage(dataSourceWizardOptions);
                     },
                     navigationPanelText: Analytics.Utils.getLocalization("Specify Data Source Settings", "AnalyticsCoreStringId.Wizard_SpecifyDataSourceSettingsPage"),
-                    template: "dx-wizard-fullscreen-page",
-                    description: Analytics.Utils.getLocalization("Choose a Data Source to use in your report.", "TODO"),
+                    template: "dx-wizard-fullscreen-page"
                 });
             }
-            Wizard.registerSpecifyJsonDataSourceSettingsPage = registerSpecifyJsonDataSourceSettingsPage;
+            Wizard._registerSpecifyJsonDataSourceSettingsPage = _registerSpecifyJsonDataSourceSettingsPage;
             var SpecifySqlDataSourceSettingsPage = (function (_super) {
                 __extends(SpecifySqlDataSourceSettingsPage, _super);
-                function SpecifySqlDataSourceSettingsPage(connectionStrings, callbacks, requestWrapper, disableCustomSql) {
-                    if (connectionStrings === void 0) { connectionStrings = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
-                    if (callbacks === void 0) { callbacks = {}; }
-                    if (disableCustomSql === void 0) { disableCustomSql = false; }
+                function SpecifySqlDataSourceSettingsPage(_dataSourceWizardOptions) {
                     var _this = _super.call(this) || this;
-                    _this.connectionStrings = connectionStrings;
-                    _this.callbacks = callbacks;
-                    _this.requestWrapper = requestWrapper;
-                    _this.disableCustomSql = disableCustomSql;
+                    _this._dataSourceWizardOptions = _dataSourceWizardOptions;
                     return _this;
                 }
-                SpecifySqlDataSourceSettingsPage.prototype.getNextPageId = function (pageId) {
-                    if (!pageId)
-                        return Analytics.Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage;
-                    else if (pageId === Analytics.Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage && this.stateManager.getCurrentState().sqlDataSourceWizard.name) {
-                        return Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage;
+                SpecifySqlDataSourceSettingsPage.prototype.getNextSectionId = function (sectionId) {
+                    if (!sectionId)
+                        return Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseSqlConnectionPage;
+                    else if (sectionId === Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseSqlConnectionPage && this._stateManager.getCurrentState().sqlDataSourceWizard.name) {
+                        return Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryPage;
                     }
-                    else if (pageId === Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage) {
-                        var pages = [];
-                        if (this.stateManager.getCurrentState().sqlDataSourceWizard.customQueries.length > 0) {
-                            pages.push(Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage);
+                    else if (sectionId === Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryPage) {
+                        var sections = [];
+                        if (this._stateManager.getCurrentState().sqlDataSourceWizard.customQueries.length > 0) {
+                            sections.push(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryParametersPage);
                         }
-                        var sqlDataSourceWrapped = Analytics.Wizard.restoreSqlDataSourceFromState(this.stateManager.getCurrentState().sqlDataSourceWizard);
+                        var sqlDataSourceWrapped = Analytics.Wizard._restoreSqlDataSourceFromState(this._stateManager.getCurrentState().sqlDataSourceWizard);
                         if (sqlDataSourceWrapped.sqlDataSource.queries().length > 1) {
-                            pages.push(Analytics.Wizard.DataSourceWizardPageId.ConfigureMasterDetailRelationshipsPage);
+                            sections.push(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureMasterDetailRelationshipsPage);
                         }
-                        return pages;
+                        return sections;
                     }
                 };
-                SpecifySqlDataSourceSettingsPage.prototype.registerPages = function () {
-                    Analytics.Wizard.registerChooseSqlConnectionPage(this.factory, this.connectionStrings.sql);
-                    Analytics.Wizard.registerMultiQueryConfigurePage(this.factory, this.callbacks, this.disableCustomSql, this.requestWrapper);
-                    Analytics.Wizard.registerConfigureMasterDetailRelationshipsPage(this.factory, QueryBuilder.Internal.wrapRebuildResultSchema(this.callbacks.sqlDataSourceResultSchema));
-                    Analytics.Wizard.registerMultiQueryConfigureParametersPage(this.factory, this.requestWrapper);
-                    var meta = this.factory.getMetadata(Analytics.Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage);
+                SpecifySqlDataSourceSettingsPage.prototype.registerSections = function () {
+                    Analytics.Wizard._registerChooseSqlConnectionPage(this._factory, this._dataSourceWizardOptions.connectionStrings.sql);
+                    Analytics.Wizard._registerMultiQueryConfigurePage(this._factory, this._dataSourceWizardOptions);
+                    Analytics.Wizard._registerConfigureMasterDetailRelationshipsPage(this._factory, QueryBuilder.Internal.wrapRebuildResultSchema(this._dataSourceWizardOptions.callbacks.sqlDataSourceResultSchema));
+                    Analytics.Wizard._registerMultiQueryConfigureParametersPage(this._factory, this._dataSourceWizardOptions.requestWrapper);
+                    var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseSqlConnectionPage);
                     meta.description = Analytics.Utils.getLocalization("Choose a data connection.", "AnalyticsCoreStringId.SqlDSWizard_PageChooseConnection");
-                    var meta = this.factory.getMetadata(Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage);
+                    var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryPage);
                     meta["recreate"] = true;
                     meta.description = Analytics.Utils.getLocalization("Choose predefined queries and/or create custom queries.", "AnalyticsCoreStringId.Wizard_Queries_Description");
-                    var meta = this.factory.getMetadata(Analytics.Wizard.DataSourceWizardPageId.ConfigureMasterDetailRelationshipsPage);
+                    var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureMasterDetailRelationshipsPage);
                     meta.description = Analytics.Utils.getLocalization("Configure master-detail relationships.", "AnalyticsCoreStringId.SqlDSWizard_PageConfigureMasterDetailRelations");
                     meta["disabledText"] = Analytics.Utils.getLocalization("To create a master-detail relationship, select two or more queries.", "AnalyticsCoreStringId.Wizard_MasterDetailRelationship_Placeholder");
-                    var meta = this.factory.getMetadata(Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage);
+                    var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryParametersPage);
                     meta.description = Analytics.Utils.getLocalization("Configure query parameters.", "AnalyticsCoreStringId.SqlDSWizard_PageConfigureParameters");
                     meta["disabledText"] = Analytics.Utils.getLocalization("To specify query parameters, select a parameterized stored procedure or create a custom query.", "AnalyticsCoreStringId.Wizard_ConfigureQueryParameters_Placeholder");
-                    this._setSectionPosition(Analytics.Wizard.SqlDataSourceWizardPageId.ChooseConnectionPage, WizardSectionPosition.TopLeft);
-                    this._setSectionPosition(Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigurePage, WizardSectionPosition.TopRight);
-                    this._setSectionPosition(Analytics.Wizard.SqlDataSourceWizardPageId.MultiQueryConfigureParametersPage, WizardSectionPosition.BottomRight);
-                    this._setSectionPosition(Analytics.Wizard.DataSourceWizardPageId.ConfigureMasterDetailRelationshipsPage, WizardSectionPosition.BottomLeft);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseSqlConnectionPage, WizardSectionPosition.TopLeft);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryPage, WizardSectionPosition.TopRight);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryParametersPage, WizardSectionPosition.BottomRight);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureMasterDetailRelationshipsPage, WizardSectionPosition.BottomLeft);
                 };
                 return SpecifySqlDataSourceSettingsPage;
             }(FullscreenWizardPage));
             Wizard.SpecifySqlDataSourceSettingsPage = SpecifySqlDataSourceSettingsPage;
-            function registerSpecifySqlDataSourceSettingsPage(factory, connections, callbacks, requestWrapper, disableCustomSql) {
-                if (connections === void 0) { connections = { json: ko.observableArray([]), sql: ko.observableArray([]) }; }
-                if (callbacks === void 0) { callbacks = {}; }
-                if (disableCustomSql === void 0) { disableCustomSql = false; }
+            function _registerSpecifySqlDataSourceSettingsPage(factory, dataSourceWizardOptions) {
                 factory.registerMetadata(Wizard.FullscreenDataSourceWizardPageId.SpecifySqlDataSourceSettingsPage, {
                     setState: function (data, state) {
                         state.sqlDataSourceWizard.customQueries = data.sqlDataSourceWizard.customQueries;
@@ -5097,19 +5223,18 @@ var DevExpress;
                         state.sqlDataSourceWizard = {};
                     },
                     create: function () {
-                        return new SpecifySqlDataSourceSettingsPage(connections, callbacks, requestWrapper, disableCustomSql);
+                        return new SpecifySqlDataSourceSettingsPage(dataSourceWizardOptions);
                     },
                     navigationPanelText: Analytics.Utils.getLocalization("Specify Data Source Settings", "AnalyticsCoreStringId.Wizard_SpecifyDataSourceSettingsPage"),
-                    template: "dx-wizard-fullscreen-page",
-                    description: Analytics.Utils.getLocalization("Choose a Data Source to use in your report.", "TODO"),
+                    template: "dx-wizard-fullscreen-page"
                 });
             }
-            Wizard.registerSpecifySqlDataSourceSettingsPage = registerSpecifySqlDataSourceSettingsPage;
+            Wizard._registerSpecifySqlDataSourceSettingsPage = _registerSpecifySqlDataSourceSettingsPage;
             var FullscreenWizard = (function (_super) {
                 __extends(FullscreenWizard, _super);
                 function FullscreenWizard(pageFactory, finishCallback) {
                     var _this = _super.call(this, pageFactory, finishCallback) || this;
-                    _this.extendCssClass = "dx-wizard-fullscreen";
+                    _this._extendCssClass = "dx-wizard-fullscreen";
                     _this.navigationPanel = ko.observable(null);
                     _this.isVisible.subscribe(function (newValue) {
                         if (!newValue) {
@@ -5120,21 +5245,21 @@ var DevExpress;
                     });
                     return _this;
                 }
-                FullscreenWizard.prototype.onClose = function (callback) {
+                FullscreenWizard.prototype._onClose = function (callback) {
                     this._onCloseCallback = callback;
                 };
                 FullscreenWizard.prototype.onFinish = function () {
                     _super.prototype.onFinish.call(this);
                     this.navigationPanel().dispose();
                 };
-                FullscreenWizard.prototype.initPage = function (page) {
+                FullscreenWizard.prototype._initPage = function (page) {
                     var _this = this;
                     if (page.onChange)
-                        page.onChange(function () { return _this.navigationPanel().resetNextPages(page.pageId); });
-                    return _super.prototype.initPage.call(this, page);
+                        page.onChange(function () { return _this.navigationPanel()._resetNextPages(page.pageId); });
+                    return _super.prototype._initPage.call(this, page);
                 };
-                FullscreenWizard.prototype.onResetPage = function (page) {
-                    this.navigationPanel().reset(page.pageId);
+                FullscreenWizard.prototype._onResetPage = function (page) {
+                    this.navigationPanel()._reset(page.pageId);
                 };
                 FullscreenWizard.prototype.start = function (finishCallback) {
                     if (finishCallback)
@@ -5144,16 +5269,16 @@ var DevExpress;
                     this.navigationPanel(new WizardNavigationPanel(this));
                     _super.prototype.start.call(this);
                 };
-                FullscreenWizard.prototype.pageDescription = function () {
-                    var currentStep = this.navigationPanel().steps.filter(function (x) { return x.isActive(); })[0];
+                FullscreenWizard.prototype._pageDescription = function () {
+                    var currentStep = this.navigationPanel()._steps.filter(function (x) { return x.isActive(); })[0];
                     if (currentStep) {
                         return currentStep.text;
                     }
                     else {
-                        return this.pageFactory.getMetadata(this.currentPage().pageId).description;
+                        return this.pageFactory.getMetadata(this._currentPage().pageId).description;
                     }
                 };
-                FullscreenWizard.prototype.description = function () {
+                FullscreenWizard.prototype._description = function () {
                     return "";
                 };
                 return FullscreenWizard;
@@ -5163,18 +5288,18 @@ var DevExpress;
                 __extends(WizardNavigationPanel, _super);
                 function WizardNavigationPanel(wizard) {
                     var _this = _super.call(this) || this;
-                    _this.steps = [];
-                    _this._disposables.push(wizard.currentPage.subscribe(function (newPage) {
-                        var currentStep = _this.steps.filter(function (step) { return step.pageIds.some(function (x) { return x === newPage.pageId; }); })[0];
+                    _this._steps = [];
+                    _this._disposables.push(wizard._currentPage.subscribe(function (newPage) {
+                        var currentStep = _this._steps.filter(function (step) { return step.pageIds.some(function (x) { return x === newPage.pageId; }); })[0];
                         if (currentStep) {
                             currentStep.currentPageId = newPage.pageId;
                             currentStep.disabled(false);
-                            _this.setStepVisible(currentStep.stepIndex);
+                            _this._setStepVisible(currentStep.stepIndex);
                         }
                     }));
                     Object.keys(wizard.pageFactory.metadata).forEach(function (pageId) {
                         var item = wizard.pageFactory.metadata[pageId];
-                        var navigationItem = _this.steps.filter(function (x) { return x.text === item.navigationPanelText; })[0];
+                        var navigationItem = _this._steps.filter(function (x) { return x.text === item.navigationPanelText; })[0];
                         if (navigationItem) {
                             navigationItem.pageIds.push(pageId);
                         }
@@ -5183,43 +5308,43 @@ var DevExpress;
                                 text: item.navigationPanelText,
                                 pageIds: [pageId],
                                 currentPageId: null,
-                                stepIndex: _this.steps.length,
+                                stepIndex: _this._steps.length,
                                 disabled: ko.observable(true),
                                 visible: ko.observable(true)
                             };
                             _this._disposables.push(navigationStep.isActive = ko.computed(function () {
-                                return wizard.currentPage() && navigationStep.currentPageId === wizard.currentPage().pageId;
+                                return wizard._currentPage() && navigationStep.currentPageId === wizard._currentPage().pageId;
                             }));
                             navigationStep.clickAction = function () {
                                 if (!navigationStep.isActive())
                                     wizard.goToPage(navigationStep.currentPageId);
                             };
-                            _this.steps.push(navigationStep);
+                            _this._steps.push(navigationStep);
                         }
                     });
                     _this._disposables.push(_this.isVisible = ko.computed(function () {
-                        return _this.steps.filter(function (step) { return step.visible(); }).length > 1;
+                        return _this._steps.filter(function (step) { return step.visible(); }).length > 1;
                     }));
                     return _this;
                 }
                 WizardNavigationPanel.prototype.resetAll = function () {
-                    this.steps.forEach(function (step) {
+                    this._steps.forEach(function (step) {
                         step.disabled(true);
                     });
                 };
-                WizardNavigationPanel.prototype.reset = function (pageId) {
-                    this.steps.filter(function (x) { return x.currentPageId === pageId; })[0].disabled(true);
+                WizardNavigationPanel.prototype._reset = function (pageId) {
+                    this._steps.filter(function (x) { return x.currentPageId === pageId; })[0].disabled(true);
                 };
-                WizardNavigationPanel.prototype.resetNextPages = function (pageId) {
-                    var currentStep = this.steps.filter(function (x) { return x.currentPageId === pageId; })[0];
+                WizardNavigationPanel.prototype._resetNextPages = function (pageId) {
+                    var currentStep = this._steps.filter(function (x) { return x.currentPageId === pageId; })[0];
                     if (!currentStep)
                         return;
-                    for (var i = currentStep.stepIndex + 1; i < this.steps.length; i++) {
-                        this.steps[i].disabled(true);
+                    for (var i = currentStep.stepIndex + 1; i < this._steps.length; i++) {
+                        this._steps[i].disabled(true);
                     }
                 };
-                WizardNavigationPanel.prototype.setStepVisible = function (currentPageIndex) {
-                    var previousSteps = this.steps.filter(function (_, index) { return index < currentPageIndex; });
+                WizardNavigationPanel.prototype._setStepVisible = function (currentPageIndex) {
+                    var previousSteps = this._steps.filter(function (_, index) { return index < currentPageIndex; });
                     if (previousSteps.length > 0 && !previousSteps.some(function (step) { return !step.disabled(); })) {
                         previousSteps.forEach(function (step) { return step.visible(false); });
                     }
@@ -5227,61 +5352,68 @@ var DevExpress;
                 return WizardNavigationPanel;
             }(Analytics.Utils.Disposable));
             Wizard.WizardNavigationPanel = WizardNavigationPanel;
-            var DataSourceFullscreenWizard = (function (_super) {
-                __extends(DataSourceFullscreenWizard, _super);
-                function DataSourceFullscreenWizard(factory, _jsonAvailable, finishCallback) {
-                    var _this = _super.call(this, factory, finishCallback) || this;
-                    _this._jsonAvailable = _jsonAvailable;
+            var FullscreenDataSourceWizard = (function (_super) {
+                __extends(FullscreenDataSourceWizard, _super);
+                function FullscreenDataSourceWizard(factory, _dataSourceWizardOptions) {
+                    var _this = _super.call(this, factory, _dataSourceWizardOptions.callbacks.finishCallback) || this;
+                    _this._dataSourceWizardOptions = _dataSourceWizardOptions;
                     return _this;
                 }
-                DataSourceFullscreenWizard.prototype.initialize = function (state, createIterator) {
+                FullscreenDataSourceWizard.prototype.initialize = function (state, createIterator) {
                     var _this = this;
-                    if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new DataSourceFullscreenWizardPageIterator(pageFactory, stateManager, _this._jsonAvailable, function (page) { return _this.onResetPage(page); }); }; }
+                    if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new FullscreenDataSourceWizardPageIterator(pageFactory, stateManager, _this._dataSourceWizardOptions, function (page) { return _this._onResetPage(page); }); }; }
+                    if (this._dataSourceWizardOptions.sqlDataSourceAvailable || !Analytics.Internal.isEmptyObject(state.sqlDataSourceWizard)) {
+                        state.dataSourceType = DataSourceType.Sql;
+                    }
+                    else if (this._dataSourceWizardOptions.jsonDataSourceAvailable || state.jsonDataSourceWizard.jsonSource) {
+                        state.dataSourceType = DataSourceType.Json;
+                    }
                     _super.prototype.initialize.call(this, state, createIterator);
                 };
-                DataSourceFullscreenWizard.prototype.description = function () {
+                FullscreenDataSourceWizard.prototype.canRunWizard = function () {
+                    return this._dataSourceWizardOptions.jsonDataSourceAvailable || this._dataSourceWizardOptions.sqlDataSourceAvailable;
+                };
+                FullscreenDataSourceWizard.prototype._description = function () {
                     return Analytics.Utils.getLocalization("Data Source Wizard", "AnalyticsCoreStringId.DSWizard_Title");
                 };
-                return DataSourceFullscreenWizard;
+                return FullscreenDataSourceWizard;
             }(FullscreenWizard));
-            Wizard.DataSourceFullscreenWizard = DataSourceFullscreenWizard;
-            var DataSourceFullscreenWizardPageIterator = (function (_super) {
-                __extends(DataSourceFullscreenWizardPageIterator, _super);
-                function DataSourceFullscreenWizardPageIterator(factory, stateManager, _jsonAvailable, onResetPage) {
+            Wizard.FullscreenDataSourceWizard = FullscreenDataSourceWizard;
+            var FullscreenDataSourceWizardPageIterator = (function (_super) {
+                __extends(FullscreenDataSourceWizardPageIterator, _super);
+                function FullscreenDataSourceWizardPageIterator(factory, stateManager, _dataSourceOptions, onResetPage) {
                     var _this = _super.call(this, factory, stateManager, onResetPage) || this;
-                    _this._jsonAvailable = _jsonAvailable;
+                    _this._dataSourceOptions = _dataSourceOptions;
                     return _this;
                 }
-                DataSourceFullscreenWizardPageIterator.prototype.getNextPageId = function (pageId) {
-                    if (!pageId && this._jsonAvailable)
+                FullscreenDataSourceWizardPageIterator.prototype.getNextPageId = function (pageId) {
+                    if (!pageId && this._dataSourceOptions.jsonDataSourceAvailable && this._dataSourceOptions.sqlDataSourceAvailable)
                         return Analytics.Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage;
-                    else if (!pageId) {
+                    else if (!pageId && this._dataSourceOptions.sqlDataSourceAvailable) {
                         return Wizard.FullscreenDataSourceWizardPageId.SpecifySqlDataSourceSettingsPage;
                     }
-                    else if (pageId === Analytics.Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === Analytics.Wizard.DataSourceType.Json) {
+                    else if (!pageId && this._dataSourceOptions.jsonDataSourceAvailable) {
                         return Wizard.FullscreenDataSourceWizardPageId.SpecifyJsonDataSourceSettingsPage;
                     }
-                    else if (pageId === Analytics.Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this.getCurrentState().dataSourceType === Analytics.Wizard.DataSourceType.Sql) {
+                    else if (pageId === Analytics.Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === Analytics.Wizard.DataSourceType.Json) {
+                        return Wizard.FullscreenDataSourceWizardPageId.SpecifyJsonDataSourceSettingsPage;
+                    }
+                    else if (pageId === Analytics.Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage && this._getCurrentState().dataSourceType === Analytics.Wizard.DataSourceType.Sql) {
                         return Wizard.FullscreenDataSourceWizardPageId.SpecifySqlDataSourceSettingsPage;
                     }
                 };
-                return DataSourceFullscreenWizardPageIterator;
+                return FullscreenDataSourceWizardPageIterator;
             }(PageIterator));
-            Wizard.DataSourceFullscreenWizardPageIterator = DataSourceFullscreenWizardPageIterator;
-            function createDataSourceFullscreenWizard(callbacks, connectionStrings, wizardSettings, qbRequestWrapper, disableCustomSql, canCreateNewJsonDataSource) {
-                if (disableCustomSql === void 0) { disableCustomSql = true; }
-                if (canCreateNewJsonDataSource === void 0) { canCreateNewJsonDataSource = false; }
+            Wizard.FullscreenDataSourceWizardPageIterator = FullscreenDataSourceWizardPageIterator;
+            function _createDataSourceFullscreenWizard(dataSourceWizardOptions) {
                 var factory = new FullscreenWizardPageFactory();
-                var jsonAvailable = wizardSettings.enableJsonDataSource && (canCreateNewJsonDataSource || (ko.unwrap(connectionStrings.json) || []).length > 0);
-                Analytics.Wizard.registerChooseDataSourceTypePage(factory, jsonAvailable);
+                Analytics.Wizard._registerChooseDataSourceTypePage(factory, dataSourceWizardOptions);
                 factory.getMetadata(Analytics.Wizard.DataSourceWizardPageId.ChooseDataSourceTypePage).navigationPanelText = Analytics.Utils.getLocalization("Select Data Source Type", "AnalyticsCoreStringId.Wizard_SelectDataSourceType");
-                registerSpecifySqlDataSourceSettingsPage(factory, connectionStrings, callbacks, qbRequestWrapper, disableCustomSql);
-                if (wizardSettings.enableJsonDataSource) {
-                    registerSpecifyJsonDataSourceSettingsPage(factory, connectionStrings, canCreateNewJsonDataSource, callbacks);
-                }
-                return new DataSourceFullscreenWizard(factory, jsonAvailable, callbacks.finishCallback);
+                _registerSpecifySqlDataSourceSettingsPage(factory, dataSourceWizardOptions);
+                _registerSpecifyJsonDataSourceSettingsPage(factory, dataSourceWizardOptions);
+                return new FullscreenDataSourceWizard(factory, dataSourceWizardOptions);
             }
-            Wizard.createDataSourceFullscreenWizard = createDataSourceFullscreenWizard;
+            Wizard._createDataSourceFullscreenWizard = _createDataSourceFullscreenWizard;
             var Legacy;
             (function (Legacy) {
                 var WizardPage = (function () {
@@ -6002,7 +6134,7 @@ var DevExpress;
                         var _this = this;
                         this._rootItems = [];
                         data.sqlDataSource.queries().forEach(function (query) {
-                            if (canEditQueryParameters(query, data.customQueries())) {
+                            if (_canEditQueryParameters(query, data.customQueries())) {
                                 var parent = new Internal.ParametersTreeListRootItem(query);
                                 parent.parameters(query.parameters().map(function (parameterModel) {
                                     return new Internal.ParametersTreeListItem(_this.parametersConverter.createParameterViewModel(parameterModel), parent);
@@ -6430,9 +6562,9 @@ var DevExpress;
                     return JsonDataSourceJsonSourcePage;
                 }(WizardPage));
                 Legacy.JsonDataSourceJsonSourcePage = JsonDataSourceJsonSourcePage;
-                var ConfigureParametersPage = (function (_super) {
-                    __extends(ConfigureParametersPage, _super);
-                    function ConfigureParametersPage(wizard, parametersConverter) {
+                var ConfigureQueryParametersPage = (function (_super) {
+                    __extends(ConfigureQueryParametersPage, _super);
+                    function ConfigureQueryParametersPage(wizard, parametersConverter) {
                         if (parametersConverter === void 0) { parametersConverter = {
                             createParameterViewModel: function (parameter) { return parameter; },
                             getParameterFromViewModel: function (parameterViewModel) { return parameterViewModel; }
@@ -6469,23 +6601,23 @@ var DevExpress;
                         };
                         return _this;
                     }
-                    ConfigureParametersPage.prototype.getParameters = function () {
+                    ConfigureQueryParametersPage.prototype.getParameters = function () {
                         return this.parametersEditorOptions.values()();
                     };
-                    ConfigureParametersPage.prototype._begin = function (data) {
+                    ConfigureQueryParametersPage.prototype._begin = function (data) {
                         var _this = this;
                         this.parametersEditorOptions.hideButtons(data.sqlQuery.type() === Data.Utils.SqlQueryType.storedProcQuery);
                         this.parametersEditorOptions.values(ko.observableArray(data.sqlQuery.parameters().map(function (item) { return _this.parametersConverter.createParameterViewModel(item); })));
                         this.validateParameters();
                     };
-                    ConfigureParametersPage.prototype.commit = function (data) {
+                    ConfigureQueryParametersPage.prototype.commit = function (data) {
                         var _this = this;
                         _super.prototype.commit.call(this, data);
                         data.sqlQuery.parameters(this.parametersEditorOptions.values()().map(function (item) { return _this.parametersConverter.getParameterFromViewModel(item); }));
                     };
-                    return ConfigureParametersPage;
+                    return ConfigureQueryParametersPage;
                 }(CommonParametersPage));
-                Legacy.ConfigureParametersPage = ConfigureParametersPage;
+                Legacy.ConfigureQueryParametersPage = ConfigureQueryParametersPage;
                 var CreateQueryPage = (function (_super) {
                     __extends(CreateQueryPage, _super);
                     function CreateQueryPage(wizard, callbacks, disableCustomSql, rtl) {
@@ -6651,7 +6783,7 @@ var DevExpress;
                             new JsonDataSourceFieldsPage(_this),
                             new SelectConnectionString(_this, connectionStrings.sql, false),
                             new CreateQueryPage(_this, callbacks, disableCustomSql, rtl),
-                            new ConfigureParametersPage(_this)
+                            new ConfigureQueryParametersPage(_this)
                         ];
                         _this.connectionStrings = connectionStrings;
                         return _this;
@@ -6737,8 +6869,9 @@ var DevExpress;
                         };
                         _this.jsonStringValidationRules = [{
                                 type: "custom",
+                                reevaluate: true,
                                 validationCallback: function (options) { return _this.isValid(); },
-                                message: DevExpress.Analytics.Utils.getLocalization('Data loading failed because the exception occurred.', 'DataAccessUIStringId.LoadingDataException')
+                                message: Internal.getLocalizedValidationErrorMessage(Analytics.Utils.getLocalization('The value cannot be empty and should have a valid format.', 'AnalyticsCoreStringId.ValueIsRequiredOrInvalidFormat_Error'), Analytics.Utils.getLocalization('JSON String:', 'DataAccessUIStringId.WizardPageChooseJsonSource_Custom'))
                             }];
                         return _this;
                     }
@@ -6755,13 +6888,71 @@ var DevExpress;
                         });
                     };
                     JsonStringEditor.prototype.getUploadTitle = function () {
-                        return Analytics.Utils.getLocalization("Upload JSON", "TODO");
+                        return Analytics.Utils.getLocalization("Upload JSON File", "AnalyticsCoreStringId.UploadJsonFile_Title");
                     };
                     return JsonStringEditor;
                 }(Analytics.Widgets.Editor));
                 Internal.JsonStringEditor = JsonStringEditor;
             })(Internal = Wizard.Internal || (Wizard.Internal = {}));
             (function (Internal) {
+                function getLocalizedValidationErrorMessage(emptyValueErrorMessage, localizedPropertyName, subProperty) {
+                    var requiredMessageSuffix = emptyValueErrorMessage || Analytics.Utils.getLocalization('The value cannot be empty', "AnalyticsCoreStringId.ParametersPanel_DateTimeValueValidationError");
+                    if (!localizedPropertyName)
+                        return requiredMessageSuffix;
+                    var propertyNamesPrefix = !subProperty ? localizedPropertyName : Analytics.Internal.formatUnicorn("{0}. {1}", localizedPropertyName, subProperty);
+                    if (!Analytics.Utils._stringEndsWith(propertyNamesPrefix, ":"))
+                        propertyNamesPrefix += ":";
+                    return Analytics.Internal.formatUnicorn("{0} {1}", propertyNamesPrefix, requiredMessageSuffix);
+                }
+                Internal.getLocalizedValidationErrorMessage = getLocalizedValidationErrorMessage;
+                var JsonDataSourceJsonSourcePageSettingsBase = (function (_super) {
+                    __extends(JsonDataSourceJsonSourcePageSettingsBase, _super);
+                    function JsonDataSourceJsonSourcePageSettingsBase() {
+                        var _this = _super.call(this) || this;
+                        _this._validationGroup = null;
+                        _this._validationSummary = null;
+                        _this.validationGroup = {
+                            onInitialized: function (args) { return _this._onValidationGroupInitialized(args); },
+                            onDisposing: function (args) { return _this._onValidationGroupDisposing(args); },
+                            validate: function () { return _this._validate(); }
+                        };
+                        _this.validationSummary = {
+                            onInitialized: function (args) { return _this._onValidationSummaryInitialized(args); },
+                            onDisposing: function (args) { return _this._onValidationSummaryDisposing(args); }
+                        };
+                        _this._disposables.push(_this.grid = new Analytics.Widgets.ObjectProperties(ko.observable(_this)));
+                        return _this;
+                    }
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype.dispose = function () {
+                        this._validationSummary && this._validationSummary.dispose();
+                        this._validationGroup && this._validationGroup.dispose();
+                        this._validationSummary = null;
+                        this._validationGroup = null;
+                        _super.prototype.dispose.call(this);
+                    };
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype._onValidationGroupInitialized = function (args) {
+                        this._validationGroup = args.component;
+                    };
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype._onValidationGroupDisposing = function (args) {
+                        this._validationGroup = null;
+                    };
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype._onValidationSummaryInitialized = function (args) {
+                        var _this = this;
+                        this._validationSummary = args.component;
+                        setTimeout(function () { return _this._validate(); }, 1);
+                    };
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype._onValidationSummaryDisposing = function (args) {
+                        this._validationSummary = null;
+                    };
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype._repaintSummary = function () {
+                        this._validationSummary && this._validationSummary.repaint();
+                    };
+                    JsonDataSourceJsonSourcePageSettingsBase.prototype._validate = function () {
+                        this._validationSummary && this._validationGroup && this._validationGroup.validate();
+                    };
+                    return JsonDataSourceJsonSourcePageSettingsBase;
+                }(Analytics.Utils.Disposable));
+                Internal.JsonDataSourceJsonSourcePageSettingsBase = JsonDataSourceJsonSourcePageSettingsBase;
                 var JsonDataSourceJsonSourcePageStringSettings = (function (_super) {
                     __extends(JsonDataSourceJsonSourcePageStringSettings, _super);
                     function JsonDataSourceJsonSourcePageStringSettings() {
@@ -6769,13 +6960,23 @@ var DevExpress;
                         _this.isValid = ko.pureComputed(function () {
                             return _this.isEmpty() || _this._isJsonSourceValid(_this.stringSource()) && !_this.aceEditorHasErrors();
                         });
+                        _this.validationGroup = null;
+                        _this.validationSummary = null;
                         _this.stringSource = ko.observable("");
                         _this.aceEditorHasErrors = ko.observable(false);
-                        _this._disposables.push(_this.isValid);
+                        _this.cssClass = { 'dxrd-wizard-json-string-source-grid': true };
+                        _this._disposables.push(_this.grid = new Analytics.Widgets.ObjectProperties(ko.observable(_this)));
                         return _this;
                     }
                     JsonDataSourceJsonSourcePageStringSettings.prototype.onChange = function (_onChange) {
-                        this._disposables.push(this.stringSource.subscribe(function (newVal) { return _onChange(); }));
+                        var _this = this;
+                        var timeoutId = null;
+                        var localOnChange = function () {
+                            _onChange();
+                            clearTimeout(timeoutId);
+                            timeoutId = setTimeout(function () { return _this._validate(); }, 1);
+                        };
+                        this._disposables.push(this.stringSource.subscribe(function (newVal) { return localOnChange(); }));
                     };
                     JsonDataSourceJsonSourcePageStringSettings.prototype._isJsonSourceValid = function (jsonString) {
                         if (!jsonString)
@@ -6802,7 +7003,7 @@ var DevExpress;
                         return [
                             {
                                 propertyName: "stringSource", defaultVal: "", displayName: "JSON String", editor: {
-                                    header: "dx-jsonwizard-jsonstring-editor", editorType: Wizard.Internal.JsonStringEditor
+                                    header: "dx-jsonwizard-jsonstring-editor", editorType: Wizard.Internal.JsonStringEditor, custom: "dx-property-json-string-editor"
                                 }
                             }
                         ];
@@ -6815,35 +7016,42 @@ var DevExpress;
                         jsonDataSource.source.queryParameters([]);
                     };
                     return JsonDataSourceJsonSourcePageStringSettings;
-                }(Analytics.Utils.Disposable));
+                }(JsonDataSourceJsonSourcePageSettingsBase));
                 Internal.JsonDataSourceJsonSourcePageStringSettings = JsonDataSourceJsonSourcePageStringSettings;
                 var JsonDataSourceJsonSourcePageUriSettings = (function (_super) {
                     __extends(JsonDataSourceJsonSourcePageUriSettings, _super);
                     function JsonDataSourceJsonSourcePageUriSettings(_requestWrapper) {
                         var _this = _super.call(this) || this;
                         _this._requestWrapper = _requestWrapper;
-                        _this._isUriValid = ko.observable(true);
+                        _this._isUriValid = ko.observable(false);
+                        _this._collectionItemNamePlaceholder = Analytics.Utils.getLocalization("Name", "AnalyticsCoreStringId.CollectionEditor_Name_Placeholder");
+                        _this._lastValidationMessage = ko.observable();
                         _this.isValid = ko.pureComputed(function () {
-                            return _this._isUriValid()
-                                && _this._isBasicHttpAuthValid()
-                                && _this._isHeadersValid()
-                                && _this._isQueryParametersValid();
+                            var isPropertiesNotEmpty = _this._noEmptyProperties();
+                            var isUriValid = _this._isUriValid();
+                            return isPropertiesNotEmpty && isUriValid;
                         });
-                        _this.uriSource = ko.observable("");
+                        _this._noEmptyProperties = ko.pureComputed(function () {
+                            var isBasicHttpAuthValid = _this._isBasicHttpAuthValid();
+                            var isHeadersValid = _this._isHeadersValid();
+                            var isQueryParametersValid = _this._isQueryParametersValid();
+                            var sourceUriNotEmpty = !!_this.sourceUri();
+                            return isBasicHttpAuthValid && isHeadersValid && isQueryParametersValid && sourceUriNotEmpty;
+                        });
+                        _this.sourceUri = ko.observable("");
                         _this.basicHttpAuth = {
                             password: ko.observable(""),
                             userName: ko.observable(""),
                         };
                         _this.queryParameters = ko.observableArray([]);
                         _this.headers = ko.observableArray([]);
-                        _this._disposables.push(_this.uriSource.subscribe(function (newValue) {
+                        _this._disposables.push(_this.sourceUri.subscribe(function (newValue) {
                             if (newValue)
-                                _this._validateUri();
+                                _this._validateUriSource();
                             else
                                 _this._isUriValid(true);
                         }));
                         _this._disposables.push(_this.grid = new Analytics.Widgets.ObjectProperties(ko.observable(_this)));
-                        _this._disposables.push(_this.isValid);
                         return _this;
                     }
                     JsonDataSourceJsonSourcePageUriSettings.prototype.dispose = function () {
@@ -6854,46 +7062,159 @@ var DevExpress;
                     JsonDataSourceJsonSourcePageUriSettings.prototype.onChange = function (_onChange) {
                         var _this = this;
                         var _a;
-                        (_a = this._disposables).push.apply(_a, Internal.subscribeProperties([this.uriSource, this.basicHttpAuth.password, this.basicHttpAuth.userName], _onChange));
+                        var timeoutId = null;
+                        var localOnChange = function () {
+                            _onChange();
+                            clearTimeout(timeoutId);
+                            timeoutId = setTimeout(function () { return _this._validate(); }, 1);
+                        };
+                        (_a = this._disposables).push.apply(_a, Internal.subscribeProperties([this.sourceUri, this.basicHttpAuth.password, this.basicHttpAuth.userName], localOnChange));
                         [this.headers, this.queryParameters]
                             .forEach(function (arrayProperty) {
                             _this._disposables.push(Internal.subscribeArray(arrayProperty, function (item) {
                                 var _a;
-                                (_a = item._disposables).push.apply(_a, Internal.subscribeProperties([item.name, item.value], _onChange));
-                            }, _onChange));
+                                (_a = item._disposables).push.apply(_a, Internal.subscribeProperties([item.name, item.value], localOnChange));
+                            }, localOnChange));
                         });
                     };
-                    JsonDataSourceJsonSourcePageUriSettings.prototype._validateUri = function () {
+                    JsonDataSourceJsonSourcePageUriSettings.prototype._validateUriSource = function () {
                         var _this = this;
+                        var defaultValidationErrorMessage = Analytics.Utils.getLocalization('Invalid URI.', "AnalyticsCoreStringId.ReportDesigner_Wizard_JsonSource_UriValidationError");
+                        var endpointUriDisplayName = Analytics.Utils.getLocalization('Web Service Endpoint (URI):', 'DataAccessUIStringId.WizardPageChooseJsonSource_URI');
+                        var deferred = $.Deferred();
                         try {
-                            this._requestWrapper.validateJsonUri(this.uriSource())
+                            var jsonDataSource = new Analytics.Data.JsonDataSource({});
+                            this.applySettings(jsonDataSource);
+                            this._requestWrapper.validateJsonUri(jsonDataSource)
                                 .done(function (data) {
                                 _this._isUriValid(data.isUriValid);
+                                var faultMessage = Internal.getLocalizedValidationErrorMessage(data.isUriValid ? "" : data && data.faultMessage || defaultValidationErrorMessage, endpointUriDisplayName);
+                                deferred.resolve({
+                                    isUriValid: data.isUriValid,
+                                    faultMessage: faultMessage
+                                });
                             })
                                 .fail(function (data) {
                                 _this._isUriValid(false);
+                                var faultMessage = Internal.getLocalizedValidationErrorMessage(data && data.faultMessage || defaultValidationErrorMessage, endpointUriDisplayName);
+                                deferred.resolve({
+                                    isUriValid: false,
+                                    faultMessage: faultMessage
+                                });
                             });
                         }
                         catch (ex) {
                             this._isUriValid(false);
                         }
+                        return deferred.promise();
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype._isCollectionValid = function (collectionName) {
-                        if (!this[collectionName]().length)
-                            return true;
-                        return this[collectionName]().every(function (x) { return !!x.name(); });
+                        return !this[collectionName]().length || this[collectionName]().every(function (x) { return x.name(); });
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype._isHeadersValid = function () {
                         return this._isCollectionValid("headers");
                     };
+                    ;
                     JsonDataSourceJsonSourcePageUriSettings.prototype._isQueryParametersValid = function () {
                         return this._isCollectionValid("queryParameters");
                     };
+                    ;
                     JsonDataSourceJsonSourcePageUriSettings.prototype._isBasicHttpAuthValid = function () {
-                        return !this.basicHttpAuth.password() || (!!this.basicHttpAuth.password() && !!this.basicHttpAuth.userName());
+                        return !this.basicHttpAuth.password() || !!this.basicHttpAuth.userName();
+                    };
+                    ;
+                    JsonDataSourceJsonSourcePageUriSettings.prototype._getSourceUriInfo = function () {
+                        var _this = this;
+                        var sourceUri = {
+                            propertyName: "sourceUri",
+                            displayName: "Web Service Endpoint (URI):",
+                            localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_URI",
+                            defaultVal: "",
+                            editor: Analytics.Widgets.editorTemplates.text,
+                            validationRules: null
+                        };
+                        sourceUri.validationRules = [{
+                                type: 'required',
+                                message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(sourceUri.displayName, sourceUri.localizationId))
+                            }, {
+                                type: "custom",
+                                assignValueFirst: true,
+                                isDeferred: ko.pureComputed(function () { return _this._noEmptyProperties(); }),
+                                message: function () { return _this._lastValidationMessage(); },
+                                validationCallback: function (params) {
+                                    if (!_this._lastValidationMessage())
+                                        _this._lastValidationMessage(Analytics.Utils.getLocalization("Validation...", "AnalyticsCoreStringId.Validation"));
+                                    _this._noEmptyProperties() && _this._validateUriSource().done(function (result) {
+                                        params.rule.isValid = result.isUriValid;
+                                        result.faultMessage && (params.rule.message = result.faultMessage);
+                                        _this._lastValidationMessage(result.faultMessage);
+                                        params.validator.validate();
+                                        setTimeout(function () { return _this._repaintSummary(); }, 1);
+                                    });
+                                    return false;
+                                }
+                            }];
+                        return sourceUri;
+                    };
+                    JsonDataSourceJsonSourcePageUriSettings.prototype._getBasicHttpAuthInfo = function () {
+                        var _this = this;
+                        var basicHttpAuthName = {
+                            propertyName: "userName", displayName: "Username:", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_UsernameText", editor: Analytics.Widgets.editorTemplates.text,
+                            validationRules: undefined,
+                        };
+                        var basicHttpAuth = {
+                            propertyName: "basicHttpAuth", displayName: "Basic HTTP Authentication", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_BasicHttpAuthText", info: [
+                                basicHttpAuthName,
+                                { propertyName: "password", displayName: "Password:", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_PasswordText", editor: Analytics.Widgets.editorTemplates.text, editorOptions: { mode: "password" } },
+                            ], editor: Analytics.Widgets.editorTemplates.objecteditor
+                        };
+                        basicHttpAuthName.validationRules = [{
+                                type: "custom",
+                                reevaluate: true,
+                                assignValueFirst: true,
+                                message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(basicHttpAuth.displayName, basicHttpAuth.localizationId), Analytics.Utils.getLocalization(basicHttpAuthName.displayName, basicHttpAuthName.localizationId)),
+                                validationCallback: function (params) {
+                                    return _this._isBasicHttpAuthValid();
+                                }
+                            }];
+                        return basicHttpAuth;
+                    };
+                    JsonDataSourceJsonSourcePageUriSettings.prototype._getQueryParametersInfo = function () {
+                        var queryParameters = {
+                            propertyName: "queryParameters", displayName: "Query Parameters", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_QueryParametersText",
+                            array: true,
+                            addHandler: function () { return Data.JsonQueryParameter.from({}); },
+                            editor: Analytics.Widgets.editorTemplates.commonCollection,
+                            editorOptions: null,
+                            template: '#dx-jsonwizard-parametercollection'
+                        };
+                        queryParameters.editorOptions = {
+                            nameValidationRules: [{
+                                    type: "required",
+                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(queryParameters.displayName, queryParameters.localizationId), this._collectionItemNamePlaceholder),
+                                }]
+                        };
+                        return queryParameters;
+                    };
+                    JsonDataSourceJsonSourcePageUriSettings.prototype._getHttpHeadersInfo = function () {
+                        var httpHeaders = {
+                            propertyName: "headers", displayName: "HTTP Headers", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_HttpHeadersText",
+                            array: true,
+                            addHandler: function () { return Data.JsonHeaderParameter.from({}); },
+                            editor: Analytics.Widgets.editorTemplates.commonCollection,
+                            editorOptions: null,
+                            template: '#dx-jsonwizard-parametercollection'
+                        };
+                        httpHeaders.editorOptions = {
+                            nameValidationRules: [{
+                                    type: "required",
+                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(httpHeaders.displayName, httpHeaders.localizationId), this._collectionItemNamePlaceholder),
+                                }]
+                        };
+                        return httpHeaders;
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype.applySettings = function (jsonDataSource) {
-                        jsonDataSource.source.uri(this.uriSource());
+                        jsonDataSource.source.uri(this.sourceUri());
                         jsonDataSource.source.json(undefined);
                         jsonDataSource.source.authenticationInfo.password(this.basicHttpAuth.password());
                         jsonDataSource.source.authenticationInfo.userName(this.basicHttpAuth.userName());
@@ -6901,80 +7222,31 @@ var DevExpress;
                         jsonDataSource.source.queryParameters(this.queryParameters());
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype.getInfo = function () {
-                        var _this = this;
-                        return [
-                            {
-                                propertyName: "uriSource",
-                                displayName: "Web Service Endpoint (URI)",
-                                localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType_Uri",
-                                defaultVal: "",
-                                editor: Analytics.Widgets.editorTemplates.text,
-                                validationRules: null,
-                                editorOptions: {
-                                    isValid: ko.pureComputed(function () { return _this.isEmpty() || _this._isUriValid(); }),
-                                    validationError: { message: function () { return Analytics.Utils.getLocalization('The URI is not valid.', "AnalyticsCoreStringId.ReportDesigner_Wizard_JsonSource_UriValidationError"); } }
-                                }
-                            },
-                            {
-                                propertyName: "basicHttpAuth", displayName: "Basic HTTP Authentication", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_BasicHttpAuthText", info: [
-                                    {
-                                        propertyName: "userName", displayName: "Username:", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_UsernameText", editor: Analytics.Widgets.editorTemplates.text,
-                                        validationRules: null,
-                                        editorOptions: {
-                                            isValid: ko.pureComputed(function () { return _this._isBasicHttpAuthValid(); }),
-                                            validationError: { message: function () { return DevExpress.Analytics.Utils.getLocalization('The value cannot be empty', "AnalyticsCoreStringId.ParametersPanel_DateTimeValueValidationError"); } }
-                                        }
-                                    },
-                                    { propertyName: "password", displayName: "Password:", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_PasswordText", editor: Analytics.Widgets.editorTemplates.text, editorOptions: { mode: "password" } },
-                                ], editor: Analytics.Widgets.editorTemplates.objecteditor
-                            },
-                            {
-                                propertyName: "queryParameters",
-                                displayName: "Query Parameters",
-                                localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_QueryParametersText",
-                                array: true,
-                                addHandler: function () { return Data.JsonQueryParameter.from({}); },
-                                editor: Analytics.Widgets.editorTemplates.commonCollection,
-                                editorOptions: {
-                                    isValid: function (value) { return !!value; },
-                                    validationError: { message: function () { return DevExpress.Analytics.Utils.getLocalization('The value cannot be empty', "AnalyticsCoreStringId.ParametersPanel_DateTimeValueValidationError"); } }
-                                },
-                                template: '#dx-jsonwizard-queryparameter'
-                            },
-                            {
-                                propertyName: "headers",
-                                displayName: "HTTP Headers",
-                                localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_HttpHeadersText",
-                                array: true,
-                                addHandler: function () { return Data.JsonHeaderParameter.from({}); },
-                                editor: Analytics.Widgets.editorTemplates.commonCollection,
-                                editorOptions: {
-                                    isValid: function (value) { return !!value; },
-                                    validationError: { message: function () { return DevExpress.Analytics.Utils.getLocalization('The value cannot be empty', "AnalyticsCoreStringId.ParametersPanel_DateTimeValueValidationError"); } }
-                                },
-                                template: '#dx-jsonwizard-queryparameter'
-                            }
-                        ];
+                        var sourceUri = this._getSourceUriInfo();
+                        var basicHttpAuth = this._getBasicHttpAuthInfo();
+                        var queryParameters = this._getQueryParametersInfo();
+                        var httpHeaders = this._getHttpHeadersInfo();
+                        return [sourceUri, basicHttpAuth, queryParameters, httpHeaders];
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype.reset = function () {
-                        this.uriSource("");
+                        this.sourceUri("");
                         this.basicHttpAuth.password("");
                         this.basicHttpAuth.userName("");
                         this.headers([]);
                         this.queryParameters([]);
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype.setValue = function (dataSource) {
-                        this.uriSource(dataSource.source.uri());
+                        this.sourceUri(dataSource.source.uri());
                         this.basicHttpAuth.userName(dataSource.source.authenticationInfo.userName());
                         this.basicHttpAuth.password(dataSource.source.authenticationInfo.password());
                         this.headers(dataSource.source.headers());
                         this.queryParameters(dataSource.source.queryParameters());
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype.isEmpty = function () {
-                        return !this.uriSource();
+                        return !this.sourceUri();
                     };
                     return JsonDataSourceJsonSourcePageUriSettings;
-                }(Analytics.Utils.Disposable));
+                }(JsonDataSourceJsonSourcePageSettingsBase));
                 Internal.JsonDataSourceJsonSourcePageUriSettings = JsonDataSourceJsonSourcePageUriSettings;
             })(Internal = Wizard.Internal || (Wizard.Internal = {}));
             (function (Internal) {
@@ -7011,6 +7283,23 @@ var DevExpress;
                     });
                 }
                 Internal.subscribeObject = subscribeObject;
+                function _createBeforeInitializePageEventArgs(page, self) {
+                    return {
+                        page: page.page,
+                        pageId: page.pageId,
+                        wizard: self,
+                        state: self.stateManager.getPageState(page.pageId)
+                    };
+                }
+                Internal._createBeforeInitializePageEventArgs = _createBeforeInitializePageEventArgs;
+                function _createPageEventArgs(page, self) {
+                    return {
+                        page: page.page,
+                        pageId: page.pageId,
+                        wizard: self
+                    };
+                }
+                Internal._createPageEventArgs = _createPageEventArgs;
                 var ParametersTreeListItem = (function (_super) {
                     __extends(ParametersTreeListItem, _super);
                     function ParametersTreeListItem(parameter, parent) {
@@ -9143,6 +9432,9 @@ var DevExpress;
                     return Analytics.Internal.ajax(Utils.HandlerUri, action, arg);
                 };
                 ;
+                RequestWrapper.prototype._sendRequest = function (settings) {
+                    return Analytics.Internal.ajax(settings);
+                };
                 RequestWrapper.prototype.getDbSchema = function (connection, tables) {
                     var requestModel = {
                         connectionJSON: this.getConnectionJSON(connection),
@@ -9191,14 +9483,18 @@ var DevExpress;
                     });
                     return this.sendRequest("rebuildResultSchema", encodeURIComponent(requestJson));
                 };
-                RequestWrapper.prototype.validateJsonUri = function (jsonSourceUri) {
-                    var jsonDataSource = new Analytics.Data.JsonDataSource({});
-                    jsonDataSource.source.uri(jsonSourceUri);
+                RequestWrapper.prototype.validateJsonUri = function (jsonDataSource) {
                     var uriJsonSourceJSON = JSON.stringify(jsonDataSource.source.serialize(true));
                     var requestJson = JSON.stringify({
                         uriJsonSourceJSON: uriJsonSourceJSON
                     });
-                    return this.sendRequest("validateJsonEndPoint", encodeURIComponent(requestJson));
+                    var ajaxSettings = {
+                        uri: Utils.HandlerUri,
+                        action: "validateJsonEndPoint",
+                        arg: encodeURIComponent(requestJson),
+                        ignoreError: function () { return true; }
+                    };
+                    return this._sendRequest(ajaxSettings);
                 };
                 RequestWrapper.prototype.saveJsonSource = function (connectionName, jsonDataSource) {
                     var jsonSource = jsonDataSource.source;
@@ -10641,7 +10937,7 @@ DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Repo
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.MultiQueryConfigureParametersPage", "Analytics.Wizard.Legacy.MultiQueryConfigureParametersPage");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.MultiQueryDataSourceWizard", "Analytics.Wizard.Legacy.MultiQueryDataSourceWizard");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.MultiQueryDataSourceWizardModel", "Analytics.Wizard.Legacy.MultiQueryDataSourceWizardModel");
-DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.ConfigureParametersPage", "Analytics.Wizard.Legacy.ConfigureParametersPage");
+DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.ConfigureParametersPage", "Analytics.Wizard.Legacy.ConfigureQueryParametersPage");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.CreateQueryPage", "Analytics.Wizard.Legacy.CreateQueryPage");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.SqlDataSourceWizardModel", "Analytics.Wizard.SqlDataSourceWizardModel", "Analytics.Wizard.Legacy.DataSourceWizardModel");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.Wizard.SelectConnectionString", "Analytics.Wizard.Legacy.SelectConnectionString");
@@ -10705,19 +11001,23 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxqb-filtereditor-parameterspopup': '<div class="dx-widget" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko if: $parent.viewModel.canCreateParameters -->        <div class="dx-filtereditor-popup-item dx-item dx-list-item dxd-list-item-back-color dxd-back-highlighted">            <span class="dx-item-content dx-list-item-content" data-bind="text: $parent.viewModel.defaultDisplay(), click: function() { $parent.viewModel.isEditable(true); $parent.viewModel._parameterName(\'\'); $parent.visible(false); }"></span>        </div>        <!-- /ko -->        <!-- ko foreach: data -->        <div class="dx-filtereditor-popup-item dx-item dx-list-item dxd-list-item-back-color dxd-back-highlighted">            <span class="dx-item-content dx-list-item-content" data-bind="text: name, click: function() { $parent.click($data); } "></span>        </div>        <!-- /ko -->    </div>',
     'dxqb-treelist-item-with-search': '<div data-bind="visible: visible">        <!-- ko template: "dxqb-treelist-header-item-with-search" -->        <!-- /ko -->    </div>',
     'dxqb-treelist-header-item-with-search': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <div class="dx-treelist-collapsedbutton"></div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                <div class="dx-treelist-text-wrapper">                    <!-- ko if: treeListController && !!$data.treeListController.searchName -->                    <div class="dx-treelist-text dxdr-highlighted-search-text" data-bind="searchHighlighting: { text: text, textToSearch: treeListController.searchName }, attr: { title: text }"></div>                    <!-- /ko -->                </div>            </div>        </div>    </div>',
-    'dxrd-page-choose-datasource-type': '<div class="dxrd-wizard-type-page" data-bind="css: $data.extendCssClass(\'type-page\')">        <!-- ko foreach: typeItems -->        <div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">            <div data-bind="event: { click: $parent.itemClick, dblclick: function() { $parent.goToNextPage() } }, attr: { class: \'dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color \' + $parent.extendCssClass(\'type-item\')}, css: { \'dxd-state-selected dxd-border-secondary dxd-back-secondary\': $parent.IsSelected($data) } ">                <div data-bind="attr: { class: \'dxrd-wizard-type-image \' + $parent.extendCssClass(\'type-image\') }, css: imageClassName, template: imageTemplateName"> </div>                <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent.extendCssClass(\'type-text\')"></div>            </div>        </div>        <!-- /ko -->    </div>',
-    'dx-wizard-fullscreen': '<!-- ko if: $data && $data.isVisible() -->    <div class="dx-fullscreen-wizard dx-editors" data-bind="css: { \'dx-rtl\': $root.rtl, \'dx-ltr\': !$root.rtl }">        <div class="dxrd-wizard dxrd-report-wizard dx-editors dxd-text-primary dxd-back-primary2" data-bind="css: extendCssClass">            <div class="dxrd-wizard-steps-container dxd-back-primary" data-bind="visible: $data.navigationPanel().isVisible">                <div class="dxrd-wizard-title dxd-border-primary" data-bind="text: description()"></div>                <!-- ko with: navigationPanel -->                <div class="dxrd-wizard-steps" data-bind="foreach: steps">                    <div class="dxrd-wizard-steps-relative" style="position:relative" data-bind="visible: $data.visible">                        <div class="dxrd-wizard-steps-content" data-bind="click: $data.clickAction, text: $data.text, attr: {\'title\': $data.text }, css: { \'dxrd-disabled\': $data.disabled, \'dxd-back-secondary\': $data.isActive() }"></div>                        <div class="dxrd-wizard-steps-marker dxd-back-primary2" data-bind="visible: $data.isActive"></div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dxrd-wizard-content" data-bind="css: { \'withoutPanel\': !$data.navigationPanel().isVisible() }">                <div class="dxrd-wizard-part-description dxd-back-contrast">                    <div class="dxrd-wizard-part-description-text dxd-text-primary dxd-border-primary" data-bind="text: pageDescription()"></div>                </div>                <!-- ko with: currentPage -->                <div class="dxrd-wizard-work-content">                    <div class="dxrd-wizard-work-content-relative">                        <div data-bind="template: { name: template, data: page } "></div>                    </div>                </div>                <!-- /ko -->                <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: loadPanelViewModel($element)">                </div>                <div class="dxrd-wizard-navigation">                    <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>                    <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>                </div>            </div>        </div>    </div>    <!-- /ko -->',
-    'dx-wizard-fullscreen-page': '<!-- ko if: $data.sections.length > 0 -->    <div style="position:absolute;" data-bind="foreach: sections, styleunit: { top: parentMarginOffset, left: parentMarginOffset, right: parentMarginOffset, bottom: parentMarginOffset }">        <div class="dx-border-inheritor dxd-border-accented">            <div class="dxrd-report-page-tile dxd-border-secondary" data-bind="css: { \'dxrd-disabled\': !$data.page() }, style: $parent.pageCss[$data.pageId]">                <div class="dxrd-report-page-tile-title" data-bind="visible: $parent.isShowPageDescription(), text: $parent.getPageDescription($index(), $data), attr: { title: $parent.getPageDescription($index(), $data) }"></div>                <!-- ko if: $data.page() !== null -->                <!-- ko with: page -->                <div class="dxrd-report-page-tile-content" data-bind="template: { name: $parent.metadata.template, data: page }, dxScrollView: { showScrollbar: \'onHover\'}"></div>                <!-- /ko -->                <!-- /ko -->                <!-- ko if: $data.page() === null -->                <div class="dxrd-report-page-tile-content dx-default-border-style dxd-border-secondary">                    <div class="dxrd-wizard-page dxrd-wizard-disabled-content" data-bind="text: metadata.disabledText"></div>                </div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
-    'dxrd-jsondatasource-fields-page': '<div class="dxrd-wizard-page dx-jsonschema-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height:100%">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: rootElementTitle"></div>                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: rootElementList, value: selectedRootElement, displayExpr: \'fullPath\', displayCustomValue: true }"></div>            </div>            <div class="dxrd-wizard-add-queries-page dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">                <div data-bind="treelist: fieldListModel" style="width:100%; height: 100%;"></div>            </div>        </div>    </div>',
-    'dxrd-page-jsonsource': '<div class="dxrd-wizard-page dx-jsonsource-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height: 100%" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: jsonConnectionTitle"></div>                <div class="dx-field-value" data-bind="dxTextBox: { value: connectionName }"></div>            </div>            <div class="dx-field">                <div class="dx-field-label" data-bind="text: jsonSourceTitle"></div>                <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { dataSource: sources, value: selectedSource, valueExpr:\'value\', displayExpr: \'displayValue\', displayCustomValue: true }"></div>            </div>            <!-- ko template: { name: \'dx-propertieseditor\', data: grid } -->            <!-- /ko -->        </div>    </div>',
-    'dxrd-page-dataSource': '<div class="dxrd-wizard-page">    <!-- ko if: isDataSourceCreationAvailable -->    <div class="dxrd-wizard-datasourceoperation" style="margin-bottom: 15px" data-bind="dxRadioGroup: { value: selectedDataSourceOperation, items: dataSourceOperations, layout: \'vertical\' }">        <div data-options="dxTemplate : { name: \'text\' }">            <div data-bind="text: $data"></div>        </div>    </div>    <!-- /ko -->    <div class="dxrd-wizard-availabledatasources dx-default-border-style dxd-border-secondary">        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: \'single\', activeStateEnabled: false, disabled: createNewDataSource, noDataText: $root.dx.Analytics.Internal.noDataText() }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: name"></div>            </div>        </div>    </div></div>',
-    'dxrd-page-selectitems': '<div class="dxrd-wizard-page">    <!-- ko if: isNewCreationAvailable -->    <div class="dxrd-wizard-datasourceoperation" style="margin-bottom: 15px" data-bind="dxRadioGroup: { value: selectedOperation, items: operations, layout: \'vertical\' }">        <div data-options="dxTemplate : { name: \'text\' }">            <div data-bind="text: $data"></div>        </div>    </div>    <!-- /ko -->    <div class="dxrd-wizard-availabledatasources dx-default-border-style dxd-border-secondary" data-bind="styleunit: { top: $data.isNewCreationAvailable() ? 65 : 0 }">        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: items, onSelectionChanged: function(e) { selectedItems(e.addedItems) }, selectedItems: selectedItems.peek(), focusStateEnabled:false, editEnabled: true, height: \'100%\', editConfig: { selectionEnabled: false }, selectionMode: \'single\', activeStateEnabled: false, disabled: createNew, noDataText: $root.dx.Analytics.Internal.noDataText() }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: $parent.displayExpr($data)"></div>            </div>        </div>    </div></div>',
-    'dx-jsonwizard-queryparameter': '<div class="dx-field">        <!-- ko with: value -->        <div class="dx-jsonwizard-parameter-left-container">            <div class="dx-jsonwizard-parameter">                <div data-bind="dxTextBox: { value: name, placeholder: \'Name\', isValid: $parent.editor.editorOptions.isValid($data.name()), validationError: $parent.editor.editorOptions.validationError }"></div>            </div>        </div>        <div class="dx-jsonwizard-parameter-right-container">            <div class="dx-jsonwizard-parameter">                <div data-bind="dxTextBox: { value: value, placeholder: \'Value\' }"></div>            </div>        </div>        <!-- /ko -->    </div>',
-    'dx-jsonwizard-loadfile-editor': '<div data-bind="dxFileImagePicker: { value: value, placeHolder: \'File\', accept:\'.json,.txt\' }"></div>',
-    'dx-jsonwizard-jsonstring-editor': '<!-- ko if: !aceAvailable -->    <div class="dxd-border-secondary dxd-back-primary2" style="height: 230px" data-bind="dxTextArea: { value: value, spellcheck: false, isValid: isValid }, dxValidator: { validationRules: jsonStringValidationRules || [] }"></div>    <!-- /ko -->    <!-- ko if: aceAvailable -->    <div class="dxd-wizard-jsoneditor dxd-border-secondary dxd-back-primary2" style="height: 230px" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }"></div>    <!-- /ko -->    <div class="dxd-upload-file">        <div class="dxd-back-primary2"></div>        <div data-bind="dxButtonWithTemplate: { onClick: uploadFile, hint: $data.getUploadTitle(), icon: \'dxrd-svg-wizard-Download\' }"></div>    </div>',
-    'dxrd-wizard-add-queries-page': '<div class="dxrd-wizard-page dxrd-wizard-add-queries-page">        <div class="dxrd-wizard-dataMember dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', height: scrollViewHeight }">            <div data-bind="treelist: fieldListModel" style="width:100%; height: 100%;"></div>        </div>        <!-- ko ifnot: $data.disableCustomSql -->        <!-- ko template: { name: \'dxqb-popup-selectStatment\', data: popupSelectStatment } -->        <!-- /ko -->        <!-- /ko -->        <!-- ko template: { name: \'dxrd-querybuilder-popup\', data: popupQueryBuilder } -->        <!-- /ko -->        <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: loadPanelViewModel($element)">        </div>    </div>',
-    'dxrd-configure-query-parameters-page': '<div class="dxrd-wizard-page dxrd-configure-query-parameters-page">        <div class="dxrd-wizard-dataMember dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', height: scrollViewHeight }">            <!-- ko if: !!$data.fieldListModel() -->            <div data-bind="treelist: fieldListModel" style="width:100%; height: 100%;"></div>            <!-- /ko -->        </div>    </div>',
-    'dxrd-wizard-configure-relations-page': '<div class="dxrd-wizard-page dxrd-wizard-configure-relations-page">        <!-- ko if: $data.relationsEditor() -->        <!-- ko template: { name: \'dxrd-masterDetail-editor-complete-wizard\', data: $data.relationsEditor }-->        <!-- /ko -->        <!-- /ko -->    </div>',
+    'dxrd-page-choose-datasource-type': '<div class="dxrd-wizard-type-page" data-bind="css: $data._extendCssClass(\'type-page\')">        <!-- ko foreach: typeItems -->        <div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">            <div data-bind="event: { click: $parent._itemClick, dblclick: function() { $parent._goToNextPage() } }, attr: { class: \'dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color \' + $parent._extendCssClass(\'type-item\')}, css: { \'dxd-state-selected dxd-border-secondary dxd-back-secondary\': $parent._IsSelected($data) } ">                <div data-bind="attr: { class: \'dxrd-wizard-type-image \' + $parent._extendCssClass(\'type-image\') }, css: imageClassName, template: imageTemplateName"> </div>                <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent._extendCssClass(\'type-text\')"></div>            </div>        </div>        <!-- /ko -->    </div>',
+    'dx-wizard-fullscreen': '<!-- ko if: $data && $data.isVisible() -->    <div class="dx-fullscreen-wizard dx-editors" data-bind="css: { \'dx-rtl\': $root.rtl, \'dx-ltr\': !$root.rtl }">        <div class="dxrd-wizard dxrd-report-wizard dx-editors dxd-text-primary dxd-back-primary2" data-bind="css: _extendCssClass">            <div class="dxrd-wizard-steps-container dxd-back-primary" data-bind="visible: $data.navigationPanel().isVisible">                <div class="dxrd-wizard-title dxd-border-primary" data-bind="text: _description()"></div>                <!-- ko with: navigationPanel -->                <div class="dxrd-wizard-steps" data-bind="foreach: _steps">                    <div class="dxrd-wizard-steps-relative" style="position:relative" data-bind="visible: $data.visible">                        <div class="dxrd-wizard-steps-content" data-bind="click: $data.clickAction, text: $data.text, attr: {\'title\': $data.text }, css: { \'dxrd-disabled\': $data.disabled, \'dxd-back-secondary\': $data.isActive() }"></div>                        <div class="dxrd-wizard-steps-marker dxd-back-primary2" data-bind="visible: $data.isActive"></div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dxrd-wizard-content" data-bind="css: { \'withoutPanel\': !$data.navigationPanel().isVisible() }">                <div class="dxrd-wizard-part-description dxd-back-contrast">                    <div class="dxrd-wizard-part-description-text dxd-text-primary dxd-border-primary" data-bind="text: _pageDescription()"></div>                </div>                <!-- ko with: _currentPage -->                <div class="dxrd-wizard-work-content">                    <div class="dxrd-wizard-work-content-relative">                        <div data-bind="template: { name: template, data: page } "></div>                    </div>                </div>                <!-- /ko -->                <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)">                </div>                <div class="dxrd-wizard-navigation">                    <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>                    <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>                </div>            </div>        </div>    </div>    <!-- /ko -->',
+    'dx-wizard-fullscreen-page': '<!-- ko if: $data._sections.length > 0 -->    <div style="position:absolute;" data-bind="foreach: _sections, styleunit: { top: _parentMarginOffset, left: _parentMarginOffset, right: _parentMarginOffset, bottom: _parentMarginOffset }">        <div class="dx-border-inheritor dxd-border-accented">            <div class="dxrd-report-page-tile dxd-border-secondary" data-bind="css: { \'dxrd-disabled\': !$data.page() }, style: $parent._pageCss[$data.pageId]">                <div class="dxrd-report-page-tile-title" data-bind="visible: $parent._showPageDescription(), text: $parent._getPageDescription($index(), $data), attr: { title: $parent._getPageDescription($index(), $data) }"></div>                <!-- ko if: $data.page() !== null -->                <!-- ko with: page -->                <div class="dxrd-report-page-tile-content" data-bind="template: { name: $parent.metadata.template, data: page }, dxScrollView: { showScrollbar: \'onHover\'}"></div>                <!-- /ko -->                <!-- /ko -->                <!-- ko if: $data.page() === null -->                <div class="dxrd-report-page-tile-content dx-default-border-style dxd-border-secondary">                    <div class="dxrd-wizard-page dxrd-wizard-disabled-content" data-bind="text: metadata.disabledText"></div>                </div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
+    'dxrd-jsondatasource-fields-page': '<div class="dxrd-wizard-page dx-jsonschema-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height:100%">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _rootElementTitle"></div>                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: _rootElementList, value: _selectedRootElement, displayExpr: \'fullPath\', displayCustomValue: true }"></div>            </div>            <div class="dxrd-wizard-add-queries-page dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">                <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>            </div>        </div>    </div>',
+    'dxrd-page-jsonsource': '<div class="dxrd-wizard-page dx-jsonsource-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height: 100%" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, dxValidationGroup: $data._validationGroup || {}">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _jsonConnectionTitle, attr: { \'title\': _jsonConnectionTitle }"></div>                <div class="dx-field-value" data-bind="dxTextBox: { value: _connectionName }, dxValidator: { validationRules: $data._connectionNameValidationRules || [] }"></div>            </div>            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _jsonSourceTitle, attr: { \'title\': _jsonSourceTitle }"></div>                <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { dataSource: _sources, value: _selectedSource, valueExpr:\'value\', displayExpr: \'displayValue\', displayCustomValue: true }"></div>            </div>            <!-- ko with: _selectedSource -->            <div data-bind="dxValidationGroup: $data.validationGroup || {}">                <div data-bind="css: $data.cssClass">                    <!-- ko template: { name: \'dx-propertieseditor\', data: grid } -->                    <!-- /ko -->                </div>                <div class="dxrd-wizard-validationsummary" data-bind="dxValidationSummary: $data.validationSummary || {}, visible: $data.validationSummary && !isValid()"></div>            </div>            <!-- /ko -->            <div class="dxrd-wizard-validationsummary" data-bind="dxValidationSummary: $data._validationSummary || {}, visible: $data._validationSummary && _selectedSource().validationSummary && !canNext()"></div>        </div>    </div>',
+    'dx-property-json-string-editor': '<div class="dx-field" data-bind="visible: visible">        <!-- ko template: templateName -->        <!-- /ko -->    </div>',
+    'dxrd-page-dataSource': '<div class="dxrd-wizard-page">    <!-- ko if: isDataSourceCreationAvailable -->    <div class="dxrd-wizard-datasourceoperation dxrd-radio-nowrap-ellipsis" style="margin-bottom: 15px" data-bind="dxRadioGroup: { value: selectedDataSourceOperation, items: dataSourceOperations, layout: \'vertical\' }">        <div data-options="dxTemplate : { name: \'item\' }">            <div class="dxrd-radio-nowrap-ellipsis-text" data-bind="text: text, attr: { \'title\': text }"></div>        </div>    </div>    <!-- /ko -->    <div class="dxrd-wizard-availabledatasources dx-default-border-style dxd-border-secondary">        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: \'single\', activeStateEnabled: false, disabled: createNewDataSource, noDataText: $root.dx.Analytics.Internal.noDataText() }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: name"></div>            </div>        </div>    </div></div>',
+    'dxrd-page-selectitems': '<div class="dxrd-wizard-page">        <!-- ko template: { name: \'dxrd-page-selectitems-radio-group\', data: $data } -->        <!-- /ko -->        <!-- ko template: { name: \'dxrd-page-selectitems-list\', data: $data } -->        <!-- /ko -->    </div>',
+    'dxrd-page-selectitems-radio-group': '<!-- ko if: canCreateNew -->    <div class="dxrd-wizard-datasourceoperation dxrd-radio-nowrap-ellipsis" style="margin-bottom: 15px" data-bind="dxRadioGroup: { value: selectedOperation, items: operations, layout: \'vertical\' }">        <div data-options="dxTemplate : { name: \'item\' }">            <div class="dxrd-radio-nowrap-ellipsis-text" data-bind="text: text, attr: { \'title\': text }"></div>        </div>    </div>    <!-- /ko -->',
+    'dxrd-page-selectitems-list': '<div class="dxrd-wizard-availabledatasources dx-default-border-style dxd-border-secondary" data-bind="styleunit: { top: $data.canCreateNew() ? 65 : 0 }">        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: items, onSelectionChanged: function(e) { selectedItems(e.addedItems) }, selectedItems: selectedItems.peek(), focusStateEnabled:false, editEnabled: true, height: \'100%\', editConfig: { selectionEnabled: false }, selectionMode: \'single\', activeStateEnabled: false, disabled: _createNew, noDataText: $root.dx.Analytics.Internal.noDataText() }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: $parent._displayExpr($data)"></div>            </div>        </div>    </div>',
+    'dxrd-page-specify-connection': '<div class="dxrd-wizard-page">    <!-- ko template: { name: \'dxrd-page-selectitems-radio-group\', data: $data } -->    <!-- /ko -->    <!-- ko if: !_createNew() -->    <!-- ko template: { name: \'dxrd-page-selectitems-list\', data: $data } -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: _createNew -->    <div style="position:relative; top: 65px; height: calc(100% - 65px)">        <!-- ko template: { name: \'dxrd-page-jsonsource\', data: _specifySourceData } -->        <!-- /ko -->    </div>    <!-- /ko --></div>',
+    'dx-jsonwizard-parametercollection': '<div class="dx-field">        <!-- ko with: value -->        <div class="dx-jsonwizard-parameter-left-container">            <div class="dx-jsonwizard-parameter">                <div data-bind="dxTextBox: { value: name, placeholder: $data.namePlaceholder() }, dxValidator: { validationRules: $parent.editor.editorOptions.nameValidationRules || [] }"></div>            </div>        </div>        <div class="dx-jsonwizard-parameter-right-container">            <div class="dx-jsonwizard-parameter">                <div data-bind="dxTextBox: { value: value, placeholder: $data.valuePlaceholder() }"></div>            </div>        </div>        <!-- /ko -->    </div>',
+    'dx-jsonwizard-loadfile-editor': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'File\', accept:\'.json,.txt\' }"></div>',
+    'dx-jsonwizard-jsonstring-editor': '<!-- ko if: !aceAvailable -->    <div class="dxrd-jsonwizard-jsonstring-editor dxd-border-secondary dxd-back-primary2" data-bind="dxTextArea: { value: value, spellcheck: false, isValid: isValid }, dxValidator: { validationRules: jsonStringValidationRules || [] }"></div>    <!-- /ko -->    <!-- ko if: aceAvailable -->    <div class="dx-texteditor dx-editor-outlined dxrd-jsonwizard-jsonstring-editor dxd-wizard-jsoneditor dxd-border-secondary dxd-back-primary2" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }, css: { \'dx-invalid\' : !!value() && !isValid() }"></div>    <!-- /ko -->    <div class="dxd-upload-file">        <div class="dxd-back-primary2"></div>        <div data-bind="dxButtonWithTemplate: { onClick: uploadFile, hint: $data.getUploadTitle(), icon: \'dxrd-svg-wizard-Download\' }"></div>    </div>',
+    'dxrd-wizard-add-queries-page': '<div class="dxrd-wizard-page dxrd-wizard-add-queries-page">        <div class="dxrd-wizard-dataMember dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', height: _scrollViewHeight }">            <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>        </div>        <!-- ko ifnot: $data.disableCustomSql -->        <!-- ko template: { name: \'dxqb-popup-selectStatment\', data: _popupSelectStatement } -->        <!-- /ko -->        <!-- /ko -->        <!-- ko template: { name: \'dxrd-querybuilder-popup\', data: _popupQueryBuilder } -->        <!-- /ko -->        <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)">        </div>    </div>',
+    'dxrd-configure-query-parameters-page': '<div class="dxrd-wizard-page dxrd-configure-query-parameters-page">        <div class="dxrd-wizard-dataMember dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', height: _scrollViewHeight }">            <!-- ko if: !!$data._fieldListModel() -->            <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>            <!-- /ko -->        </div>    </div>',
+    'dxrd-wizard-configure-relations-page': '<div class="dxrd-wizard-page dxrd-wizard-configure-relations-page">        <!-- ko if: $data._relationsEditor() -->        <!-- ko template: { name: \'dxrd-masterDetail-editor-complete-wizard\', data: $data._relationsEditor }-->        <!-- /ko -->        <!-- /ko -->    </div>',
     'dxrd-masterDetail-editor-complete-wizard': '<div class="dx-filtereditor dxrd-masterDetail-editor-complete-wizard dxd-border-secondary">        <!-- ko if: $data -->        <div class="dx-filtereditor-tree dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', direction: \'both\' }" style="cursor: default">            <!-- ko foreach: masterQueries -->            <div class="criteria-operator-group">                <div class="criteria-operator-group-item">                    <div class="criteria-operator-text dxd-filter-editor-text-color criteria-operator-item-group dxd-filter-editor-group-back-color stylized" data-bind="text: queryName"></div>                    <div data-bind="service: { name: \'createRelation\' }"></div>                </div>                <div class="criteria-operator-content">                    <!-- ko template: { name: \'dx-masterDetail-editor-relation\', foreach: relations }-->                    <!-- /ko -->                </div>            </div>            <!-- /ko -->        </div>        <div class="dx-selectbox-popup-wrapper dx-dropdownlist-popup-wrapper dx-filtereditor-criteriaoperator-popup dx-dropdowneditor-overlay" data-bind="dxPopupWithAutoHeight: { width: \'170px\', height: \'235px\', focusStateEnabled: false,        position: $root.rtl ? { my: \'right top\', at: \'right bottom\', of: popupService.target } : { my: \'left top\', at: \'left bottom\', of: popupService.target },        container: \'.dx-designer-viewport\',        target: popupService.target,        showTitle: false,        showCloseButton: false,        animation: {},        closeOnOutsideClick: true,        shading: false,        visible: popupService.visible }">            <!-- ko with: popupService-->            <!-- ko with: data -->            <!-- ko template: template-->            <!-- /ko -->            <!-- /ko -->            <!-- /ko -->        </div>        <!-- /ko -->    </div>',
     'dxqb-popup-selectStatment': '<div class="dxqb-preview" data-bind="dxPopup: {                animation: {                    show: { type: \'fade\', from: 0, to: 1, duration: 700 },                    hide: { type: \'fade\', from: 1, to: 0, duration: 700 }                },                visible: isVisible,                title: title(),                showTitle: true,                resizeEnabled: true,                shading: true,                shadingColor: \'transparent\',                fullScreen: false,                width: 800,                height: 544,                container: closest($element, \'.dxrd-wizard\'),                position: { of: closest($element, \'.dx-designer-viewport\') },                onHidden: function() { $data.data(null) },                focusStateEnabled: false            }">        <div class="dxqb-preview-popup-content">            <div class="dxqb-show-query-string-content dx-widget">                <!-- ko if: !aceAvailable -->                <div class="dxrd-show-query-string-editor" data-bind="dxTextArea: { value: data, valueChangeEvent: \'keyup\', disabled: false }"></div>                <!-- /ko -->                <!-- ko if: aceAvailable -->                <div class="dxrd-show-query-string-editor">                    <div class="dxrd-show-query-string-editor-content">                        <div class="dx-sql_editor dxd-back-primary2" data-bind="dxAceEditor: { value: data, additionalOptions: additionalOptions, options: aceOptions }"></div>                    </div>                </div>                <!-- /ko -->            </div>        </div>        <div class="dxqb-preview-popup-buttons dxd-border-secondary">            <div data-bind="dxButton: { text: okButtonText(), onClick: okButtonHandler }" class="dxqb-preview-popup-button"></div>        </div>    </div>',
     'dxrd-treelist-with-checkbox': '<div data-bind="visible: visible">        <!-- ko if: hasContent -->        <!-- ko template: "dx-treelist-accordion-item-with-checkbox" -->        <!-- /ko -->        <!-- /ko -->        <!-- ko ifnot: hasContent -->        <!-- ko template: "dx-treelist-header-item-with-checkbox" -->        <!-- /ko -->        <!-- /ko -->    </div>',
@@ -10728,16 +11028,14 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-page-configure-parameters': '<div class="dxrd-wizard-page">        <div class="dxrd-datasource-parameters" data-bind="dxCollectionEditor: parametersEditorOptions"></div>    </div>',
     'dxrd-parameter-collection-item': '<div data-bind="dxdAccordion: { collapsed: collapsed }">        <div class="dxrd-group-header dx-accordion-header dxd-text-primary" style="border-bottom: 0" data-bind="styleunit: { \'marginLeft\' : editor.padding }, css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">            <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>            <span class="dxrd-group-header-text dxd-text-primary" data-bind="text: value().name"></span>        </div>        <div class="dx-accordion-content">            <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1 }"></div>        </div>    </div>',
     'dxrd-wizard-datasource-parameters': '<div class="dx-fieldset" style="height:100%">        <div class="dx-collectioneditor" style="height:100%">            <div class="dxrd-datasource-parameters-collection">                <div class="dxrd-datasource-parameters-container dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true  }">                    <!-- ko if: values().length === 0 -->                    <div class="dx-collectioneditor-empty dxd-empty-area-placeholder-text-color dxd-text-info">                        <span class="dxrd-datasource-parameters-empty-text" data-bind="text: getDisplayTextEmptyArray()"></span>                    </div>                    <!-- /ko -->                    <!-- ko if: values().length !== 0 -->                    <div class="dx-collectioneditor-items" data-bind="foreach: values">                        <div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected" data-bind="with: $parent.createCollectionItemWrapper($parents[1], $index)">                            <div class="dx-collectioneditor-item-container dx-fontsize-reestablished dxd-list-item-back-color" data-bind="dxclick: $parents[1].select, css: { \'dxd-state-selected dxd-back-secondary\' : $parents[1].selectedIndex() === $index() }">                                <div class="dx-collection-item"></div>                            </div>                        </div>                    </div>                    <!-- /ko -->                </div>            </div>            <div class="dxrd-collectioneditor-wizard-buttons" data-bind="visible: showButtons">                <div class="dxrd-collectioneditor-action" data-bind="dxButton: { onClick: add, text: getDisplayTextButton(\'add\') }, attr: { title: getDisplayTextButton(\'add\') }"></div>                <div class="dxrd-collectioneditor-action" data-bind="dxButton: { onClick: remove, disabled: selectedIndex() === null, text: $parent.removeButtonTitle }, attr: { title: $parent.removeButtonTitle }"></div>            </div>        </div>    </div>',
-    'dxrd-page-connectionstring': '<div class="dxrd-wizard-page">        <div class="dx-wizard-connections dx-default-border-style dxd-border-secondary">            <div class="dxrd-wizard-list" data-bind="dxList: { items: connectionStrings, onSelectionChanged: function(e) { selectedConnectionString(e.addedItems) },  selectedItems: selectedConnectionString.peek(), editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: \'single\', activeStateEnabled: false, noDataText: $root.dx.Analytics.Internal.noDataText() }">                <div data-options="dxTemplate : { name: \'item\' }">                    <div data-bind="text: $data[\'description\'] || $data[\'name\']"></div>                </div>            </div>        </div>    </div>',
+    'dxrd-page-connectionstring': '<div class="dxrd-wizard-page">        <div class="dx-wizard-connections dx-default-border-style dxd-border-secondary">            <div class="dxrd-wizard-list" data-bind="dxList: { items: _connectionStrings, onSelectionChanged: function(e) { _selectedConnectionString(e.addedItems) },  selectedItems: _selectedConnectionString.peek(), editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: \'single\', activeStateEnabled: false, noDataText: $root.dx.Analytics.Internal.noDataText() }">                <div data-options="dxTemplate : { name: \'item\' }">                    <div data-bind="text: $data[\'description\'] || $data[\'name\']"></div>                </div>            </div>        </div>    </div>',
     'dxrd-select-control': '<div data-bind="text: caption()"></div>    <!-- ko if: !aceAvailable -->    <div class="dxrd-wizard-list dxrd-create-query-page-editor dx-default-border-style dxd-border-secondary" data-bind="dxTextArea: { value: sqlString, valueChangeEvent: \'keyup input blur\', readOnly: disableCustomSql() }"></div>    <!-- /ko -->    <!-- ko if: aceAvailable -->    <div class="dxrd-create-query-page-editor dxrd-create-query-page-editor-border dxd-border-secondary">        <div class="dxrd-create-query-page-editor-content">            <div class="dx-sql_editor dxd-back-primary2" data-bind="dxAceEditor: { value: sqlString, additionalOptions: additionalOptions, options: aceOptions }, css: { \'dx-disabled-ace\': disableCustomSql() }"></div>        </div>    </div>    <!-- /ko -->',
     'dxrd-procedures-control': '<div data-bind="text: caption()"></div>    <div class="dx-default-border-style dxd-border-secondary">        <div class="dxrd-wizard-list dxrd-create-query-page-editor" data-bind="dxList: { items: storedProcedures, onContentReady: scrollActiveItem, selectedItems: selectedProcedure, editEnabled: true, editConfig: { selectionEnabled: true }, selectionMode: \'single\', activeStateEnabled: false, noDataText: $root.dx.Analytics.Internal.noDataText() }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: $parent.generateStoredProcedureDisplayName($data)"></div>            </div>        </div>    </div>',
-    'dxrd-wizard-create-query-page': '<div class="dxrd-wizard-page dxrd-wizard-create-query-page">        <div data-bind="dxRadioGroup: { value: selectedQueryType, items: queryTypeItems }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: $parent.localizeQueryType($data)"></div>            </div>        </div>        <div class="dxrd-create-query-page-content">            <!-- ko template: { name: queryControl().template, data: queryControl() } -->            <!-- /ko -->        </div>        <div data-bind="dxButton: { text: runQueryBuilderBtnText, onClick: runQueryBuilder, disabled: queryControl().runQueryBuilderDisabled }" class="dxrd-wizard-btn"></div>        <!-- ko template: { name: \'dxrd-querybuilder-popup\', data: popupQueryBuilder } -->        <!-- /ko -->    </div>',
-    'dxrd-querybuilder-popup': '<div class="dxrd-querybuilder-popup" data-bind="dxPopup: popupViewModel($element)">        <!-- ko if: qbOptions -->        <div class="dxrd-querybuilder-popup-content">            <div style="height:100%;" data-bind="dxQueryBuilder: { options: qbOptions, designerModel: designer }"></div>        </div>        <div class="dxrd-querybuilder-popup-buttons dxd-border-secondary">            <div data-bind="dxButton: { text: getDisplayText(\'previewResults\'), onClick: previewHandler, disabled: okButtonDisabled }" class="dxrd-querybuilder-popup-button-left"></div>            <div data-bind="dxButton: { text: getDisplayText(\'cancel\'), onClick: cancelHandler }" class="dxrd-querybuilder-popup-button"></div>            <div data-bind="dxButton: { text: getDisplayText(\'ok\'), onClick: okHandler, disabled: okButtonDisabled }" class="dxrd-querybuilder-popup-button"></div>        </div>        <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel:{            animation: {                show: { type: \'fade\', from: 0, to: 1, duration: 700 },                hide: { type: \'fade\', from: 1, to: 0, duration: 700 }            },            deferRendering: false,            message: getDisplayText(\'loading\'),            visible: showLoadIndicator,            shading: true,            shadingColor: \'transparent\'}">        </div>        <!-- /ko -->    </div>',
+    'dxrd-wizard-create-query-page': '<div class="dxrd-wizard-page dxrd-wizard-create-query-page">        <div class="dxrd-radio-nowrap-ellipsis" data-bind="dxRadioGroup: { value: selectedQueryType, items: queryTypeItems }">            <div data-options="dxTemplate : { name: \'item\' }">                <div class="dxrd-radio-nowrap-ellipsis-text" data-bind="text: $parent.localizeQueryType($data), attr: { \'title\': $parent.localizeQueryType($data) }"></div>            </div>        </div>        <div class="dxrd-create-query-page-content">            <!-- ko template: { name: queryControl().template, data: queryControl() } -->            <!-- /ko -->        </div>        <div data-bind="dxButton: { text: runQueryBuilderBtnText, onClick: runQueryBuilder, disabled: queryControl().runQueryBuilderDisabled }" class="dxrd-wizard-btn"></div>        <!-- ko template: { name: \'dxrd-querybuilder-popup\', data: popupQueryBuilder } -->        <!-- /ko -->    </div>',
+    'dxrd-querybuilder-popup': '<div class="dxrd-querybuilder-popup" data-bind="dxPopup: popupViewModel($element)">        <!-- ko if: qbOptions -->        <!-- ko if: isVisible -->        <div class="dxrd-querybuilder-popup-content">            <div style="height:100%;" data-bind="dxQueryBuilder: { options: qbOptions, designerModel: designer }"></div>        </div>        <!-- /ko -->        <div class="dxrd-querybuilder-popup-buttons dxd-border-secondary">            <div data-bind="dxButton: { text: getDisplayText(\'previewResults\'), onClick: previewHandler, disabled: okButtonDisabled }" class="dxrd-querybuilder-popup-button-left"></div>            <div data-bind="dxButton: { text: getDisplayText(\'cancel\'), onClick: cancelHandler }" class="dxrd-querybuilder-popup-button"></div>            <div data-bind="dxButton: { text: getDisplayText(\'ok\'), onClick: okHandler, disabled: okButtonDisabled }" class="dxrd-querybuilder-popup-button"></div>        </div>        <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel:{            animation: {                show: { type: \'fade\', from: 0, to: 1, duration: 700 },                hide: { type: \'fade\', from: 1, to: 0, duration: 700 }            },            deferRendering: false,            message: getDisplayText(\'loading\'),            visible: showLoadIndicator,            shading: true,            shadingColor: \'transparent\'}">        </div>        <!-- /ko -->    </div>',
     'dxrd-querybuilder': '<div class="dx-designer dx-querybuilder" data-bind="template: \'dxrd-designer\'">    </div>',
-    'dxrd-wizard-header-custom': '<div class="dxrd-wizard-header-custom">        <div class="dxrd-span-title" data-bind="text: currentStep.title || title"></div>        <div class="dxrd-span-description" data-bind="text: currentStep.description, attr: { title: currentStep.description }"></div>    </div>',
-    'dxrd-wizard': '<!-- ko if: $data -->    <div class="dxrd-wizard dx-editors dxd-text-primary" data-bind="dxPopup: {        visible: isVisible,        title: isVisible() ? title : \'\',        showTitle: true,        fullScreen: false,        width: width,        height: height,        container: container($element),        titleTemplate: titleTemplate,        position: wizardPopupPosition($element)    }, css: extendCssClass">        <div class="dxrd-wizard-content">            <!-- ko foreach: renderedSteps -->            <div style="width: 100%; height: 100%" data-bind="visible: $parent.currentStep === $data">                <!-- ko template: { name: $data.template, data: $data } -->                <!-- /ko -->            </div>            <!-- /ko -->            <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: loadPanelViewModel($element)">            </div>        </div>        <div class="dxrd-wizard-navigation">            <!-- ko with: currentStep.actionCancel  -->            <div data-bind="dxButton: { text: text, onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn left"></div>            <!-- /ko -->            <!-- ko with: currentStep.actionFinish  -->            <div data-bind="dxButton: { text: text, onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>            <!-- /ko -->            <!-- ko with: currentStep.actionNext  -->            <div data-bind="dxButton: { text: text, onClick: handler, disabled: isDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>            <!-- /ko -->            <!-- ko with: currentStep.actionPrevious  -->            <div data-bind="dxButton: { text: text, onClick: handler, disabled: $parent.isPreviousButtonDisabled, visible: isVisible }" class="dxrd-wizard-btn right"></div>            <!-- /ko -->        </div>    </div>    <!-- /ko -->',
-    'dx-wizard-headerNew': '<div class="dxrd-wizard-header-custom">        <!-- ko with: currentPage -->        <div class="dxrd-span-title" data-bind="text: $data.title || $parent.title"></div>        <div class="dxrd-span-description" data-bind="text: description, attr: { title: description }"></div>        <!-- /ko -->    </div>',
-    'dx-wizard-newlayout': '<div class="dxrd-wizard dx-editors dxd-text-primary" data-bind="dxPopup: {        visible: isVisible,        title: isVisible() ? title : \'\',        showTitle: true,        fullScreen: false,        width: width,        height: height,        container: container($element),        titleTemplate: titleTemplate,        position: wizardPopupPosition($element)    }, css: extendCssClass">        <div class="dxrd-wizard-content">            <!-- ko with: currentPage -->            <div style="height: 100%" data-bind="template: { name: template, data: page } "></div>            <!-- /ko -->            <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: loadPanelViewModel($element)"></div>        </div>        <div class="dxrd-wizard-navigation">            <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>            <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>        </div>    </div>',
+    'dx-wizard-headerNew': '<div class="dxrd-wizard-header-custom">        <!-- ko with: _currentPage -->        <div class="dxrd-span-title" data-bind="text: $data.title || $parent.title"></div>        <div class="dxrd-span-description" data-bind="text: description, attr: { title: description }"></div>        <!-- /ko -->    </div>',
+    'dx-wizard-newlayout': '<div class="dxrd-wizard dx-editors dxd-text-primary" data-bind="dxPopup: {        visible: isVisible,        title: isVisible() ? title : \'\',        showTitle: true,        fullScreen: false,        width: width,        height: height,        container: _container($element),        titleTemplate: _titleTemplate,        position: _wizardPopupPosition($element)    }, css: _extendCssClass">        <div class="dxrd-wizard-content">            <!-- ko with: _currentPage -->            <div style="height: 100%" data-bind="template: { name: template, data: page } "></div>            <!-- /ko -->            <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)"></div>        </div>        <div class="dxrd-wizard-navigation">            <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>            <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>        </div>    </div>',
 });
 
 if(window["ace"]) {

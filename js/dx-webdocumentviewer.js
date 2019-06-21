@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 19.1.3
-* Build date: 2019-05-24
+* Version: 19.1.4
+* Build date: 2019-06-18
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -164,6 +164,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-svg-pictureeditor-toolbar_brush_options': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .BrushColor{fill:#000000;} .st0{opacity:0.75;}</style><g><path class="BrushColor" d="M2 21c8.5 8.6 11.8-4.5 19 0-8.4-8.6-11.8 4.6-19 0z"/><path class="White" d="M8 13l2 2c-2.5 4.2-4 4-8 4 2.5-2.5 3.3-6 6-6zm6-1l6.5-6.5c.3-.3.3-.7 0-1l-2-2c-.3-.3-.7-.3-1 0L11 9l3 3zm-5-1c-.3.3-.3.7 0 1l2 2c.3.3.7.3 1 0l1-1-3-3-1 1z"/></g></svg>',
     'dxrd-svg-pictureeditor-toolbar_clear': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><path class="White" d="M14.2 12l5.5-5.5c.3-.3.3-.8 0-1.1l-1.1-1.1c-.3-.3-.8-.3-1.1 0L12 9.8 6.5 4.2c-.3-.3-.8-.3-1.1 0L4.2 5.4c-.3.3-.3.8 0 1.1L9.8 12l-5.5 5.5c-.3.3-.3.8 0 1.1l1.1 1.1c.3.3.8.3 1.1 0l5.5-5.5 5.5 5.5c.3.3.8.3 1.1 0l1.1-1.1c.3-.3.3-.8 0-1.1L14.2 12z"/></svg>',
     'dxrd-svg-pictureeditor-toolbar_open': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><g><path class="st0 White" d="M7.9 11.9c.4-.6 1-.9 1.7-.9H19V8.7c0-.4-.3-.7-.7-.7H10V5.7c0-.4-.3-.7-.7-.7H3.7c-.4 0-.7.3-.7.7v14l4.9-7.8z"/><path class="White" d="M9.6 12h13.2c.5 0 .9.6.6 1.1l-4 6.5c-.2.3-.5.5-.8.5H4l4.7-7.5c.2-.4.5-.6.9-.6z"/></g></svg>',
+    'dxrd-svg-pictureeditor-toolbar_reset': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;}</style><path class="White" d="M12 3C9.5 3 7.3 4 5.6 5.6L3 3v8h8L7.8 7.8C8.9 6.7 10.3 6 12 6c3.3 0 6 2.7 6 6s-2.7 6-6 6c-2.6 0-4.8-1.7-5.6-4H3.2c.9 4 4.5 7 8.8 7 5 0 9-4 9-9s-4-9-9-9z"/></svg>',
     'dxrd-svg-pictureeditor-toolbar_size_mode_and_alignment': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><path class="White" d="M20 12V4h-8l3 3-8 8-3-3v8h8l-3-3 8-8z"/></svg>',
     'dxrd-svg-portrait': '<svg data-bind="svgAttrs" viewBox="0 0 34 34"><style>.st0{opacity:0.5;}</style><g><path class="dxd-icon-fill" d="M29 0H5c-.5 0-1 .5-1 1v32c0 .5.5 1 1 1h24c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1zm-1 32H6V2h22v30z"/><path class="st0 dxd-icon-fill" d="M24 8H10V6h14v2zm0 2H10v2h14v-2zm0 4H10v2h14v-2zm0 4H10v2h14v-2zm0 4H10v2h14v-2zm0 4H10v2h14v-2z"/></g></svg>',
     'dxrd-svg-preview-export-Export': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><path class="dxd-icon-fill" d="M22 10l-4-4v2h-1.4C11.8 8 8 11.1 8 15.9V18c1-4.2 4.6-6 8.6-6H18v2l4-4z"/><path class="dxd-icon-fill" d="M18 22H4V2h14l2 2V0H2v24h18v-8l-2 2z"/></svg>',
@@ -2070,6 +2071,7 @@ var DevExpress;
                                     return Math.round((val || reportPreview.zoom.peek()) * 100) + '%';
                                 }
                             },
+                            onCustomItemCreating: function (e) { e.customItem = DevExpress.Analytics.Internal.parseZoom(e.text); },
                             zoom: reportPreview.zoom,
                             zoomLevels: reportPreview.predefinedZoomLevels,
                             zoomItems: ko.pureComputed(function () {
@@ -4271,7 +4273,7 @@ var DevExpress;
                         this._$button = $("<div />").addClass(EDITOR_BUTTON_CLASS);
                         this._attachButtonEvents(direction);
                         this._$buttonIcon = $("<div />").addClass(EDITOR_BUTTON_ICON_CLASS + direction.toLowerCase())
-                            .append(ko.utils.parseHtmlFragment(DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.templates[direction.toLowerCase() === "up" ? EDITOR_BUTTON_ICON_UP_TEMPLATE : EDITOR_BUTTON_ICON_DOWN_TEMPLATE]))
+                            .append(DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.templates[direction.toLowerCase() === "up" ? EDITOR_BUTTON_ICON_UP_TEMPLATE : EDITOR_BUTTON_ICON_DOWN_TEMPLATE])
                             .appendTo(this._$button);
                         ko.applyBindingsToDescendants(this._koContext, this._$buttonIcon[0]);
                         var buttonsContainer = _super.prototype._buttonsContainer.call(this);
@@ -4402,12 +4404,9 @@ var DevExpress;
                                 _this._setSelectedPathByNavigationNode(reportPreview.documentMap().nodes, brickNavigation);
                         };
                         this.documentMapOptions = ko.pureComputed(function () {
-                            var rootNodeSubscribtion = treeListController.selectedItem.subscribe(function (item) {
-                                item.path === "0" && item.collapsed() && item.toggleCollapsed();
-                                rootNodeSubscribtion.dispose();
-                            });
                             return {
                                 itemsProvider: new DocumentMapItemsProvider(reportPreview.documentMap()),
+                                expandRootItems: true,
                                 selectedPath: _this._selectedPath,
                                 treeListController: treeListController
                             };
@@ -4770,16 +4769,18 @@ var DevExpress;
                             DevExpress["events"].off(element, 'dxpointermove', this._pointerMoveHandler);
                             DevExpress["events"].off(element, 'dxpointerleave', this._pointerLeaveHandler);
                         };
-                        Painter.prototype._cleanCanvas = function () {
-                            this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
-                        };
                         Painter.prototype._setCanvasSize = function (width, height) {
                             this._context.canvas.setAttribute('width', width);
                             this._context.canvas.setAttribute('height', height);
                         };
+                        Painter.prototype.clear = function (applyValue) {
+                            if (applyValue === void 0) { applyValue = false; }
+                            this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
+                            applyValue && this.image(null);
+                        };
                         Painter.prototype.refresh = function () {
                             var _this = this;
-                            this._cleanCanvas();
+                            this.clear();
                             var zoom = this.signaturePainter.hasPoints() ? 1 : this.zoom();
                             var size = this.signaturePainter.hasPoints() ? this.initialSize : undefined;
                             this.imagePainter.refresh(this._context, zoom, size)
@@ -4900,6 +4901,7 @@ var DevExpress;
                         PictureEditorActionId[PictureEditorActionId["Alignment"] = 2] = "Alignment";
                         PictureEditorActionId[PictureEditorActionId["Brush"] = 3] = "Brush";
                         PictureEditorActionId[PictureEditorActionId["Clear"] = 4] = "Clear";
+                        PictureEditorActionId[PictureEditorActionId["ClearAll"] = 5] = "ClearAll";
                     })(PictureEditorActionId = Internal.PictureEditorActionId || (Internal.PictureEditorActionId = {}));
                     var PictureEditorActionProvider = (function (_super) {
                         __extends(PictureEditorActionProvider, _super);
@@ -4951,7 +4953,7 @@ var DevExpress;
                             var openFileActionOptions = {
                                 id: PictureEditorActionId.OpenFile,
                                 icon: "dxrd-svg-pictureeditor-toolbar_open",
-                                title: DevExpress.Analytics.Utils.getLocalization("Load Image"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Load Image", "TODO"),
                                 template: "dx-file-dialog",
                                 isActive: ko.observable(false),
                                 action: function (e) { return action(e); }
@@ -5003,7 +5005,7 @@ var DevExpress;
                             return new PictureEditorToolbarItemWithPopup({
                                 id: PictureEditorActionId.PickImage,
                                 icon: "dxrd-svg-pictureeditor-image_gallery",
-                                title: DevExpress.Analytics.Utils.getLocalization("Choose Image"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Choose Image", "TODO"),
                                 isActive: active,
                                 template: "dx-picture-editing-toolbar-popup",
                                 templateOptions: popupOptions
@@ -5028,7 +5030,7 @@ var DevExpress;
                             return new PictureEditorToolbarItemWithPopup({
                                 id: PictureEditorActionId.Alignment,
                                 icon: "dxrd-svg-pictureeditor-toolbar_size_mode_and_alignment",
-                                title: DevExpress.Analytics.Utils.getLocalization("Size Mode and Alignment"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Size Mode and Alignment", "TODO"),
                                 isActive: alignmentActive,
                                 template: "dx-picture-editing-toolbar-popup",
                                 templateOptions: popupOptions
@@ -5045,14 +5047,14 @@ var DevExpress;
                                     lineWidth: this._editorModel.painter.lineWidth,
                                     lineColor: this._editorModel.painter.lineColor,
                                     colors: this._getColorValues(),
-                                    brushWidthText: DevExpress.Analytics.Utils.getLocalization("Brush size"),
-                                    brushColorText: DevExpress.Analytics.Utils.getLocalization("Brush color"),
+                                    brushWidthText: DevExpress.Analytics.Utils.getLocalization("Brush size", "TODO"),
+                                    brushColorText: DevExpress.Analytics.Utils.getLocalization("Brush color", "TODO"),
                                 }
                             });
                             return new PictureEditorToolbarItemWithPopup({
                                 id: PictureEditorActionId.Brush,
                                 icon: "dxrd-svg-pictureeditor-toolbar_brush_options",
-                                title: DevExpress.Analytics.Utils.getLocalization("Brush Options"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Brush Options", "TODO"),
                                 isActive: brushItemActive,
                                 template: "dx-picture-editing-toolbar-popup",
                                 templateOptions: popupOptions,
@@ -5067,11 +5069,11 @@ var DevExpress;
                                 }
                             });
                         };
-                        PictureEditorActionProvider.prototype.createClearItem = function (action) {
+                        PictureEditorActionProvider.prototype.createResetItem = function (action) {
                             var clearItemOptions = {
                                 id: PictureEditorActionId.Clear,
                                 icon: "dxrd-svg-pictureeditor-toolbar_clear",
-                                title: DevExpress.Analytics.Utils.getLocalization("Clear Changes"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Reset Changes", "TODO"),
                                 isActive: ko.observable(false),
                                 action: function (e) { return action(); }
                             };
@@ -5157,7 +5159,7 @@ var DevExpress;
                             if (this.editMode == PictureEditMode.Signature || this.editMode == PictureEditMode.ImageAndSignature) {
                                 this.actions.push(this.actionsProvider.createBrushAction());
                             }
-                            this.actions.push(this.actionsProvider.createClearItem(function () {
+                            this.actions.push(this.actionsProvider.createResetItem(function () {
                                 _this.painter.reset(_this._initialImage, _this._initialAlignment, _this._initialSizeMode);
                             }));
                             customizeActionsCallback && customizeActionsCallback(this, this.actions);
@@ -5278,7 +5280,7 @@ var DevExpress;
                 Widgets.editorTemplates = {
                     multiValue: {
                         header: "dxrd-multivalue", extendedOptions: {
-                            placeHolder: function () { return DevExpress.Analytics.Internal.selectPlaceholder(); },
+                            placeholder: function () { return DevExpress.Analytics.Internal.selectPlaceholder(); },
                             onMultiTagPreparing: function (args) {
                                 var selectedItemsLength = args.selectedItems.length, totalCount = args.model.items.length;
                                 if (selectedItemsLength === totalCount) {
@@ -8434,6 +8436,9 @@ var DevExpress;
                 JSReportViewer.prototype.previewExists = function () {
                     return this.previewModel && this.previewModel.reportPreview;
                 };
+                JSReportViewer.prototype.GetReportPreview = function () {
+                    return this.previewExists();
+                };
                 JSReportViewer.prototype.GetPreviewModel = function () {
                     return this.previewModel;
                 };
@@ -8782,6 +8787,7 @@ DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Repo
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.excludeModesForMergedDocuments", "Reporting.Viewer.Export.Metadata.excludeModesForMergedDocuments");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Designer.Report.excludeDifferentFilesMode", "Reporting.Viewer.Export.Metadata.excludeDifferentFilesMode");
 DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
+    'dxrd-checkboxcustomglyph': '<div class="dxrd-checkbox-custom-glyph" data-bind="style: $data.customGlyphStyleCss"></div>',
     'dxrp-mobile-editing-field-image': '<div class="dxrp-editing-field-container" data-bind="style: containerStyle() ">        <div data-bind="dxclick: activateEditor, css: parentPopupClass">            <div class="dxrp-editing-field-popup-container-cloned" data-bind="dxPainter: $data.getPainter()"></div>            <!-- ko template: { name: \'dx-picture-editing-mobile\', data: $data.getPopupData() } -->            <!-- /ko -->        </div>    </div>',
     'dx-picture-editing-mobile': '<div class="dx-picture-edit-popup-content dx-picture-edit-popup-content-fullscreen" data-bind="dxPopup: {            width: contentData.containerStyle().width,            height: contentData.containerStyle().height,            position: { boundary: getContainer(), of: getPositionTarget($element) },            container: getContainer(),            showTitle: false,            target: getContainer(),            deferRendering: false,            closeOnOutsideClick: true,            showCloseButton: false,            onContentReady: onContentReady,            onHiding: onHiding,            onShown: onShown,            shading: false,            animation: { show: {}, hide: { type: \'fade\', duration: 100, to: { opacity: 0 }, from: { opacity: 1 } }},            visible: isVisible($element) }">        <!-- ko if: showContent -->        <!-- ko template: { name: contentTemplate, data: contentData, afterRender: $data.renderedHandler } -->        <!--/ko-->        <!--/ko-->    </div>',
     'dxrd-preview-page-mobile': '<div class="dxrdp-content" data-bind="dxclick: clickToBrick, styleunit: { width: width, height: height }, autoFit: { autoFitBy: $root.reportPreview.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, alwaysRecalculate: true, previewSize: $root.reportPreview.previewSize, brickLoading: brickLoading, skipIfInvisible: true }">        <div class="dxrdp-loading-wrapper" data-bind="styleunit: { width: width, height: height, lineHeight: height }, style: { \'background-color\': color }, visible: pageLoading, text: loadingText">        </div>        <img style="width:100%; height:100%;" data-bind="attr: { src: displayImageSrc }, style:{ \'background-color\': color }" />        <div class="dxrdp-active-border" data-bind="css: { \'dxrdp-active\': active() && $parents[1].blocks().length > 1 }, visible: !$root.slideOptions.readerMode"></div>        <!-- ko foreach: activeBricks -->        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko if: !brickLoading() && $data.editingFields-->        <!-- ko foreach: editingFields -->        <!-- ko template: template -->        <!--/ko-->        <!--/ko-->        <!--/ko-->    </div>',
@@ -8809,7 +8815,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-page-brick': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->        <!-- ko foreach: ($data.bricks || []) -->        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->        <!--/ko-->        <!--/ko-->    </div>',
     'dxrd-page-brick-clickable': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->    </div>',
     'dxrd-preview-page': '<div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, \'brick-selection-prog\': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">        <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { \'width\': width() + 2, \'height\': height() + 2 }, visible: pageLoading">            <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { \'paddingTop\': height() / 2.3 }">                <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>            </div>        </div>        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="attr: { src: displayImageSrc }" />        <!-- ko foreach: activeBricks -->        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko foreach: clickableBricks -->        <!-- ko template: { name: "dxrd-page-brick-clickable", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko if: !brickLoading() && $data.editingFields-->        <!-- ko foreach: editingFields -->        <!-- ko template: template -->        <!--/ko-->        <!--/ko-->        <!--/ko-->    </div>',
-    'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true }"></div>    </div>',
+    'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating }"></div>    </div>',
     'dxrd-preview-toolbar-scrollable': '<div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: \'onHover\', direction: \'horizontal\', useNative: false, scrollByThumb: true }">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }, keyDownActions: actionLists"></div>    </div>',
     'dxrd-preview-search': '<div class="dxrd-preview-search-wrapper" data-bind="visible: active() && visible()">        <!-- ko with: model -->        <div class="dxrd-preview-search-tab-header">            <span class="dxrd-preview-search-tab-header-text dxd-text-primary" data-bind="text: $root.getLocalization(\'Search\', \'ASPxReportsStringId.SearchDialog_Header\')"></span>            <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: $data } "></div>            <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: $root.getLocalization(\'Match case\', \'ASPxReportsStringId.SearchDialog_Case\')}"></div>            <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: $root.getLocalization(\'Match whole word only\', \'ASPxReportsStringId.SearchDialog_WholeWord\')}"></div>        </div>        <div class="dxrd-preview-search-result-header dxd-border-primary">            <div class="dxrd-preview-search-result-header-text" data-bind="text: $root.getLocalization(\'Search result\', \'ASPxReportsStringId.WebDocumentViewer_SearchResultText\')"></div>        </div>        <div class="dxrd-preview-search-result" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">            <!-- ko foreach: searchResult -->            <div class="dxrd-preview-search-result-item dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function() { $parent.goToResult($data); }">                <div class="dxrd-preview-search-tab-item-text propertygrid-editor-displayName dxd-text-primary" data-bind="text: text"></div>                <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Reporting.Viewer.Internal.formatSearchResult($data)"></div>            </div>            <!-- /ko -->            <div class="dxrd-preview-search-result dxrdp-search-loading" data-bind="visible: loading">                <div data-bind="dxLoadIndicator: { height: \'30px\', width: \'30px\' }"></div>            </div>        </div>        <!-- /ko -->    </div>',
     'dxrd-preview-progress-bar': '<div class="dxrd-preview-progress dxd-popup-back-color dxd-back-primary2 dxd-border-primary" data-bind="visible: visible">        <div class="dxrd-preview-progress-text dxd-text-primary" data-bind="text : text"></div>        <div class="dxrd-preview-progress-bar dxd-back-primary">            <div class="dxrd-preview-progress-value dxd-preview-progress-bar-value-color dxd-back-accented" data-bind="style : { width: progress()  + \'%\' }"></div>        </div>        <div class="dxrd-preview-progress-cancel dxd-hyperlink-color dxd-border-accented dxd-text-accented" data-bind="text: cancelText, dxclick: function() { $data.stop && stop(); }"></div>    </div>',
