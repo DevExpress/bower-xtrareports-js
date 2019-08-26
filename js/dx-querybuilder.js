@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 19.1.4
-* Build date: 2019-06-17
+* Version: 19.1.5
+* Build date: 2019-07-29
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2460,7 +2460,7 @@ var DevExpress;
                 }
                 WizardPageBase.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
-                    this._onChange = null;
+                    this._onChange = function () { return void 0; };
                 };
                 WizardPageBase.prototype.commit = function () {
                     return $.Deferred().resolve().promise();
@@ -2489,6 +2489,7 @@ var DevExpress;
                     _this.template = template;
                     _this.description = description;
                     _this._isInitialized = false;
+                    _this._initDef = null;
                     _this.isChanged = true;
                     if (page.onChange) {
                         _this.onChange = function (callback) { return page.onChange(callback); };
@@ -2499,6 +2500,8 @@ var DevExpress;
                     this.onChange = null;
                     this[BaseWizard.__loadingStateFunctionName] = null;
                     this.page.dispose();
+                    this._initDef && this._initDef.reject();
+                    this._initDef = null;
                 };
                 _WrappedWizardPage.prototype.resetCommitedState = function () {
                     this._lastCommitedState = null;
@@ -2513,13 +2516,21 @@ var DevExpress;
                 _WrappedWizardPage.prototype.initialize = function (state, force) {
                     var _this = this;
                     if (force === void 0) { force = false; }
+                    this._initDef && this._initDef.reject();
+                    this._initDef = $.Deferred();
                     if (!this._isInitialized || force) {
                         this._isInitialized = true;
-                        return this.page.initialize(state).fail(function () {
+                        this.page.initialize(state).fail(function () {
                             _this._isInitialized = false;
+                            _this._initDef && _this._initDef.reject();
+                        }).done(function (result) {
+                            _this._initDef && _this._initDef.resolve(result);
                         });
                     }
-                    return $.Deferred().resolve().promise();
+                    else {
+                        this._initDef.resolve();
+                    }
+                    return this._initDef.promise();
                 };
                 return _WrappedWizardPage;
             }(Analytics.Utils.Disposable));
@@ -2590,8 +2601,8 @@ var DevExpress;
                     getState: function (state) {
                         return state;
                     },
-                    resetState: function (state) {
-                        state.dataSourceType = DataSourceType.Sql;
+                    resetState: function (state, defaultState) {
+                        state.dataSourceType = defaultState.dataSourceType;
                     },
                     create: function () {
                         return new ChooseDataSourceTypePage(dataSourceTypeOptions);
@@ -2651,8 +2662,8 @@ var DevExpress;
                     getState: function (state) {
                         return state.sqlDataSourceWizard;
                     },
-                    resetState: function (state) {
-                        state.name = undefined;
+                    resetState: function (state, defaultState) {
+                        state.name = defaultState.name;
                     },
                     template: "dxrd-page-connectionstring",
                     description: Analytics.Utils.getLocalization("Choose a data connection", "AnalyticsCoreStringId.SqlDSWizard_PageChooseConnection")
@@ -2746,7 +2757,9 @@ var DevExpress;
                     description: Analytics.Utils.getLocalization("Do you want to use an existing data connection?", "AnalyticsCoreStringId.JsonDSWizard_ChooseConnection_Description"),
                     getState: function (state) { return state.jsonDataSourceWizard; },
                     setState: function (data, state) { return state.connectionName = data.connectionName; },
-                    resetState: function (state) { return delete state.connectionName; },
+                    resetState: function (state, defaultState) {
+                        state.connectionName = defaultState.connectionName;
+                    },
                     template: "dxrd-page-selectitems"
                 });
             }
@@ -2804,10 +2817,10 @@ var DevExpress;
                         state.jsonSource = data.jsonSource;
                         state.newConnectionName = data.newConnectionName;
                     },
-                    resetState: function (state) {
-                        delete state.connectionName;
-                        state.jsonSource = "";
-                        delete state.newConnectionName;
+                    resetState: function (state, defaultState) {
+                        state.connectionName = defaultState.connectionName;
+                        state.jsonSource = defaultState.jsonSource;
+                        state.newConnectionName = defaultState.newConnectionName;
                     },
                     template: "dxrd-page-specify-connection"
                 });
@@ -2851,11 +2864,16 @@ var DevExpress;
                             if (selectedSource() === newVal)
                                 return;
                             selectedSource(newVal);
+                            newVal._validatorsReady && newVal._validatorsReady(false);
+                            setTimeout(function () {
+                                newVal._validate && newVal._validate();
+                            }, 1);
+                            _this._onChange();
                         }
                     });
                     _this._selectedSource(_this._sources[0].value);
-                    _this._disposables.push(_this._connectionName.subscribe(function () { return _this._onChange(); }));
                     _this._disposables.push(_this._selectedSource);
+                    _this._disposables.push(_this._connectionName.subscribe(function () { return _this._onChange(); }));
                     return _this;
                 }
                 ChooseJsonSourcePage.prototype._onValidationGroupInitialized = function (e) {
@@ -2914,8 +2932,8 @@ var DevExpress;
                     getState: function (state) {
                         return state.jsonDataSourceWizard;
                     },
-                    resetState: function (state) {
-                        state.jsonSource = "";
+                    resetState: function (state, defaultState) {
+                        state.jsonSource = defaultState.jsonSource;
                     },
                     create: function () {
                         return new ChooseJsonSourcePage();
@@ -2927,8 +2945,10 @@ var DevExpress;
             Wizard._registerChooseJsonSourcePage = _registerChooseJsonSourcePage;
             var ChooseJsonSchemaPage = (function (_super) {
                 __extends(ChooseJsonSchemaPage, _super);
-                function ChooseJsonSchemaPage() {
+                function ChooseJsonSchemaPage(_requestWrapper) {
+                    if (_requestWrapper === void 0) { _requestWrapper = new QueryBuilder.Utils.RequestWrapper(); }
                     var _this = _super.call(this) || this;
+                    _this._requestWrapper = _requestWrapper;
                     _this._rootItems = ko.observableArray([]);
                     _this._fieldListItemsProvider = ko.observable(null);
                     _this._fieldSelectedPath = ko.observable(null);
@@ -2986,6 +3006,10 @@ var DevExpress;
                     this._rootElementList([]);
                     this._selectedRootElement(null);
                     this._dataSource && this._dataSource.jsonSchemaProvider.reset();
+                    this._cachedState = {
+                        connectionName: null,
+                        jsonSource: null
+                    };
                 };
                 ChooseJsonSchemaPage.prototype._createFieldListCallback = function () {
                     var _this = this;
@@ -3046,20 +3070,25 @@ var DevExpress;
                         connectionName: state.connectionName,
                         jsonSource: state.jsonSource
                     };
-                    this._dataSource = Wizard._restoreJsonDataSourceFromState(state);
-                    return this._dataSource.getSchema()
-                        .done(function (jsonSchema) {
-                        var rootElementList = jsonSchema.getRootElementPartList();
-                        if (_this._rootElementList() !== rootElementList) {
-                            _this._rootElementList(rootElementList);
-                        }
-                        if (_this._dataSource.rootElement()) {
-                            var dataSourceRootElementPath = ["root", _this._dataSource.rootElement()].join('.');
-                            var rootElementToSelect = _this._rootElementList().filter(function (item) { return item.fullPath === dataSourceRootElementPath; })[0] || _this._rootElementList()[0];
-                            _this._selectedRootElement(rootElementToSelect);
-                        }
-                        _this._onChange();
-                    });
+                    var oldDataSourceId = this._dataSource && this._dataSource.id;
+                    this._dataSource = Wizard._restoreJsonDataSourceFromState(state, this._requestWrapper);
+                    if ((oldDataSourceId && oldDataSourceId != this._dataSource.id) || !this._dataSource.schema.nodes.length) {
+                        return this._dataSource.getSchema()
+                            .done(function (schema) { return _this.updatePage(schema); });
+                    }
+                    return $.Deferred().done(function (schema) { return _this.updatePage(schema); }).resolve(this._dataSource.schema).promise();
+                };
+                ChooseJsonSchemaPage.prototype.updatePage = function (jsonSchema) {
+                    var rootElementList = jsonSchema.getRootElementPartList();
+                    if (this._rootElementList() !== rootElementList) {
+                        this._rootElementList(rootElementList);
+                    }
+                    if (this._dataSource.rootElement()) {
+                        var dataSourceRootElementPath = ["root", this._dataSource.rootElement()].join('.');
+                        var rootElementToSelect = this._rootElementList().filter(function (item) { return item.fullPath === dataSourceRootElementPath; })[0] || this._rootElementList()[0];
+                        this._selectedRootElement(rootElementToSelect);
+                    }
+                    this._onChange();
                 };
                 ChooseJsonSchemaPage.prototype._resetSelectionRecursive = function (currentNode, selectedRootElement) {
                     var _this = this;
@@ -3117,7 +3146,7 @@ var DevExpress;
                 return ChooseJsonSchemaPage;
             }(WizardPageBase));
             Wizard.ChooseJsonSchemaPage = ChooseJsonSchemaPage;
-            function _registerChooseJsonSchemaPage(factory) {
+            function _registerChooseJsonSchemaPage(factory, requestWrapper) {
                 factory.registerMetadata(Wizard.JsonDataSourceWizardPageId.ChooseJsonSchemaPage, {
                     setState: function (data, state) {
                         state.dataSourceName = data.dataSourceName;
@@ -3127,13 +3156,13 @@ var DevExpress;
                     getState: function (state) {
                         return state.jsonDataSourceWizard;
                     },
-                    resetState: function (state) {
-                        delete state.dataSourceName;
-                        delete state.jsonScheme;
-                        delete state.rootElement;
+                    resetState: function (state, defaultState) {
+                        state.dataSourceName = defaultState.dataSourceName;
+                        state.jsonScheme = defaultState.jsonScheme;
+                        state.rootElement = defaultState.rootElement;
                     },
                     create: function () {
-                        return new ChooseJsonSchemaPage();
+                        return new ChooseJsonSchemaPage(requestWrapper);
                     },
                     description: Analytics.Utils.getLocalization('Select data fields.', 'DataAccessUIStringId.WizardPageChooseJsonSchema'),
                     template: "dxrd-jsondatasource-fields-page"
@@ -3286,9 +3315,9 @@ var DevExpress;
                     getState: function (state) {
                         return state.sqlDataSourceWizard;
                     },
-                    resetState: function (state) {
-                        delete state.sqlDataSourceJSON;
-                        delete state.queryName;
+                    resetState: function (state, defaultState) {
+                        state.sqlDataSourceJSON = defaultState.sqlDataSourceJSON;
+                        state.queryName = defaultState.queryName;
                     },
                     template: "dxrd-wizard-create-query-page",
                     description: DevExpress.Analytics.Utils.getLocalization("Create a query or select a stored procedure", DevExpress.Analytics.Internal.StringId.WizardPageConfigureQuery)
@@ -3716,9 +3745,9 @@ var DevExpress;
                     getState: function (state) {
                         return state.sqlDataSourceWizard;
                     },
-                    resetState: function (state) {
-                        delete state.sqlDataSourceJSON;
-                        delete state.customQueries;
+                    resetState: function (state, defaultState) {
+                        state.sqlDataSourceJSON = defaultState.sqlDataSourceJSON;
+                        state.customQueries = defaultState.customQueries;
                     },
                     description: Analytics.Utils.getLocalization("Columns selected from specific tables and/or views will be automatically included into a separate query.", "AnalyticsCoreStringId.SqlDSWizard_PageConfigureMultiQuery"),
                     template: "dxrd-wizard-add-queries-page"
@@ -3993,8 +4022,8 @@ var DevExpress;
                     getState: function (state) {
                         return state.sqlDataSourceWizard;
                     },
-                    resetState: function (state) {
-                        delete state.relations;
+                    resetState: function (state, defaultState) {
+                        state.relations = defaultState.relations;
                     },
                     description: Analytics.Utils.getLocalization("Configure master-detail relationships.", "AnalyticsCoreStringId.SqlDSWizard_PageConfigureMasterDetailRelations"),
                     template: "dxrd-wizard-configure-relations-page"
@@ -4028,15 +4057,21 @@ var DevExpress;
                 function StateManager(globalState, pageFactory) {
                     this.globalState = globalState;
                     this.pageFactory = pageFactory;
+                    this.defaultState = Analytics.Internal.extend(true, {}, globalState);
                 }
+                StateManager.prototype._getPageState = function (pageId, state) {
+                    if (state === void 0) { state = this.globalState; }
+                    return this.pageFactory.getMetadata(pageId).getState(state);
+                };
                 StateManager.prototype.setPageState = function (pageId, data) {
                     this.pageFactory.getMetadata(pageId).setState(data, this.getPageState(pageId));
                 };
                 StateManager.prototype.getPageState = function (pageId) {
-                    return this.pageFactory.getMetadata(pageId).getState(this.globalState);
+                    return this._getPageState(pageId);
                 };
                 StateManager.prototype.resetPageState = function (pageId) {
-                    this.pageFactory.getMetadata(pageId).resetState(this.getPageState(pageId));
+                    var defaultState = Analytics.Internal.extend(true, {}, this._getPageState(pageId, this.defaultState));
+                    this.pageFactory.getMetadata(pageId).resetState(this.getPageState(pageId), defaultState);
                 };
                 StateManager.prototype.getCurrentState = function () {
                     return this.globalState;
@@ -4073,6 +4108,9 @@ var DevExpress;
                         }
                     }
                 };
+                PageIterator.prototype._nextPage = function () {
+                    return this._pages[this._currentIndex + 1];
+                };
                 PageIterator.prototype._getNextExistingPage = function () {
                     this._currentIndex += 1;
                     var deferred = $.Deferred();
@@ -4101,7 +4139,7 @@ var DevExpress;
                 };
                 PageIterator.prototype._getNextPage = function () {
                     var currentPage = this._getCurrentPage();
-                    if (currentPage.isChanged) {
+                    if (currentPage.isChanged || !this._nextPage()) {
                         var nextPageId = this.getNextPageId(this._getCurrentPage().pageId);
                         if (!nextPageId)
                             return $.Deferred().reject().promise();
@@ -4185,10 +4223,17 @@ var DevExpress;
                         this.isLoading(false);
                     }
                 };
+                BaseWizard.prototype._callBeforeFinishHandler = function (state, wizardModel) {
+                    this.events.call("beforeFinish", { state: state });
+                };
+                BaseWizard.prototype._callAfterFinishHandler = function (state, result) {
+                    this.events.call("afterFinish", { state: state });
+                };
                 BaseWizard.prototype.onFinish = function () {
                     this.iterator.dispose();
                 };
                 BaseWizard.prototype.initialize = function (state, createIterator) {
+                    if (state === void 0) { state = {}; }
                     if (createIterator === void 0) { createIterator = function (pageFactory, stateManager) { return new PageIterator(pageFactory, stateManager); }; }
                     this.events.call("beforeInitialize", { wizard: this, state: state });
                     this.stateManager = new StateManager(state, this.pageFactory);
@@ -4199,10 +4244,10 @@ var DevExpress;
                     return this._currentPage() && this._currentPage().pageId == this.iterator.getNextPageId();
                 };
                 BaseWizard.prototype.canNext = function () {
-                    return this._currentPage() && this.pageFactory.getMetadata(this._currentPage().pageId).canNext(this._currentPage().page);
+                    return !this.isLoading() && this._currentPage() && this.pageFactory.getMetadata(this._currentPage().pageId).canNext(this._currentPage().page);
                 };
                 BaseWizard.prototype.canFinish = function () {
-                    return this._currentPage() && this.pageFactory.getMetadata(this._currentPage().pageId).canFinish(this._currentPage().page);
+                    return !this.isLoading() && this._currentPage() && this.pageFactory.getMetadata(this._currentPage().pageId).canFinish(this._currentPage().page);
                 };
                 BaseWizard.prototype._initPage = function (page) {
                     this.events.call("beforePageInitialize", Internal._createBeforeInitializePageEventArgs(page, this));
@@ -4231,6 +4276,10 @@ var DevExpress;
                         return;
                     var currentPage = this.iterator._getCurrentPage();
                     this._loadingState(true);
+                    var revertPreviosPage = function () { return _this.iterator._getPreviousPage().always(function () {
+                        _this.iterator._resetPages();
+                        _this._loadingState(false);
+                    }); };
                     currentPage.commit().done(function (result) {
                         if (currentPage.isChanged)
                             _this.stateManager.setPageState(currentPage.pageId, result);
@@ -4240,10 +4289,10 @@ var DevExpress;
                                     _this._currentPage(page);
                                     _this.events.call("afterPageInitialize", Internal._createPageEventArgs(page, _this));
                                     _this._loadingState(false);
-                                }).fail(function () { return _this._loadingState(false); });
+                                }).fail(function () { return revertPreviosPage(); });
                             }
                             else
-                                _this._loadingState(false);
+                                revertPreviosPage();
                         }).fail(function () { return _this._loadingState(false); });
                     }).fail(function () { return _this._loadingState(false); });
                 };
@@ -4277,10 +4326,12 @@ var DevExpress;
                         _this.stateManager.setPageState(currentPage.pageId, result);
                         _this.iterator._resetPages();
                         if (_this._finishCallback) {
-                            _this._finishCallback(_this.stateManager.getCurrentState())
+                            var currentState = _this.stateManager.getCurrentState();
+                            _this._callBeforeFinishHandler(currentState);
+                            _this._finishCallback(currentState)
                                 .done(function (result) {
                                 _this.onFinish();
-                                _this.events.call("finish", { wizard: _this });
+                                _this._callAfterFinishHandler(currentState, result);
                                 _this.isVisible(false);
                             })
                                 .always(function () {
@@ -4364,7 +4415,11 @@ var DevExpress;
                     WizardPageSectionIterator.prototype._resetPage = function (pageId) {
                         this.stateManager.resetPageState(pageId);
                         this._resetPageCallback(pageId);
-                        this._pages.splice(this._pages.indexOf(this._getPage(pageId)), 1);
+                        var page = this._getPage(pageId);
+                        if (page) {
+                            page.dispose();
+                            this._pages.splice(this._pages.indexOf(page), 1);
+                        }
                     };
                     WizardPageSectionIterator.prototype._createNewPage = function (nextPageId) {
                         var pageMetadata = this.pageFactory.getMetadata(nextPageId);
@@ -4509,10 +4564,10 @@ var DevExpress;
                         this.events.call("afterInitialize", { wizard: this });
                     };
                     WizardPageProcessor.prototype._canNext = function (currentPage) {
-                        return currentPage && this.pageFactory.getMetadata(currentPage.pageId).canNext(currentPage.page);
+                        return !this.isLoading() && currentPage && this.pageFactory.getMetadata(currentPage.pageId).canNext(currentPage.page);
                     };
                     WizardPageProcessor.prototype._canFinish = function (currentPage) {
-                        return currentPage && this.pageFactory.getMetadata(currentPage.pageId).canFinish(currentPage.page);
+                        return !this.isLoading() && currentPage && this.pageFactory.getMetadata(currentPage.pageId).canFinish(currentPage.page);
                     };
                     WizardPageProcessor.prototype._initPage = function (page, force) {
                         var _this = this;
@@ -4553,8 +4608,9 @@ var DevExpress;
                             if (this.sections[i].page()) {
                                 this.sections[i].page().commit().done(function (result) {
                                     if (_this.sections[i].page().isChanged) {
-                                        _this.events.call("finish", { wizard: _this });
+                                        _this.events.call("beforeFinish", { wizardModel: _this, state: _this.stateManager.getCurrentState() });
                                         _this.stateManager.setPageState(_this.sections[i].page().pageId, result);
+                                        _this.events.call("afterFinish", { wizardResult: _this, state: _this.stateManager.getCurrentState() });
                                     }
                                 }).always(function () { return deferred.resolve(); });
                                 resolved = true;
@@ -4796,7 +4852,7 @@ var DevExpress;
                 _registerChooseDataSourceTypePage(factory, dataSourceWizardOptions);
                 _registerChooseJsonSourcePage(factory);
                 _registerChooseJsonConnectionPage(factory, dataSourceWizardOptions);
-                _registerChooseJsonSchemaPage(factory);
+                _registerChooseJsonSchemaPage(factory, dataSourceWizardOptions.requestWrapper);
                 _registerConfigureQueryPage(factory, dataSourceWizardOptions);
                 _registerChooseSqlConnectionPage(factory, dataSourceWizardOptions.connectionStrings.sql);
                 _registerConfigureParametersPage(factory, dataSourceWizardOptions.requestWrapper);
@@ -4897,7 +4953,7 @@ var DevExpress;
                 _registerChooseDataSourceTypePage(factory, dataSourceWizardOptions);
                 _registerChooseJsonConnectionPage(factory, dataSourceWizardOptions);
                 _registerChooseJsonSourcePage(factory);
-                _registerChooseJsonSchemaPage(factory);
+                _registerChooseJsonSchemaPage(factory, dataSourceWizardOptions.requestWrapper);
                 _registerChooseSqlConnectionPage(factory, dataSourceWizardOptions.connectionStrings.sql);
                 _registerMultiQueryConfigurePage(factory, dataSourceWizardOptions);
                 _registerMultiQueryConfigureParametersPage(factory, dataSourceWizardOptions.requestWrapper);
@@ -5107,7 +5163,7 @@ var DevExpress;
                             meta["disabledText"] = Analytics.Utils.getLocalization("To create a data connection, select \"No, I'd like to create a new data connection\".", "AnalyticsCoreStringId.JsonDSWizard_CreateNewConnectionPage_Placeholder");
                         }
                     }
-                    Analytics.Wizard._registerChooseJsonSchemaPage(this._factory);
+                    Analytics.Wizard._registerChooseJsonSchemaPage(this._factory, this._dataSourceWizardOptions.requestWrapper);
                     this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage, WizardSectionPosition.Right);
                     var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage);
                     meta["disabledText"] = Analytics.Utils.getLocalization("To select data fields, choose or create a data connection.", "AnalyticsCoreStringId.JsonDSWizard_ChooseJsonSchemaPage_Placeholder");
@@ -5144,13 +5200,13 @@ var DevExpress;
                         state.jsonDataSourceWizard.rootElement = data.jsonDataSourceWizard.rootElement;
                     },
                     getState: function (state) { return state; },
-                    resetState: function (state) {
-                        delete state.jsonDataSourceWizard.connectionName;
-                        state.jsonDataSourceWizard.jsonSource = "";
-                        delete state.jsonDataSourceWizard.dataSourceName;
-                        delete state.jsonDataSourceWizard.newConnectionName;
-                        delete state.jsonDataSourceWizard.jsonScheme;
-                        delete state.jsonDataSourceWizard.rootElement;
+                    resetState: function (state, defaultState) {
+                        state.jsonDataSourceWizard.connectionName = defaultState.jsonDataSourceWizard.connectionName;
+                        state.jsonDataSourceWizard.jsonSource = defaultState.jsonDataSourceWizard.jsonSource;
+                        state.jsonDataSourceWizard.dataSourceName = defaultState.jsonDataSourceWizard.dataSourceName;
+                        state.jsonDataSourceWizard.newConnectionName = defaultState.jsonDataSourceWizard.newConnectionName;
+                        state.jsonDataSourceWizard.jsonScheme = defaultState.jsonDataSourceWizard.jsonScheme;
+                        state.jsonDataSourceWizard.rootElement = defaultState.jsonDataSourceWizard.rootElement;
                     },
                     create: function () {
                         return new SpecifyJsonDataSourceSettingsPage(dataSourceWizardOptions);
@@ -5219,8 +5275,8 @@ var DevExpress;
                         state.sqlDataSourceWizard.relations = data.sqlDataSourceWizard.relations;
                     },
                     getState: function (state) { return state; },
-                    resetState: function (state) {
-                        state.sqlDataSourceWizard = {};
+                    resetState: function (state, defaulState) {
+                        state.sqlDataSourceWizard = Analytics.Internal.extend(true, {}, defaulState);
                     },
                     create: function () {
                         return new SpecifySqlDataSourceSettingsPage(dataSourceWizardOptions);
@@ -6515,18 +6571,35 @@ var DevExpress;
                         _this.description = Analytics.Utils.getLocalization("Specify JSON-formatted data location.", "DataAccessUIStringId.WizardPageChooseJsonSource");
                         _this.jsonSourceTitle = Analytics.Utils.getLocalization("JSON Source", "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType");
                         _this.sources = [];
-                        _this.selectedSource = ko.observable();
                         _this._jsonStringSettings = new Internal.JsonDataSourceJsonSourcePageStringSettings();
                         _this._jsonUriSetting = new Internal.JsonDataSourceJsonSourcePageUriSettings(_this._requestWrapper);
+                        _this._jsonUriSetting.onChange(function () { return void 0; });
+                        _this._jsonStringSettings.onChange(function () { return void 0; });
                         _this.sources = [
                             { value: _this._jsonUriSetting, displayValue: "Web Service Endpoint (URI)", localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType_Uri" },
                             { value: _this._jsonStringSettings, displayValue: "JSON String", localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_SourceType_Custom" }
                         ];
-                        _this.selectedSource(_this.sources[0].value);
-                        _this.grid = new Analytics.Widgets.ObjectProperties(_this.selectedSource);
+                        var selectedSource = ko.observable();
+                        _this._selectedSource = ko.pureComputed({
+                            read: function () { return selectedSource(); },
+                            write: function (newVal) {
+                                if (selectedSource() === newVal)
+                                    return;
+                                selectedSource(newVal);
+                                newVal._validatorsReady && newVal._validatorsReady(false);
+                                setTimeout(function () {
+                                    newVal._validate && newVal._validate();
+                                }, 1);
+                            }
+                        });
+                        _this._selectedSource(_this.sources[0].value);
+                        _this.grid = new Analytics.Widgets.ObjectProperties(_this._selectedSource);
                         _this.actionPrevious.isVisible(true);
                         _this.actionNext.isDisabled = ko.pureComputed(function () {
-                            return _this.isVisible && (!_this.selectedSource().isValid() || _this.selectedSource().isEmpty());
+                            var selectedSource = _this._selectedSource();
+                            var isCurrentSourceValid = selectedSource.isValid();
+                            var isCurrentSourceEmpty = selectedSource.isEmpty();
+                            return _this.isVisible && (!isCurrentSourceValid || isCurrentSourceEmpty);
                         });
                         _this.actionFinish.isDisabled(true);
                         return _this;
@@ -6543,21 +6616,21 @@ var DevExpress;
                         }
                         else if (data.jsonDataSource.source.uri()) {
                             this._jsonUriSetting.setValue(data.jsonDataSource);
-                            this.selectedSource(this._jsonUriSetting);
+                            this._selectedSource(this._jsonUriSetting);
                         }
                         else if (data.jsonDataSource.source.json()) {
                             this._jsonStringSettings.setValue(data.jsonDataSource);
-                            this.selectedSource(this._jsonStringSettings);
+                            this._selectedSource(this._jsonStringSettings);
                         }
                     };
                     JsonDataSourceJsonSourcePage.prototype.reset = function () {
                         this._jsonStringSettings.reset();
                         this._jsonUriSetting.reset();
-                        this.selectedSource(this._jsonUriSetting);
+                        this._selectedSource(this._jsonUriSetting);
                     };
                     JsonDataSourceJsonSourcePage.prototype.commit = function (data) {
                         data.jsonDataSource = data.jsonDataSource || new Data.JsonDataSource({});
-                        this.selectedSource().applySettings(data.jsonDataSource);
+                        this._selectedSource().applySettings(data.jsonDataSource);
                     };
                     return JsonDataSourceJsonSourcePage;
                 }(WizardPage));
@@ -6875,8 +6948,12 @@ var DevExpress;
                             }];
                         return _this;
                     }
-                    JsonStringEditor.prototype.uploadFile = function () {
+                    JsonStringEditor.prototype.uploadFile = function (e) {
                         var _this = this;
+                        if (e && e.event) {
+                            e.event.stopPropagation();
+                            e.event.preventDefault();
+                        }
                         Analytics.Internal.uploadFile({
                             accept: ".json,.txt"
                         }).done(function (result) {
@@ -6957,8 +7034,11 @@ var DevExpress;
                     __extends(JsonDataSourceJsonSourcePageStringSettings, _super);
                     function JsonDataSourceJsonSourcePageStringSettings() {
                         var _this = _super.call(this) || this;
+                        _this._validatorsReady = ko.observable(false);
                         _this.isValid = ko.pureComputed(function () {
-                            return _this.isEmpty() || _this._isJsonSourceValid(_this.stringSource()) && !_this.aceEditorHasErrors();
+                            var isJsonValid = _this._isJsonSourceValid(_this.stringSource());
+                            var aceHasErrors = _this.aceEditorHasErrors();
+                            return isJsonValid && !aceHasErrors;
                         });
                         _this.validationGroup = null;
                         _this.validationSummary = null;
@@ -7024,19 +7104,57 @@ var DevExpress;
                         var _this = _super.call(this) || this;
                         _this._requestWrapper = _requestWrapper;
                         _this._isUriValid = ko.observable(false);
+                        _this._lastValidatedJsonSourceJSON = "";
+                        _this._authNameValidatorInstance = null;
                         _this._collectionItemNamePlaceholder = Analytics.Utils.getLocalization("Name", "AnalyticsCoreStringId.CollectionEditor_Name_Placeholder");
-                        _this._lastValidationMessage = ko.observable();
-                        _this.isValid = ko.pureComputed(function () {
-                            var isPropertiesNotEmpty = _this._noEmptyProperties();
-                            var isUriValid = _this._isUriValid();
-                            return isPropertiesNotEmpty && isUriValid;
-                        });
+                        _this._lastValidateDeferred = null;
+                        _this._sourceUriValidatorsReady = ko.observable(true);
+                        _this._basicAuthValidatorsReady = ko.observable(false);
+                        _this._validationRequested = ko.observable(false).extend({ deferred: true });
                         _this._noEmptyProperties = ko.pureComputed(function () {
                             var isBasicHttpAuthValid = _this._isBasicHttpAuthValid();
                             var isHeadersValid = _this._isHeadersValid();
                             var isQueryParametersValid = _this._isQueryParametersValid();
                             var sourceUriNotEmpty = !!_this.sourceUri();
                             return isBasicHttpAuthValid && isHeadersValid && isQueryParametersValid && sourceUriNotEmpty;
+                        });
+                        _this._lastValidationMessage = ko.observable();
+                        _this._getSerializedUriSource = function (jsonDataSource) {
+                            if (jsonDataSource === void 0) { jsonDataSource = new Analytics.Data.JsonDataSource({}); }
+                            _this.applySettings(jsonDataSource);
+                            return JSON.stringify(jsonDataSource.source.serialize(true));
+                        };
+                        _this._sourceUriValidationCallback = function (params) {
+                            if (!_this._lastValidationMessage())
+                                _this._lastValidationMessage(Analytics.Utils.getLocalization("Validation...", "AnalyticsCoreStringId.Validation"));
+                            var serverValidationResult = false;
+                            var serializedJsonSource = _this._getSerializedUriSource();
+                            if (serializedJsonSource != _this._lastValidatedJsonSourceJSON) {
+                                _this._validateUriSource().done(function (result) {
+                                    serverValidationResult = params.rule.isValid = result.isUriValid;
+                                    result.faultMessage && (params.rule.message = result.faultMessage);
+                                    _this._lastValidationMessage(result.faultMessage);
+                                    params.validator.validate();
+                                    setTimeout(function () { return _this._repaintSummary(); }, 1);
+                                });
+                            }
+                            return serverValidationResult;
+                        };
+                        _this.isValid = ko.pureComputed(function () {
+                            var isPropertiesNotEmpty = _this._noEmptyProperties();
+                            var isUriValid = _this._isUriValid();
+                            return isPropertiesNotEmpty && isUriValid;
+                        });
+                        _this._validatorsReady = ko.pureComputed({
+                            read: function () {
+                                var sourceUriValidatorReady = _this._sourceUriValidatorsReady();
+                                var authIsEmpty = !_this.basicHttpAuth.password() && !_this.basicHttpAuth.userName();
+                                var authInitialized = _this._basicAuthValidatorsReady();
+                                return sourceUriValidatorReady && (authInitialized || authIsEmpty);
+                            },
+                            write: function (newVal) {
+                                _this._basicAuthValidatorsReady(newVal);
+                            }
                         });
                         _this.sourceUri = ko.observable("");
                         _this.basicHttpAuth = {
@@ -7045,68 +7163,53 @@ var DevExpress;
                         };
                         _this.queryParameters = ko.observableArray([]);
                         _this.headers = ko.observableArray([]);
-                        _this._disposables.push(_this.sourceUri.subscribe(function (newValue) {
-                            if (newValue)
-                                _this._validateUriSource();
-                            else
-                                _this._isUriValid(true);
-                        }));
                         _this._disposables.push(_this.grid = new Analytics.Widgets.ObjectProperties(ko.observable(_this)));
+                        _this._disposables.push(ko.computed(function () {
+                            var editorsInitialized = _this._validatorsReady();
+                            var validationRequested = _this._validationRequested();
+                            if (editorsInitialized && validationRequested) {
+                                _this._validate();
+                            }
+                        }));
+                        _this._disposables.push(_this._validatorsReady);
                         return _this;
                     }
-                    JsonDataSourceJsonSourcePageUriSettings.prototype.dispose = function () {
-                        _super.prototype.dispose.call(this);
-                        this.disposeObservableArray(this.headers);
-                        this.disposeObservableArray(this.queryParameters);
-                    };
-                    JsonDataSourceJsonSourcePageUriSettings.prototype.onChange = function (_onChange) {
-                        var _this = this;
-                        var _a;
-                        var timeoutId = null;
-                        var localOnChange = function () {
-                            _onChange();
-                            clearTimeout(timeoutId);
-                            timeoutId = setTimeout(function () { return _this._validate(); }, 1);
-                        };
-                        (_a = this._disposables).push.apply(_a, Internal.subscribeProperties([this.sourceUri, this.basicHttpAuth.password, this.basicHttpAuth.userName], localOnChange));
-                        [this.headers, this.queryParameters]
-                            .forEach(function (arrayProperty) {
-                            _this._disposables.push(Internal.subscribeArray(arrayProperty, function (item) {
-                                var _a;
-                                (_a = item._disposables).push.apply(_a, Internal.subscribeProperties([item.name, item.value], localOnChange));
-                            }, localOnChange));
-                        });
-                    };
                     JsonDataSourceJsonSourcePageUriSettings.prototype._validateUriSource = function () {
                         var _this = this;
                         var defaultValidationErrorMessage = Analytics.Utils.getLocalization('Invalid URI.', "AnalyticsCoreStringId.ReportDesigner_Wizard_JsonSource_UriValidationError");
                         var endpointUriDisplayName = Analytics.Utils.getLocalization('Web Service Endpoint (URI):', 'DataAccessUIStringId.WizardPageChooseJsonSource_URI');
-                        var deferred = $.Deferred();
+                        this._isUriValid(false);
+                        if (this._lastValidateDeferred) {
+                            this._lastValidateDeferred.reject();
+                        }
+                        var resultDeferred = $.Deferred();
+                        this._lastValidateDeferred = resultDeferred;
                         try {
                             var jsonDataSource = new Analytics.Data.JsonDataSource({});
-                            this.applySettings(jsonDataSource);
-                            this._requestWrapper.validateJsonUri(jsonDataSource)
-                                .done(function (data) {
+                            var serializedJsonSource = this._getSerializedUriSource(jsonDataSource);
+                            this._lastValidatedJsonSourceJSON = serializedJsonSource;
+                            var validationResultHandler = function (data) {
+                                if (resultDeferred.state && resultDeferred.state() === "rejected")
+                                    return;
                                 _this._isUriValid(data.isUriValid);
                                 var faultMessage = Internal.getLocalizedValidationErrorMessage(data.isUriValid ? "" : data && data.faultMessage || defaultValidationErrorMessage, endpointUriDisplayName);
-                                deferred.resolve({
+                                resultDeferred.resolve({
                                     isUriValid: data.isUriValid,
                                     faultMessage: faultMessage
                                 });
-                            })
+                            };
+                            this._requestWrapper.validateJsonUri(jsonDataSource)
+                                .done(validationResultHandler)
                                 .fail(function (data) {
-                                _this._isUriValid(false);
-                                var faultMessage = Internal.getLocalizedValidationErrorMessage(data && data.faultMessage || defaultValidationErrorMessage, endpointUriDisplayName);
-                                deferred.resolve({
-                                    isUriValid: false,
-                                    faultMessage: faultMessage
-                                });
+                                if (data === void 0) { data = {}; }
+                                data.isValid = false;
+                                validationResultHandler(data);
                             });
                         }
                         catch (ex) {
                             this._isUriValid(false);
                         }
-                        return deferred.promise();
+                        return resultDeferred.promise();
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype._isCollectionValid = function (collectionName) {
                         return !this[collectionName]().length || this[collectionName]().every(function (x) { return x.name(); });
@@ -7131,36 +7234,33 @@ var DevExpress;
                             localizationId: "DataAccessUIStringId.WizardPageChooseJsonSource_URI",
                             defaultVal: "",
                             editor: Analytics.Widgets.editorTemplates.text,
-                            validationRules: null
+                            validatorOptions: null
                         };
-                        sourceUri.validationRules = [{
-                                type: 'required',
-                                message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(sourceUri.displayName, sourceUri.localizationId))
-                            }, {
-                                type: "custom",
-                                assignValueFirst: true,
-                                isDeferred: ko.pureComputed(function () { return _this._noEmptyProperties(); }),
-                                message: function () { return _this._lastValidationMessage(); },
-                                validationCallback: function (params) {
-                                    if (!_this._lastValidationMessage())
-                                        _this._lastValidationMessage(Analytics.Utils.getLocalization("Validation...", "AnalyticsCoreStringId.Validation"));
-                                    _this._noEmptyProperties() && _this._validateUriSource().done(function (result) {
-                                        params.rule.isValid = result.isUriValid;
-                                        result.faultMessage && (params.rule.message = result.faultMessage);
-                                        _this._lastValidationMessage(result.faultMessage);
-                                        params.validator.validate();
-                                        setTimeout(function () { return _this._repaintSummary(); }, 1);
-                                    });
-                                    return false;
-                                }
-                            }];
+                        sourceUri.validatorOptions = {
+                            onInitialized: function (e) {
+                                _this._sourceUriValidatorsReady(true);
+                            },
+                            onDisposed: function () {
+                                _this._sourceUriValidatorsReady(false);
+                            },
+                            validationRules: [{
+                                    type: 'required',
+                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(sourceUri.displayName, sourceUri.localizationId))
+                                }, {
+                                    type: "custom",
+                                    assignValueFirst: true,
+                                    isDeferred: ko.pureComputed(function () { return _this._noEmptyProperties(); }),
+                                    message: function () { return _this._lastValidationMessage(); },
+                                    validationCallback: this._sourceUriValidationCallback
+                                }]
+                        };
                         return sourceUri;
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype._getBasicHttpAuthInfo = function () {
                         var _this = this;
                         var basicHttpAuthName = {
                             propertyName: "userName", displayName: "Username:", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_UsernameText", editor: Analytics.Widgets.editorTemplates.text,
-                            validationRules: undefined,
+                            validatorOptions: undefined,
                         };
                         var basicHttpAuth = {
                             propertyName: "basicHttpAuth", displayName: "Basic HTTP Authentication", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_BasicHttpAuthText", info: [
@@ -7168,15 +7268,30 @@ var DevExpress;
                                 { propertyName: "password", displayName: "Password:", localizationId: "DataAccessUIStringId.WizardPageConfigureJsonConnection_PasswordText", editor: Analytics.Widgets.editorTemplates.text, editorOptions: { mode: "password" } },
                             ], editor: Analytics.Widgets.editorTemplates.objecteditor
                         };
-                        basicHttpAuthName.validationRules = [{
-                                type: "custom",
-                                reevaluate: true,
-                                assignValueFirst: true,
-                                message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(basicHttpAuth.displayName, basicHttpAuth.localizationId), Analytics.Utils.getLocalization(basicHttpAuthName.displayName, basicHttpAuthName.localizationId)),
-                                validationCallback: function (params) {
-                                    return _this._isBasicHttpAuthValid();
-                                }
-                            }];
+                        var onValidatorInitialied = function (e) {
+                            var authNmeValidatorInstance = e && e.component;
+                            if (_this._authNameValidatorInstance && _this._authNameValidatorInstance != authNmeValidatorInstance) {
+                                _this._authNameValidatorInstance.dispose();
+                            }
+                            _this._authNameValidatorInstance = authNmeValidatorInstance;
+                            _this._basicAuthValidatorsReady(true);
+                        };
+                        var authNameValidatorDisposed = function () {
+                            _this._authNameValidatorInstance = null;
+                        };
+                        basicHttpAuthName.validatorOptions = {
+                            onInitialized: onValidatorInitialied,
+                            onDisposed: authNameValidatorDisposed,
+                            validationRules: [{
+                                    type: "custom",
+                                    reevaluate: true,
+                                    assignValueFirst: true,
+                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(basicHttpAuth.displayName, basicHttpAuth.localizationId), Analytics.Utils.getLocalization(basicHttpAuthName.displayName, basicHttpAuthName.localizationId)),
+                                    validationCallback: function (params) {
+                                        return _this._isBasicHttpAuthValid();
+                                    }
+                                }]
+                        };
                         return basicHttpAuth;
                     };
                     JsonDataSourceJsonSourcePageUriSettings.prototype._getQueryParametersInfo = function () {
@@ -7242,8 +7357,47 @@ var DevExpress;
                         this.headers(dataSource.source.headers());
                         this.queryParameters(dataSource.source.queryParameters());
                     };
+                    JsonDataSourceJsonSourcePageUriSettings.prototype.dispose = function () {
+                        this._authNameValidatorInstance && this._authNameValidatorInstance.dispose();
+                        if (this._lastValidateDeferred) {
+                            this._lastValidateDeferred.reject();
+                            this._lastValidateDeferred = null;
+                        }
+                        _super.prototype.dispose.call(this);
+                        this.disposeObservableArray(this.headers);
+                        this.disposeObservableArray(this.queryParameters);
+                    };
+                    JsonDataSourceJsonSourcePageUriSettings.prototype.onChange = function (_onChange) {
+                        var _this = this;
+                        var _a;
+                        var timeoutId = null;
+                        var localOnChange = function () {
+                            _onChange();
+                            clearTimeout(timeoutId);
+                            timeoutId = setTimeout(function () { return _this._validate(); }, 1);
+                        };
+                        (_a = this._disposables).push.apply(_a, Internal.subscribeProperties([this.sourceUri, this.basicHttpAuth.password, this.basicHttpAuth.userName], localOnChange));
+                        [this.headers, this.queryParameters]
+                            .forEach(function (arrayProperty) {
+                            _this._disposables.push(Internal.subscribeArray(arrayProperty, function (item) {
+                                var _a;
+                                (_a = item._disposables).push.apply(_a, Internal.subscribeProperties([item.name, item.value], localOnChange));
+                            }, localOnChange));
+                        });
+                    };
                     JsonDataSourceJsonSourcePageUriSettings.prototype.isEmpty = function () {
                         return !this.sourceUri();
+                    };
+                    JsonDataSourceJsonSourcePageUriSettings.prototype._validate = function () {
+                        if (this._validationSummary && this._validationGroup) {
+                            if (this._validatorsReady()) {
+                                this._validationGroup.validate();
+                                this._validationRequested(false);
+                            }
+                            else {
+                                this._validationRequested(true);
+                            }
+                        }
                     };
                     return JsonDataSourceJsonSourcePageUriSettings;
                 }(JsonDataSourceJsonSourcePageSettingsBase));
@@ -8123,6 +8277,7 @@ var DevExpress;
                     __extends(TreeNodeItemsProvider, _super);
                     function TreeNodeItemsProvider(fieldListProvider, rootItems, generateTreeNode, generateTreeLeafNode) {
                         var _this = _super.call(this) || this;
+                        _this._fullTreeLoaded = false;
                         _this._rootItems = ko.observableArray([]);
                         _this._checkedRootNodesCount = ko.computed(function () {
                             if (!_this._rootItems || _this._rootItems().length === 0)
@@ -8137,9 +8292,10 @@ var DevExpress;
                             return !(_this._checkedRootNodesCount() === 0);
                         });
                         _this.getRootItems = function () { return _this._rootItems(); };
-                        _this.getItems = function (pathRequest) {
+                        _this.getItems = function (pathRequest, collectChilds) {
+                            if (collectChilds === void 0) { collectChilds = false; }
                             var result = $.Deferred();
-                            if (!pathRequest.fullPath) {
+                            if (!pathRequest.fullPath && pathRequest.pathParts.length === 0) {
                                 result.resolve(_this._rootItems());
                             }
                             else {
@@ -8149,19 +8305,24 @@ var DevExpress;
                                         return result.reject();
                                     if (currentParentNode.children().length === 0) {
                                         var array = [];
+                                        var listPath = [];
                                         value.forEach(function (item) {
+                                            var isChecked = _this._getDefaultTreeNodeCheckState(item);
                                             if (Analytics.Internal.isList(item)) {
                                                 if (pathRequest.pathParts.length <= 5) {
-                                                    var isChecked = _this._getDefaultTreeNodeCheckState(item);
+                                                    listPath.push([].concat(pathRequest.fullPath.split('.'), [item.name]));
                                                     array.push(generateTreeNode(item, isChecked, [pathRequest.fullPath, item.name].join(".")));
                                                 }
                                             }
                                             else {
-                                                array.push(generateTreeLeafNode(item, currentParentNode.checked(), [pathRequest.fullPath, item.name].join(".")));
+                                                array.push(generateTreeLeafNode(item, isChecked, [pathRequest.fullPath, item.name].join(".")));
                                             }
                                         });
                                         currentParentNode.initializeChildren(array);
-                                        result.resolve(array);
+                                        if (collectChilds)
+                                            $.when.apply($, listPath.map(function (x) { return _this.getItems(new Analytics.Utils.PathRequest(x.join('.'), x), collectChilds); })).always(function () { return result.resolve(array); });
+                                        else
+                                            result.resolve(array);
                                     }
                                     else {
                                         result.resolve(currentParentNode.children());
@@ -8171,6 +8332,7 @@ var DevExpress;
                             return result.promise();
                         };
                         _this._disposables.push(rootItems.subscribe(function (newValue) {
+                            _this._fullTreeLoaded = false;
                             _this._rootItems(newValue.map(function (item) {
                                 var isChecked = _this._getDefaultTreeNodeCheckState(item);
                                 return generateTreeNode(item, isChecked, item.name);
@@ -8179,6 +8341,95 @@ var DevExpress;
                         _this._disposables.push(_this.hasCheckedItems);
                         return _this;
                     }
+                    TreeNodeItemsProvider.prototype._createTree = function () {
+                        var _this = this;
+                        if (!this._fullTreeLoaded)
+                            return $.when.apply($, this._rootItems().map(function (item) { return _this.getItems(new Analytics.Utils.PathRequest(item.path), true); })).always(function () { return _this._fullTreeLoaded = true; });
+                        else {
+                            return $.Deferred().resolve().promise();
+                        }
+                    };
+                    TreeNodeItemsProvider.prototype._createTreePart = function (pathParts, deferred, checkedPath) {
+                        var _this = this;
+                        if (deferred === void 0) { deferred = $.Deferred(); }
+                        if (this._fullTreeLoaded)
+                            return deferred.resolve().promise();
+                        if (pathParts.length === 0)
+                            return deferred.resolve();
+                        if (!checkedPath) {
+                            var deferred = $.Deferred();
+                            if (pathParts.length === 1) {
+                                this.getItems(new Analytics.Utils.PathRequest(pathParts[0], pathParts)).done(function () { return deferred.resolve(); }).fail(function () { return deferred.reject(); });
+                            }
+                            else
+                                this._createTreePart(pathParts.slice(1), deferred, [pathParts[0]]);
+                            return deferred;
+                        }
+                        else {
+                            var newParentPath = [].concat([], checkedPath, pathParts[0]);
+                            var request = new Analytics.Utils.PathRequest(newParentPath.join('.'), newParentPath);
+                            if (!this._getParentNode(request)) {
+                                this.getItems(new Analytics.Utils.PathRequest(checkedPath.join('.'), checkedPath)).done(function (res) {
+                                    _this._createTreePart(pathParts.slice(1), deferred, newParentPath);
+                                }).fail(function () { return deferred.reject(); });
+                            }
+                            else {
+                                this._createTreePart(pathParts.slice(1), deferred, newParentPath);
+                            }
+                        }
+                    };
+                    TreeNodeItemsProvider.prototype._setChecked = function (item) {
+                        var _this = this;
+                        item.setChecked(true);
+                        if (item instanceof DataMemberTreeNode) {
+                            item.children().forEach(function (x) { return _this._setChecked(x); });
+                        }
+                    };
+                    TreeNodeItemsProvider.prototype.selectAllItems = function (onlyRoot) {
+                        var _this = this;
+                        if (onlyRoot === void 0) { onlyRoot = true; }
+                        var deferred = $.Deferred();
+                        this._createTree().always(function () {
+                            if (onlyRoot) {
+                                _this._rootItems().forEach(function (x) { return x.setChecked(true); });
+                            }
+                            else {
+                                _this._rootItems().forEach(function (x) { return _this._setChecked(x); });
+                            }
+                            deferred.resolve();
+                        });
+                        return deferred.promise();
+                    };
+                    TreeNodeItemsProvider.prototype.selectItemsByPath = function (path) {
+                        var _this = this;
+                        var deferred = $.Deferred();
+                        var pathParts = path.split('.');
+                        this._createTreePart(pathParts).done(function () {
+                            _this.getItems(new Analytics.Utils.PathRequest(pathParts.join('.'), pathParts)).done(function (items) {
+                                items.forEach(function (item) {
+                                    if (item instanceof Analytics.Wizard.Internal.TreeNodeBase) {
+                                        item.setChecked(true);
+                                    }
+                                });
+                            }).always(function () { return deferred.resolve(); });
+                        });
+                        return deferred.promise();
+                    };
+                    TreeNodeItemsProvider.prototype.selectItemByPath = function (path) {
+                        var _this = this;
+                        var deferred = $.Deferred();
+                        var pathParts = path.split('.');
+                        this._createTreePart(pathParts).done(function () {
+                            var fieldName = pathParts.pop();
+                            _this.getItems(new Analytics.Utils.PathRequest(pathParts.join('.'), pathParts)).done(function (items) {
+                                var item = items.filter(function (x) { return x.name === fieldName; })[0];
+                                if (item instanceof Analytics.Wizard.Internal.TreeNodeBase) {
+                                    item.setChecked(true);
+                                }
+                            }).always(function () { return deferred.resolve(); });
+                        });
+                        return deferred.promise();
+                    };
                     TreeNodeItemsProvider.prototype._getParentNode = function (pathRequest) {
                         var parentNode = this._rootItems().filter(function (item) { return item.path === (pathRequest.id || pathRequest.ref); })[0];
                         if (!parentNode)
@@ -9191,6 +9442,13 @@ var DevExpress;
                             contentScroll.scrollTo({ left: contentScroll.scrollWidth(), top: 0 });
                         }
                     }
+                    Analytics.Internal.addDisposeCallback($element.children()[0], function () {
+                        $element.find(".dxd-tableview-titles .dxd-tableview-resizable").each(function (_, resizable) {
+                            if ($(resizable).data("ui-resizable"))
+                                $(resizable).resizable("destroy");
+                        });
+                        $element = null;
+                    });
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -11001,7 +11259,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxqb-filtereditor-parameterspopup': '<div class="dx-widget" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">        <!-- ko if: $parent.viewModel.canCreateParameters -->        <div class="dx-filtereditor-popup-item dx-item dx-list-item dxd-list-item-back-color dxd-back-highlighted">            <span class="dx-item-content dx-list-item-content" data-bind="text: $parent.viewModel.defaultDisplay(), click: function() { $parent.viewModel.isEditable(true); $parent.viewModel._parameterName(\'\'); $parent.visible(false); }"></span>        </div>        <!-- /ko -->        <!-- ko foreach: data -->        <div class="dx-filtereditor-popup-item dx-item dx-list-item dxd-list-item-back-color dxd-back-highlighted">            <span class="dx-item-content dx-list-item-content" data-bind="text: name, click: function() { $parent.click($data); } "></span>        </div>        <!-- /ko -->    </div>',
     'dxqb-treelist-item-with-search': '<div data-bind="visible: visible">        <!-- ko template: "dxqb-treelist-header-item-with-search" -->        <!-- /ko -->    </div>',
     'dxqb-treelist-header-item-with-search': '<div class="dx-treelist-item dxd-list-item-back-color dxd-back-highlighted" data-bind="event: { dblclick: function() { $data.dblClickHandler ? $data.dblClickHandler($data) : $data.toggleCollapsed() } }, styleunit: padding, css: { \'dx-treelist-item-selected dxd-state-selected\': isSelected() || isMultiSelected() }">        <div class="dx-treelist-collapsedbutton"></div>        <div class="dx-treelist-caption">            <div class="dx-treelist-selectedcontent" data-bind="click: toggleSelected,  draggable: isDraggable ? dragDropHandler : null">                <div class="dx-treelist-image" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: text }"> </div>                <div class="dx-treelist-text-wrapper">                    <!-- ko if: treeListController && !!$data.treeListController.searchName -->                    <div class="dx-treelist-text dxdr-highlighted-search-text" data-bind="searchHighlighting: { text: text, textToSearch: treeListController.searchName }, attr: { title: text }"></div>                    <!-- /ko -->                </div>            </div>        </div>    </div>',
-    'dxrd-page-choose-datasource-type': '<div class="dxrd-wizard-type-page" data-bind="css: $data._extendCssClass(\'type-page\')">        <!-- ko foreach: typeItems -->        <div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">            <div data-bind="event: { click: $parent._itemClick, dblclick: function() { $parent._goToNextPage() } }, attr: { class: \'dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color \' + $parent._extendCssClass(\'type-item\')}, css: { \'dxd-state-selected dxd-border-secondary dxd-back-secondary\': $parent._IsSelected($data) } ">                <div data-bind="attr: { class: \'dxrd-wizard-type-image \' + $parent._extendCssClass(\'type-image\') }, css: imageClassName, template: imageTemplateName"> </div>                <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent._extendCssClass(\'type-text\')"></div>            </div>        </div>        <!-- /ko -->    </div>',
+    'dxrd-page-choose-datasource-type': '<div class="dxrd-wizard-type-page" data-bind="css: $data._extendCssClass(\'type-page\')">        <!-- ko foreach: typeItems -->        <div data-bind="event: { click: $parent._itemClick, dblclick: function() { $parent._goToNextPage() } }, attr: { class: \'dxd-back-highlighted dxd-state-normal dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color \' + $parent._extendCssClass(\'type-item\')}, css: { \'dxd-border-secondary dxd-back-secondary\': $parent._IsSelected($data) } ">            <div data-bind="attr: { class: \'dxrd-wizard-type-image \' + $parent._extendCssClass(\'type-image\') }, css: imageClassName, template: imageTemplateName"> </div>            <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent._extendCssClass(\'type-text\')"></div>        </div>        <!-- /ko -->    </div>',
     'dx-wizard-fullscreen': '<!-- ko if: $data && $data.isVisible() -->    <div class="dx-fullscreen-wizard dx-editors" data-bind="css: { \'dx-rtl\': $root.rtl, \'dx-ltr\': !$root.rtl }">        <div class="dxrd-wizard dxrd-report-wizard dx-editors dxd-text-primary dxd-back-primary2" data-bind="css: _extendCssClass">            <div class="dxrd-wizard-steps-container dxd-back-primary" data-bind="visible: $data.navigationPanel().isVisible">                <div class="dxrd-wizard-title dxd-border-primary" data-bind="text: _description()"></div>                <!-- ko with: navigationPanel -->                <div class="dxrd-wizard-steps" data-bind="foreach: _steps">                    <div class="dxrd-wizard-steps-relative" style="position:relative" data-bind="visible: $data.visible">                        <div class="dxrd-wizard-steps-content" data-bind="click: $data.clickAction, text: $data.text, attr: {\'title\': $data.text }, css: { \'dxrd-disabled\': $data.disabled, \'dxd-back-secondary\': $data.isActive() }"></div>                        <div class="dxrd-wizard-steps-marker dxd-back-primary2" data-bind="visible: $data.isActive"></div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dxrd-wizard-content" data-bind="css: { \'withoutPanel\': !$data.navigationPanel().isVisible() }">                <div class="dxrd-wizard-part-description dxd-back-contrast">                    <div class="dxrd-wizard-part-description-text dxd-text-primary dxd-border-primary" data-bind="text: _pageDescription()"></div>                </div>                <!-- ko with: _currentPage -->                <div class="dxrd-wizard-work-content">                    <div class="dxrd-wizard-work-content-relative">                        <div data-bind="template: { name: template, data: page } "></div>                    </div>                </div>                <!-- /ko -->                <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)">                </div>                <div class="dxrd-wizard-navigation">                    <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>                    <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>                </div>            </div>        </div>    </div>    <!-- /ko -->',
     'dx-wizard-fullscreen-page': '<!-- ko if: $data._sections.length > 0 -->    <div style="position:absolute;" data-bind="foreach: _sections, styleunit: { top: _parentMarginOffset, left: _parentMarginOffset, right: _parentMarginOffset, bottom: _parentMarginOffset }">        <div class="dx-border-inheritor dxd-border-accented">            <div class="dxrd-report-page-tile dxd-border-secondary" data-bind="css: { \'dxrd-disabled\': !$data.page() }, style: $parent._pageCss[$data.pageId]">                <div class="dxrd-report-page-tile-title" data-bind="visible: $parent._showPageDescription(), text: $parent._getPageDescription($index(), $data), attr: { title: $parent._getPageDescription($index(), $data) }"></div>                <!-- ko if: $data.page() !== null -->                <!-- ko with: page -->                <div class="dxrd-report-page-tile-content" data-bind="template: { name: $parent.metadata.template, data: page }, dxScrollView: { showScrollbar: \'onHover\'}"></div>                <!-- /ko -->                <!-- /ko -->                <!-- ko if: $data.page() === null -->                <div class="dxrd-report-page-tile-content dx-default-border-style dxd-border-secondary">                    <div class="dxrd-wizard-page dxrd-wizard-disabled-content" data-bind="text: metadata.disabledText"></div>                </div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
     'dxrd-jsondatasource-fields-page': '<div class="dxrd-wizard-page dx-jsonschema-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height:100%">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _rootElementTitle"></div>                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: _rootElementList, value: _selectedRootElement, displayExpr: \'fullPath\', displayCustomValue: true }"></div>            </div>            <div class="dxrd-wizard-add-queries-page dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">                <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>            </div>        </div>    </div>',
@@ -11014,7 +11272,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-page-specify-connection': '<div class="dxrd-wizard-page">    <!-- ko template: { name: \'dxrd-page-selectitems-radio-group\', data: $data } -->    <!-- /ko -->    <!-- ko if: !_createNew() -->    <!-- ko template: { name: \'dxrd-page-selectitems-list\', data: $data } -->    <!-- /ko -->    <!-- /ko -->    <!-- ko if: _createNew -->    <div style="position:relative; top: 65px; height: calc(100% - 65px)">        <!-- ko template: { name: \'dxrd-page-jsonsource\', data: _specifySourceData } -->        <!-- /ko -->    </div>    <!-- /ko --></div>',
     'dx-jsonwizard-parametercollection': '<div class="dx-field">        <!-- ko with: value -->        <div class="dx-jsonwizard-parameter-left-container">            <div class="dx-jsonwizard-parameter">                <div data-bind="dxTextBox: { value: name, placeholder: $data.namePlaceholder() }, dxValidator: { validationRules: $parent.editor.editorOptions.nameValidationRules || [] }"></div>            </div>        </div>        <div class="dx-jsonwizard-parameter-right-container">            <div class="dx-jsonwizard-parameter">                <div data-bind="dxTextBox: { value: value, placeholder: $data.valuePlaceholder() }"></div>            </div>        </div>        <!-- /ko -->    </div>',
     'dx-jsonwizard-loadfile-editor': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'File\', accept:\'.json,.txt\' }"></div>',
-    'dx-jsonwizard-jsonstring-editor': '<!-- ko if: !aceAvailable -->    <div class="dxrd-jsonwizard-jsonstring-editor dxd-border-secondary dxd-back-primary2" data-bind="dxTextArea: { value: value, spellcheck: false, isValid: isValid }, dxValidator: { validationRules: jsonStringValidationRules || [] }"></div>    <!-- /ko -->    <!-- ko if: aceAvailable -->    <div class="dx-texteditor dx-editor-outlined dxrd-jsonwizard-jsonstring-editor dxd-wizard-jsoneditor dxd-border-secondary dxd-back-primary2" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }, css: { \'dx-invalid\' : !!value() && !isValid() }"></div>    <!-- /ko -->    <div class="dxd-upload-file">        <div class="dxd-back-primary2"></div>        <div data-bind="dxButtonWithTemplate: { onClick: uploadFile, hint: $data.getUploadTitle(), icon: \'dxrd-svg-wizard-Download\' }"></div>    </div>',
+    'dx-jsonwizard-jsonstring-editor': '<!-- ko if: !aceAvailable -->    <div class="dxrd-jsonwizard-jsonstring-editor dxd-border-secondary dxd-back-primary2" data-bind="dxTextArea: { value: value, spellcheck: false, isValid: isValid }, dxValidator: $data.validator || { validationRules: jsonStringValidationRules || [] }"></div>    <!-- /ko -->    <!-- ko if: aceAvailable -->    <div class="dx-texteditor dx-editor-outlined dxrd-jsonwizard-jsonstring-editor dxd-wizard-jsoneditor dxd-border-secondary dxd-back-primary2" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }, css: { \'dx-invalid\' : !value() || !isValid() }"></div>    <!-- /ko -->    <div class="dxd-upload-file">        <div class="dxd-back-primary2"></div>        <div data-bind="dxButtonWithTemplate: { onClick: uploadFile, hint: $data.getUploadTitle(), icon: \'dxrd-svg-wizard-Download\' }"></div>    </div>',
     'dxrd-wizard-add-queries-page': '<div class="dxrd-wizard-page dxrd-wizard-add-queries-page">        <div class="dxrd-wizard-dataMember dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', height: _scrollViewHeight }">            <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>        </div>        <!-- ko ifnot: $data.disableCustomSql -->        <!-- ko template: { name: \'dxqb-popup-selectStatment\', data: _popupSelectStatement } -->        <!-- /ko -->        <!-- /ko -->        <!-- ko template: { name: \'dxrd-querybuilder-popup\', data: _popupQueryBuilder } -->        <!-- /ko -->        <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)">        </div>    </div>',
     'dxrd-configure-query-parameters-page': '<div class="dxrd-wizard-page dxrd-configure-query-parameters-page">        <div class="dxrd-wizard-dataMember dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\', height: _scrollViewHeight }">            <!-- ko if: !!$data._fieldListModel() -->            <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>            <!-- /ko -->        </div>    </div>',
     'dxrd-wizard-configure-relations-page': '<div class="dxrd-wizard-page dxrd-wizard-configure-relations-page">        <!-- ko if: $data._relationsEditor() -->        <!-- ko template: { name: \'dxrd-masterDetail-editor-complete-wizard\', data: $data._relationsEditor }-->        <!-- /ko -->        <!-- /ko -->    </div>',

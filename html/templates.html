@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (templates.html)
-* Version: 19.1.4
-* Build date: 2019-06-17
+* Version: 19.1.5
+* Build date: 2019-07-29
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -743,11 +743,9 @@
 <script type="text/html" id="dxrd-page-choose-datasource-type">
     <div class="dxrd-wizard-type-page" data-bind="css: $data._extendCssClass('type-page')">
         <!-- ko foreach: typeItems -->
-        <div class="dx-background-inheritor dxd-back-highlighted dxd-state-selected">
-            <div data-bind="event: { click: $parent._itemClick, dblclick: function() { $parent._goToNextPage() } }, attr: { class: 'dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color ' + $parent._extendCssClass('type-item')}, css: { 'dxd-state-selected dxd-border-secondary dxd-back-secondary': $parent._IsSelected($data) } ">
-                <div data-bind="attr: { class: 'dxrd-wizard-type-image ' + $parent._extendCssClass('type-image') }, css: imageClassName, template: imageTemplateName"> </div>
-                <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent._extendCssClass('type-text')"></div>
-            </div>
+        <div data-bind="event: { click: $parent._itemClick, dblclick: function() { $parent._goToNextPage() } }, attr: { class: 'dxd-back-highlighted dxd-state-normal dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color ' + $parent._extendCssClass('type-item')}, css: { 'dxd-border-secondary dxd-back-secondary': $parent._IsSelected($data) } ">
+            <div data-bind="attr: { class: 'dxrd-wizard-type-image ' + $parent._extendCssClass('type-image') }, css: imageClassName, template: imageTemplateName"> </div>
+            <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent._extendCssClass('type-text')"></div>
         </div>
         <!-- /ko -->
     </div>
@@ -946,10 +944,10 @@
 
 <script type="text/html" id="dx-jsonwizard-jsonstring-editor">
     <!-- ko if: !aceAvailable -->
-    <div class="dxrd-jsonwizard-jsonstring-editor dxd-border-secondary dxd-back-primary2" data-bind="dxTextArea: { value: value, spellcheck: false, isValid: isValid }, dxValidator: { validationRules: jsonStringValidationRules || [] }"></div>
+    <div class="dxrd-jsonwizard-jsonstring-editor dxd-border-secondary dxd-back-primary2" data-bind="dxTextArea: { value: value, spellcheck: false, isValid: isValid }, dxValidator: $data.validator || { validationRules: jsonStringValidationRules || [] }"></div>
     <!-- /ko -->
     <!-- ko if: aceAvailable -->
-    <div class="dx-texteditor dx-editor-outlined dxrd-jsonwizard-jsonstring-editor dxd-wizard-jsoneditor dxd-border-secondary dxd-back-primary2" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }, css: { 'dx-invalid' : !!value() && !isValid() }"></div>
+    <div class="dx-texteditor dx-editor-outlined dxrd-jsonwizard-jsonstring-editor dxd-wizard-jsoneditor dxd-border-secondary dxd-back-primary2" data-bind="dxAceEditor: { value: value, editorContainer: editorContainer, options: aceOptions, additionalOptions: additionalOptions }, css: { 'dx-invalid' : !value() || !isValid() }"></div>
     <!-- /ko -->
     <div class="dxd-upload-file">
         <div class="dxd-back-primary2"></div>
@@ -1457,7 +1455,7 @@
 </script>
 <script type="text/html" id="dx-text">
     <!-- ko if: $data.validationRules -->
-    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [], onInitialized: $data.onValidatorInitialized  }"></div>
+    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: getValidatorOptions($data.validatorOptions || { validationRules: validationRules || [] })"></div>
     <!-- /ko -->
     <!-- ko if: !$data.validationRules -->
     <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled })"></div>
@@ -2501,7 +2499,7 @@
             <!-- ko foreach: actionLists.menuItems -->
             <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled }, visible: visible">
                 <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
-                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>
+                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text, attr: { title: $data.displayText && $data.displayText() || text}"></div>
                 <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
             </div>
             <!-- /ko -->
@@ -2725,12 +2723,15 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 19.1.3
-* Build date: 2019-05-24
+* Version: 19.1.5
+* Build date: 2019-07-30
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
+
+<script type='text/html' id='dxrd-checkboxcustomglyph'>
+<div class="dxrd-checkbox-custom-glyph" data-bind="style: $data.customGlyphStyleCss"></div></script>
 
 <script type="text/html" id="dxrp-mobile-editing-field-image">
     <div class="dxrp-editing-field-container" data-bind="style: containerStyle() ">
@@ -2957,7 +2958,7 @@
 </script>
 
 <script type="text/html" id="dxrp-editing-field-image-editor">
-    <div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: { image: $data.getImage(), imageType: $data.getImageType(), imageMode: editMode, alignment: alignment, sizeMode: sizeMode, callbacks: callbacks, isActive: isActive, zoom: zoom, popupOptions: popupOptions }"></div>
+    <div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: $data.getPictureEditorOptions()"></div>
 </script>
 
 <script type="text/html" id="dxrp-editing-field-checkbox">
@@ -3377,8 +3378,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 19.1.4
-* Build date: 2019-06-18
+* Version: 19.1.5
+* Build date: 2019-07-30
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3579,8 +3580,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 19.1.4
-* Build date: 2019-06-18
+* Version: 19.1.5
+* Build date: 2019-07-30
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4979,7 +4980,7 @@
             <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }, visible: visible">
                 <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
                 <!-- ko if: !$root.isMenuCollapsed() -->
-                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>
+                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text, attr: { title: $data.displayText && $data.displayText() || text}"></div>
                 <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
                 <!-- /ko -->
             </div>
@@ -5042,7 +5043,7 @@
 </script>
 
 <script type="text/html" id="dxrd-datasource">
-    <div data-bind="dxSelectBox: { items: $root.dataSourceHelper() && $root.dataSourceHelper().usedDataSources, value: $root.dataSourceHelper() && $root.dataSourceHelper().dataSourceValue(value, $root.undoEngine), valueExpr: 'name', displayExpr: $root.dataSourceHelper() && $root.dataSourceHelper().dataSourceDisplayExpr, displayCustomValue: true, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: getEditorOptions($root.dataSourceHelper, $root.undoEngine)"></div>
 </script>
 
 <script type="text/html" id="dxrd-bands">
@@ -5338,7 +5339,7 @@
     </div>
     <div class="dxrd-wizard-splitter">
         <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: select, disabled: !isSelectEnable(), icon: 'dxrd-svg-operations-moveright', iconClass: 'dxrd-image-moveright' }" style="margin-top: 40px"></div>
-        <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: selectAll, disabled: !isSelectEnable(), icon: 'dxrd-svg-operations-moveleft_all', iconClass: 'dxrd-image-moveright-all' }"></div>
+        <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: selectAll, disabled: !isSelectEnable(), icon: 'dxrd-svg-operations-moveright_all', iconClass: 'dxrd-image-moveright-all' }"></div>
         <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: unselect, disabled: !isUnselectEnable(), icon: 'dxrd-svg-operations-moveleft', iconClass: 'dxrd-image-moveleft' }" style="margin-top: 44px"></div>
         <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: unselectAll, disabled: !isUnselectEnable(), icon: 'dxrd-svg-operations-moveleft_all', iconClass: 'dxrd-image-moveleft-all' }"></div>
     </div>

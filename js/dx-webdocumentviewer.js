@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 19.1.4
-* Build date: 2019-06-18
+* Version: 19.1.5
+* Build date: 2019-07-30
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -162,7 +162,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-svg-pictureeditor-size_mode_stretchimage': '<svg data-bind="svgAttrs" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .st0{opacity:0.35;}</style><g><path class="Blue" d="M10 10h12v12H10z"/><path class="Black" d="M5 15h3v2H5v4l-5-5 5-5v4zm6-10h4v3h2V5h4l-5-5-5 5zm21 11l-5-5v4h-3v2h3v4l5-5zm-15 8h-2v3h-4l5 5 5-5h-4v-3z"/></g></svg>',
     'dxrd-svg-pictureeditor-size_mode_zoomimage': '<svg data-bind="svgAttrs" viewBox="0 0 32 32"><style>.Black{fill:#727272;} .Blue{fill:#1177D7;} .st0{opacity:0.35;}</style><g><path class="Blue" d="M10 10h12v12H10z"/><path class="Black" d="M6.2 4.8l2.1 2.1-1.4 1.4-2.1-2.1L2 9V2h7L6.2 4.8zm19.6 0l-2.1 2.1 1.4 1.4 2.1-2.1L30 9V2h-7l2.8 2.8zM6.2 27.2l2.1-2.1-1.4-1.4-2.1 2.1L2 23v7h7l-2.8-2.8zM23 30h7v-7l-2.8 2.8-2.1-2.1-1.4 1.4 2.1 2.1L23 30z"/></g></svg>',
     'dxrd-svg-pictureeditor-toolbar_brush_options': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .BrushColor{fill:#000000;} .st0{opacity:0.75;}</style><g><path class="BrushColor" d="M2 21c8.5 8.6 11.8-4.5 19 0-8.4-8.6-11.8 4.6-19 0z"/><path class="White" d="M8 13l2 2c-2.5 4.2-4 4-8 4 2.5-2.5 3.3-6 6-6zm6-1l6.5-6.5c.3-.3.3-.7 0-1l-2-2c-.3-.3-.7-.3-1 0L11 9l3 3zm-5-1c-.3.3-.3.7 0 1l2 2c.3.3.7.3 1 0l1-1-3-3-1 1z"/></g></svg>',
-    'dxrd-svg-pictureeditor-toolbar_clear': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><path class="White" d="M14.2 12l5.5-5.5c.3-.3.3-.8 0-1.1l-1.1-1.1c-.3-.3-.8-.3-1.1 0L12 9.8 6.5 4.2c-.3-.3-.8-.3-1.1 0L4.2 5.4c-.3.3-.3.8 0 1.1L9.8 12l-5.5 5.5c-.3.3-.3.8 0 1.1l1.1 1.1c.3.3.8.3 1.1 0l5.5-5.5 5.5 5.5c.3.3.8.3 1.1 0l1.1-1.1c.3-.3.3-.8 0-1.1L14.2 12z"/></svg>',
+    'dxrd-svg-pictureeditor-toolbar_clear': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;}</style><path class="White" d="M19 5c.6 0 1 .4 1 1v1H4V6c0-.6.4-1 1-1h5V4c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v1h5zm0 3v12c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1V8h14zM9 10H7v9h2v-9zm4 0h-2v9h2v-9zm4 0h-2v9h2v-9z"/></svg>',
     'dxrd-svg-pictureeditor-toolbar_open': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><g><path class="st0 White" d="M7.9 11.9c.4-.6 1-.9 1.7-.9H19V8.7c0-.4-.3-.7-.7-.7H10V5.7c0-.4-.3-.7-.7-.7H3.7c-.4 0-.7.3-.7.7v14l4.9-7.8z"/><path class="White" d="M9.6 12h13.2c.5 0 .9.6.6 1.1l-4 6.5c-.2.3-.5.5-.8.5H4l4.7-7.5c.2-.4.5-.6.9-.6z"/></g></svg>',
     'dxrd-svg-pictureeditor-toolbar_reset': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;}</style><path class="White" d="M12 3C9.5 3 7.3 4 5.6 5.6L3 3v8h8L7.8 7.8C8.9 6.7 10.3 6 12 6c3.3 0 6 2.7 6 6s-2.7 6-6 6c-2.6 0-4.8-1.7-5.6-4H3.2c.9 4 4.5 7 8.8 7 5 0 9-4 9-9s-4-9-9-9z"/></svg>',
     'dxrd-svg-pictureeditor-toolbar_size_mode_and_alignment': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><style>.White{fill:#FFFFFF;} .Color{fill:#5DABE0;} .st0{opacity:0.75;}</style><path class="White" d="M20 12V4h-8l3 3-8 8-3-3v8h8l-3-3 8-8z"/></svg>',
@@ -711,7 +711,7 @@ var DevExpress;
             function createFullscreenComputed(element, parent) {
                 var _fullscreen = ko.observable(false);
                 var func = function () {
-                    var isFullscreen = document.fullscreen || !!document["msFullscreenElement"];
+                    var isFullscreen = document.fullscreen || !!document["msFullscreenElement"] || !!document["webkitFullscreenElement"];
                     if (isFullscreen) {
                         if (restoreViewPortFunc)
                             return;
@@ -744,6 +744,8 @@ var DevExpress;
                 parent._disposables.push({
                     dispose: function () {
                         removeFullscreenListener(document, func);
+                        func = null;
+                        restoreViewPortFunc = null;
                     }
                 }, fullscreen);
                 return fullscreen;
@@ -846,37 +848,48 @@ var DevExpress;
                     EditingFieldExtensions.registerRegExpEditor("OnlyLatinLetters", getLocalizedString("Only Latin Letters", "PreviewStringId.EditingFieldEditors_OnlyLatinLetters"), Editing.Categories.Letters(), /^[a-zA-Z]*$/, /^[a-zA-Z]*$/, "");
                 };
                 EditingFieldExtensions.registerImageEditor = function (imageRegistrationOptions) {
-                    imageRegistrationOptions.imageLoadEnabled = imageRegistrationOptions.imageLoadEnabled === undefined ? true : imageRegistrationOptions.imageLoadEnabled;
+                    imageRegistrationOptions.imageLoadEnabled = imageRegistrationOptions.imageLoadEnabled === undefined ? !imageRegistrationOptions.images : imageRegistrationOptions.imageLoadEnabled;
                     imageRegistrationOptions.drawingEnabled = imageRegistrationOptions.drawingEnabled === undefined ? false : imageRegistrationOptions.drawingEnabled;
                     var editMode = Viewer.Widgets.PictureEditMode.ImageAndSignature;
                     if (!imageRegistrationOptions.imageLoadEnabled)
                         editMode = Viewer.Widgets.PictureEditMode.Signature;
                     if (!imageRegistrationOptions.drawingEnabled)
                         editMode = Viewer.Widgets.PictureEditMode.Image;
-                    var options = { editMode: editMode };
-                    if (imageRegistrationOptions.images || imageRegistrationOptions.customizeActions) {
-                        options["callbacks"] = {
-                            customizeActions: function (s, actions) {
-                                if (imageRegistrationOptions.customizeActions) {
-                                    imageRegistrationOptions.customizeActions(s, actions);
-                                    return;
-                                }
+                    var options = {
+                        editMode: editMode,
+                        registrationOptions: imageRegistrationOptions
+                    };
+                    options["callbacks"] = {
+                        customizeActions: function (s, actions) {
+                            if (imageRegistrationOptions.images) {
                                 var imagePickerAction = s.actionsProvider.createImagePickerAction(imageRegistrationOptions.images, imageRegistrationOptions.searchEnabled, function (base64) {
                                     s.painter.image(base64);
                                     s.painter.refresh();
                                 });
-                                var openFile = actions.filter((function (x) { return x.id === Viewer.Widgets.Internal.PictureEditorActionId.OpenFile; }))[0];
-                                if (openFile) {
-                                    actions.splice(actions.indexOf(openFile), 1);
-                                }
                                 actions.splice(0, 0, imagePickerAction);
                                 if (!imageRegistrationOptions.sizeOptionsEnabled) {
                                     var alignmentAction = actions.filter(function (x) { return x.id === Viewer.Widgets.Internal.PictureEditorActionId.Alignment; })[0];
-                                    actions.splice(actions.indexOf(alignmentAction), 1);
+                                    alignmentAction && actions.splice(actions.indexOf(alignmentAction), 1);
                                 }
                             }
-                        };
-                    }
+                            if (!imageRegistrationOptions.imageLoadEnabled) {
+                                var openFile = actions.filter((function (x) { return x.id === Viewer.Widgets.Internal.PictureEditorActionId.OpenFile; }))[0];
+                                openFile && actions.splice(actions.indexOf(openFile), 1);
+                            }
+                            if (imageRegistrationOptions.sizeOptionsEnabled !== undefined && !imageRegistrationOptions.sizeOptionsEnabled) {
+                                var alignmentAction = actions.filter(function (x) { return x.id === Viewer.Widgets.Internal.PictureEditorActionId.Alignment; })[0];
+                                alignmentAction && actions.splice(actions.indexOf(alignmentAction), 1);
+                            }
+                            if (imageRegistrationOptions.clearEnabled !== undefined && !imageRegistrationOptions.clearEnabled) {
+                                var clearAction = actions.filter(function (x) { return x.id === Viewer.Widgets.Internal.PictureEditorActionId.Clear; })[0];
+                                clearAction && actions.splice(actions.indexOf(clearAction), 1);
+                            }
+                            if (imageRegistrationOptions.customizeActions) {
+                                imageRegistrationOptions.customizeActions(s, actions);
+                                return;
+                            }
+                        }
+                    };
                     EditingFieldExtensions.registerEditor(imageRegistrationOptions.name, imageRegistrationOptions.displayName, Editing.Categories.Image(), options, "dxrp-editing-field-image");
                 };
                 EditingFieldExtensions.registerEditor = function (name, displayName, category, options, template, validate, defaultVal) {
@@ -1851,8 +1864,13 @@ var DevExpress;
                                 fullscreen(!fullscreen());
                             }
                         });
+                        _this._disposables.push(fullscreen);
                         return _this;
                     }
+                    PreviewDesignerActions.prototype.dispose = function () {
+                        _super.prototype.dispose.call(this);
+                        this.removeProperties();
+                    };
                     PreviewDesignerActions.prototype.getActions = function (context) {
                         return this.actions;
                     };
@@ -1873,6 +1891,7 @@ var DevExpress;
                             customizeActions && customizeActions(globalActions);
                             return globalActions;
                         });
+                        _this._disposables.push(_this.toolbarItems);
                         return _this;
                     }
                     ActionLists.prototype.processShortcut = function (actions, e) {
@@ -1880,20 +1899,27 @@ var DevExpress;
                             return;
                         _super.prototype.processShortcut.call(this, actions, e);
                     };
+                    ActionLists.prototype.dispose = function () {
+                        _super.prototype.dispose.call(this);
+                        this.resetObservableArray(this.globalActionProviders);
+                        this.removeProperties();
+                    };
                     return ActionLists;
                 }(DevExpress.Analytics.Internal.ActionListsBase));
                 Internal.ActionLists = ActionLists;
-                var PreviewActions = (function () {
+                var PreviewActions = (function (_super) {
+                    __extends(PreviewActions, _super);
                     function PreviewActions(reportPreview) {
-                        this.actions = [];
+                        var _this = _super.call(this) || this;
+                        _this.actions = [];
                         var printDisabled = reportPreview.exportDisabled;
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.FirstPage,
                             text: DevExpress.Analytics.Utils.getLocalization("First Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_FirstPage"),
                             imageClassName: "dxrd-image-preview-first",
                             imageTemplateName: "dxrd-svg-preview-first_page",
-                            disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 1; }),
-                            visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 1; })),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: true, keyCode: 37 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() > 0) {
@@ -1901,13 +1927,13 @@ var DevExpress;
                                 }
                             }
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.PrevPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Previous Page", "ASPxReportsStringId.ToolBarItemText_PreviousPage"),
                             imageClassName: "dxrd-image-preview-prev",
                             imageTemplateName: "dxrd-svg-preview-previous_page",
-                            disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 1; }),
-                            visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 1; })),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: false, keyCode: 37 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() >= 1) {
@@ -1919,10 +1945,10 @@ var DevExpress;
                             id: Viewer.ActionId.Pagination,
                             text: "Pagination",
                             imageClassName: "dxrd-image-pager",
-                            disabled: ko.pureComputed(function () { return reportPreview.pages().length === 0 || reportPreview.pageIndex() === -1; }),
-                            visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pages().length === 0 || reportPreview.pageIndex() === -1; })),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             clickAction: $.noop,
-                            selectedItem: ko.pureComputed({
+                            selectedItem: _this.wrapDisposable(ko.pureComputed({
                                 read: function () {
                                     if (reportPreview.pageIndex() < 0) {
                                         return null;
@@ -1936,8 +1962,8 @@ var DevExpress;
                                     }
                                 },
                                 deferEvaluation: true
-                            }),
-                            pageItems: ko.pureComputed(function () {
+                            })),
+                            pageItems: _this.wrapDisposable(ko.pureComputed(function () {
                                 var pageCount = reportPreview.pages().length;
                                 if (pageCount === 0 || reportPreview.pageIndex.peek() === -1) {
                                     return [];
@@ -1951,7 +1977,7 @@ var DevExpress;
                                     paginate: pageCount > 200,
                                     pageSize: 100
                                 };
-                            }),
+                            })),
                             currentPage: reportPreview._currentPageText,
                             focusOut: function (e) {
                                 if (!paginationSelectBoxViewModel._isPageChanged(e.component.option("text"))) {
@@ -1989,14 +2015,14 @@ var DevExpress;
                             opened: ko.observable(false),
                             templateName: "dxrd-preview-pager"
                         };
-                        this.actions.push(paginationSelectBoxViewModel);
-                        this.actions.push({
+                        _this.actions.push(paginationSelectBoxViewModel);
+                        _this.actions.push({
                             id: Viewer.ActionId.NextPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Next Page", "ASPxReportsStringId.ToolBarItemText_NextPage"),
                             imageClassName: "dxrd-image-preview-next",
                             imageTemplateName: "dxrd-svg-preview-next_page",
-                            disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; }),
-                            visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; })),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: false, keyCode: 39 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
@@ -2004,13 +2030,13 @@ var DevExpress;
                                 }
                             }
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.LastPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Last Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_LastPage"),
                             imageClassName: "dxrd-image-preview-last",
                             imageTemplateName: "dxrd-svg-preview-last_page",
-                            disabled: ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; }),
-                            visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; })),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: true, keyCode: 39 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
@@ -2018,13 +2044,13 @@ var DevExpress;
                                 }
                             }
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.MultipageToggle,
                             text: DevExpress.Analytics.Utils.getLocalization("Toggle Multipage Mode", "ASPxReportsStringId.WebDocumentViewer_ToggleMultipageMode"),
-                            imageClassName: ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage"; }),
-                            imageTemplateName: ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-svg-preview-single_page" : "dxrd-svg-preview-multi_page_preview"; }),
+                            imageClassName: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage"; })),
+                            imageTemplateName: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-svg-preview-single_page" : "dxrd-svg-preview-multi_page_preview"; })),
                             disabled: ko.observable(false),
-                            visible: ko.pureComputed(function () { return reportPreview.previewVisible(); }),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: true, keyCode: 77 },
                             clickAction: function () {
                                 var zoom = reportPreview._zoom();
@@ -2033,7 +2059,7 @@ var DevExpress;
                             },
                             hasSeparator: true
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.ZoomOut,
                             text: DevExpress.Analytics.Utils.getLocalization("Zoom Out", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomOut"),
                             imageClassName: "dxrd-image-zoomout",
@@ -2049,7 +2075,7 @@ var DevExpress;
                             },
                             hasSeparator: true
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.ZoomSelector,
                             text: DevExpress.Analytics.Utils.getLocalization('Zoom to Whole Page', 'DevExpress.XtraPrinting.PrintingSystemCommand.ZoomToWholePage'),
                             imageClassName: "dxrd-image-zoom",
@@ -2074,16 +2100,16 @@ var DevExpress;
                             onCustomItemCreating: function (e) { e.customItem = DevExpress.Analytics.Internal.parseZoom(e.text); },
                             zoom: reportPreview.zoom,
                             zoomLevels: reportPreview.predefinedZoomLevels,
-                            zoomItems: ko.pureComputed(function () {
+                            zoomItems: _this.wrapDisposable(ko.pureComputed(function () {
                                 var items = reportPreview.predefinedZoomLevels.slice(0);
                                 if (reportPreview.showMultipagePreview() === false && items.indexOf(0) === -1) {
                                     items.push(Viewer.ZoomAutoBy.PageWidth);
                                     items.push(Viewer.ZoomAutoBy.WholePage);
                                 }
                                 return items;
-                            })
+                            }))
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.ZoomIn,
                             text: DevExpress.Analytics.Utils.getLocalization("Zoom In", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomIn"),
                             imageClassName: "dxrd-image-zoomin",
@@ -2098,25 +2124,25 @@ var DevExpress;
                                 reportPreview.zoom(Math.min(zoomLevel + reportPreview.zoomStep(), 10));
                             }
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.HighlightEditingFields,
                             text: DevExpress.Analytics.Utils.getLocalization("Highlight Editing Fields", "DevExpress.XtraPrinting.PrintingSystemCommand.HighlightEditingFields"),
                             imageClassName: "dxrp-image-hightlight-editing-fields",
                             imageTemplateName: "dxrd-svg-toolbar-hightlightEditingFields",
-                            disabled: ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; }),
-                            visible: ko.pureComputed(function () {
+                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; })),
+                            visible: _this.wrapDisposable(ko.pureComputed(function () {
                                 var available = Settings.EditablePreviewEnabled();
                                 var viewerVisible = reportPreview.previewVisible();
                                 return available && viewerVisible;
-                            }),
-                            selected: ko.pureComputed(function () { return reportPreview.editingFieldsHighlighted(); }),
+                            })),
+                            selected: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.editingFieldsHighlighted(); })),
                             hotKey: { ctrlKey: true, keyCode: 72 },
                             clickAction: function () {
                                 reportPreview.editingFieldsHighlighted(!reportPreview.editingFieldsHighlighted());
                             },
                             hasSeparator: true
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.Print,
                             text: DevExpress.Analytics.Utils.getLocalization("Print", "ASPxReportsStringId.DocumentViewer_RibbonPrintGroupText"),
                             imageClassName: "dxrd-image-print",
@@ -2132,7 +2158,7 @@ var DevExpress;
                                 reportPreview.printDocument();
                             }
                         });
-                        this.actions.push({
+                        _this.actions.push({
                             id: Viewer.ActionId.PrintPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Print Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintPage"),
                             imageClassName: "dxrd-image-print-page",
@@ -2146,12 +2172,21 @@ var DevExpress;
                                 reportPreview.printDocument(reportPreview.pageIndex());
                             }
                         });
+                        return _this;
                     }
+                    PreviewActions.prototype.wrapDisposable = function (object) {
+                        this._disposables.push(object);
+                        return object;
+                    };
+                    PreviewActions.prototype.dispose = function () {
+                        _super.prototype.dispose.call(this);
+                        this.removeProperties();
+                    };
                     PreviewActions.prototype.getActions = function (context) {
                         return this.actions;
                     };
                     return PreviewActions;
-                }());
+                }(DevExpress.Analytics.Utils.Disposable));
                 Internal.PreviewActions = PreviewActions;
                 function convertToPercent(childSize, parentSize) {
                     return childSize * 100 / parentSize + '%';
@@ -2238,7 +2273,7 @@ var DevExpress;
                                 }
                             }
                         });
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                             subscription.dispose();
                         });
                     }
@@ -2271,7 +2306,7 @@ var DevExpress;
                         var scrollLoad = function () { return loadVisibleImages(700); };
                         $element.on("scroll", scrollLoad);
                         loadVisibleImages(500);
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                             $element.off("scroll", scrollLoad);
                             subscribtion.dispose();
                         });
@@ -2301,7 +2336,7 @@ var DevExpress;
                         };
                         $(document).on("keydown", keyDownHandler);
                         $(document).on("keyup", keyUpHandler);
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                             $(document).off("keydown", keyDownHandler);
                             $(document).off("keyup", keyUpHandler);
                         });
@@ -2339,7 +2374,7 @@ var DevExpress;
                         subscribe(options.autoFitBy);
                         subscribe(options.brickLoading);
                         subscribe(options.previewSize);
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                             $(window).unbind("resize", onResize);
                             subscriptions.forEach(function (subscription) {
                                 subscription.dispose();
@@ -2814,7 +2849,7 @@ var DevExpress;
                     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                         var values = valueAccessor(), unwrappedValues = ko.unwrap(values);
                         var selection = new PreviewSelection(element, unwrappedValues.page, unwrappedValues.click);
-                        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                             selection.dispose();
                         });
                     }
@@ -3201,6 +3236,38 @@ var DevExpress;
                     return PreviewPage;
                 }(DevExpress.Analytics.Utils.Disposable));
                 Internal.PreviewPage = PreviewPage;
+                var PreviewModel = (function (_super) {
+                    __extends(PreviewModel, _super);
+                    function PreviewModel(options) {
+                        var _this = _super.call(this) || this;
+                        _this.rootStyle = options.rootStyle;
+                        _this.reportPreview = options.reportPreview;
+                        _this.parametersModel = options.parametersModel;
+                        _this.exportModel = options.exportModel;
+                        _this.searchModel = options.searchModel;
+                        _this.documentMapModel = options.documentMapModel;
+                        _this.tabPanel = options.tabPanel;
+                        _this.actionLists = options.actionLists;
+                        _this.rtl = options.rtl;
+                        _this._disposables.push(options.reportPreview);
+                        _this._disposables.push(options.parametersModel);
+                        _this._disposables.push(options.exportModel);
+                        _this._disposables.push(options.searchModel);
+                        _this._disposables.push(options.documentMapModel);
+                        _this._disposables.push(options.tabPanel);
+                        _this._disposables.push(options.actionLists);
+                        return _this;
+                    }
+                    PreviewModel.prototype._addDisposable = function (object) {
+                        this._disposables.push(object);
+                    };
+                    PreviewModel.prototype.dispose = function () {
+                        _super.prototype.dispose.call(this);
+                        this.removeProperties();
+                    };
+                    return PreviewModel;
+                }(DevExpress.Analytics.Utils.Disposable));
+                Internal.PreviewModel = PreviewModel;
                 function createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl, tabPanelSettings) {
                     if (previewVisible === void 0) { previewVisible = true; }
                     if (applyBindings === void 0) { applyBindings = true; }
@@ -3224,10 +3291,12 @@ var DevExpress;
                         rtl: rtl
                     });
                     tabPanel.collapsed(true);
-                    var globalActionProviders = ko.observableArray([new Internal.PreviewActions(reportPreview), exportModel, searchModel, new Internal.PreviewDesignerActions(reportPreview, element)]);
+                    var previewActions = new Internal.PreviewActions(reportPreview);
+                    var designPreviewActions = new Internal.PreviewDesignerActions(reportPreview, element);
+                    var globalActionProviders = ko.observableArray([previewActions, exportModel, searchModel, designPreviewActions]);
                     var actionLists = new Internal.ActionLists(reportPreview, globalActionProviders, callbacks && callbacks.customizeActions, reportPreview.previewVisible);
                     reportPreview.previewVisible(previewVisible);
-                    var designerModel = {
+                    var designerModelOptions = {
                         rootStyle: "dxrd-preview dxd-back-primary",
                         reportPreview: reportPreview,
                         parametersModel: parametersModel,
@@ -3238,6 +3307,9 @@ var DevExpress;
                         actionLists: actionLists,
                         rtl: reportPreview.rtlViewer
                     };
+                    var designerModel = new PreviewModel(designerModelOptions);
+                    designerModel._addDisposable(previewActions);
+                    designerModel._addDisposable(designPreviewActions);
                     designerModel.parts = [
                         { id: Viewer.PreviewElements.Toolbar, templateName: Viewer.PreviewElements.Toolbar, model: { actionLists: actionLists } },
                         { id: Viewer.PreviewElements.Surface, templateName: Viewer.PreviewElements.Surface, model: designerModel.reportPreview },
@@ -3253,21 +3325,31 @@ var DevExpress;
                         updatePreviewContentSize_(tabPanel.position());
                     };
                     $(window).bind("resize", designerModel.resizeCallback);
-                    tabPanel.width.subscribe(function () {
+                    designerModel._addDisposable({
+                        dispose: function () {
+                            $(window).unbind("resize", designerModel.resizeCallback);
+                        }
+                    });
+                    designerModel._addDisposable(tabPanel.width.subscribe(function () {
                         setTimeout(function () { return updatePreviewContentSize_(tabPanel.position()); }, 1);
-                    });
-                    tabPanel.position.subscribe(function (newVal) {
+                    }));
+                    designerModel._addDisposable(tabPanel.position.subscribe(function (newVal) {
                         updatePreviewContentSize_(newVal);
-                    });
-                    tabPanel.isEmpty.subscribe(function () {
+                    }));
+                    designerModel._addDisposable(tabPanel.isEmpty.subscribe(function () {
                         setTimeout(function () {
                             updatePreviewContentSize_(tabPanel.position());
                         }, 1);
-                    });
+                    }));
                     designerModel.updateSurfaceSize = function () {
                         updatePreviewContentSize_(tabPanel.position());
                     };
                     updatePreviewContentSize_(tabPanel.position());
+                    designerModel._addDisposable({
+                        dispose: function () {
+                            updatePreviewContentSize_ = null;
+                        }
+                    });
                     DevExpress.Analytics.Internal.appendStaticContextToRootViewModel(designerModel, DevExpress);
                     if (element && !reportPreview.canSwitchToDesigner && applyBindings) {
                         callbacks.beforeRender && callbacks.beforeRender(designerModel);
@@ -4308,6 +4390,9 @@ var DevExpress;
                                     result.resolve(root);
                                 }
                             }
+                            else {
+                                result.reject();
+                            }
                             return result.promise();
                         };
                     }
@@ -4372,11 +4457,12 @@ var DevExpress;
                     return DocumentMapTreeListController;
                 }());
                 Internal.DocumentMapTreeListController = DocumentMapTreeListController;
-                var DocumentMapModel = (function () {
+                var DocumentMapModel = (function (_super) {
+                    __extends(DocumentMapModel, _super);
                     function DocumentMapModel(reportPreview) {
-                        var _this = this;
-                        this._selectedPath = ko.observable("0");
-                        this._setSelectedPathByNavigationNode = function (nodes, brickNavigation, path) {
+                        var _this = _super.call(this) || this;
+                        _this._selectedPath = ko.observable("0");
+                        _this._setSelectedPathByNavigationNode = function (nodes, brickNavigation, path) {
                             if (path === void 0) { path = "0"; }
                             nodes.forEach(function (item, index) {
                                 if (item.indexes === brickNavigation.indexes && item.pageIndex === brickNavigation.pageIndex) {
@@ -4389,7 +4475,7 @@ var DevExpress;
                             return _this._selectedPath();
                         };
                         var treeListController = new DocumentMapTreeListController();
-                        this.isEmpty = ko.pureComputed(function () {
+                        _this.isEmpty = ko.pureComputed(function () {
                             return !(reportPreview.documentMap() && reportPreview.documentMap().nodes && (reportPreview.documentMap().nodes.length !== 0));
                         });
                         treeListController.clickHandler = function (item) {
@@ -4403,7 +4489,7 @@ var DevExpress;
                             if (reportPreview.documentMap && reportPreview.documentMap())
                                 _this._setSelectedPathByNavigationNode(reportPreview.documentMap().nodes, brickNavigation);
                         };
-                        this.documentMapOptions = ko.pureComputed(function () {
+                        _this.documentMapOptions = ko.pureComputed(function () {
                             return {
                                 itemsProvider: new DocumentMapItemsProvider(reportPreview.documentMap()),
                                 expandRootItems: true,
@@ -4411,18 +4497,25 @@ var DevExpress;
                                 treeListController: treeListController
                             };
                         });
-                        this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
+                        var documentMapTabVisible = ko.pureComputed(function () { return !_this.isEmpty(); });
+                        _this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
                             text: "Document Map",
                             template: "dxrd-preview-document-map",
-                            model: this,
+                            model: _this,
                             localizationId: "DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap",
                             imageClassName: "reportexplorer",
                             imageTemplateName: "dxrd-svg-tabs-reportexplorer",
-                            visible: ko.pureComputed(function () { return !_this.isEmpty(); })
+                            visible: documentMapTabVisible
                         });
+                        _this._disposables.push(_this.tabInfo, documentMapTabVisible, _this.documentMapOptions, _this.isEmpty);
+                        return _this;
                     }
+                    DocumentMapModel.prototype.dispose = function () {
+                        _super.prototype.dispose.call(this);
+                        this.removeProperties();
+                    };
                     return DocumentMapModel;
-                }());
+                }(DevExpress.Analytics.Utils.Disposable));
                 Internal.DocumentMapModel = DocumentMapModel;
             })(Internal = Viewer.Internal || (Viewer.Internal = {}));
             var Widgets;
@@ -4773,14 +4866,16 @@ var DevExpress;
                             this._context.canvas.setAttribute('width', width);
                             this._context.canvas.setAttribute('height', height);
                         };
-                        Painter.prototype.clear = function (applyValue) {
-                            if (applyValue === void 0) { applyValue = false; }
+                        Painter.prototype._cleanCanvas = function () {
                             this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
-                            applyValue && this.image(null);
+                        };
+                        Painter.prototype.clear = function () {
+                            this._cleanCanvas();
+                            this.image(null);
                         };
                         Painter.prototype.refresh = function () {
                             var _this = this;
-                            this.clear();
+                            this._cleanCanvas();
                             var zoom = this.signaturePainter.hasPoints() ? 1 : this.zoom();
                             var size = this.signaturePainter.hasPoints() ? this.initialSize : undefined;
                             this.imagePainter.refresh(this._context, zoom, size)
@@ -4834,7 +4929,7 @@ var DevExpress;
                             var $child = $(child);
                             var model = new Painter(options);
                             model.initSize($child, options.zoom());
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                            DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                                 model.dispose();
                             });
                             ko.applyBindings(model, child);
@@ -4901,7 +4996,7 @@ var DevExpress;
                         PictureEditorActionId[PictureEditorActionId["Alignment"] = 2] = "Alignment";
                         PictureEditorActionId[PictureEditorActionId["Brush"] = 3] = "Brush";
                         PictureEditorActionId[PictureEditorActionId["Clear"] = 4] = "Clear";
-                        PictureEditorActionId[PictureEditorActionId["ClearAll"] = 5] = "ClearAll";
+                        PictureEditorActionId[PictureEditorActionId["Reset"] = 5] = "Reset";
                     })(PictureEditorActionId = Internal.PictureEditorActionId || (Internal.PictureEditorActionId = {}));
                     var PictureEditorActionProvider = (function (_super) {
                         __extends(PictureEditorActionProvider, _super);
@@ -4953,7 +5048,7 @@ var DevExpress;
                             var openFileActionOptions = {
                                 id: PictureEditorActionId.OpenFile,
                                 icon: "dxrd-svg-pictureeditor-toolbar_open",
-                                title: DevExpress.Analytics.Utils.getLocalization("Load Image", "TODO"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Load Image", "PreviewStringId.ImageEditingFieldEditor_LoadImage"),
                                 template: "dx-file-dialog",
                                 isActive: ko.observable(false),
                                 action: function (e) { return action(e); }
@@ -5005,7 +5100,7 @@ var DevExpress;
                             return new PictureEditorToolbarItemWithPopup({
                                 id: PictureEditorActionId.PickImage,
                                 icon: "dxrd-svg-pictureeditor-image_gallery",
-                                title: DevExpress.Analytics.Utils.getLocalization("Choose Image", "TODO"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Choose Image", "PreviewStringId.ImageEditingFieldEditor_ChooseImage"),
                                 isActive: active,
                                 template: "dx-picture-editing-toolbar-popup",
                                 templateOptions: popupOptions
@@ -5019,10 +5114,10 @@ var DevExpress;
                                 visible: alignmentActive,
                                 contentTemplate: "dx-picture-editing-sizemode-alignment",
                                 contentData: {
-                                    sizeModeText: DevExpress.Analytics.Utils.getLocalization("Size mode", "DevExpress.XtraReports.UI.XRPictureBox.Sizing"),
+                                    sizeModeText: DevExpress.Analytics.Utils.getLocalization("Size Mode", "PreviewStringId.ImageEditingFieldEditor_SizeMode"),
                                     sizeMode: this._editorModel.painter.imageSizeMode,
                                     sizeModeValues: this._getValues(Editing.ImageSizeMode, 'size_mode', 'imageSizeMode'),
-                                    alignmentText: DevExpress.Analytics.Utils.getLocalization("Image Alignment", "DevExpress.XtraReports.UI.XRPictureBox.ImageAlignment"),
+                                    alignmentText: DevExpress.Analytics.Utils.getLocalization("Alignment", "PreviewStringId.ImageEditingFieldEditor_Alignment"),
                                     alignment: this._editorModel.painter.imageAlignment,
                                     alignmentValues: this._getValues(Editing.ImageAlignment, 'alignment', 'imageAlignment'),
                                 }
@@ -5030,7 +5125,7 @@ var DevExpress;
                             return new PictureEditorToolbarItemWithPopup({
                                 id: PictureEditorActionId.Alignment,
                                 icon: "dxrd-svg-pictureeditor-toolbar_size_mode_and_alignment",
-                                title: DevExpress.Analytics.Utils.getLocalization("Size Mode and Alignment", "TODO"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Size Mode and Alignment", "PreviewStringId.ImageEditingFieldEditor_SizeModeAndAlignment"),
                                 isActive: alignmentActive,
                                 template: "dx-picture-editing-toolbar-popup",
                                 templateOptions: popupOptions
@@ -5047,14 +5142,14 @@ var DevExpress;
                                     lineWidth: this._editorModel.painter.lineWidth,
                                     lineColor: this._editorModel.painter.lineColor,
                                     colors: this._getColorValues(),
-                                    brushWidthText: DevExpress.Analytics.Utils.getLocalization("Brush size", "TODO"),
-                                    brushColorText: DevExpress.Analytics.Utils.getLocalization("Brush color", "TODO"),
+                                    brushWidthText: DevExpress.Analytics.Utils.getLocalization("Brush size", "PreviewStringId.ImageEditingFieldEditor_BrushSize"),
+                                    brushColorText: DevExpress.Analytics.Utils.getLocalization("Brush color", "PreviewStringId.ImageEditingFieldEditor_BrushColor"),
                                 }
                             });
                             return new PictureEditorToolbarItemWithPopup({
                                 id: PictureEditorActionId.Brush,
                                 icon: "dxrd-svg-pictureeditor-toolbar_brush_options",
-                                title: DevExpress.Analytics.Utils.getLocalization("Brush Options", "TODO"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Brush Options", "PreviewStringId.ImageEditingFieldEditor_BrushOptions"),
                                 isActive: brushItemActive,
                                 template: "dx-picture-editing-toolbar-popup",
                                 templateOptions: popupOptions,
@@ -5071,9 +5166,19 @@ var DevExpress;
                         };
                         PictureEditorActionProvider.prototype.createResetItem = function (action) {
                             var clearItemOptions = {
+                                id: PictureEditorActionId.Reset,
+                                icon: "dxrd-svg-pictureeditor-toolbar_reset",
+                                title: DevExpress.Analytics.Utils.getLocalization("Reset", "PreviewStringId.ImageEditingFieldEditor_Reset"),
+                                isActive: ko.observable(false),
+                                action: function (e) { return action(); }
+                            };
+                            return new PictureEditorToolbarItem(clearItemOptions);
+                        };
+                        PictureEditorActionProvider.prototype.createClearItem = function (action) {
+                            var clearItemOptions = {
                                 id: PictureEditorActionId.Clear,
                                 icon: "dxrd-svg-pictureeditor-toolbar_clear",
-                                title: DevExpress.Analytics.Utils.getLocalization("Reset Changes", "TODO"),
+                                title: DevExpress.Analytics.Utils.getLocalization("Clear", "PreviewStringId.ImageEditingFieldEditor_Clear"),
                                 isActive: ko.observable(false),
                                 action: function (e) { return action(); }
                             };
@@ -5092,6 +5197,9 @@ var DevExpress;
                             _this._getPopupContent = function () {
                                 var popupInstance = DevExpress.ui.dxPopup["getInstance"](_this.$element.find(_this.ACTIVE_POPUP_CLASS).get(0));
                                 return popupInstance && $(popupInstance.content());
+                            };
+                            _this._loadImageCallBack = function (_) {
+                                _this._handleFiles(_this._cacheLoadFileElement.get(0));
                             };
                             _this.actions = [];
                             _this.canDraw = ko.observable(false);
@@ -5159,19 +5267,32 @@ var DevExpress;
                             if (this.editMode == PictureEditMode.Signature || this.editMode == PictureEditMode.ImageAndSignature) {
                                 this.actions.push(this.actionsProvider.createBrushAction());
                             }
-                            this.actions.push(this.actionsProvider.createResetItem(function () {
-                                _this.painter.reset(_this._initialImage, _this._initialAlignment, _this._initialSizeMode);
+                            if (!!this._initialImage) {
+                                this.actions.push(this.actionsProvider.createResetItem(function () {
+                                    _this.painter.reset(_this._initialImage, _this._initialAlignment, _this._initialSizeMode);
+                                    _this._clearLoadedFile();
+                                }));
+                            }
+                            this.actions.push(this.actionsProvider.createClearItem(function () {
+                                _this.painter.clear();
+                                _this._clearLoadedFile();
                             }));
                             customizeActionsCallback && customizeActionsCallback(this, this.actions);
                             this.actions.forEach(function (item) { return _this._wrapButtonAction(item, _this); });
                         };
+                        PictureEditorModel.prototype._clearLoadedFile = function () {
+                            if (this._cacheLoadFileElement) {
+                                this._cacheLoadFileElement.off('change', this._loadImageCallBack);
+                                this._cacheLoadFileElement.replaceWith(this._cacheLoadFileElement.val('').clone(true));
+                            }
+                        };
                         PictureEditorModel.prototype._loadImage = function (event) {
-                            var self = this;
                             var $input = $(event.currentTarget).siblings('input');
-                            $input.on("change", function (e) {
-                                self._handleFiles($input.get(0));
-                            });
-                            $input.click();
+                            if (this._cacheLoadFileElement !== $input) {
+                                this._cacheLoadFileElement = $input;
+                                this._cacheLoadFileElement.on('change', this._loadImageCallBack);
+                                this._cacheLoadFileElement.click();
+                            }
                         };
                         PictureEditorModel.prototype._handleFiles = function (filesHolder) {
                             var _this = this;
@@ -5237,8 +5358,12 @@ var DevExpress;
                             DevExpress["events"].off(element, 'dxpointerdown', this._pointerDownHandler);
                             DevExpress["events"].off(element, 'dxpointercancel', this._pointerCancelHandler);
                             DevExpress["events"].off(document, 'dxpointerup', this._pointerUpHandler);
+                            if (this._cacheLoadFileElement) {
+                                this._cacheLoadFileElement.off('change', this._loadImageCallBack);
+                            }
                             this.actions.forEach(function (action) { return action.dispose && action.dispose(); });
                             this.$element = null;
+                            this._cacheLoadFileElement = null;
                         };
                         PictureEditorModel.prototype.getImage = function () {
                             return this.painter.getImage();
@@ -5248,6 +5373,7 @@ var DevExpress;
                             this._initialAlignment = alignment;
                             this._initialSizeMode = sizeMode;
                             this.painter.reset(this._initialImage, this._initialAlignment, this._initialSizeMode);
+                            this._clearLoadedFile();
                         };
                         PictureEditorModel.prototype.getCurrentOptions = function () {
                             var imageBase64 = (this.painter.hasSignature() ? this.painter.getImage() : this.painter.image()) || "";
@@ -5270,7 +5396,7 @@ var DevExpress;
                             var $element = $(element).append(templateHtml);
                             var child = $element.children()[0];
                             var model = new PictureEditorModel(options, child);
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                            DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                                 model.dispose();
                             });
                             return { controlsDescendantBindings: true };
@@ -5616,6 +5742,19 @@ var DevExpress;
                     };
                     ImageEditingFieldViewModel.prototype.getImageType = function () {
                         return this.field.editValue().imageType;
+                    };
+                    ImageEditingFieldViewModel.prototype.getPictureEditorOptions = function () {
+                        return {
+                            image: this.getImage(),
+                            imageType: this.getImageType(),
+                            imageMode: ko.observable(this.editMode),
+                            alignment: this.alignment,
+                            sizeMode: this.sizeMode,
+                            callbacks: this.callbacks,
+                            isActive: this.isActive,
+                            zoom: this.zoom,
+                            popupOptions: this.popupOptions
+                        };
                     };
                     ImageEditingFieldViewModel.prototype.onKeyDown = function (_, e) {
                         if (e.keyCode == 32) {
@@ -6337,21 +6476,36 @@ var DevExpress;
                     return ExportOptionsMergedPreview;
                 }(ExportOptionsPreview));
                 Export.ExportOptionsMergedPreview = ExportOptionsMergedPreview;
-                var ExportOptionsModel = (function () {
+                var ExportOptionsModel = (function (_super) {
+                    __extends(ExportOptionsModel, _super);
                     function ExportOptionsModel(reportPreview) {
-                        var _this = this;
-                        this.actions = [];
-                        this._reportPreview = reportPreview;
-                        this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
+                        var _this = _super.call(this) || this;
+                        _this.actions = [];
+                        _this._reportPreview = reportPreview;
+                        var tabPanelVisible = ko.pureComputed(function () { return !!reportPreview.exportOptionsModel() && (!reportPreview.exportOptionsTabVisible || reportPreview.exportOptionsTabVisible()); });
+                        _this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
                             text: "Export Options",
                             template: "dxrd-preview-export-options",
                             model: reportPreview.exportOptionsModel,
                             localizationId: 'DevExpress.XtraPrinting.ExportOptions',
                             imageClassName: "properties",
                             imageTemplateName: "dxrd-svg-tabs-properties",
-                            visible: ko.pureComputed(function () { return !!reportPreview.exportOptionsModel() && (!reportPreview.exportOptionsTabVisible || reportPreview.exportOptionsTabVisible()); })
+                            visible: tabPanelVisible
                         });
-                        this.actions.push({
+                        _this._disposables.push(tabPanelVisible);
+                        _this._disposables.push(_this.tabInfo);
+                        var exportItems = ko.pureComputed(function () {
+                            var result = _this._getExportFormatItems();
+                            return [{
+                                    text: "Export To",
+                                    textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
+                                    imageClassName: "dxrd-image-export-to",
+                                    imageTemplateName: "dxrd-svg-preview-export-export-to",
+                                    items: result
+                                }];
+                        });
+                        _this._disposables.push(exportItems);
+                        _this.actions.push({
                             id: Viewer.ActionId.ExportTo,
                             text: "Export To",
                             textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
@@ -6362,18 +6516,10 @@ var DevExpress;
                                     return;
                                 _this._exportDocumentByFormat(model.itemData.format);
                             },
-                            items: ko.pureComputed(function () {
-                                var result = _this._getExportFormatItems();
-                                return [{
-                                        text: "Export To",
-                                        textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
-                                        imageClassName: "dxrd-image-export-to",
-                                        imageTemplateName: "dxrd-svg-preview-export-export-to",
-                                        items: result
-                                    }];
-                            }),
+                            items: exportItems,
                             templateName: "dxrd-preview-export-to"
                         });
+                        return _this;
                     }
                     ExportOptionsModel.prototype._getExportFormatItems = function () {
                         var result = [];
@@ -6399,8 +6545,12 @@ var DevExpress;
                     ExportOptionsModel.prototype.getActions = function (context) {
                         return this.actions;
                     };
+                    ExportOptionsModel.prototype.dispose = function () {
+                        _super.prototype.dispose.call(this);
+                        this.removeProperties();
+                    };
                     return ExportOptionsModel;
-                }());
+                }(DevExpress.Analytics.Utils.Disposable));
                 Export.ExportOptionsModel = ExportOptionsModel;
             })(Export = Viewer.Export || (Viewer.Export = {}));
             var ReportPreview = (function (_super) {
@@ -6425,6 +6575,8 @@ var DevExpress;
                     _this._drillDownState = [];
                     _this._sortingState = [];
                     _this._sortingProcessor = new Internal.SortingProcessor(function () { return _this._sortingState || []; });
+                    _this._timeouts = [];
+                    _this._deferreds = [];
                     _this._window = null;
                     _this.rtlReport = ko.observable(false);
                     _this.currentPage = ko.observable(null);
@@ -6490,7 +6642,7 @@ var DevExpress;
                         _this.customProcessBrickClick = callbacks.previewClick;
                         _this.customizeExportOptions = callbacks.customizeExportOptions;
                     }
-                    _this.documentBuilding.subscribe(function (newVal) {
+                    _this._disposables.push(_this.documentBuilding.subscribe(function (newVal) {
                         if (!newVal) {
                             _this._unifier(Reporting.Internal.generateGuid());
                             var documentId = _this._currentDocumentId();
@@ -6508,11 +6660,14 @@ var DevExpress;
                                 documentId && callbacks.documentReady(documentId, _this._currentReportId(), pageCount);
                             }
                         }
-                    });
+                    }));
                     _this._disposables.push(_this._currentDocumentId.subscribe(function (newVal) {
                         _this._unifier(newVal ? Reporting.Internal.generateGuid() : '');
                     }));
                     _this._disposables.push(_this.previewSize.subscribe(function () { return _this._raiseOnSizeChanged(); }));
+                    _this._disposables.push(_this.zoom);
+                    _this._disposables.push(_this.exportDisabled);
+                    _this._disposables.push(_this._currentPageText);
                     _this._disposables.push(_this._zoom.subscribe(function () {
                         if (_this.showMultipagePreview()) {
                             _this.pages().forEach(function (page) {
@@ -6526,7 +6681,7 @@ var DevExpress;
                             currentPage && currentPage.isClientVisible.notifySubscribers(currentPage.isClientVisible.peek());
                         }
                     }));
-                    ko.computed(function () {
+                    _this._disposables.push(ko.computed(function () {
                         var pagesArray = _this.pages();
                         var pageIndex = _this.pageIndex();
                         if (!pagesArray || pageIndex >= pagesArray.length)
@@ -6536,7 +6691,7 @@ var DevExpress;
                             currentPage = pagesArray[pageIndex];
                         if (currentPage != _this.currentPage.peek())
                             _this.currentPage(currentPage);
-                    });
+                    }));
                     return _this;
                 }
                 ReportPreview.prototype._doDrillDown = function (drillDownKey) {
@@ -6566,6 +6721,9 @@ var DevExpress;
                 };
                 ReportPreview.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
+                    (this._timeouts || []).forEach(function (tic) { return clearTimeout(tic); });
+                    (this._deferreds || []).forEach(function (deferred) { return deferred.reject(); });
+                    this.removeProperties();
                     this._sortingProcessor = null;
                 };
                 ReportPreview.prototype.removeEmptyPages = function (all) {
@@ -6702,6 +6860,7 @@ var DevExpress;
                 ReportPreview.prototype.openReport = function (reportName) {
                     this._clearReportInfo();
                     var deferred = $.Deferred();
+                    this._deferreds.push(deferred);
                     this._openReportOperationDeferred = deferred;
                     this.requestWrapper.openReport(reportName).done(function (response) {
                         deferred.resolve(response);
@@ -6731,40 +6890,44 @@ var DevExpress;
                     this._currentReportUrl(null);
                     this._currentDocumentId(null);
                     this._initialize();
-                    initializeDataPromise.done(function (previewInitialize) {
-                        if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
-                            _this._currentReportId(previewInitialize.reportId);
-                            _this._currentReportUrl(previewInitialize.reportUrl);
-                            _this._currentDocumentId(previewInitialize.documentId);
-                            _this.rtlReport(previewInitialize.rtlReport);
-                            var pageSettings = previewInitialize.pageSettings;
-                            if (pageSettings) {
-                                if (pageSettings.height)
-                                    _this._pageHeight(pageSettings.height);
-                                if (pageSettings.width)
-                                    _this._pageWidth(pageSettings.width);
-                                _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
+                    var _initializeDeferred = $.Deferred();
+                    this._deferreds.push(_initializeDeferred);
+                    _initializeDeferred.done(function () {
+                        initializeDataPromise.done(function (previewInitialize) {
+                            if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
+                                _this._currentReportId(previewInitialize.reportId);
+                                _this._currentReportUrl(previewInitialize.reportUrl);
+                                _this._currentDocumentId(previewInitialize.documentId);
+                                _this.rtlReport(previewInitialize.rtlReport);
+                                var pageSettings = previewInitialize.pageSettings;
+                                if (pageSettings) {
+                                    if (pageSettings.height)
+                                        _this._pageHeight(pageSettings.height);
+                                    if (pageSettings.width)
+                                        _this._pageWidth(pageSettings.width);
+                                    _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
+                                }
+                                var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions);
+                                var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
+                                _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
+                                _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
+                                _this.exportOptionsModel(deserializedExportOptions);
+                                _this.originalParametersInfo(previewInitialize.parametersInfo);
+                                if (previewInitialize.documentId) {
+                                    _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
+                                    _this.documentBuilding(true);
+                                    var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
+                                    doGetBuildStatusFunc(previewInitialize.documentId);
+                                }
                             }
-                            var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions);
-                            var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
-                            _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
-                            _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
-                            _this.exportOptionsModel(deserializedExportOptions);
-                            _this.originalParametersInfo(previewInitialize.parametersInfo);
-                            if (previewInitialize.documentId) {
-                                _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
-                                _this.documentBuilding(true);
-                                var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
-                                doGetBuildStatusFunc(previewInitialize.documentId);
+                            else {
+                                _this.pageLoading(false);
+                                _this._processError(DevExpress.Analytics.Utils.getLocalization("The report preview initialization has failed", "ASPxReportsStringId.WebDocumentViewer_InitializationErro"), previewInitialize && previewInitialize.error);
                             }
-                        }
-                        else {
-                            _this.pageLoading(false);
-                            _this._processError(DevExpress.Analytics.Utils.getLocalization("The report preview initialization has failed", "ASPxReportsStringId.WebDocumentViewer_InitializationErro"), previewInitialize && previewInitialize.error);
-                        }
-                    }).fail(function (error) {
-                        _this.removeEmptyPages();
-                    });
+                        }).fail(function (error) {
+                            _this.removeEmptyPages();
+                        });
+                    }).resolve();
                     return initializeDataPromise;
                 };
                 ReportPreview.prototype._deserializeExportOptions = function (exportOptionsString, isMerged) {
@@ -6858,11 +7021,11 @@ var DevExpress;
                 ReportPreview.prototype.getExportStatus = function (operationId) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    setTimeout(function () {
+                    this._timeouts.push(setTimeout(function () {
                         _this.requestWrapper.getExportStatusRequest(operationId)
                             .done(function (response) { _this.previewHandlersHelper.doneExportStatusHandler(deffered, operationId, response); })
                             .fail(function (error) { _this.previewHandlersHelper.errorExportStatusHandler(deffered, error); });
-                    }, 250);
+                    }, 250));
                     return deffered.promise();
                 };
                 ReportPreview.prototype.getExportResult = function (operationId, inlineDisposition, token, printable, uri) {
@@ -6883,15 +7046,17 @@ var DevExpress;
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
                     var _this = this;
                     var deffered = $.Deferred();
-                    setTimeout(function () {
+                    this._deferreds.push(deffered);
+                    this._timeouts.push(setTimeout(function () {
                         var ignorePredicate = function () { return _this._closeDocumentRequests[documentId]; };
                         _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
                             .done(function (response) { _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
                             .fail(function (error) { _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
-                    }, 250);
+                    }, 250));
                     return deffered.promise();
                 };
                 ReportPreview.prototype.getDoGetBuildStatusFunc = function () {
+                    var _this = this;
                     var preview = this;
                     var doGetBuildStatus = function (documentId) {
                         var promise = preview.getBuildStatus(documentId);
@@ -6904,7 +7069,7 @@ var DevExpress;
                                         doGetBuildStatus(documentId);
                                     }
                                 };
-                                Settings.PollingDelay ? setTimeout(doStatusRequest, Settings.PollingDelay) : doStatusRequest();
+                                Settings.PollingDelay ? _this._timeouts.push(setTimeout(doStatusRequest, Settings.PollingDelay)) : doStatusRequest();
                             }
                             else {
                                 try {
@@ -6925,7 +7090,7 @@ var DevExpress;
                                 }
                                 finally {
                                     preview.progressBar.complete();
-                                    setTimeout(preview._raiseOnSizeChanged, 1000);
+                                    _this._timeouts.push(setTimeout(preview._raiseOnSizeChanged, 1000));
                                 }
                             }
                         });
@@ -7038,7 +7203,7 @@ var DevExpress;
                         _this._goToPageTimer = undefined;
                     };
                     if (throttle)
-                        this._goToPageTimer = setTimeout(function () { return updateActivePage(_this.pageIndex()); }, throttle);
+                        this._timeouts.push(this._goToPageTimer = setTimeout(function () { return updateActivePage(_this.pageIndex()); }, throttle));
                     else
                         updateActivePage(pageIndex);
                     this.pageIndex(pageIndex);
@@ -7593,7 +7758,7 @@ var DevExpress;
                             element.style.display = "none";
                             var $searchText = $element.find('.dxrdp-taptosearch-text');
                             var searchBarModel = new SearchBarModel(viewModel, element, $searchText);
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                            DevExpress.Analytics.Internal.addDisposeCallback(element, function () {
                                 searchBarModel.dispose();
                             });
                         }
@@ -8502,6 +8667,7 @@ var DevExpress;
                     return Internal.createAndInitPreviewModel(this._options, element, this._callbacks, false);
                 };
                 JSReportViewerBinding.prototype._applyBindings = function (model, _$element) {
+                    this._disposables.push(model);
                     _$element.children().remove();
                     var child = _$element.append(this._templateHtml).children()[0];
                     if (!child)
@@ -8513,36 +8679,33 @@ var DevExpress;
                 };
                 JSReportViewerBinding.prototype.applyBindings = function (element) {
                     var _this = this;
-                    var self = this;
                     var _$element = $(element);
                     _$element.addClass("dx-designer");
-                    if (self._options.reportPreview && self._options.parts) {
-                        self._applyBindings(self._options, _$element);
+                    if (this._options.reportPreview && this._options.parts) {
+                        this._applyBindings(this._options, _$element);
                         return;
                     }
-                    var requestOptions = self._options.requestOptions;
-                    var subscription = null;
+                    var requestOptions = this._options.requestOptions;
                     var applyModel = function () {
                         if (requestOptions && requestOptions.invokeAction) {
-                            self._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
+                            _this._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                         }
-                        self._createModel(element).done(function (result) {
-                            self.sender.previewModel = result;
-                            if (self._options.reportUrl) {
-                                if (ko.isSubscribable(self._options.reportUrl)) {
-                                    subscription = self._options.reportUrl.subscribe(function (newVal) {
-                                        self.sender.OpenReport(newVal);
-                                    });
+                        _this._createModel(element)
+                            .done(function (result) {
+                            _this.sender.previewModel = result;
+                            if (_this._options.reportUrl) {
+                                if (ko.isSubscribable(_this._options.reportUrl)) {
+                                    _this._disposables.push(_this._options.reportUrl.subscribe(function (newVal) {
+                                        _this.sender.OpenReport(newVal);
+                                    }));
                                 }
                             }
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                                subscription && subscription.dispose();
-                            });
-                            self._applyBindings(self.sender.previewModel, _$element);
+                            _this._createDisposeFunction(element);
+                            _this._applyBindings(_this.sender.previewModel, _$element);
                         });
                     };
                     if (requestOptions) {
-                        self._getLocalizationRequest().done(function (localization) {
+                        this._getLocalizationRequest().done(function (localization) {
                             localization && DevExpress.Analytics.Utils.addCultureInfo(localization);
                         }).always(function () {
                             applyModel();
@@ -8806,7 +8969,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrp-editing-field-number': '<div class="dxrp-editing-field-mask" data-bind="dxNumberBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
     'dxrp-editing-field-datetime': '<div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
     'dxrp-editing-field-image': '<div class="dxrp-editing-field-container" data-bind="style: containerStyle() ">        <!-- ko template: \'dxrp-editing-field-image-editor\' -->        <!-- /ko -->    </div>',
-    'dxrp-editing-field-image-editor': '<div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: { image: $data.getImage(), imageType: $data.getImageType(), imageMode: editMode, alignment: alignment, sizeMode: sizeMode, callbacks: callbacks, isActive: isActive, zoom: zoom, popupOptions: popupOptions }"></div>',
+    'dxrp-editing-field-image-editor': '<div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: $data.getPictureEditorOptions()"></div>',
     'dxrp-editing-field-checkbox': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle(), template: {name: $data.checkStateStyleIcon, if: !!ko.unwrap($data.checkStateStyleIcon)}"> </div>    </div>',
     'dxrp-editing-field-radio': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet">                <g fill="#010101" stroke="none">                    <path d="M32,380a348,348 0 1,0 696,0a348,348 0 1,0 -696,0" class="highlight" style="stroke-width: 50;stroke: rgb(0, 0, 0);" />                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? \'black\' : \'transparent\' }"/>                </g>            </svg>        </div>    </div>',
     'dxrp-character-comb-editing-field': '<div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">        <!-- ko if: !active() || field.readOnly()  -->        <!-- ko foreach: cells -->            <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>        <!-- /ko -->        <!-- /ko -->        <!-- ko if: active() && !field.readOnly() -->        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>        <!--/ko-->    </div>',

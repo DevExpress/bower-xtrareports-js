@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 19.1.4
-* Build date: 2019-06-17
+* Version: 19.1.5
+* Build date: 2019-07-29
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -75,6 +75,16 @@ var DevExpress;
                 }
             }
             Internal._definePropertyByString = _definePropertyByString;
+            function addDisposeCallback(element, callback) {
+                var disposeCallback = function () {
+                    ko.utils.domNodeDisposal.removeDisposeCallback(element, disposeCallback);
+                    callback && callback();
+                    disposeCallback = null;
+                    callback = null;
+                };
+                ko.utils.domNodeDisposal.addDisposeCallback(element, disposeCallback);
+            }
+            Internal.addDisposeCallback = addDisposeCallback;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
         var Utils;
         (function (Utils) {
@@ -101,7 +111,7 @@ var DevExpress;
                 Disposable.prototype.dispose = function () {
                     if (!this.isDisposing) {
                         this.isDisposing = true;
-                        this._disposables.reverse().forEach(function (x) { return x && x.dispose && x.dispose(); });
+                        (this._disposables || []).reverse().forEach(function (x) { return x && x.dispose && x.dispose(); });
                         this._disposables = [];
                     }
                 };
@@ -773,7 +783,7 @@ var DevExpress;
                     _this_1.isSearchedProperty = ko.observable(true);
                     _this_1.isParentSearched = ko.observable(false);
                     _this_1.rtl = DevExpress.config().rtlEnabled;
-                    _this_1._onValidatedHandler = undefined;
+                    _this_1._validator = new EditorValidator(_this_1);
                     _this_1._cachedValue = undefined;
                     _this_1.isEditorSelected = ko.observable(false);
                     _this_1.isPropertyModified = ko.computed(function () {
@@ -794,6 +804,7 @@ var DevExpress;
                     _this_1.padding = _this_1._setPadding(_this_1.rtl ? "right" : "left", level * Internal.propertiesGridEditorsPaddingLeft);
                     var defaultValue = ko.observable(null), propertyName = modelPropertyInfo.propertyName;
                     _this_1.editorOptions = modelPropertyInfo.editorOptions;
+                    _this_1.validatorOptions = modelPropertyInfo.validatorOptions;
                     if (modelPropertyInfo.defaultVal !== undefined) {
                         defaultValue = ko.observable(modelPropertyInfo.defaultVal);
                     }
@@ -853,12 +864,11 @@ var DevExpress;
                     return obj;
                 };
                 Editor.prototype.dispose = function () {
+                    this._validator && this._validator.dispose();
+                    this._validator = null;
                     _super.prototype.dispose.call(this);
                     this._cachedValue = null;
                     this._model(null);
-                    this.onValidatedHandler = null;
-                    this.validatorInstance && this.validatorInstance.dispose();
-                    this.validatorInstance = null;
                 };
                 Editor.prototype._assignValue = function (modelValue, model, newValue, name) {
                     if (ko.isObservable(modelValue)) {
@@ -866,17 +876,6 @@ var DevExpress;
                     }
                     else {
                         model[name] = newValue;
-                    }
-                };
-                Editor.prototype._isValid = function (validationRules, newValue) {
-                    var _this_1 = this;
-                    this.onValidatedHandler = undefined;
-                    if (this.validatorInstance) {
-                        (validationRules || []).forEach(function (rule) { return rule && (rule.validator = _this_1.validatorInstance); });
-                        return this.validatorInstance.validate();
-                    }
-                    else {
-                        return DevExpress.validationEngine.validate(newValue, validationRules, this.displayName());
                     }
                 };
                 Editor.prototype._init = function (editorTemplate, value, name) {
@@ -909,26 +908,9 @@ var DevExpress;
                                 return;
                             }
                             var modelValue = model[name];
-                            var validationRules = _this_1.validationRules;
-                            var assignValueFirst = validationRules.some(function (x) { return x.assignValueFirst; });
-                            if (assignValueFirst) {
+                            _this_1._validator.assignWithValidation(newValue, function () {
                                 _this_1._assignValue(modelValue, model, newValue, name);
-                            }
-                            var validationResult = _this_1._isValid(validationRules, newValue);
-                            if (!validationResult.isValid) {
-                                if (validationResult.brokenRule && validationResult.brokenRule['isDeferred']) {
-                                    _this_1.onValidatedHandler = function (result) {
-                                        _this_1.onValidatedHandler = undefined;
-                                        if (!result.isValid)
-                                            return;
-                                        _this_1._assignValue(modelValue, model, newValue, name);
-                                    };
-                                }
-                                return;
-                            }
-                            if (!assignValueFirst) {
-                                _this_1._assignValue(modelValue, model, newValue, name);
-                            }
+                            });
                         }
                     }));
                     this.name = name;
@@ -968,53 +950,22 @@ var DevExpress;
                     var extendedOptions = this.info.peek().editor.extendedOptions;
                     return $.extend({}, templateOptions, this.editorOptions, extendedOptions);
                 };
-                Editor.prototype.getValidationRules = function () {
-                    return !!this.info && !!this.info() && this.info().validationRules || (this.info().validationRules === null ? null : []);
+                Editor.prototype.getValidatorOptions = function (templateValidatorOptions) {
+                    return this._validator && this._validator.getValidatorOptions(templateValidatorOptions);
                 };
-                Object.defineProperty(Editor.prototype, "validatorInstance", {
-                    get: function () {
-                        return this._validatorInstance;
-                    },
-                    set: function (newValue) {
-                        if (this._validatorInstance && this.onValidatedHandler) {
-                            this._validatorInstance.off("validated", this._onValidatedHandler);
-                        }
-                        this._validatorInstance = newValue;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(Editor.prototype, "onValidatedHandler", {
-                    get: function () {
-                        return this._onValidatedHandler;
-                    },
-                    set: function (newValue) {
-                        if (this._onValidatedHandler && this.validatorInstance) {
-                            this.validatorInstance.off("validated", this._onValidatedHandler);
-                            this._onValidatedHandler = newValue;
-                            if (newValue) {
-                                this.validatorInstance.on("validated", this._onValidatedHandler);
-                            }
-                        }
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
+                Editor.prototype._getEditorValidationRules = function () {
+                    var info = ko.unwrap(this.info);
+                    if (!info)
+                        return;
+                    var validationRules = info.validationRules;
+                    return validationRules || (validationRules === null ? null : []);
+                };
+                Editor.prototype.getValidationRules = function () {
+                    return this._validator && this._validator.getValidationRules();
+                };
                 Object.defineProperty(Editor.prototype, "validationRules", {
                     get: function () {
                         return this.getValidationRules();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(Editor.prototype, "onValidatorInitialized", {
-                    get: function () {
-                        var _this_1 = this;
-                        var validationRuleSet = this.validationRules;
-                        if (!validationRuleSet || !validationRuleSet.length) {
-                            return undefined;
-                        }
-                        return function (e) { _this_1.validatorInstance = e && e.component; };
                     },
                     enumerable: true,
                     configurable: true
@@ -1073,6 +1024,151 @@ var DevExpress;
             (function () {
                 Widgets.editorTemplates["objecteditor"] = { header: "dx-emptyHeader", content: "dx-objectEditorContent", editorType: PropertyGridEditor };
             })();
+            var EditorValidator = (function (_super) {
+                __extends(EditorValidator, _super);
+                function EditorValidator(_editor) {
+                    var _this_1 = _super.call(this) || this;
+                    _this_1._editor = _editor;
+                    _this_1._lastValidatorOptions = null;
+                    _this_1._lastModelOverridableRules = null;
+                    _this_1._onValidatedHandler = undefined;
+                    return _this_1;
+                }
+                EditorValidator.prototype.dispose = function () {
+                    this.onValidatedHandler = null;
+                    this.validatorInstance && this.validatorInstance.dispose();
+                    this.validatorInstance = null;
+                    _super.prototype.dispose.call(this);
+                };
+                EditorValidator.prototype._isValid = function (validationRules, newValue) {
+                    var _this_1 = this;
+                    this.onValidatedHandler = undefined;
+                    if (this.validatorInstance) {
+                        (validationRules || []).forEach(function (rule) { return rule && (rule.validator = _this_1.validatorInstance); });
+                        return this.validatorInstance.validate();
+                    }
+                    else {
+                        return DevExpress.validationEngine.validate(newValue, validationRules, this._editor.displayName());
+                    }
+                };
+                Object.defineProperty(EditorValidator.prototype, "validatorInstance", {
+                    get: function () {
+                        return this._validatorInstance;
+                    },
+                    set: function (newValue) {
+                        if (this._validatorInstance && this.onValidatedHandler) {
+                            this._validatorInstance.off("validated", this._onValidatedHandler);
+                        }
+                        this._validatorInstance = newValue;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EditorValidator.prototype, "onValidatedHandler", {
+                    get: function () {
+                        return this._onValidatedHandler;
+                    },
+                    set: function (newValue) {
+                        if (this._onValidatedHandler && this.validatorInstance) {
+                            this.validatorInstance.off("validated", this._onValidatedHandler);
+                            this._onValidatedHandler = newValue;
+                            if (newValue) {
+                                this.validatorInstance.on("validated", this._onValidatedHandler);
+                            }
+                        }
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                EditorValidator.prototype.getValidationRules = function () {
+                    var options = this.getValidatorOptions();
+                    var resultRules = (options || {}).validationRules;
+                    return resultRules || (resultRules === null ? null : []);
+                };
+                EditorValidator.prototype.getValidatorOptions = function (templateValidatorOptions) {
+                    if (templateValidatorOptions === void 0) { templateValidatorOptions = {}; }
+                    var info = this._editor.info.peek();
+                    if (!info)
+                        return;
+                    var options = this._lastValidatorOptions;
+                    var modelOverridableRules = this._editor._getEditorValidationRules();
+                    if (options && !this.areRulesChanged(modelOverridableRules)) {
+                        return options;
+                    }
+                    this._lastModelOverridableRules = modelOverridableRules;
+                    var extendedValidationRules = this._concatValidationRules(info.validatorOptions, modelOverridableRules);
+                    var extendedValidatorOptions = info.editor.extendedOptions && info.editor.extendedOptions.validatorOptions;
+                    var options = $.extend({}, templateValidatorOptions, info.validatorOptions, { validationRules: extendedValidationRules }, extendedValidatorOptions);
+                    this._wrapValidatorEvents(options);
+                    this._lastValidatorOptions = options;
+                    return options;
+                };
+                EditorValidator.prototype.areRulesChanged = function (overridableRuleSet) {
+                    var _this_1 = this;
+                    if (!(this._lastModelOverridableRules && this._lastModelOverridableRules.length)) {
+                        return overridableRuleSet && overridableRuleSet.length;
+                    }
+                    else if (!overridableRuleSet || !overridableRuleSet.length) {
+                        return true;
+                    }
+                    else {
+                        return !overridableRuleSet.every(function (newRule) {
+                            return _this_1._lastModelOverridableRules.some(function (rule) {
+                                return newRule.message === rule.message && newRule.validationCallback === rule.validationCallback && newRule.type === rule.type;
+                            });
+                        });
+                    }
+                };
+                EditorValidator.prototype.wrapOnValidatorInitialized = function (options) {
+                    var onInitializedHandler = options.onInitialized;
+                    var _this = this;
+                    options.onInitialized = function (e) {
+                        _this._onValidatorInitialized(e);
+                        onInitializedHandler && onInitializedHandler.apply(this, arguments);
+                    };
+                };
+                EditorValidator.prototype._onValidatorInitialized = function (e) {
+                    this.validatorInstance = e && e.component;
+                };
+                EditorValidator.prototype._concatValidationRules = function (validatorOptions, validationRules) {
+                    if ((!validatorOptions || !validatorOptions.validationRules) && !validationRules) {
+                        return null;
+                    }
+                    return ((validatorOptions || {}).validationRules || []).concat(validationRules || []);
+                };
+                EditorValidator.prototype._wrapValidatorEvents = function (validatorOptions) {
+                    if (!validatorOptions || !validatorOptions.validationRules || !validatorOptions.validationRules.length) {
+                        return;
+                    }
+                    this.wrapOnValidatorInitialized(validatorOptions);
+                    return validatorOptions;
+                };
+                EditorValidator.prototype.assignWithValidation = function (newValue, assignValueFunc) {
+                    var _this_1 = this;
+                    var validationRules = this.getValidationRules();
+                    var assignValueFirst = !validationRules || validationRules.some(function (x) { return x.assignValueFirst; });
+                    if (assignValueFirst) {
+                        assignValueFunc();
+                    }
+                    var validationResult = this._isValid(validationRules, newValue);
+                    if (!validationResult.isValid) {
+                        if (validationResult.brokenRule && validationResult.brokenRule['isDeferred']) {
+                            this.onValidatedHandler = function (result) {
+                                _this_1.onValidatedHandler = undefined;
+                                if (!result.isValid)
+                                    return;
+                                assignValueFunc();
+                            };
+                        }
+                        return;
+                    }
+                    if (!assignValueFirst) {
+                        assignValueFunc();
+                    }
+                };
+                return EditorValidator;
+            }(Utils.Disposable));
+            Widgets.EditorValidator = EditorValidator;
             var ObjectProperties = (function (_super) {
                 __extends(ObjectProperties, _super);
                 function ObjectProperties(target, editorsInfo, level, parentDisabled, recreateEditors, textToSearch) {
@@ -1236,7 +1332,7 @@ var DevExpress;
                     var value = valueAccessor();
                     var model = new Widgets.ObjectProperties(value.target, value.editorsInfo, value.level, value.parentDisabled, value.recreateEditors, value.textToSearch);
                     ko.applyBindings(bindingContext.createChildContext(model), $element.children()[0]);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         model.dispose();
                     });
                     return { controlsDescendantBindings: true };
@@ -1272,7 +1368,7 @@ var DevExpress;
                             }
                         }, 1);
                     });
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         isDisposed = true;
                     });
                     return { controlsDescendantBindings: true };
@@ -1297,7 +1393,7 @@ var DevExpress;
                     var subscription = options.collapsed.subscribe(function (newVal) {
                         $accordionContent.slideToggle(options.timeout, function () { return scrollUpdateCallback(); });
                     });
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () { return subscription.dispose(); });
+                    Analytics.Internal.addDisposeCallback(element, function () { return subscription.dispose(); });
                 }
             };
             ko.bindingHandlers["dxdAccordionExt"] = {
@@ -1451,8 +1547,8 @@ var DevExpress;
                 function GuidEditor() {
                     return _super !== null && _super.apply(this, arguments) || this;
                 }
-                GuidEditor.prototype.getValidationRules = function () {
-                    return (_super.prototype.getValidationRules.call(this) || []).concat(Internal.guidValidationRules).concat((this.editorOptions && this.editorOptions.isNullable) ? [] : Internal.guidRequiredValidationRules);
+                GuidEditor.prototype._getEditorValidationRules = function () {
+                    return (_super.prototype._getEditorValidationRules.call(this) || []).concat(Internal.guidValidationRules).concat((this.editorOptions && this.editorOptions.isNullable) ? [] : Internal.guidRequiredValidationRules);
                 };
                 return GuidEditor;
             }(Widgets.Editor));
@@ -2020,27 +2116,8 @@ var DevExpress;
                     function SvgTemplatesEngine() {
                         var _this_1 = this;
                         this._hasTemplate = function (name) { return _this_1._templates.hasOwnProperty(name); };
-                        this.makeTemplateSource = function (template, doc) {
-                            var elem;
-                            if (typeof template === "string") {
-                                elem = (doc || document).getElementById(template);
-                                if (elem) {
-                                    return new ko.templateSources.domElement(elem);
-                                }
-                                return new ko.templateSources["svgTemplateSource"](template, _this_1._data, _this_1._templates);
-                            }
-                            else if (template && (template.nodeType == 1) || (template.nodeType == 8)) {
-                                return new ko.templateSources.anonymousTemplate(template);
-                            }
-                            else
-                                throw new Error("Unknown template type: " + template);
-                        };
-                        this._engine = new ko.nativeTemplateEngine();
                         this._data = {};
                         this._templates = {};
-                        ko.templateSources["svgTemplateSource"] = SvgTemplateSource;
-                        this._engine["makeTemplateSource"] = this.makeTemplateSource;
-                        ko.setTemplateEngine(this._engine);
                     }
                     Object.defineProperty(SvgTemplatesEngine, "Instance", {
                         get: function () {
@@ -2065,6 +2142,15 @@ var DevExpress;
                     return SvgTemplatesEngine;
                 }());
                 Internal.SvgTemplatesEngine = SvgTemplatesEngine;
+                var makeTemplateSource = ko.templateEngine.prototype["makeTemplateSource"];
+                ko.templateEngine.prototype["makeTemplateSource"] = function (template, doc) {
+                    if (typeof template === "string" && SvgTemplatesEngine.getExistingTemplate(template)) {
+                        return new SvgTemplateSource(template, SvgTemplatesEngine["_instance"]["_data"], SvgTemplatesEngine.templates);
+                    }
+                    else {
+                        return makeTemplateSource.apply(this, [template, doc]);
+                    }
+                };
                 function getTemplate(id) {
                     var id = id[0] === '#' ? id.substr(1) : id;
                     return $('#' + id).text() || DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.templates[id];
@@ -2135,7 +2221,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-image': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'Image\', accept: \'image/*\', type: \'img\', disabled: disabled }"></div>',
     'dx-numeric': '<div data-bind="dxNumberBox: getOptions({ value:value, showSpinButtons:true, disabled:disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
     'dx-number-editor': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
-    'dx-text': '<!-- ko if: $data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [], onInitialized: $data.onValidatorInitialized  }"></div>    <!-- /ko -->    <!-- ko if: !$data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled })"></div>    <!-- /ko -->',
+    'dx-text': '<!-- ko if: $data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: getValidatorOptions($data.validatorOptions || { validationRules: validationRules || [] })"></div>    <!-- /ko -->    <!-- ko if: !$data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled })"></div>    <!-- /ko -->',
     'dx-string-array': '<div class="dx-field">        <div class="dx-string-array-container dx-texteditor dx-multiline">            <textarea class="dx-string-array-textarea dx-texteditor-input" data-bind="value: value, disable: disabled"></textarea>        </div>    </div>',
     'dx-propertieseditor': '<div data-bind="css: { \'dx-rtl\' : rtl }">        <div class="dx-editors">            <div class="dx-fieldset">                <!-- ko foreach: getEditors() -->                <!-- ko template: editorTemplate -->                <!-- /ko -->                <!-- /ko -->            </div>        </div>    </div>',
     'dx-objectEditorContent': '<!-- ko if: visible -->    <div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>    <!-- /ko -->',
@@ -2217,7 +2303,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-surface-template-base': '<!-- ko ifnot: isLoading -->    <!-- ko with: surface -->    <div class="dxrd-surface-wrapper" data-bind="template: templateName, click: function(_, e) { $root.selection.clickHandler($data, e); e.stopPropagation(); }">    </div>    <!-- /ko -->    <!-- /ko -->    <!-- ko if: isLoading -->    <div class="dxrd-surface-wrapper">        <div style="text-align: center; padding-top: 25%;">            <div data-bind="dxLoadIndicator: { visible: isLoading() }"></div>        </div>    </div>    <!-- /ko -->',
     'dxrd-designer': '<div data-bind="css: surfaceClass($element)">        <div class="dxrd-designer-wrapper dx-editors dxd-surface-back-color dxd-scrollbar-color" data-bind="visible: (!$data.designMode || designMode()), cssArray: [ $data.rootStyle , { \'dx-rtl\' : $data.rtl, \'dx-ltr\': !$data.rtl } ]">            <!-- ko foreach: parts -->            <!-- ko template: { name: templateName, data: model }-->            <!-- /ko -->            <!-- /ko -->        </div>        <!-- ko if: ($data.addOns) -->        <!-- ko foreach: addOns -->        <!-- ko template: { name: templateName, data: model } -->        <!-- /ko -->        <!-- /ko -->        <!-- /ko -->    </div>',
     'dxrd-collectionactions-template': '<div class="dxrd-action-items-container"></div>    <div class="dx-treelist-action" data-bind="dxButtonWithTemplate: { onClick: togglePopoverVisible, disabled: disabled, icon: ko.unwrap($data.imageTemplateName), iconClass: ko.unwrap($data.imageClassName) }, attr: { id: id, title: text }"></div>    <div data-bind="dxPopup: { width: 235, height: \'auto\',            position: { my: $root.rtl ? \'left top\': \'right top\', at: \'bottom\', of: (\'#\' + id) },            showTitle: false,            showCloseButton: false,            animation: {},            closeOnOutsideClick: true,            container: ($data.getContainer || function(_e, selector) { return selector; })($element, \'.dxrd-action-items-container\'),            shading: false,            visible: popoverVisible }">        <!-- ko foreach: actions -->        <div class="dxrd-action-item dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: clickAction, css: { \'dxrd-disabled-button\': disabled }">            <div class="dxrd-action-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>        </div>        <!-- /ko -->    </div>',
-    'dxrd-menubutton-template-base': '<div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">        <div class="dxrd-menu-place" style="width:54px;"></div>        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: \'dxrd-svg-menu-menu\', css: {\'dxd-state-active\': appMenuVisible }"></div>        <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {                             width: 250,                             height: \'100%\' ,                             position: $data.rtl ? { my: \'right top\' , at: \'left top\' , offset: \'-10 0\' } : { my: \'left top\' , at: \'right top\' , offset: \'10 0\' },                             showTitle: false,                             showCloseButton: false,                             container: getMenuPopupContainer($element),                             target: getMenuPopupTarget($element),                             animation: {},                             closeOnOutsideClick: function(e) {                                var buttonClassName = \'dxrd-menu-button-image\';                                var parentClassList = e.target.parentNode && e.target.parentNode.parentNode && e.target.parentNode.parentNode.classList;                                stopPropagation = (e.target.classList && e.target.classList.contains(buttonClassName)) || (parentClassList && parentClassList.contains(buttonClassName));                                return true;                             },                             shading: false,                             focusStateEnabled: false,                             visible: appMenuVisible }">            <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>            <!-- ko foreach: actionLists.menuItems -->            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { \'dxrd-disabled-button\': disabled }, visible: visible">                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text"></div>                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>            </div>            <!-- /ko -->        </div>    </div>',
+    'dxrd-menubutton-template-base': '<div class="dxrd-menu-container" style="position:relative; width:0; height:100%"></div>    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">        <div class="dxrd-menu-place" style="width:54px;"></div>        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: \'dxrd-svg-menu-menu\', css: {\'dxd-state-active\': appMenuVisible }"></div>        <div class="dxd-menu-back-color dxd-back-primary2" data-bind="dxPopup: {                             width: 250,                             height: \'100%\' ,                             position: $data.rtl ? { my: \'right top\' , at: \'left top\' , offset: \'-10 0\' } : { my: \'left top\' , at: \'right top\' , offset: \'10 0\' },                             showTitle: false,                             showCloseButton: false,                             container: getMenuPopupContainer($element),                             target: getMenuPopupTarget($element),                             animation: {},                             closeOnOutsideClick: function(e) {                                var buttonClassName = \'dxrd-menu-button-image\';                                var parentClassList = e.target.parentNode && e.target.parentNode.parentNode && e.target.parentNode.parentNode.classList;                                stopPropagation = (e.target.classList && e.target.classList.contains(buttonClassName)) || (parentClassList && parentClassList.contains(buttonClassName));                                return true;                             },                             shading: false,                             focusStateEnabled: false,                             visible: appMenuVisible }">            <div class="dxrd-menu-break dxd-popup-back-color dxd-back-primary2"></div>            <!-- ko foreach: actionLists.menuItems -->            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { \'dxrd-disabled-button\': disabled }, visible: visible">                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text, attr: { title: $data.displayText && $data.displayText() || text}"></div>                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>            </div>            <!-- /ko -->        </div>    </div>',
     'dxrd-top-grid': '<!-- ko if: popularVisible -->    <div class="dx-fieldset">        <div data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                <span class="dxrd-group-header-text" data-bind="text: $root.actionsGroupTitle()"></span>            </div>            <div class="dx-accordion-content dxd-back-primary">                <!-- ko foreach: (contextActions || []) -->                <!-- ko if: $data.templateName -->                <!-- ko template: templateName  -->                <!-- /ko -->                <!-- /ko -->                <!-- ko if: !$data.templateName -->                <div class="dxrd-properties-grid-action" data-bind="dxclick: function() { if($data.disabled && !$data.disabled() || !$data.disabled) { clickAction($root.editableObject()); } }, css: { \'dxrd-disabled-button\': $data.disabled && $data.disabled() }, visible: (ko.unwrap($data.visible) == undefined) || ko.unwrap($data.visible)">                    <div class="dxrd-properties-grid-action-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="css: $data.imageClassName, template: {name: $data.imageTemplateName, if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>                </div>                <!-- /ko -->                <!-- /ko -->                <!-- ko with: popularProperties -->                <div style="position: relative" data-bind="template: { name: \'dx-propertieseditor\', data: $data }"></div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
     'dxrd-propertiestab': '<div class="dxrd-properties-wrapper" data-bind="visible: active() && visible()">    <div style="height:100%" class="dxd-text-primary">        <div class="dxrd-right-panel-header">            <span data-bind="text: text"></span>        </div>        <!-- ko with: model -->        <!-- ko if: $root.controlsStore.visible() -->        <div class="dx-property-grid-header">            <div class="dx-property-grid-header-content">                <div class="dx-property-grid-sorting-actions-group" data-bind="css: { \'dx-property-gread-search-collapsed\': isSearching }">                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>                    <div class="dx-property-grid-sorting-actions-container">                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: \'dxrd-svg-properties-sortingbyalphabet\', iconClass: \'image-sortingbyalphabet\' }"></div>                        <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active dxd-state-no-hover\': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: \'dxrd-svg-properties-sortingbygroups\', iconClass: \'image-sortingbygroups\' }"></div>                    </div>                </div>                <div class="dx-property-grid-search-group dx-property-gread-search-collapsed" data-bind="css: { \'dx-property-gread-search-collapsed\': !isSearching() }">                    <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { \'dxd-state-active\': isSearching }, dxButtonWithTemplate: { onClick: switchSearchBox, icon: \'dxrd-svg-properties-search\', iconClass: \'image-search\' }"></div>                    <div class="dx-property-grid-search-box" data-bind="dxTextBox: { value: textToSearch, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true }, cacheElement: { action: function(element) { searchBox(element); } }"></div>                </div>            </div>        </div>        <!-- /ko -->        <div class="dxrd-properties-grid dxd-border-primary" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, styleunit: { top: $root.controlsStore.visible() ? 80 : 40 }">            <!-- ko template: { name: \'dxrd-top-grid\', data: { contextActions: $root.contextActions, popularProperties: $root.popularProperties, collapsed: ko.observable(false), popularVisible: $root.popularVisible() && isSortingByGroups(), actionsGroupTitle: $root.actionsGroupTitle } } -->            <!-- /ko -->            <div data-bind="visible: isSortingByGroups">                <!-- ko foreach: groups -->                <div class="dx-fieldset" data-bind="visible: visible">                    <div data-bind="dxdAccordion: { collapsed: collapsed }">                        <div class="dxrd-group-header dx-accordion-header" data-bind="css: { \'dxrd-group-header-collapsed dxd-border-primary\': collapsed() }">                            <div class="dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }" style="display:inline-block;"></div>                            <span class="dxrd-group-header-text" data-bind="text: displayName()"></span>                        </div>                        <div class="dx-accordion-content dxd-back-primary">                            <!-- ko ifnot: editorsCreated -->                            <div class="dx-accordion-content-loading-panel">                                <div data-bind="dxLoadIndicator: { visible: !editorsCreated() }"></div>                            </div>                            <!-- /ko -->                            <!-- ko if: $data.editorsRendered() -->                            <div data-bind="visible: editorsCreated">                                <div class="dx-editors">                                    <!-- ko foreach: editors -->                                    <!-- ko template: editorTemplate -->                                    <!-- /ko -->                                    <!-- ko if: ($index() === $parent.editors().length - 1 && $parent.editorsCreated(true)) -->                                    <!-- /ko -->                                    <!-- /ko -->                                </div>                            </div>                            <!-- /ko -->                        </div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dx-fieldset dxd-back-primary" data-bind="visible: !isSortingByGroups()">                <div data-bind="dxLoadIndicator: { visible: !allEditorsCreated() }"></div>                <!-- ko if: $data.editorsRendered() -->                <div data-bind="visible: allEditorsCreated">                    <div class="dx-editors">                        <!-- ko foreach: $data.getEditors() -->                        <!-- ko template: editorTemplate -->                        <!-- /ko -->                        <!-- ko if: ($index() === $parent._editors().length - 1 && $parent.allEditorsCreated(true)) -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>                <!-- /ko -->            </div>            <div data-bind="dxPopup: { width: 148, height: \'auto\',        position: $data.rtl ? { my: \'left top\', at: \'right top\', of: popupService.target } : { my: \'right top\', at: \'left top\', of: popupService.target },        container: \'.dx-designer-viewport\',        target: popupService.target,        showTitle: false,        showCloseButton: false,        animation: {},        closeOnOutsideClick: true,        shading: false,        visible: popupService.visible }">                <div data-options="dxTemplate: { name: \'content\' }">                    <!-- ko if: popupService.title -->                    <div class="dxrd-editor-menu-caption dxd-text-primary" data-bind="text: popupService.title"></div>                    <!-- /ko -->                    <!-- ko foreach: popupService.actions -->                    <!-- ko if: (!visible || visible()) -->                    <div class="dxrd-editor-menu-item dxd-list-item-back-color dxd-back-highlighted dxd-state-normal" data-bind="dxclick: action">                        <div class="dxrd-menuitem-box dxd-property-grid-menu-box-color dxd-back-contrast">                            <div class="dxrd-menuitem-box-inside dxd-back-secondary"></div>                        </div>                        <span class="dxrd-editor-menu-title dxd-text-primary" data-bind="text: title"></span>                    </div>                    <!-- /ko -->                    <!-- /ko -->                </div>            </div>        </div>        <!-- /ko -->    </div></div>',
     'dx-right-panel-lightweight': '<div class="dxrd-right-panel dx-shadow dxd-border-secondary dxd-property-grid-group-header-back-color dxd-back-primary2" data-bind="styleunit: { width: tabPanel.width }, css: tabPanel.cssClasses(), resizable: tabPanel.getResizableOptions($element, \'1px\', 325)">        <!-- ko foreach: tabPanel.tabs -->        <!-- ko lazy: { template: $data.template } -->        <!-- /ko -->        <!-- /ko -->    </div>',
@@ -3033,7 +3119,7 @@ var DevExpress;
                             var propertyName = operator.propertyName.indexOf("^.") === 0 ? operator.propertyName.substring(2) : operator.propertyName;
                             var path = propertyName;
                             if ((options.rootItems || []).indexOf(propertyName.split('.')[0]) === -1 && innerPath) {
-                                path = [innerPath, propertyName].join('.');
+                                path = propertyName ? [innerPath, propertyName].join('.') : innerPath;
                             }
                             _pushRequest(path, propertyName);
                         }
@@ -3203,7 +3289,7 @@ var DevExpress;
                                         editor.textInput.getElement().focus();
                                     }, 10);
                                 };
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                            Analytics.Internal.addDisposeCallback(element, function () {
                                 subscription.dispose();
                                 if (values.callbacks)
                                     values.callbacks.focus = $.noop;
@@ -3230,7 +3316,7 @@ var DevExpress;
                             }, 1);
                         }
                     });
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         subscription.dispose();
                     });
                 }
@@ -5700,8 +5786,10 @@ var DevExpress;
                     }
                     TreeListRootItemViewModel.prototype.dispose = function () {
                         _super.prototype.dispose.call(this);
-                        this._selectedPathSubscription.dispose();
-                        this._selectedPathSubscription = null;
+                        if (this._selectedPathSubscription) {
+                            this._selectedPathSubscription.dispose();
+                            this._selectedPathSubscription = null;
+                        }
                     };
                     return TreeListRootItemViewModel;
                 }(TreeListItemViewModel));
@@ -6114,10 +6202,8 @@ var DevExpress;
                         editor.dispose();
                         editor = null;
                         optionSubscription && optionSubscription.dispose();
-                        ko.utils.domNodeDisposal.removeDisposeCallback(element, callback);
-                        callback = null;
                     };
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, callback);
+                    Analytics.Internal.addDisposeCallback(element, callback);
                     return { controlsDescendantBindings: true };
                 }
             };
@@ -7843,7 +7929,7 @@ var DevExpress;
                     }));
                     var editor = new FilterEditor(values.options, itemsProvider, $(element).closest('.dx-rtl').length > 0, values.displayNameProvider);
                     ko.applyBindingsToDescendants(editor, $element.children()[0]);
-                    ko.utils.domNodeDisposal.addDisposeCallback($element.children()[0], function () {
+                    Analytics.Internal.addDisposeCallback($element.children()[0], function () {
                         computedFunctions.forEach(function (x) { return x.dispose(); });
                         editor.dispose();
                     });
@@ -7889,7 +7975,7 @@ var DevExpress;
                         }
                     }));
                     window.addEventListener("resize", updateHeight);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         window.removeEventListener("resize", updateHeight);
                         _this.dispose();
                     });
@@ -8223,7 +8309,7 @@ var DevExpress;
                     var templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dx-format-string'), $element = $(element).append(templateHtml), values = valueAccessor();
                     var formatEditor = new FormatStringEditor(values.value, values['disabled'], values['standardPatterns'], values['customPatterns'] || DevExpress["Reporting"] && DevExpress["Reporting"].Designer && DevExpress["Reporting"].Designer.Utils.formatStringEditorCustomSet, values['actions'] || DevExpress["Reporting"] && DevExpress["Reporting"].Designer && DevExpress["Reporting"].Designer.Internal.FormatStringService.actions, values['rtl'], values['popupContainer']);
                     ko.applyBindings(formatEditor, $element.children()[0]);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         formatEditor.dispose();
                     });
                     return { controlsDescendantBindings: true };
@@ -8248,7 +8334,7 @@ var DevExpress;
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
         (function (Internal) {
             function cloneHtmlBinding(data, element, allBindings, viewModel, bindingContext) {
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                Internal.addDisposeCallback(element, function () {
                     data.dispose();
                 });
                 setTimeout(function () {
@@ -9693,12 +9779,21 @@ var DevExpress;
                 return RequestHelper;
             }());
             Internal.RequestHelper = RequestHelper;
-            var JSDesignerBindingCommon = (function () {
+            var JSDesignerBindingCommon = (function (_super) {
+                __extends(JSDesignerBindingCommon, _super);
                 function JSDesignerBindingCommon(_options, _customEventRaiser) {
-                    this._options = _options;
-                    this._customEventRaiser = _customEventRaiser;
-                    this._templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dxrd-designer');
+                    var _this = _super.call(this) || this;
+                    _this._options = _options;
+                    _this._customEventRaiser = _customEventRaiser;
+                    _this._templateHtml = DevExpress.Analytics.Widgets.Internal.getTemplate('dxrd-designer');
+                    return _this;
                 }
+                JSDesignerBindingCommon.prototype.dispose = function () {
+                    _super.prototype.dispose.call(this);
+                    if (this.sender && this.sender instanceof Utils.Disposable)
+                        this.sender.dispose();
+                    this.removeProperties();
+                };
                 JSDesignerBindingCommon.prototype._fireEvent = function (eventName, args) {
                     if (this._customEventRaiser) {
                         this._customEventRaiser(eventName, args);
@@ -9747,8 +9842,14 @@ var DevExpress;
                     }
                     return deferred.promise();
                 };
+                JSDesignerBindingCommon.prototype._createDisposeFunction = function (element) {
+                    var _this = this;
+                    Internal.addDisposeCallback(element, function () {
+                        _this.dispose();
+                    });
+                };
                 return JSDesignerBindingCommon;
-            }());
+            }(Utils.Disposable));
             Internal.JSDesignerBindingCommon = JSDesignerBindingCommon;
         })(Internal = Analytics.Internal || (Analytics.Internal = {}));
         var Elements;
@@ -9965,7 +10066,7 @@ var DevExpress;
                         this._targetElement.off("keydown", this._activeHandler);
                     this._handlers.push(handler);
                     this._targetElement.on("keydown", handler);
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () { _this._removeHandler(handler); });
+                    Analytics.Internal.addDisposeCallback(element, function () { _this._removeHandler(handler); });
                 };
                 return KeyDownHandlersManager;
             }());
@@ -10012,7 +10113,7 @@ var DevExpress;
                     };
                     subscribeProperty(selection.disabled, "disabled");
                     subscribeProperty(values.zoom, "zoom");
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         if ($element.data("ui-selectable")) {
                             $element.selectable("destroy");
                         }
@@ -10035,7 +10136,7 @@ var DevExpress;
                         updateTop(newVal);
                     });
                     updateTop(value());
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         subscription.dispose();
                     });
                 }
@@ -10084,6 +10185,10 @@ var DevExpress;
                     });
                     options.containment = $parent.find(options.containment);
                     $element.draggable(options);
+                    Internal.addDisposeCallback(element, function () {
+                        if ($element.data("ui-draggable"))
+                            $element.draggable("destroy");
+                    });
                 }
             };
             var trackCursorData = "dxd-track-cursor-data";
@@ -10121,7 +10226,7 @@ var DevExpress;
                     $element.bind("mouseover", overHandler);
                     $element.bind("mouseleave", leaveHandler);
                     $element.bind("dragover", function (event) { handler(event.originalEvent); });
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
                         $element.unbind("dragover", function (event) { handler(event.originalEvent); });
                         $element.unbind("mousemove", handler);
                         $element.unbind("mouseover", overHandler);
@@ -10157,7 +10262,7 @@ var DevExpress;
                                 if (newVal)
                                     handlersManager.bindHandler(element, handler);
                             });
-                            ko.utils.domNodeDisposal.addDisposeCallback(element, function () { return subscribe.dispose(); });
+                            Analytics.Internal.addDisposeCallback(element, function () { return subscribe.dispose(); });
                         }
                         if (ko.unwrap(actionLists.enabled))
                             handlersManager.bindHandler(element, handler);
@@ -10471,8 +10576,8 @@ var DevExpress;
                     function RequiredNullableEditor() {
                         return _super !== null && _super.apply(this, arguments) || this;
                     }
-                    RequiredNullableEditor.prototype.getValidationRules = function () {
-                        return (_super.prototype.getValidationRules.call(this) || []).concat(this.editorOptions.showClearButton && ko.unwrap(this.editorOptions.showClearButton) ? [] : Internal.requiredValidationRules);
+                    RequiredNullableEditor.prototype._getEditorValidationRules = function () {
+                        return (_super.prototype._getEditorValidationRules.call(this) || []).concat(this.editorOptions.showClearButton && ko.unwrap(this.editorOptions.showClearButton) ? [] : Internal.requiredValidationRules);
                     };
                     return RequiredNullableEditor;
                 }(Widgets.Editor));
@@ -12160,7 +12265,9 @@ var DevExpress;
                     $element.resizable().on("resize", function (event) {
                         event.stopPropagation();
                     });
-                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    Analytics.Internal.addDisposeCallback(element, function () {
+                        if ($element.data("ui-resizable"))
+                            $element.resizable("destroy");
                         $element = null;
                         subscription && subscription.dispose();
                     });
@@ -14137,8 +14244,10 @@ var DevExpress;
                         _this.option("valueChangeEvent", "change");
                         _this.option("openOnFieldClick", _this.option("acceptCustomValue") === false);
                         _this._parentViewport = _$element.parents(".dx-designer-viewport");
-                        _this.option("displayValue", options.displayValue);
-                        _this._setTitle(_this.option("displayValue"));
+                        if ("displayValue" in options) {
+                            _this.option("displayValue", options.displayValue);
+                            _this._setTitle(_this.option("displayValue"));
+                        }
                         return _this;
                     }
                     dxFieldListPicker.prototype._showDropDown = function () {
