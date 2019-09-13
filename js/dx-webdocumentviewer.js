@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 19.1.5
-* Build date: 2019-07-30
+* Version: 19.1.6
+* Build date: 2019-09-09
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -375,6 +375,16 @@ var DevExpress;
             return ImageSource;
         }());
         Reporting.ImageSource = ImageSource;
+        function convertMapToKeyValuePair(object) {
+            var result = [];
+            if (object) {
+                Object.keys(object).forEach(function (key) {
+                    result.push({ Key: key, Value: object[key] });
+                });
+            }
+            return result;
+        }
+        Reporting.convertMapToKeyValuePair = convertMapToKeyValuePair;
         var CustomizeExportOptionsEventArgs = (function () {
             function CustomizeExportOptionsEventArgs(options) {
                 this._options = options;
@@ -706,30 +716,21 @@ var DevExpress;
                 };
                 return getNewQuartet(2) + '-' + getNewQuartet(1) + '-' + getNewQuartet(1) + '-' + getNewQuartet(1) + '-' + getNewQuartet(3);
             };
+            var commonBlur = HTMLElement.prototype.blur;
             var fullscreenEventsList = ["fullscreenchange", "mozfullscreenchange", "webkitfullscreenchange", "MSFullscreenChange"];
-            var restoreViewPortFunc = null;
             function createFullscreenComputed(element, parent) {
                 var _fullscreen = ko.observable(false);
                 var func = function () {
                     var isFullscreen = document.fullscreen || !!document["msFullscreenElement"] || !!document["webkitFullscreenElement"];
-                    if (isFullscreen) {
-                        if (restoreViewPortFunc)
-                            return;
-                        var viewport = $(DevExpress["viewPort"]())[0];
-                        var viewportClassName = viewport.className;
-                        var elementClassName = element.className;
-                        restoreViewPortFunc = function () {
-                            element.className = elementClassName;
-                            DevExpress["viewPort"](viewport);
-                            viewport.className = viewportClassName;
-                        };
-                        DevExpress["viewPort"](element);
-                    }
-                    else {
-                        if (!restoreViewPortFunc)
-                            return;
-                        restoreViewPortFunc();
-                        restoreViewPortFunc = null;
+                    if (element["msRequestFullscreen"]) {
+                        HTMLElement.prototype.blur = isFullscreen ? function () {
+                            try {
+                                commonBlur.apply(this);
+                            }
+                            catch (e) {
+                                document.body.blur();
+                            }
+                        } : commonBlur;
                     }
                     _fullscreen(isFullscreen);
                 };
@@ -744,8 +745,8 @@ var DevExpress;
                 parent._disposables.push({
                     dispose: function () {
                         removeFullscreenListener(document, func);
+                        commonBlur = null;
                         func = null;
-                        restoreViewPortFunc = null;
                     }
                 }, fullscreen);
                 return fullscreen;
@@ -769,8 +770,9 @@ var DevExpress;
                     element["mozRequestFullScreen"]();
                 else if (element["webkitRequestFullscreen"])
                     element["webkitRequestFullscreen"]();
-                else if (element["msRequestFullscreen"])
+                else if (element["msRequestFullscreen"]) {
                     element["msRequestFullscreen"]();
+                }
             }
             function exitFullscreen() {
                 if (document.exitFullscreen)
@@ -779,8 +781,10 @@ var DevExpress;
                     document["mozCancelFullScreen"]();
                 else if (document["webkitExitFullscreen"])
                     document["webkitExitFullscreen"]();
-                else if (document["msExitFullscreen"])
+                else if (document["msExitFullscreen"]) {
+                    HTMLElement.prototype.blur = commonBlur;
                     document["msExitFullscreen"]();
+                }
             }
             function toggleFullscreen(element, value) {
                 if (!element)
@@ -3363,7 +3367,7 @@ var DevExpress;
                     if (previewVisible === void 0) { previewVisible = true; }
                     if (applyBindings === void 0) { applyBindings = true; }
                     if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
-                    callbacks && callbacks.onServerError && DevExpress.Analytics.Internal.processErrorEvent(callbacks.onServerError);
+                    var _disposableCallBack = callbacks && callbacks.onServerError && DevExpress.Analytics.Internal.processErrorEvent(callbacks.onServerError);
                     if (localization && localization.currentCulture) {
                         DevExpress.Analytics.Internal.applyLocalizationToDevExtreme(localization.currentCulture);
                     }
@@ -3392,6 +3396,9 @@ var DevExpress;
                     else {
                         designerModel = createDesktopPreview(element, callbacks, parametersInfo, handlerUri, previewVisible, applyBindings, allowURLsWithJSContent, rtl, tabPanelSettings);
                     }
+                    designerModel.dispose = function () {
+                        (_disposableCallBack || {})['dispose'] && _disposableCallBack.dispose();
+                    };
                     designerModel.GetParametersModel = function () {
                         return designerModel.parametersModel;
                     };
@@ -3702,7 +3709,7 @@ var DevExpress;
                         else if (this.isMultiValue) {
                             resultValue = value ? parameterHelper.createMultiValueArray(value, this) : ko.observableArray();
                         }
-                        else if (this.allowNull && !value) {
+                        else if (this.allowNull && !value && value !== false) {
                             resultValue = ko.observable(null);
                         }
                         else {
@@ -4602,27 +4609,6 @@ var DevExpress;
                     }(DevExpress.Analytics.Utils.Disposable));
                     Internal.MultiValueEditorOptions = MultiValueEditorOptions;
                 })(Internal = Widgets.Internal || (Widgets.Internal = {}));
-                var MultiValueEditor = (function (_super) {
-                    __extends(MultiValueEditor, _super);
-                    function MultiValueEditor(modelPropertyInfo, level, parentDisabled, textToSearch) {
-                        var _this = _super.call(this, modelPropertyInfo, level, parentDisabled, textToSearch) || this;
-                        _this.options = ko.observable(null);
-                        _this._disposables.push(_this.value.subscribe(function (newVal) {
-                            _this.options() && _this.options().dispose();
-                            _this.options(_this._createOptions(newVal));
-                        }));
-                        _this.options(_this._createOptions(_this.value()));
-                        _this._disposables.push(_this.options());
-                        return _this;
-                    }
-                    MultiValueEditor.prototype._createOptions = function (helper) {
-                        if (!helper)
-                            return null;
-                        return new Internal.MultiValueEditorOptions(helper.value, helper.items);
-                    };
-                    return MultiValueEditor;
-                }(DevExpress.Analytics.Widgets.Editor));
-                Widgets.MultiValueEditor = MultiValueEditor;
                 var PictureEditMode;
                 (function (PictureEditMode) {
                     PictureEditMode[PictureEditMode["Image"] = 0] = "Image";
@@ -4870,8 +4856,9 @@ var DevExpress;
                             this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
                         };
                         Painter.prototype.clear = function () {
-                            this._cleanCanvas();
                             this.image(null);
+                            this.signaturePainter.reset();
+                            this._cleanCanvas();
                         };
                         Painter.prototype.refresh = function () {
                             var _this = this;
@@ -5087,7 +5074,7 @@ var DevExpress;
                                             Viewer.Internal.getImageBase64(data.url).done(function (result) {
                                                 action(result);
                                             }).fail(function (e) {
-                                                DevExpress.ui.notify(e.name + " :" + e.message.split(':').pop(), "error");
+                                                DevExpress.Analytics.Internal.ShowMessage(e.name + " :" + e.message.split(':').pop(), "error");
                                             });
                                         }
                                         else {
@@ -5417,7 +5404,6 @@ var DevExpress;
                         }
                     },
                     multiValueEditable: { custom: "dxrd-multivalue-editable" },
-                    multiValueSelectBox: { header: "dxrd-multivalue-selectbox", editorType: MultiValueEditor },
                     selectBox: { header: "dx-selectbox" }
                 };
             })(Widgets = Viewer.Widgets || (Viewer.Widgets = {}));
@@ -5495,7 +5481,8 @@ var DevExpress;
                             hideEditor: _this.hideEditor,
                             keypressAction: _this.keypressAction,
                             textStyle: _this.textStyle,
-                            options: editorOptions
+                            options: editorOptions,
+                            getOptions: function (templateOptions) { return $.extend({}, _this.data.options, templateOptions); }
                         };
                         var isCustomEditor = !!(editor && editor.template && editor.template !== "dxrp-editing-field-datetime");
                         if (!isCustomEditor) {
@@ -6907,7 +6894,7 @@ var DevExpress;
                                         _this._pageWidth(pageSettings.width);
                                     _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
                                 }
-                                var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions);
+                                var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions, !_this.reportId && (!previewInitialize.documentData || !previewInitialize.documentData.canPerformContinuousExport));
                                 var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
                                 _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
                                 _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
@@ -6932,7 +6919,7 @@ var DevExpress;
                 };
                 ReportPreview.prototype._deserializeExportOptions = function (exportOptionsString, isMerged) {
                     var jsonModel = exportOptionsString && JSON.parse(exportOptionsString);
-                    return (!this.reportId || isMerged) ? new Export.ExportOptionsMergedPreview(jsonModel) : new Export.ExportOptionsPreview(jsonModel);
+                    return isMerged ? new Export.ExportOptionsMergedPreview(jsonModel) : new Export.ExportOptionsPreview(jsonModel);
                 };
                 ReportPreview.prototype.deactivate = function () {
                     this._initialize();
@@ -7050,8 +7037,8 @@ var DevExpress;
                     this._timeouts.push(setTimeout(function () {
                         var ignorePredicate = function () { return _this._closeDocumentRequests[documentId]; };
                         _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
-                            .done(function (response) { _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
-                            .fail(function (error) { _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
+                            .done(function (response) { _this.previewHandlersHelper && _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
+                            .fail(function (error) { _this.previewHandlersHelper && _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
                     }, 250));
                     return deffered.promise();
                 };
@@ -8872,7 +8859,6 @@ DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Previe
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.PreviewPage", "Reporting.Viewer.Internal.PreviewPage");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.ReportPreview", "Reporting.Viewer.ReportPreview");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.MultiValuesHelper", "Reporting.Viewer.Parameters.MultiValuesHelper");
-DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.MultiValueEditor", "Reporting.Viewer.Widgets.MultiValueEditor");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.MultiValueEditorOptions", "Reporting.Viewer.Widgets.Internal.MultiValueEditorOptions");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.ParameterHelper", "Reporting.Viewer.Parameters.ParameterHelper");
 DevExpress.Analytics.Internal._definePropertyByString(DevExpress, "Report.Preview.CheckState", "Reporting.Viewer.Editing.CheckState");
@@ -8967,28 +8953,27 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrp-editing-field-text': '<textarea class="dxrp-editing-field-text" data-bind="value: value, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>',
     'dxrp-editing-field-mask': '<div class="dxrp-editing-field-mask" data-bind="dxTextBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
     'dxrp-editing-field-number': '<div class="dxrp-editing-field-mask" data-bind="dxNumberBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
-    'dxrp-editing-field-datetime': '<div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
+    'dxrp-editing-field-datetime': '<div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: $data.getOptions({ dropDownOptions: { container: $root.getPopupContainer($element) } }), childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
     'dxrp-editing-field-image': '<div class="dxrp-editing-field-container" data-bind="style: containerStyle() ">        <!-- ko template: \'dxrp-editing-field-image-editor\' -->        <!-- /ko -->    </div>',
     'dxrp-editing-field-image-editor': '<div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: $data.getPictureEditorOptions()"></div>',
     'dxrp-editing-field-checkbox': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle(), template: {name: $data.checkStateStyleIcon, if: !!ko.unwrap($data.checkStateStyleIcon)}"> </div>    </div>',
-    'dxrp-editing-field-radio': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet">                <g fill="#010101" stroke="none">                    <path d="M32,380a348,348 0 1,0 696,0a348,348 0 1,0 -696,0" class="highlight" style="stroke-width: 50;stroke: rgb(0, 0, 0);" />                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? \'black\' : \'transparent\' }"/>                </g>            </svg>        </div>    </div>',
-    'dxrp-character-comb-editing-field': '<div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">        <!-- ko if: !active() || field.readOnly()  -->        <!-- ko foreach: cells -->            <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>        <!-- /ko -->        <!-- /ko -->        <!-- ko if: active() && !field.readOnly() -->        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>        <!--/ko-->    </div>',
+    'dxrp-editing-field-radio': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle()">            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet">                <g fill="#010101" stroke="none">                    <path d="M32,380a348,348 0 1,0 696,0a348,348 0 1,0 -696,0" class="highlight" style="stroke-width: 50;stroke: rgb(0, 0, 0);" />                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? \'black\' : \'transparent\' }" />                </g>            </svg>        </div>    </div>',
+    'dxrp-character-comb-editing-field': '<div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">        <!-- ko if: !active() || field.readOnly()  -->        <!-- ko foreach: cells -->        <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>        <!-- /ko -->        <!-- /ko -->        <!-- ko if: active() && !field.readOnly() -->        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>        <!--/ko-->    </div>',
     'dxrd-preview-export-options': '<div class="dxrd-preview-export-options-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">    <div class="dxrd-right-panel-header dxd-text-primary">        <span data-bind="text: $root.getLocalization(\'Export Options\', \'DevExpress.XtraReports.UI.XtraReport.ExportOptions\')"></span>    </div>    <!-- ko if: model-->    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <div class="dx-fieldset">            <div data-bind="dxPropertyGrid: { target: model }"></div>        </div>    </div>    <!-- /ko --></div>',
-    'dxrd-preview-export-to': '<div class="dxrd-preview-export-toolbar-item dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: \'dxrdp-export-to-menu\', onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">            <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: \'item\' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">                <!--ko if: $data.format -->                <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>                <!-- /ko -->                <!--ko ifnot: $data.format -->                <div class="dxrd-preview-export-item-image-wrapper">                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"> </div>                </div>                <div class="dx-menu-item-popout-container">                    <div class="dx-menu-item-popout"></div>                </div>                <!-- /ko -->            </div>        </div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
+    'dxrd-preview-export-to': '<div class="dxrd-preview-export-toolbar-item dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: \'dxrdp-export-to-menu\', onItemClick: clickAction, onSubmenuShowing: function(e) { e.submenu._overlay.option(\'container\', $root.getPopupContainer($element)) } }, attr: { title: $root.getLocalization(text, $data.textId) }">            <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: \'item\' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">                <!--ko if: $data.format -->                <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>                <!-- /ko -->                <!--ko ifnot: $data.format -->                <div class="dxrd-preview-export-item-image-wrapper">                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"> </div>                </div>                <div class="dx-menu-item-popout-container">                    <div class="dx-menu-item-popout"></div>                </div>                <!-- /ko -->            </div>        </div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
     'dxrd-page-brick': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->        <!-- ko foreach: ($data.bricks || []) -->        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->        <!--/ko-->        <!--/ko-->    </div>',
     'dxrd-page-brick-clickable': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->    </div>',
     'dxrd-preview-page': '<div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, \'brick-selection-prog\': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">        <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { \'width\': width() + 2, \'height\': height() + 2 }, visible: pageLoading">            <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { \'paddingTop\': height() / 2.3 }">                <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>            </div>        </div>        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="attr: { src: displayImageSrc }" />        <!-- ko foreach: activeBricks -->        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko foreach: clickableBricks -->        <!-- ko template: { name: "dxrd-page-brick-clickable", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko if: !brickLoading() && $data.editingFields-->        <!-- ko foreach: editingFields -->        <!-- ko template: template -->        <!--/ko-->        <!--/ko-->        <!--/ko-->    </div>',
-    'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating }"></div>    </div>',
+    'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>    </div>',
     'dxrd-preview-toolbar-scrollable': '<div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: \'onHover\', direction: \'horizontal\', useNative: false, scrollByThumb: true }">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }, keyDownActions: actionLists"></div>    </div>',
     'dxrd-preview-search': '<div class="dxrd-preview-search-wrapper" data-bind="visible: active() && visible()">        <!-- ko with: model -->        <div class="dxrd-preview-search-tab-header">            <span class="dxrd-preview-search-tab-header-text dxd-text-primary" data-bind="text: $root.getLocalization(\'Search\', \'ASPxReportsStringId.SearchDialog_Header\')"></span>            <div class="dxrd-preview-search-editor" data-bind="dxSearchEditor: { searchModel: $data } "></div>            <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchCase, text: $root.getLocalization(\'Match case\', \'ASPxReportsStringId.SearchDialog_Case\')}"></div>            <div class="dxrd-preview-search-checkbox" data-bind="dxCheckBox: { value: matchWholeWord, text: $root.getLocalization(\'Match whole word only\', \'ASPxReportsStringId.SearchDialog_WholeWord\')}"></div>        </div>        <div class="dxrd-preview-search-result-header dxd-border-primary">            <div class="dxrd-preview-search-result-header-text" data-bind="text: $root.getLocalization(\'Search result\', \'ASPxReportsStringId.WebDocumentViewer_SearchResultText\')"></div>        </div>        <div class="dxrd-preview-search-result" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">            <!-- ko foreach: searchResult -->            <div class="dxrd-preview-search-result-item dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function() { $parent.goToResult($data); }">                <div class="dxrd-preview-search-tab-item-text propertygrid-editor-displayName dxd-text-primary" data-bind="text: text"></div>                <div class="dxrd-preview-search-tab-item-info" data-bind="text: $root.dx.Reporting.Viewer.Internal.formatSearchResult($data)"></div>            </div>            <!-- /ko -->            <div class="dxrd-preview-search-result dxrdp-search-loading" data-bind="visible: loading">                <div data-bind="dxLoadIndicator: { height: \'30px\', width: \'30px\' }"></div>            </div>        </div>        <!-- /ko -->    </div>',
     'dxrd-preview-progress-bar': '<div class="dxrd-preview-progress dxd-popup-back-color dxd-back-primary2 dxd-border-primary" data-bind="visible: visible">        <div class="dxrd-preview-progress-text dxd-text-primary" data-bind="text : text"></div>        <div class="dxrd-preview-progress-bar dxd-back-primary">            <div class="dxrd-preview-progress-value dxd-preview-progress-bar-value-color dxd-back-accented" data-bind="style : { width: progress()  + \'%\' }"></div>        </div>        <div class="dxrd-preview-progress-cancel dxd-hyperlink-color dxd-border-accented dxd-text-accented" data-bind="text: cancelText, dxclick: function() { $data.stop && stop(); }"></div>    </div>',
     'dxrd-preview-parameters': '<div class="dxrd-preview-parameters-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">        <div class="dxrd-right-panel-header dxd-text-primary">            <span data-bind="text: $root.getLocalization(\'Preview Parameters\', \'ASPxReportsStringId.ReportDesigner_Preview_ParametersTitle\')"></span>            <!-- ko if: (model && !model.isEmpty()) -->            <!-- /ko -->        </div>        <!-- ko if: (!model || model.isEmpty()) -->        <div class="dxrd-group-header-parameters-empty dxd-text-primary" data-bind="text: $root.getLocalization(\'The report does not contain any parameters.\', \'ASPxReportsStringId.WebDocumentViewer_NoParameters\')"></div>        <!-- /ko -->        <!-- ko if: (model && !model.isEmpty()) -->        <div class="dxrd-right-panel-body" id="propertiesPanel" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, dxValidationGroup: {}">            <div class="dx-fieldset">                <div data-bind="dxPropertyGrid: { target: ko.observable(model), recreateEditors: true }"></div>            </div>            <div class="dxrd-preview-parameter-action dxrdp-parameters-submit" data-bind="dxButton: { text: $root.getLocalization(\'Submit\', \'ASPxReportsStringId.ParametersPanel_Submit\'), onClick: function(params) { model.validateAndSubmit(params); } }"></div>            <div class="dxrd-preview-parameter-action dxrdp-parameters-reset" data-bind="dxButton: { text: $root.getLocalization(\'Reset\', \'ASPxReportsStringId.ParametersPanel_Reset\'), onClick: function() { model.restore(); } }"></div>            <div class="dxrd-preview-parameter-action dxrd-preview-loading" data-bind="dxLoadIndicator: { visible: model.parametersLoading }"></div>        </div>        <!-- /ko -->    </div>',
-    'dxrd-preview-pager': '<div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled }"></div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
+    'dxrd-preview-pager': '<div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
     'dxrd-preview-document-map': '<div class="dxrd-preview-document-map" data-bind="visible: active() && visible()" style="height: 100%; overflow:hidden">    <div class="dxrd-right-panel-header dxd-text-primary">        <div style="display: inline-block;" data-bind="text: $root.getLocalization(\'Document Map\', \'ASPxReportsStringId.DocumentViewer_RibbonCommandText_DocumentMap\')"></div>    </div>    <!-- ko if: model -->    <!-- ko with: model -->    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <div id="documentMapTree" data-bind="treelist: documentMapOptions" style="width:100%; height: 100%;"></div>    </div>    <!-- /ko -->    <!-- /ko --></div>',
     'dxrd-report-preview': '<div class="dxrd-preview dxrd-designer-wrapper dxd-scrollbar-color dxd-surface-back-color" data-bind="visible: reportPreview.previewVisible, cssArray: [ $data.rootStyle , { \'dx-rtl\' : $data.rtl, \'dx-ltr\': !$data.rtl } ]">        <!-- ko foreach: parts -->        <!-- ko template: { name: templateName, data: model }-->        <!-- /ko -->        <!-- /ko -->    </div>',
     'dxrdp-surface': '<div class="dxrd-preview-wrapper" data-bind="textCopier, css: { \'dx-rtl\': $data.rtlReport, \'dxrp-editing-fields-hightlighted\': editingFieldsHighlighted } ">        <!-- ko with: progressBar-->        <!-- ko template: \'dxrd-preview-progress-bar\'-->        <!-- /ko -->        <!-- /ko -->        <div class="dxrd-preview-surface">            <!-- ko if: !showMultipagePreview() -->            <div class="dxrd-report-preview-holder">                <!-- ko with: currentPage-->                <!-- ko if: pageLoading() || (!pageLoading() && displayImageSrc()) -->                <div class="dxrd-report-preview" data-bind="styleunit: { width: width, height: height }, autoFit: { autoFitBy: $parent.autoFitBy, zoom: zoom, width: originalWidth, height: originalHeight, rightPanelWidth: $root.tabPanel.width, previewSize: $parent.previewSize, brickLoading: brickLoading } ">                    <!-- ko template: \'dxrd-preview-page\'-->                    <!-- /ko -->                </div>                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->            <!-- ko if: showMultipagePreview() && !!currentPage() -->            <div class="dxrd-report-preview-holder" data-bind="lazyImages: { enabled: showMultipagePreview, updateCallback: onSizeChanged }">                <!-- ko foreach: pages -->                <!-- ko lazy: { if: pageLoading() || (!pageLoading() && displayImageSrc()) } -->                <div class="dxrd-report-preview dxrd-report-preview-multipage" data-bind="styleunit: { \'width\': width(), \'height\': height() }, toView: { active: active }, css : { \'dxrd-report-preview-active\': active }">                    <!-- ko template: \'dxrd-preview-page\'-->                    <!-- /ko -->                </div>                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->            <!-- ko if: !currentPage() -->            <div class="dxrd-report-preview-placeholder">                <div class="dxd-empty-area-placeholder-text-color dxd-text-info" data-bind="text: emptyDocumentCaption()"></div>            </div>            <!-- /ko -->        </div>    </div>    <div id="clipboard-container" style="position:absolute;top:-100px;"><textarea id="clipboard"></textarea></div>',
-    'dxrd-multivalue': '<!-- ko with: value -->    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: $data.dataSource, searchEnabled: true, searchExpr: $data.searchExpr || [\'displayValue\'], value: $data.value,         displayExpr: $data.displayExpr || \'displayValue\', valueExpr: $data.valueExpr || \'value\', multiline: false, showSelectionControls: true,         showDropDownButton: !!$data.showDropDownButton, selectAllMode: \'allPages\', selectedItems: $data.selectedItems,         placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), maxDisplayedTags: $data.maxDisplayedTags }), dxValidator: { validationRules: $parent.validationRules || [] }">    </div>    <!-- /ko -->',
-    'dxrd-multivalue-selectbox': '<!-- ko if: options -->    <!-- ko with: options -->    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: \'valueItem\', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: \'valueItem\' }" data-bind="dxclick: function(_, event) { toggleSelected(); event.stopPropagation(); }">            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>        </div>    </div>    <!-- /ko -->    <!-- /ko -->',
+    'dxrd-multivalue': '<!-- ko with: value -->    <div data-bind="dxTagBox: $parent.getOptions({ dataSource: $data.dataSource, searchEnabled: true, searchExpr: $data.searchExpr || [\'displayValue\'], value: $data.value,         displayExpr: $data.displayExpr || \'displayValue\', valueExpr: $data.valueExpr || \'value\', multiline: false, showSelectionControls: true,         showDropDownButton: !!$data.showDropDownButton, selectAllMode: \'allPages\', selectedItems: $data.selectedItems,         placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), maxDisplayedTags: $data.maxDisplayedTags, dropDownOptions: { container: $root.getPopupContainer($element) } }),          dxValidator: { validationRules: $parent.validationRules || [] }">    </div>    <!-- /ko -->',
     'dxrd-multivalue-editable': '<!-- ko if: value -->    <div class="dxrd-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: { values: value, info: info, level: level, displayName: $root.getLocalization(displayName) }">            <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1 }"></div>        </div>    </div>    <!-- /ko -->',
     'dx-picture-editing': '<div class="dx-picture-editing">        <canvas data-bind="zoom: painter.scale"></canvas>        <div class="dx-picture-editing-active" data-bind="dxPopup: {                width: 48, height: \'auto\',                position:{ my: \'left top\', at: \'right top\', boundary: \'.dxrd-preview-surface\', of: $data.$element, collision: \'fit fit\', offset: \'1 -1\' },                container: \'.dx-designer\',                target: \'.dx-designer\',                showTitle: false,                showCloseButton: false,                animation: {},                shading: false,                visible: $data.isActive            }">            <div data-options="dxTemplate: { name: \'content\' }">                <div class="dx-picture-editing-toolbar" data-bind="foreach: $data.actions">                    <div class="dx-picture-editing-toolbar-item" data-bind="dxclick: $data.action, attr: { title: title }">                        <div class="dx-picture-editing-toolbar-item-icon" data-bind="template: { name: icon, afterRender: $data.renderedHandler }"> </div>                    </div>                    <!-- ko template: { if: $data.template, name: $data.template, data: $data.templateOptions }-->                    <!-- /ko -->                </div>            </div>        </div>    </div>',
     'dx-painter': '<div class="dx-painter">        <canvas data-bind="zoom: scale"></canvas>    </div>',
@@ -8998,5 +8983,5 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-picture-editing-sizemode-alignment': '<div class="dx-picture-editing-sizemode-alignment">        <div class="dx-picture-editing-sizemode">            <div class="dx-picture-editing-text" data-bind="text: sizeModeText"></div>            <div class="dx-picture-editing-sizemode-values" data-bind="foreach: { data: sizeModeValues }">                <div class="dx-picture-editing-sizemode-alignment-value" data-bind="css: { selected: isSelected }, template: $data.iconTemplate, dxclick: $data.action">                </div>            </div>        </div>        <div class="dx-picture-editing-alignment">            <div class="dx-picture-editing-text" data-bind="text: alignmentText"></div>            <div class="dx-picture-editing-alignment-values" data-bind="foreach: { data: alignmentValues }">                <div class="dx-picture-editing-sizemode-alignment-value" data-bind="css: { selected: isSelected }, template: $data.iconTemplate, dxclick: $data.action">                </div>            </div>        </div>    </div>',
     'dx-picture-editing-imagepickerwithfilter': '<div class="dx-picture-editing-filtercontent" data-bind="styleunit: { width: contentWidth }">        <div class="dx-picture-editing-filtercontent-editor" data-bind="dxTextBox: { value: filter, valueChangeEvent: \'keyup\', placeholder: searchPlaceholder(), showClearButton: true  }"></div>        <div class="dx-picture-editing-filtercontent-images">            <!-- ko template: \'dx-picture-editing-imagespicker\' -->            <!-- /ko -->        </div>    </div>',
     'dx-picture-editing-imagespicker': '<div class="dx-picture-editing-imagescontainer dxd-text-primary" data-bind="styleunit: { width: contentWidth }, dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <!-- ko foreach: images -->        <div class="dx-picture-editing-block dxd-state-normal dxd-back-highlighted" data-bind="styleunit: { width: $parent.width + 10 }, visible: visible, click: function() { $parent.action($data); }">            <div class="dx-picture-editing-block-image" data-bind="styleunit: { width: $parent.width, height: $parent.height }, style: { backgroundImage: \'url(\' + ($data.url || $data.data) + \')\' }"></div>            <!-- ko if: $data.text-->            <!-- ko if: $parent.filterEnabled -->            <div class="dx-picture-editing-block-text" data-bind="searchHighlighting: { text: $data.text, textToSearch: $parent.filter }, attr: { title: $data.text }"></div>            <!-- /ko -->            <!-- ko ifnot: $parent.filterEnabled -->            <div class="dx-picture-editing-block-text" data-bind="text: $data.text, attr: { title: $data.text }"></div>            <!-- /ko -->            <!-- /ko -->        </div>        <!-- /ko -->    </div>',
-    'dx-selectbox': '<div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled }), dxValidator: { validationRules: $data.validationRules || [] }"></div>',
+    'dx-selectbox': '<div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }), dxValidator: { validationRules: $data.validationRules || [] }"></div>',
 });

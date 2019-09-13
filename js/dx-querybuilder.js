@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 19.1.5
-* Build date: 2019-07-29
+* Version: 19.1.6
+* Build date: 2019-09-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2810,7 +2810,9 @@ var DevExpress;
             function _registerSpecifyJsonConnectionPage(factory, connections, canCreateNewJsonDataSource) {
                 factory.registerMetadata(Wizard.JsonDataSourceWizardPageId.SpecifyJsonConnectionPage, {
                     create: function () { return new SpecifyJsonConnectionPage(connections, canCreateNewJsonDataSource); },
-                    description: Analytics.Utils.getLocalization("Do you want to use an existing data connection?", "AnalyticsCoreStringId.JsonDSWizard_ChooseConnection_Description"),
+                    description: canCreateNewJsonDataSource ?
+                        Analytics.Utils.getLocalization("Do you want to use an existing data connection?", "AnalyticsCoreStringId.JsonDSWizard_ChooseConnection_Description") :
+                        Analytics.Utils.getLocalization("Choose a data connection.", "AnalyticsCoreStringId.SqlDSWizard_PageChooseConnection"),
                     getState: function (state) { return state.jsonDataSourceWizard; },
                     setState: function (data, state) {
                         state.connectionName = data.connectionName;
@@ -3074,11 +3076,11 @@ var DevExpress;
                     this._dataSource = Wizard._restoreJsonDataSourceFromState(state, this._requestWrapper);
                     if ((oldDataSourceId && oldDataSourceId != this._dataSource.id) || !this._dataSource.schema.nodes.length) {
                         return this._dataSource.getSchema()
-                            .done(function (schema) { return _this.updatePage(schema); });
+                            .done(function (schema) { return _this._updatePage(schema); });
                     }
-                    return $.Deferred().done(function (schema) { return _this.updatePage(schema); }).resolve(this._dataSource.schema).promise();
+                    return $.Deferred().done(function (schema) { return _this._updatePage(schema); }).resolve(this._dataSource.schema).promise();
                 };
-                ChooseJsonSchemaPage.prototype.updatePage = function (jsonSchema) {
+                ChooseJsonSchemaPage.prototype._updatePage = function (jsonSchema) {
                     var rootElementList = jsonSchema.getRootElementPartList();
                     if (this._rootElementList() !== rootElementList) {
                         this._rootElementList(rootElementList);
@@ -3246,7 +3248,7 @@ var DevExpress;
                     _this.selectedQueryType(ConfigureQueryPage.QUERY_TEXT);
                     _this.popupQueryBuilder = new Analytics.Wizard.Internal.QueryBuilderPopup(function (newQuery, isInProcess) {
                         return _this._selectStatementControl.setQuery(newQuery, isInProcess);
-                    }, false, _this._options.callbacks.customizeQBInitData);
+                    }, _this._options.rtl, _this._options.callbacks.customizeQBInitData);
                     return _this;
                 }
                 ConfigureQueryPage.prototype.canNext = function () {
@@ -3274,14 +3276,14 @@ var DevExpress;
                 };
                 ConfigureQueryPage.prototype.initialize = function (state) {
                     this._dataSourceWrapper = Wizard._restoreSqlDataSourceFromState(state, this._options.requestWrapper);
-                    if (!this._dataSourceWrapper.sqlQuery) {
-                        this._proceduresList.setQuery(new Data.StoredProcQuery({}, this._dataSource()));
-                        this._selectStatementControl.setQuery(new Data.CustomSqlQuery({}, this._dataSource()));
-                        this.selectedQueryType(ConfigureQueryPage.QUERY_TEXT);
-                    }
+                    this._proceduresList.setQuery(new Data.StoredProcQuery({}, this._dataSource()));
+                    this._selectStatementControl.setQuery(new Data.CustomSqlQuery({}, this._dataSource()));
                     if (this._dataSourceWrapper.sqlQuery) {
                         this.selectedQueryType(this._dataSourceWrapper.sqlQuery.type() === Data.Utils.SqlQueryType.storedProcQuery ? ConfigureQueryPage.SP_TEXT : ConfigureQueryPage.QUERY_TEXT);
                         this.queryControl().setQuery(this._dataSourceWrapper.sqlQuery);
+                    }
+                    else {
+                        this.selectedQueryType(ConfigureQueryPage.QUERY_TEXT);
                     }
                     this.popupQueryBuilder.isVisible(false);
                     return $.Deferred().resolve().promise();
@@ -4827,7 +4829,7 @@ var DevExpress;
                     var _this = _super.call(this, pageFactory, _wizardOptions.callbacks.finishCallback) || this;
                     _this._wizardOptions = _wizardOptions;
                     _this._extendCssClass = "dxrd-sqldatasource-wizard";
-                    _this.title = "Data Source Wizard";
+                    _this.title = Analytics.Utils.getLocalization("Data Source Wizard", "AnalyticsCoreStringId.DSWizard_Title");
                     return _this;
                 }
                 DataSourceWizard.prototype.initialize = function (state, createIterator) {
@@ -4878,7 +4880,7 @@ var DevExpress;
                 function MultiQueryDataSourceWizard(pageFactory, _wizardOptions) {
                     var _this = _super.call(this, pageFactory, _wizardOptions.callbacks.finishCallback) || this;
                     _this._wizardOptions = _wizardOptions;
-                    _this.title = Analytics.Utils.getLocalization("SQL Data Source Wizard", "AnalyticsCoreStringId.SqlDSWizard_Title");
+                    _this.title = Analytics.Utils.getLocalization("Data Source Wizard", "AnalyticsCoreStringId.SqlDSWizard_Title");
                     _this._extendCssClass = "dxrd-multiqueries-sqldatasource-wizard";
                     _this.height(443);
                     return _this;
@@ -5153,18 +5155,18 @@ var DevExpress;
                 SpecifyJsonDataSourceSettingsPage.prototype.registerSections = function () {
                     if (this._dataSourceWizardOptions.connectionStrings.json().length > 0) {
                         Analytics.Wizard._registerSpecifyJsonConnectionPage(this._factory, this._dataSourceWizardOptions.connectionStrings.json, this._dataSourceWizardOptions.canCreateNewJsonDataSource);
-                        this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.SpecifyJsonConnectionPage, WizardSectionPosition.Left);
+                        this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.SpecifyJsonConnectionPage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.Right : WizardSectionPosition.Left);
                     }
                     if (this._dataSourceWizardOptions.canCreateNewJsonDataSource) {
                         if (this._dataSourceWizardOptions.connectionStrings.json().length === 0) {
                             Analytics.Wizard._registerChooseJsonSourcePage(this._factory);
-                            this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage, WizardSectionPosition.Left);
+                            this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.Right : WizardSectionPosition.Left);
                             var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSourcePage);
                             meta["disabledText"] = Analytics.Utils.getLocalization("To create a data connection, select \"No, I'd like to create a new data connection\".", "AnalyticsCoreStringId.JsonDSWizard_CreateNewConnectionPage_Placeholder");
                         }
                     }
                     Analytics.Wizard._registerChooseJsonSchemaPage(this._factory, this._dataSourceWizardOptions.requestWrapper);
-                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage, WizardSectionPosition.Right);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.Left : WizardSectionPosition.Right);
                     var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseJsonSchemaPage);
                     meta["disabledText"] = Analytics.Utils.getLocalization("To select data fields, choose or create a data connection.", "AnalyticsCoreStringId.JsonDSWizard_ChooseJsonSchemaPage_Placeholder");
                 };
@@ -5257,10 +5259,10 @@ var DevExpress;
                     var meta = this._factory.getMetadata(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryParametersPage);
                     meta.description = Analytics.Utils.getLocalization("Configure query parameters.", "AnalyticsCoreStringId.SqlDSWizard_PageConfigureParameters");
                     meta["disabledText"] = Analytics.Utils.getLocalization("To specify query parameters, select a parameterized stored procedure or create a custom query.", "AnalyticsCoreStringId.Wizard_ConfigureQueryParameters_Placeholder");
-                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseSqlConnectionPage, WizardSectionPosition.TopLeft);
-                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryPage, WizardSectionPosition.TopRight);
-                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryParametersPage, WizardSectionPosition.BottomRight);
-                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureMasterDetailRelationshipsPage, WizardSectionPosition.BottomLeft);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ChooseSqlConnectionPage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.TopRight : WizardSectionPosition.TopLeft);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryPage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.TopLeft : WizardSectionPosition.TopRight);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureQueryParametersPage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.BottomLeft : WizardSectionPosition.BottomRight);
+                    this._setSectionPosition(Analytics.Wizard.FullscreenDataSourceWizardSectionId.ConfigureMasterDetailRelationshipsPage, this._dataSourceWizardOptions.rtl ? WizardSectionPosition.BottomRight : WizardSectionPosition.BottomLeft);
                 };
                 return SpecifySqlDataSourceSettingsPage;
             }(FullscreenWizardPage));
@@ -5811,7 +5813,7 @@ var DevExpress;
                         var _this = _super.call(this) || this;
                         _this.connectionStrings = connectionStrings;
                         _this.height = ko.observable("443");
-                        _this.title = Analytics.Utils.getLocalization("SQL Data Source Wizard", "AnalyticsCoreStringId.SqlDSWizard_Title");
+                        _this.title = Analytics.Utils.getLocalization("Data Source Wizard", "AnalyticsCoreStringId.SqlDSWizard_Title");
                         _this.extendCssClass = "dxrd-multiqueries-sqldatasource-wizard";
                         _this.container = Analytics.Internal.getParentContainer;
                         wizardSettings = wizardSettings || DataSourceWizardSettings.prototype.createDefault();
@@ -9201,6 +9203,7 @@ var DevExpress;
             Internal.isJoinsResolvingDisabled = false;
             function _createQueryBuilder(element, data, callbacks, localization, rtl) {
                 if (rtl === void 0) { rtl = false; }
+                var _disposableCallBack = callbacks && callbacks.onServerError && Analytics.Internal.processErrorEvent(callbacks.onServerError);
                 var wrapper = data.requestWrapper || new Utils.RequestWrapper();
                 var parametersMode = data.parametersMode || Elements.Metadata.ParametersMode.ReadWrite;
                 var query = ko.observable(), surface = ko.observable(), treeListOptions = ko.observable();
@@ -9214,6 +9217,9 @@ var DevExpress;
                 initQuery(data.querySource());
                 var selection = new Analytics.Internal.SurfaceSelection(["alias", "name", "sortOrder"]);
                 var designerModel = Analytics.Internal.createDesigner(query, surface, QueryBuilder.Utils.controlsFactory, undefined, undefined, undefined, rtl, selection);
+                designerModel.dispose = function () {
+                    (_disposableCallBack || {})['dispose'] && _disposableCallBack.dispose();
+                };
                 designerModel.rootStyle = "dxqb-designer dxd-back-primary2";
                 var previewPopupContainer = Analytics.Internal.getParentContainer;
                 designerModel.dataPreview = {
@@ -9384,7 +9390,6 @@ var DevExpress;
                 }
                 DevExpress.config({ rtlEnabled: !!rtl });
                 Internal.registerControls();
-                callbacks && callbacks.onServerError && Analytics.Internal.processErrorEvent(callbacks.onServerError);
                 var promises = [];
                 callbacks && callbacks.customizeLocalization && callbacks.customizeLocalization(promises);
                 return Analytics.Internal.resolveFromPromises(promises, function () { return _createQueryBuilder(element, data, callbacks, localization, rtl); });
@@ -11262,8 +11267,8 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-page-choose-datasource-type': '<div class="dxrd-wizard-type-page" data-bind="css: $data._extendCssClass(\'type-page\')">        <!-- ko foreach: typeItems -->        <div data-bind="event: { click: $parent._itemClick, dblclick: function() { $parent._goToNextPage() } }, attr: { class: \'dxd-back-highlighted dxd-state-normal dxrd-wizard-type-item dx-fontsize-reestablished dxrd-wizard-type-item-border-color dxd-list-item-back-color \' + $parent._extendCssClass(\'type-item\')}, css: { \'dxd-border-secondary dxd-back-secondary\': $parent._IsSelected($data) } ">            <div data-bind="attr: { class: \'dxrd-wizard-type-image \' + $parent._extendCssClass(\'type-image\') }, css: imageClassName, template: imageTemplateName"> </div>            <div class="dxrd-wizard-type-text" data-bind="text: text, attr: { title: text }, css: $parent._extendCssClass(\'type-text\')"></div>        </div>        <!-- /ko -->    </div>',
     'dx-wizard-fullscreen': '<!-- ko if: $data && $data.isVisible() -->    <div class="dx-fullscreen-wizard dx-editors" data-bind="css: { \'dx-rtl\': $root.rtl, \'dx-ltr\': !$root.rtl }">        <div class="dxrd-wizard dxrd-report-wizard dx-editors dxd-text-primary dxd-back-primary2" data-bind="css: _extendCssClass">            <div class="dxrd-wizard-steps-container dxd-back-primary" data-bind="visible: $data.navigationPanel().isVisible">                <div class="dxrd-wizard-title dxd-border-primary" data-bind="text: _description()"></div>                <!-- ko with: navigationPanel -->                <div class="dxrd-wizard-steps" data-bind="foreach: _steps">                    <div class="dxrd-wizard-steps-relative" style="position:relative" data-bind="visible: $data.visible">                        <div class="dxrd-wizard-steps-content" data-bind="click: $data.clickAction, text: $data.text, attr: {\'title\': $data.text }, css: { \'dxrd-disabled\': $data.disabled, \'dxd-back-secondary\': $data.isActive() }"></div>                        <div class="dxrd-wizard-steps-marker dxd-back-primary2" data-bind="visible: $data.isActive"></div>                    </div>                </div>                <!-- /ko -->            </div>            <div class="dxrd-wizard-content" data-bind="css: { \'withoutPanel\': !$data.navigationPanel().isVisible() }">                <div class="dxrd-wizard-part-description dxd-back-contrast">                    <div class="dxrd-wizard-part-description-text dxd-text-primary dxd-border-primary" data-bind="text: _pageDescription()"></div>                </div>                <!-- ko with: _currentPage -->                <div class="dxrd-wizard-work-content">                    <div class="dxrd-wizard-work-content-relative">                        <div data-bind="template: { name: template, data: page } "></div>                    </div>                </div>                <!-- /ko -->                <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)">                </div>                <div class="dxrd-wizard-navigation">                    <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>                    <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>                    <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>                </div>            </div>        </div>    </div>    <!-- /ko -->',
     'dx-wizard-fullscreen-page': '<!-- ko if: $data._sections.length > 0 -->    <div style="position:absolute;" data-bind="foreach: _sections, styleunit: { top: _parentMarginOffset, left: _parentMarginOffset, right: _parentMarginOffset, bottom: _parentMarginOffset }">        <div class="dx-border-inheritor dxd-border-accented">            <div class="dxrd-report-page-tile dxd-border-secondary" data-bind="css: { \'dxrd-disabled\': !$data.page() }, style: $parent._pageCss[$data.pageId]">                <div class="dxrd-report-page-tile-title" data-bind="visible: $parent._showPageDescription(), text: $parent._getPageDescription($index(), $data), attr: { title: $parent._getPageDescription($index(), $data) }"></div>                <!-- ko if: $data.page() !== null -->                <!-- ko with: page -->                <div class="dxrd-report-page-tile-content" data-bind="template: { name: $parent.metadata.template, data: page }, dxScrollView: { showScrollbar: \'onHover\'}"></div>                <!-- /ko -->                <!-- /ko -->                <!-- ko if: $data.page() === null -->                <div class="dxrd-report-page-tile-content dx-default-border-style dxd-border-secondary">                    <div class="dxrd-wizard-page dxrd-wizard-disabled-content" data-bind="text: metadata.disabledText"></div>                </div>                <!-- /ko -->            </div>        </div>    </div>    <!-- /ko -->',
-    'dxrd-jsondatasource-fields-page': '<div class="dxrd-wizard-page dx-jsonschema-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height:100%">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _rootElementTitle"></div>                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: _rootElementList, value: _selectedRootElement, displayExpr: \'fullPath\', displayCustomValue: true }"></div>            </div>            <div class="dxrd-wizard-add-queries-page dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">                <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>            </div>        </div>    </div>',
-    'dxrd-page-jsonsource': '<div class="dxrd-wizard-page dx-jsonsource-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height: 100%" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, dxValidationGroup: $data._validationGroup || {}">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _jsonConnectionTitle, attr: { \'title\': _jsonConnectionTitle }"></div>                <div class="dx-field-value" data-bind="dxTextBox: { value: _connectionName }, dxValidator: { validationRules: $data._connectionNameValidationRules || [] }"></div>            </div>            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _jsonSourceTitle, attr: { \'title\': _jsonSourceTitle }"></div>                <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { dataSource: _sources, value: _selectedSource, valueExpr:\'value\', displayExpr: \'displayValue\', displayCustomValue: true }"></div>            </div>            <!-- ko with: _selectedSource -->            <div data-bind="dxValidationGroup: $data.validationGroup || {}">                <div data-bind="css: $data.cssClass">                    <!-- ko template: { name: \'dx-propertieseditor\', data: grid } -->                    <!-- /ko -->                </div>                <div class="dxrd-wizard-validationsummary" data-bind="dxValidationSummary: $data.validationSummary || {}, visible: $data.validationSummary && !isValid()"></div>            </div>            <!-- /ko -->            <div class="dxrd-wizard-validationsummary" data-bind="dxValidationSummary: $data._validationSummary || {}, visible: $data._validationSummary && _selectedSource().validationSummary && !canNext()"></div>        </div>    </div>',
+    'dxrd-jsondatasource-fields-page': '<div class="dxrd-wizard-page dx-jsonschema-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height:100%">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _rootElementTitle"></div>                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: _rootElementList, value: _selectedRootElement, displayExpr: \'fullPath\', displayCustomValue: true, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>            </div>            <div class="dxrd-wizard-add-queries-page dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: \'onHover\' }">                <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>            </div>        </div>    </div>',
+    'dxrd-page-jsonsource': '<div class="dxrd-wizard-page dx-jsonsource-page dx-frameless-style">        <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height: 100%" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }, dxValidationGroup: $data._validationGroup || {}">            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _jsonConnectionTitle, attr: { \'title\': _jsonConnectionTitle }"></div>                <div class="dx-field-value" data-bind="dxTextBox: { value: _connectionName }, dxValidator: { validationRules: $data._connectionNameValidationRules || [] }"></div>            </div>            <div class="dx-field">                <div class="dx-field-label" data-bind="text: _jsonSourceTitle, attr: { \'title\': _jsonSourceTitle }"></div>                <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { dataSource: _sources, value: _selectedSource, valueExpr:\'value\', displayExpr: \'displayValue\', displayCustomValue: true, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>            </div>            <!-- ko with: _selectedSource -->            <div data-bind="dxValidationGroup: $data.validationGroup || {}">                <div data-bind="css: $data.cssClass">                    <!-- ko template: { name: \'dx-propertieseditor\', data: grid } -->                    <!-- /ko -->                </div>                <div class="dxrd-wizard-validationsummary" data-bind="dxValidationSummary: $data.validationSummary || {}, visible: $data.validationSummary && !isValid()"></div>            </div>            <!-- /ko -->            <div class="dxrd-wizard-validationsummary" data-bind="dxValidationSummary: $data._validationSummary || {}, visible: $data._validationSummary && _selectedSource().validationSummary && !canNext()"></div>        </div>    </div>',
     'dx-property-json-string-editor': '<div class="dx-field" data-bind="visible: visible">        <!-- ko template: templateName -->        <!-- /ko -->    </div>',
     'dxrd-page-dataSource': '<div class="dxrd-wizard-page">    <!-- ko if: isDataSourceCreationAvailable -->    <div class="dxrd-wizard-datasourceoperation dxrd-radio-nowrap-ellipsis" style="margin-bottom: 15px" data-bind="dxRadioGroup: { value: selectedDataSourceOperation, items: dataSourceOperations, layout: \'vertical\' }">        <div data-options="dxTemplate : { name: \'item\' }">            <div class="dxrd-radio-nowrap-ellipsis-text" data-bind="text: text, attr: { \'title\': text }"></div>        </div>    </div>    <!-- /ko -->    <div class="dxrd-wizard-availabledatasources dx-default-border-style dxd-border-secondary">        <div class="dxrd-wizard-list" data-bind="dxList: { dataSource: availableDataSources, selectedItems: selectedDataSource, focusStateEnabled:false, editEnabled: true, height: dataSourcesListHeight, editConfig: { selectionEnabled: false }, selectionMode: \'single\', activeStateEnabled: false, disabled: createNewDataSource, noDataText: $root.dx.Analytics.Internal.noDataText() }">            <div data-options="dxTemplate : { name: \'item\' }">                <div data-bind="text: name"></div>            </div>        </div>    </div></div>',
     'dxrd-page-selectitems': '<div class="dxrd-wizard-page">        <!-- ko template: { name: \'dxrd-page-selectitems-radio-group\', data: $data } -->        <!-- /ko -->        <!-- ko template: { name: \'dxrd-page-selectitems-list\', data: $data } -->        <!-- /ko -->    </div>',
@@ -11293,7 +11298,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-querybuilder-popup': '<div class="dxrd-querybuilder-popup" data-bind="dxPopup: popupViewModel($element)">        <!-- ko if: qbOptions -->        <!-- ko if: isVisible -->        <div class="dxrd-querybuilder-popup-content">            <div style="height:100%;" data-bind="dxQueryBuilder: { options: qbOptions, designerModel: designer }"></div>        </div>        <!-- /ko -->        <div class="dxrd-querybuilder-popup-buttons dxd-border-secondary">            <div data-bind="dxButton: { text: getDisplayText(\'previewResults\'), onClick: previewHandler, disabled: okButtonDisabled }" class="dxrd-querybuilder-popup-button-left"></div>            <div data-bind="dxButton: { text: getDisplayText(\'cancel\'), onClick: cancelHandler }" class="dxrd-querybuilder-popup-button"></div>            <div data-bind="dxButton: { text: getDisplayText(\'ok\'), onClick: okHandler, disabled: okButtonDisabled }" class="dxrd-querybuilder-popup-button"></div>        </div>        <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel:{            animation: {                show: { type: \'fade\', from: 0, to: 1, duration: 700 },                hide: { type: \'fade\', from: 1, to: 0, duration: 700 }            },            deferRendering: false,            message: getDisplayText(\'loading\'),            visible: showLoadIndicator,            shading: true,            shadingColor: \'transparent\'}">        </div>        <!-- /ko -->    </div>',
     'dxrd-querybuilder': '<div class="dx-designer dx-querybuilder" data-bind="template: \'dxrd-designer\'">    </div>',
     'dx-wizard-headerNew': '<div class="dxrd-wizard-header-custom">        <!-- ko with: _currentPage -->        <div class="dxrd-span-title" data-bind="text: $data.title || $parent.title"></div>        <div class="dxrd-span-description" data-bind="text: description, attr: { title: description }"></div>        <!-- /ko -->    </div>',
-    'dx-wizard-newlayout': '<div class="dxrd-wizard dx-editors dxd-text-primary" data-bind="dxPopup: {        visible: isVisible,        title: isVisible() ? title : \'\',        showTitle: true,        fullScreen: false,        width: width,        height: height,        container: _container($element),        titleTemplate: _titleTemplate,        position: _wizardPopupPosition($element)    }, css: _extendCssClass">        <div class="dxrd-wizard-content">            <!-- ko with: _currentPage -->            <div style="height: 100%" data-bind="template: { name: template, data: page } "></div>            <!-- /ko -->            <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)"></div>        </div>        <div class="dxrd-wizard-navigation">            <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>            <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>        </div>    </div>',
+    'dx-wizard-newlayout': '<div class="dxrd-wizard dx-editors dxd-text-primary" data-bind="dxPopup: {        visible: isVisible,        title: isVisible() ? title : \'\',        showTitle: true,        fullScreen: false,        width: width,        height: height,        container: _container($element),        titleTemplate: _titleTemplate,        position: _wizardPopupPosition($element)    }, class: _extendCssClass, css: { \'dx-rtl\': $root.rtl, \'dx-ltr\': !$root.rtl }">        <div class="dxrd-wizard-content">            <!-- ko with: _currentPage -->            <div style="height: 100%" data-bind="template: { name: template, data: page } "></div>            <!-- /ko -->            <div class="dxrd-wizard-load-panel dxd-text-primary" data-bind="dxLoadPanel: _loadPanelViewModel($element)"></div>        </div>        <div class="dxrd-wizard-navigation">            <div data-bind="dxButton: cancelButton" class="dxrd-wizard-btn left"></div>            <div data-bind="dxButton: finishButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: nextButton" class="dxrd-wizard-btn right"></div>            <div data-bind="dxButton: previousButton" class="dxrd-wizard-btn right"></div>        </div>    </div>',
 });
 
 if(window["ace"]) {

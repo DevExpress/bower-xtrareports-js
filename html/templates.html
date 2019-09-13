@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (templates.html)
-* Version: 19.1.5
-* Build date: 2019-07-29
+* Version: 19.1.6
+* Build date: 2019-09-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -817,7 +817,7 @@
         <div class="dx-default-border-style dxd-border-secondary dxrd-wizard-dataMember dx-fieldset" style="height:100%">
             <div class="dx-field">
                 <div class="dx-field-label" data-bind="text: _rootElementTitle"></div>
-                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: _rootElementList, value: _selectedRootElement, displayExpr: 'fullPath', displayCustomValue: true }"></div>
+                <div class="dx-field-value" data-bind="dxSelectBox: { dataSource: _rootElementList, value: _selectedRootElement, displayExpr: 'fullPath', displayCustomValue: true, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
             </div>
             <div class="dxrd-wizard-add-queries-page dxd-border-secondary" data-bind="dxScrollView: { showScrollbar: 'onHover' }">
                 <div data-bind="treelist: _fieldListModel" style="width:100%; height: 100%;"></div>
@@ -835,7 +835,7 @@
             </div>
             <div class="dx-field">
                 <div class="dx-field-label" data-bind="text: _jsonSourceTitle, attr: { 'title': _jsonSourceTitle }"></div>
-                <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { dataSource: _sources, value: _selectedSource, valueExpr:'value', displayExpr: 'displayValue', displayCustomValue: true }"></div>
+                <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { dataSource: _sources, value: _selectedSource, valueExpr:'value', displayExpr: 'displayValue', displayCustomValue: true, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
             </div>
             <!-- ko with: _selectedSource -->
             <div data-bind="dxValidationGroup: $data.validationGroup || {}">
@@ -1311,7 +1311,7 @@
         container: _container($element),
         titleTemplate: _titleTemplate,
         position: _wizardPopupPosition($element)
-    }, css: _extendCssClass">
+    }, class: _extendCssClass, css: { 'dx-rtl': $root.rtl, 'dx-ltr': !$root.rtl }">
         <div class="dxrd-wizard-content">
             <!-- ko with: _currentPage -->
             <div style="height: 100%" data-bind="template: { name: template, data: page } "></div>
@@ -1339,7 +1339,7 @@
 </script>
 
 <script type="text/html" id="dx-boolean-select">
-    <div data-bind="dxLocalizedSelectBox: { dataSource: [ { val: true, text: $root.getLocalization('Yes', 'AnalyticsCoreStringId.ParametersPanel_True') }, { val: false, text: $root.getLocalization('No', 'AnalyticsCoreStringId.ParametersPanel_False') }], valueExpr: 'val', displayExpr: 'text', value: value, disabled: disabled }, dxValidator: { validationRules: validationRules || [] }"></div>
+    <div data-bind="dxLocalizedSelectBox: { dataSource: [ { val: true, text: $root.getLocalization('Yes', 'AnalyticsCoreStringId.ParametersPanel_True') }, { val: false, text: $root.getLocalization('No', 'AnalyticsCoreStringId.ParametersPanel_False') }], valueExpr: 'val', displayExpr: 'text', value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: validationRules || [] }"></div>
 </script>
 <script type="text/html" id="dx-commonCollection">
     <div class="dx-editor" data-bind="visible: visible">
@@ -1351,24 +1351,21 @@
 <script type="text/html" id="dx-commonCollectionItem">
     <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1, parentDisabled: editor.disabled }"></div>
 </script>
-<script type="text/html" id="dx-color">
-    <div data-bind="dxColorBox: { value: value, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled }"></div>
-</script>
 <script type="text/javascript" id="item-with-title">
     <div class="dx-listitem-with-title" data-bind="text: $data.display, attr: { title: $data.display }"></div>
 </script>
 
 <script type="text/html" id="dx-combobox">
-    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }">
+    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: $data.validationRules || [] }">
     </div>
 </script>
 
 <script type="text/html" id="dx-combobox-editable">
-    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', disabled: disabled, placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), acceptCustomValue: true, onCustomItemCreating: function(arg) { return { value: arg.text, displayValue: arg.text }; } })"></div>
+    <div data-bind="dxSelectBox: getOptions({ items: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', disabled: disabled, placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), acceptCustomValue: true, onCustomItemCreating: function(arg) { return { value: arg.text, displayValue: arg.text }; }, dropDownOptions: { container: $root.getPopupContainer($element) } })"></div>
 </script>
 
 <script type="text/html" id="dx-combobox-undo">
-    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }">
+    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: $data.validationRules || [] }">
     </div>
 </script>
 <script type="text/html" id="dx-property-editor">
@@ -1420,7 +1417,7 @@
 </script>
 <script type="text/html" id="dx-date">
     <div class="dx-datebox-container">
-        <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>
+        <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }), dxValidator: { validationRules: validationRules || [] }"></div>
     </div>
 </script>
 <script type="text/html" id="dx-file">
@@ -1978,20 +1975,20 @@
         <!-- ko if: $data.specifics() === "string" || $data.specifics() === "guid" -->
         <div class="criteria-operator-item-editor" data-bind="dxTextBox: { value: _value, onFocusOut: function() { isEditable(false); } }, focus: { on: isEditable }"></div>        <!-- /ko -->
         <!-- ko if: $data.specifics() === "bool" -->
-        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: 'True', text: 'Yes', localizationId: 'AnalyticsCoreStringId.ParametersPanel_True' }, { val: 'False', text: 'No', localizationId: 'AnalyticsCoreStringId.ParametersPanel_False' }], valueExpr: 'val', displayExpr: 'text', value: _value, onFocusOut: function() { isEditable(false); } }"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxLocalizedSelectBox: { dataSource: [ { val: 'True', text: 'Yes', localizationId: 'AnalyticsCoreStringId.ParametersPanel_True' }, { val: 'False', text: 'No', localizationId: 'AnalyticsCoreStringId.ParametersPanel_False' }], valueExpr: 'val', displayExpr: 'text', value: _value, onFocusOut: function() { isEditable(false); }, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() === "date" -->
-        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: 'date', onFocusOut: function() { isEditable(false); } }"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxDateBox: { value: _value, closeOnValueChange: true, type: 'date', onFocusOut: function() { isEditable(false); }, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
         <!-- /ko -->
         <!-- ko if: $data.specifics() !== "string" && $data.specifics() !== "bool" && $data.specifics() !== "date" && $data.specifics() !== "guid" -->
         <div class="criteria-operator-item-editor" data-bind="dxTextBox: getNumberEditorOptions(), focus: { on: isEditable }"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: $data.items.length > 0 && typeof $data.items[0] === "object" -->
-        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: dataSource, valueExpr: 'value', displayExpr: 'display', searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: dataSource, valueExpr: 'value', displayExpr: 'display', searchEnabled: true, onFocusOut: function() { isEditable(false); }}, dropDownOptions: { container: $root.getPopupContainer($element) }"></div>
         <!-- /ko -->
         <!-- ko if: $data.items.length > 0 && typeof $data.items[0] !== "object" -->
-        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: dataSource, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }}"></div>
+        <div class="criteria-operator-item-editor" data-bind="focus: isEditable, dxSelectBox: { value: _value, dataSource: dataSource, acceptCustomValue: true, searchEnabled: true, onFocusOut: function() { isEditable(false); }, dropDownOptions: { container: $root.getPopupContainer($element) }}"></div>
         <!-- /ko -->
     </div>
     <div class="criteria-operator-text dxd-filter-editor-text-color criteria-operator-item-value dxd-filter-editor-value-back-color" data-bind="visible: !isEditable()">
@@ -2334,9 +2331,8 @@
 <script type="text/html" id="dxrd-borders">
     <div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>
 </script>
-
 <script type="text/html" id="dxrd-colorpicker">
-    <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled }"></div>
+    <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 <script type="text/html" id="dxrd-expressionstring">
     <!-- ko if: $data.value() -->
@@ -2386,22 +2382,6 @@
 
 <script type="text/html" id="dxrd-commonCollectionItem">
     <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1, parentDisabled: editor.disabled }"></div>
-</script>
-
-
-<script type="text/html" id="dxrd-controls">
-    <div data-bind="dxLocalizedSelectBox: { items: $root.controls, value: value, displayExpr: 'displayName', valueExpr: 'value', disabled: disabled }"></div>
-</script>
-
-
-<script type="text/html" id="dxrd-treelistContent">
-    <!-- ko if: visible -->
-    <!-- ko if: value -->
-    <!-- ko with: value -->
-    <div data-bind="treelist: { itemsProvider: itemsProvider, selectedPath: selectedPath, treeListController: treeListController }"></div>
-    <!-- /ko -->
-    <!-- /ko -->
-    <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxrd-objectVisitor">
@@ -2546,7 +2526,7 @@
         <div class="dx-property-grid-header">
             <div class="dx-property-grid-header-content">
                 <div class="dx-property-grid-sorting-actions-group" data-bind="css: { 'dx-property-gread-search-collapsed': isSearching }">
-                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr }"></div>
+                    <div class="dxrd-properties-focused-item" data-bind="dxSelectBox: { dataSource: $root.controlsStore.dataSource, value: focusedItem, displayExpr: displayExpr, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
                     <div class="dx-property-grid-sorting-actions-container">
                         <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { 'dxd-state-active dxd-state-no-hover': !isSortingByGroups() }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(false); }, icon: 'dxrd-svg-properties-sortingbyalphabet', iconClass: 'image-sortingbyalphabet' }"></div>
                         <div class="dx-property-grid-sorting-action dxd-button-back-color dxd-state-normal dxd-back-highlighted dxd-back-primary2" data-bind="css: { 'dxd-state-active dxd-state-no-hover': isSortingByGroups }, dxButtonWithTemplate: { onClick: function() { $data.isSortingByGroups(true); }, icon: 'dxrd-svg-properties-sortingbygroups', iconClass: 'image-sortingbygroups' }"></div>
@@ -2705,7 +2685,7 @@
 </script>
 <script type="text/html" id="dxrd-zoom-select-template">
     <div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">
-        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomLevels, value: $data.zoom, displayExpr: function(val) { return Math.round((val || this.option('value')) * 100) + '%'; }, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating, disabled: disabled }"></div>
+        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomLevels, value: $data.zoom, displayExpr: function(val) { return Math.round((val || this.option('value')) * 100) + '%'; }, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
     </div>
 </script>
 
@@ -2723,8 +2703,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 19.1.5
-* Build date: 2019-07-30
+* Version: 19.1.6
+* Build date: 2019-09-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2947,7 +2927,7 @@
 </script>
 
 <script type="text/html" id="dxrp-editing-field-datetime">
-    <div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: options, childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
+    <div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: $data.getOptions({ dropDownOptions: { container: $root.getPopupContainer($element) } }), childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
 </script>
 
 <script type="text/html" id="dxrp-editing-field-image">
@@ -2973,7 +2953,7 @@
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet">
                 <g fill="#010101" stroke="none">
                     <path d="M32,380a348,348 0 1,0 696,0a348,348 0 1,0 -696,0" class="highlight" style="stroke-width: 50;stroke: rgb(0, 0, 0);" />
-                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? 'black' : 'transparent' }"/>
+                    <path d="M185,380a195,195 0 1,0 390,0a195,195 0 1,0 -390,0" data-bind="style: { fill: checked() ? 'black' : 'transparent' }" />
                 </g>
             </svg>
         </div>
@@ -2984,7 +2964,7 @@
     <div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">
         <!-- ko if: !active() || field.readOnly()  -->
         <!-- ko foreach: cells -->
-            <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>
+        <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: active() && !field.readOnly() -->
@@ -3011,7 +2991,7 @@
 
 <script type="text/html" id="dxrd-preview-export-to">
     <div class="dxrd-preview-export-toolbar-item dxrd-toolbar-item" data-bind="visible: visible">
-        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: 'dxrdp-export-to-menu', onItemClick: clickAction }, attr: { title: $root.getLocalization(text, $data.textId) }">
+        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: 'dxrdp-export-to-menu', onItemClick: clickAction, onSubmenuShowing: function(e) { e.submenu._overlay.option('container', $root.getPopupContainer($element)) } }, attr: { title: $root.getLocalization(text, $data.textId) }">
             <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: 'item' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">
                 <!--ko if: $data.format -->
                 <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>
@@ -3076,7 +3056,7 @@
 </script>
 <script type="text/html" id="dxrd-zoom-autofit-select-template">
     <div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">
-        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating }"></div>
+        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
     </div>
 </script>
 
@@ -3148,7 +3128,7 @@
 
 <script type="text/html" id="dxrd-preview-pager">
     <div class="dxrd-preview-pager dxrd-toolbar-item" data-bind="visible: visible">
-        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled }"></div>
+        <div class="dxrd-preview-pager-selectbox" data-bind="dxSelectBox: { dataSource: pageItems, value: selectedItem, opened: opened, displayExpr: displayExpr, onFocusOut: focusOut, onKeyUp: keyUp, itemTemplate: itemTemplate, searchMode: searchMode, searchEnabled: searchEnabled, searchTimeout: searchTimeout, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
         <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
     </div>
 </script>
@@ -3221,21 +3201,9 @@
     <div data-bind="dxTagBox: $parent.getOptions({ dataSource: $data.dataSource, searchEnabled: true, searchExpr: $data.searchExpr || ['displayValue'], value: $data.value,
          displayExpr: $data.displayExpr || 'displayValue', valueExpr: $data.valueExpr || 'value', multiline: false, showSelectionControls: true,
          showDropDownButton: !!$data.showDropDownButton, selectAllMode: 'allPages', selectedItems: $data.selectedItems,
-         placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), maxDisplayedTags: $data.maxDisplayedTags }), dxValidator: { validationRules: $parent.validationRules || [] }">
+         placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), maxDisplayedTags: $data.maxDisplayedTags, dropDownOptions: { container: $root.getPopupContainer($element) } }), 
+         dxValidator: { validationRules: $parent.validationRules || [] }">
     </div>
-    <!-- /ko -->
-</script>
-
-<script type="text/html" id="dxrd-multivalue-selectbox">
-    <!-- ko if: options -->
-    <!-- ko with: options -->
-    <div data-bind="dxSelectBox: $parent.getOptions({ dataSource: dataSource, itemTemplate: 'valueItem', onOptionChanged: onOptionChanged, value: editorValue, displayExpr: function() { return selectedValuesString(); } })">
-        <div class="dxrd-multivalue-editor-item" data-options="dxTemplate: { name: 'valueItem' }" data-bind="dxclick: function(_, event) { toggleSelected(); event.stopPropagation(); }">
-            <div class="dxrd-multivalue-editor-item-checkState" data-bind="dxCheckBox: { value: selected, readOnly: true }"></div>
-            <div class="dxrd-multivalue-editor-item-text" data-bind="text: displayValue"></div>
-        </div>
-    </div>
-    <!-- /ko -->
     <!-- /ko -->
 </script>
 
@@ -3372,14 +3340,14 @@
     </div>
 </script>
 <script type="text/html" id="dx-selectbox">
-    <div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }), dxValidator: { validationRules: $data.validationRules || [] }"></div>
+    <div data-bind="dxSelectBox: getOptions({ dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }), dxValidator: { validationRules: $data.validationRules || [] }"></div>
 </script>
 
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 19.1.5
-* Build date: 2019-07-30
+* Version: 19.1.6
+* Build date: 2019-09-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3435,7 +3403,7 @@
 </script>
 
 <script type="text/html" id="dxcd-collection-lookup-header">
-    <div data-bind="dxSelectBox: { items: array, displayExpr: 'name', value: selectedItem, disabled: disabled,  placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), noDataText: $root.dx.Analytics.Internal.noDataText() }"></div>
+    <div data-bind="dxSelectBox: { items: array, displayExpr: 'name', value: selectedItem, disabled: disabled,  placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), noDataText: $root.dx.Analytics.Internal.noDataText(), dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxcd-collection-item">
@@ -3459,30 +3427,30 @@
 </script>
 
 <script type="text/html" id="dxcd-panes-editor">
-    <div data-bind="dxSelectBox: { dataSource: $root.panes, value: value, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { dataSource: $root.panes, value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxcd-legends-editor">
-    <div data-bind="dxSelectBox: { dataSource: $root.legends, value: value, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { dataSource: $root.legends, value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxcd-axisX-editor">
-    <div data-bind="dxSelectBox: { dataSource: $root.axisX, value: value, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { dataSource: $root.axisX, value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxcd-axisY-editor">
-    <div data-bind="dxSelectBox: { dataSource: $root.axisY, value: value, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { dataSource: $root.axisY, value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 
 <script type="text/html" id="dxcd-datasource">
-    <!-- ko with: generateOptions($root.chartDataSources) -->
+    <!-- ko with: generateOptions($root.chartDataSources, $root.getPopupContainer($element)) -->
     <div data-bind="dxSelectBox: $data"></div>
     <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxcd-viewHeader">
-    <div data-bind="dxSelectBox: { dataSource: values, itemTemplate: 'stateItem', valueExpr: 'value', value: generateHeaderValue($root.undoEngine), displayExpr: 'displayValue', disabled: disabled }">
+    <div data-bind="dxSelectBox: { dataSource: values, itemTemplate: 'stateItem', valueExpr: 'value', value: generateHeaderValue($root.undoEngine), displayExpr: 'displayValue', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }">
         <div class="lookupItem" data-options="dxTemplate:{ name:'stateItem' }">
             <div style="display:inline-block; width: 24px; height: 24px;" data-bind="css: $parent.generateViewClassName(value), template: {name: $parent.generateViewClassName(value, true), if: !!$parent.generateViewClassName(value, true)}"> </div>
             <div style="display:inline-block; vertical-align: super;" data-bind="text: displayValue"></div>
@@ -3509,7 +3477,7 @@
                 <div class="propertygrid-editor-displayName" data-bind="text: $parent.getLocalization('Function', 'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function'), attr: { 'title': $parent.getLocalization('Function', 'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function') }"></div>
             </div>
             <div class="dx-field-value">
-                <div data-bind="dxSelectBox: { value: functionName, dataSource: $parent.availableItems() ,acceptCustomValue: true, disabled: $parent.disabled(), placeholder: $root.dx.Analytics.Internal.selectPlaceholder() }"></div>
+                <div data-bind="dxSelectBox: { value: functionName, dataSource: $parent.availableItems() ,acceptCustomValue: true, disabled: $parent.disabled(), placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
             </div>
         </div>
         <!-- ko foreach: args -->
@@ -3567,21 +3535,21 @@
 </script>
 
 <script type="text/html" id="dxcd-group">
-    <div data-bind="dxSelectBox: { dataSource: $root.groups, value: value, acceptCustomValue:true, onFocusOut: function() { $root.applyGroup($data.value()); }, disabled: disabled }"></div>
+    <div data-bind="dxSelectBox: { dataSource: $root.groups, value: value, acceptCustomValue:true, onFocusOut: function() { $root.applyGroup($data.value()); }, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxcd-color-undo">
-    <div data-bind="dxColorBox: { value: generateValue($root.undoEngine), editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled }"></div>
+    <div data-bind="dxColorBox: { value: generateValue($root.undoEngine), editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dx-selectbox-undo">
-    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
+    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
 </script>
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 19.1.5
-* Build date: 2019-07-30
+* Version: 19.1.6
+* Build date: 2019-09-10
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4704,13 +4672,14 @@
                 <div class="dx-property-grid-header-content">
                     <div class="dx-property-grid-selected-component">
                         <div class="dxrd-properties-focused-item" style="margin:0" data-bind="dxSelectBox: {
-                        dataSource: $root.controlsStore.dataSource,
-                        value: $root.editableObject,
-                        displayExpr: function(value) {
-                             var showValue = value || $root.editableObject();
-                             return $root.dx.Analytics.Internal.getControlFullName(showValue)  
-                             }
-                }">
+                            dataSource: $root.controlsStore.dataSource,
+                            value: $root.editableObject,
+                            displayExpr: function(value) {
+                                 var showValue = value || $root.editableObject();
+                                 return $root.dx.Analytics.Internal.getControlFullName(showValue)
+                                 },
+                            dropDownOptions: { container: $root.getPopupContainer($element) }
+                        }">
                         </div>
                     </div>
                 </div>
@@ -4825,14 +4794,14 @@
 
 <script type="text/html" id="dxrd-scripting-controlchooser">
     <div class="dxrd-toolbar-item dxrd-toolbar-selectbox">
-        <div data-bind="dxSelectBox: { dataSource: controls, value: control, displayExpr: displayExpr, placeholder: $root.getLocalization('Select control...', 'ASPxReportsStringId.ReportDesigner_ScriptEditor_Toolbar_SelectControl'), width: '300px' }"></div>
+        <div data-bind="dxSelectBox: { dataSource: controls, value: control, displayExpr: displayExpr, placeholder: $root.getLocalization('Select control...', 'ASPxReportsStringId.ReportDesigner_ScriptEditor_Toolbar_SelectControl'), width: '300px', dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
         <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
     </div>
 </script>
 
 <script type="text/html" id="dxrd-scripting-eventchooser">
     <div class="dxrd-toolbar-item dxrd-toolbar-selectbox">
-        <div data-bind="dxSelectBox: { items: events, value: event, placeholder: $root.getLocalization('Select event...', 'ASPxReportsStringId.ReportDesigner_ScriptEditor_Toolbar_SelectEvent'), width: '200px' }"></div>
+        <div data-bind="dxSelectBox: { items: events, value: event, placeholder: $root.getLocalization('Select event...', 'ASPxReportsStringId.ReportDesigner_ScriptEditor_Toolbar_SelectEvent'), width: '200px', dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
         <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>
     </div>
 </script>
@@ -4950,41 +4919,34 @@
     </div>
 </script>
 <script type="text/html" id="dxrd-menubutton-template">
-    <div class="dxrd-menu-container dxrd-menu-fullscreen-nav" style="" data-bind="css: { 'dxrd-menu-fullscreen-nav-collapsed': isMenuCollapsed()}"></div>
-    <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">
-        <div class="dxrd-menu-place" style="width:54px;"></div>
-        <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: 'dxrd-svg-menu-menu', css: {'dxd-state-active': appMenuVisible }"></div>
-        <div class="dxd-menu-back-color dxd-back-contrast" data-bind="dxPopup: {
-                             width: ko.computed(function() { return $data.isMenuCollapsed() ? 50 : 300}),
-                             height: '100%',
-                             position: $data.rtl ? { my: 'right top' , at: 'right top'  } : { my: 'left top' , at: 'left top' },
-                             showTitle: false,
-                             showCloseButton: false,
-                             container: getMenuPopupContainer($element),
-                             target: getMenuPopupTarget($element),
-                             animation: {},
-                             closeOnOutsideClick: !$data.isMenuCollapsed(),
-                             shading: false,
-                             focusStateEnabled: false,
-                             visible: appMenuVisible }">
-            <div class="dxrd-report-menu-title dxd-border-primary">
-                <!-- ko if: !isMenuCollapsed()-->
-                <div class="dxrd-report-menu-button dxrd-report-menu-close-button" data-bind="template: 'dxrd-svg-toolbar-delete', dxclick: function(e) { toggleAppMenu() }, dxpointerenter: function(_, e) {  e.target.classList &&  e.target.classList.add('dxd-state-active') }, dxpointerleave: function(_, e) {  e.target.classList &&  e.target.classList.remove('dxd-state-active') }"></div>
-                <div class="dxrd-report-menu-title-text dxd-text-primary" data-bind="text: $root.getLocalization('Menu', 'ASPxReportsStringId.ReportDesigner_Menu_Text')"></div>
-                <!-- /ko -->
-                <!-- ko if: isMenuCollapsed-->
-                <div class="dxrd-report-menu-button dxd-back-highlighted dxrd-report-menu-back-button" data-bind="template: 'dxrd-svg-menu-back', dxclick: function(e) { isMenuCollapsed(false); }"></div>
-                <!-- /ko -->
+    <div class="dxrd-menubutton-part" tabindex="1" style="outline:inherit" data-bind="cacheElement: { action: function(element){ $data.setMenuElement(element) } }">
+        <div class="dxrd-menu-container dxrd-menu-fullscreen-nav" data-bind="css: { 'dxrd-menu-fullscreen-nav-collapsed': isMenuCollapsed()}">
+            <div class="dx-overlay-wrapper dxd-menu-back-color dxd-back-contrast" data-bind="styleunit: { width: $data.isMenuCollapsed() ? 50 : 300 }, visible: appMenuVisible">
+                <div class="dx-overlay-content">
+                    <div class="dxrd-report-menu-title dxd-border-primary">
+                        <!-- ko if: !isMenuCollapsed()-->
+                        <div class="dxrd-report-menu-button dxrd-report-menu-close-button" data-bind="template: 'dxrd-svg-toolbar-delete', dxclick: function(e) { toggleAppMenu() }, dxpointerenter: function(_, e) {  e.target.classList &&  e.target.classList.add('dxd-state-active') }, dxpointerleave: function(_, e) {  e.target.classList &&  e.target.classList.remove('dxd-state-active') }"></div>
+                        <div class="dxrd-report-menu-title-text dxd-text-primary" data-bind="text: $root.getLocalization('Menu', 'ASPxReportsStringId.ReportDesigner_Menu_Text')"></div>
+                        <!-- /ko -->
+                        <!-- ko if: isMenuCollapsed-->
+                        <div class="dxrd-report-menu-button dxd-back-highlighted dxrd-report-menu-back-button" data-bind="template: 'dxrd-svg-menu-back', dxclick: function(e) { isMenuCollapsed(false); }"></div>
+                        <!-- /ko -->
+                    </div>
+                    <!-- ko foreach: actionLists.menuItems -->
+                    <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }, visible: visible">
+                        <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
+                        <!-- ko if: !$root.isMenuCollapsed() -->
+                        <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text, attr: { title: $data.displayText && $data.displayText() || text}"></div>
+                        <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
+                        <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+                </div>
             </div>
-            <!-- ko foreach: actionLists.menuItems -->
-            <div class="dxrd-menu-item dxd-text-primary dxd-list-item-back-color dxd-back-highlighted" data-bind="dxclick: function(e) { if(disabled && !disabled() || !disabled) { $root.toggleAppMenu(); clickAction($root.model(), e); }}, css: { 'dxrd-disabled-button': disabled, 'dxd-state-active': $data.selected }, visible: visible">
-                <div class="dxrd-menu-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: {name: ko.unwrap($data.imageTemplateName), if: !!ko.unwrap($data.imageTemplateName)}, attr: { title: $data.displayText && $data.displayText() || text }"> </div>
-                <!-- ko if: !$root.isMenuCollapsed() -->
-                <div class="dxrd-menu-item-text" data-bind="text: $data.displayText && $data.displayText() || text, attr: { title: $data.displayText && $data.displayText() || text}"></div>
-                <div class="dxrd-menu-item-separator" data-bind="visible: $data.hasSeparator"></div>
-                <!-- /ko -->
-            </div>
-            <!-- /ko -->
+        </div>
+        <div class="dxrd-menu-button dxd-toolbox-back-color dxd-border-primary dxd-back-primary2">
+            <div class="dxrd-menu-button-image dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: function(e) { if(stopPropagation) { stopPropagation = false; } else { toggleAppMenu() } }, template: 'dxrd-svg-menu-menu', css: {'dxd-state-active': appMenuVisible }"></div>
+            <div class="dxrd-menu-place" style="width:54px;"></div>
         </div>
     </div>
 </script>
@@ -5007,7 +4969,7 @@
 <script type="text/html" id="dxrd-wizard-report-tree">
     <div class="dxrd-wizard-report-tree">
         <div class="dxrd-wizard-report-tree-title" data-bind="text: $root.getLocalization('Select the report', 'ASPxReportsStringId.ReportDesigner_MasterDetailWizard_SelectReport')"></div>
-        <div class="dxrd-wizard-report-tree-selectbox" data-bind="dxSelectBox: { dataSource: $data.items, itemTemplate: 'stateItem', valueExpr: 'path', displayExpr: 'name', value: $data.value  }">
+        <div class="dxrd-wizard-report-tree-selectbox" data-bind="dxSelectBox: { dataSource: $data.items, itemTemplate: 'stateItem', valueExpr: 'path', displayExpr: 'name', value: $data.value, dropDownOptions: { container: $root.getPopupContainer($element) } }">
             <div data-options="dxTemplate:{ name:'stateItem' }" style="text-align: left;">
                 <div data-bind="text: name, styleunit: {marginLeft: 30 * level}"></div>
             </div>
@@ -5015,23 +4977,23 @@
     </div>
 </script>  
 <script type="text/html" id="dxrd-viewStyle">
-    <div data-bind="dxLocalizedSelectBox: { items: viewmodel.items, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }"></div>
+    <div data-bind="dxLocalizedSelectBox: { items: viewmodel.items, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxrd-reportSourceUrl">
-    <div data-bind="dxSelectBox: { items: getItems($root.reportUrls, $root.navigateByReports.currentTab), value: value, disabled: disabled, valueExpr: 'Key', displayExpr: 'Value' }"></div>
+    <div data-bind="dxSelectBox: { items: getItems($root.reportUrls, $root.navigateByReports.currentTab), value: value, disabled: disabled, valueExpr: 'Key', displayExpr: 'Value', dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxrd-content-type">
     <!-- ko if: value -->
     <!-- ko with: value -->
-    <div data-bind="dxLocalizedSelectBox: { items: $parent.values, value: type, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: $parent.disabled }"></div>
+    <div data-bind="dxLocalizedSelectBox: { items: $parent.values, value: type, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: $parent.disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
     <!-- /ko -->
     <!-- /ko -->
 </script>
 
 <script type="text/html" id="dxrd-checkbox-style-combobox">
-    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }">
+    <div data-bind="dxLocalizedSelectBox: { dataSource: values, value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: $data.validationRules || [] }">
         <div class="dxrd-checkbox-style-combobox-item" data-options="dxTemplate: { name: 'item' }">
             <div class="dxrd-checkbox-style-combobox-item-icons" data-bind="foreach: ['Unchecked','Checked','Indeterminate']">
                 <!-- ko template: $parent.templateBinding('dxrd-svg-checkboxglyphs-' + $parent.value + '_' + $data) -->
@@ -5043,11 +5005,11 @@
 </script>
 
 <script type="text/html" id="dxrd-datasource">
-    <div data-bind="dxSelectBox: getEditorOptions($root.dataSourceHelper, $root.undoEngine)"></div>
+    <div data-bind="dxSelectBox: getEditorOptions($root.dataSourceHelper, $root.undoEngine, $root.getPopupContainer($element))"></div>
 </script>
 
 <script type="text/html" id="dxrd-bands">
-    <div data-bind="dxSelectBox: { items: generateValue($root.bands), value: value, displayExpr: 'displayName', valueExpr: 'value', displayCustomValue: true, disabled: disabled, placeholder: $root.getLocalization('(none)', 'ChartStringId.WizNoBackImage') }"></div>
+    <div data-bind="dxSelectBox: { items: generateValue($root.bands), value: value, displayExpr: 'displayName', valueExpr: 'value', displayCustomValue: true, disabled: disabled, placeholder: $root.getLocalization('(none)', 'ChartStringId.WizNoBackImage'), dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxrd-formattingRuleCollection">
@@ -5070,11 +5032,11 @@
 </script>
 
 <script type="text/html" id="dxrd-fields-combobox">
-    <div data-bind="dxSelectBox: { dataSource: wrapValues($root.displayNameProvider), value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
+    <div data-bind="dxSelectBox: { dataSource: wrapValues($root.displayNameProvider), value: value, valueExpr: 'value', displayExpr: 'displayValue', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: $data.validationRules || [] }"></div>
 </script>
 
 <script type="text/html" id="dxrd-style">
-    <div data-bind="dxSelectBox: new $root.dx.Reporting.Designer.Widgets.StylesEditorHeaderModel(value, $root.styles(), disabled)"></div>
+    <div data-bind="dxSelectBox: new $root.dx.Reporting.Designer.Widgets.StylesEditorHeaderModel(value, $root.styles(), disabled, $root.getPopupContainer($element))"></div>
 </script>
 
 <script type="text/html" id="dxrd-styleContent">
@@ -5137,7 +5099,7 @@
 </script>
 
 <script type="text/html" id="dxrd-scriptsbox">
-    <div data-bind="dxEventDropDownEditor: { items: $root.events, value: value, editEnabled: true, disabled: disabled, secondAction: function() { $root.gotoEvent && $root.gotoEvent($data.value(), name, $parents[1]._model && $parents[1]._model()); }, placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), noDataText: $root.dx.Analytics.Internal.noDataText() }"></div>
+    <div data-bind="dxEventDropDownEditor: { items: $root.events, value: value, editEnabled: true, disabled: disabled, secondAction: function() { $root.gotoEvent && $root.gotoEvent($data.value(), name, $parents[1]._model && $parents[1]._model()); }, placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), noDataText: $root.dx.Analytics.Internal.noDataText(), dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 </script>
 
 <script type="text/html" id="dxrd-collection-item-group">
@@ -5300,6 +5262,7 @@
              visible: $data.popoverVisible,
              width: 'auto',
              height: 'auto',
+             container: $root.getPopupContainer($element),
              target: '.dxrd-page-color-scheme-tile-content-edit-icon',
              position: { my: 'left center', at: 'right center' }
              }">
@@ -5363,7 +5326,7 @@
             <div class="dxrd-wizard-customizelabel-head-props">
                 <div class="dxrd-wizard-customizelabel-select-papersize">
                     <span data-bind="text: $root.getLocalization('Page Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSize'), attr: { title: $root.getLocalization('Page Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSize') }"></span>
-                    <div data-bind="dxSelectBox: { items: _labelData.paperKinds, displayExpr: 'name', value: _selectedPaperSize, itemTemplate: 'PaperSizeText',
+                    <div data-bind="dxSelectBox: { items: _labelData.paperKinds, displayExpr: 'name', value: _selectedPaperSize, itemTemplate: 'PaperSizeText', dropDownOptions: { container: $root.getPopupContainer($element) }, 
                             onOpened: function (e) {
                                 e.component._popup.option('width', 300);
                         }}, attr: { title: _selectedPaperSize().name + ' - ' + $root.dx.Reporting.Designer.Wizard.CustomizeLabelPage._getPageSizeText(_selectedPaperSize().width, _selectedPaperSize().height, _selectedPaperSize().unit)}">
@@ -5385,7 +5348,7 @@
                 <div class="dxrd-wizard-customizelabel-props">
                     <div class="dxrd-wizard-customizelabel-pagesizetext-inline">
                         <span data-bind="text: $root.getLocalization('Measure Units', 'DevExpress.XtraReports.UI.XtraReport.ReportUnit') + ':', attr: { title: $root.getLocalization('Measure Units', 'DevExpress.XtraReports.UI.XtraReport.ReportUnit') + ':' }"></span>
-                        <div data-bind="dxLocalizedSelectBox: { items: _units, valueExpr: 'value', displayExpr: 'text', value: unit }"></div>
+                        <div data-bind="dxLocalizedSelectBox: { items: _units, valueExpr: 'value', displayExpr: 'text', value: unit, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
                     </div>
                     <div>
                         <span data-bind="text: $root.getLocalization('Label Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth'), attr: { title: $root.getLocalization('Label Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth') }"></span>
@@ -5643,7 +5606,7 @@
                 <div data-bind="foreach: _summaryInfos">
                     <div class="dxrd-wizard-summary-infos dxd-border-secondary">
                         <div class="dxrd-wizard-summary-infos-fields dxd-wizard-title-back-color dxd-back-secondary dxd-border-secondary">
-                            <div data-bind="dxSelectBox: { dataSource: $parent._displayedFields[$parent._currentPath()], itemTemplate: 'visibleItems', displayExpr: 'displayName', value: field, placeholder: $root.dx.Analytics.Internal.selectPlaceholder() }">
+                            <div data-bind="dxSelectBox: { dataSource: $parent._displayedFields[$parent._currentPath()], itemTemplate: 'visibleItems', displayExpr: 'displayName', value: field, placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), dropDownOptions: { container: $root.getPopupContainer($element) } }">
                                 <div data-options="dxTemplate:{ name:'visibleItems' }" style="text-align: left;">
                                     <!-- ko if: visible-->
                                     <div data-bind="text: name"></div>
@@ -5697,18 +5660,18 @@
         <div class="dx-fieldset dxrd-page-setup-long-group">
             <div class="dx-field">
                 <div class="dx-field-label dxd-text-primary" data-bind="text: $root.getLocalization('Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Size'), attr: { 'title': $root.getLocalization('Size:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Size') }"></div>
-                <div class="dx-field-value" data-bind="dxSelectBox: { items: lookupData.paperKind, valueExpr: 'value', displayExpr: 'displayName', value: paperKind }"></div>
+                <div class="dx-field-value" data-bind="dxSelectBox: { items: lookupData.paperKind, valueExpr: 'value', displayExpr: 'displayName', value: paperKind, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
             </div>
         </div>
         <div class="dxrd-page-setup-setting">
             <div class="dx-fieldset dxrd-group-fieldset dxrd-page-setup-short-group">
                 <div class="dx-field">
                     <div class="dx-field-label dxd-text-primary" data-bind="text: $root.getLocalization('Unit:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Unit'), attr: { 'title': $root.getLocalization('Unit:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Unit') }"></div>
-                    <div class="dx-field-value" data-bind="dxSelectBox: { items: lookupData.unit, valueExpr: 'value', displayExpr: 'displayName', value: unit }"></div>
+                    <div class="dx-field-value" data-bind="dxSelectBox: { items: lookupData.unit, valueExpr: 'value', displayExpr: 'displayName', value: unit, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
                 </div>
                 <div class="dx-field dxrd-page-setup-pagemode-compact">
                     <div class="dx-field-label dxd-text-primary" data-bind="text: $root.getLocalization('Orientation:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Orientation'), attr: { 'title': $root.getLocalization('Orientation:', 'ASPxReportsStringId.ReportDesigner_Wizard_PageSetup_Orientation') }"></div>
-                    <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { items: [ { value: true, displayName: 'Landscape', localizationId: 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Landscape'}, { value: false, displayName: 'Portrait', localizationId:'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Portrait' }], valueExpr: 'value', displayExpr: 'displayName', value: $data.landscape }"></div>
+                    <div class="dx-field-value" data-bind="dxLocalizedSelectBox: { items: [ { value: true, displayName: 'Landscape', localizationId: 'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Landscape'}, { value: false, displayName: 'Portrait', localizationId:'ASPxReportsStringId.ReportDesigner_Wizard_ReportLayout_Portrait' }], valueExpr: 'value', displayExpr: 'displayName', value: $data.landscape, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
                 </div>
                 <div class="dx-field">
                     <div class="dx-field-label dxd-text-primary" data-bind="text: $root.getLocalization('Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_Width'), attr: { 'title': $root.getLocalization('Width:', 'ASPxReportsStringId.ReportDesigner_Wizard_Width') }"></div>
@@ -5878,10 +5841,10 @@
     <div class="dxrd-wizard-selectlabelproduct-page dxd-border-secondary">
         <div class="dxrd-wizard-selectlabelproduct-list">
             <div class="dxrd-wizard-selectlabelproduct-list-label" data-bind="text: $root.getLocalization('Label Product:', 'ASPxReportsStringId.ReportDesigner_Wizard_LabelProduct')"></div>
-            <div data-bind="dxSelectBox: { items: _labelData.labelProducts, displayExpr: 'name', value: _selectedLabelProduct }"></div>
+            <div data-bind="dxSelectBox: { items: _labelData.labelProducts, displayExpr: 'name', value: _selectedLabelProduct, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
 
             <div class="dxrd-wizard-selectlabelproduct-list-label" data-bind="text: $root.getLocalization('Product Number:', 'ASPxReportsStringId.ReportDesigner_Wizard_ProductNumber')"></div>
-            <div data-bind="dxSelectBox: { dataSource: _labelDetails, displayExpr: 'name', value: _selectedLabelDetails }"></div>
+            <div data-bind="dxSelectBox: { dataSource: _labelDetails, displayExpr: 'name', value: _selectedLabelDetails, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
         </div>
 
         <div class="dxrd-wizard-selectproduct-props">
