@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 19.1.6
-* Build date: 2019-09-10
+* Version: 19.1.7
+* Build date: 2019-10-14
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -13848,7 +13848,7 @@ var DevExpress;
                     result = val * 96 / 100;
                 }
                 result = result * (zoom);
-                return Math.floor(result * 100) / 100;
+                return Math.floor(result * 10000) / 10000;
             }
             Internal.unitsToPixel = unitsToPixel;
             function pixelToUnits(val, measureUnit, zoom) {
@@ -13863,7 +13863,7 @@ var DevExpress;
                     result = val / 96 * 100;
                 }
                 result = result / (zoom);
-                return Math.floor(result * 100) / 100;
+                return Math.round(result * 10000) / 10000;
             }
             Internal.pixelToUnits = pixelToUnits;
             function createUnitProperty(model, target, propertyName, property, measureUnit, zoom, afterCreation) {

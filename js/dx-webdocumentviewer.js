@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 19.1.6
-* Build date: 2019-09-09
+* Version: 19.1.7
+* Build date: 2019-10-16
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -392,7 +392,7 @@ var DevExpress;
             CustomizeExportOptionsEventArgs.prototype.HideExportOptionsPanel = function () { this._options.panelVisible = false; };
             CustomizeExportOptionsEventArgs.prototype.HideFormat = function (format) { delete this._options.exportOptions[format.propertyName || format.format]; };
             CustomizeExportOptionsEventArgs.prototype.HideProperties = function (format) {
-                var _this = this;
+                var _this_1 = this;
                 var paths = [];
                 for (var _i = 1; _i < arguments.length; _i++) {
                     paths[_i - 1] = arguments[_i];
@@ -422,7 +422,7 @@ var DevExpress;
                         var path = Array.isArray(property)
                             ? property
                             : property.split('.');
-                        var obj = _this._options.exportOptions[format.format];
+                        var obj = _this_1._options.exportOptions[format.format];
                         while (path.length > 1) {
                             obj = ko.unwrap(obj[patchPropName(path[0], obj)]);
                             path.splice(0, 1);
@@ -949,8 +949,8 @@ var DevExpress;
                     return categories;
                 };
                 EditingFieldExtensions.prototype.editors = function () {
-                    var _this = this;
-                    return Object.keys(this._editors).map(function (key) { return _this._editors[key]; });
+                    var _this_1 = this;
+                    return Object.keys(this._editors).map(function (key) { return _this_1._editors[key]; });
                 };
                 EditingFieldExtensions.prototype.editorsByCategories = function (categories) {
                     if (categories === void 0) { categories = []; }
@@ -1085,7 +1085,7 @@ var DevExpress;
             })(Metadata = Export.Metadata || (Export.Metadata = {}));
             var CsvExportOptions = (function () {
                 function CsvExportOptions(model, serializer) {
-                    var _this = this;
+                    var _this_1 = this;
                     this.defaultSeparatorValue = "";
                     serializer = serializer || new DevExpress.Analytics.Utils.ModelSerializer();
                     serializer.deserialize(this, model);
@@ -1093,14 +1093,14 @@ var DevExpress;
                     var separatorValue = ko.observable(this.separator());
                     this.useCustomSeparator.subscribe(function (newValue) {
                         if (!newValue)
-                            separatorValue(_this.defaultSeparatorValue);
+                            separatorValue(_this_1.defaultSeparatorValue);
                     });
                     this.separator = ko.computed({
                         read: function () { return separatorValue(); },
                         write: function (newValue) {
                             separatorValue(newValue);
-                            if (_this.useCustomSeparator)
-                                _this.useCustomSeparator(newValue !== _this.defaultSeparatorValue);
+                            if (_this_1.useCustomSeparator)
+                                _this_1.useCustomSeparator(newValue !== _this_1.defaultSeparatorValue);
                         }
                     });
                 }
@@ -1838,9 +1838,9 @@ var DevExpress;
                 var PreviewDesignerActions = (function (_super) {
                     __extends(PreviewDesignerActions, _super);
                     function PreviewDesignerActions(reportPreview, element) {
-                        var _this = _super.call(this) || this;
-                        _this.actions = [];
-                        _this.actions.push({
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.actions = [];
+                        _this_1.actions.push({
                             id: Viewer.ActionId.Design,
                             text: DevExpress.Analytics.Utils.getLocalization("Design", 'ReportStringId.RepTabCtl_Designer'),
                             imageClassName: "dxrd-image-design",
@@ -1854,9 +1854,9 @@ var DevExpress;
                             }
                         });
                         if (!element)
-                            return _this;
-                        var fullscreen = Reporting.Internal.createFullscreenComputed(element, _this);
-                        _this.actions.push({
+                            return _this_1;
+                        var fullscreen = Reporting.Internal.createFullscreenComputed(element, _this_1);
+                        _this_1.actions.push({
                             id: Viewer.ActionId.FullScreen,
                             text: DevExpress.Analytics.Utils.getLocalization("Full Screen", 'ASPxReportsStringId.ToolBarItemText_FullScreen'),
                             imageClassName: "dxrd-image-fullscreen",
@@ -1868,8 +1868,8 @@ var DevExpress;
                                 fullscreen(!fullscreen());
                             }
                         });
-                        _this._disposables.push(fullscreen);
-                        return _this;
+                        _this_1._disposables.push(fullscreen);
+                        return _this_1;
                     }
                     PreviewDesignerActions.prototype.dispose = function () {
                         _super.prototype.dispose.call(this);
@@ -1884,10 +1884,10 @@ var DevExpress;
                 var ActionLists = (function (_super) {
                     __extends(ActionLists, _super);
                     function ActionLists(reportPreview, globalActionProviders, customizeActions, enabled) {
-                        var _this = _super.call(this, enabled) || this;
-                        _this._reportPreview = reportPreview;
-                        _this.globalActionProviders = globalActionProviders;
-                        _this.toolbarItems = ko.computed(function () {
+                        var _this_1 = _super.call(this, enabled) || this;
+                        _this_1._reportPreview = reportPreview;
+                        _this_1.globalActionProviders = globalActionProviders;
+                        _this_1.toolbarItems = ko.computed(function () {
                             var globalActions = [];
                             globalActionProviders().forEach(function (actionProvider) {
                                 globalActions.push.apply(globalActions, actionProvider.getActions(reportPreview));
@@ -1895,8 +1895,8 @@ var DevExpress;
                             customizeActions && customizeActions(globalActions);
                             return globalActions;
                         });
-                        _this._disposables.push(_this.toolbarItems);
-                        return _this;
+                        _this_1._disposables.push(_this_1.toolbarItems);
+                        return _this_1;
                     }
                     ActionLists.prototype.processShortcut = function (actions, e) {
                         if (this.shouldIgnoreProcessing(e))
@@ -1914,16 +1914,16 @@ var DevExpress;
                 var PreviewActions = (function (_super) {
                     __extends(PreviewActions, _super);
                     function PreviewActions(reportPreview) {
-                        var _this = _super.call(this) || this;
-                        _this.actions = [];
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.actions = [];
                         var printDisabled = reportPreview.exportDisabled;
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.FirstPage,
                             text: DevExpress.Analytics.Utils.getLocalization("First Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_FirstPage"),
                             imageClassName: "dxrd-image-preview-first",
                             imageTemplateName: "dxrd-svg-preview-first_page",
-                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 1; })),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
+                            disabled: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 1; })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: true, keyCode: 37 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() > 0) {
@@ -1931,13 +1931,13 @@ var DevExpress;
                                 }
                             }
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.PrevPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Previous Page", "ASPxReportsStringId.ToolBarItemText_PreviousPage"),
                             imageClassName: "dxrd-image-preview-prev",
                             imageTemplateName: "dxrd-svg-preview-previous_page",
-                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 1; })),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
+                            disabled: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 1; })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: false, keyCode: 37 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() >= 1) {
@@ -1949,10 +1949,10 @@ var DevExpress;
                             id: Viewer.ActionId.Pagination,
                             text: "Pagination",
                             imageClassName: "dxrd-image-pager",
-                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pages().length === 0 || reportPreview.pageIndex() === -1; })),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
+                            disabled: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.pages().length === 0 || reportPreview.pageIndex() === -1; })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             clickAction: $.noop,
-                            selectedItem: _this.wrapDisposable(ko.pureComputed({
+                            selectedItem: _this_1.wrapDisposable(ko.pureComputed({
                                 read: function () {
                                     if (reportPreview.pageIndex() < 0) {
                                         return null;
@@ -1967,7 +1967,7 @@ var DevExpress;
                                 },
                                 deferEvaluation: true
                             })),
-                            pageItems: _this.wrapDisposable(ko.pureComputed(function () {
+                            pageItems: _this_1.wrapDisposable(ko.pureComputed(function () {
                                 var pageCount = reportPreview.pages().length;
                                 if (pageCount === 0 || reportPreview.pageIndex.peek() === -1) {
                                     return [];
@@ -2019,14 +2019,14 @@ var DevExpress;
                             opened: ko.observable(false),
                             templateName: "dxrd-preview-pager"
                         };
-                        _this.actions.push(paginationSelectBoxViewModel);
-                        _this.actions.push({
+                        _this_1.actions.push(paginationSelectBoxViewModel);
+                        _this_1.actions.push({
                             id: Viewer.ActionId.NextPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Next Page", "ASPxReportsStringId.ToolBarItemText_NextPage"),
                             imageClassName: "dxrd-image-preview-next",
                             imageTemplateName: "dxrd-svg-preview-next_page",
-                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; })),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
+                            disabled: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: false, keyCode: 39 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
@@ -2034,13 +2034,13 @@ var DevExpress;
                                 }
                             }
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.LastPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Last Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_LastPage"),
                             imageClassName: "dxrd-image-preview-last",
                             imageTemplateName: "dxrd-svg-preview-last_page",
-                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; })),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
+                            disabled: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.pageIndex() < 0 || reportPreview.pageIndex() >= reportPreview.pages().length - 1; })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: true, keyCode: 39 },
                             clickAction: function () {
                                 if (reportPreview.pageIndex() < reportPreview.pages().length - 1) {
@@ -2048,13 +2048,13 @@ var DevExpress;
                                 }
                             }
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.MultipageToggle,
                             text: DevExpress.Analytics.Utils.getLocalization("Toggle Multipage Mode", "ASPxReportsStringId.WebDocumentViewer_ToggleMultipageMode"),
-                            imageClassName: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage"; })),
-                            imageTemplateName: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-svg-preview-single_page" : "dxrd-svg-preview-multi_page_preview"; })),
+                            imageClassName: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-image-preview-single-page" : "dxrd-image-preview-multipage"; })),
+                            imageTemplateName: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.showMultipagePreview() ? "dxrd-svg-preview-single_page" : "dxrd-svg-preview-multi_page_preview"; })),
                             disabled: ko.observable(false),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.previewVisible(); })),
                             hotKey: { ctrlKey: true, keyCode: 77 },
                             clickAction: function () {
                                 var zoom = reportPreview._zoom();
@@ -2063,7 +2063,7 @@ var DevExpress;
                             },
                             hasSeparator: true
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.ZoomOut,
                             text: DevExpress.Analytics.Utils.getLocalization("Zoom Out", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomOut"),
                             imageClassName: "dxrd-image-zoomout",
@@ -2079,7 +2079,7 @@ var DevExpress;
                             },
                             hasSeparator: true
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.ZoomSelector,
                             text: DevExpress.Analytics.Utils.getLocalization('Zoom to Whole Page', 'DevExpress.XtraPrinting.PrintingSystemCommand.ZoomToWholePage'),
                             imageClassName: "dxrd-image-zoom",
@@ -2104,7 +2104,7 @@ var DevExpress;
                             onCustomItemCreating: function (e) { e.customItem = DevExpress.Analytics.Internal.parseZoom(e.text); },
                             zoom: reportPreview.zoom,
                             zoomLevels: reportPreview.predefinedZoomLevels,
-                            zoomItems: _this.wrapDisposable(ko.pureComputed(function () {
+                            zoomItems: _this_1.wrapDisposable(ko.pureComputed(function () {
                                 var items = reportPreview.predefinedZoomLevels.slice(0);
                                 if (reportPreview.showMultipagePreview() === false && items.indexOf(0) === -1) {
                                     items.push(Viewer.ZoomAutoBy.PageWidth);
@@ -2113,7 +2113,7 @@ var DevExpress;
                                 return items;
                             }))
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.ZoomIn,
                             text: DevExpress.Analytics.Utils.getLocalization("Zoom In", "DevExpress.XtraPrinting.PrintingSystemCommand.ZoomIn"),
                             imageClassName: "dxrd-image-zoomin",
@@ -2128,25 +2128,25 @@ var DevExpress;
                                 reportPreview.zoom(Math.min(zoomLevel + reportPreview.zoomStep(), 10));
                             }
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.HighlightEditingFields,
                             text: DevExpress.Analytics.Utils.getLocalization("Highlight Editing Fields", "DevExpress.XtraPrinting.PrintingSystemCommand.HighlightEditingFields"),
                             imageClassName: "dxrp-image-hightlight-editing-fields",
                             imageTemplateName: "dxrd-svg-toolbar-hightlightEditingFields",
-                            disabled: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; })),
-                            visible: _this.wrapDisposable(ko.pureComputed(function () {
+                            disabled: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.editingFieldsProvider().length < 1; })),
+                            visible: _this_1.wrapDisposable(ko.pureComputed(function () {
                                 var available = Settings.EditablePreviewEnabled();
                                 var viewerVisible = reportPreview.previewVisible();
                                 return available && viewerVisible;
                             })),
-                            selected: _this.wrapDisposable(ko.pureComputed(function () { return reportPreview.editingFieldsHighlighted(); })),
+                            selected: _this_1.wrapDisposable(ko.pureComputed(function () { return reportPreview.editingFieldsHighlighted(); })),
                             hotKey: { ctrlKey: true, keyCode: 72 },
                             clickAction: function () {
                                 reportPreview.editingFieldsHighlighted(!reportPreview.editingFieldsHighlighted());
                             },
                             hasSeparator: true
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.Print,
                             text: DevExpress.Analytics.Utils.getLocalization("Print", "ASPxReportsStringId.DocumentViewer_RibbonPrintGroupText"),
                             imageClassName: "dxrd-image-print",
@@ -2162,7 +2162,7 @@ var DevExpress;
                                 reportPreview.printDocument();
                             }
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.PrintPage,
                             text: DevExpress.Analytics.Utils.getLocalization("Print Page", "ASPxReportsStringId.DocumentViewer_RibbonCommandText_PrintPage"),
                             imageClassName: "dxrd-image-print-page",
@@ -2176,7 +2176,7 @@ var DevExpress;
                                 reportPreview.printDocument(reportPreview.pageIndex());
                             }
                         });
-                        return _this;
+                        return _this_1;
                     }
                     PreviewActions.prototype.wrapDisposable = function (object) {
                         this._disposables.push(object);
@@ -2444,7 +2444,7 @@ var DevExpress;
                         this._preview = preview;
                     }
                     PreviewHandlersHelper.prototype.doneStartExportHandler = function (deffered, inlineResult, response, printable) {
-                        var _this = this;
+                        var _this_1 = this;
                         if (printable === void 0) { printable = false; }
                         try {
                             if (!response) {
@@ -2454,21 +2454,21 @@ var DevExpress;
                             this._preview._currentOperationId(response);
                             var progress = 0;
                             var doGetExportStatus = function (operationId) {
-                                var promise = _this._preview.getExportStatus(operationId);
+                                var promise = _this_1._preview.getExportStatus(operationId);
                                 promise.done(function (result) {
                                     if (result && result.requestAgain) {
                                         if (progress < result.progress) {
                                             progress = result.progress;
-                                            _this._preview.updateExportStatus(result.progress);
+                                            _this_1._preview.updateExportStatus(result.progress);
                                         }
                                         var doStatusRequest = function () { doGetExportStatus(operationId); };
                                         Settings.PollingDelay ? setTimeout(doStatusRequest, Settings.PollingDelay) : doStatusRequest();
                                     }
                                     else {
-                                        _this._preview.progressBar.complete();
+                                        _this_1._preview.progressBar.complete();
                                         if (!result.requestAgain && result.completed) {
-                                            _this._preview.updateExportStatus(result.progress);
-                                            _this._preview.getExportResult(operationId, inlineResult, result.token, printable, result.uri);
+                                            _this_1._preview.updateExportStatus(result.progress);
+                                            _this_1._preview.getExportResult(operationId, inlineResult, result.token, printable, result.uri);
                                         }
                                     }
                                 });
@@ -2504,11 +2504,11 @@ var DevExpress;
                         deffered.resolve({ requestAgain: false, created: false });
                     };
                     PreviewHandlersHelper.prototype.doneStartBuildHandler = function (deffered, response) {
-                        var _this = this;
+                        var _this_1 = this;
                         try {
                             var removeAllEmptyPages = function (all) {
-                                all && _this._preview.pages.removeAll();
-                                _this._preview.removeEmptyPages();
+                                all && _this_1._preview.pages.removeAll();
+                                _this_1._preview.removeEmptyPages();
                             };
                             if (!response || !response.documentId) {
                                 this._preview.progressBar.complete();
@@ -2548,7 +2548,7 @@ var DevExpress;
                         deffered.resolve({ requestAgain: false, created: false });
                     };
                     PreviewHandlersHelper.prototype.doneGetBuildStatusHandler = function (deffered, documentId, response, stopProcessingPredicate) {
-                        var _this = this;
+                        var _this_1 = this;
                         try {
                             if (!response) {
                                 deffered.resolve({ requestAgain: false });
@@ -2562,7 +2562,7 @@ var DevExpress;
                             }
                             for (var i = 0; i < response.pageCount && !this._preview._stopBuildRequests[documentId] && !stopProcessingPredicate(); i++) {
                                 var createNewPage = function (index) {
-                                    return _this._preview.createPage(index, _this._preview.createBrickClickProcessor(index));
+                                    return _this_1._preview.createPage(index, _this_1._preview.createBrickClickProcessor(index));
                                 };
                                 if (i < this._preview.pages().length) {
                                     var page = this._preview.pages()[i];
@@ -2733,7 +2733,7 @@ var DevExpress;
                 }
                 var PreviewSelection = (function () {
                     function PreviewSelection(_element, _page, _click) {
-                        var _this = this;
+                        var _this_1 = this;
                         this._element = _element;
                         this._page = _page;
                         this._click = _click;
@@ -2741,22 +2741,22 @@ var DevExpress;
                             move: null,
                             up: null
                         };
-                        this.dispose = function () { return _this._dispose && _this._dispose(); };
+                        this.dispose = function () { return _this_1._dispose && _this_1._dispose(); };
                         this._$element = $(this._element);
-                        var mousemove = function (event) { return _this._mouseMove(event); };
-                        var mouseup = function (event) { return _this._mouseUp(event); };
-                        var mousedown = function (event) { return _this._mouseDown(event); };
+                        var mousemove = function (event) { return _this_1._mouseMove(event); };
+                        var mouseup = function (event) { return _this_1._mouseUp(event); };
+                        var mousedown = function (event) { return _this_1._mouseDown(event); };
                         this._element.addEventListener("mousemove", mousemove);
                         this._element.addEventListener("mouseup", mouseup);
                         this._element.addEventListener("mousedown", mousedown);
                         this._dispose = function () {
-                            _this._element.removeEventListener("mousemove", mousemove);
-                            _this._element.removeEventListener("mouseup", mouseup);
-                            _this._element.removeEventListener("mousedown", mousedown);
-                            _this._dispose = null;
-                            _this._click = null;
-                            _this._page = null;
-                            _this._element = null;
+                            _this_1._element.removeEventListener("mousemove", mousemove);
+                            _this_1._element.removeEventListener("mouseup", mouseup);
+                            _this_1._element.removeEventListener("mousedown", mousedown);
+                            _this_1._dispose = null;
+                            _this_1._click = null;
+                            _this_1._page = null;
+                            _this_1._element = null;
                             mousemove = null;
                             mouseup = null;
                             mousedown = null;
@@ -2797,7 +2797,7 @@ var DevExpress;
                         }
                     };
                     PreviewSelection.prototype._mouseMove = function (event) {
-                        var _this = this;
+                        var _this_1 = this;
                         if (!this._startRect || !this._page.active() || PreviewSelection.disabled)
                             return;
                         var leftButtonPressed = event.which === 1;
@@ -2811,8 +2811,8 @@ var DevExpress;
                                     if (DevExpress.ui.dxPopup.prototype._zIndexInitValue)
                                         this._$selectionContent.css("z-index", DevExpress.ui.dxPopup.prototype._zIndexInitValue() + 100);
                                     this._updateSelectionContent(event);
-                                    this._bodyEvents.move = function (event) { return _this._mouseMove(event); };
-                                    this._bodyEvents.up = function (event) { return _this._mouseUp(event); };
+                                    this._bodyEvents.move = function (event) { return _this_1._mouseMove(event); };
+                                    this._bodyEvents.up = function (event) { return _this_1._mouseUp(event); };
                                     document.body.addEventListener("mousemove", this._bodyEvents.move);
                                     document.body.addEventListener("mouseup", this._bodyEvents.up);
                                 }
@@ -2860,7 +2860,7 @@ var DevExpress;
                 };
                 var ProgressViewModel = (function () {
                     function ProgressViewModel() {
-                        var _this = this;
+                        var _this_1 = this;
                         this.progress = ko.observable(0);
                         this._forceInvisible = ko.observable(false);
                         this.inProgress = ko.observable(false);
@@ -2868,31 +2868,31 @@ var DevExpress;
                         this.text = ko.observable('');
                         this.visible = ko.pureComputed({
                             read: function () {
-                                if (_this._forceInvisible()) {
+                                if (_this_1._forceInvisible()) {
                                     return false;
                                 }
-                                return _this.inProgress();
+                                return _this_1.inProgress();
                             },
                             write: function (visibleState) {
-                                _this._forceInvisible(!visibleState);
+                                _this_1._forceInvisible(!visibleState);
                             }
                         });
                         this.complete = function () {
-                            _this.inProgress(false);
-                            _this.progress(0);
-                            $.isFunction(_this._onComplete) && _this._onComplete();
-                            _this._onComplete = null;
+                            _this_1.inProgress(false);
+                            _this_1.progress(0);
+                            $.isFunction(_this_1._onComplete) && _this_1._onComplete();
+                            _this_1._onComplete = null;
                         };
                         this.startProgress = function (onComplete, onStop) {
-                            _this.inProgress(true);
-                            _this.progress(0);
-                            _this._onComplete = onComplete;
-                            _this.stop = function () {
+                            _this_1.inProgress(true);
+                            _this_1.progress(0);
+                            _this_1._onComplete = onComplete;
+                            _this_1.stop = function () {
                                 try {
                                     $.isFunction(onStop) && onStop();
                                 }
                                 finally {
-                                    _this.complete();
+                                    _this_1.complete();
                                 }
                             };
                         };
@@ -2964,12 +2964,12 @@ var DevExpress;
                         return true;
                     };
                     SortingProcessor.prototype._applySorting = function (sortData) {
-                        var _this = this;
+                        var _this_1 = this;
                         this._getSortingStage().forEach(function (x) {
                             if (x && x.Key === sortData.target) {
                                 (x.Value || []).forEach(function (f) {
                                     if (f && (f.fieldName === sortData.field))
-                                        _this._changeSortOrder(f);
+                                        _this_1._changeSortOrder(f);
                                     else
                                         f.sortOrder = ColumnSortOrder.None;
                                 });
@@ -2977,10 +2977,10 @@ var DevExpress;
                         });
                     };
                     SortingProcessor.prototype._appendSorting = function (sortData) {
-                        var _this = this;
+                        var _this_1 = this;
                         this._getSortingStage().forEach(function (x) {
                             if (x && x.Key === sortData.target) {
-                                (x.Value || []).forEach(function (f) { f && (f.fieldName === sortData.field) && _this._changeSortOrder(f); });
+                                (x.Value || []).forEach(function (f) { f && (f.fieldName === sortData.field) && _this_1._changeSortOrder(f); });
                                 return;
                             }
                         });
@@ -3011,76 +3011,76 @@ var DevExpress;
                 var PreviewPage = (function (_super) {
                     __extends(PreviewPage, _super);
                     function PreviewPage(preview, pageIndex, processClick, loading) {
-                        var _this = _super.call(this) || this;
-                        _this.isClientVisible = ko.observable(false);
-                        _this.originalHeight = ko.observable(0);
-                        _this.originalWidth = ko.observable(0);
-                        _this.loadingText = DevExpress.Analytics.Utils.getLocalization("Loading...", "AnalyticsCoreStringId.Loading");
-                        _this.realZoom = ko.observable(1);
-                        _this.actualResolution = 0;
-                        _this.currentScaleFactor = ko.observable(1);
-                        _this.imageHeight = ko.observable(0);
-                        _this.imageWidth = ko.observable(0);
-                        _this.imageSrc = ko.observable("");
-                        _this.displayImageSrc = ko.observable("");
-                        _this.brick = ko.observable(null);
-                        _this.brickLoading = ko.observable(true);
-                        _this.bricks = ko.computed(function () {
-                            return _this.getBricksFlatList(_this.brick());
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.isClientVisible = ko.observable(false);
+                        _this_1.originalHeight = ko.observable(0);
+                        _this_1.originalWidth = ko.observable(0);
+                        _this_1.loadingText = DevExpress.Analytics.Utils.getLocalization("Loading...", "AnalyticsCoreStringId.Loading");
+                        _this_1.realZoom = ko.observable(1);
+                        _this_1.actualResolution = 0;
+                        _this_1.currentScaleFactor = ko.observable(1);
+                        _this_1.imageHeight = ko.observable(0);
+                        _this_1.imageWidth = ko.observable(0);
+                        _this_1.imageSrc = ko.observable("");
+                        _this_1.displayImageSrc = ko.observable("");
+                        _this_1.brick = ko.observable(null);
+                        _this_1.brickLoading = ko.observable(true);
+                        _this_1.bricks = ko.computed(function () {
+                            return _this_1.getBricksFlatList(_this_1.brick());
                         });
-                        _this.activeBricks = ko.computed(function () {
-                            return _this.bricks().filter(function (x) { return x.active(); });
+                        _this_1.activeBricks = ko.computed(function () {
+                            return _this_1.bricks().filter(function (x) { return x.active(); });
                         });
-                        _this.clickableBricks = ko.computed(function () {
-                            return _this.bricks().filter(function (x) { return !!x.navigation; });
+                        _this_1.clickableBricks = ko.computed(function () {
+                            return _this_1.bricks().filter(function (x) { return !!x.navigation; });
                         });
-                        _this.active = ko.observable(false);
-                        _this.maxZoom = 0;
-                        _this.disableResolutionReduction = false;
-                        _this._lastZoom = 0;
-                        _this._selectedBrickPath = null;
-                        _this.pageIndex = pageIndex;
+                        _this_1.active = ko.observable(false);
+                        _this_1.maxZoom = 0;
+                        _this_1.disableResolutionReduction = false;
+                        _this_1._lastZoom = 0;
+                        _this_1._selectedBrickPath = null;
+                        _this_1.pageIndex = pageIndex;
                         var timeout = null;
-                        _this.documentId = preview._currentDocumentId || ko.observable(null);
-                        _this.imageSrc.subscribe(function (newVal) {
-                            var documentId = _this.documentId.peek();
+                        _this_1.documentId = preview._currentDocumentId || ko.observable(null);
+                        _this_1.imageSrc.subscribe(function (newVal) {
+                            var documentId = _this_1.documentId.peek();
                             var ignoreError = preview._closeDocumentRequests && (function () { return preview._closeDocumentRequests[documentId]; });
-                            var zoom = _this.maxZoom ? Math.min(_this.maxZoom, _this.zoom()) : _this.zoom();
+                            var zoom = _this_1.maxZoom ? Math.min(_this_1.maxZoom, _this_1.zoom()) : _this_1.zoom();
                             timeout && clearTimeout(timeout);
                             timeout = setTimeout(function () {
                                 Internal.PreviewRequestWrapper.getPage(newVal, ignoreError).done(function (response) {
-                                    _this.imageHeight(response.height);
-                                    _this.imageWidth(response.width);
-                                    _this.currentScaleFactor(zoom);
-                                    _this.displayImageSrc("data:image/png;base64," + response.base64string);
-                                    _this._onPageLoaded(response, processClick, preview._editingFields);
+                                    _this_1.imageHeight(response.height);
+                                    _this_1.imageWidth(response.width);
+                                    _this_1.currentScaleFactor(zoom);
+                                    _this_1.displayImageSrc("data:image/png;base64," + response.base64string);
+                                    _this_1._onPageLoaded(response, processClick, preview._editingFields);
                                 }).fail(function (_e) {
-                                    _this._onPageLoadFailed();
+                                    _this_1._onPageLoadFailed();
                                 });
                             }, 100);
                         });
                         var unifier = ko.isObservable(preview._unifier) ? preview._unifier : ko.observable(preview._unifier || Reporting.Internal.generateGuid());
-                        _this.pageLoading = loading || ko.observable(true);
-                        _this.originalHeight(ko.unwrap(preview._pageHeight));
-                        _this.originalWidth(ko.unwrap(preview._pageWidth));
-                        _this.zoom = preview._zoom;
-                        _this.imageWidth(_this.originalWidth() * _this.zoom() / _this._getPixelRatio());
-                        _this.imageHeight(_this.originalHeight() * _this.zoom() / _this._getPixelRatio());
-                        _this.isClientVisible.subscribe(function (newVal) {
-                            if (_this.isClientVisible()) {
-                                _this._setPageImgSrc(_this.documentId(), unifier(), _this.zoom());
+                        _this_1.pageLoading = loading || ko.observable(true);
+                        _this_1.originalHeight(ko.unwrap(preview._pageHeight));
+                        _this_1.originalWidth(ko.unwrap(preview._pageWidth));
+                        _this_1.zoom = preview._zoom;
+                        _this_1.imageWidth(_this_1.originalWidth() * _this_1.zoom() / _this_1._getPixelRatio());
+                        _this_1.imageHeight(_this_1.originalHeight() * _this_1.zoom() / _this_1._getPixelRatio());
+                        _this_1.isClientVisible.subscribe(function (newVal) {
+                            if (_this_1.isClientVisible()) {
+                                _this_1._setPageImgSrc(_this_1.documentId(), unifier(), _this_1.zoom());
                             }
                         });
-                        _this.color = ko.isObservable(preview._pageBackColor) ? preview._pageBackColor.peek() : "";
-                        _this.width = ko.pureComputed(function () {
-                            return _this.imageWidth() * _this.zoom() / _this.currentScaleFactor() / _this._getPixelRatio();
+                        _this_1.color = ko.isObservable(preview._pageBackColor) ? preview._pageBackColor.peek() : "";
+                        _this_1.width = ko.pureComputed(function () {
+                            return _this_1.imageWidth() * _this_1.zoom() / _this_1.currentScaleFactor() / _this_1._getPixelRatio();
                         });
-                        _this.height = ko.pureComputed(function () {
-                            return _this.imageHeight() * _this.zoom() / _this.currentScaleFactor() / _this._getPixelRatio();
+                        _this_1.height = ko.pureComputed(function () {
+                            return _this_1.imageHeight() * _this_1.zoom() / _this_1.currentScaleFactor() / _this_1._getPixelRatio();
                         });
-                        var _self = _this;
-                        _this.isEmpty = pageIndex === -1 && !_this.brick() && !processClick;
-                        _this.resetBrickRecusive = function (brick) {
+                        var _self = _this_1;
+                        _this_1.isEmpty = pageIndex === -1 && !_this_1.brick() && !processClick;
+                        _this_1.resetBrickRecusive = function (brick) {
                             if (brick && brick.active) {
                                 brick.active(false);
                                 if (brick.bricks) {
@@ -3088,7 +3088,7 @@ var DevExpress;
                                 }
                             }
                         };
-                        _this.selectBrick = function (path, ctrlKey) {
+                        _this_1.selectBrick = function (path, ctrlKey) {
                             if (Internal.PreviewSelection.started)
                                 return;
                             processClick && processClick(null);
@@ -3107,16 +3107,16 @@ var DevExpress;
                             });
                             currentBrick.active(true);
                         };
-                        _this._disposables.push(ko.computed(function () {
-                            if (!_this.active()) {
-                                _this.resetBrickRecusive(_this.brick());
-                                _this._selectedBrickPath = null;
+                        _this_1._disposables.push(ko.computed(function () {
+                            if (!_this_1.active()) {
+                                _this_1.resetBrickRecusive(_this_1.brick());
+                                _this_1._selectedBrickPath = null;
                             }
                         }));
-                        return _this;
+                        return _this_1;
                     }
                     PreviewPage.prototype._initializeEditingFields = function (editingFieldBricks, previewEditngFields, originalWidth, originalHeight) {
-                        var _this = this;
+                        var _this_1 = this;
                         if (this.editingFields) {
                             var oldEditFields = ko.unwrap(this.editingFields());
                             if (oldEditFields && oldEditFields.length > 0) {
@@ -3135,7 +3135,7 @@ var DevExpress;
                                 var editingField = allEditingFields[brick.efIndex - 1];
                                 if (!editingField)
                                     return [];
-                                pageFieldViewModels.push(editingField.createViewModel(_this.zoom, originalWidth, originalHeight, function () { return allEditingFields; }, brick.absoluteBounds));
+                                pageFieldViewModels.push(editingField.createViewModel(_this_1.zoom, originalWidth, originalHeight, function () { return allEditingFields; }, brick.absoluteBounds));
                                 brick.text = (function (brick) { return (function () { return Internal.brickText(brick, function () { return allEditingFields; }); }); })(brick);
                             }
                             return pageFieldViewModels;
@@ -3243,24 +3243,24 @@ var DevExpress;
                 var PreviewModel = (function (_super) {
                     __extends(PreviewModel, _super);
                     function PreviewModel(options) {
-                        var _this = _super.call(this) || this;
-                        _this.rootStyle = options.rootStyle;
-                        _this.reportPreview = options.reportPreview;
-                        _this.parametersModel = options.parametersModel;
-                        _this.exportModel = options.exportModel;
-                        _this.searchModel = options.searchModel;
-                        _this.documentMapModel = options.documentMapModel;
-                        _this.tabPanel = options.tabPanel;
-                        _this.actionLists = options.actionLists;
-                        _this.rtl = options.rtl;
-                        _this._disposables.push(options.reportPreview);
-                        _this._disposables.push(options.parametersModel);
-                        _this._disposables.push(options.exportModel);
-                        _this._disposables.push(options.searchModel);
-                        _this._disposables.push(options.documentMapModel);
-                        _this._disposables.push(options.tabPanel);
-                        _this._disposables.push(options.actionLists);
-                        return _this;
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.rootStyle = options.rootStyle;
+                        _this_1.reportPreview = options.reportPreview;
+                        _this_1.parametersModel = options.parametersModel;
+                        _this_1.exportModel = options.exportModel;
+                        _this_1.searchModel = options.searchModel;
+                        _this_1.documentMapModel = options.documentMapModel;
+                        _this_1.tabPanel = options.tabPanel;
+                        _this_1.actionLists = options.actionLists;
+                        _this_1.rtl = options.rtl;
+                        _this_1._disposables.push(options.reportPreview);
+                        _this_1._disposables.push(options.parametersModel);
+                        _this_1._disposables.push(options.exportModel);
+                        _this_1._disposables.push(options.searchModel);
+                        _this_1._disposables.push(options.documentMapModel);
+                        _this_1._disposables.push(options.tabPanel);
+                        _this_1._disposables.push(options.actionLists);
+                        return _this_1;
                     }
                     PreviewModel.prototype._addDisposable = function (object) {
                         this._disposables.push(object);
@@ -3473,7 +3473,7 @@ var DevExpress;
             (function (Parameters) {
                 var MultiValuesHelper = (function () {
                     function MultiValuesHelper(value, items) {
-                        var _this = this;
+                        var _this_1 = this;
                         this.items = items;
                         this.selectedItems = ko.observableArray([]);
                         this.value = value;
@@ -3481,10 +3481,10 @@ var DevExpress;
                         var allValues;
                         this.maxDisplayedTags = ((items && items.length) || 1) - 1;
                         this.isSelectedAll = ko.pureComputed({
-                            read: function () { return _this.value.length == items.length; },
+                            read: function () { return _this_1.value.length == items.length; },
                             write: function (selectAll) {
                                 var newValue = selectAll ? (allValues || (allValues = items.map(function (x) { return x.value; }))) : [];
-                                _this.value(newValue);
+                                _this_1.value(newValue);
                             }
                         });
                     }
@@ -3554,9 +3554,9 @@ var DevExpress;
                         return info;
                     };
                     ParameterHelper.prototype.addShowCleanButton = function (info, parameter) {
-                        var _this = this;
+                        var _this_1 = this;
                         info.editorOptions.showClearButton = parameter.allowNull;
-                        info.editorOptions.placeholder = ko.computed(function () { return ko.unwrap(parameter.allowNull) ? _this.getUnspecifiedDisplayText() : ""; });
+                        info.editorOptions.placeholder = ko.computed(function () { return ko.unwrap(parameter.allowNull) ? _this_1.getUnspecifiedDisplayText() : ""; });
                     };
                     ParameterHelper.prototype.assignValueStore = function (info, parameter) {
                         var items = this.getEnumCollection(parameter);
@@ -3570,10 +3570,10 @@ var DevExpress;
                         return { value: newValue, getInfo: function () { return [parameter.multiValueInfo()]; } };
                     };
                     ParameterHelper.prototype.createMultiValueArray = function (fromArray, parameter, convertSingleValue) {
-                        var _this = this;
+                        var _this_1 = this;
                         var converter = convertSingleValue ? convertSingleValue : this.getValueConverter(ko.unwrap(parameter.type));
                         return ko.observableArray(fromArray.map(function (item) {
-                            return _this.createMultiValue(parameter, converter(item));
+                            return _this_1.createMultiValue(parameter, converter(item));
                         }));
                     };
                     ParameterHelper.prototype.isEnumType = function (parameter) {
@@ -3598,7 +3598,7 @@ var DevExpress;
                         }
                     };
                     ParameterHelper.prototype.getParameterInfo = function (parameter) {
-                        var _this = this;
+                        var _this_1 = this;
                         var valueInfo = this.createInfo(parameter);
                         parameter.multiValueInfo($.extend(true, {}, valueInfo, { propertyName: "value" }));
                         if (parameter.allowNull !== undefined) {
@@ -3606,7 +3606,7 @@ var DevExpress;
                         }
                         if (ko.unwrap(parameter.isMultiValue)) {
                             valueInfo.editor = getEditorType(parameter["isMultiValueWithLookUp"] ? "multiValueWithLookUp" : "multiValue");
-                            valueInfo["addHandler"] = function () { return _this.createMultiValue(parameter); };
+                            valueInfo["addHandler"] = function () { return _this_1.createMultiValue(parameter); };
                         }
                         if (this._customizeParameterEditors()) {
                             this._customizeParameterEditors()(parameter.getParameterDescriptor(), valueInfo);
@@ -3622,50 +3622,50 @@ var DevExpress;
                 var PreviewParameter = (function (_super) {
                     __extends(PreviewParameter, _super);
                     function PreviewParameter(parameterInfo, parameterHelper) {
-                        var _this = _super.call(this) || this;
-                        _this.valueInfo = ko.observable();
-                        _this.lookUpValues = ko.observableArray();
-                        _this.valueStoreCache = null;
-                        _this.multiValueInfo = ko.observable();
-                        _this.intTypes = ["System.Int16", "System.Int32", "System.Int64"];
-                        _this.floatTypes = ["System.Single", "System.Double", "System.Decimal"];
-                        _this.isTypesCurrentType = function (types, type) { return types.indexOf(type) > -1; };
-                        _this.tag = parameterInfo.Tag;
-                        _this.type = parameterInfo.TypeName;
-                        _this.path = parameterInfo.Path;
-                        _this.visible = parameterInfo.Visible;
-                        _this.isFilteredLookUpSettings = parameterInfo.IsFilteredLookUpSettings;
-                        _this._originalLookUpValues = parameterInfo.LookUpValues ? parameterHelper.mapLookUpValues(_this.type, parameterInfo.LookUpValues || []) : null;
-                        _this.lookUpValues(_this._originalLookUpValues);
-                        _this.lookUpValues.subscribe(function () { _this.valueStoreCache = null; });
-                        _this.isMultiValue = parameterInfo.MultiValue;
-                        _this.allowNull = parameterInfo.AllowNull;
-                        _this.isMultiValueWithLookUp = _this.isMultiValue && !!_this.lookUpValues();
-                        _this._originalValue = parameterInfo.Value;
-                        if (parameterInfo.ValueInfo && _this.isTypesCurrentType(_this.intTypes.concat(_this.floatTypes), _this.type) && !_this.isMultiValueWithLookUp) {
-                            _this._originalValue = parameterInfo.ValueInfo;
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.valueInfo = ko.observable();
+                        _this_1.lookUpValues = ko.observableArray();
+                        _this_1.valueStoreCache = null;
+                        _this_1.multiValueInfo = ko.observable();
+                        _this_1.intTypes = ["System.Int16", "System.Int32", "System.Int64"];
+                        _this_1.floatTypes = ["System.Single", "System.Double", "System.Decimal"];
+                        _this_1.isTypesCurrentType = function (types, type) { return types.indexOf(type) > -1; };
+                        _this_1.tag = parameterInfo.Tag;
+                        _this_1.type = parameterInfo.TypeName;
+                        _this_1.path = parameterInfo.Path;
+                        _this_1.visible = parameterInfo.Visible;
+                        _this_1.isFilteredLookUpSettings = parameterInfo.IsFilteredLookUpSettings;
+                        _this_1._originalLookUpValues = parameterInfo.LookUpValues ? parameterHelper.mapLookUpValues(_this_1.type, parameterInfo.LookUpValues || []) : null;
+                        _this_1.lookUpValues(_this_1._originalLookUpValues);
+                        _this_1.lookUpValues.subscribe(function () { _this_1.valueStoreCache = null; });
+                        _this_1.isMultiValue = parameterInfo.MultiValue;
+                        _this_1.allowNull = parameterInfo.AllowNull;
+                        _this_1.isMultiValueWithLookUp = _this_1.isMultiValue && !!_this_1.lookUpValues();
+                        _this_1._originalValue = parameterInfo.Value;
+                        if (parameterInfo.ValueInfo && _this_1.isTypesCurrentType(_this_1.intTypes.concat(_this_1.floatTypes), _this_1.type) && !_this_1.isMultiValueWithLookUp) {
+                            _this_1._originalValue = parameterInfo.ValueInfo;
                         }
-                        _this.getParameterDescriptor = function () {
+                        _this_1.getParameterDescriptor = function () {
                             return {
                                 description: parameterInfo.Description,
                                 displayName: parameterInfo.Description || parameterInfo.Name,
                                 name: parameterInfo.Name,
                                 tag: parameterInfo.Tag,
                                 type: parameterInfo.TypeName,
-                                value: _this._originalValue,
+                                value: _this_1._originalValue,
                                 multiValue: parameterInfo.MultiValue,
                                 allowNull: parameterInfo.AllowNull,
-                                hasLookUpValues: !!_this.lookUpValues() || parameterHelper.isEnumType(_this),
+                                hasLookUpValues: !!_this_1.lookUpValues() || parameterHelper.isEnumType(_this_1),
                                 visible: parameterInfo.Visible
                             };
                         };
-                        _this._disposables.push(ko.computed(function () {
-                            var info = parameterHelper.getParameterInfo(_this);
+                        _this_1._disposables.push(ko.computed(function () {
+                            var info = parameterHelper.getParameterInfo(_this_1);
                             info.propertyName = PreviewParameterHelper.getPrivatePropertyName(parameterInfo.Path);
-                            _this.valueInfo(info);
+                            _this_1.valueInfo(info);
                         }));
-                        _this.initialize(_this._originalValue, parameterHelper);
-                        return _this;
+                        _this_1.initialize(_this_1._originalValue, parameterHelper);
+                        return _this_1;
                     }
                     PreviewParameter._compareValues = function (value1, value2) {
                         if (value1 instanceof Date && value2 instanceof Date) {
@@ -3684,11 +3684,11 @@ var DevExpress;
                         }
                     };
                     PreviewParameter.prototype.initialize = function (value, parameterHelper) {
-                        var _this = this;
+                        var _this_1 = this;
                         var resultValue;
                         if (this.isMultiValueWithLookUp) {
                             this.safeAssignObservable("_value", ko.observableArray((value || []).map(function (arrayItem) {
-                                return parameterHelper.getValueConverter(_this.type)(arrayItem);
+                                return parameterHelper.getValueConverter(_this_1.type)(arrayItem);
                             })));
                             var multiValuesHelper = new MultiValuesHelper(this._value, this.lookUpValues());
                             var newItems;
@@ -3723,13 +3723,13 @@ var DevExpress;
                 var PreviewParametersViewModel = (function (_super) {
                     __extends(PreviewParametersViewModel, _super);
                     function PreviewParametersViewModel(reportPreview, parameterHelper) {
-                        var _this = _super.call(this) || this;
-                        _this._parameters = [];
-                        _this._getLookUpValueRequest = function (argsObject) {
-                            return DevExpress.Analytics.Internal.ajax(Settings.HandlerUri, 'getLookUpValues', encodeURIComponent(JSON.stringify(argsObject)), function (message, jqXHR, textStatus) { return _this._reportPreview._processError(DevExpress.Analytics.Utils.getLocalization("Cannot supply filtered lookup values to a report parameter editor", "ASPxReportsStringId.WebDocumentViewer_GetLookUpValuesError"), jqXHR); });
+                        var _this_1 = _super.call(this) || this;
+                        _this_1._parameters = [];
+                        _this_1._getLookUpValueRequest = function (argsObject) {
+                            return DevExpress.Analytics.Internal.ajax(Settings.HandlerUri, 'getLookUpValues', encodeURIComponent(JSON.stringify(argsObject)), function (message, jqXHR, textStatus) { return _this_1._reportPreview._processError(DevExpress.Analytics.Utils.getLocalization("Cannot supply filtered lookup values to a report parameter editor", "ASPxReportsStringId.WebDocumentViewer_GetLookUpValuesError"), jqXHR); });
                         };
-                        _this._getDoneGetLookUpValueHandler = function () {
-                            var parametersViewModel = _this;
+                        _this_1._getDoneGetLookUpValueHandler = function () {
+                            var parametersViewModel = _this_1;
                             return function (response) {
                                 try {
                                     if (!response || !response.parameters) {
@@ -3747,40 +3747,40 @@ var DevExpress;
                                 }
                             };
                         };
-                        _this._getFailGetLookUpValueHandler = function () {
-                            var parametersViewModel = _this;
+                        _this_1._getFailGetLookUpValueHandler = function () {
+                            var parametersViewModel = _this_1;
                             return function (jqXHRError) {
                                 parametersViewModel.parametersLoading(false);
                             };
                         };
-                        _this.getInfo = ko.observable(null);
-                        _this.needToRefreshLookUps = ko.observable(false);
-                        _this.isEmpty = ko.observable(true);
-                        _this.processInvisibleParameters = false;
-                        _this.parametersLoading = ko.observable(false);
-                        _this._reportPreview = reportPreview;
-                        _this.parameterHelper = parameterHelper || new PreviewParameterHelper();
-                        _this.validateAndSubmit = function (params) {
+                        _this_1.getInfo = ko.observable(null);
+                        _this_1.needToRefreshLookUps = ko.observable(false);
+                        _this_1.isEmpty = ko.observable(true);
+                        _this_1.processInvisibleParameters = false;
+                        _this_1.parametersLoading = ko.observable(false);
+                        _this_1._reportPreview = reportPreview;
+                        _this_1.parameterHelper = parameterHelper || new PreviewParameterHelper();
+                        _this_1.validateAndSubmit = function (params) {
                             var result = params && params.validationGroup && params.validationGroup.validate && params.validationGroup.validate();
                             if (!result || result.isValid)
-                                _this.submit();
+                                _this_1.submit();
                         };
-                        _this.submit = function () {
-                            if (_this.parametersLoading())
+                        _this_1.submit = function () {
+                            if (_this_1.parametersLoading())
                                 return;
-                            _this.parametersLoading(true);
+                            _this_1.parametersLoading(true);
                             var promise = reportPreview.startBuild();
-                            promise && promise.done(function (val) { _this.parametersLoading(false); });
+                            promise && promise.done(function (val) { _this_1.parametersLoading(false); });
                         };
-                        _this._disposables.push(reportPreview.originalParametersInfo.subscribe(function (originalParametersInfo) {
-                            _this.initialize(originalParametersInfo);
+                        _this_1._disposables.push(reportPreview.originalParametersInfo.subscribe(function (originalParametersInfo) {
+                            _this_1.initialize(originalParametersInfo);
                         }));
-                        _this.initialize(reportPreview.originalParametersInfo());
-                        var notEmpty = ko.pureComputed(function () { return !_this.isEmpty(); });
-                        _this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
+                        _this_1.initialize(reportPreview.originalParametersInfo());
+                        var notEmpty = ko.pureComputed(function () { return !_this_1.isEmpty(); });
+                        _this_1.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
                             text: "Parameters",
                             template: "dxrd-preview-parameters",
-                            model: _this,
+                            model: _this_1,
                             localizationId: 'PreviewStringId.RibbonPreview_Parameters_Caption',
                             imageClassName: "parameters",
                             imageTemplateName: "dxrd-svg-tabs-parameters",
@@ -3795,8 +3795,8 @@ var DevExpress;
                                 return popupVisibleSwitch(newVal);
                             }
                         });
-                        _this.popupInfo = { visible: popupVisible, notEmpty: notEmpty };
-                        return _this;
+                        _this_1.popupInfo = { visible: popupVisible, notEmpty: notEmpty };
+                        return _this_1;
                     }
                     Object.defineProperty(PreviewParametersViewModel.prototype, "_visibleParameters", {
                         get: function () {
@@ -3812,15 +3812,15 @@ var DevExpress;
                         return new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), localDate.getHours(), localDate.getMinutes(), localDate.getSeconds()));
                     };
                     PreviewParametersViewModel.prototype._add = function (parameterInfo) {
-                        var _this = this;
+                        var _this_1 = this;
                         var parameter = new PreviewParameter(parameterInfo, this.parameterHelper);
                         this._parameters.push(parameter);
                         var needToRefreshLookUps = this.needToRefreshLookUps() || (this._shouldProcessParameter(parameter)) && parameter.isFilteredLookUpSettings;
                         this.needToRefreshLookUps(needToRefreshLookUps);
                         if (this._shouldProcessParameter(parameter)) {
                             this._disposables.push((parameter.isMultiValueWithLookUp ? parameter._value : parameter.value).subscribe(function (newValue) {
-                                if (!_this.parametersLoading() && _this.needToRefreshLookUps()) {
-                                    _this.getLookUpValues(parameter.path);
+                                if (!_this_1.parametersLoading() && _this_1.needToRefreshLookUps()) {
+                                    _this_1.getLookUpValues(parameter.path);
                                 }
                             }));
                         }
@@ -3875,11 +3875,11 @@ var DevExpress;
                         }
                     };
                     PreviewParametersViewModel.prototype._getParameterValuesContainedInLookups = function (parameterLookUpValues, parameter) {
-                        var _this = this;
+                        var _this_1 = this;
                         if (parameterLookUpValues) {
                             if (parameter.isMultiValue) {
                                 var selectedItems = parameter.value().value();
-                                return selectedItems.filter(function (item) { return _this._filterParameterValuesContainsInLookups(parameterLookUpValues, parameter.type, item).length > 0; });
+                                return selectedItems.filter(function (item) { return _this_1._filterParameterValuesContainsInLookups(parameterLookUpValues, parameter.type, item).length > 0; });
                             }
                             else {
                                 return this._filterParameterValuesContainsInLookups(parameterLookUpValues, parameter.type, parameter.value());
@@ -3888,16 +3888,16 @@ var DevExpress;
                         return [];
                     };
                     PreviewParametersViewModel.prototype._filterParameterValuesContainsInLookups = function (parameterLookUpValues, parameterType, value) {
-                        var _this = this;
+                        var _this_1 = this;
                         return parameterLookUpValues.filter(function (x) {
-                            return PreviewParameter._compareValues(_this.parameterHelper.getValueConverter(parameterType)(x.Value), value);
+                            return PreviewParameter._compareValues(_this_1.parameterHelper.getValueConverter(parameterType)(x.Value), value);
                         });
                     };
                     PreviewParametersViewModel.prototype.initialize = function (originalParametersInfo) {
-                        var _this = this;
+                        var _this_1 = this;
                         this._parameters.forEach(function (usedParameter) {
-                            delete _this[PreviewParameterHelper.fixPropertyName(usedParameter.path)];
-                            delete _this[PreviewParameterHelper.getPrivatePropertyName(usedParameter.path)];
+                            delete _this_1[PreviewParameterHelper.fixPropertyName(usedParameter.path)];
+                            delete _this_1[PreviewParameterHelper.getPrivatePropertyName(usedParameter.path)];
                         });
                         this._parameters = [];
                         if (!originalParametersInfo) {
@@ -3907,7 +3907,7 @@ var DevExpress;
                         }
                         this.parameterHelper.initialize(originalParametersInfo.knownEnums);
                         (originalParametersInfo.parameters || []).forEach(function (parameter) {
-                            _this._add(parameter);
+                            _this_1._add(parameter);
                         });
                         if (this._visibleParameters.length === 0) {
                             this.isEmpty(true);
@@ -3929,7 +3929,7 @@ var DevExpress;
                         }
                     };
                     PreviewParametersViewModel.prototype.getPathsAfterPath = function (parameterPath) {
-                        var _this = this;
+                        var _this_1 = this;
                         var startIndex = 0;
                         for (var index = 0; index < this._parameters.length; index++) {
                             if (this._parameters[index].path === parameterPath) {
@@ -3939,7 +3939,7 @@ var DevExpress;
                         }
                         var paths = this._parameters
                             .filter(function (param, index) {
-                            return (_this._shouldProcessParameter(param) && param.isFilteredLookUpSettings && (index >= startIndex));
+                            return (_this_1._shouldProcessParameter(param) && param.isFilteredLookUpSettings && (index >= startIndex));
                         })
                             .map(function (x) { return x.path; });
                         return paths || [];
@@ -3961,17 +3961,17 @@ var DevExpress;
                         return params;
                     };
                     PreviewParametersViewModel.prototype.restore = function () {
-                        var _this = this;
+                        var _this_1 = this;
                         if (this.parametersLoading()) {
                             return;
                         }
                         try {
                             this.parametersLoading(true);
                             this._parameters.forEach(function (parameter) {
-                                if (!_this._shouldProcessParameter(parameter))
+                                if (!_this_1._shouldProcessParameter(parameter))
                                     return;
                                 parameter.lookUpValues(parameter._originalLookUpValues);
-                                parameter.initialize(parameter._originalValue, _this.parameterHelper);
+                                parameter.initialize(parameter._originalValue, _this_1.parameterHelper);
                             });
                         }
                         finally {
@@ -3983,7 +3983,7 @@ var DevExpress;
                         return this.parametersLoading();
                     };
                     PreviewParametersViewModel.prototype.getLookUpValues = function (changedParameterPath) {
-                        var _this = this;
+                        var _this_1 = this;
                         var requiredParameterPaths = this.getPathsAfterPath(changedParameterPath);
                         if (!requiredParameterPaths || requiredParameterPaths.length === 0) {
                             return;
@@ -3996,10 +3996,10 @@ var DevExpress;
                             timeZoneOffset: 0 - new Date().getTimezoneOffset()
                         };
                         setTimeout(function () {
-                            _this.parametersLoading(true);
-                            _this._getLookUpValueRequest(argsObject)
-                                .done(_this._getDoneGetLookUpValueHandler())
-                                .fail(_this._getFailGetLookUpValueHandler());
+                            _this_1.parametersLoading(true);
+                            _this_1._getLookUpValueRequest(argsObject)
+                                .done(_this_1._getDoneGetLookUpValueHandler())
+                                .fail(_this_1._getFailGetLookUpValueHandler());
                         }, 10);
                     };
                     return PreviewParametersViewModel;
@@ -4008,10 +4008,10 @@ var DevExpress;
                 var PreviewParameterHelper = (function (_super) {
                     __extends(PreviewParameterHelper, _super);
                     function PreviewParameterHelper(knownEnums, callbacks) {
-                        var _this = _super.call(this) || this;
-                        _this.callbacks = callbacks;
-                        _this.initialize(knownEnums, callbacks);
-                        return _this;
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.callbacks = callbacks;
+                        _this_1.initialize(knownEnums, callbacks);
+                        return _this_1;
                     }
                     PreviewParameterHelper.prototype.mapLookUpValues = function (type, lookUpValues) {
                         var converter = this.getValueConverter(type);
@@ -4088,64 +4088,64 @@ var DevExpress;
                 var SearchViewModel = (function (_super) {
                     __extends(SearchViewModel, _super);
                     function SearchViewModel(reportPreview) {
-                        var _this = _super.call(this) || this;
-                        _this.actions = [];
-                        _this.focusRequested = ko.observable(true);
-                        _this.matchWholeWord = ko.observable(false);
-                        _this.matchCase = ko.observable(false);
-                        _this.searchUp = ko.observable(false);
-                        _this.searchText = ko.observable();
-                        _this.searchResult = ko.observable();
-                        _this.loading = ko.observable(false);
-                        _this.resetSearchResult();
-                        _this._resultNavigator = SearchViewModel.createResultNavigator(_this, reportPreview);
-                        _this.clean = function () { _this.searchText(""); };
-                        _this._disposables.push(reportPreview._currentDocumentId.subscribe(function (newVal) {
-                            _this.resetSearchResult();
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.actions = [];
+                        _this_1.focusRequested = ko.observable(true);
+                        _this_1.matchWholeWord = ko.observable(false);
+                        _this_1.matchCase = ko.observable(false);
+                        _this_1.searchUp = ko.observable(false);
+                        _this_1.searchText = ko.observable();
+                        _this_1.searchResult = ko.observable();
+                        _this_1.loading = ko.observable(false);
+                        _this_1.resetSearchResult();
+                        _this_1._resultNavigator = SearchViewModel.createResultNavigator(_this_1, reportPreview);
+                        _this_1.clean = function () { _this_1.searchText(""); };
+                        _this_1._disposables.push(reportPreview._currentDocumentId.subscribe(function (newVal) {
+                            _this_1.resetSearchResult();
                         }));
-                        _this._disposables.push(reportPreview._currentReportId.subscribe(function (newVal) {
-                            _this.resetSearchResult();
+                        _this_1._disposables.push(reportPreview._currentReportId.subscribe(function (newVal) {
+                            _this_1.resetSearchResult();
                         }));
-                        _this.findUp = function () { _this.searchUp(true); _this.findNext(); };
-                        _this.findDown = function () { _this.searchUp(false); _this.findNext(); };
-                        _this.goToResult = function (result) { _this._resultNavigator.goToResult(result.id); };
+                        _this_1.findUp = function () { _this_1.searchUp(true); _this_1.findNext(); };
+                        _this_1.findDown = function () { _this_1.searchUp(false); _this_1.findNext(); };
+                        _this_1.goToResult = function (result) { _this_1._resultNavigator.goToResult(result.id); };
                         var newSearch = function (text, matchCase, matchWholeWord) {
-                            _this.searchResult([]);
-                            _this._resultNavigator.currentResult(null);
+                            _this_1.searchResult([]);
+                            _this_1._resultNavigator.currentResult(null);
                             if (!text) {
                                 reportPreview.pages() && reportPreview.pages()[reportPreview.pageIndex()] && reportPreview.pages()[reportPreview.pageIndex()].selectBrick("");
                                 return;
                             }
-                            var mCase = _this.matchCase();
-                            var text = mCase ? _this.searchText() : _this.searchText().toLocaleLowerCase();
-                            var cache = _this.matchWholeWord()
-                                ? mCase ? _this._cachedWholeWordWithCaseRequests : _this._cachedWholeWordRequests
-                                : mCase ? _this._cachedCaseSensitiveRequests : _this._cachedRequests;
+                            var mCase = _this_1.matchCase();
+                            var text = mCase ? _this_1.searchText() : _this_1.searchText().toLocaleLowerCase();
+                            var cache = _this_1.matchWholeWord()
+                                ? mCase ? _this_1._cachedWholeWordWithCaseRequests : _this_1._cachedWholeWordRequests
+                                : mCase ? _this_1._cachedCaseSensitiveRequests : _this_1._cachedRequests;
                             if (cache[text]) {
-                                _this.searchResult(cache[text]);
+                                _this_1.searchResult(cache[text]);
                                 return;
                             }
-                            _this.loading(true);
-                            var self = _this;
+                            _this_1.loading(true);
+                            var self = _this_1;
                             reportPreview.requestWrapper.findTextRequest(text).done(function (result) {
                                 self.findTextRequestDone(result, cache[text]);
                             }).fail(function (error) {
                                 self.loading(false);
                             });
                         };
-                        _this.findNext = function () {
-                            if (_this.loading()) {
+                        _this_1.findNext = function () {
+                            if (_this_1.loading()) {
                                 return;
                             }
-                            _this._resultNavigator.next(_this.searchUp()) || newSearch(_this.searchText(), _this.matchCase(), _this.matchWholeWord());
+                            _this_1._resultNavigator.next(_this_1.searchUp()) || newSearch(_this_1.searchText(), _this_1.matchCase(), _this_1.matchWholeWord());
                         };
-                        _this._disposables.push(_this.searchText.subscribe(function (newVal) { newSearch(newVal, _this.matchCase(), _this.matchWholeWord()); }), _this.matchCase.subscribe(function (newVal) { newSearch(_this.searchText(), newVal, _this.matchWholeWord()); }), _this.matchWholeWord.subscribe(function (newVal) { newSearch(_this.searchText(), _this.matchCase(), newVal); }));
+                        _this_1._disposables.push(_this_1.searchText.subscribe(function (newVal) { newSearch(newVal, _this_1.matchCase(), _this_1.matchWholeWord()); }), _this_1.matchCase.subscribe(function (newVal) { newSearch(_this_1.searchText(), newVal, _this_1.matchWholeWord()); }), _this_1.matchWholeWord.subscribe(function (newVal) { newSearch(_this_1.searchText(), _this_1.matchCase(), newVal); }));
                         var disabled = ko.pureComputed(function () {
                             var documentId = reportPreview["_currentDocumentId"]();
                             var pageIndex = reportPreview.pageIndex();
                             return reportPreview.documentBuilding() || !documentId || pageIndex === -1;
                         });
-                        _this.actions.push({
+                        _this_1.actions.push({
                             id: Viewer.ActionId.Search,
                             text: DevExpress.Analytics.Utils.getLocalization("Search", 'ASPxReportsStringId.SearchDialog_Header'),
                             imageClassName: "dxrd-image-search",
@@ -4155,27 +4155,27 @@ var DevExpress;
                             hasSeparator: true,
                             hotKey: { ctrlKey: false, keyCode: 70 },
                             clickAction: function () {
-                                if (!_this.tabInfo.active()) {
-                                    _this.tabInfo.active(true);
+                                if (!_this_1.tabInfo.active()) {
+                                    _this_1.tabInfo.active(true);
                                 }
                                 else {
-                                    _this.tabInfo.active.notifySubscribers(true);
+                                    _this_1.tabInfo.active.notifySubscribers(true);
                                 }
                             }
                         });
-                        _this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
+                        _this_1.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
                             text: "Search",
                             template: "dxrd-preview-search",
-                            model: _this,
+                            model: _this_1,
                             localizationId: 'ASPxReportsStringId.SearchDialog_Header',
                             imageClassName: "search",
                             imageTemplateName: "dxrd-svg-preview-search",
                             visible: ko.pureComputed(function () { return !disabled() && Settings.SearchAvailable(); })
                         });
-                        _this._disposables.push(_this.tabInfo.active.subscribe(function (newVal) {
-                            newVal && setTimeout(function () { return _this.focusRequested.notifySubscribers(); }, 100);
+                        _this_1._disposables.push(_this_1.tabInfo.active.subscribe(function (newVal) {
+                            newVal && setTimeout(function () { return _this_1.focusRequested.notifySubscribers(); }, 100);
                         }));
-                        return _this;
+                        return _this_1;
                     }
                     SearchViewModel.prototype.resetSearchResult = function () {
                         this._cachedRequests = {};
@@ -4211,8 +4211,8 @@ var DevExpress;
                 var SearchResultNavigator = (function (_super) {
                     __extends(SearchResultNavigator, _super);
                     function SearchResultNavigator(searchModel, reportPreview) {
-                        var _this = _super.call(this) || this;
-                        _this.currentResult = ko.observable(null);
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.currentResult = ko.observable(null);
                         var goToMatchedResult = function (foundResult) {
                             if (!foundResult) {
                                 return;
@@ -4221,7 +4221,7 @@ var DevExpress;
                             var page = reportPreview.pages.peek()[foundResult.pageIndex];
                             page && page.selectBrick(foundResult.indexes);
                         };
-                        _this.getFirstMatchFromPage = function (pageIndex, up, thisPageOnly) {
+                        _this_1.getFirstMatchFromPage = function (pageIndex, up, thisPageOnly) {
                             if (!searchModel.searchResult() || searchModel.searchResult().length === 0) {
                                 return null;
                             }
@@ -4248,37 +4248,37 @@ var DevExpress;
                             if (searchModel.searchResult() && searchModel.searchResult().length !== 0) {
                                 var currentResult = (resultId >= 0 && searchModel.searchResult().length > resultId) ?
                                     searchModel.searchResult()[resultId] :
-                                    _this.getFirstMatchFromPage(reportPreview.pageIndex.peek(), searchModel.searchUp.peek(), thisPageOnly);
-                                _this.currentResult(currentResult);
-                                highlight && goToMatchedResult(_this.currentResult.peek());
+                                    _this_1.getFirstMatchFromPage(reportPreview.pageIndex.peek(), searchModel.searchUp.peek(), thisPageOnly);
+                                _this_1.currentResult(currentResult);
+                                highlight && goToMatchedResult(_this_1.currentResult.peek());
                             }
                             else {
                                 reportPreview.pages() && reportPreview.pages()[reportPreview.pageIndex()] && reportPreview.pages()[reportPreview.pageIndex()].selectBrick("");
                             }
                         };
-                        _this.goToResult = function (id) {
+                        _this_1.goToResult = function (id) {
                             if (id !== 0 && !id) {
                                 return null;
                             }
                             _setCurrentResult(true, id);
                         };
-                        _this._disposables.push(reportPreview.pageIndex.subscribe(function (newPageIndex) {
-                            if (_this.currentResult() && newPageIndex === _this.currentResult().pageIndex)
+                        _this_1._disposables.push(reportPreview.pageIndex.subscribe(function (newPageIndex) {
+                            if (_this_1.currentResult() && newPageIndex === _this_1.currentResult().pageIndex)
                                 return;
-                            _this.currentResult(null);
+                            _this_1.currentResult(null);
                         }));
-                        _this._disposables.push(searchModel.searchResult.subscribe(function () {
+                        _this_1._disposables.push(searchModel.searchResult.subscribe(function () {
                             _setCurrentResult(true);
                         }));
-                        _this.next = function (up) {
+                        _this_1.next = function (up) {
                             if (!searchModel.searchResult()) {
                                 return false;
                             }
-                            if (!_this.currentResult()) {
+                            if (!_this_1.currentResult()) {
                                 var prevPageIndex = (reportPreview.pageIndex() === 0 ? reportPreview.pages.length : reportPreview.pageIndex()) - 1;
                                 var pageIndexToSearchFrom = up ? prevPageIndex : reportPreview.pageIndex();
-                                var firstResult = _this.getFirstMatchFromPage(pageIndexToSearchFrom, up);
-                                _this.currentResult(firstResult);
+                                var firstResult = _this_1.getFirstMatchFromPage(pageIndexToSearchFrom, up);
+                                _this_1.currentResult(firstResult);
                                 if (firstResult) {
                                     goToMatchedResult(firstResult);
                                     return true;
@@ -4287,18 +4287,18 @@ var DevExpress;
                                     return false;
                                 }
                             }
-                            var id, currentId = _this.currentResult().id;
+                            var id, currentId = _this_1.currentResult().id;
                             if (up) {
                                 id = (currentId === 0) ? searchModel.searchResult().length - 1 : (currentId - 1);
                             }
                             else {
                                 id = (currentId === searchModel.searchResult().length - 1) ? 0 : (currentId + 1);
                             }
-                            _this.currentResult(searchModel.searchResult()[id]);
-                            goToMatchedResult(_this.currentResult());
+                            _this_1.currentResult(searchModel.searchResult()[id]);
+                            goToMatchedResult(_this_1.currentResult());
                             return true;
                         };
-                        return _this;
+                        return _this_1;
                     }
                     return SearchResultNavigator;
                 }(DevExpress.Analytics.Utils.Disposable));
@@ -4307,7 +4307,7 @@ var DevExpress;
                 var dxSearchEditor = (function (_super) {
                     __extends(dxSearchEditor, _super);
                     function dxSearchEditor(element, options) {
-                        var _this = this;
+                        var _this_1 = this;
                         options["onKeyDown"] = function (e) {
                             if (e.event.keyCode === 13) {
                                 e.event.stopPropagation();
@@ -4316,18 +4316,18 @@ var DevExpress;
                                     e.component.blur();
                                     e.component.focus();
                                 }
-                                _this.findNext(e && e.event && e.event.shiftKey);
+                                _this_1.findNext(e && e.event && e.event.shiftKey);
                             }
                         };
                         options["onFocusOut"] = function (e) {
-                            _this._searchModel.searchText(_this.option("text"));
+                            _this_1._searchModel.searchText(_this_1.option("text"));
                         };
-                        _this = _super.call(this, element, options) || this;
-                        _this._activeStateUnit = EDITOR_BUTTON_SELECTOR;
-                        _this._focusRequestRaised = function () { _this.focus(); };
-                        _this._searchModel = options.searchModel;
-                        _this._searchModel.focusRequested.subscribe(function (val) { return _this._focusRequestRaised(); });
-                        return _this;
+                        _this_1 = _super.call(this, element, options) || this;
+                        _this_1._activeStateUnit = EDITOR_BUTTON_SELECTOR;
+                        _this_1._focusRequestRaised = function () { _this_1.focus(); };
+                        _this_1._searchModel = options.searchModel;
+                        _this_1._searchModel.focusRequested.subscribe(function (val) { return _this_1._focusRequestRaised(); });
+                        return _this_1;
                     }
                     dxSearchEditor.prototype.findNext = function (searchUp) {
                         if (this._searchModel.searchText() !== this.option("text")) {
@@ -4369,11 +4369,11 @@ var DevExpress;
                         this._$button.appendTo(buttonsContainer);
                     };
                     dxSearchEditor.prototype._attachButtonEvents = function (direction) {
-                        var _this = this;
+                        var _this_1 = this;
                         this._$button.off("click");
                         if (!this.option("disabled")) {
                             this._$button.on("click", function (e) {
-                                _this.findNext(direction.toLowerCase() === "up") && e.stopPropagation();
+                                _this_1.findNext(direction.toLowerCase() === "up") && e.stopPropagation();
                             });
                         }
                     };
@@ -4383,17 +4383,17 @@ var DevExpress;
                 DevExpress.registerComponent("dxSearchEditor", dxSearchEditor);
                 var DocumentMapItemsProvider = (function () {
                     function DocumentMapItemsProvider(bookmark) {
-                        var _this = this;
+                        var _this_1 = this;
                         this.bookmarkDict = {};
                         this.getItems = function (pathRequest) {
                             var result = $.Deferred();
                             if (bookmark) {
                                 if (pathRequest.fullPath) {
-                                    var nodes = _this._selectNode(bookmark, pathRequest.fullPath);
+                                    var nodes = _this_1._selectNode(bookmark, pathRequest.fullPath);
                                     result.resolve(nodes);
                                 }
                                 else {
-                                    var root = _this._getRootNode(bookmark);
+                                    var root = _this_1._getRootNode(bookmark);
                                     result.resolve(root);
                                 }
                             }
@@ -4467,22 +4467,22 @@ var DevExpress;
                 var DocumentMapModel = (function (_super) {
                     __extends(DocumentMapModel, _super);
                     function DocumentMapModel(reportPreview) {
-                        var _this = _super.call(this) || this;
-                        _this._selectedPath = ko.observable("0");
-                        _this._setSelectedPathByNavigationNode = function (nodes, brickNavigation, path) {
+                        var _this_1 = _super.call(this) || this;
+                        _this_1._selectedPath = ko.observable("0");
+                        _this_1._setSelectedPathByNavigationNode = function (nodes, brickNavigation, path) {
                             if (path === void 0) { path = "0"; }
                             nodes.forEach(function (item, index) {
                                 if (item.indexes === brickNavigation.indexes && item.pageIndex === brickNavigation.pageIndex) {
-                                    _this._selectedPath(path + "." + index.toString());
+                                    _this_1._selectedPath(path + "." + index.toString());
                                 }
                                 else if (item.nodes) {
-                                    _this._selectedPath(_this._setSelectedPathByNavigationNode(item.nodes, brickNavigation, path + "." + index.toString()));
+                                    _this_1._selectedPath(_this_1._setSelectedPathByNavigationNode(item.nodes, brickNavigation, path + "." + index.toString()));
                                 }
                             });
-                            return _this._selectedPath();
+                            return _this_1._selectedPath();
                         };
                         var treeListController = new DocumentMapTreeListController();
-                        _this.isEmpty = ko.pureComputed(function () {
+                        _this_1.isEmpty = ko.pureComputed(function () {
                             return !(reportPreview.documentMap() && reportPreview.documentMap().nodes && (reportPreview.documentMap().nodes.length !== 0));
                         });
                         treeListController.clickHandler = function (item) {
@@ -4494,28 +4494,28 @@ var DevExpress;
                         };
                         reportPreview.brickClickDocumentMapHandler = function (brickNavigation) {
                             if (reportPreview.documentMap && reportPreview.documentMap())
-                                _this._setSelectedPathByNavigationNode(reportPreview.documentMap().nodes, brickNavigation);
+                                _this_1._setSelectedPathByNavigationNode(reportPreview.documentMap().nodes, brickNavigation);
                         };
-                        _this.documentMapOptions = ko.pureComputed(function () {
+                        _this_1.documentMapOptions = ko.pureComputed(function () {
                             return {
                                 itemsProvider: new DocumentMapItemsProvider(reportPreview.documentMap()),
                                 expandRootItems: true,
-                                selectedPath: _this._selectedPath,
+                                selectedPath: _this_1._selectedPath,
                                 treeListController: treeListController
                             };
                         });
-                        var documentMapTabVisible = ko.pureComputed(function () { return !_this.isEmpty(); });
-                        _this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
+                        var documentMapTabVisible = ko.pureComputed(function () { return !_this_1.isEmpty(); });
+                        _this_1.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
                             text: "Document Map",
                             template: "dxrd-preview-document-map",
-                            model: _this,
+                            model: _this_1,
                             localizationId: "DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap",
                             imageClassName: "reportexplorer",
                             imageTemplateName: "dxrd-svg-tabs-reportexplorer",
                             visible: documentMapTabVisible
                         });
-                        _this._disposables.push(_this.tabInfo, documentMapTabVisible, _this.documentMapOptions, _this.isEmpty);
-                        return _this;
+                        _this_1._disposables.push(_this_1.tabInfo, documentMapTabVisible, _this_1.documentMapOptions, _this_1.isEmpty);
+                        return _this_1;
                     }
                     DocumentMapModel.prototype.dispose = function () {
                         _super.prototype.dispose.call(this);
@@ -4532,27 +4532,27 @@ var DevExpress;
                     var MultiValueEditorOptions = (function (_super) {
                         __extends(MultiValueEditorOptions, _super);
                         function MultiValueEditorOptions(value, items) {
-                            var _this = _super.call(this) || this;
-                            _this.selectedItems = ko.observable([]);
+                            var _this_1 = _super.call(this) || this;
+                            _this_1.selectedItems = ko.observable([]);
                             var values = value();
-                            _this.value = value;
+                            _this_1.value = value;
                             var valueHasMutated = function () {
-                                _this.editorValue.notifySubscribers(_this.displayItems[0]);
+                                _this_1.editorValue.notifySubscribers(_this_1.displayItems[0]);
                             };
-                            _this._items = items.map(function (item) {
-                                var selected = ko.observable(_this._isValueSelected(item.value, values));
+                            _this_1._items = items.map(function (item) {
+                                var selected = ko.observable(_this_1._isValueSelected(item.value, values));
                                 return { selected: selected, value: item.value, displayValue: item.displayValue || item.value, toggleSelected: function () { selected(!selected()); valueHasMutated(); } };
                             });
-                            _this._disposables.push(_this.selectedItems = ko.pureComputed(function () {
-                                return _this._items.filter(function (item) { return item.selected(); });
+                            _this_1._disposables.push(_this_1.selectedItems = ko.pureComputed(function () {
+                                return _this_1._items.filter(function (item) { return item.selected(); });
                             }));
                             var selectionInProcess = ko.observable(false), isSelectedAllState, stringValue;
-                            _this._disposables.push(_this.selectedValuesString = ko.pureComputed({
+                            _this_1._disposables.push(_this_1.selectedValuesString = ko.pureComputed({
                                 read: function () {
                                     if (selectionInProcess())
                                         return stringValue;
                                     stringValue = "";
-                                    _this.selectedItems().forEach(function (item, index, array) {
+                                    _this_1.selectedItems().forEach(function (item, index, array) {
                                         stringValue += item.displayValue;
                                         if (index < array.length - 1) {
                                             stringValue += ", ";
@@ -4562,42 +4562,42 @@ var DevExpress;
                                 },
                                 write: function (newValue) { }
                             }));
-                            _this._disposables.push(_this.isSelectedAll = ko.pureComputed({
+                            _this_1._disposables.push(_this_1.isSelectedAll = ko.pureComputed({
                                 read: function () {
                                     if (selectionInProcess())
                                         return isSelectedAllState;
-                                    var selectedItemCount = _this.selectedItems().length;
-                                    if (selectedItemCount > 0 && selectedItemCount < _this._items.length) {
+                                    var selectedItemCount = _this_1.selectedItems().length;
+                                    if (selectedItemCount > 0 && selectedItemCount < _this_1._items.length) {
                                         return undefined;
                                     }
-                                    isSelectedAllState = selectedItemCount === _this._items.length;
+                                    isSelectedAllState = selectedItemCount === _this_1._items.length;
                                     return isSelectedAllState;
                                 },
                                 write: function (newValue) {
                                     isSelectedAllState = newValue;
                                     try {
                                         selectionInProcess(true);
-                                        _this._items.forEach(function (item) { item.selected(newValue); });
+                                        _this_1._items.forEach(function (item) { item.selected(newValue); });
                                     }
                                     finally {
                                         selectionInProcess(false);
                                     }
                                 }
                             }));
-                            var selectAllItem = { selected: _this.isSelectedAll, value: null, displayValue: DevExpress.Analytics.Utils.getLocalization('(Select All)', "AnalyticsCoreStringId.SelectAll"), toggleSelected: function () { _this.isSelectedAll(!_this.isSelectedAll()); valueHasMutated(); } };
-                            _this.displayItems = [selectAllItem].concat(_this._items);
-                            _this.dataSource = _this.displayItems;
-                            _this.editorValue = ko.observable(selectAllItem);
-                            _this.updateValue = function () {
-                                value(_this._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
+                            var selectAllItem = { selected: _this_1.isSelectedAll, value: null, displayValue: DevExpress.Analytics.Utils.getLocalization('(Select All)', "AnalyticsCoreStringId.SelectAll"), toggleSelected: function () { _this_1.isSelectedAll(!_this_1.isSelectedAll()); valueHasMutated(); } };
+                            _this_1.displayItems = [selectAllItem].concat(_this_1._items);
+                            _this_1.dataSource = _this_1.displayItems;
+                            _this_1.editorValue = ko.observable(selectAllItem);
+                            _this_1.updateValue = function () {
+                                value(_this_1._items.filter(function (item) { return item.selected(); }).map(function (item) { return item.value; }));
                                 valueHasMutated();
                             };
-                            _this.onOptionChanged = function (e) {
+                            _this_1.onOptionChanged = function (e) {
                                 if (e.name !== "opened" || e.value)
                                     return;
-                                _this.updateValue();
+                                _this_1.updateValue();
                             };
-                            return _this;
+                            return _this_1;
                         }
                         MultiValueEditorOptions.prototype._isValueSelected = function (value, array) {
                             if (value instanceof Date) {
@@ -4624,7 +4624,7 @@ var DevExpress;
                             this.alignment = options.alignment;
                         }
                         ImagePainter.prototype._drawImage = function (imageSource, context, scale, contentSize) {
-                            var _this = this;
+                            var _this_1 = this;
                             var deferred = $.Deferred();
                             if (!imageSource)
                                 return deferred.resolve().promise();
@@ -4636,8 +4636,8 @@ var DevExpress;
                             var imageBase64 = imageSource.indexOf("base64,") !== -1 ? imageSource : prefix + imageSource;
                             background.src = imageBase64;
                             background.onload = function () {
-                                var size = _this._getImageSize(background, scale, contentSize);
-                                var location = _this._getImageCoordinate(size, contentSize);
+                                var size = _this_1._getImageSize(background, scale, contentSize);
+                                var location = _this_1._getImageCoordinate(size, contentSize);
                                 context.drawImage(background, location.x, location.y, size.width, size.height);
                                 deferred.resolve();
                             };
@@ -4688,11 +4688,11 @@ var DevExpress;
                     var SignaturePainter = (function (_super) {
                         __extends(SignaturePainter, _super);
                         function SignaturePainter() {
-                            var _this = _super.call(this) || this;
-                            _this._points = ko.observableArray([]);
-                            _this.hasPoints = ko.computed(function () { return _this._points().length > 0; });
-                            _this._disposables.push(_this.hasPoints);
-                            return _this;
+                            var _this_1 = _super.call(this) || this;
+                            _this_1._points = ko.observableArray([]);
+                            _this_1.hasPoints = ko.computed(function () { return _this_1._points().length > 0; });
+                            _this_1._disposables.push(_this_1.hasPoints);
+                            return _this_1;
                         }
                         SignaturePainter.prototype.dispose = function () {
                             _super.prototype.dispose.call(this);
@@ -4715,13 +4715,13 @@ var DevExpress;
                             context.fill();
                         };
                         SignaturePainter.prototype._drawAllPoints = function (context) {
-                            var _this = this;
+                            var _this_1 = this;
                             this._points().forEach(function (point) {
                                 if (point.isStart) {
-                                    _this._drawCircle(context, point.x, point.y, point.color, point.width);
+                                    _this_1._drawCircle(context, point.x, point.y, point.color, point.width);
                                 }
                                 else {
-                                    _this._drawPath(context, point.x, point.y, point.lastX, point.lastY, point.color, point.width);
+                                    _this_1._drawPath(context, point.x, point.y, point.lastX, point.lastY, point.color, point.width);
                                 }
                             });
                         };
@@ -4757,67 +4757,67 @@ var DevExpress;
                     var Painter = (function (_super) {
                         __extends(Painter, _super);
                         function Painter(options) {
-                            var _this = _super.call(this) || this;
-                            _this._pointerDownHandler = function (e) {
-                                var point = _this._getContextPoint(e);
-                                point && _this.signaturePainter.drawCircle(_this._context, point.x, point.y, _this.lineColor(), _this.lineWidth());
+                            var _this_1 = _super.call(this) || this;
+                            _this_1._pointerDownHandler = function (e) {
+                                var point = _this_1._getContextPoint(e);
+                                point && _this_1.signaturePainter.drawCircle(_this_1._context, point.x, point.y, _this_1.lineColor(), _this_1.lineWidth());
                             };
-                            _this._pointerMoveHandler = function (e) {
+                            _this_1._pointerMoveHandler = function (e) {
                                 if (e.pointerType === "touch" || e.pointerType === "pen" || (e.pointerType === "mouse" && e.originalEvent["buttons"] == 1)) {
-                                    var point = _this._getContextPoint(e);
-                                    point && _this.signaturePainter.drawPath(_this._context, point.x, point.y, _this.lineColor(), _this.lineWidth());
+                                    var point = _this_1._getContextPoint(e);
+                                    point && _this_1.signaturePainter.drawPath(_this_1._context, point.x, point.y, _this_1.lineColor(), _this_1.lineWidth());
                                 }
                             };
-                            _this._pointerLeaveHandler = function (e) {
-                                _this.signaturePainter.resetLastPosition();
+                            _this_1._pointerLeaveHandler = function (e) {
+                                _this_1.signaturePainter.resetLastPosition();
                             };
-                            _this.format = function (newVal) {
+                            _this_1.format = function (newVal) {
                                 if (newVal)
-                                    _this.imagePainter.format(newVal);
-                                return _this.imagePainter.format();
+                                    _this_1.imagePainter.format(newVal);
+                                return _this_1.imagePainter.format();
                             };
-                            _this.imageSizeMode = ko.observable(Editing.ImageSizeMode.Normal);
-                            _this.imageAlignment = ko.observable(Editing.ImageAlignment.TopLeft);
-                            _this.lineWidth = ko.observable(1);
-                            _this.lineColor = ko.observable("#000000");
-                            _this.zoom = options.zoom;
-                            _this.image = ko.observable(options.imageSource);
-                            _this.format = ko.observable(options.imageType);
-                            _this.imageSizeMode(options.sizeMode);
-                            _this.imageAlignment(options.alignment);
-                            _this.imagePainter = new ImagePainter({
-                                alignment: _this.imageAlignment,
-                                imageSource: _this.image,
-                                sizeMode: _this.imageSizeMode
+                            _this_1.imageSizeMode = ko.observable(Editing.ImageSizeMode.Normal);
+                            _this_1.imageAlignment = ko.observable(Editing.ImageAlignment.TopLeft);
+                            _this_1.lineWidth = ko.observable(1);
+                            _this_1.lineColor = ko.observable("#000000");
+                            _this_1.zoom = options.zoom;
+                            _this_1.image = ko.observable(options.imageSource);
+                            _this_1.format = ko.observable(options.imageType);
+                            _this_1.imageSizeMode(options.sizeMode);
+                            _this_1.imageAlignment(options.alignment);
+                            _this_1.imagePainter = new ImagePainter({
+                                alignment: _this_1.imageAlignment,
+                                imageSource: _this_1.image,
+                                sizeMode: _this_1.imageSizeMode
                             });
-                            _this._disposables.push(_this.signaturePainter = new SignaturePainter());
-                            _this._disposables.push(_this.signaturePainter.hasPoints.subscribe(function (newVal) {
+                            _this_1._disposables.push(_this_1.signaturePainter = new SignaturePainter());
+                            _this_1._disposables.push(_this_1.signaturePainter.hasPoints.subscribe(function (newVal) {
                                 if (newVal)
-                                    _this._setCanvasSize(_this.initialSize.width, _this.initialSize.height);
+                                    _this_1._setCanvasSize(_this_1.initialSize.width, _this_1.initialSize.height);
                                 else
-                                    _this._setCanvasSize(_this.initialSize.width * _this.zoom(), _this.initialSize.height * _this.zoom());
-                                _this.refresh();
+                                    _this_1._setCanvasSize(_this_1.initialSize.width * _this_1.zoom(), _this_1.initialSize.height * _this_1.zoom());
+                                _this_1.refresh();
                             }));
-                            _this._disposables.push(_this.scale = ko.computed(function () {
-                                return _this.hasSignature() ? _this.zoom() : 1;
+                            _this_1._disposables.push(_this_1.scale = ko.computed(function () {
+                                return _this_1.hasSignature() ? _this_1.zoom() : 1;
                             }));
                             if (options.canDraw) {
-                                _this._disposables.push((options.canDraw).subscribe(function (newValue) {
+                                _this_1._disposables.push((options.canDraw).subscribe(function (newValue) {
                                     if (newValue) {
-                                        _this._addEvents();
+                                        _this_1._addEvents();
                                     }
                                     else {
-                                        _this._removeEvents();
+                                        _this_1._removeEvents();
                                     }
                                 }));
                             }
-                            _this._disposables.push(_this.zoom.subscribe(function (newVal) {
-                                if (!_this.signaturePainter.hasPoints()) {
-                                    _this._setCanvasSize(_this.initialSize.width * newVal, _this.initialSize.height * newVal);
-                                    _this.refresh();
+                            _this_1._disposables.push(_this_1.zoom.subscribe(function (newVal) {
+                                if (!_this_1.signaturePainter.hasPoints()) {
+                                    _this_1._setCanvasSize(_this_1.initialSize.width * newVal, _this_1.initialSize.height * newVal);
+                                    _this_1.refresh();
                                 }
                             }));
-                            return _this;
+                            return _this_1;
                         }
                         Painter.prototype._getContextPoint = function (e) {
                             if (e.target.nodeName !== "CANVAS")
@@ -4861,12 +4861,12 @@ var DevExpress;
                             this._cleanCanvas();
                         };
                         Painter.prototype.refresh = function () {
-                            var _this = this;
+                            var _this_1 = this;
                             this._cleanCanvas();
                             var zoom = this.signaturePainter.hasPoints() ? 1 : this.zoom();
                             var size = this.signaturePainter.hasPoints() ? this.initialSize : undefined;
                             this.imagePainter.refresh(this._context, zoom, size)
-                                .done(function () { return _this.signaturePainter.refresh(_this._context); });
+                                .done(function () { return _this_1.signaturePainter.refresh(_this_1._context); });
                         };
                         Painter.prototype.initSize = function (element, zoom) {
                             this.$element = element;
@@ -4943,20 +4943,20 @@ var DevExpress;
                     var PictureEditorToolbarItemWithPopup = (function (_super) {
                         __extends(PictureEditorToolbarItemWithPopup, _super);
                         function PictureEditorToolbarItemWithPopup(options) {
-                            var _this = _super.call(this, options) || this;
-                            _this.component = ko.observable();
-                            _this.template = options.template;
+                            var _this_1 = _super.call(this, options) || this;
+                            _this_1.component = ko.observable();
+                            _this_1.template = options.template;
                             if (options.templateOptions) {
-                                _this.templateOptions = options.templateOptions;
-                                _this.templateOptions.onContentReady = function (e) {
-                                    _this.component(e.component);
+                                _this_1.templateOptions = options.templateOptions;
+                                _this_1.templateOptions.onContentReady = function (e) {
+                                    _this_1.component(e.component);
                                 };
-                                _this.templateOptions.closeOnOutsideClick = function (e) {
-                                    var component = ko.unwrap(_this.component);
+                                _this_1.templateOptions.closeOnOutsideClick = function (e) {
+                                    var component = ko.unwrap(_this_1.component);
                                     var $content = component && $(component.content());
                                     return !$content || !($content.has(e.target).length || $content.is(e.target));
                                 };
-                                _this.templateOptions.onShown = function (e) {
+                                _this_1.templateOptions.onShown = function (e) {
                                     var $element = $(e.element);
                                     var topElement = $element.position().top;
                                     var popupsOffset = e["model"].getPositionTarget().offset().top - $(e.component.content()).offset().top;
@@ -4964,7 +4964,7 @@ var DevExpress;
                                     $arrow.css("top", popupsOffset + topElement - 24 - 11);
                                 };
                             }
-                            return _this;
+                            return _this_1;
                         }
                         PictureEditorToolbarItemWithPopup.prototype.dispose = function () {
                             _super.prototype.dispose.call(this);
@@ -4988,45 +4988,45 @@ var DevExpress;
                     var PictureEditorActionProvider = (function (_super) {
                         __extends(PictureEditorActionProvider, _super);
                         function PictureEditorActionProvider(_editorModel, _popupOptions) {
-                            var _this = _super.call(this) || this;
-                            _this._editorModel = _editorModel;
-                            _this._popupOptions = _popupOptions;
-                            return _this;
+                            var _this_1 = _super.call(this) || this;
+                            _this_1._editorModel = _editorModel;
+                            _this_1._popupOptions = _popupOptions;
+                            return _this_1;
                         }
                         PictureEditorActionProvider.prototype._getValues = function (enumType, prefix, propertyName) {
-                            var _this = this;
+                            var _this_1 = this;
                             var array = [];
                             Viewer.Internal.getEnumValues(enumType).forEach(function (item) {
                                 array.push({
                                     value: item,
                                     iconTemplate: 'dxrd-svg-pictureeditor-' + prefix + '_' + item.toLowerCase(),
-                                    isSelected: ko.computed(function () { return _this._editorModel.painter[propertyName]() === enumType[item]; }),
+                                    isSelected: ko.computed(function () { return _this_1._editorModel.painter[propertyName]() === enumType[item]; }),
                                     action: function () {
-                                        _this._editorModel.painter[propertyName](enumType[item]);
-                                        _this._editorModel.painter.refresh();
+                                        _this_1._editorModel.painter[propertyName](enumType[item]);
+                                        _this_1._editorModel.painter.refresh();
                                     }
                                 });
                             });
                             return array;
                         };
                         PictureEditorActionProvider.prototype._getColorValues = function () {
-                            var _this = this;
+                            var _this_1 = this;
                             var array = [];
                             PictureEditorActionProvider.colors.forEach(function (item) {
                                 array.push({
                                     value: item,
-                                    isSelected: ko.computed(function () { return _this._editorModel.painter.lineColor() === item; }),
+                                    isSelected: ko.computed(function () { return _this_1._editorModel.painter.lineColor() === item; }),
                                     action: function (e) {
-                                        _this._editorModel.painter.lineColor(item);
+                                        _this_1._editorModel.painter.lineColor(item);
                                     }
                                 });
                             });
                             return array;
                         };
                         PictureEditorActionProvider.prototype._initPopupOptions = function (options) {
-                            var _this = this;
+                            var _this_1 = this;
                             options.boundary = this._popupOptions.boundary;
-                            options.getPositionTarget = function () { return _this._popupOptions.getPositionTarget(); };
+                            options.getPositionTarget = function () { return _this_1._popupOptions.getPositionTarget(); };
                             options.target = this._popupOptions.target;
                             options.container = this._popupOptions.container;
                             return options;
@@ -5043,13 +5043,13 @@ var DevExpress;
                             return new PictureEditorToolbarItemWithPopup(openFileActionOptions);
                         };
                         PictureEditorActionProvider.prototype.createImagePickerAction = function (images, filterEnabled, action) {
-                            var _this = this;
+                            var _this_1 = this;
                             filterEnabled = filterEnabled && images.every(function (image) { return image.text !== undefined; });
                             var active = ko.observable(false);
                             var filter = ko.observable("");
                             images.forEach(function (image) {
                                 if (filterEnabled) {
-                                    _this._disposables.push(image.visible = ko.computed(function () {
+                                    _this_1._disposables.push(image.visible = ko.computed(function () {
                                         return !!DevExpress.Analytics.Internal.findMatchesInString(image.text, filter());
                                     }));
                                 }
@@ -5178,47 +5178,47 @@ var DevExpress;
                     var PictureEditorModel = (function (_super) {
                         __extends(PictureEditorModel, _super);
                         function PictureEditorModel(options, element) {
-                            var _this = _super.call(this) || this;
-                            _this.GESTURE_COVER_CLASS = "dx-gesture-cover";
-                            _this.ACTIVE_POPUP_CLASS = ".dx-picture-editing-active";
-                            _this._getPopupContent = function () {
-                                var popupInstance = DevExpress.ui.dxPopup["getInstance"](_this.$element.find(_this.ACTIVE_POPUP_CLASS).get(0));
+                            var _this_1 = _super.call(this) || this;
+                            _this_1.GESTURE_COVER_CLASS = "dx-gesture-cover";
+                            _this_1.ACTIVE_POPUP_CLASS = ".dx-picture-editing-active";
+                            _this_1._getPopupContent = function () {
+                                var popupInstance = DevExpress.ui.dxPopup["getInstance"](_this_1.$element.find(_this_1.ACTIVE_POPUP_CLASS).get(0));
                                 return popupInstance && $(popupInstance.content());
                             };
-                            _this._loadImageCallBack = function (_) {
-                                _this._handleFiles(_this._cacheLoadFileElement.get(0));
+                            _this_1._loadImageCallBack = function (_) {
+                                _this_1._handleFiles(_this_1._cacheLoadFileElement.get(0));
                             };
-                            _this.actions = [];
-                            _this.canDraw = ko.observable(false);
+                            _this_1.actions = [];
+                            _this_1.canDraw = ko.observable(false);
                             var imageType = ko.unwrap(options.imageType) || "png";
-                            _this.zoom = options.zoom || ko.observable(1);
-                            _this.editMode = ko.unwrap(options.imageMode) || PictureEditMode.Image;
-                            _this._initialImage = ko.unwrap(options.image);
-                            _this._initialAlignment = ko.unwrap(options.alignment);
-                            _this._initialSizeMode = ko.unwrap(options.sizeMode);
-                            _this._callbacks = options.callbacks;
-                            _this.$element = $(element);
-                            _this.isActive = ko.isObservable(options.isActive) ? options.isActive : ko.observable(!!options.isActive);
+                            _this_1.zoom = options.zoom || ko.observable(1);
+                            _this_1.editMode = ko.unwrap(options.imageMode) || PictureEditMode.Image;
+                            _this_1._initialImage = ko.unwrap(options.image);
+                            _this_1._initialAlignment = ko.unwrap(options.alignment);
+                            _this_1._initialSizeMode = ko.unwrap(options.sizeMode);
+                            _this_1._callbacks = options.callbacks;
+                            _this_1.$element = $(element);
+                            _this_1.isActive = ko.isObservable(options.isActive) ? options.isActive : ko.observable(!!options.isActive);
                             var painterOptions = {
-                                alignment: _this._initialAlignment,
-                                canDraw: _this.editMode !== PictureEditMode.Image && _this.canDraw,
-                                imageSource: _this._initialImage,
+                                alignment: _this_1._initialAlignment,
+                                canDraw: _this_1.editMode !== PictureEditMode.Image && _this_1.canDraw,
+                                imageSource: _this_1._initialImage,
                                 imageType: imageType,
-                                sizeMode: _this._initialSizeMode,
-                                zoom: _this.zoom
+                                sizeMode: _this_1._initialSizeMode,
+                                zoom: _this_1.zoom
                             };
-                            _this.painter = new Painter(painterOptions);
-                            _this._disposables.push(_this.painter);
-                            _this.painter.initSize(_this.$element, _this.zoom());
-                            _this.actionsProvider = new PictureEditorActionProvider(_this, $.extend(true, {
+                            _this_1.painter = new Painter(painterOptions);
+                            _this_1._disposables.push(_this_1.painter);
+                            _this_1.painter.initSize(_this_1.$element, _this_1.zoom());
+                            _this_1.actionsProvider = new PictureEditorActionProvider(_this_1, $.extend(true, {
                                 getPositionTarget: function () {
-                                    return _this._getPopupContent().find('.dx-picture-editing-toolbar');
+                                    return _this_1._getPopupContent().find('.dx-picture-editing-toolbar');
                                 }
                             }, (options.popupOptions || {})));
-                            _this._disposables.push(_this.actionsProvider);
-                            _this._initActions(options.callbacks && options.callbacks.customizeActions);
-                            _this.applyBindings();
-                            return _this;
+                            _this_1._disposables.push(_this_1.actionsProvider);
+                            _this_1._initActions(options.callbacks && options.callbacks.customizeActions);
+                            _this_1.applyBindings();
+                            return _this_1;
                         }
                         PictureEditorModel.prototype._takeFocus = function () {
                             if (!this.isActive()) {
@@ -5246,9 +5246,9 @@ var DevExpress;
                             };
                         };
                         PictureEditorModel.prototype._initActions = function (customizeActionsCallback) {
-                            var _this = this;
+                            var _this_1 = this;
                             if (this.editMode == PictureEditMode.Image || this.editMode == PictureEditMode.ImageAndSignature) {
-                                this.actions.push(this.actionsProvider.createOpenFileAction(function (e) { return _this._loadImage(e); }));
+                                this.actions.push(this.actionsProvider.createOpenFileAction(function (e) { return _this_1._loadImage(e); }));
                                 this.actions.push(this.actionsProvider.createSizingAction());
                             }
                             if (this.editMode == PictureEditMode.Signature || this.editMode == PictureEditMode.ImageAndSignature) {
@@ -5256,16 +5256,16 @@ var DevExpress;
                             }
                             if (!!this._initialImage) {
                                 this.actions.push(this.actionsProvider.createResetItem(function () {
-                                    _this.painter.reset(_this._initialImage, _this._initialAlignment, _this._initialSizeMode);
-                                    _this._clearLoadedFile();
+                                    _this_1.painter.reset(_this_1._initialImage, _this_1._initialAlignment, _this_1._initialSizeMode);
+                                    _this_1._clearLoadedFile();
                                 }));
                             }
                             this.actions.push(this.actionsProvider.createClearItem(function () {
-                                _this.painter.clear();
-                                _this._clearLoadedFile();
+                                _this_1.painter.clear();
+                                _this_1._clearLoadedFile();
                             }));
                             customizeActionsCallback && customizeActionsCallback(this, this.actions);
-                            this.actions.forEach(function (item) { return _this._wrapButtonAction(item, _this); });
+                            this.actions.forEach(function (item) { return _this_1._wrapButtonAction(item, _this_1); });
                         };
                         PictureEditorModel.prototype._clearLoadedFile = function () {
                             if (this._cacheLoadFileElement) {
@@ -5282,45 +5282,45 @@ var DevExpress;
                             }
                         };
                         PictureEditorModel.prototype._handleFiles = function (filesHolder) {
-                            var _this = this;
+                            var _this_1 = this;
                             var files = filesHolder.files;
                             for (var i = 0; i < files.length; i++) {
                                 var file = files[i];
                                 var fileReader = new FileReader();
                                 fileReader.onload = function (args) {
-                                    _this.painter.format(files[0].name.split('.').pop());
+                                    _this_1.painter.format(files[0].name.split('.').pop());
                                     var encodedContent = fileReader.result.replace(/^data:[^,]+,/, '');
-                                    _this.painter.image(encodedContent);
-                                    _this.painter.refresh();
+                                    _this_1.painter.image(encodedContent);
+                                    _this_1.painter.refresh();
                                 };
                                 fileReader.readAsDataURL(file);
                             }
                         };
                         PictureEditorModel.prototype._addEvents = function () {
-                            var _this = this;
+                            var _this_1 = this;
                             this._pointerDownHandler = function (e) {
-                                _this._takeFocus();
+                                _this_1._takeFocus();
                             };
                             this._pointerCancelHandler = function (e) {
-                                _this._releaseFocus();
+                                _this_1._releaseFocus();
                             };
                             this._pointerUpHandler = function (e) {
-                                if (!_this.isActive())
+                                if (!_this_1.isActive())
                                     return;
                                 var isUnderCursor = function (componentContent) {
                                     return componentContent && (componentContent.is(e.target) || componentContent.has(e.target).length > 0);
                                 };
-                                var isEditorContainer = _this.$element.is(e.target) || _this.$element.has(e.target).length > 0
-                                    || isUnderCursor(_this._getPopupContent())
-                                    || _this.actions.some(function (a) {
+                                var isEditorContainer = _this_1.$element.is(e.target) || _this_1.$element.has(e.target).length > 0
+                                    || isUnderCursor(_this_1._getPopupContent())
+                                    || _this_1.actions.some(function (a) {
                                         if (!a.isActive())
                                             return false;
                                         var component = ko.unwrap(a.component);
                                         return isUnderCursor(component && $(component.content()));
                                     })
-                                    || (e.target.className.indexOf && e.target.className.indexOf(_this.GESTURE_COVER_CLASS) !== -1);
+                                    || (e.target.className.indexOf && e.target.className.indexOf(_this_1.GESTURE_COVER_CLASS) !== -1);
                                 if (!isEditorContainer) {
-                                    _this._releaseFocus();
+                                    _this_1._releaseFocus();
                                 }
                             };
                             var element = this.$element.get(0);
@@ -5393,7 +5393,7 @@ var DevExpress;
                 Widgets.editorTemplates = {
                     multiValue: {
                         header: "dxrd-multivalue", extendedOptions: {
-                            placeholder: function () { return DevExpress.Analytics.Internal.selectPlaceholder(); },
+                            placeholder: ko.observable(DevExpress.Analytics.Internal.selectPlaceholder()),
                             onMultiTagPreparing: function (args) {
                                 var selectedItemsLength = args.selectedItems.length, totalCount = args.model.items.length;
                                 if (selectedItemsLength === totalCount) {
@@ -5413,13 +5413,13 @@ var DevExpress;
                     function TextEditingFieldViewModelBase() {
                     }
                     TextEditingFieldViewModelBase.prototype.keypressAction = function (data, event) {
-                        var _this = this;
+                        var _this_1 = this;
                         DevExpress.Analytics.Internal.processTextEditorHotKeys(event, {
                             esc: function () {
-                                _this.hideEditor(false);
+                                _this_1.hideEditor(false);
                             },
                             ctrlEnter: function () {
-                                _this.hideEditor(true);
+                                _this_1.hideEditor(true);
                             }
                         });
                     };
@@ -5429,11 +5429,11 @@ var DevExpress;
                 var TextEditingFieldViewModel = (function (_super) {
                     __extends(TextEditingFieldViewModel, _super);
                     function TextEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
-                        var _this = _super.call(this) || this;
-                        _this.template = "dxrp-editing-field-container";
-                        _this.htmlValue = function () { return _this.field.htmlValue(); };
-                        _this.wordWrap = true;
-                        _this.active = ko.observable(false);
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.template = "dxrp-editing-field-container";
+                        _this_1.htmlValue = function () { return _this_1.field.htmlValue(); };
+                        _this_1.wordWrap = true;
+                        _this_1.active = ko.observable(false);
                         var brickStyle = field.model().brickOptions;
                         var style = { rtl: function () { return brickStyle.rtl; } };
                         new DevExpress.Analytics.Utils.ModelSerializer().deserialize(style, JSON.parse(brickStyle.style), DevExpress.Reporting.Metadata.brickStyleSerializationsInfo);
@@ -5446,19 +5446,19 @@ var DevExpress;
                         if (cssCalculator.borderCss()["borderBottom"] !== "none") {
                             verticalPadding += style["borderWidth"]();
                         }
-                        _this.breakOffsetStyle = function () {
+                        _this_1.breakOffsetStyle = function () {
                             return {
                                 top: bounds.offset.y * -100 / bounds.height + "%",
                                 left: bounds.offset.x * -100 / bounds.width + "%"
                             };
                         };
-                        _this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
-                        _this.zoom = zoom;
-                        _this.field = field;
+                        _this_1.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
+                        _this_1.zoom = zoom;
+                        _this_1.field = field;
                         if (brickStyle.wordWrap != undefined) {
-                            _this.wordWrap = brickStyle.wordWrap;
+                            _this_1.wordWrap = brickStyle.wordWrap;
                         }
-                        _this.hideEditor = function (shouldCommit) {
+                        _this_1.hideEditor = function (shouldCommit) {
                             setTimeout(function () {
                                 if (shouldCommit) {
                                     if (editorOptions.onHideEditor) {
@@ -5471,23 +5471,23 @@ var DevExpress;
                                 else {
                                     field._editorValue(field.editValue());
                                 }
-                                _this.active(false);
+                                _this_1.active(false);
                             }, 1);
                         };
                         var editor = DevExpress.Reporting.Editing.EditingFieldExtensions.instance().editor(field.editorName());
                         var editorOptions = $.extend(true, {}, editor && editor.options || {});
-                        _this.data = {
+                        _this_1.data = {
                             value: field._editorValue,
-                            hideEditor: _this.hideEditor,
-                            keypressAction: _this.keypressAction,
-                            textStyle: _this.textStyle,
+                            hideEditor: _this_1.hideEditor,
+                            keypressAction: _this_1.keypressAction,
+                            textStyle: _this_1.textStyle,
                             options: editorOptions,
-                            getOptions: function (templateOptions) { return $.extend({}, _this.data.options, templateOptions); }
+                            getOptions: function (templateOptions) { return $.extend({}, _this_1.data.options, templateOptions); }
                         };
                         var isCustomEditor = !!(editor && editor.template && editor.template !== "dxrp-editing-field-datetime");
                         if (!isCustomEditor) {
-                            var self = _this;
-                            _this.data.options = $.extend(true, {}, editorOptions, {
+                            var self = _this_1;
+                            _this_1.data.options = $.extend(true, {}, editorOptions, {
                                 value: field._editorValue,
                                 onFocusOut: function (e) {
                                     self.hideEditor(true);
@@ -5495,21 +5495,21 @@ var DevExpress;
                             });
                         }
                         if (editor) {
-                            _this.editorTemplate = editor.template || "dxrp-editing-field-mask";
+                            _this_1.editorTemplate = editor.template || "dxrp-editing-field-mask";
                         }
                         else {
-                            _this.editorTemplate = "dxrp-editing-field-text";
+                            _this_1.editorTemplate = "dxrp-editing-field-text";
                         }
-                        _this.containerStyle = ko.pureComputed(function () {
+                        _this_1.containerStyle = ko.pureComputed(function () {
                             return $.extend({
                                 width: bounds.width + "px",
                                 height: bounds.height + "px",
                                 "line-height": (bounds.height - verticalPadding) + "px",
                                 top: bounds.top * 100 / pageHeight + "%",
                                 left: bounds.left * 100 / pageWidth + "%"
-                            }, _this.active() || !_this.htmlValue() ? cssCalculator.borderCss() : { border: 'none' }, isCustomEditor && _this.active() || (!!_this.htmlValue() && !_this.active()) ? { padding: 0 } : cssCalculator.paddingsCss(), { "border-color": "transparent" });
+                            }, _this_1.active() || !_this_1.htmlValue() ? cssCalculator.borderCss() : { border: 'none' }, isCustomEditor && _this_1.active() || (!!_this_1.htmlValue() && !_this_1.active()) ? { padding: 0 } : cssCalculator.paddingsCss(), { "border-color": "transparent" });
                         });
-                        _this.borderStyle = ko.pureComputed(function () {
+                        _this_1.borderStyle = ko.pureComputed(function () {
                             if (style["borderWidth"]() > 0 && style["borders"]() !== "None") {
                                 return {
                                     left: "-" + style["borderWidth"]() + "px",
@@ -5519,7 +5519,7 @@ var DevExpress;
                                 };
                             }
                         });
-                        return _this;
+                        return _this_1;
                     }
                     TextEditingFieldViewModel.prototype.activateEditor = function (viewModel, e) {
                         if (this.field.readOnly()) {
@@ -5591,16 +5591,16 @@ var DevExpress;
                 var CheckEditingFieldViewModel = (function (_super) {
                     __extends(CheckEditingFieldViewModel, _super);
                     function CheckEditingFieldViewModel(field, pageWidth, pageHeight, zoom, editingFieldsProvider) {
-                        var _this = _super.call(this) || this;
-                        _this.focused = ko.observable(false);
-                        _this._editingFieldsProvider = editingFieldsProvider;
-                        _this.template = "dxrp-editing-field-checkbox";
-                        _this.field = field;
-                        _this.zoom = zoom;
-                        var bounds = _this.field.model().bounds;
-                        var checkBounds = _this.field.model().brickOptions.checkBoxBounds;
-                        var rtl = _this.field.model().brickOptions.rtlLayout;
-                        _this.containerStyle = function () {
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.focused = ko.observable(false);
+                        _this_1._editingFieldsProvider = editingFieldsProvider;
+                        _this_1.template = "dxrp-editing-field-checkbox";
+                        _this_1.field = field;
+                        _this_1.zoom = zoom;
+                        var bounds = _this_1.field.model().bounds;
+                        var checkBounds = _this_1.field.model().brickOptions.checkBoxBounds;
+                        var rtl = _this_1.field.model().brickOptions.rtlLayout;
+                        _this_1.containerStyle = function () {
                             return {
                                 height: bounds.height + "px",
                                 width: bounds.width + "px",
@@ -5608,7 +5608,7 @@ var DevExpress;
                                 left: bounds.left * 100 / pageWidth + "%"
                             };
                         };
-                        _this.checkStyle = function () {
+                        _this_1.checkStyle = function () {
                             var result = {
                                 height: checkBounds.height + "px",
                                 width: checkBounds.width + "px",
@@ -5617,17 +5617,17 @@ var DevExpress;
                             };
                             return result;
                         };
-                        _this._disposables.push(_this.customGlyphStyleCss = ko.pureComputed(function () {
-                            var imageSourceData = field.model().brickOptions.checkBoxGlyphOptions.customGlyphs.filter(function (item) { return item.key === _this.field.editValue(); })[0];
+                        _this_1._disposables.push(_this_1.customGlyphStyleCss = ko.pureComputed(function () {
+                            var imageSourceData = field.model().brickOptions.checkBoxGlyphOptions.customGlyphs.filter(function (item) { return item.key === _this_1.field.editValue(); })[0];
                             if (!imageSourceData.value)
                                 return {};
                             var imageSource = new DevExpress.Reporting.ImageSource(imageSourceData.value.imageType, imageSourceData.value.image);
                             return createCustomGlyphStyleCss(imageSource);
                         }));
-                        _this._disposables.push(_this.checkStateStyleIcon = ko.pureComputed(function () {
-                            return getCheckBoxTemplate(GlyphStyle[field.model().brickOptions.checkBoxGlyphOptions.glyphStyle], CheckState[_this.field.editValue()], _this.customGlyphStyleCss());
+                        _this_1._disposables.push(_this_1.checkStateStyleIcon = ko.pureComputed(function () {
+                            return getCheckBoxTemplate(GlyphStyle[field.model().brickOptions.checkBoxGlyphOptions.glyphStyle], CheckState[_this_1.field.editValue()], _this_1.customGlyphStyleCss());
                         }));
-                        return _this;
+                        return _this_1;
                     }
                     CheckEditingFieldViewModel.prototype._toggleCheckState = function () {
                         if (this.field.editValue() === CheckState.Checked) {
@@ -5663,7 +5663,7 @@ var DevExpress;
                         }
                     };
                     CheckEditingFieldViewModel.prototype.toggleCheckState = function () {
-                        var _this = this;
+                        var _this_1 = this;
                         if (this.field.readOnly())
                             return;
                         if (!this.field.groupID()) {
@@ -5671,7 +5671,7 @@ var DevExpress;
                         }
                         else if (this.checked() === false) {
                             this._editingFieldsProvider().forEach(function (value) {
-                                if (value.groupID() === _this.field.groupID()) {
+                                if (value.groupID() === _this_1.field.groupID()) {
                                     value.editValue(CheckState.Unchecked);
                                 }
                             });
@@ -5684,45 +5684,45 @@ var DevExpress;
                 var ImageEditingFieldViewModel = (function (_super) {
                     __extends(ImageEditingFieldViewModel, _super);
                     function ImageEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
-                        var _this = _super.call(this) || this;
-                        _this.field = field;
-                        _this.zoom = zoom;
-                        _this.bounds = bounds;
-                        _this.popupTarget = '.dx-designer';
-                        _this.popupOptions = {
-                            target: _this.popupTarget,
-                            boundary: _this.popupTarget,
-                            container: _this.popupTarget
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.field = field;
+                        _this_1.zoom = zoom;
+                        _this_1.bounds = bounds;
+                        _this_1.popupTarget = '.dx-designer';
+                        _this_1.popupOptions = {
+                            target: _this_1.popupTarget,
+                            boundary: _this_1.popupTarget,
+                            container: _this_1.popupTarget
                         };
-                        _this.template = "dxrp-editing-field-image";
-                        _this.isActive = ko.observable(false);
+                        _this_1.template = "dxrp-editing-field-image";
+                        _this_1.isActive = ko.observable(false);
                         var brickStyle = field.model().brickOptions;
                         var style = { rtl: function () { return brickStyle.rtl; } };
                         new DevExpress.Analytics.Utils.ModelSerializer().deserialize(style, JSON.parse(brickStyle.style), DevExpress.Reporting.Metadata.brickStyleSerializationsInfo);
                         var cssCalculator = new DevExpress.Analytics.Internal.CssCalculator(style, ko.observable(!!brickStyle.rtlLayout));
-                        _this._disposables.push(_this.alignment = ko.computed(function () {
+                        _this_1._disposables.push(_this_1.alignment = ko.computed(function () {
                             return field.editValue().alignment;
-                        }), _this.sizeMode = ko.computed(function () {
+                        }), _this_1.sizeMode = ko.computed(function () {
                             return field.editValue().sizeMode;
                         }));
                         var editor = DevExpress.Reporting.Editing.EditingFieldExtensions.instance().editor(field.editorName());
                         var options = editor ? editor.options : { editMode: Widgets.PictureEditMode.ImageAndSignature };
-                        _this.editMode = options.editMode;
-                        _this.containerStyle = function () {
+                        _this_1.editMode = options.editMode;
+                        _this_1.containerStyle = function () {
                             return $.extend({
-                                height: _this.bounds.height * zoom() + "px",
-                                width: _this.bounds.width * zoom() + "px",
-                                zIndex: _this.isActive() ? 10 : 0,
-                                top: _this.bounds.top * 100 / pageHeight + "%",
-                                left: _this.bounds.left * 100 / pageWidth + "%"
+                                height: _this_1.bounds.height * zoom() + "px",
+                                width: _this_1.bounds.width * zoom() + "px",
+                                zIndex: _this_1.isActive() ? 10 : 0,
+                                top: _this_1.bounds.top * 100 / pageHeight + "%",
+                                left: _this_1.bounds.left * 100 / pageWidth + "%"
                             }, cssCalculator.borderCss(), cssCalculator.paddingsCss());
                         };
-                        _this.callbacks = $.extend({
-                            onDraw: function (s) { return _this.onDraw(s); },
-                            onFocusIn: function (s) { return _this.onFocusIn(s); },
-                            onFocusOut: function (s) { return _this.onBlur(s); }
+                        _this_1.callbacks = $.extend({
+                            onDraw: function (s) { return _this_1.onDraw(s); },
+                            onFocusIn: function (s) { return _this_1.onFocusIn(s); },
+                            onFocusOut: function (s) { return _this_1.onBlur(s); }
                         }, options.callbacks);
-                        return _this;
+                        return _this_1;
                     }
                     ImageEditingFieldViewModel.prototype.getImage = function () {
                         return this.field.editValue().image;
@@ -5766,28 +5766,28 @@ var DevExpress;
                 var PopupImageEditingFieldViewModel = (function (_super) {
                     __extends(PopupImageEditingFieldViewModel, _super);
                     function PopupImageEditingFieldViewModel() {
-                        var _this = _super !== null && _super.apply(this, arguments) || this;
-                        _this.parentPopupClass = "dxrp-editing-field-popup-container";
-                        _this._popupInitializedClass = "dxrp-editing-field-popup-container-initialized";
-                        _this._getPopupContainer = function (element) { return $(element).closest("." + _this.parentPopupClass); };
-                        _this._getPainterModel = function (element) {
-                            var $painter = _this._getPopupContainer(element).find(".dx-painter");
+                        var _this_1 = _super !== null && _super.apply(this, arguments) || this;
+                        _this_1.parentPopupClass = "dxrp-editing-field-popup-container";
+                        _this_1._popupInitializedClass = "dxrp-editing-field-popup-container-initialized";
+                        _this_1._getPopupContainer = function (element) { return $(element).closest("." + _this_1.parentPopupClass); };
+                        _this_1._getPainterModel = function (element) {
+                            var $painter = _this_1._getPopupContainer(element).find(".dx-painter");
                             return $painter.length ? ko.dataFor($painter[0]) : null;
                         };
-                        _this._getPictureEditorModel = function (element) {
+                        _this_1._getPictureEditorModel = function (element) {
                             var $popupEditing = $(element).find(".dx-picture-editing");
                             return $popupEditing.length ? ko.dataFor($popupEditing[0]) : null;
                         };
-                        _this._resetPictureEditor = function (pictureEditorModel) {
-                            pictureEditorModel.reset(_this.painterData.imageSource, _this.painterData.alignment, _this.painterData.sizeMode);
-                            _this._resetPainter(pictureEditorModel.painter);
+                        _this_1._resetPictureEditor = function (pictureEditorModel) {
+                            pictureEditorModel.reset(_this_1.painterData.imageSource, _this_1.painterData.alignment, _this_1.painterData.sizeMode);
+                            _this_1._resetPainter(pictureEditorModel.painter);
                         };
-                        _this._resetPainter = function (painter) {
-                            painter.imagePainter.image(_this.getImage());
+                        _this_1._resetPainter = function (painter) {
+                            painter.imagePainter.image(_this_1.getImage());
                             painter.refresh();
                         };
-                        _this.template = "dxrp-mobile-editing-field-image";
-                        return _this;
+                        _this_1.template = "dxrp-mobile-editing-field-image";
+                        return _this_1;
                     }
                     PopupImageEditingFieldViewModel.prototype.isPopupActive = function (element) {
                         return this.isActive() && this._getPopupContainer(element).hasClass(this._popupInitializedClass);
@@ -5806,28 +5806,28 @@ var DevExpress;
                         return this.painterData;
                     };
                     PopupImageEditingFieldViewModel.prototype.getPopupData = function () {
-                        var _this = this;
+                        var _this_1 = this;
                         var _showContent = ko.observable(false);
                         this.popupData = {
                             contentData: this,
                             paintData: this.painterData,
                             contentTemplate: 'dxrp-editing-field-image-editor',
-                            isVisible: function (element) { return _this.isPopupActive(element); },
-                            getContainer: function () { return _this.popupTarget; },
-                            getPositionTarget: function (element) { return _this._getPopupContainer(element); },
+                            isVisible: function (element) { return _this_1.isPopupActive(element); },
+                            getContainer: function () { return _this_1.popupTarget; },
+                            getPositionTarget: function (element) { return _this_1._getPopupContainer(element); },
                             showContent: _showContent,
                             onShown: function (e) {
                                 _showContent(true);
                             },
                             onHiding: function (e) {
-                                _this._getPictureEditorModel(e.component._$popupContent[0]).painter.signaturePainter.resetLastPosition();
-                                _this._resetPainter(_this._getPainterModel(e.element));
+                                _this_1._getPictureEditorModel(e.component._$popupContent[0]).painter.signaturePainter.resetLastPosition();
+                                _this_1._resetPainter(_this_1._getPainterModel(e.element));
                             },
                             onContentReady: function (e) {
-                                _this._resetPainter(_this._getPainterModel(e.element));
+                                _this_1._resetPainter(_this_1._getPainterModel(e.element));
                             },
                             renderedHandler: function (element, model) {
-                                _this._resetPictureEditor(_this._getPictureEditorModel(element));
+                                _this_1._resetPictureEditor(_this_1._getPictureEditorModel(element));
                             }
                         };
                         return this.popupData;
@@ -5847,10 +5847,10 @@ var DevExpress;
                 var CharacterCombEditingFieldViewModel = (function (_super) {
                     __extends(CharacterCombEditingFieldViewModel, _super);
                     function CharacterCombEditingFieldViewModel(field, pageWidth, pageHeight, zoom, bounds) {
-                        var _this = _super.call(this) || this;
-                        _this.field = field;
-                        _this.template = "dxrp-character-comb-editing-field";
-                        _this.active = ko.observable(false);
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.field = field;
+                        _this_1.template = "dxrp-character-comb-editing-field";
+                        _this_1.active = ko.observable(false);
                         var brickStyle = field.model().brickOptions;
                         var style = { rtl: function () { return brickStyle.rtl; } };
                         new DevExpress.Analytics.Utils.ModelSerializer().deserialize(style, JSON.parse(brickStyle.style), DevExpress.Reporting.Metadata.brickStyleSerializationsInfo);
@@ -5863,8 +5863,8 @@ var DevExpress;
                         if (borderCss["borderBottom"] !== "none") {
                             verticalPadding += style["borderWidth"]();
                         }
-                        _this.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
-                        _this.hideEditor = function (shouldCommit) {
+                        _this_1.textStyle = function () { return $.extend({}, cssCalculator.fontCss(), cssCalculator.foreColorCss(), cssCalculator.textAlignmentCss()); };
+                        _this_1.hideEditor = function (shouldCommit) {
                             setTimeout(function () {
                                 if (shouldCommit) {
                                     field.editValue(field._editorValue());
@@ -5872,10 +5872,10 @@ var DevExpress;
                                 else {
                                     field._editorValue(field.editValue());
                                 }
-                                _this.active(false);
+                                _this_1.active(false);
                             });
                         };
-                        _this.containerStyle = ko.pureComputed(function () {
+                        _this_1.containerStyle = ko.pureComputed(function () {
                             return $.extend({
                                 width: bounds.width + "px",
                                 height: bounds.height + "px",
@@ -5900,10 +5900,10 @@ var DevExpress;
                             "border-color": "transparent"
                         };
                         var characterCombBounds = field.model().brickOptions.characterCombBounds;
-                        _this.cells = [];
+                        _this_1.cells = [];
                         var rowTops = {};
                         for (var i = 0; i < characterCombBounds.length; i++) {
-                            _this.cells.push({
+                            _this_1.cells.push({
                                 style: $.extend({
                                     width: characterCombBounds[i].width + "px",
                                     height: characterCombBounds[i].height + "px",
@@ -5916,13 +5916,13 @@ var DevExpress;
                             rowTops[characterCombBounds[i].top] = i;
                         }
                         var rowsCount = Object.keys(rowTops).length;
-                        var colsCount = _this.cells.length / rowsCount;
-                        CharacterCombEditingFieldViewModel.setText(_this.cells, style["textAlignment"](), style.rtl(), field.editValue.peek(), rowsCount, colsCount);
+                        var colsCount = _this_1.cells.length / rowsCount;
+                        CharacterCombEditingFieldViewModel.setText(_this_1.cells, style["textAlignment"](), style.rtl(), field.editValue.peek(), rowsCount, colsCount);
                         field.editValue.subscribe(function (newValue) {
-                            CharacterCombEditingFieldViewModel.setText(_this.cells, style["textAlignment"](), style.rtl(), newValue, rowsCount, colsCount);
+                            CharacterCombEditingFieldViewModel.setText(_this_1.cells, style["textAlignment"](), style.rtl(), newValue, rowsCount, colsCount);
                         });
-                        _this.zoom = zoom;
-                        return _this;
+                        _this_1.zoom = zoom;
+                        return _this_1;
                     }
                     CharacterCombEditingFieldViewModel.prototype.activateEditor = function (viewModel, e) {
                         if (!this.field.readOnly()) {
@@ -5997,7 +5997,7 @@ var DevExpress;
                 })(ImageSizeMode = Editing.ImageSizeMode || (Editing.ImageSizeMode = {}));
                 var EditingField = (function () {
                     function EditingField(model, index, htmlProvider) {
-                        var _this = this;
+                        var _this_1 = this;
                         this._needToUseHtml = false;
                         this._index = -1;
                         this._model = model;
@@ -6006,19 +6006,19 @@ var DevExpress;
                         this.modelValue = ko.observable(model.editValue);
                         this.editValue = ko.computed({
                             read: function () {
-                                return _this.modelValue();
+                                return _this_1.modelValue();
                             },
                             write: function (newVal) {
-                                var oldVal = _this.modelValue();
-                                _this.modelValue(newVal);
-                                var val = _this.editingFieldChanged(_this, oldVal, newVal);
+                                var oldVal = _this_1.modelValue();
+                                _this_1.modelValue(newVal);
+                                var val = _this_1.editingFieldChanged(_this_1, oldVal, newVal);
                                 val = val == null ? newVal : val;
                                 if (val !== oldVal) {
-                                    _this._refreshHtmlValue(val);
+                                    _this_1._refreshHtmlValue(val);
                                 }
                                 if (val !== newVal) {
-                                    _this.modelValue(val);
-                                    _this._editorValue(val);
+                                    _this_1.modelValue(val);
+                                    _this_1._editorValue(val);
                                 }
                             }
                         });
@@ -6027,11 +6027,11 @@ var DevExpress;
                         this._htmlProvider = htmlProvider;
                     }
                     EditingField.prototype._refreshHtmlValue = function (newValue) {
-                        var _this = this;
+                        var _this_1 = this;
                         this.htmlValue(null);
                         if (this._needToUseHtml) {
                             this._htmlProvider.getEditingFieldHtml(newValue, this._index).done(function (html) {
-                                _this.htmlValue(html);
+                                _this_1.htmlValue(html);
                             });
                         }
                     };
@@ -6183,9 +6183,9 @@ var DevExpress;
                 var DocxExportOptionsMergedPreview = (function (_super) {
                     __extends(DocxExportOptionsMergedPreview, _super);
                     function DocxExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.docxExportMode(Metadata.excludeModesForMergedDocuments(_this.docxExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.docxExportMode(Metadata.excludeModesForMergedDocuments(_this_1.docxExportMode())());
+                        return _this_1;
                     }
                     DocxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.docxExportModeMergedPreview];
@@ -6218,9 +6218,9 @@ var DevExpress;
                 var HtmlExportOptionsMergedPreview = (function (_super) {
                     __extends(HtmlExportOptionsMergedPreview, _super);
                     function HtmlExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.htmlExportMode(Metadata.excludeModesForMergedDocuments(_this.htmlExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.htmlExportMode(Metadata.excludeModesForMergedDocuments(_this_1.htmlExportMode())());
+                        return _this_1;
                     }
                     HtmlExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.htmlExportModeMergedPreview];
@@ -6253,9 +6253,9 @@ var DevExpress;
                 var ImageExportOptionsMergedPreview = (function (_super) {
                     __extends(ImageExportOptionsMergedPreview, _super);
                     function ImageExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.imageExportMode(Metadata.excludeModesForMergedDocuments(_this.imageExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.imageExportMode(Metadata.excludeModesForMergedDocuments(_this_1.imageExportMode())());
+                        return _this_1;
                     }
                     ImageExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.imageExportModeMergedPreview];
@@ -6288,9 +6288,9 @@ var DevExpress;
                 var MhtExportOptionsMergedPreview = (function (_super) {
                     __extends(MhtExportOptionsMergedPreview, _super);
                     function MhtExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.htmlExportMode(Metadata.excludeModesForMergedDocuments(_this.htmlExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.htmlExportMode(Metadata.excludeModesForMergedDocuments(_this_1.htmlExportMode())());
+                        return _this_1;
                     }
                     MhtExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.htmlExportModeMergedPreview];
@@ -6323,9 +6323,9 @@ var DevExpress;
                 var RtfExportOptionsMergedPreview = (function (_super) {
                     __extends(RtfExportOptionsMergedPreview, _super);
                     function RtfExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.rtfExportMode(Metadata.excludeModesForMergedDocuments(_this.rtfExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.rtfExportMode(Metadata.excludeModesForMergedDocuments(_this_1.rtfExportMode())());
+                        return _this_1;
                     }
                     RtfExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.rtfExportModeMergedPreview];
@@ -6358,9 +6358,9 @@ var DevExpress;
                 var XlsExportOptionsMergedPreview = (function (_super) {
                     __extends(XlsExportOptionsMergedPreview, _super);
                     function XlsExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.xlsExportMode(Metadata.excludeModesForMergedDocuments(_this.xlsExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.xlsExportMode(Metadata.excludeModesForMergedDocuments(_this_1.xlsExportMode())());
+                        return _this_1;
                     }
                     XlsExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.xlsExportModeMergedPreview];
@@ -6393,9 +6393,9 @@ var DevExpress;
                 var XlsxExportOptionsMergedPreview = (function (_super) {
                     __extends(XlsxExportOptionsMergedPreview, _super);
                     function XlsxExportOptionsMergedPreview(model, serializer) {
-                        var _this = _super.call(this, model, serializer) || this;
-                        _this.xlsxExportMode(Metadata.excludeModesForMergedDocuments(_this.xlsxExportMode())());
-                        return _this;
+                        var _this_1 = _super.call(this, model, serializer) || this;
+                        _this_1.xlsxExportMode(Metadata.excludeModesForMergedDocuments(_this_1.xlsxExportMode())());
+                        return _this_1;
                     }
                     XlsxExportOptionsMergedPreview.prototype._getVariableInfo = function () {
                         return [Metadata.xlsxExportModeMergedPreview];
@@ -6466,11 +6466,11 @@ var DevExpress;
                 var ExportOptionsModel = (function (_super) {
                     __extends(ExportOptionsModel, _super);
                     function ExportOptionsModel(reportPreview) {
-                        var _this = _super.call(this) || this;
-                        _this.actions = [];
-                        _this._reportPreview = reportPreview;
+                        var _this_1 = _super.call(this) || this;
+                        _this_1.actions = [];
+                        _this_1._reportPreview = reportPreview;
                         var tabPanelVisible = ko.pureComputed(function () { return !!reportPreview.exportOptionsModel() && (!reportPreview.exportOptionsTabVisible || reportPreview.exportOptionsTabVisible()); });
-                        _this.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
+                        _this_1.tabInfo = new DevExpress.Analytics.Utils.TabInfo({
                             text: "Export Options",
                             template: "dxrd-preview-export-options",
                             model: reportPreview.exportOptionsModel,
@@ -6479,10 +6479,10 @@ var DevExpress;
                             imageTemplateName: "dxrd-svg-tabs-properties",
                             visible: tabPanelVisible
                         });
-                        _this._disposables.push(tabPanelVisible);
-                        _this._disposables.push(_this.tabInfo);
+                        _this_1._disposables.push(tabPanelVisible);
+                        _this_1._disposables.push(_this_1.tabInfo);
                         var exportItems = ko.pureComputed(function () {
-                            var result = _this._getExportFormatItems();
+                            var result = _this_1._getExportFormatItems();
                             return [{
                                     text: "Export To",
                                     textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
@@ -6491,8 +6491,8 @@ var DevExpress;
                                     items: result
                                 }];
                         });
-                        _this._disposables.push(exportItems);
-                        _this.actions.push({
+                        _this_1._disposables.push(exportItems);
+                        _this_1.actions.push({
                             id: Viewer.ActionId.ExportTo,
                             text: "Export To",
                             textId: "ASPxReportsStringId.WebDocumentViewer_ExportToText",
@@ -6501,12 +6501,12 @@ var DevExpress;
                             clickAction: function (model) {
                                 if (reportPreview.exportDisabled())
                                     return;
-                                _this._exportDocumentByFormat(model.itemData.format);
+                                _this_1._exportDocumentByFormat(model.itemData.format);
                             },
                             items: exportItems,
                             templateName: "dxrd-preview-export-to"
                         });
-                        return _this;
+                        return _this_1;
                     }
                     ExportOptionsModel.prototype._getExportFormatItems = function () {
                         var result = [];
@@ -6544,143 +6544,200 @@ var DevExpress;
                 __extends(ReportPreview, _super);
                 function ReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl) {
                     if (rtl === void 0) { rtl = false; }
-                    var _this = _super.call(this) || this;
-                    _this.predefinedZoomLevels = ko.observableArray([5, 2, 1.5, 1, 0.75, 0.5, 0.25]);
-                    _this._pageWidth = ko.observable(818);
-                    _this._pageHeight = ko.observable(1058);
-                    _this._pageBackColor = ko.observable('');
-                    _this._currentReportId = ko.observable(null);
-                    _this._currentReportUrl = ko.observable(null);
-                    _this._currentDocumentId = ko.observable(null);
-                    _this._unifier = ko.observable("");
-                    _this._currentOperationId = ko.observable(null);
-                    _this._stopBuildRequests = {};
-                    _this._closeDocumentRequests = {};
-                    _this._editingFields = ko.observable([]);
-                    _this._startBuildOperationId = "";
-                    _this._editingValuesSubscriptions = [];
-                    _this._drillDownState = [];
-                    _this._sortingState = [];
-                    _this._sortingProcessor = new Internal.SortingProcessor(function () { return _this._sortingState || []; });
-                    _this._timeouts = [];
-                    _this._deferreds = [];
-                    _this._window = null;
-                    _this.rtlReport = ko.observable(false);
-                    _this.currentPage = ko.observable(null);
-                    _this.originalParametersInfo = ko.observable(null);
-                    _this.pageIndex = ko.observable(-1);
-                    _this.showMultipagePreview = ko.observable(false);
-                    _this.documentMap = ko.observable();
-                    _this.exportOptionsModel = ko.observable();
-                    _this.pageLoading = ko.observable(false);
-                    _this.documentBuilding = ko.observable(false);
-                    _this.progressBar = new Internal.ProgressViewModel();
-                    _this.pages = ko.observableArray([]).extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
-                    _this.isAutoFit = ko.observable(true);
-                    _this.autoFitBy = ko.observable(Viewer.ZoomAutoBy.WholePage);
-                    _this.exportDisabled = ko.pureComputed(function () {
-                        var inProgress = _this.progressBar.inProgress();
-                        var documentBuilding = _this.documentBuilding();
-                        return _this.pageIndex() === -1 || inProgress || documentBuilding;
+                    var _this_1 = _super.call(this) || this;
+                    _this_1.predefinedZoomLevels = ko.observableArray([5, 2, 1.5, 1, 0.75, 0.5, 0.25]);
+                    _this_1._pageWidth = ko.observable(818);
+                    _this_1._pageHeight = ko.observable(1058);
+                    _this_1._pageBackColor = ko.observable('');
+                    _this_1._currentReportId = ko.observable(null);
+                    _this_1._currentReportUrl = ko.observable(null);
+                    _this_1._currentDocumentId = ko.observable(null);
+                    _this_1._unifier = ko.observable("");
+                    _this_1._currentOperationId = ko.observable(null);
+                    _this_1._stopBuildRequests = {};
+                    _this_1._closeDocumentRequests = {};
+                    _this_1._editingFields = ko.observable([]);
+                    _this_1._startBuildOperationId = "";
+                    _this_1._editingValuesSubscriptions = [];
+                    _this_1._workerTicker = null;
+                    _this_1._workerFunctionBlobUrl = null;
+                    _this_1._workerTickerFunction = function () {
+                        var started, interval;
+                        self.onmessage = function (e) {
+                            if (e.data === "stop") {
+                                clearInterval(interval);
+                                return;
+                            }
+                            if (started)
+                                return;
+                            interval = setInterval(function () {
+                                postMessage.apply(self, ["tick"]);
+                            }, 10);
+                            started = true;
+                        };
+                    };
+                    _this_1._drillDownState = [];
+                    _this_1._sortingState = [];
+                    _this_1._sortingProcessor = new Internal.SortingProcessor(function () { return _this_1._sortingState || []; });
+                    _this_1._timeouts = [];
+                    _this_1._deferreds = [];
+                    _this_1._window = null;
+                    _this_1.rtlReport = ko.observable(false);
+                    _this_1.currentPage = ko.observable(null);
+                    _this_1.originalParametersInfo = ko.observable(null);
+                    _this_1.pageIndex = ko.observable(-1);
+                    _this_1.showMultipagePreview = ko.observable(false);
+                    _this_1.documentMap = ko.observable();
+                    _this_1.exportOptionsModel = ko.observable();
+                    _this_1.pageLoading = ko.observable(false);
+                    _this_1.documentBuilding = ko.observable(false);
+                    _this_1.progressBar = new Internal.ProgressViewModel();
+                    _this_1.pages = ko.observableArray([]).extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+                    _this_1.isAutoFit = ko.observable(true);
+                    _this_1.autoFitBy = ko.observable(Viewer.ZoomAutoBy.WholePage);
+                    _this_1.exportDisabled = ko.pureComputed(function () {
+                        var inProgress = _this_1.progressBar.inProgress();
+                        var documentBuilding = _this_1.documentBuilding();
+                        return _this_1.pageIndex() === -1 || inProgress || documentBuilding;
                     });
-                    _this._zoom = ko.observable(1);
-                    _this.zoom = ko.pureComputed({
+                    _this_1._zoom = ko.observable(1);
+                    _this_1.zoom = ko.pureComputed({
                         read: function () {
-                            var autoFitBy = _this.autoFitBy();
-                            if (autoFitBy != Viewer.ZoomAutoBy.None || _this._zoom() === 0) {
+                            var autoFitBy = _this_1.autoFitBy();
+                            if (autoFitBy != Viewer.ZoomAutoBy.None || _this_1._zoom() === 0) {
                                 return autoFitBy;
                             }
-                            return _this._zoom();
+                            return _this_1._zoom();
                         },
                         write: function (val) {
                             if (val > 0) {
-                                _this.autoFitBy(Viewer.ZoomAutoBy.None);
-                                _this._zoom(val);
+                                _this_1.autoFitBy(Viewer.ZoomAutoBy.None);
+                                _this_1._zoom(val);
                             }
                             else {
-                                _this.autoFitBy(val);
+                                _this_1.autoFitBy(val);
                             }
                         }
                     });
-                    _this.editingFieldsProvider = function () { return _this._editingFields(); };
-                    _this._currentPageText = ko.pureComputed(function () {
-                        if (_this.pageIndex() === -1) {
+                    _this_1.editingFieldsProvider = function () { return _this_1._editingFields(); };
+                    _this_1._currentPageText = ko.pureComputed(function () {
+                        if (_this_1.pageIndex() === -1) {
                             return DevExpress.Analytics.Utils.getLocalization('0 pages', 'ASPxReportsStringId.WebDocumentViewer_0Pages');
                         }
                         else {
                             var ofText = DevExpress.Analytics.Utils.getLocalization('of', 'ASPxReportsStringId.ToolBarItemText_OfLabel');
-                            return (_this.pageIndex() + 1) + " " + ofText + " " + _this.pages().length;
+                            return (_this_1.pageIndex() + 1) + " " + ofText + " " + _this_1.pages().length;
                         }
                     });
-                    _this._raiseOnSizeChanged = function () { _this.onSizeChanged() && _this.onSizeChanged()(); };
-                    _this.previewSize = ko.observable(0);
-                    _this.onSizeChanged = ko.observable();
-                    _this.previewVisible = ko.observable(false);
-                    _this.editingFieldsHighlighted = ko.observable(false);
-                    _this.canSwitchToDesigner = true;
-                    _this.allowURLsWithJSContent = false;
-                    _this.zoomStep = ko.observable(0.05);
-                    _this.exportOptionsTabVisible = ko.observable(true);
+                    _this_1._raiseOnSizeChanged = function () { _this_1.onSizeChanged() && _this_1.onSizeChanged()(); };
+                    _this_1.previewSize = ko.observable(0);
+                    _this_1.onSizeChanged = ko.observable();
+                    _this_1.previewVisible = ko.observable(false);
+                    _this_1.editingFieldsHighlighted = ko.observable(false);
+                    _this_1.canSwitchToDesigner = true;
+                    _this_1.allowURLsWithJSContent = false;
+                    _this_1.zoomStep = ko.observable(0.05);
+                    _this_1.exportOptionsTabVisible = ko.observable(true);
                     Settings.HandlerUri = handlerUri || Settings.HandlerUri;
-                    _this.previewHandlersHelper = previewHandlersHelper || new Internal.PreviewHandlersHelper(_this);
-                    _this.requestWrapper = previewRequestWrapper || new Internal.PreviewRequestWrapper(null, callbacks);
-                    _this.rtlViewer = rtl;
+                    _this_1.previewHandlersHelper = previewHandlersHelper || new Internal.PreviewHandlersHelper(_this_1);
+                    _this_1.requestWrapper = previewRequestWrapper || new Internal.PreviewRequestWrapper(null, callbacks);
+                    _this_1.rtlViewer = rtl;
                     if (callbacks) {
-                        _this.customProcessBrickClick = callbacks.previewClick;
-                        _this.customizeExportOptions = callbacks.customizeExportOptions;
+                        _this_1.customProcessBrickClick = callbacks.previewClick;
+                        _this_1.customizeExportOptions = callbacks.customizeExportOptions;
                     }
-                    _this._disposables.push(_this.documentBuilding.subscribe(function (newVal) {
+                    _this_1._disposables.push(_this_1.documentBuilding.subscribe(function (newVal) {
                         if (!newVal) {
-                            _this._unifier(Reporting.Internal.generateGuid());
-                            var documentId = _this._currentDocumentId();
-                            var pageCount = _this.pages().length;
+                            _this_1._unifier(Reporting.Internal.generateGuid());
+                            var documentId = _this_1._currentDocumentId();
+                            var pageCount = _this_1.pages().length;
                             for (var i = 0; i < pageCount; i++) {
-                                var page = _this.pages()[i];
+                                var page = _this_1.pages()[i];
                                 if (!page.pageLoading()) {
                                     page.clearBricks();
                                 }
-                                page.updateSize(_this._zoom());
+                                page.updateSize(_this_1._zoom());
                                 page.actualResolution = 0;
-                                page.isClientVisible() && page._setPageImgSrc(documentId, _this._unifier(), _this._zoom());
+                                page.isClientVisible() && page._setPageImgSrc(documentId, _this_1._unifier(), _this_1._zoom());
                             }
                             if (callbacks && callbacks.documentReady) {
-                                documentId && callbacks.documentReady(documentId, _this._currentReportId(), pageCount);
+                                documentId && callbacks.documentReady(documentId, _this_1._currentReportId(), pageCount);
                             }
                         }
                     }));
-                    _this._disposables.push(_this._currentDocumentId.subscribe(function (newVal) {
-                        _this._unifier(newVal ? Reporting.Internal.generateGuid() : '');
+                    _this_1._disposables.push(_this_1._currentDocumentId.subscribe(function (newVal) {
+                        _this_1._unifier(newVal ? Reporting.Internal.generateGuid() : '');
                     }));
-                    _this._disposables.push(_this.previewSize.subscribe(function () { return _this._raiseOnSizeChanged(); }));
-                    _this._disposables.push(_this.zoom);
-                    _this._disposables.push(_this.exportDisabled);
-                    _this._disposables.push(_this._currentPageText);
-                    _this._disposables.push(_this._zoom.subscribe(function () {
-                        if (_this.showMultipagePreview()) {
-                            _this.pages().forEach(function (page) {
+                    _this_1._disposables.push(_this_1.previewSize.subscribe(function () { return _this_1._raiseOnSizeChanged(); }));
+                    _this_1._disposables.push(_this_1.zoom);
+                    _this_1._disposables.push(_this_1.exportDisabled);
+                    _this_1._disposables.push(_this_1._currentPageText);
+                    _this_1._disposables.push(_this_1._zoom.subscribe(function () {
+                        if (_this_1.showMultipagePreview()) {
+                            _this_1.pages().forEach(function (page) {
                                 page.updateSize(page.zoom());
                                 page.isClientVisible(false);
                             });
-                            _this._raiseOnSizeChanged();
+                            _this_1._raiseOnSizeChanged();
                         }
                         else {
-                            var currentPage = _this.pages()[_this.pageIndex()];
+                            var currentPage = _this_1.pages()[_this_1.pageIndex()];
                             currentPage && currentPage.isClientVisible.notifySubscribers(currentPage.isClientVisible.peek());
                         }
                     }));
-                    _this._disposables.push(ko.computed(function () {
-                        var pagesArray = _this.pages();
-                        var pageIndex = _this.pageIndex();
+                    _this_1._disposables.push(ko.computed(function () {
+                        var pagesArray = _this_1.pages();
+                        var pageIndex = _this_1.pageIndex();
                         if (!pagesArray || pageIndex >= pagesArray.length)
                             return;
                         var currentPage = null;
                         if (pageIndex >= 0)
                             currentPage = pagesArray[pageIndex];
-                        if (currentPage != _this.currentPage.peek())
-                            _this.currentPage(currentPage);
+                        if (currentPage != _this_1.currentPage.peek())
+                            _this_1.currentPage(currentPage);
                     }));
-                    return _this;
+                    return _this_1;
                 }
+                ReportPreview.prototype._getUrlObject = function () {
+                    return window.URL || window['webkitURL'] || window['mozURL'] || window['msURL'] || window['oURL'];
+                };
+                ReportPreview.prototype._createWorker = function () {
+                    this._terminateWorker();
+                    var blob = new Blob(["(" + this._workerTickerFunction.toString() + ")()"], { type: "text/javascript" });
+                    var _url = this._getUrlObject();
+                    this._workerFunctionBlobUrl = _url.createObjectURL(blob);
+                    this._workerTicker = new Worker(this._workerFunctionBlobUrl);
+                    return this._workerTicker;
+                };
+                ReportPreview.prototype._terminateWorker = function () {
+                    if (this._workerTicker) {
+                        this._workerTicker.terminate();
+                        this._workerTicker = null;
+                    }
+                    if (this._workerFunctionBlobUrl) {
+                        var _url = this._getUrlObject();
+                        _url && _url.revokeObjectURL(this._workerFunctionBlobUrl);
+                        this._workerFunctionBlobUrl = null;
+                    }
+                };
+                ReportPreview.prototype._callPrint = function (_window, asyncPrint) {
+                    var _this_1 = this;
+                    if (asyncPrint === void 0) { asyncPrint = false; }
+                    var browserVersion = parseInt(DevExpress.utils.browser.version);
+                    if (_window && (DevExpress.utils.browser.chrome && 76 <= browserVersion)) {
+                        var worker = this._createWorker();
+                        var checkOnTick = function () {
+                            if (_window.document && _window.document.contentType === "application/pdf") {
+                                _window.print();
+                                worker.postMessage("stop");
+                                _this_1._terminateWorker();
+                            }
+                        };
+                        worker.onerror = function (e) { checkOnTick(); };
+                        worker.onmessage = function (e) { checkOnTick(); };
+                        worker.postMessage("start");
+                    }
+                };
                 ReportPreview.prototype._doDrillDown = function (drillDownKey) {
                     this._drillDownState.forEach(function (x) { return x.Key === drillDownKey && (x.Value = !x.Value); });
                     this.closeDocument();
@@ -6709,6 +6766,7 @@ var DevExpress;
                 ReportPreview.prototype.dispose = function () {
                     _super.prototype.dispose.call(this);
                     (this._timeouts || []).forEach(function (tic) { return clearTimeout(tic); });
+                    this._terminateWorker();
                     (this._deferreds || []).forEach(function (deferred) { return deferred.reject(); });
                     this.removeProperties();
                     this._sortingProcessor = null;
@@ -6759,32 +6817,63 @@ var DevExpress;
                     this._window.document.body.appendChild(div);
                 };
                 ReportPreview.prototype._export = function (args, actionUri, inlineResult, printable) {
-                    var _this = this;
+                    var _this_1 = this;
                     if (printable === void 0) { printable = false; }
+                    this._terminateWorker();
                     var deffered = $.Deferred();
                     if (this._editingFields().length > 0 || Settings.AsyncExportApproach || this.exportOptionsModel().hasSensitiveData()) {
-                        var self = this;
                         this._window = window.open();
                         this._window.onunload = function () {
-                            _this.progressBar.stop();
+                            _this_1.progressBar.stop();
+                            _this_1._terminateWorker();
                         };
                         this._initExportWindow();
                         this.progressBar.text(DevExpress.Analytics.Utils.getLocalization('Exporting the document...', 'PreviewStringId.Msg_ExportingDocument'));
                         this.progressBar.cancelText(DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'));
-                        this.progressBar.startProgress(function () { _this._currentOperationId(null); });
+                        this.progressBar.startProgress(function () { _this_1._currentOperationId(null); });
                         this.requestWrapper.getStartExportOperation(args)
-                            .done(function (response) { self.previewHandlersHelper.doneStartExportHandler(deffered, inlineResult, response, printable); })
-                            .fail(function (error) { self.previewHandlersHelper.errorStartExportHandler(deffered, error); });
+                            .done(function (response) { _this_1.previewHandlersHelper.doneStartExportHandler(deffered, inlineResult, response, printable); })
+                            .fail(function (error) { _this_1.previewHandlersHelper.errorStartExportHandler(deffered, error); });
                     }
                     else {
                         deffered.resolve(true);
-                        this._safelyRunWindowOpen(actionUri + "?actionKey=exportTo&arg=" + args);
+                        var exportUrl = actionUri + "?actionKey=exportTo&arg=" + args;
+                        if (printable && this._shouldUseBlob(actionUri)) {
+                            var newWindow = this._safelyRunWindowOpen("");
+                            this._printUsingBlob(newWindow, exportUrl);
+                        }
+                        else {
+                            var _window = this._safelyRunWindowOpen(exportUrl);
+                            printable && this._callPrint(_window);
+                        }
                     }
                     return deffered.promise();
                 };
-                ReportPreview.prototype._safelyRunWindowOpen = function (url, target, useIFrame) {
+                ReportPreview.prototype._shouldUseBlob = function (actionUri) {
+                    var isNewChrome = DevExpress.utils.browser.chrome && (parseInt(DevExpress.utils.browser.version) >= 76);
+                    return ((!actionUri.indexOf("http://") || !actionUri.indexOf("https://") || !actionUri.indexOf("ftp://") || !actionUri.indexOf("ftps://")) && actionUri.indexOf(location.origin) === -1)
+                        && isNewChrome;
+                };
+                ReportPreview.prototype._printUsingBlob = function (_newWindow, exportedDocumentUrl, asyncPrint) {
+                    var _this = this;
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            var _url = _this._getUrlObject();
+                            var blobUrl = _url.createObjectURL(this.response);
+                            _newWindow.location.replace(blobUrl);
+                            setTimeout(function () { _url.revokeObjectURL(blobUrl); }, 1);
+                            _this._callPrint(_newWindow, asyncPrint);
+                        }
+                    };
+                    xhr.open('GET', exportedDocumentUrl);
+                    xhr.responseType = 'blob';
+                    xhr.send();
+                };
+                ReportPreview.prototype._safelyRunWindowOpen = function (url, target, useIFrame, printable) {
                     if (target === void 0) { target = "_blank"; }
                     if (useIFrame === void 0) { useIFrame = false; }
+                    if (printable === void 0) { printable = false; }
                     var newWindow = window.open(url, target);
                     target === "_blank" && newWindow && (newWindow.opener = newWindow);
                     return newWindow;
@@ -6857,13 +6946,13 @@ var DevExpress;
                     return this.initialize(deferred.promise());
                 };
                 ReportPreview.prototype.drillThrough = function (customData, closeCurrentReport) {
-                    var _this = this;
+                    var _this_1 = this;
                     if (closeCurrentReport === void 0) { closeCurrentReport = true; }
                     var deferred = $.Deferred();
                     this.requestWrapper.drillThrough(customData).done(function (response) {
                         if (closeCurrentReport) {
-                            _this._clearReportInfo();
-                            _this.initialize(deferred.promise());
+                            _this_1._clearReportInfo();
+                            _this_1.initialize(deferred.promise());
                         }
                         deferred.resolve(response);
                     }).fail(function (error) {
@@ -6872,7 +6961,7 @@ var DevExpress;
                     return deferred.promise();
                 };
                 ReportPreview.prototype.initialize = function (initializeDataPromise) {
-                    var _this = this;
+                    var _this_1 = this;
                     this._currentReportId(null);
                     this._currentReportUrl(null);
                     this._currentDocumentId(null);
@@ -6882,37 +6971,37 @@ var DevExpress;
                     _initializeDeferred.done(function () {
                         initializeDataPromise.done(function (previewInitialize) {
                             if (previewInitialize && !previewInitialize.error && (previewInitialize.reportId || previewInitialize.documentId)) {
-                                _this._currentReportId(previewInitialize.reportId);
-                                _this._currentReportUrl(previewInitialize.reportUrl);
-                                _this._currentDocumentId(previewInitialize.documentId);
-                                _this.rtlReport(previewInitialize.rtlReport);
+                                _this_1._currentReportId(previewInitialize.reportId);
+                                _this_1._currentReportUrl(previewInitialize.reportUrl);
+                                _this_1._currentDocumentId(previewInitialize.documentId);
+                                _this_1.rtlReport(previewInitialize.rtlReport);
                                 var pageSettings = previewInitialize.pageSettings;
                                 if (pageSettings) {
                                     if (pageSettings.height)
-                                        _this._pageHeight(pageSettings.height);
+                                        _this_1._pageHeight(pageSettings.height);
                                     if (pageSettings.width)
-                                        _this._pageWidth(pageSettings.width);
-                                    _this._pageBackColor((pageSettings.color && _this.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
+                                        _this_1._pageWidth(pageSettings.width);
+                                    _this_1._pageBackColor((pageSettings.color && _this_1.readerMode) ? 'rgba(' + pageSettings.color + ')' : '');
                                 }
-                                var deserializedExportOptions = _this._deserializeExportOptions(previewInitialize.exportOptions, !_this.reportId && (!previewInitialize.documentData || !previewInitialize.documentData.canPerformContinuousExport));
+                                var deserializedExportOptions = _this_1._deserializeExportOptions(previewInitialize.exportOptions, !_this_1.reportId && (!previewInitialize.documentData || !previewInitialize.documentData.canPerformContinuousExport));
                                 var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
-                                _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
-                                _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
-                                _this.exportOptionsModel(deserializedExportOptions);
-                                _this.originalParametersInfo(previewInitialize.parametersInfo);
+                                _this_1.customizeExportOptions && _this_1.customizeExportOptions(customizeExportOptionsArgs);
+                                _this_1.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
+                                _this_1.exportOptionsModel(deserializedExportOptions);
+                                _this_1.originalParametersInfo(previewInitialize.parametersInfo);
                                 if (previewInitialize.documentId) {
-                                    _this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
-                                    _this.documentBuilding(true);
-                                    var doGetBuildStatusFunc = _this.getDoGetBuildStatusFunc();
+                                    _this_1.progressBar.startProgress(function () { _this_1.documentBuilding(false); }, function () { _this_1.stopBuild(); });
+                                    _this_1.documentBuilding(true);
+                                    var doGetBuildStatusFunc = _this_1.getDoGetBuildStatusFunc();
                                     doGetBuildStatusFunc(previewInitialize.documentId);
                                 }
                             }
                             else {
-                                _this.pageLoading(false);
-                                _this._processError(DevExpress.Analytics.Utils.getLocalization("The report preview initialization has failed", "ASPxReportsStringId.WebDocumentViewer_InitializationErro"), previewInitialize && previewInitialize.error);
+                                _this_1.pageLoading(false);
+                                _this_1._processError(DevExpress.Analytics.Utils.getLocalization("The report preview initialization has failed", "ASPxReportsStringId.WebDocumentViewer_InitializationErro"), previewInitialize && previewInitialize.error);
                             }
                         }).fail(function (error) {
-                            _this.removeEmptyPages();
+                            _this_1.removeEmptyPages();
                         });
                     }).resolve();
                     return initializeDataPromise;
@@ -6982,7 +7071,7 @@ var DevExpress;
                     return deferred.promise();
                 };
                 ReportPreview.prototype._initializeStartBuild = function () {
-                    var _this = this;
+                    var _this_1 = this;
                     if (this.documentBuilding() || this._startBuildOperationId) {
                         return false;
                     }
@@ -6990,28 +7079,28 @@ var DevExpress;
                     this._currentDocumentId(null);
                     this.progressBar.text(DevExpress.Analytics.Utils.getLocalization("Creating the document...", "PreviewStringId.Msg_CreatingDocument"));
                     this.progressBar.cancelText(DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'));
-                    this.progressBar.startProgress(function () { _this.documentBuilding(false); }, function () { _this.stopBuild(); });
+                    this.progressBar.startProgress(function () { _this_1.documentBuilding(false); }, function () { _this_1.stopBuild(); });
                     this.documentBuilding(true);
                     return true;
                 };
                 ReportPreview.prototype._startBuildRequest = function () {
-                    var _this = this;
+                    var _this_1 = this;
                     if (!this._initializeStartBuild()) {
                         return null;
                     }
                     var deffered = $.Deferred();
                     this.requestWrapper.startBuildRequest()
-                        .done(function (response) { _this.previewHandlersHelper.doneStartBuildHandler(deffered, response); })
-                        .fail(function (error) { _this.previewHandlersHelper.errorStartBuildHandler(deffered, error, _this._startBuildOperationId); });
+                        .done(function (response) { _this_1.previewHandlersHelper.doneStartBuildHandler(deffered, response); })
+                        .fail(function (error) { _this_1.previewHandlersHelper.errorStartBuildHandler(deffered, error, _this_1._startBuildOperationId); });
                     return deffered.promise();
                 };
                 ReportPreview.prototype.getExportStatus = function (operationId) {
-                    var _this = this;
+                    var _this_1 = this;
                     var deffered = $.Deferred();
                     this._timeouts.push(setTimeout(function () {
-                        _this.requestWrapper.getExportStatusRequest(operationId)
-                            .done(function (response) { _this.previewHandlersHelper.doneExportStatusHandler(deffered, operationId, response); })
-                            .fail(function (error) { _this.previewHandlersHelper.errorExportStatusHandler(deffered, error); });
+                        _this_1.requestWrapper.getExportStatusRequest(operationId)
+                            .done(function (response) { _this_1.previewHandlersHelper.doneExportStatusHandler(deffered, operationId, response); })
+                            .fail(function (error) { _this_1.previewHandlersHelper.errorExportStatusHandler(deffered, error); });
                     }, 250));
                     return deffered.promise();
                 };
@@ -7028,22 +7117,31 @@ var DevExpress;
                         var arg = encodeURIComponent(JSON.stringify({ id: operationId, inlineResult: !!inlineDisposition }));
                         uri = Settings.HandlerUri + "?actionKey=getExportResult&arg=" + arg;
                     }
-                    this._window && this._window.location.replace(uri);
+                    if (this._window) {
+                        this._window.onunload = null;
+                        if (printable && this._shouldUseBlob(uri)) {
+                            this._printUsingBlob(this._window, uri, true);
+                        }
+                        else {
+                            this._window.location.replace(uri);
+                            printable && this._callPrint(this._window, true);
+                        }
+                    }
                 };
                 ReportPreview.prototype.getBuildStatus = function (documentId) {
-                    var _this = this;
+                    var _this_1 = this;
                     var deffered = $.Deferred();
                     this._deferreds.push(deffered);
                     this._timeouts.push(setTimeout(function () {
-                        var ignorePredicate = function () { return _this._closeDocumentRequests[documentId]; };
-                        _this.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
-                            .done(function (response) { _this.previewHandlersHelper && _this.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
-                            .fail(function (error) { _this.previewHandlersHelper && _this.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
+                        var ignorePredicate = function () { return _this_1._closeDocumentRequests[documentId]; };
+                        _this_1.requestWrapper.getBuildStatusRequest(documentId, ignorePredicate)
+                            .done(function (response) { _this_1.previewHandlersHelper && _this_1.previewHandlersHelper.doneGetBuildStatusHandler(deffered, documentId, response, ignorePredicate); })
+                            .fail(function (error) { _this_1.previewHandlersHelper && _this_1.previewHandlersHelper.errorGetBuildStatusHandler(deffered, error, ignorePredicate); });
                     }, 250));
                     return deffered.promise();
                 };
                 ReportPreview.prototype.getDoGetBuildStatusFunc = function () {
-                    var _this = this;
+                    var _this_1 = this;
                     var preview = this;
                     var doGetBuildStatus = function (documentId) {
                         var promise = preview.getBuildStatus(documentId);
@@ -7056,7 +7154,7 @@ var DevExpress;
                                         doGetBuildStatus(documentId);
                                     }
                                 };
-                                Settings.PollingDelay ? _this._timeouts.push(setTimeout(doStatusRequest, Settings.PollingDelay)) : doStatusRequest();
+                                Settings.PollingDelay ? _this_1._timeouts.push(setTimeout(doStatusRequest, Settings.PollingDelay)) : doStatusRequest();
                             }
                             else {
                                 try {
@@ -7077,7 +7175,7 @@ var DevExpress;
                                 }
                                 finally {
                                     preview.progressBar.complete();
-                                    _this._timeouts.push(setTimeout(preview._raiseOnSizeChanged, 1000));
+                                    _this_1._timeouts.push(setTimeout(preview._raiseOnSizeChanged, 1000));
                                 }
                             }
                         });
@@ -7085,31 +7183,31 @@ var DevExpress;
                     return doGetBuildStatus;
                 };
                 ReportPreview.prototype.getDocumentData = function (documentId) {
-                    var _this = this;
-                    var ignoreErrorPredicate = function () { return _this._closeDocumentRequests[documentId]; };
+                    var _this_1 = this;
+                    var ignoreErrorPredicate = function () { return _this_1._closeDocumentRequests[documentId]; };
                     this.requestWrapper.getDocumentData(documentId, ignoreErrorPredicate)
                         .done(function (response) {
                         if (!response) {
                             return;
                         }
-                        _this._drillDownState = response.drillDownKeys || [];
-                        _this._sortingState = response.sortingState || [];
-                        if (response.canPerformContinuousExport === false && _this.reportId) {
-                            var deserializedExportOptions = _this._deserializeExportOptions(response.exportOptions || {}, true);
+                        _this_1._drillDownState = response.drillDownKeys || [];
+                        _this_1._sortingState = response.sortingState || [];
+                        if (response.canPerformContinuousExport === false && _this_1.reportId) {
+                            var deserializedExportOptions = _this_1._deserializeExportOptions(response.exportOptions || {}, true);
                             var customizeExportOptionsArgs = { exportOptions: deserializedExportOptions, panelVisible: true };
-                            _this.customizeExportOptions && _this.customizeExportOptions(customizeExportOptionsArgs);
-                            _this.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
-                            _this.exportOptionsModel(deserializedExportOptions);
+                            _this_1.customizeExportOptions && _this_1.customizeExportOptions(customizeExportOptionsArgs);
+                            _this_1.exportOptionsTabVisible(customizeExportOptionsArgs.panelVisible);
+                            _this_1.exportOptionsModel(deserializedExportOptions);
                         }
-                        _this.documentMap(response.documentMap);
-                        _this._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
-                        _this._editingValuesSubscriptions = [];
-                        _this._editingFields((response.editingFields || []).map(function (item, index) {
-                            var field = _this.createEditingField(item, index);
-                            if (_this.editingFieldChanged) {
-                                field.editingFieldChanged = _this.editingFieldChanged;
+                        _this_1.documentMap(response.documentMap);
+                        _this_1._editingValuesSubscriptions.forEach(function (item) { return item.dispose(); });
+                        _this_1._editingValuesSubscriptions = [];
+                        _this_1._editingFields((response.editingFields || []).map(function (item, index) {
+                            var field = _this_1.createEditingField(item, index);
+                            if (_this_1.editingFieldChanged) {
+                                field.editingFieldChanged = _this_1.editingFieldChanged;
                             }
-                            _this._editingValuesSubscriptions.push(field.editValue);
+                            _this_1._editingValuesSubscriptions.push(field.editValue);
                             return field;
                         }));
                     });
@@ -7174,7 +7272,7 @@ var DevExpress;
                     this.requestWrapper.sendCloseRequest(null, this._currentReportId());
                 };
                 ReportPreview.prototype.goToPage = function (pageIndex, forcePageChanging, throttle) {
-                    var _this = this;
+                    var _this_1 = this;
                     if (!forcePageChanging && this.pageIndex.peek() === pageIndex || this.pages.peek().length === 0 || pageIndex < 0 || pageIndex >= this.pages.peek().length) {
                         return;
                     }
@@ -7182,15 +7280,15 @@ var DevExpress;
                         clearTimeout(this._goToPageTimer);
                     }
                     var updateActivePage = function (activePageIndex) {
-                        _this.pages.peek().forEach(function (page) {
+                        _this_1.pages.peek().forEach(function (page) {
                             var visible = page.pageIndex === activePageIndex;
                             page.active(visible);
                             page.isClientVisible(visible);
                         });
-                        _this._goToPageTimer = undefined;
+                        _this_1._goToPageTimer = undefined;
                     };
                     if (throttle)
-                        this._timeouts.push(this._goToPageTimer = setTimeout(function () { return updateActivePage(_this.pageIndex()); }, throttle));
+                        this._timeouts.push(this._goToPageTimer = setTimeout(function () { return updateActivePage(_this_1.pageIndex()); }, throttle));
                     else
                         updateActivePage(pageIndex);
                     this.pageIndex(pageIndex);
@@ -7405,7 +7503,7 @@ var DevExpress;
                     }
                     var EventProcessor = (function () {
                         function EventProcessor(element, slideOptions) {
-                            var _this = this;
+                            var _this_1 = this;
                             this.element = element;
                             this.slideOptions = slideOptions;
                             this._direction = {
@@ -7424,26 +7522,26 @@ var DevExpress;
                             this.slideOptions.searchPanel.height.subscribe(function (newVal) {
                                 if (slideOptions.disabled())
                                     return;
-                                if (!_this.firstMobilePageOffset)
-                                    _this.firstMobilePageOffset = _this._getFirstPageOffset();
-                                if (_this.slideOptions.readerMode) {
-                                    _this.slideOptions.topOffset(newVal);
+                                if (!_this_1.firstMobilePageOffset)
+                                    _this_1.firstMobilePageOffset = _this_1._getFirstPageOffset();
+                                if (_this_1.slideOptions.readerMode) {
+                                    _this_1.slideOptions.topOffset(newVal);
                                 }
                                 else {
-                                    _this.slideOptions.topOffset(Math.min(newVal, Math.max(0, MobileSearchViewModel.maxHeight - _this.firstMobilePageOffset.top)));
+                                    _this_1.slideOptions.topOffset(Math.min(newVal, Math.max(0, MobileSearchViewModel.maxHeight - _this_1.firstMobilePageOffset.top)));
                                 }
                                 if (!newVal) {
-                                    _this.applySearchAnimation(newVal);
+                                    _this_1.applySearchAnimation(newVal);
                                 }
                                 else if (newVal === MobileSearchViewModel.maxHeight) {
-                                    _this.slideOptions.searchPanel.searchPanelVisible(true);
-                                    _this.applySearchAnimation(newVal);
+                                    _this_1.slideOptions.searchPanel.searchPanelVisible(true);
+                                    _this_1.applySearchAnimation(newVal);
                                 }
                                 else {
                                     var dif = 1 - Internal.minScale;
                                     var perc = newVal / MobileSearchViewModel.maxHeight;
                                     var scale = 1 - dif * perc;
-                                    setTransform(_this.$galleryblocks, 'scale(' + Math.max(Internal.minScale, scale) + ')');
+                                    setTransform(_this_1.$galleryblocks, 'scale(' + Math.max(Internal.minScale, scale) + ')');
                                 }
                             });
                         }
@@ -7518,7 +7616,7 @@ var DevExpress;
                             this.setPosition(e.clientX, e.clientY);
                         };
                         EventProcessor.prototype.end = function (e) {
-                            var _this = this;
+                            var _this_1 = this;
                             if (this.slideOptions.zoomUpdating() || this.slideOptions.galleryIsAnimated()) {
                                 var touches = e["touches"];
                                 if (!touches || touches.length === 0) {
@@ -7553,16 +7651,16 @@ var DevExpress;
                                 }
                             }
                             this.$body.removeClass("dxrd-prevent-refresh");
-                            setTimeout(function () { _this.slideOptions.brickEventsDisabled(false); }, 10);
+                            setTimeout(function () { _this_1.slideOptions.brickEventsDisabled(false); }, 10);
                         };
                         EventProcessor.prototype.applySearchAnimation = function (value) {
-                            var _this = this;
+                            var _this_1 = this;
                             if (this.slideOptions.animationSettings.zoomEnabled()) {
                                 this.$galleryblocks.addClass("dxrdp-animation");
                                 this.$element.addClass("dxrdp-animation");
                                 setTimeout(function () {
-                                    _this.$galleryblocks.removeClass("dxrdp-animation");
-                                    _this.$element.removeClass("dxrdp-animation");
+                                    _this_1.$galleryblocks.removeClass("dxrdp-animation");
+                                    _this_1.$element.removeClass("dxrdp-animation");
                                 }, 410);
                             }
                             setTransform(this.$galleryblocks, !value ? '' : 'scale(0.92)');
@@ -7572,10 +7670,10 @@ var DevExpress;
                     Internal.EventProcessor = EventProcessor;
                     var MobilePaginator = (function () {
                         function MobilePaginator(reportPreview, gallery) {
-                            var _this = this;
+                            var _this_1 = this;
                             this.visible = ko.observable(false).extend({ notify: 'always' });
                             this.text = ko.computed(function () {
-                                setTimeout(function () { _this.visible(true); }, 1);
+                                setTimeout(function () { _this_1.visible(true); }, 1);
                                 if (reportPreview.pageIndex() === -1) {
                                     return DevExpress.Analytics.Utils.getLocalization('0 pages', 'ASPxReportsStringId.WebDocumentViewer_0Pages');
                                 }
@@ -7614,24 +7712,24 @@ var DevExpress;
                     var MobileSearchViewModel = (function (_super) {
                         __extends(MobileSearchViewModel, _super);
                         function MobileSearchViewModel(reportPreview, gallery) {
-                            var _this = _super.call(this, reportPreview) || this;
-                            _this.height = ko.observable(0);
-                            _this["_resultNavigator"]["_disposables"].forEach(function (x) { x.dispose(); });
+                            var _this_1 = _super.call(this, reportPreview) || this;
+                            _this_1.height = ko.observable(0);
+                            _this_1["_resultNavigator"]["_disposables"].forEach(function (x) { x.dispose(); });
                             var _galleryCurrentItemBlocksSubscription;
                             var currentBlocksSubscribe = function (selectedIndex) {
-                                _this._killSubscription(_galleryCurrentItemBlocksSubscription);
-                                _galleryCurrentItemBlocksSubscription = gallery.items()[selectedIndex].blocks.subscribe(function (newBlocks) { return _this.updatePagesInBlocks(newBlocks); });
-                                _this.updatePagesInBlocks(gallery.items()[selectedIndex].blocks());
+                                _this_1._killSubscription(_galleryCurrentItemBlocksSubscription);
+                                _galleryCurrentItemBlocksSubscription = gallery.items()[selectedIndex].blocks.subscribe(function (newBlocks) { return _this_1.updatePagesInBlocks(newBlocks); });
+                                _this_1.updatePagesInBlocks(gallery.items()[selectedIndex].blocks());
                             };
                             var _gallerySelectedIndexSubscription;
                             var currentIndexSubscribe = function () {
-                                _this._killSubscription(_gallerySelectedIndexSubscription);
+                                _this_1._killSubscription(_gallerySelectedIndexSubscription);
                                 _gallerySelectedIndexSubscription = gallery.selectedIndex.subscribe(function (newSelectedIndex) { return currentBlocksSubscribe(newSelectedIndex); });
                                 currentBlocksSubscribe(gallery.selectedIndex());
                             };
-                            _this._disposables.push(gallery.items.subscribe(function (newItems) { return currentIndexSubscribe(); }));
+                            _this_1._disposables.push(gallery.items.subscribe(function (newItems) { return currentIndexSubscribe(); }));
                             currentIndexSubscribe();
-                            _this._disposables.push(_this.searchResult.subscribe(function (newResult) {
+                            _this_1._disposables.push(_this_1.searchResult.subscribe(function (newResult) {
                                 if (!newResult || newResult.length === 0) {
                                     reportPreview.availablePages(null);
                                     reportPreview.pages().forEach(function (page) { return page.resetBrickRecusive(page.brick()); });
@@ -7642,21 +7740,21 @@ var DevExpress;
                                 var blocks = gallery.items()[gallery.selectedIndex()].blocks();
                                 blocks.forEach(function (block) {
                                     block.page && block.page.resetBrickRecusive(block.page.brick());
-                                    _this._updateBricks(block.page, _this.searchResult());
+                                    _this_1._updateBricks(block.page, _this_1.searchResult());
                                 });
                             }));
-                            _this.searchPanelVisible = reportPreview.searchPanelVisible;
-                            _this.editorVisible = ko.observable(false);
-                            _this.searchPanelVisible.subscribe(function (newVal) {
+                            _this_1.searchPanelVisible = reportPreview.searchPanelVisible;
+                            _this_1.editorVisible = ko.observable(false);
+                            _this_1.searchPanelVisible.subscribe(function (newVal) {
                                 if (!newVal || !Settings.SearchAvailable()) {
-                                    _this.stopSearching();
+                                    _this_1.stopSearching();
                                 }
                                 else {
-                                    _this.height(MobileSearchViewModel.maxHeight);
+                                    _this_1.height(MobileSearchViewModel.maxHeight);
                                 }
                             });
-                            _this.enabled = Settings.SearchAvailable;
-                            return _this;
+                            _this_1.enabled = Settings.SearchAvailable;
+                            return _this_1;
                         }
                         MobileSearchViewModel.prototype.focusEditor = function (event) {
                             if (this.searchPanelVisible()) {
@@ -7678,7 +7776,7 @@ var DevExpress;
                             this._disposables.splice(index, 1);
                         };
                         MobileSearchViewModel.prototype._updateBricks = function (page, searchResult) {
-                            var _this = this;
+                            var _this_1 = this;
                             if (page.brick() && searchResult && searchResult.length > 0) {
                                 var results = searchResult.filter(function (x) { return x.pageIndex === page.pageIndex; });
                                 for (var i = 0; i < results.length; i++) {
@@ -7688,15 +7786,15 @@ var DevExpress;
                             else {
                                 var subscription = page.brick.subscribe(function (newVal) {
                                     subscription.dispose();
-                                    _this._updateBricks(page, _this.searchResult());
+                                    _this_1._updateBricks(page, _this_1.searchResult());
                                 });
                             }
                         };
                         MobileSearchViewModel.prototype.updatePagesInBlocks = function (blocks) {
-                            var _this = this;
+                            var _this_1 = this;
                             blocks.forEach(function (block) {
-                                if (block.page && _this.searchResult() && _this.searchResult().length > 0) {
-                                    _this._updateBricks(block.page, _this.searchResult());
+                                if (block.page && _this_1.searchResult() && _this_1.searchResult().length > 0) {
+                                    _this_1._updateBricks(block.page, _this_1.searchResult());
                                 }
                             });
                         };
@@ -7716,9 +7814,9 @@ var DevExpress;
                     var SearchBarModel = (function (_super) {
                         __extends(SearchBarModel, _super);
                         function SearchBarModel(viewModel, element, $searchText) {
-                            var _this = _super.call(this) || this;
-                            _this.viewModel = viewModel;
-                            _this._disposables.push(viewModel.height.subscribe(function (newValue) {
+                            var _this_1 = _super.call(this) || this;
+                            _this_1.viewModel = viewModel;
+                            _this_1._disposables.push(viewModel.height.subscribe(function (newValue) {
                                 if (!newValue) {
                                     element.style.display = "none";
                                 }
@@ -7729,7 +7827,7 @@ var DevExpress;
                                     'opacity': Math.min((newValue / MobileSearchViewModel.maxHeight), 1)
                                 });
                             }));
-                            return _this;
+                            return _this_1;
                         }
                         SearchBarModel.prototype.dispose = function () {
                             this.viewModel.stopSearching();
@@ -7752,7 +7850,7 @@ var DevExpress;
                     };
                     var GalleryModel = (function () {
                         function GalleryModel(preview, previewWrapperSize) {
-                            var _this = this;
+                            var _this_1 = this;
                             this.preview = preview;
                             this.previewWrapperSize = previewWrapperSize;
                             this._spacing = 1;
@@ -7768,7 +7866,7 @@ var DevExpress;
                             this.selectedIndex = ko.observable(0);
                             var oldIndex = this.selectedIndex();
                             this.contentSize = ko.pureComputed(function () {
-                                var blocks = _this.items()[_this.selectedIndex()].blocks();
+                                var blocks = _this_1.items()[_this_1.selectedIndex()].blocks();
                                 var width, height;
                                 if (blocks.length === 1) {
                                     var block = blocks[0];
@@ -7784,63 +7882,63 @@ var DevExpress;
                                 var pageHeight = Math.ceil(preview._pageHeight() * Viewer.Internal.getCurrentResolution(_zoom) / Settings.previewDefaultResolution);
                                 var pageWidth = Math.ceil(preview._pageWidth() * Viewer.Internal.getCurrentResolution(_zoom) / Settings.previewDefaultResolution);
                                 var _containerSize = previewWrapperSize();
-                                var horizontal = (preview.autoFitBy() != Viewer.ZoomAutoBy.PageWidth && (Math.floor(_containerSize.width / (pageWidth + 2 * _this._spacing)))) || 1;
-                                var vertical = Math.floor(_containerSize.height / (pageHeight + 2 * _this._spacing)) || 1;
-                                _this.horizontal(horizontal);
-                                _this.vertical(vertical);
+                                var horizontal = (preview.autoFitBy() != Viewer.ZoomAutoBy.PageWidth && (Math.floor(_containerSize.width / (pageWidth + 2 * _this_1._spacing)))) || 1;
+                                var vertical = Math.floor(_containerSize.height / (pageHeight + 2 * _this_1._spacing)) || 1;
+                                _this_1.horizontal(horizontal);
+                                _this_1.vertical(vertical);
                             };
                             var updateGalleryContent = function () {
                                 _calcHorizontalVertical();
-                                _this.pageCount = _this.horizontal() * _this.vertical();
-                                _this.updateContent(preview, _this.pageCount);
+                                _this_1.pageCount = _this_1.horizontal() * _this_1.vertical();
+                                _this_1.updateContent(preview, _this_1.pageCount);
                             };
                             previewWrapperSize.subscribe(function () {
-                                _this.items().forEach(function (item) { return item.blocks().forEach(function (block) { return block.repaint = true; }); });
+                                _this_1.items().forEach(function (item) { return item.blocks().forEach(function (block) { return block.repaint = true; }); });
                                 updateGalleryContent();
-                                var currentGalleryItem = _this.items()[_this.selectedIndex()];
-                                _this.updateBlocks(currentGalleryItem, _this.pageCount, preview, _this.selectedIndexReal(), preview.animationSettings.zoomEnabled());
-                                _this.repaint.valueHasMutated();
+                                var currentGalleryItem = _this_1.items()[_this_1.selectedIndex()];
+                                _this_1.updateBlocks(currentGalleryItem, _this_1.pageCount, preview, _this_1.selectedIndexReal(), preview.animationSettings.zoomEnabled());
+                                _this_1.repaint.valueHasMutated();
                             });
                             preview.visiblePages.subscribe(function () {
-                                for (var i = 0; i < _this.items().length; i++) {
-                                    _this.items()[i].blocks([]);
-                                    _this.items()[i].realIndex = -1;
+                                for (var i = 0; i < _this_1.items().length; i++) {
+                                    _this_1.items()[i].blocks([]);
+                                    _this_1.items()[i].realIndex = -1;
                                 }
                                 updateGalleryContent();
                             });
                             preview.pageIndex.subscribe(updateGalleryContent);
                             preview._zoom.subscribe(function () {
                                 _calcHorizontalVertical();
-                                var pageCount = _this.horizontal() * _this.vertical();
-                                if (_this.pageCount !== pageCount) {
-                                    _this.pageCount = pageCount;
-                                    _this.items().forEach(function (item) { return item.blocks().forEach(function (block) { return block.repaint = true; }); });
-                                    _this.updateContent(preview, pageCount);
+                                var pageCount = _this_1.horizontal() * _this_1.vertical();
+                                if (_this_1.pageCount !== pageCount) {
+                                    _this_1.pageCount = pageCount;
+                                    _this_1.items().forEach(function (item) { return item.blocks().forEach(function (block) { return block.repaint = true; }); });
+                                    _this_1.updateContent(preview, pageCount);
                                 }
                             });
                             this.selectedIndexReal.subscribe(function (newVal) {
                                 if (newVal >= 0) {
-                                    _this.changePage(preview);
+                                    _this_1.changePage(preview);
                                 }
                                 else if (newVal < 0) {
-                                    _this.selectedIndexReal(0);
+                                    _this_1.selectedIndexReal(0);
                                 }
                             });
                             this.selectedIndex.subscribe(function (newVal) {
                                 var result = newVal - oldIndex;
                                 if (result === -2 || result === 1) {
-                                    _this.selectedIndexReal(_this.selectedIndexReal() + 1);
+                                    _this_1.selectedIndexReal(_this_1.selectedIndexReal() + 1);
                                 }
                                 else if (result === 2 || result === -1) {
-                                    _this.selectedIndexReal(_this.selectedIndexReal() - 1);
+                                    _this_1.selectedIndexReal(_this_1.selectedIndexReal() - 1);
                                 }
                                 oldIndex = newVal;
                             });
                             this.swipeLeftEnable = ko.computed(function () {
-                                return _this.selectedIndexReal() !== 0;
+                                return _this_1.selectedIndexReal() !== 0;
                             });
                             this.swipeRightEnable = ko.computed(function () {
-                                return _this.selectedIndexReal() != (Math.ceil(preview.visiblePages().length / (_this.horizontal() * _this.vertical())) - 1);
+                                return _this_1.selectedIndexReal() != (Math.ceil(preview.visiblePages().length / (_this_1.horizontal() * _this_1.vertical())) - 1);
                             });
                         }
                         GalleryModel.prototype._createBlock = function (previewPage, className, visible) {
@@ -8047,30 +8145,30 @@ var DevExpress;
                     var dxGalleryReportPreview = (function (_super) {
                         __extends(dxGalleryReportPreview, _super);
                         function dxGalleryReportPreview(element, options) {
-                            var _this = _super.call(this, element, options) || this;
-                            _this._animationClassName = "dxrdp-gallery-item-animation";
-                            _this.currentBlockItem = null;
-                            _this.nextBlockItem = null;
-                            _this.initializeBlockItems = function () {
-                                _this.blockItems = [];
-                                var $items = _this["_getAvailableItems"]();
+                            var _this_1 = _super.call(this, element, options) || this;
+                            _this_1._animationClassName = "dxrdp-gallery-item-animation";
+                            _this_1.currentBlockItem = null;
+                            _this_1.nextBlockItem = null;
+                            _this_1.initializeBlockItems = function () {
+                                _this_1.blockItems = [];
+                                var $items = _this_1["_getAvailableItems"]();
                                 for (var i = 0; i < $items.length; i++) {
                                     var left = parseFloat($items[i]["style"].left);
                                     left = isNaN(left) ? 0 : left;
-                                    _this.blockItems.push({
+                                    _this_1.blockItems.push({
                                         element: $($items[i]),
                                         left: left
                                     });
                                 }
                             };
-                            _this.initializeBlockItems();
-                            _this.gallery = _this["option"]("gallery");
-                            _this.gallery.repaint.subscribe(function (newVal) {
-                                if (!_this.gallery.preview._hasActiveEditingFields()) {
-                                    _this.repaint();
+                            _this_1.initializeBlockItems();
+                            _this_1.gallery = _this_1["option"]("gallery");
+                            _this_1.gallery.repaint.subscribe(function (newVal) {
+                                if (!_this_1.gallery.preview._hasActiveEditingFields()) {
+                                    _this_1.repaint();
                                 }
                             });
-                            return _this;
+                            return _this_1;
                         }
                         dxGalleryReportPreview.prototype.repaint = function () {
                             _super.prototype.repaint.call(this);
@@ -8211,21 +8309,21 @@ var DevExpress;
                     var MobilePreviewPage = (function (_super) {
                         __extends(MobilePreviewPage, _super);
                         function MobilePreviewPage(preview, pageIndex, processClick, loading) {
-                            var _this = _super.call(this, preview, pageIndex, processClick, loading) || this;
-                            _this.maxZoom = 1;
-                            _this.selectBrick = function (path, ctrlKey) {
-                                var currentBrick = _this.brick();
-                                !ctrlKey && _this.resetBrickRecusive(currentBrick);
+                            var _this_1 = _super.call(this, preview, pageIndex, processClick, loading) || this;
+                            _this_1.maxZoom = 1;
+                            _this_1.selectBrick = function (path, ctrlKey) {
+                                var currentBrick = _this_1.brick();
+                                !ctrlKey && _this_1.resetBrickRecusive(currentBrick);
                                 if (!path) {
                                     return;
                                 }
                                 if (!currentBrick) {
-                                    _this["_selectedBrickPath"] = path;
+                                    _this_1["_selectedBrickPath"] = path;
                                     return;
                                 }
-                                _this.bricks().forEach(function (brick) { brick.indexes === path && brick.active(true); });
+                                _this_1.bricks().forEach(function (brick) { brick.indexes === path && brick.active(true); });
                             };
-                            return _this;
+                            return _this_1;
                         }
                         return MobilePreviewPage;
                     }(Viewer.Internal.PreviewPage));
@@ -8401,62 +8499,62 @@ var DevExpress;
                     function MobileReportPreview(handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl, mobileSettings) {
                         if (rtl === void 0) { rtl = false; }
                         if (mobileSettings === void 0) { mobileSettings = { readerMode: true, animationEnabled: true }; }
-                        var _this = _super.call(this, handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl) || this;
-                        _this.availablePages = ko.observable(null);
-                        _this.visiblePages = ko.computed(function () {
-                            if (!_this.availablePages()) {
-                                return _this.pages();
+                        var _this_1 = _super.call(this, handlerUri, previewRequestWrapper, previewHandlersHelper, callbacks, rtl) || this;
+                        _this_1.availablePages = ko.observable(null);
+                        _this_1.visiblePages = ko.computed(function () {
+                            if (!_this_1.availablePages()) {
+                                return _this_1.pages();
                             }
                             else {
-                                return _this.pages().filter(function (x) { return _this.availablePages().indexOf(x.pageIndex) !== -1; });
+                                return _this_1.pages().filter(function (x) { return _this_1.availablePages().indexOf(x.pageIndex) !== -1; });
                             }
                         });
-                        _this.topOffset = ko.observable(0);
-                        _this.previewWrapperSize = ko.observable({ width: 0, height: 0 });
-                        _this.searchPanelVisible = ko.observable(false);
-                        _this.actionsVisible = ko.observable(false);
-                        _this.scrollReachedLeft = ko.observable(false);
-                        _this.scrollReachedRight = ko.observable(false);
-                        _this.scrollReachedTop = ko.observable(true);
-                        _this.scrollReachedBottom = ko.observable(true);
-                        _this.zoomUpdating = ko.observable(false);
-                        _this.mobileZoom = ko.computed({
+                        _this_1.topOffset = ko.observable(0);
+                        _this_1.previewWrapperSize = ko.observable({ width: 0, height: 0 });
+                        _this_1.searchPanelVisible = ko.observable(false);
+                        _this_1.actionsVisible = ko.observable(false);
+                        _this_1.scrollReachedLeft = ko.observable(false);
+                        _this_1.scrollReachedRight = ko.observable(false);
+                        _this_1.scrollReachedTop = ko.observable(true);
+                        _this_1.scrollReachedBottom = ko.observable(true);
+                        _this_1.zoomUpdating = ko.observable(false);
+                        _this_1.mobileZoom = ko.computed({
                             read: function () {
-                                var currentZoom = _this.zoom();
-                                return currentZoom > 0 ? currentZoom : _this._zoom();
+                                var currentZoom = _this_1.zoom();
+                                return currentZoom > 0 ? currentZoom : _this_1._zoom();
                             },
                             write: function (newVal) {
-                                _this.zoom(newVal);
+                                _this_1.zoom(newVal);
                             }
                         });
-                        _this.readerMode = mobileSettings.readerMode;
+                        _this_1.readerMode = mobileSettings.readerMode;
                         var globalAnimationEnabled = mobileSettings.animationEnabled;
-                        _this.animationSettings = { zoomEnabled: ko.observable(globalAnimationEnabled), swipeEnabled: ko.observable(globalAnimationEnabled) };
-                        _this.canSwitchToDesigner = false;
-                        _this.autoFitBy(Viewer.ZoomAutoBy.PageWidth);
-                        _this.showMultipagePreview(true);
-                        _this.interactionDisabled = ko.pureComputed(function () { return _this.pages().length === 0; });
-                        _this.searchPanelVisible.subscribe(function (newVal) {
+                        _this_1.animationSettings = { zoomEnabled: ko.observable(globalAnimationEnabled), swipeEnabled: ko.observable(globalAnimationEnabled) };
+                        _this_1.canSwitchToDesigner = false;
+                        _this_1.autoFitBy(Viewer.ZoomAutoBy.PageWidth);
+                        _this_1.showMultipagePreview(true);
+                        _this_1.interactionDisabled = ko.pureComputed(function () { return _this_1.pages().length === 0; });
+                        _this_1.searchPanelVisible.subscribe(function (newVal) {
                             if (newVal) {
-                                _this.actionsVisible(false);
+                                _this_1.actionsVisible(false);
                             }
                         });
-                        return _this;
+                        return _this_1;
                     }
                     MobileReportPreview.prototype.createPage = function (pageIndex, processClick, loading) {
                         return new Internal.MobilePreviewPage(this, pageIndex, processClick, loading);
                     };
                     MobileReportPreview.prototype.createBrickClickProcessor = function (cyclePageIndex) {
-                        var _this = this;
+                        var _this_1 = this;
                         var _clickHandler = _super.prototype.createBrickClickProcessor.call(this, cyclePageIndex);
                         var func = function (brick) {
-                            if (_this.zoomUpdating())
+                            if (_this_1.zoomUpdating())
                                 return;
-                            if (cyclePageIndex !== _this.pageIndex()) {
-                                _this.actionsVisible(false);
-                                var supscription = _this.actionsVisible.subscribe(function (newVal) {
+                            if (cyclePageIndex !== _this_1.pageIndex()) {
+                                _this_1.actionsVisible(false);
+                                var supscription = _this_1.actionsVisible.subscribe(function (newVal) {
                                     supscription.dispose();
-                                    _this.actionsVisible(false);
+                                    _this_1.actionsVisible(false);
                                 });
                             }
                             _clickHandler(brick);
@@ -8492,9 +8590,9 @@ var DevExpress;
                         _super.prototype.goToPage.call(this, pageIndex, forcePage);
                     };
                     MobileReportPreview.prototype.getScrollViewOptions = function () {
-                        var _this = this;
+                        var _this_1 = this;
                         var options = {
-                            onUpdated: function (e) { _this.setScrollReached(e); },
+                            onUpdated: function (e) { _this_1.setScrollReached(e); },
                             direction: 'both',
                             pushBackValue: 0,
                             bounceEnabled: false
@@ -8514,26 +8612,26 @@ var DevExpress;
                     var ParametersPopupModel = (function (_super) {
                         __extends(ParametersPopupModel, _super);
                         function ParametersPopupModel(parametersModel, _reportPreview) {
-                            var _this = _super.call(this) || this;
-                            _this.parametersModel = parametersModel;
-                            _this._reportPreview = _reportPreview;
-                            _this.showIcons = ko.observable(false);
-                            _this.visible = parametersModel.popupInfo.visible;
-                            _this.model = parametersModel;
-                            _this._disposables.push(_this.cancelDisabled = ko.computed(function () {
-                                return _this._reportPreview._currentDocumentId() === null;
+                            var _this_1 = _super.call(this) || this;
+                            _this_1.parametersModel = parametersModel;
+                            _this_1._reportPreview = _reportPreview;
+                            _this_1.showIcons = ko.observable(false);
+                            _this_1.visible = parametersModel.popupInfo.visible;
+                            _this_1.model = parametersModel;
+                            _this_1._disposables.push(_this_1.cancelDisabled = ko.computed(function () {
+                                return _this_1._reportPreview._currentDocumentId() === null;
                             }));
-                            _this.actionButtons = [
-                                { className: "dxrdp-parameters-reset", text: DevExpress.Analytics.Utils.getLocalization('Reset', 'ASPxReportsStringId.ParametersPanel_Reset'), action: _this._reset, disabled: false },
-                                { className: "dxrdp-parameters-cancel", text: DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'), action: _this._cancel, disabled: _this.cancelDisabled },
-                                { className: "dxrdp-parameters-submit", text: DevExpress.Analytics.Utils.getLocalization('Submit', 'ASPxReportsStringId.ParametersPanel_Submit'), action: _this._submit, disabled: false }
+                            _this_1.actionButtons = [
+                                { className: "dxrdp-parameters-reset", text: DevExpress.Analytics.Utils.getLocalization('Reset', 'ASPxReportsStringId.ParametersPanel_Reset'), action: _this_1._reset, disabled: false },
+                                { className: "dxrdp-parameters-cancel", text: DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'), action: _this_1._cancel, disabled: _this_1.cancelDisabled },
+                                { className: "dxrdp-parameters-submit", text: DevExpress.Analytics.Utils.getLocalization('Submit', 'ASPxReportsStringId.ParametersPanel_Submit'), action: _this_1._submit, disabled: false }
                             ];
-                            _this.actionIcons = [
-                                { className: "dxrdp-parameters-reset dxrdp-image-parameters-reset", action: _this._reset, disabled: false },
-                                { className: "dxrdp-parameters-cancel dxrdp-image-parameters-cancel", action: _this._cancel, disabled: _this.cancelDisabled },
-                                { className: "dxrdp-parameters-submit dxrdp-image-parameters-submit", action: _this._submit, disabled: false }
+                            _this_1.actionIcons = [
+                                { className: "dxrdp-parameters-reset dxrdp-image-parameters-reset", action: _this_1._reset, disabled: false },
+                                { className: "dxrdp-parameters-cancel dxrdp-image-parameters-cancel", action: _this_1._cancel, disabled: _this_1.cancelDisabled },
+                                { className: "dxrdp-parameters-submit dxrdp-image-parameters-submit", action: _this_1._submit, disabled: false }
                             ];
-                            return _this;
+                            return _this_1;
                         }
                         ParametersPopupModel.prototype._submit = function (parametersModel, params) {
                             var result = params.validationGroup && params.validationGroup.validate && params.validationGroup.validate();
@@ -8597,6 +8695,9 @@ var DevExpress;
                 JSReportViewer.prototype.GetParametersModel = function () {
                     return this.previewModel && this.previewModel.GetParametersModel();
                 };
+                JSReportViewer.prototype.PerformCustomDocumentOperation = function (customData, hideMessageFromUser) {
+                    return this.previewExists() && this.previewModel.PerformCustomDocumentOperation(customData, hideMessageFromUser);
+                };
                 JSReportViewer.prototype.OpenReport = function (reportName) {
                     return this.previewExists() && this.previewModel.OpenReport(reportName);
                 };
@@ -8633,15 +8734,22 @@ var DevExpress;
             var JSReportViewerBinding = (function (_super) {
                 __extends(JSReportViewerBinding, _super);
                 function JSReportViewerBinding(_options, customEventRaiser) {
-                    var _this = _super.call(this, _options, customEventRaiser) || this;
+                    var _this_1 = _super.call(this, _options, customEventRaiser) || this;
+                    _this_1._deferreds = [];
                     _options.viewerModel = ko.isWriteableObservable(_options.viewerModel) ? _options.viewerModel : ko.observable(null);
-                    _this.sender = new JSReportViewer(_options.viewerModel);
-                    return _this;
+                    _this_1.sender = new JSReportViewer(_options.viewerModel);
+                    return _this_1;
                 }
+                JSReportViewerBinding.prototype.dispose = function () {
+                    (this._deferreds || []).forEach(function (deferred) {
+                        deferred.reject();
+                    });
+                    _super.prototype.dispose.call(this);
+                };
                 JSReportViewerBinding.prototype._initializeEvents = function () {
-                    var _this = this;
+                    var _this_1 = this;
                     return this._getAvailableEvents(EventGenerator.generatePreviewEvents(function (eventName, args) {
-                        _this._fireEvent(eventName, args);
+                        _this_1._fireEvent(eventName, args);
                     }));
                 };
                 JSReportViewerBinding.prototype._initializeCallbacks = function () {
@@ -8665,7 +8773,7 @@ var DevExpress;
                     this._fireEvent("Init");
                 };
                 JSReportViewerBinding.prototype.applyBindings = function (element) {
-                    var _this = this;
+                    var _this_1 = this;
                     var _$element = $(element);
                     _$element.addClass("dx-designer");
                     if (this._options.reportPreview && this._options.parts) {
@@ -8675,21 +8783,21 @@ var DevExpress;
                     var requestOptions = this._options.requestOptions;
                     var applyModel = function () {
                         if (requestOptions && requestOptions.invokeAction) {
-                            _this._options.handlerUri = _this._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
+                            _this_1._options.handlerUri = _this_1._getServerActionUrl(requestOptions.host, requestOptions.invokeAction);
                         }
-                        _this._createModel(element)
+                        _this_1._deferreds.push(_this_1._createModel(element)
                             .done(function (result) {
-                            _this.sender.previewModel = result;
-                            if (_this._options.reportUrl) {
-                                if (ko.isSubscribable(_this._options.reportUrl)) {
-                                    _this._disposables.push(_this._options.reportUrl.subscribe(function (newVal) {
-                                        _this.sender.OpenReport(newVal);
+                            _this_1.sender.previewModel = result;
+                            if (_this_1._options.reportUrl) {
+                                if (ko.isSubscribable(_this_1._options.reportUrl)) {
+                                    _this_1._disposables.push(_this_1._options.reportUrl.subscribe(function (newVal) {
+                                        _this_1.sender.OpenReport(newVal);
                                     }));
                                 }
                             }
-                            _this._createDisposeFunction(element);
-                            _this._applyBindings(_this.sender.previewModel, _$element);
-                        });
+                            _this_1._createDisposeFunction(element);
+                            _this_1._applyBindings(_this_1.sender.previewModel, _$element);
+                        }));
                     };
                     if (requestOptions) {
                         this._getLocalizationRequest().done(function (localization) {
@@ -8961,8 +9069,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrp-character-comb-editing-field': '<div class="dxrp-editing-field-charactercomb" data-bind="style: containerStyle(), dxclick: activateEditor, zoom: zoom, css: { active: active(), readonly: field.readOnly() }">        <!-- ko if: !active() || field.readOnly()  -->        <!-- ko foreach: cells -->        <div class="dxrp-editing-field-charactercomb-cell" data-bind="style: style, text: text"></div>        <!-- /ko -->        <!-- /ko -->        <!-- ko if: active() && !field.readOnly() -->        <textarea style="background:white" class="dxrp-editing-field-text" data-bind="value: field._editorValue, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>        <!--/ko-->    </div>',
     'dxrd-preview-export-options': '<div class="dxrd-preview-export-options-wrapper dxrd-preview-property-wrapper" data-bind="visible: active() && visible()">    <div class="dxrd-right-panel-header dxd-text-primary">        <span data-bind="text: $root.getLocalization(\'Export Options\', \'DevExpress.XtraReports.UI.XtraReport.ExportOptions\')"></span>    </div>    <!-- ko if: model-->    <div class="dxrd-right-panel-body" data-bind="dxScrollView: { showScrollbar: \'onHover\', useNative: false, scrollByThumb: true }">        <div class="dx-fieldset">            <div data-bind="dxPropertyGrid: { target: model }"></div>        </div>    </div>    <!-- /ko --></div>',
     'dxrd-preview-export-to': '<div class="dxrd-preview-export-toolbar-item dxrd-toolbar-item" data-bind="visible: visible">        <div class="dxrd-preview-export-to dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxMenu: { disabled: $data.disabled(), items: items, cssClass: \'dxrdp-export-to-menu\', onItemClick: clickAction, onSubmenuShowing: function(e) { e.submenu._overlay.option(\'container\', $root.getPopupContainer($element)) } }, attr: { title: $root.getLocalization(text, $data.textId) }">            <div class="dxrd-preview-export-menu-item" data-options="dxTemplate: { name: \'item\' }" data-bind="attr: { title: $root.getLocalization(text, $data.textId) }">                <!--ko if: $data.format -->                <div class="dxrd-preview-export-item-text" data-bind="text: $root.getLocalization($data.text, $data.textId)"></div>                <!-- /ko -->                <!--ko ifnot: $data.format -->                <div class="dxrd-preview-export-item-image-wrapper">                    <div class="dxrd-preview-export-item-image" data-bind="css: ko.unwrap($data.imageClassName), template: ko.unwrap($data.imageTemplateName)"> </div>                </div>                <div class="dx-menu-item-popout-container">                    <div class="dx-menu-item-popout"></div>                </div>                <!-- /ko -->            </div>        </div>        <div class="dxrd-toolbar-item-separator dxd-toolbar-separator-color dxd-border-secondary" data-bind="visible: $data.hasSeparator"></div>    </div>',
-    'dxrd-page-brick': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->        <!-- ko foreach: ($data.bricks || []) -->        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->        <!--/ko-->        <!--/ko-->    </div>',
-    'dxrd-page-brick-clickable': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->    </div>',
+    'dxrd-page-brick-clickable': '<div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); event.stopPropagation(); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { \'dxrd-report-preview-brick-selected\': $data.active, \'dxrd-report-preview-brick-selectable\': !($data.bricks) }">        <!-- ko if: $data.navigation -->        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { \'dxrdp-navigation-brick-drill-down\' : !!navigation.drillDownKey, \'dxrdp-navigation-brick-sorting\' : !!navigation.sortData }"></div>        <!--/ko-->    </div>',
     'dxrd-preview-page': '<div class="dxrd-report-preview-content" style="position: relative; width: 100%; height: 100%" data-bind="dxclick: clickToBrick, \'brick-selection-prog\': { page: $data, preview: $parent, click: function(pageIndex) { $parent.goToPage(pageIndex) } }">        <div class="dxrd-report-preview-content-loading-wrapper" style="background: white;" data-bind="styleunit: { \'width\': width() + 2, \'height\': height() + 2 }, visible: pageLoading">            <div class="dxrd-report-preview-content-loading-panel" style="text-align: center;" data-bind="styleunit: { \'paddingTop\': height() / 2.3 }">                <div class="dxrd-report-preview-content-loading-panel-text" data-bind="text: loadingText"></div>            </div>        </div>        <img style="pointer-events: none; width: 100%; height: 100%;" data-bind="attr: { src: displayImageSrc }" />        <!-- ko foreach: activeBricks -->        <!-- ko template: { name: "dxrd-page-brick-mobile", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko foreach: clickableBricks -->        <!-- ko template: { name: "dxrd-page-brick-clickable", data: $data } -->        <!--/ko-->        <!--/ko-->        <!-- ko if: !brickLoading() && $data.editingFields-->        <!-- ko foreach: editingFields -->        <!-- ko template: template -->        <!--/ko-->        <!--/ko-->        <!--/ko-->    </div>',
     'dxrd-zoom-autofit-select-template': '<div class="dxrd-toolbar-item-zoom" data-bind="visible: visible">        <div class="dxrd-toolbar-item-zoom-editor" data-bind="dxSelectBox: { items: zoomItems, value: $data.zoom, displayExpr: displayExpr, displayCustomValue: true, acceptCustomValue: true, onCustomItemCreating: onCustomItemCreating, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>    </div>',
     'dxrd-preview-toolbar-scrollable': '<div class="dxrd-toolbar-wrapper dxrdp-toolbar-scrollable" data-bind="dxScrollView: { showScrollbar: \'onHover\', direction: \'horizontal\', useNative: false, scrollByThumb: true }">        <div class="dxrd-toolbar" data-bind="template: {name: \'dxrd-toolbar-tmplt\', data: actionLists.toolbarItems }, keyDownActions: actionLists"></div>    </div>',

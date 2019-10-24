@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (templates.html)
-* Version: 19.1.6
-* Build date: 2019-09-10
+* Version: 19.1.7
+* Build date: 2019-10-14
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1351,7 +1351,7 @@
 <script type="text/html" id="dx-commonCollectionItem">
     <div data-bind="dxPropertyGrid: { target: value, level: editor.level + 1, parentDisabled: editor.disabled }"></div>
 </script>
-<script type="text/javascript" id="item-with-title">
+<script type="text/html" id="item-with-title">
     <div class="dx-listitem-with-title" data-bind="text: $data.display, attr: { title: $data.display }"></div>
 </script>
 
@@ -2703,8 +2703,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 19.1.6
-* Build date: 2019-09-10
+* Version: 19.1.7
+* Build date: 2019-10-16
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3010,20 +3010,8 @@
     </div>
 </script>
 
-<script type="text/html" id="dxrd-page-brick">
-    <div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
-        <!-- ko if: $data.navigation -->
-        <div class="dxrd-report-preview-brick-navigation" data-bind="css: { 'dxrdp-navigation-brick-drill-down' : !!navigation.drillDownKey, 'dxrdp-navigation-brick-sorting' : !!navigation.sortData }"></div>
-        <!--/ko-->
-        <!-- ko foreach: ($data.bricks || []) -->
-        <!-- ko lazy: { template: { name: "dxrd-page-brick" } } -->
-        <!--/ko-->
-        <!--/ko-->
-    </div>
-</script>
-
 <script type="text/html" id="dxrd-page-brick-clickable">
-    <div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
+    <div class="dxrd-report-preview-brick" data-bind="dxclick: function(_, event){ onClick(event); event.stopPropagation(); }, style: { top: topP, left: $data.leftP, right: $data.rightP, height: heightP, width: widthP }, css: { 'dxrd-report-preview-brick-selected': $data.active, 'dxrd-report-preview-brick-selectable': !($data.bricks) }">
         <!-- ko if: $data.navigation -->
         <div class="dxrd-report-preview-brick-navigation" data-bind="css: { 'dxrdp-navigation-brick-drill-down' : !!navigation.drillDownKey, 'dxrdp-navigation-brick-sorting' : !!navigation.sortData }"></div>
         <!--/ko-->
@@ -3346,8 +3334,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 19.1.6
-* Build date: 2019-09-10
+* Version: 19.1.7
+* Build date: 2019-10-16
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3548,8 +3536,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 19.1.6
-* Build date: 2019-09-10
+* Version: 19.1.7
+* Build date: 2019-10-16
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

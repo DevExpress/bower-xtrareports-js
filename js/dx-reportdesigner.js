@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.js)
-* Version: 19.1.6
-* Build date: 2019-09-09
+* Version: 19.1.7
+* Build date: 2019-10-16
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1098,11 +1098,18 @@ var DevExpress;
                             var _this = _super.call(this, DevExpress.Analytics.Internal.cutRefs(model), serializer, Internal.chartSerializationsInfo) || this;
                             var oldType = ko.observable("");
                             _this._createDiagram(model["Diagram"], oldType, serializer);
-                            ko.computed(function () {
+                            _this._disposables.push(ko.computed(function () {
                                 _this._createDiagram({}, oldType, serializer);
-                            });
+                            }));
                             _this.titles = deserializeModelArray(model && model.Titles, function (title, parent) { return new Models.TitleViewModel(title, parent, serializer); }, Models.TitleViewModel.prefix);
                             _this.legends = deserializeModelArray(model && model.Legends, function (legends, parent) { return new Models.AdditionalLegendViewModel(legends, parent, serializer); }, Models.AdditionalLegendViewModel.prefix);
+                            _this._patchSeries(_this.dataContainer.seriesTemplate);
+                            _this._disposables.push(_this.dataContainer.series.subscribe(function (changes) {
+                                changes.filter(function (x) { return x.status === "added"; }).forEach(function (change) {
+                                    _this._patchSeries(change.value);
+                                });
+                            }, undefined, "arrayChange"));
+                            _this.dataContainer.series().forEach(function (series) { return _this._patchSeries(series); });
                             var actions = [
                                 {
                                     text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
@@ -1198,6 +1205,22 @@ var DevExpress;
                         };
                         ChartViewModel.toJson = function (value, serializer, refs) {
                             return serializer.serialize(value, Internal.chartSerializationsInfo, refs);
+                        };
+                        ChartViewModel.prototype._patchView = function (view) {
+                            var _this = this;
+                            var info = view.getInfo();
+                            ["barDistance", "barDistanceFixed"].forEach(function (propertyName) {
+                                if (info.filter(function (x) { return x.propertyName === propertyName; }).length > 0) {
+                                    view[propertyName] = _this[propertyName];
+                                }
+                            });
+                        };
+                        ChartViewModel.prototype._patchSeries = function (series) {
+                            var _this = this;
+                            series._disposables.push(series.view.subscribe(function (newVal) {
+                                _this._patchView(newVal);
+                            }));
+                            this._patchView(series.view());
                         };
                         ChartViewModel.prototype._createDiagram = function (model, oldType, serializer) {
                             if (model) {
@@ -1505,8 +1528,8 @@ var DevExpress;
                 };
                 var stepAreaSeriesViewinfo = [invertedStep3, viewBorder1, viewFillStyle, markerOptions, transparency3, viewMarkerVisibility, viewEnableAntialiasing, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var stackedGroup = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.StackedGroup", editor: Internal.editorTemplates.group, defaultVal: null };
-                var barDistance = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBar3DSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var viewBarWidth = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarWidth", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
                 var barDepth = { propertyName: "barDepth", modelName: "@BarDepth", displayName: "Bar Depth", localizationId: "DevExpress.XtraCharts.Bar3DSeriesView.BarDepth", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
@@ -1523,8 +1546,8 @@ var DevExpress;
                 var colorEach2 = { propertyName: "colorEach", modelName: "@ColorEach", displayName: "Color Each", localizationId: "DevExpress.XtraCharts.SeriesView3DColorEachSupportBase.ColorEach", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: false };
                 var sideBySideFullStackedBar3DSeriesViewinfo = [stackedGroup, barDistance, barDistanceFixed, equalBarWidth, viewBarWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Internal.tag,];
                 var stackedGroup1 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.StackedGroup", editor: Internal.editorTemplates.group, defaultVal: null };
-                var barDistance1 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed1 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance1 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed1 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth1 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideFullStackedBarSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var barWidth1 = { propertyName: "barWidth", modelName: "@BarWidth", displayName: "Bar Width", localizationId: "DevExpress.XtraCharts.BarSeriesView.BarWidth", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0.6, editorOptions: { min: 0 } };
                 var border3 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.BarSeriesView.Border", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: borderInfo, };
@@ -1532,13 +1555,13 @@ var DevExpress;
                 var transparency5 = { propertyName: "transparency", modelName: "@Transparency", displayName: "Transparency", localizationId: "DevExpress.XtraCharts.BarSeriesView.Transparency", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
                 var sideBySideFullStackedBarSeriesViewinfo = [stackedGroup1, barDistance1, barDistanceFixed1, equalBarWidth1, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var stackedGroup2 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.StackedGroup", editor: Internal.editorTemplates.group, defaultVal: null };
-                var barDistance2 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed2 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance2 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed2 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth2 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideStackedBar3DSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var sideBySideStackedBar3DSeriesViewinfo = [stackedGroup2, barDistance2, barDistanceFixed2, equalBarWidth2, viewBarWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Internal.tag,];
                 var stackedGroup3 = { propertyName: "stackedGroup", modelName: "@StackedGroupSerializable", displayName: "Stacked Group", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.StackedGroup", editor: Internal.editorTemplates.group, defaultVal: null };
-                var barDistance3 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed3 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance3 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed3 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth3 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideStackedBarSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var sideBySideStackedBarSeriesViewinfo = [stackedGroup3, barDistance3, barDistanceFixed3, equalBarWidth3, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var lineThickness = { propertyName: "lineThickness", modelName: "@LineThickness", displayName: "Line Thickness", localizationId: "DevExpress.XtraCharts.Line3DSeriesView.LineThickness", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 5, editorOptions: { min: 1 } };
@@ -1632,8 +1655,8 @@ var DevExpress;
                 var radarAreaSeriesViewinfo = [border6, fillStyle2, markerOptions1, transparency1, markerVisibility1, aggregateFunction1, shadow1, viewColorEach, color1, Internal.tag,];
                 var stackedArea3DSeriesViewinfo = [areaWidth, aggregateFunction2, transparency4, color1, Internal.tag,];
                 var fullStackedBar3DSeriesViewinfo = [viewBarWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Internal.tag,];
-                var barDistance4 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed4 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance4 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed4 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth4 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideBar3DSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var sideBySideBar3DSeriesViewinfo = [barDistance4, barDistanceFixed4, equalBarWidth4, viewBarWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Internal.tag,];
                 var stackedBar3DSeriesViewinfo = [viewBarWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Internal.tag,];
@@ -1675,8 +1698,8 @@ var DevExpress;
                 };
                 var overlappedGanttSeriesViewinfo = [linkOptions, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var radarPointSeriesViewinfo = [pointMarkerOptions, aggregateFunction1, shadow1, viewColorEach, color1, Internal.tag,];
-                var barDistance5 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed5 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance5 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed5 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth5 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideGanttSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var sideBySideGanttSeriesViewinfo = [barDistance5, barDistanceFixed5, equalBarWidth5, linkOptions, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var areaSeriesViewinfo = [viewBorder1, viewFillStyle, markerOptions, transparency3, viewMarkerVisibility, viewEnableAntialiasing, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
@@ -1708,12 +1731,12 @@ var DevExpress;
                 var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Internal.tag, totalLabel];
                 var pointMarkerOptions1 = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
                 var pointSeriesViewinfo = [pointMarkerOptions1, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
-                var barDistance6 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed6 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance6 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed6 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth6 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var sideBySideBarSeriesViewinfo = [barDistance6, barDistanceFixed6, equalBarWidth6, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
-                var barDistance7 = { propertyName: "barDistance", modelName: "@BarDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
-                var barDistanceFixed7 = { propertyName: "barDistanceFixed", modelName: "@BarDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
+                var barDistance7 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
+                var barDistanceFixed7 = { propertyName: "barDistanceFixed", displayName: "Bar Distance Fixed", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.BarDistanceFixed", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { format: "#0" } };
                 var equalBarWidth7 = { propertyName: "equalBarWidth", modelName: "@EqualBarWidth", displayName: "Equal Bar Width", localizationId: "DevExpress.XtraCharts.SideBySideRangeBarSeriesView.EqualBarWidth", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
                 var sideBySideRangeBarSeriesViewinfo = [barDistance7, barDistanceFixed7, equalBarWidth7, minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var stackedAreaSeriesViewinfo = [viewBorder1, viewFillStyle, transparency, viewEnableAntialiasing, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
@@ -2522,6 +2545,7 @@ var DevExpress;
                     "OverlappedGanttSeriesView": gantObject,
                     "SideBySideGanttSeriesView": gantObject
                 };
+                var sideBySideBarDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@SideBySideBarDistanceFixed", defaultVal: 1 }, sideBySideBarDistance = { propertyName: "barDistance", modelName: "@SideBySideBarDistance", defaultVal: 0.0 };
                 var seriesPointsSorting = {
                     propertyName: "seriesPointsSorting", modelName: "@SeriesPointsSorting", displayName: "Series Points Sorting", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [{ value: "None", displayValue: "None", localizationId: 'DevExpress.XtraReports.UI.MultiColumnMode.None' }, { value: "Ascending", displayValue: "Ascending", localizationId: 'DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending' }, { value: "Descending", displayValue: "Descending", localizationId: 'DevExpress.XtraReports.UI.XRColumnSortOrder.Descending' }],
                     localizationId: 'DevExpress.XtraCharts.SeriesBase.SeriesPointsSorting'
@@ -2707,7 +2731,7 @@ var DevExpress;
                     propertyName: "paletteName", modelName: "@PaletteName", displayName: "Palette Name", defaultVal: "Default", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Default", displayValue: "Default", localizationId: 'DevExpress.XtraReports.UI.WinControlPrintMode.Default' }, { value: "Nature Colors", displayValue: "Nature Colors", localizationId: 'ChartStringId.AppNatureColors' }, { value: "Pastel Kit", displayValue: "Pastel Kit", localizationId: 'ChartStringId.AppPastelKit' }, { value: "In A Fog", displayValue: "In A Fog", localizationId: 'ChartStringId.AppInAFog' }, { value: "Terracotta Pie", displayValue: "Terracotta Pie", localizationId: 'ChartStringId.PltTerracottaPie' }, { value: "Northern Lights", displayValue: "Northern Lights", localizationId: 'ChartStringId.PltNorthernLights' }, { value: "Chameleon", displayValue: "Chameleon", localizationId: 'ChartStringId.AppChameleon' }, { value: "The Trees", displayValue: "The Trees", localizationId: 'ChartStringId.PltTheTrees' }, { value: "Mixed", displayValue: "Mixed", localizationId: 'ChartStringId.PltMixed' }, { value: "Office", displayValue: "Office", localizationId: 'ChartStringId.PltOffice' }, { value: "Black and White", displayValue: "Black and White", localizationId: 'ChartStringId.PltBlackAndWhite' }, { value: "Grayscale", displayValue: "Grayscale", localizationId: 'ChartStringId.PltGrayscale' }, { value: "Apex", displayValue: "Apex", localizationId: 'ChartStringId.PltApex' }, { value: "Aspect", displayValue: "Aspect", localizationId: 'ChartStringId.PltAspect' }, { value: "Civic", displayValue: "Civic", localizationId: 'ChartStringId.PltCivic' }, { value: "Concourse", displayValue: "Concourse", localizationId: 'ChartStringId.PltConcourse' }, { value: "Equity", displayValue: "Equity", localizationId: 'ChartStringId.PltEquity' }, { value: "Flow", displayValue: "Flow", localizationId: 'ChartStringId.PltFlow' }, { value: "Foundry", displayValue: "Foundry", localizationId: 'ChartStringId.PltFoundry' }, { value: "Median", displayValue: "Median", localizationId: 'DevExpress.XtraReports.UI.SortingSummaryFunction.Median' }, { value: "Metro", displayValue: "Metro", localizationId: 'ChartStringId.PltMetro' }, { value: "Module", displayValue: "Module", localizationId: 'DevExpress.XtraReports.UI.XRBarCode.Module' }, { value: "Opulent", displayValue: "Opulent", localizationId: 'ChartStringId.PltOpulent' }, { value: "Oriel", displayValue: "Oriel", localizationId: 'ChartStringId.PltOriel' }, { value: "Origin", displayValue: "Origin", localizationId: 'ChartStringId.PltOrigin' }, { value: "Paper", displayValue: "Paper", localizationId: 'ChartStringId.PltPaper' }, { value: "Solstice", displayValue: "Solstice", localizationId: 'ChartStringId.PltSolstice' }, { value: "Technic", displayValue: "Technic", localizationId: 'ChartStringId.PltTechnic' }, { value: "Trek", displayValue: "Trek", localizationId: 'ChartStringId.PltTrek' }, { value: "Urban", displayValue: "Urban", localizationId: 'ChartStringId.PltUrban' }, { value: "Verve", displayValue: "Verve", localizationId: 'ChartStringId.PltVerve' }, { value: "Office2013", displayValue: "Office2013" }, { value: "Blue Warm", displayValue: "Blue Warm", localizationId: 'ChartStringId.PltBlueWarm' }, { value: "Blue", displayValue: "Blue", localizationId: 'ChartStringId.PltBlue' }, { value: "Blue II", displayValue: "Blue II", localizationId: 'ChartStringId.PltBlueII' }, { value: "Blue Green", displayValue: "Blue Green", localizationId: 'ChartStringId.PltBlueGreen' }, { value: "Green", displayValue: "Green", localizationId: 'ChartStringId.PltGreen' }, { value: "Green Yellow", displayValue: "Green Yellow", localizationId: 'ChartStringId.PltGreenYellow' }, { value: "Yellow", displayValue: "Yellow", localizationId: 'ChartStringId.PltYellow' }, { value: "Yellow Orange", displayValue: "Yellow Orange", localizationId: 'ChartStringId.PltYellowOrange' }, { value: "Orange", displayValue: "Orange", localizationId: 'ChartStringId.PltOrange' }, { value: "Orange Red", displayValue: "Orange Red", localizationId: 'ChartStringId.PltOrangeRed' }, { value: "Red Orange", displayValue: "Red Orange", localizationId: 'ChartStringId.PltRedOrange' }, { value: "Red", displayValue: "Red", localizationId: 'ChartStringId.PltRed' }, { value: "Red Violet", displayValue: "Red Violet", localizationId: 'ChartStringId.PltRedViolet' }, { value: "Violet", displayValue: "Violet", localizationId: 'ChartStringId.PltViolet' }, { value: "Violet II", displayValue: "Violet II", localizationId: 'ChartStringId.PltVioletII' }, { value: "Marquee", displayValue: "Marquee", localizationId: 'ChartStringId.PltMarquee' }, { value: "Slipstream", displayValue: "Slipstream", localizationId: 'ChartStringId.PltSlipstream' }],
                     localizationId: 'DevExpress.XtraReports.UI.XRChart.PaletteName'
                 };
-                Internal.chartSerializationsInfo = [Internal.appearanceName, Internal.paletteName, Internal.dataContainer, Internal.diagram, Internal.titles, Internal.legend, Internal.legends];
+                Internal.chartSerializationsInfo = [Internal.appearanceName, Internal.paletteName, sideBySideBarDistanceFixed, sideBySideBarDistance, Internal.dataContainer, Internal.diagram, Internal.titles, Internal.legend, Internal.legends];
                 Internal.chart = { propertyName: "chart", modelName: "Chart", displayName: "Chart", from: Internal.Models.ChartViewModel.from, toJsonObject: Internal.Models.ChartViewModel.toJson, localizationId: 'DevExpress.XtraReports.UI.XRChart' };
                 Internal.chartDataMember = { propertyName: "dataMember", displayName: "Data Member", defaultVal: "", editor: ko.bindingHandlers["displayNameExtender"] ? DevExpress.Analytics.Widgets.editorTemplates.dataMember : Internal.editorTemplates.dataMemberChart, localizationId: 'DevExpress.XtraReports.UI.XRSparkline.DataMember' };
                 Internal.chartSeriesDataMember = { propertyName: "seriesDataMember", displayName: "Series Data Member", defaultVal: "", editor: Internal.editorTemplates.fieldChart, localizationId: 'DevExpress.XtraReports.UI.XRChart.SeriesDataMember' };
@@ -13004,13 +13028,15 @@ var DevExpress;
                     dxEventDropDownEditor.prototype._init = function () {
                         _super.prototype._init.call(this);
                         this._initSecondAction();
-                        this._koContext = ko.contextFor(this["element"]()[0]);
+                        var $element = $(this["element"]());
+                        this._koContext = ko.contextFor($element[0]);
                     };
                     dxEventDropDownEditor.prototype._initSecondAction = function () {
                         this._secondAction = this["_createAction"](this.option("secondAction"));
                     };
                     dxEventDropDownEditor.prototype._render = function () {
-                        this["element"]().addClass(EDITOR_CLASS);
+                        var $element = $(this["element"]());
+                        $element.addClass(EDITOR_CLASS);
                         _super.prototype._render.call(this);
                     };
                     dxEventDropDownEditor.prototype._renderDropDownButton = function () {
@@ -17514,6 +17540,41 @@ var DevExpress;
                         }
                         return accumulator;
                     };
+                    Object.defineProperty(XRControlSurfaceBase.prototype, "_unitAbsoluteRect", {
+                        get: function () {
+                            var parentAbsoluteRect = this.parent && this.parent["_unitAbsoluteRect"];
+                            if (parentAbsoluteRect) {
+                                return {
+                                    top: parentAbsoluteRect.top + this._unitRect.top,
+                                    left: parentAbsoluteRect.left + this._unitRect.left,
+                                    right: parentAbsoluteRect.left + this._unitRect.left + this._unitRect.width,
+                                    bottom: parentAbsoluteRect.top + this._unitRect.top + this._unitRect.height,
+                                    width: this._unitRect.width,
+                                    height: this._unitRect.height
+                                };
+                            }
+                            else {
+                                return this._unitRect;
+                            }
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
+                    Object.defineProperty(XRControlSurfaceBase.prototype, "_unitRect", {
+                        get: function () {
+                            var location = this._control["location"] || new DevExpress.Analytics.Elements.Point(0, 0), size = this._control["size"] || new DevExpress.Analytics.Elements.Size(0, 0);
+                            return {
+                                top: location.y(),
+                                left: location.x(),
+                                right: location.x() + size.width(),
+                                bottom: location.y() + size.height(),
+                                width: size.width(),
+                                height: size.height()
+                            };
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
                     XRControlSurfaceBase.prototype.checkParent = function (surfaceParent) {
                         var thisParent = this.parent instanceof Bands.BandSurface || this.parent instanceof Controls.ReportSurface ? null : this.parent;
                         var anotherParent = surfaceParent instanceof Bands.BandSurface || this.parent instanceof Controls.ReportSurface ? null : surfaceParent;
@@ -17521,10 +17582,10 @@ var DevExpress;
                     };
                     XRControlSurfaceBase.prototype.isThereIntersection = function (rect1, rect2) {
                         var rect1Right = rect1.right || rect1.left + rect1.width, rect2Right = rect2.right || rect2.left + rect2.width, rect1Bottom = rect1.bottom || rect1.top + rect1.height, rect2Bottom = rect2.bottom || rect2.top + rect2.height;
-                        return rect1Right > rect2.left && Math.abs(rect1Right - rect2.left) > this.delta &&
-                            rect2Right > rect1.left && Math.abs(rect2Right - rect1.left) > this.delta &&
-                            rect1Bottom > rect2.top && Math.abs(rect1Bottom - rect2.top) > this.delta &&
-                            rect2Bottom > rect1.top && Math.abs(rect2Bottom - rect1.top) > this.delta;
+                        return rect1Right > rect2.left && Math.abs(rect1Right - rect2.left) > 0.00001 &&
+                            rect2Right > rect1.left && Math.abs(rect2Right - rect1.left) > 0.00001 &&
+                            rect1Bottom > rect2.top && Math.abs(rect1Bottom - rect2.top) > 0.00001 &&
+                            rect2Bottom > rect1.top && Math.abs(rect2Bottom - rect1.top) > 0.00001;
                     };
                     XRControlSurfaceBase.prototype.isThereIntersectionWithParent = function (parentRect, childRect) {
                         var rectWidhtElement = childRect.right || childRect.left + childRect.width, rectHeightElement = childRect.bottom || childRect.top + childRect.height;
@@ -17545,9 +17606,11 @@ var DevExpress;
                         }
                     };
                     XRControlSurfaceBase.prototype.isThereIntersectionWithCrossBandControls = function (currentRect) {
-                        if (currentRect === void 0) { currentRect = this.absoluteRect(); }
+                        if (currentRect === void 0) { currentRect = this._unitAbsoluteRect; }
+                        if (!currentRect)
+                            return false;
                         var isThereIntersection = false, crossBandControls = this.getRoot()["crossBandControls"]();
-                        if (this.isThereIntersectionWithNeighborsCollection(currentRect, crossBandControls.filter(function (control) { return control.visible() && control.getControlModel().controlType === "XRCrossBandLine"; }), "rect")) {
+                        if (this.isThereIntersectionWithNeighborsCollection(currentRect, crossBandControls.filter(function (control) { return control.visible() && control.getControlModel().controlType === "XRCrossBandLine"; }), "_unitAbsoluteRect")) {
                             return true;
                         }
                         var crossBandBoxControls = crossBandControls.filter(function (control) { return control.visible() && control.getControlModel().controlType === "XRCrossBandBox"; });
@@ -17568,33 +17631,34 @@ var DevExpress;
                     };
                     XRControlSurfaceBase.prototype.isThereIntersectionWithControls = function () {
                         var collectionControls = this.parent && this.parent.getChildrenCollection() && this.parent.getChildrenCollection()().filter(function (control) { return !control.isIntersectionDeny; }) || [];
-                        return this.isThereIntersectionWithParentCollection(this.rect())
-                            || this.isThereIntersectionWithChildCollection(this.rect())
-                            || this.isThereIntersectionWithNeighborsCollection(this.rect(), collectionControls);
+                        return this.isThereIntersectionWithParentCollection(this._unitRect)
+                            || this.isThereIntersectionWithChildCollection()
+                            || this.isThereIntersectionWithNeighborsCollection(this._unitRect, collectionControls);
                     };
                     XRControlSurfaceBase.prototype.isThereIntersectionWithParentCollection = function (currentRect, controlRectProperty) {
-                        if (controlRectProperty === void 0) { controlRectProperty = "rect"; }
+                        if (controlRectProperty === void 0) { controlRectProperty = "_unitRect"; }
                         return this.parent && this.parent instanceof Controls.XRControlSurfaceBase &&
-                            this.parent[controlRectProperty] && this.isThereIntersectionWithParent(this.parent[controlRectProperty](), currentRect);
+                            this.parent[controlRectProperty] && this.isThereIntersectionWithParent(this.parent[controlRectProperty], currentRect);
                     };
-                    XRControlSurfaceBase.prototype.isThereIntersectionWithChildCollection = function (currentRect, controlRectProperty) {
-                        if (controlRectProperty === void 0) { controlRectProperty = "rect"; }
+                    XRControlSurfaceBase.prototype.isThereIntersectionWithChildCollection = function (controlRectProperty) {
+                        if (controlRectProperty === void 0) { controlRectProperty = "_unitRect"; }
                         return this["controls"] && this["controls"]().length > 0 &&
-                            this.isThereIntersectionWithChildControls(currentRect, this["controls"](), controlRectProperty);
+                            this.isThereIntersectionWithChildControls(this["controls"](), controlRectProperty);
                     };
                     XRControlSurfaceBase.prototype.isThereIntersectionWithNeighborsCollection = function (currentRect, collectionControls, controlRectProperty) {
-                        if (controlRectProperty === void 0) { controlRectProperty = "rect"; }
+                        if (controlRectProperty === void 0) { controlRectProperty = "_unitRect"; }
                         for (var i = 0; i < collectionControls.length; i++) {
-                            if (this !== collectionControls[i] && this.isThereIntersection(currentRect, collectionControls[i][controlRectProperty]())) {
+                            if (this !== collectionControls[i] && this.isThereIntersection(currentRect, collectionControls[i][controlRectProperty])) {
                                 return true;
                             }
                         }
                         return false;
                     };
-                    XRControlSurfaceBase.prototype.isThereIntersectionWithChildControls = function (currentRect, collectionControls, controlRectProperty) {
-                        if (controlRectProperty === void 0) { controlRectProperty = "rect"; }
+                    XRControlSurfaceBase.prototype.isThereIntersectionWithChildControls = function (collectionControls, controlRectProperty) {
+                        if (controlRectProperty === void 0) { controlRectProperty = "_unitRect"; }
+                        var currentRect = this[controlRectProperty];
                         for (var i = 0; i < collectionControls.length; i++) {
-                            if (this !== collectionControls[i] && this.isThereIntersectionWithParent(currentRect, collectionControls[i][controlRectProperty]())) {
+                            if (this !== collectionControls[i] && this.isThereIntersectionWithParent(currentRect, collectionControls[i][controlRectProperty])) {
                                 return true;
                             }
                         }
@@ -18868,10 +18932,10 @@ var DevExpress;
                     Metadata.cellVerticalSpacing = { propertyName: "verticalSpacing", modelName: "@CellVerticalSpacing", defaultVal: 0, displayName: "Cell Vertical Spacing", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellVerticalSpacing", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric };
                     Metadata.cellHorizontalSpacing = { propertyName: "horizontalSpacing", modelName: "@CellHorizontalSpacing", defaultVal: 0, displayName: "Cell Horizontal Spacing", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHorizontalSpacing", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric };
                     Metadata.cellWidth = {
-                        propertyName: "cellWidth", modelName: "@CellWidth", defaultVal: 25, displayName: "Cell Width", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellWidth", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, editorOptions: { placeholder: function () { return DevExpress.Analytics.Utils.getLocalization("(Auto)", "ASPxReportsStringId.ReportDesigner_PropertyGrid_AutoValueString"); } }
+                        propertyName: "cellWidth", modelName: "@CellWidth", defaultVal: 25, displayName: "Cell Width", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellWidth", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, editorOptions: { placeholder: ko.observable(DevExpress.Analytics.Utils.getLocalization("(Auto)", "ASPxReportsStringId.ReportDesigner_PropertyGrid_AutoValueString")) }
                     };
                     Metadata.cellHeight = {
-                        propertyName: "cellHeight", modelName: "@CellHeight", defaultVal: 25, displayName: "Cell Height", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHeight", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, editorOptions: { placeholder: function () { return DevExpress.Analytics.Utils.getLocalization("(Auto)", "ASPxReportsStringId.ReportDesigner_PropertyGrid_AutoValueString"); } }
+                        propertyName: "cellHeight", modelName: "@CellHeight", defaultVal: 25, displayName: "Cell Height", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellHeight", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, editorOptions: { placeholder: ko.observable(DevExpress.Analytics.Utils.getLocalization("(Auto)", "ASPxReportsStringId.ReportDesigner_PropertyGrid_AutoValueString")) }
                     };
                     Metadata.cellSizeMode = {
                         propertyName: "sizeMode", modelName: "@CellSizeMode", displayName: "Cell Size Mode", localizationId: "DevExpress.XtraReports.UI.XRCharacterComb.CellSizeMode", defaultVal: "AutoSize", editor: Widgets.editorTemplates.comboboxUndo,
@@ -19402,17 +19466,30 @@ var DevExpress;
                         return intersectionBands;
                     };
                     XRCrossBandSurface.prototype._getCrossBandBoxSides = function () {
-                        var currentRect = this.rect(), borderWidth = this.getControlModel()["borderWidth"]();
+                        var currentRect = this._unitAbsoluteRect, borderWidth = this.getControlModel()["borderWidth"]();
                         return [{ top: currentRect.top, left: currentRect.left, height: borderWidth, width: currentRect.width },
                             { top: currentRect.bottom - borderWidth, left: currentRect.left, height: borderWidth, width: currentRect.width },
                             { top: currentRect.top, left: currentRect.left, height: currentRect.height, width: borderWidth },
                             { top: currentRect.top, left: currentRect.right - borderWidth, height: currentRect.height, width: borderWidth }];
                     };
+                    Object.defineProperty(XRCrossBandSurface.prototype, "_unitAbsoluteRect", {
+                        get: function () {
+                            var startBandSurface = this._control.startBand().surface, endBandSurface = this._control.endBand().surface;
+                            var top = startBandSurface["_unitAbsoluteRect"].top + this._control.startPoint.y(), bottom = endBandSurface["_unitAbsoluteRect"].top + this._control.endPoint.y();
+                            return {
+                                top: top, left: this._control.startPoint.x(),
+                                right: this._control.startPoint.x() + this._control.width(), bottom: bottom,
+                                width: this._control.width(), height: bottom - top
+                            };
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
                     XRCrossBandSurface.prototype.isThereIntersectionWithControls = function () {
-                        var isThereIntersection = false, currentRect = this.rect(), intersectionBands = this._getIntersectionBands(currentRect, this.parent && this.parent.getChildrenCollection()()), rectangles = this.getControlModel().controlType === "XRCrossBandBox" ? this._getCrossBandBoxSides() : [currentRect];
+                        var isThereIntersection = false, currentRect = this._unitAbsoluteRect, intersectionBands = this._getIntersectionBands(currentRect, this.parent && this.parent.getChildrenCollection()()), rectangles = this.getControlModel().controlType === "XRCrossBandBox" ? this._getCrossBandBoxSides() : [currentRect];
                         for (var bandIndex = 0; bandIndex < intersectionBands.length; bandIndex++) {
                             for (var rectIndex = 0; rectIndex < rectangles.length; rectIndex++) {
-                                if (this.isThereIntersectionWithNeighborsCollection(rectangles[rectIndex], intersectionBands[bandIndex].controls().filter(function (control) { return !control.isIntersectionDeny; }), "absoluteRect")) {
+                                if (this.isThereIntersectionWithNeighborsCollection(rectangles[rectIndex], intersectionBands[bandIndex].controls().filter(function (control) { return !control.isIntersectionDeny; }), "_unitAbsoluteRect")) {
                                     isThereIntersection = true;
                                     break;
                                 }
@@ -19441,7 +19518,7 @@ var DevExpress;
                             return isThereIntersection;
                         }
                         else {
-                            return _super.prototype.isThereIntersectionWithCrossBandControls.call(this, this.rect());
+                            return _super.prototype.isThereIntersectionWithCrossBandControls.call(this);
                         }
                     };
                     XRCrossBandSurface.prototype.container = function () {
@@ -19476,7 +19553,7 @@ var DevExpress;
                 }(Controls.XRControlSurfaceBase));
                 Controls.XRCrossBandSurface = XRCrossBandSurface;
                 (function (Metadata) {
-                    Metadata.crossBandLineWidth = { propertyName: "width", modelName: "@WidthF", defaultVal: 1, editor: DevExpress.Analytics.Widgets.editorTemplates.text, displayName: "Width", localizationId: "DevExpress.XtraReports.UI.XRControl.Width" };
+                    Metadata.crossBandLineWidth = { propertyName: "width", modelName: "@WidthF", defaultVal: 1, editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, displayName: "Width", localizationId: "DevExpress.XtraReports.UI.XRControl.Width", from: DevExpress.Analytics.Utils.floatFromModel };
                     Metadata.startPoint = { propertyName: "startPoint", modelName: "@StartPointFloat", from: DevExpress.Analytics.Elements.Point.fromString, displayName: "Start Point", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.StartPoint", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor };
                     Metadata.endPoint = { propertyName: "endPoint", modelName: "@EndPointFloat", from: DevExpress.Analytics.Elements.Point.fromString, displayName: "End Point", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.EndPoint", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor };
                     Metadata.startBand = { propertyName: "startBand", modelName: "@StartBand", link: true, displayName: "Start Band", localizationId: "DevExpress.XtraReports.UI.XRCrossBandControl.StartBand", editor: Widgets.editorTemplates.bands };
@@ -20607,6 +20684,17 @@ var DevExpress;
                             image.onload = null;
                         };
                     };
+                    Object.defineProperty(ReportSurface.prototype, "_unitAbsoluteRect", {
+                        get: function () {
+                            return {
+                                top: 0, left: 0,
+                                right: this._control.size.width(), bottom: this._control.size.height(),
+                                width: this._control.size.width(), height: this._control.size.height(),
+                            };
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
                     ReportSurface.prototype.dispose = function () {
                         _super.prototype.dispose.call(this);
                         this.disposeObservableArray(this.crossBandControls);
@@ -23329,6 +23417,46 @@ var DevExpress;
                         this.disposeObservableArray(this.controls);
                         this.resetObservableArray(this.controls);
                     };
+                    BandSurface.prototype._getUnitPositionInParent = function () {
+                        var isVerticalBandTakenIntoAccount = false;
+                        var neighbors = this._control.parentModel().bands();
+                        var absoluteY = neighbors
+                            .slice(0, neighbors.indexOf(this._control))
+                            .reduce(function (sum, currentBandModel) {
+                            if (currentBandModel instanceof VerticalBandViewModel && isVerticalBandTakenIntoAccount)
+                                return sum;
+                            else if (currentBandModel instanceof VerticalBandViewModel)
+                                isVerticalBandTakenIntoAccount = true;
+                            return sum + currentBandModel.size.height();
+                        }, 0);
+                        return new DevExpress.Analytics.Elements.Point(0, absoluteY);
+                    };
+                    BandSurface._getUnitAbsoluteRect = function (bandSurface, getPositionInParent) {
+                        var parentAbsoluteRect = bandSurface.parent && bandSurface.parent["_unitAbsoluteRect"];
+                        if (parentAbsoluteRect) {
+                            var _unitPosition = getPositionInParent();
+                            return {
+                                top: parentAbsoluteRect.top + _unitPosition.y(), left: parentAbsoluteRect.left + _unitPosition.x(),
+                                right: parentAbsoluteRect.left + _unitPosition.x() + bandSurface._control.size.width(), bottom: parentAbsoluteRect.top + _unitPosition.y() + bandSurface._control.size.height(),
+                                width: bandSurface._control.size.width(), height: bandSurface._control.size.height()
+                            };
+                        }
+                        else {
+                            return {
+                                top: 0, left: 0,
+                                right: bandSurface._control.size.width(), bottom: bandSurface._control.size.height(),
+                                width: bandSurface._control.size.width(), height: bandSurface._control.size.height()
+                            };
+                        }
+                    };
+                    Object.defineProperty(BandSurface.prototype, "_unitAbsoluteRect", {
+                        get: function () {
+                            var _this = this;
+                            return BandSurface._getUnitAbsoluteRect(this, function () { return _this._getUnitPositionInParent(); });
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
                     BandSurface.prototype.createChildCollection = function (band) {
                         this._disposables.push(this.bandsHolder = new Internal.BandsHolder(this));
                         this.bandsHolder.initialize(band.bands);
@@ -24060,6 +24188,27 @@ var DevExpress;
                             return this.verticalBandsContainer.width() - bands[bandIndex]._width();
                         }
                     };
+                    VerticalBandSurface.prototype._getUnitPositionInParent = function () {
+                        var neighbors = this._control.parentModel().bands();
+                        var position = neighbors
+                            .slice(0, neighbors.indexOf(this._control))
+                            .reduce(function (previousValue, currentBand) {
+                            if (currentBand instanceof VerticalBandViewModel)
+                                previousValue.x += currentBand.size.width();
+                            else
+                                previousValue.y += currentBand.size.height();
+                            return previousValue;
+                        }, { x: 0, y: 0 });
+                        return new DevExpress.Analytics.Elements.Point(position.x, position.y);
+                    };
+                    Object.defineProperty(VerticalBandSurface.prototype, "_unitAbsoluteRect", {
+                        get: function () {
+                            var _this = this;
+                            return BandSurface._getUnitAbsoluteRect(this, function () { return _this._getUnitPositionInParent(); });
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
                     VerticalBandSurface.prototype.getAbsolutePositionX = function () {
                         var newX = 0;
                         var bandIndex;

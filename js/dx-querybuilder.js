@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 19.1.6
-* Build date: 2019-09-10
+* Version: 19.1.7
+* Build date: 2019-10-14
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2044,10 +2044,21 @@ var DevExpress;
                     { propertyName: "itemType", modelName: "@ItemType" }
                 ];
                 Metadata.dsParameterSerializationInfo = [dsParameterName, dsParameterType, dsExpressionResultType].concat(baseDSParamterSerializationsInfo);
+                var stroredProcValuesAddition = [
+                    { value: "System.Byte", displayValue: "Non-negative number (8 bit integer)", localizationId: "DataAccessStringId.Type_Byte" },
+                    { value: "System.SByte", displayValue: "Number (8 bit integer)", localizationId: "DataAccessStringId.Type_SByte" },
+                    { value: "System.UInt32", displayValue: "Non-negative number (32 bit integer)", localizationId: "DataAccessStringId.Type_UInt" },
+                    { value: "System.UInt16", displayValue: "Non-negative number (16 bit integer)", localizationId: "DataAccessStringId.Type_UShort" },
+                    { value: "System.UInt64", displayValue: "Non-negative number (64 bit integer)", localizationId: "DataAccessStringId.Type_ULong" },
+                    { value: "System.Char", displayValue: "Char", localizationId: "DataAccessStringId.Type_Char" },
+                    { value: "System.Object", displayValue: "Object", localizationId: "DataAccessStringId.Type_Object" },
+                    { value: "System.Byte[]", displayValue: "Byte array", localizationId: "DataAccessStringId.Type_ByteArray" },
+                    { value: "System.TimeSpan", displayValue: "Time interval", localizationId: "DataAccessStringId.Type_TimeSpan" },
+                ];
                 function storedProcParameterSerializationsInfo(type) {
                     var copyParamType = $.extend(true, {}, dsParameterType);
                     var newValuesArray = [];
-                    newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === type; })[0]);
+                    newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === type; })[0] || stroredProcValuesAddition.filter(function (item) { return item.value === type; })[0]);
                     newValuesArray.push(dsParameterType.valuesArray.filter(function (item) { return item.value === "DevExpress.DataAccess.Expression"; })[0]);
                     copyParamType.valuesArray = newValuesArray;
                     var copyResultType = $.extend(true, {}, dsExpressionResultType);
@@ -8929,7 +8940,7 @@ var DevExpress;
                         this._isMaster = _isMaster;
                         this.getTitle = function () { return _this._isMaster ? Analytics.Utils.getLocalization("Master Query", "AnalyticsCoreStringId.Wizard_MasterDetailRelationship_MasterQuery") : Analytics.Utils.getLocalization("Detail Query", "AnalyticsCoreStringId.Wizard_MasterDetailRelationship_DetailQuery"); };
                         this.isSelected = ko.observable(false);
-                        this.selectColumnText = function () { return Analytics.Utils.getLocalization("DataAccessUIStringId.JoinEditorEmptyColumnText", "<Select a Column>"); };
+                        this.selectColumnText = function () { return Analytics.Utils.getLocalization("<Select a Column>", "DataAccessUIStringId.JoinEditorEmptyColumnText"); };
                         this.column = column;
                         this.queryName = queryName;
                         this.setColumn = function (resultColumn) {
