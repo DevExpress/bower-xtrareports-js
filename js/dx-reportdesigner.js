@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.js)
-* Version: 19.1.7
-* Build date: 2019-10-16
+* Version: 19.1.8
+* Build date: 2019-11-19
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1435,7 +1435,9 @@ var DevExpress;
                         validationCallback: function (options) {
                             return options.value % 2 !== 0;
                         },
-                        message: DevExpress.Analytics.Utils.getLocalization("The arrow width should be always odd and greater than 0", "ChartStringId.MsgIncorrectArrowWidth")
+                        get message() {
+                            return DevExpress.Analytics.Utils.getLocalization("The arrow width should be always odd and greater than 0", "ChartStringId.MsgIncorrectArrowWidth");
+                        }
                     }];
                 var invertedStep = { propertyName: "invertedStep", modelName: "@InvertedStep", displayName: "Inverted Step", localizationId: "DevExpress.XtraCharts.FullStackedStepAreaSeriesView.InvertedStep", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: false };
                 var viewFillMode = {
@@ -1962,10 +1964,14 @@ var DevExpress;
                         "DateTime": ScaleType.DateTime,
                         "Auto": ScaleType.Auto
                     };
+                    function _fixSeriesTemplateModel(model) {
+                        delete model["@SeriesDataMember"];
+                        return model;
+                    }
                     var SeriesTemplateViewModel = (function (_super) {
                         __extends(SeriesTemplateViewModel, _super);
                         function SeriesTemplateViewModel(model, serializer, info) {
-                            var _this = _super.call(this, model, serializer, info) || this;
+                            var _this = _super.call(this, _fixSeriesTemplateModel(model), serializer, info) || this;
                             _this._actualArgumentScaleType = ko.observable(ScaleType.Numerical);
                             if (_this.valueDataMembers) {
                                 ko.unwrap(_this.valueDataMembers).dispose();
@@ -6805,7 +6811,7 @@ var DevExpress;
                                             return true;
                                         }).length === 0;
                                     },
-                                    message: DevExpress.Analytics.Utils.getLocalization("Name is not unique", "ASPxReportsStringId.ReportDesigner_NameUniqueError")
+                                    get message() { return DevExpress.Analytics.Utils.getLocalization("Name is not unique", "ASPxReportsStringId.ReportDesigner_NameUniqueError"); }
                                 }];
                         }
                         return this._getEditorValidationRules();
@@ -16219,18 +16225,27 @@ var DevExpress;
                     __extends(ReportDialogBase, _super);
                     function ReportDialogBase() {
                         var _this = _super.call(this) || this;
+                        _this._visible = ko.observable(false);
                         _this.width = ko.observable(690);
                         _this.height = ko.observable(420);
                         _this.template = ko.observable("");
                         _this.model = ko.observable(null);
                         _this.tab = ko.observable(null);
-                        _this.visible = ko.observable(false);
-                        _this.container = function (element) { return DevExpress.Analytics.Internal.getParentContainer(element); };
-                        _this._disposables.push(_this.visible.subscribe(function (newVal) {
-                            if (!newVal) {
-                                _this.tab(null);
+                        _this.disabled = ko.observable(false);
+                        _this.visible = ko.computed({
+                            read: function () {
+                                return _this._visible();
+                            },
+                            write: function (newVal) {
+                                if (_this.disabled())
+                                    return;
+                                _this._visible(newVal);
+                                if (!newVal)
+                                    _this.tab(null);
                             }
-                        }));
+                        });
+                        _this.container = function (element) { return DevExpress.Analytics.Internal.getParentContainer(element); };
+                        _this._disposables.push(_this.visible);
                         return _this;
                     }
                     ReportDialogBase.prototype.dispose = function () {
@@ -16268,14 +16283,14 @@ var DevExpress;
                         this.popupButtons = [
                             {
                                 toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
-                                    text: DevExpress.Analytics.Utils.getLocalization('Open', 'ASPxReportsStringId.SidePanel_Open'), onClick: function () {
+                                    text: DevExpress.Analytics.Utils.getLocalization('Open', 'ASPxReportsStringId.SidePanel_Open'), disabled: popup.disabled, onClick: function () {
                                         popup.open(self.reportUrl());
                                     }
                                 }, disabled: ko.pureComputed(function () { return !_this.reportUrl(); })
                             },
                             {
                                 toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Cancel", 'AnalyticsCoreStringId.SearchDialog_Cancel'), onClick: function () {
+                                    text: DevExpress.Analytics.Utils.getLocalization("Cancel", 'AnalyticsCoreStringId.SearchDialog_Cancel'), disabled: popup.disabled, onClick: function () {
                                         popup.cancel();
                                     }
                                 }
@@ -16333,12 +16348,12 @@ var DevExpress;
                         this.popupButtons = [
                             {
                                 toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
-                                    text: DevExpress.Analytics.Utils.getLocalization('Save', 'AnalyticsCoreStringId.MenuButtons_Save'), disabled: ko.computed(function () { return !self.reportName(); }), onClick: function () {
+                                    text: DevExpress.Analytics.Utils.getLocalization('Save', 'AnalyticsCoreStringId.MenuButtons_Save'), disabled: ko.computed(function () { return !self.reportName() || popup.disabled(); }), onClick: function () {
                                         popup.save(self.reportName());
                                     }
                                 }
                             },
-                            { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'), onClick: function () { popup.cancel(); } } }
+                            { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { disabled: popup.disabled, text: DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'), onClick: function () { popup.cancel(); } } }
                         ];
                     }
                     SaveAsReportDialogModelBase.prototype.onShow = function (tab) {
@@ -16385,6 +16400,7 @@ var DevExpress;
                                 this.visible(false);
                                 return;
                             }
+                            self.disabled(true);
                             Internal.ReportStorageWeb.setNewData(data, url)
                                 .done(function (result) {
                                 self.onSaved({ report: self.tab().context().report, url: result });
@@ -16396,7 +16412,10 @@ var DevExpress;
                                     self.tab().close.resolve();
                                 }
                                 Internal.ReportStorageWeb.getUrls().done(function (result) { self.model()["urls"] && self.model()["urls"](result); });
-                            }).always(function () { self.visible(false); });
+                            }).always(function () {
+                                self.disabled(false);
+                                self.visible(false);
+                            });
                         }
                         else {
                             self.tab().context().report.save();
@@ -16420,19 +16439,21 @@ var DevExpress;
                         this.popupButtons = [
                             {
                                 toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
+                                    disabled: popup.disabled,
                                     text: DevExpress.Analytics.Utils.getLocalization('Yes', 'AnalyticsCoreStringId.ParametersPanel_True'), onClick: function () {
                                         popup.save(self.reportUrl());
                                     }
                                 }
                             },
                             {
-                                toolbar: 'bottom', location: 'after', widget: 'dxButton', options: {
+                                toolbar: 'bottom', location: 'after', widget: 'dxButton', disabled: popup.disabled, options: {
+                                    disabled: popup.disabled,
                                     text: DevExpress.Analytics.Utils.getLocalization("No", "AnalyticsCoreStringId.ParametersPanel_False"), onClick: function () {
                                         popup.notSave();
                                     }
                                 }
                             },
-                            { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'), onClick: function () { popup.cancel(); } } }
+                            { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { disabled: popup.disabled, text: DevExpress.Analytics.Utils.getLocalization('Cancel', 'AnalyticsCoreStringId.SearchDialog_Cancel'), onClick: function () { popup.cancel(); } } }
                         ];
                     }
                     SaveReportDialogModelBase.prototype.onShow = function (tab) {
@@ -17582,10 +17603,10 @@ var DevExpress;
                     };
                     XRControlSurfaceBase.prototype.isThereIntersection = function (rect1, rect2) {
                         var rect1Right = rect1.right || rect1.left + rect1.width, rect2Right = rect2.right || rect2.left + rect2.width, rect1Bottom = rect1.bottom || rect1.top + rect1.height, rect2Bottom = rect2.bottom || rect2.top + rect2.height;
-                        return rect1Right > rect2.left && Math.abs(rect1Right - rect2.left) > 0.00001 &&
-                            rect2Right > rect1.left && Math.abs(rect2Right - rect1.left) > 0.00001 &&
-                            rect1Bottom > rect2.top && Math.abs(rect1Bottom - rect2.top) > 0.00001 &&
-                            rect2Bottom > rect1.top && Math.abs(rect2Bottom - rect1.top) > 0.00001;
+                        return rect1Right > rect2.left && Math.abs(rect1Right - rect2.left) >= 0.01 &&
+                            rect2Right > rect1.left && Math.abs(rect2Right - rect1.left) >= 0.01 &&
+                            rect1Bottom > rect2.top && Math.abs(rect1Bottom - rect2.top) >= 0.01 &&
+                            rect2Bottom > rect1.top && Math.abs(rect2Bottom - rect1.top) >= 0.01;
                     };
                     XRControlSurfaceBase.prototype.isThereIntersectionWithParent = function (parentRect, childRect) {
                         var rectWidhtElement = childRect.right || childRect.left + childRect.width, rectHeightElement = childRect.bottom || childRect.top + childRect.height;
@@ -25224,8 +25245,11 @@ var DevExpress;
                             }
                         });
                     };
+                    SelectLabelTypePage.prototype.canNext = function () {
+                        return !!this._selectedLabelDetails();
+                    };
                     SelectLabelTypePage.prototype.canFinish = function () {
-                        return true;
+                        return !!this._selectedLabelDetails();
                     };
                     SelectLabelTypePage.prototype.commit = function () {
                         var labelDetails = this._selectedLabelDetails() ? $.extend({}, this._selectedLabelDetails()) : null;
@@ -27855,9 +27879,6 @@ var DevExpress;
                     SpecifyLabelSettingsPage.prototype.canNext = function () {
                         return false;
                     };
-                    SpecifyLabelSettingsPage.prototype.canFinish = function () {
-                        return true;
-                    };
                     SpecifyLabelSettingsPage.prototype.getNextSectionId = function (sectionId) {
                         if (!sectionId) {
                             return Wizard.FullscreenReportWizardSectionId.SelectLabelTypePage;
@@ -30154,10 +30175,11 @@ var DevExpress;
                     var requestOptions = this._options.requestOptions;
                     self._callbacks = this._initializeCallbacks();
                     var getDesignerModelActionUrl = this._getServerActionUrl(requestOptions.host, requestOptions.getDesignerModelAction);
-                    var onError = function (data, textStatus, jqXHR, getRequestDetails) {
-                        if (!self._callbacks || !self._callbacks.designer || !self._callbacks.designer.onServerError)
-                            return;
-                        self._callbacks.designer.onServerError({ jqXHR: jqXHR, textStatus: textStatus, data: data, getRequestDetails: getRequestDetails });
+                    var onError = function (data, textStatus, jqXHR, getRequestDetails, errorThrown) {
+                        if (self._callbacks && self._callbacks.designer && self._callbacks.designer.onServerError)
+                            self._callbacks.designer.onServerError({ jqXHR: jqXHR, textStatus: textStatus, data: data, getRequestDetails: getRequestDetails });
+                        if (errorThrown)
+                            throw errorThrown;
                     };
                     var getModel = DevExpress.Analytics.Utils.ajaxSetup.sendRequest({
                         url: getDesignerModelActionUrl,
@@ -30168,19 +30190,17 @@ var DevExpress;
                     });
                     var _deferredModel = $.Deferred();
                     this._deferreds.push(_deferredModel);
-                    getModel.always(_deferredModel.resolve);
+                    getModel.done(_deferredModel.resolve).fail(_deferredModel.reject);
                     _deferredModel.done(function (result, textStatus, jqXHR) {
                         if (result.error) {
-                            return onError(result, textStatus, jqXHR, function () { return ({ url: getDesignerModelActionUrl, data: { reportUrl: reportUrl } }); });
+                            return onError(result, textStatus, jqXHR, function () { return ({ url: getDesignerModelActionUrl, data: { reportUrl: reportUrl } }); }, result.error);
                         }
                         result.handlerUri = self._getServerActionUrl(requestOptions.host, result.handlerUri);
                         result.viewerHandlerUri = self._getServerActionUrl(requestOptions.host, result.viewerHandlerUri);
                         result.queryBuilderHandlerUri = self._getServerActionUrl(requestOptions.host, result.queryBuilderHandlerUri);
                         self._initializationData(result);
                     }).fail(function (jqXHR, textStatus, errorThrown) {
-                        onError({ error: errorThrown }, textStatus, jqXHR, function () { return ({ url: getDesignerModelActionUrl, data: { reportUrl: reportUrl } }); });
-                        if (errorThrown)
-                            throw errorThrown;
+                        onError({ error: errorThrown }, textStatus, jqXHR, function () { return ({ url: getDesignerModelActionUrl, data: { reportUrl: reportUrl } }); }, errorThrown);
                     });
                 };
                 JSReportDesignerBinding.prototype.dispose = function () {
@@ -31115,7 +31135,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-scripts': '<div class="dxrd-scripts" data-bind="visible: editorVisible, template: \'dxrd-scripts-addon\'"></div>',
     'dxrd-navigation-panel-template': '<!-- ko ifnot: $root.isLoading() && tabs().length === 1-->    <!-- ko if: allowMDI -->    <!-- ko if: tabs().length > 0 -->    <!-- ko template: \'dxrd-navigation-panel-template-content\' -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->    <!-- ko ifnot: allowMDI -->    <!-- ko if: tabs().length > 1 -->    <!-- ko template: \'dxrd-navigation-panel-template-content\' -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->',
     'dxrd-navigation-panel-template-content': '<div class="dxrd-navigation-panel-wrapper" data-bind="style: { width: $root.surfaceSize() ? $root.surfaceSize() + \'px\' : \'auto\' }">        <div data-bind="dxTabs: { dataSource: tabs, selectedIndex: selectedIndex, showNavButtons: false }">            <div data-options="dxTemplate: { name: \'item\' }">                <!-- ko if: icon -->                <div class="dx-icon" data-bind="css: icon, event: { mousedown: function(e) { $parent.removeTab(e); } }"></div>                <!-- /ko -->                <div class="dx-tab-title-wrapper">                    <div class="dx-tab-title" data-bind="text: isDirty() ? displayName() + \'*\' : displayName(), title: displayName, style: { \'font-weight\': isDirty() ? \'bold\' : \'normal\' }"></div>                </div>            </div>        </div>    </div>',
-    'dxrd-report-dialog-template': '<div class="dxrd-reportdialog dx-editors dx-widget" data-bind="dxPopup: {            showTitle: true,            width: width,            height: height,            title: $root.getLocalization(title),            visible: visible,            toolbarItems: buttons,            showCloseButton: true,            container: container($element),            position: { of: container($element) }}">        <!-- ko template: { name: template, data: model } -->        <!-- /ko -->    </div>',
+    'dxrd-report-dialog-template': '<div class="dxrd-reportdialog dx-editors dx-widget" data-bind="dxPopup: {            showTitle: true,            width: width,            height: height,            title: $root.getLocalization(title),            visible: visible,            disabled: disabled,            toolbarItems: buttons,            showCloseButton: true,            container: container($element),            position: { of: container($element) }}">        <!-- ko template: { name: template, data: model } -->        <!-- /ko -->    </div>',
     'dxrd-report-dialog-converter-template': '<div class="dxrd-reportdialog dxrd-reportdialog-converter dx-editors dx-widget" data-bind="dxPopup: {            showTitle: true,            minWidth: 530,            height: 250,            width: \'auto\',            title: popupOptions.title,            visible: popupOptions.visible,            toolbarItems: popupOptions.buttons,            showCloseButton: true,            container: popupOptions.container($element),            position: { of: popupOptions.container($element) }}">        <div class="dxrd-reportdialog-converter-content">            <div class="dxrd-image-exlamation-icons" data-bind="template: \'dxrd-svg-wizard-warning\'"></div>            <div class="dxrd-reportdialog-content-text">                <div class="dxrd-reportdialog-content-confirm-message" data-bind="text: popupOptions.confirmMessage"></div>                <a class="dxrd-reportdialog-toggle-link dxd-hyperlink-color dxd-text-accented" data-bind="text: popupOptions.linkText, attr: {href: popupOptions.linkUrl, target: \'_blank\' }"></a>            </div>        </div>    </div>',
     'dxrd-savereport-dialog-content': '<div class="dxrd-reportdialog-content">        <div class="dx-fieldset">            <div class="dx-field dxd-back-primary">                <div data-bind="dxTextBox: { value: $data.reportName, height: 36, placeholder: reportNamePlaceholder(), valueChangeEvent: \'keyup\' }"></div>            </div>        </div>        <div class="dx-default-border-style dxd-border-secondary">            <div class="dxrd-reportdialog-urls" data-bind="dxList: { dataSource: urls, selectedItems: [], editEnabled: true, height: 200, editConfig: { selectionEnabled: true }, selectionMode: \'single\', onItemClick: function(e) { this.reportName(e.itemData.Value); }, activeStateEnabled: false, noDataText: $data.noDataText, nextButtonText: $root.getLocalization(\'More\', \'ASPxReportsStringId.List_More\') }">                <div data-options="dxTemplate : { name: \'item\' }">                    <div data-bind="text: $data.Value"></div>                </div>            </div>        </div>    </div>',
     'dxrd-savereport-dialog-content-light': '<div class="dxrd-reportdialog-easy-content" data-bind="text: saveText"></div>',
@@ -31158,7 +31178,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-richtext-loadfile': '<div data-bind="dxFileImagePicker: { value: value, format: format, useFormat: true, placeholderId: \'File\', disabled: disabled, accept:\'.rtf,.docx,.txt,.htm,.html\' }"></div>',
     'dxrd-image-loadfile': '<div data-bind="dxImageSourceEditor: { value: value, accept: \'image/*\', type: \'img\', disabled: disabled }"></div>',
     'dxrd-summaryeditor-header': '<!-- ko template: \'dx-emptyHeader\' -->    <!-- /ko -->    <div class="dxrd-summaryeditor-popup" data-bind="dxPopup: {            showTitle: true,            width: \'350px\',            height: \'400px\',            title: $root.getLocalization(\'Summary Editor\'),            visible: $data.popup.visible,            toolbarItems: $data.popup.buttons,            showCloseButton: true,            container: $data.popup.container($element),            position: { of: $data.popup.container($element) }}">        <!-- ko template: { name: \'dx-propertieseditor\', data: $data.popup.grid } -->        <!-- /ko -->    </div>',
-    'dxrd-page-colorScheme-content': '<div class="dxrd-page-color-scheme">        <!-- ko foreach: _lookupData.scheme -->        <div class="dxrd-page-color-scheme-tile" data-bind="click: function () { $parent._applyScheme($data); }, style: { backgroundColor: color }">            <div class="dxrd-page-color-scheme-tile-content">                <div class="dxrd-page-color-scheme-tile-selected dxd-border-accented" data-bind="visible: $data.selected()"></div>                <!-- ko ifnot: $data.name === \'Custom\' -->                <div class="dxrd-page-color-scheme-tile-content-title" data-bind="text: displayName"></div>                <!-- /ko -->                <!-- ko if: $data.name === \'Custom\' -->                <div class="dxrd-page-color-scheme-tile-content-custom">                    <div class="dxrd-page-color-scheme-tile-content-title" data-bind="text: displayName"></div>                    <div class="dxrd-page-color-scheme-tile-content-edit" data-bind="css: { \'dxrd-page-color-scheme-tile-content-edit-active\': $data.popoverVisible() }, click: function() { $data.popoverVisible(!$data.popoverVisible()) }">                        <div class="dxrd-page-color-scheme-tile-content-edit-icon" data-bind="template:\'dxrd-svg-color_gear\'"></div>                    </div>                </div>                <div class="dxrd-page-color-scheme-colorpicker" data-bind="dxPopover: {             visible: $data.popoverVisible,             width: \'auto\',             height: \'auto\',             container: $root.getPopupContainer($element),             target: \'.dxrd-page-color-scheme-tile-content-edit-icon\',             position: { my: \'left center\', at: \'right center\' }             }">                    <div class="dxrd-page-color-scheme-colorpicker-editor-container dxd-border-secondary">                        <div data-bind="dxColorView: { value: editorColor, editAlphaChannel: true }"></div>                    </div>                    <div class="dxrd-page-color-scheme-colorpicker-buttons">                        <div class="dxrd-page-color-scheme-colorpicker-button" data-bind="dxButton: { text: \'Cancel\', onClick: function() { $data.resetColor() }}"></div>                        <div class="dxrd-page-color-scheme-colorpicker-button" data-bind="dxButton: { text: \'Ok\', onClick: function() { $data.applyColor() }}"></div>                    </div>                </div>                <!-- /ko -->            </div>        </div>        <!-- /ko -->    </div>',
+    'dxrd-page-colorScheme-content': '<div class="dxrd-page-color-scheme">        <!-- ko foreach: _lookupData.scheme -->        <div class="dxrd-page-color-scheme-tile" data-bind="click: function () { $parent._applyScheme($data); }, style: { backgroundColor: color }">            <div class="dxrd-page-color-scheme-tile-content">                <div class="dxrd-page-color-scheme-tile-selected dxd-border-accented" data-bind="visible: $data.selected()"></div>                <!-- ko ifnot: $data.name === \'Custom\' -->                <div class="dxrd-page-color-scheme-tile-content-title" data-bind="text: displayName"></div>                <!-- /ko -->                <!-- ko if: $data.name === \'Custom\' -->                <div class="dxrd-page-color-scheme-tile-content-custom">                    <div class="dxrd-page-color-scheme-tile-content-title" data-bind="text: displayName"></div>                    <div class="dxrd-page-color-scheme-tile-content-edit" data-bind="css: { \'dxrd-page-color-scheme-tile-content-edit-active\': $data.popoverVisible() }, click: function() { $data.popoverVisible(!$data.popoverVisible()) }">                        <div class="dxrd-page-color-scheme-tile-content-edit-icon" data-bind="template:\'dxrd-svg-color_gear\'"></div>                    </div>                </div>                <div class="dxrd-page-color-scheme-colorpicker" data-bind="dxPopover: {             visible: $data.popoverVisible,             width: \'auto\',             height: \'auto\',             container: $root.getPopupContainer($element),             target: \'.dxrd-page-color-scheme-tile-content-edit-icon\',             position: { my: \'left center\', at: \'right center\', collision: \'fit\', of: \'.dxrd-page-color-scheme-tile-content-edit\', boundary: $root.getPopupContainer($element) }             }">                    <div class="dxrd-page-color-scheme-colorpicker-editor-container dxd-border-secondary">                        <div data-bind="dxColorView: { value: editorColor, editAlphaChannel: true }"></div>                    </div>                    <div class="dxrd-page-color-scheme-colorpicker-buttons">                        <div class="dxrd-page-color-scheme-colorpicker-button" data-bind="dxButton: { text: \'Cancel\', onClick: function() { $data.resetColor() }}"></div>                        <div class="dxrd-page-color-scheme-colorpicker-button" data-bind="dxButton: { text: \'Ok\', onClick: function() { $data.applyColor() }}"></div>                    </div>                </div>                <!-- /ko -->            </div>        </div>        <!-- /ko -->    </div>',
     'dxrd-page-colorScheme': '<div class="dxrd-wizard-page">        <!-- ko template: \'dxrd-page-colorScheme-content\' -->        <!-- /ko -->    </div>',
     'dxrd-page-columns': '<div class="dxrd-wizard-page dxrd-wizard-columns-page">    <div class="dxrd-wizard-left-panel">        <div class="dxrd-wizard-list-title" data-bind="text: availableFields.caption"></div>        <div class="dx-default-border-style dxd-border-secondary">            <div class="dxrd-wizard-list" data-bind="dxList: { items: availableFields.items, selectedItems: availableFields.activeItemArray, height: 257, selectionMode: \'single\', activeStateEnabled: false, onItemClick: availableFieldClick }">                <div data-options="dxTemplate : { name: \'item\' }" data-bind="event: { dblclick: $parent.availableFieldDblClick }">                    <div data-bind="text: displayName"></div>                </div>            </div>        </div>    </div>    <div class="dxrd-wizard-splitter">        <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: select, disabled: !isSelectEnable(), icon: \'dxrd-svg-operations-moveright\', iconClass: \'dxrd-image-moveright\' }" style="margin-top: 40px"></div>        <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: selectAll, disabled: !isSelectEnable(), icon: \'dxrd-svg-operations-moveright_all\', iconClass: \'dxrd-image-moveright-all\' }"></div>        <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: unselect, disabled: !isUnselectEnable(), icon: \'dxrd-svg-operations-moveleft\', iconClass: \'dxrd-image-moveleft\' }" style="margin-top: 44px"></div>        <div class="dxrd-wizard-splitter-action" data-bind="dxButtonWithTemplate: { onClick: unselectAll, disabled: !isUnselectEnable(), icon: \'dxrd-svg-operations-moveleft_all\', iconClass: \'dxrd-image-moveleft-all\' }"></div>    </div>    <div class="dxrd-wizard-right-panel">        <div class="dxrd-wizard-list-title" data-bind="text: selectedFields.caption"></div>        <div class="dx-default-border-style dxd-border-secondary">            <div class="dxrd-wizard-list" data-bind="dxList: { items: selectedFields.items, selectedItems: selectedFields.activeItemArray, height: 257, selectionMode: \'single\', activeStateEnabled: false, onItemClick: selectedFieldClick }">                <div data-options="dxTemplate : { name: \'item\' }" data-bind="event: { dblclick: $parent.selectedFieldDblClick }">                    <div data-bind="text: displayName"></div>                </div>            </div>        </div>    </div></div>',
     'dxrd-page-customizeLabel': '<div class="dxrd-wizard-page">    <div class="dxrd-wizard-customizelabel-page dxd-border-secondary">        <div class="dxrd-wizard-customizelabel-list">            <div class="dxrd-wizard-customizelabel-head-props">                <div class="dxrd-wizard-customizelabel-select-papersize">                    <span data-bind="text: $root.getLocalization(\'Page Size:\', \'ASPxReportsStringId.ReportDesigner_Wizard_PageSize\'), attr: { title: $root.getLocalization(\'Page Size:\', \'ASPxReportsStringId.ReportDesigner_Wizard_PageSize\') }"></span>                    <div data-bind="dxSelectBox: { items: _labelData.paperKinds, displayExpr: \'name\', value: _selectedPaperSize, itemTemplate: \'PaperSizeText\', dropDownOptions: { container: $root.getPopupContainer($element) },                             onOpened: function (e) {                                e.component._popup.option(\'width\', 300);                        }}, attr: { title: _selectedPaperSize().name + \' - \' + $root.dx.Reporting.Designer.Wizard.CustomizeLabelPage._getPageSizeText(_selectedPaperSize().width, _selectedPaperSize().height, _selectedPaperSize().unit)}">                        <div data-options="dxTemplate: { name: \'PaperSizeText\' }" class="dxrd-wizard-customizelabel-select-customtemplate">                            <p class="dxrd-wizard-customizelabel-select-template">                                <span data-bind="text: name"></span>                                <span data-bind="text: $root.dx.Reporting.Designer.Wizard.CustomizeLabelPage._getPageSizeText(width, height, unit)"></span>                            </p>                        </div>                    </div>                </div>                <div class="dxrd-wizard-customizelabel-radiounit">                    <div data-bind=\'dxRadioGroup:{items: _units, valueExpr: "value", value: unit, layout: "horizontal" }\'></div>                </div>                <div class="dxrd-wizard-customizelabel-pagesizetext"><span data-bind="text: _pageSizeText"></span></div>            </div>            <div class="dxrd-wizard-customizelabel-props-container">                <div class="dxrd-wizard-customizelabel-props">                    <div class="dxrd-wizard-customizelabel-pagesizetext-inline">                        <span data-bind="text: $root.getLocalization(\'Measure Units\', \'DevExpress.XtraReports.UI.XtraReport.ReportUnit\') + \':\', attr: { title: $root.getLocalization(\'Measure Units\', \'DevExpress.XtraReports.UI.XtraReport.ReportUnit\') + \':\' }"></span>                        <div data-bind="dxLocalizedSelectBox: { items: _units, valueExpr: \'value\', displayExpr: \'text\', value: unit, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>                    </div>                    <div>                        <span data-bind="text: $root.getLocalization(\'Label Width:\', \'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth\'), attr: { title: $root.getLocalization(\'Label Width:\', \'ASPxReportsStringId.ReportDesigner_Wizard_LabelWidth\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: labelWidth }"></div>                    </div>                    <div>                        <span data-bind="text: $root.getLocalization(\'Label Height:\', \'ASPxReportsStringId.ReportDesigner_Wizard_LabelHeight\'), attr: { title: $root.getLocalization(\'Label Height:\', \'ASPxReportsStringId.ReportDesigner_Wizard_LabelHeight\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: labelHeight }"></div>                    </div>                    <div class="dxrd-wizard-customizelabel-prop-whis-top-margin">                        <span data-bind="text: $root.getLocalization(\'Horizontal Pitch:\', \'ASPxReportsStringId.ReportDesigner_Wizard_HorizontalPitch\'), attr: { title: $root.getLocalization(\'Horizontal Pitch:\', \'ASPxReportsStringId.ReportDesigner_Wizard_HorizontalPitch\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: horizontalPitch }"></div>                    </div>                    <div>                        <span data-bind="text: $root.getLocalization(\'Vertical Pitch:\', \'ASPxReportsStringId.ReportDesigner_Wizard_VerticalPitch\'), attr: { title: $root.getLocalization(\'Vertical Pitch:\', \'ASPxReportsStringId.ReportDesigner_Wizard_VerticalPitch\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: verticalPitch }"></div>                    </div>                    <div class="dxrd-wizard-customizelabel-prop-whis-top-margin">                        <span data-bind="text: $root.getLocalization(\'Top Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_TopMargin\'), attr: { title: $root.getLocalization(\'Top Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_TopMargin\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: topMargin }"></div>                    </div>                    <div>                        <span data-bind="text: $root.getLocalization(\'Left Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_LeftMargin\'), attr: { title: $root.getLocalization(\'Left Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_LeftMargin\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: leftMargin }"></div>                    </div>                    <div>                        <span data-bind="text: $root.getLocalization(\'Right Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_RightMargin\'), attr: { title: $root.getLocalization(\'Right Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_RightMargin\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: rightMargin }"></div>                    </div>                    <div>                        <span data-bind="text: $root.getLocalization(\'Bottom Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_BottomMargin\'), attr: { title: $root.getLocalization(\'Bottom Margin:\', \'ASPxReportsStringId.ReportDesigner_Wizard_BottomMargin\') }"></span>                        <div data-bind="dxNumberBox: { min: 0.0, max: 999.9, showSpinButtons: true, step: _stepUnit, value: bottomMargin }"></div>                    </div>                </div>                <div class="dxrd-wizard-customizelabel-pic dxd-border-secondary">                    <div class="dxrd-wizard-customizelabel-pic-element"></div>                </div>                <div class="dxrd-wizard-customizelabel-labelscounttext"><span data-bind="text: _labelsCountText"></span></div>            </div>        </div>    </div></div>',

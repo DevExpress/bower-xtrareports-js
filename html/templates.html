@@ -1,8 +1,8 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (templates.html)
-* Version: 19.1.7
-* Build date: 2019-10-14
+* Version: 19.1.8
+* Build date: 2019-11-18
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1417,7 +1417,24 @@
 </script>
 <script type="text/html" id="dx-date">
     <div class="dx-datebox-container">
-        <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: 'datetime', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }), dxValidator: { validationRules: validationRules || [] }"></div>
+        <div data-bind="
+             dxDateBox: getOptions({ 
+                value: value, 
+                closeOnValueChange: true, 
+                type: 'datetime', 
+                disabled: disabled,
+                dropDownOptions: {
+                    container: $root.getPopupContainer($element),
+                    position: {
+                        at: 'left bottom',
+                        collision: 'flipfit flip',
+                        my: 'left top',
+                        boundary: $root.getPopupContainer($element),
+                        of: $element
+                    }
+                }
+            }),
+             dxValidator: { validationRules: validationRules || [] }"></div>
     </div>
 </script>
 <script type="text/html" id="dx-file">
@@ -2332,7 +2349,7 @@
     <div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>
 </script>
 <script type="text/html" id="dxrd-colorpicker">
-    <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: 'flipfit flipfit' }, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>
+    <div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element), position: { at: 'left bottom', collision: 'flipfit flipfit', my: 'left top', boundary: $root.getPopupContainer($element), of: $element } } }"></div>
 </script>
 <script type="text/html" id="dxrd-expressionstring">
     <!-- ko if: $data.value() -->
@@ -2703,8 +2720,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 19.1.7
-* Build date: 2019-10-16
+* Version: 19.1.8
+* Build date: 2019-11-19
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -2927,7 +2944,7 @@
 </script>
 
 <script type="text/html" id="dxrp-editing-field-datetime">
-    <div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: $data.getOptions({ dropDownOptions: { container: $root.getPopupContainer($element) } }), childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
+    <div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: $data.getOptions({ dropDownOptions: { container: $root.getPopupContainer($element), position: { at: 'left bottom', collision: 'flipfit flip', my: 'left top', boundary: $root.getPopupContainer($element), of: $element } } }), childStyle: { style: textStyle(), selector: '.dx-texteditor-input'}"></div>
 </script>
 
 <script type="text/html" id="dxrp-editing-field-image">
@@ -3334,8 +3351,8 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 19.1.7
-* Build date: 2019-10-16
+* Version: 19.1.8
+* Build date: 2019-11-19
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3536,8 +3553,8 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 19.1.7
-* Build date: 2019-10-16
+* Version: 19.1.8
+* Build date: 2019-11-19
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -4836,6 +4853,7 @@
             height: height,
             title: $root.getLocalization(title),
             visible: visible,
+            disabled: disabled,
             toolbarItems: buttons,
             showCloseButton: true,
             container: container($element),
@@ -5252,7 +5270,7 @@
              height: 'auto',
              container: $root.getPopupContainer($element),
              target: '.dxrd-page-color-scheme-tile-content-edit-icon',
-             position: { my: 'left center', at: 'right center' }
+             position: { my: 'left center', at: 'right center', collision: 'fit', of: '.dxrd-page-color-scheme-tile-content-edit', boundary: $root.getPopupContainer($element) }
              }">
                     <div class="dxrd-page-color-scheme-colorpicker-editor-container dxd-border-secondary">
                         <div data-bind="dxColorView: { value: editorColor, editAlphaChannel: true }"></div>

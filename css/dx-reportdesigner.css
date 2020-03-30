@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.css)
-* Version: 19.1.7
-* Build date: 2019-10-16
+* Version: 19.1.8
+* Build date: 2019-11-19
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -501,16 +501,19 @@
   opacity: 0.3;
   pointer-events: none;
 }
-.dxrd-page-color-scheme-colorpicker .dxrd-page-color-scheme-colorpicker-editor-container {
+.dx-designer .dxrd-page-color-scheme-colorpicker .dx-popup-content {
+  padding: 20px;
+}
+.dx-designer .dxrd-page-color-scheme-colorpicker .dxrd-page-color-scheme-colorpicker-editor-container {
   padding-bottom: 10px;
   border-bottom-width: 1px;
   border-bottom-style: solid;
 }
-.dxrd-page-color-scheme-colorpicker .dxrd-page-color-scheme-colorpicker-buttons {
+.dx-designer .dxrd-page-color-scheme-colorpicker .dxrd-page-color-scheme-colorpicker-buttons {
   margin-top: 20px;
   text-align: right;
 }
-.dxrd-page-color-scheme-colorpicker .dxrd-page-color-scheme-colorpicker-buttons .dxrd-page-color-scheme-colorpicker-button {
+.dx-designer .dxrd-page-color-scheme-colorpicker .dxrd-page-color-scheme-colorpicker-buttons .dxrd-page-color-scheme-colorpicker-button {
   width: 100px;
   float: right;
   margin-left: 8px;

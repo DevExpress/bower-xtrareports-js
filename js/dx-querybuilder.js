@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 19.1.7
-* Build date: 2019-10-14
+* Version: 19.1.8
+* Build date: 2019-11-18
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -1465,7 +1465,13 @@ var DevExpress;
                     if (!node)
                         return this._rootElementList;
                     var nodeType = ko.unwrap(node.nodeType);
-                    if (nodeType === JsonNodeType[JsonNodeType.Array] || nodeType === JsonNodeType[JsonNodeType.Object]) {
+                    if (nodeType == JsonNodeType[JsonNodeType.Property])
+                        return;
+                    if (nodeType === JsonNodeType[JsonNodeType.Array]) {
+                        this._rootElementList.push(currentPath);
+                        return;
+                    }
+                    if ((nodeType === JsonNodeType[JsonNodeType.Object])) {
                         this._rootElementList.push(currentPath);
                     }
                     (node.nodes || []).forEach(function (x) {
@@ -2010,7 +2016,9 @@ var DevExpress;
                 Metadata.dsParameterNameValidationRules = [{
                         type: "custom",
                         validationCallback: function (options) { return DataSourceParameter.validateName(options.value); },
-                        message: DevExpress.Analytics.Utils.getLocalization('Name is required and should be a valid identifier.', 'AnalyticsCoreStringId.NameIsRequired_Error')
+                        get message() {
+                            return DevExpress.Analytics.Utils.getLocalization('Name is required and should be a valid identifier.', 'AnalyticsCoreStringId.NameIsRequired_Error');
+                        }
                     }];
                 Metadata.parameterValueSerializationsInfo = { propertyName: "value", displayName: "Value", localizationId: "DevExpress.DataAccess.Parameter.Value", editor: Analytics.Widgets.editorTemplates.text };
                 var dsParameterName = { propertyName: "name", displayName: "Name", localizationId: "DevExpress.DataAccess.Parameter.Name", validationRules: Metadata.dsParameterNameValidationRules, editor: Analytics.Widgets.editorTemplates.text };
@@ -2850,7 +2858,9 @@ var DevExpress;
                     _this._jsonConnectionTitle = Analytics.Utils.getLocalization("Connection Name:", "AnalyticsCoreStringId.ReportDesigner_Wizard_Json_ConnectionName");
                     _this._connectionNameValidationRules = [{
                             type: "required",
-                            message: Internal.getLocalizedValidationErrorMessage(null, _this._jsonConnectionTitle)
+                            get message() {
+                                return Internal.getLocalizedValidationErrorMessage(null, this._jsonConnectionTitle);
+                            }
                         }];
                     _this._connectionName = ko.observable("");
                     _this._validationGroup = {
@@ -6957,7 +6967,9 @@ var DevExpress;
                                 type: "custom",
                                 reevaluate: true,
                                 validationCallback: function (options) { return _this.isValid(); },
-                                message: Internal.getLocalizedValidationErrorMessage(Analytics.Utils.getLocalization('The value cannot be empty and should have a valid format.', 'AnalyticsCoreStringId.ValueIsRequiredOrInvalidFormat_Error'), Analytics.Utils.getLocalization('JSON String:', 'DataAccessUIStringId.WizardPageChooseJsonSource_Custom'))
+                                get message() {
+                                    return Internal.getLocalizedValidationErrorMessage(Analytics.Utils.getLocalization('The value cannot be empty and should have a valid format.', 'AnalyticsCoreStringId.ValueIsRequiredOrInvalidFormat_Error'), Analytics.Utils.getLocalization('JSON String:', 'DataAccessUIStringId.WizardPageChooseJsonSource_Custom'));
+                                }
                             }];
                         return _this;
                     }
@@ -7249,6 +7261,7 @@ var DevExpress;
                             editor: Analytics.Widgets.editorTemplates.text,
                             validatorOptions: null
                         };
+                        var _self = this;
                         sourceUri.validatorOptions = {
                             onInitialized: function (e) {
                                 _this._sourceUriValidatorsReady(true);
@@ -7258,12 +7271,16 @@ var DevExpress;
                             },
                             validationRules: [{
                                     type: 'required',
-                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(sourceUri.displayName, sourceUri.localizationId))
+                                    get message() {
+                                        return getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(sourceUri.displayName, sourceUri.localizationId));
+                                    }
                                 }, {
                                     type: "custom",
                                     assignValueFirst: true,
                                     isDeferred: ko.pureComputed(function () { return _this._noEmptyProperties(); }),
-                                    message: function () { return _this._lastValidationMessage(); },
+                                    get message() {
+                                        return _self._lastValidationMessage();
+                                    },
                                     validationCallback: this._sourceUriValidationCallback
                                 }]
                         };
@@ -7299,7 +7316,9 @@ var DevExpress;
                                     type: "custom",
                                     reevaluate: true,
                                     assignValueFirst: true,
-                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(basicHttpAuth.displayName, basicHttpAuth.localizationId), Analytics.Utils.getLocalization(basicHttpAuthName.displayName, basicHttpAuthName.localizationId)),
+                                    get message() {
+                                        return getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(basicHttpAuth.displayName, basicHttpAuth.localizationId), Analytics.Utils.getLocalization(basicHttpAuthName.displayName, basicHttpAuthName.localizationId));
+                                    },
                                     validationCallback: function (params) {
                                         return _this._isBasicHttpAuthValid();
                                     }
@@ -7319,7 +7338,9 @@ var DevExpress;
                         queryParameters.editorOptions = {
                             nameValidationRules: [{
                                     type: "required",
-                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(queryParameters.displayName, queryParameters.localizationId), this._collectionItemNamePlaceholder),
+                                    get message() {
+                                        return getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(queryParameters.displayName, queryParameters.localizationId), this._collectionItemNamePlaceholder);
+                                    }
                                 }]
                         };
                         return queryParameters;
@@ -7336,7 +7357,9 @@ var DevExpress;
                         httpHeaders.editorOptions = {
                             nameValidationRules: [{
                                     type: "required",
-                                    message: getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(httpHeaders.displayName, httpHeaders.localizationId), this._collectionItemNamePlaceholder),
+                                    get message() {
+                                        return getLocalizedValidationErrorMessage(null, Analytics.Utils.getLocalization(httpHeaders.displayName, httpHeaders.localizationId), this._collectionItemNamePlaceholder);
+                                    }
                                 }]
                         };
                         return httpHeaders;

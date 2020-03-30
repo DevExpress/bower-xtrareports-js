@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 19.1.7
-* Build date: 2019-10-14
+* Version: 19.1.8
+* Build date: 2019-11-18
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -663,6 +663,10 @@ var DevExpress;
                 DataSourceWizardTitle: "DataAccessUIStringId.WizardTitleDatasource",
                 WizardPageConfigureQuery: 'DataAccessUIStringId.WizardPageConfigureQuery'
             };
+            function _getFileContent(content, readMode) {
+                return readMode !== "text" ? (content).replace(/(^data:[^,]+,)|(^data:)/, '') : content;
+            }
+            Internal._getFileContent = _getFileContent;
             function _uploadFile(filesHolder, deferred, options) {
                 try {
                     var files = filesHolder.files;
@@ -679,7 +683,7 @@ var DevExpress;
                             try {
                                 deferred.resolve({
                                     format: file.name.split('.').pop(),
-                                    content: options.readMode !== "text" ? fr.result.replace(/^data:[^,]+,/, '') : fr.result
+                                    content: _getFileContent(fr.result, options.readMode)
                                 });
                             }
                             catch (e) {
@@ -1569,9 +1573,26 @@ var DevExpress;
                 }
                 Internal.validateNullableGuid = validateNullableGuid;
                 var guidValidationMessage = function () { return DevExpress.Analytics.Utils.getLocalization('Guid is required and should have a valid format.', 'AnalyticsCoreStringId.GuidIsRequired_Error'); };
-                Internal.guidValidationRules = [{ type: "custom", validationCallback: function (options) { return validateNullableGuid(options.value); }, message: guidValidationMessage }];
-                Internal.guidRequiredValidationRules = [{ type: 'required', message: guidValidationMessage }];
-                Internal.requiredValidationRules = [{ type: 'required', message: function () { return DevExpress.Analytics.Utils.getLocalization('The value cannot be empty', "AnalyticsCoreStringId.ParametersPanel_DateTimeValueValidationError"); } }];
+                Internal.guidValidationRules = [{
+                        type: "custom",
+                        validationCallback: function (options) { return validateNullableGuid(options.value); },
+                        get message() {
+                            return guidValidationMessage();
+                        }
+                    }];
+                Internal.guidRequiredValidationRules = [{
+                        type: 'required',
+                        get message() {
+                            return guidValidationMessage();
+                        }
+                    }];
+                var requiredValidationRule = {
+                    type: 'required',
+                    get message() {
+                        return DevExpress.Analytics.Utils.getLocalization('The value cannot be empty', "AnalyticsCoreStringId.ParametersPanel_DateTimeValueValidationError");
+                    }
+                };
+                Internal.requiredValidationRules = [requiredValidationRule];
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
             (function (Internal) {
                 var CollectionItemWrapper = (function () {
@@ -2143,7 +2164,7 @@ var DevExpress;
                 Internal.SvgTemplatesEngine = SvgTemplatesEngine;
                 var makeTemplateSource = ko.templateEngine.prototype["makeTemplateSource"];
                 ko.templateEngine.prototype["makeTemplateSource"] = function (template, doc) {
-                    if (typeof template === "string" && SvgTemplatesEngine.getExistingTemplate(template)) {
+                    if (typeof template === "string" && SvgTemplatesEngine.getExistingTemplate(template) && !document.getElementById(template)) {
                         return new SvgTemplateSource(template, SvgTemplatesEngine["_instance"]["_data"], SvgTemplatesEngine.templates);
                     }
                     else {
@@ -2213,7 +2234,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-combobox-undo': '<div data-bind="dxLocalizedSelectBox: { dataSource: values, value: generateValue($root.undoEngine), valueExpr: \'value\', displayExpr: \'displayValue\', displayCustomValue: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }, dxValidator: { validationRules: $data.validationRules || [] }">    </div>',
     'dx-property-editor': '<div class="dx-editor" data-bind="visible: visible">        <div class="dx-group" data-bind="dxdAccordion: { collapsed: collapsed }">            <div class="dx-editor-header">                <div class="dx-field">                    <div class="dx-field-label dx-accordion-header dxd-text-primary" data-bind="styleunit: padding, css: { \'dx-accordion-empty\': templateName === \'dx-emptyHeader\' }">                        <!-- ko if: isComplexEditor -->                        <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }"></div>                        <!-- ko if: !!$data.textToSearch -->                        <div class="dx-group-header-font" data-bind="searchHighlighting: { text: displayName, textToSearch: textToSearch }, attr: { \'title\': displayName }"></div>                        <!-- /ko -->                        <!-- ko ifnot: !!$data.textToSearch -->                        <div class="dx-group-header-font" data-bind="text: displayName, attr: { \'title\': displayName }"></div>                        <!-- /ko -->                        <!-- /ko -->                        <!-- ko if: !isComplexEditor -->                        <!-- ko if: !!$data.textToSearch -->                        <div class="propertygrid-editor-displayName" data-bind="searchHighlighting: { text: displayName, textToSearch: textToSearch }, attr: { \'title\': displayName }, style: { fontWeight: isPropertyModified() ? \'Bold\' : \'\'}"></div>                        <!-- /ko -->                        <!-- ko ifnot: !!$data.textToSearch -->                        <div class="propertygrid-editor-displayName" data-bind="text: displayName, attr: { \'title\': displayName }, style: { fontWeight: isPropertyModified() ? \'Bold\' : \'\'}"></div>                        <!-- /ko -->                        <!-- /ko -->                    </div>                    <div class="dx-field-value">                        <div data-bind="service: { name: \'createEditorAddOn\' }"></div>                        <!-- ko if: templateName !== \'dx-emptyHeader\' -->                        <!-- ko lazy: { template: templateName } -->                        <!-- /ko -->                        <!-- /ko -->                    </div>                </div>            </div>            <!-- ko if: isComplexEditor -->            <div class="dx-editor-content dx-accordion-content">                <!-- ko if: (!$data.editorCreated || editorCreated) -->                <!-- ko template: contentTemplateName -->                <!-- /ko -->                <!-- /ko -->            </div>            <!-- /ko -->        </div>    </div>',
     'dx-emptyHeader': ' ',
-    'dx-date': '<div class="dx-datebox-container">        <div data-bind="dxDateBox: getOptions({ value: value, closeOnValueChange: true, type: \'datetime\', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }), dxValidator: { validationRules: validationRules || [] }"></div>    </div>',
+    'dx-date': '<div class="dx-datebox-container">        <div data-bind="             dxDateBox: getOptions({                 value: value,                 closeOnValueChange: true,                 type: \'datetime\',                 disabled: disabled,                dropDownOptions: {                    container: $root.getPopupContainer($element),                    position: {                        at: \'left bottom\',                        collision: \'flipfit flip\',                        my: \'left top\',                        boundary: $root.getPopupContainer($element),                        of: $element                    }                }            }),             dxValidator: { validationRules: validationRules || [] }"></div>    </div>',
     'dx-file': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'File\', disabled: disabled }"></div>',
     'dx-modificators': '<div class="dx-font-content">        <div class="dx-field">            <div class="dx-field-label dxd-text-primary" data-bind="styleunit: { \'paddingLeft\': padding }"></div>            <!-- ko with: value -->            <div class="dx-field-value">                <div class="dx-font-styles-content">                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-bold" data-bind="css: { \'dxd-state-active\': bold(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { bold(!bold()); } }"><!-- ko template: \'dxrd-svg-fontstyle-bold\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-italic" data-bind="css: { \'dxd-state-active\': italic(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { italic(!italic()); } }"><!-- ko template: \'dxrd-svg-fontstyle-italic\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-underline" data-bind="css: { \'dxd-state-active\': underline(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { underline(!underline()); } }"><!-- ko template: \'dxrd-svg-fontstyle-underline\'--><!-- /ko --></div>                    <div class="dx-font-style-button dxd-button-back-color dxd-state-normal dxd-back-highlighted dx-image-fontstyle-strikeout" data-bind="css: { \'dxd-state-active\': strikeout(), \'dx-disabled-button\': $parent.disabled }, click: function() { if(!$parent.disabled()) { strikeout(!strikeout()); } }"><!-- ko template: \'dxrd-svg-fontstyle-strikeout\'--><!-- /ko --></div>                </div>            </div>            <!-- /ko -->        </div>    </div>',
     'dx-image': '<div data-bind="dxFileImagePicker: { value: value, placeholderId: \'Image\', accept: \'image/*\', type: \'img\', disabled: disabled }"></div>',
@@ -2283,7 +2304,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-treelist-common': '<!-- ko foreach: items -->    <!-- ko lazy: { resolver: resolver, innerBindings: { template: templateName } } -->    <!-- /ko -->    <div data-bind="visible: !collapsed()">        <!-- ko template: { name: \'dx-treelist\', data: $data } -->        <!-- /ko -->    </div>    <!-- /ko -->',
     'dx-treelist-paginate': '<!-- ko foreach: visibleItems -->    <!-- ko template: templateName -->    <!-- /ko -->    <div data-bind="visible: !collapsed()">        <!-- ko template: { name: \'dx-treelist\', data: $data } -->        <!-- /ko -->    </div>    <!-- /ko -->',
     'dxrd-borders': '<div class="dxrd-bordereditor" data-bind="dxBorderEditor: { value: value }"></div>',
-    'dxrd-colorpicker': '<div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, popupPosition: { collision: \'flipfit flipfit\' }, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>',
+    'dxrd-colorpicker': '<div data-bind="dxColorBox: { value: displayValue, editAlphaChannel: true, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element), position: { at: \'left bottom\', collision: \'flipfit flipfit\', my: \'left top\', boundary: $root.getPopupContainer($element), of: $element } } }"></div>',
     'dxrd-expressionstring': '<!-- ko if: $data.value() -->    <div data-bind="dxExpressionEditor: getOptions({ options: value, fieldListProvider: $root.dataBindingsProvider, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() })"></div>    <!-- /ko -->',
     'dxrd-field': '<!-- ko displayNameExtender: { path: path, dataMember: value } -->    <div data-bind="dxFieldListPicker: { path: path, acceptCustomValue: true, value: value, displayValue: $displayName, itemsProvider: $root.dataBindingsProvider, treeListController: treeListController, disabled: disabled }"></div>    <!-- /ko -->',
     'dxrd-filterstring': '<!-- ko if: $data.value() -->    <div data-bind="dxFilterEditor: { options: value, fieldListProvider: $root.dataBindingsProvider, getDisplayNameByPath: $root.getDisplayNameByPath, displayNameProvider: $root.displayNameProvider && $root.displayNameProvider() }"></div>    <!-- /ko -->',
@@ -5346,6 +5367,12 @@ var DevExpress;
                     return Tools;
                 }(Utils.Disposable));
                 Internal.Tools = Tools;
+            })(Internal = Widgets.Internal || (Widgets.Internal = {}));
+            var TreeList;
+            (function (TreeList) {
+                TreeList.LoadChildItemsForCollapsedNodes = true;
+            })(TreeList = Widgets.TreeList || (Widgets.TreeList = {}));
+            (function (Internal) {
                 Internal.treeListEditAction = {
                     templateName: "dx-treelist-edit-action",
                     imageClassName: "",
@@ -5420,9 +5447,9 @@ var DevExpress;
                             if (_this.hasItems) {
                                 _this.collapsed(!_this.collapsed.peek());
                                 if (!_this.collapsed.peek() && _this.items().length === 0) {
-                                    _this._loadItems(options, true).always(function () { onItemsVisibilityChanged(); });
+                                    _this._loadItems(options, TreeList.LoadChildItemsForCollapsedNodes).always(function () { onItemsVisibilityChanged(); });
                                 }
-                                else {
+                                else if (TreeList.LoadChildItemsForCollapsedNodes) {
                                     _this.items().forEach(function (item) {
                                         item._treeListController.hasItems(item.data) && item._loadItems(options);
                                     });
@@ -5551,11 +5578,13 @@ var DevExpress;
                                     _this.items.valueHasMutated();
                                     _this._onItemsChanged();
                                 }
-                                _this.items().forEach(function (item) {
-                                    if ((!_this.collapsed() || loadInnerItems) && item._treeListController.hasItems(item.data)) {
-                                        item._loadItems(options);
-                                    }
-                                });
+                                if (!_this.collapsed() || loadInnerItems) {
+                                    _this.items().forEach(function (item) {
+                                        if (item._treeListController.hasItems(item.data)) {
+                                            item._loadItems(options);
+                                        }
+                                    });
+                                }
                                 _this.nodeImageClass(_this.items.peek().some(function (x) { return x.visible; }) ? "dx-collapsing-image dx-image-expanded" : "dx-image-leaf-node");
                                 deferred.resolve(_this.items.peek());
                                 var selectedPath = options.selectedPath.peek();
@@ -5639,7 +5668,10 @@ var DevExpress;
                             if (!this.data) {
                                 return true;
                             }
-                            return this._treeListController.hasItems(this.data) && this.items().some(function (item) { return item.visible; });
+                            var hasItems = this._treeListController.hasItems(this.data);
+                            return TreeList.LoadChildItemsForCollapsedNodes ?
+                                hasItems && this.items().some(function (item) { return item.visible; }) :
+                                hasItems;
                         },
                         enumerable: true,
                         configurable: true
@@ -7261,7 +7293,7 @@ var DevExpress;
                                     value = DevExpress.Analytics.Internal.formatDate(value);
                                 }
                                 if (_this.items.length > 0) {
-                                    var result = _this.items.filter(function (item) { return item.value === value; })[0];
+                                    var result = _this.items.filter(function (item) { return String(item.value) === String(value); })[0];
                                     if (result) {
                                         return result.display;
                                     }
@@ -8069,6 +8101,8 @@ var DevExpress;
                 __extends(FormatStringEditor, _super);
                 function FormatStringEditor(value, disabled, defaultPatterns, customPatterns, actions, rtl, popupContainer) {
                     var _this = _super.call(this) || this;
+                    _this._isDisabled = ko.observable(false);
+                    _this._timeout = null;
                     _this.currentType = ko.observable();
                     _this.patternList = ko.observableArray([]);
                     _this.canAddCustomFormat = ko.observable(false);
@@ -8166,7 +8200,7 @@ var DevExpress;
                 FormatStringEditor.prototype._createMainPopupButtons = function () {
                     var self = this;
                     this.buttonItems = [
-                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.Utils.getLocalization('OK', DevExpress.Analytics.Internal.StringId.DataAccessBtnOK), onClick: function () { self.okAction(); } } },
+                        { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.Utils.getLocalization('OK', DevExpress.Analytics.Internal.StringId.DataAccessBtnOK), disabled: this._isDisabled, onClick: function () { self.okAction(); } } },
                         { toolbar: 'bottom', location: 'after', widget: 'dxButton', options: { text: DevExpress.Analytics.Utils.getLocalization('Cancel', DevExpress.Analytics.Internal.StringId.DataAccessBtnCancel), onClick: function () { self.popupVisible(false); } } }
                     ];
                 };
@@ -8190,23 +8224,38 @@ var DevExpress;
                         this.formatResult(currectFormat.name);
                     }
                 };
+                FormatStringEditor.prototype._setPreviewString = function (previewString) {
+                    this.previewString(previewString);
+                    this._isDisabled(false);
+                };
+                FormatStringEditor.prototype._setErrorMessage = function (setDisabled) {
+                    this.previewString(Analytics.Utils.getLocalization("Preview string is not available", "AnalyticsCoreStringId.FormatStringEditor_PreviewNotAvailable_Text"));
+                    this._isDisabled(setDisabled);
+                };
                 FormatStringEditor.prototype._updatePreview = function () {
                     var _this = this;
-                    if (this.isGeneralType) {
-                        this.previewString(this._getGeneralPreview(undefined));
-                        return;
-                    }
-                    var category = this._standardPatternSource[this.currentType()];
-                    var updatedPreviewPromise = this.updatePreview(category.value, category.type, this._wrapFormat());
-                    this._lastUpdatePreviewPromise = updatedPreviewPromise;
-                    updatedPreviewPromise
-                        .done(function (previewString) {
-                        if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
-                            _this.previewString(previewString);
-                    }).fail(function (error) {
-                        if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
-                            _this.previewString(Analytics.Utils.getLocalization("Preview string is not available", "AnalyticsCoreStringId.FormatStringEditor_PreviewNotAvailable_Text"));
-                    });
+                    this._timeout && clearTimeout(this._timeout);
+                    this._timeout = setTimeout(function () {
+                        if (_this.isGeneralType) {
+                            _this.previewString(_this._getGeneralPreview(undefined));
+                            return;
+                        }
+                        var category = _this._standardPatternSource[_this.currentType()];
+                        var updatedPreviewPromise = _this.updatePreview(category.value, category.type, _this._wrapFormat());
+                        _this._lastUpdatePreviewPromise = updatedPreviewPromise;
+                        updatedPreviewPromise
+                            .done(function (previewResult) {
+                            if (_this._lastUpdatePreviewPromise === updatedPreviewPromise) {
+                                if (previewResult.Result)
+                                    _this._setPreviewString(previewResult.Result);
+                                else
+                                    _this._setErrorMessage(previewResult.IsError);
+                            }
+                        }).fail(function (error) {
+                            if (_this._lastUpdatePreviewPromise === updatedPreviewPromise)
+                                _this.previewString(Analytics.Utils.getLocalization("Preview string is not available", "AnalyticsCoreStringId.FormatStringEditor_PreviewNotAvailable_Text"));
+                        });
+                    }, 100);
                 };
                 FormatStringEditor.prototype._getGeneralPreview = function (value) {
                     if (value === void 0) { value = '###'; }
@@ -8286,7 +8335,7 @@ var DevExpress;
                     return ko.unwrap(this[name]);
                 };
                 FormatStringEditor.prototype.updatePreview = function (value, category, pattern) {
-                    return $.Deferred().resolve(value || "preview string").promise();
+                    return $.Deferred().resolve({ Result: value || "preview string" }).promise();
                 };
                 Object.defineProperty(FormatStringEditor.prototype, "customPatterns", {
                     get: function () {
@@ -12469,7 +12518,15 @@ var DevExpress;
                 return text.replace(/[\W_]+/g, "_");
             }
             Internal.replaceInvalidSymbols = replaceInvalidSymbols;
-            Internal.nameValidationRules = [{ type: "custom", validationCallback: function (options) { return validateName(options.value); }, message: DevExpress.Analytics.Utils.getLocalization('Name is required and should be a valid identifier.', 'AnalyticsCoreStringId.NameIsRequired_Error') }];
+            Internal.nameValidationRules = [
+                {
+                    type: "custom",
+                    validationCallback: function (options) { return validateName(options.value); },
+                    get message() {
+                        return DevExpress.Analytics.Utils.getLocalization('Name is required and should be a valid identifier.', 'AnalyticsCoreStringId.NameIsRequired_Error');
+                    }
+                }
+            ];
             var CombinedObject = (function () {
                 function CombinedObject() {
                 }
@@ -13848,7 +13905,7 @@ var DevExpress;
                     result = val * 96 / 100;
                 }
                 result = result * (zoom);
-                return Math.floor(result * 10000) / 10000;
+                return Math.floor(result * 100) / 100;
             }
             Internal.unitsToPixel = unitsToPixel;
             function pixelToUnits(val, measureUnit, zoom) {
@@ -13863,7 +13920,7 @@ var DevExpress;
                     result = val / 96 * 100;
                 }
                 result = result / (zoom);
-                return Math.round(result * 10000) / 10000;
+                return Math.round(result * 100) / 100;
             }
             Internal.pixelToUnits = pixelToUnits;
             function createUnitProperty(model, target, propertyName, property, measureUnit, zoom, afterCreation) {

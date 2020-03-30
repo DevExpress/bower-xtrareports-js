@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 19.1.7
-* Build date: 2019-10-16
+* Version: 19.1.8
+* Build date: 2019-11-19
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
@@ -3277,7 +3277,6 @@ var DevExpress;
                     if (applyBindings === void 0) { applyBindings = true; }
                     if (allowURLsWithJSContent === void 0) { allowURLsWithJSContent = false; }
                     var previewWrapper = new Internal.PreviewRequestWrapper(null, callbacks), reportPreview = new ReportPreview(handlerUri, previewWrapper, undefined, callbacks, rtl), searchModel = new Internal.SearchViewModel(reportPreview);
-                    reportPreview.editingFieldChanged = callbacks && callbacks.editingFieldChanged;
                     var documentMapModel = new Internal.DocumentMapModel(reportPreview);
                     var parametersModel = new Parameters.PreviewParametersViewModel(reportPreview, new Parameters.PreviewParameterHelper(parametersInfo && parametersInfo.knownEnums, callbacks));
                     var exportModel = new Export.ExportOptionsModel(reportPreview);
@@ -6639,6 +6638,7 @@ var DevExpress;
                     _this_1.zoomStep = ko.observable(0.05);
                     _this_1.exportOptionsTabVisible = ko.observable(true);
                     Settings.HandlerUri = handlerUri || Settings.HandlerUri;
+                    _this_1.editingFieldChanged = callbacks && callbacks.editingFieldChanged;
                     _this_1.previewHandlersHelper = previewHandlersHelper || new Internal.PreviewHandlersHelper(_this_1);
                     _this_1.requestWrapper = previewRequestWrapper || new Internal.PreviewRequestWrapper(null, callbacks);
                     _this_1.rtlViewer = rtl;
@@ -6660,8 +6660,11 @@ var DevExpress;
                                 page.actualResolution = 0;
                                 page.isClientVisible() && page._setPageImgSrc(documentId, _this_1._unifier(), _this_1._zoom());
                             }
-                            if (callbacks && callbacks.documentReady) {
-                                documentId && callbacks.documentReady(documentId, _this_1._currentReportId(), pageCount);
+                            if (callbacks && callbacks.documentReady && documentId) {
+                                var self = _this_1;
+                                setTimeout(function () {
+                                    callbacks.documentReady(documentId, self._currentReportId(), pageCount);
+                                });
                             }
                         }
                     }));
@@ -6727,9 +6730,14 @@ var DevExpress;
                     if (_window && (DevExpress.utils.browser.chrome && 76 <= browserVersion)) {
                         var worker = this._createWorker();
                         var checkOnTick = function () {
-                            if (_window.document && _window.document.contentType === "application/pdf") {
-                                _window.print();
-                                worker.postMessage("stop");
+                            try {
+                                if (_window.document && _window.document.contentType === "application/pdf") {
+                                    _window.print();
+                                    worker.postMessage("stop");
+                                    _this_1._terminateWorker();
+                                }
+                            }
+                            catch (_a) {
                                 _this_1._terminateWorker();
                             }
                         };
@@ -9061,7 +9069,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrp-editing-field-text': '<textarea class="dxrp-editing-field-text" data-bind="value: value, valueUpdate: \'keypress\', style: textStyle(), event: { blur: hideEditor, keyup: keypressAction }"></textarea>',
     'dxrp-editing-field-mask': '<div class="dxrp-editing-field-mask" data-bind="dxTextBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
     'dxrp-editing-field-number': '<div class="dxrp-editing-field-mask" data-bind="dxNumberBox: options, childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
-    'dxrp-editing-field-datetime': '<div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: $data.getOptions({ dropDownOptions: { container: $root.getPopupContainer($element) } }), childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
+    'dxrp-editing-field-datetime': '<div style="width: 100%" class="dxrp-editing-field-datetime" data-bind="dxDateBox: $data.getOptions({ dropDownOptions: { container: $root.getPopupContainer($element), position: { at: \'left bottom\', collision: \'flipfit flip\', my: \'left top\', boundary: $root.getPopupContainer($element), of: $element } } }), childStyle: { style: textStyle(), selector: \'.dx-texteditor-input\'}"></div>',
     'dxrp-editing-field-image': '<div class="dxrp-editing-field-container" data-bind="style: containerStyle() ">        <!-- ko template: \'dxrp-editing-field-image-editor\' -->        <!-- /ko -->    </div>',
     'dxrp-editing-field-image-editor': '<div style="height: 100%; width: 100%;" data-bind="dxPictureEditor: $data.getPictureEditorOptions()"></div>',
     'dxrp-editing-field-checkbox': '<div class="dxrp-editing-field-check-container" data-bind="style: containerStyle(), zoom: zoom, click: onClick">        <div class="dxrp-editing-field-check" data-bind="style: checkStyle(), template: {name: $data.checkStateStyleIcon, if: !!ko.unwrap($data.checkStateStyleIcon)}"> </div>    </div>',
