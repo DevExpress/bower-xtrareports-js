@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.js)
-* Version: 19.1.8
-* Build date: 2019-11-19
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -19,6 +19,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-svg-actions-add_field_to_column_area': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M0 0h4v14H0z"/><path class="dxd-icon-fill dxd-opacity-60" d="M6 0h2v2H6zM6 4h2v2H6zM6 8h2v2H6zM6 12h2v2H6zM10 0h2v2h-2zM10 4h2v2h-2zM10 8h2v2h-2zM14 0h2v2h-2zM14 4h2v2h-2z"/><path class="dxd-icon-fill dxd-opacity-80" d="M22 12h-4V8h-4v4h-4v4h4v4h4v-4h4z"/></svg>',
     'dxrd-svg-actions-add_field_to_data_area': '<svg data-bind="svgAttrs" viewBox="0 0 24 24"><path class="dxd-icon-fill dxd-opacity-80" d="M18 14v-4h-4v4h-4v4h4v4h4v-4h4v-4z"/><ellipse class="dxd-icon-fill dxd-opacity-80" cx="6" cy="2" rx="6" ry="2"/><path class="dxd-icon-fill dxd-opacity-80" d="M12 4c0 1.1-2.7 2-6 2s-6-.9-6-2v12c0 1.1 2.7 2 6 2 .7 0 1.4 0 2-.1V12h4V4z"/></svg>',
@@ -743,6 +754,7 @@ var DevExpress;
                         __extends(ViewEditor, _super);
                         function ViewEditor(info, level, parentDisabled, textToSearch) {
                             var _this = _super.call(this, info, level, parentDisabled, textToSearch) || this;
+                            _this.viewItems = [];
                             _this.contentValue = ko.computed(function () {
                                 return _this.value() && _this.value().model() || {};
                             });
@@ -762,6 +774,15 @@ var DevExpress;
                                 }));
                             }
                             return this.headerValue;
+                        };
+                        ViewEditor.prototype.generateViewItems = function () {
+                            var _this = this;
+                            if (!this.viewItems.length) {
+                                this.viewItems = this.values().map(function (x) {
+                                    return __assign({}, x, { className: _this.generateViewClassName(x.value), templateName: _this.generateViewClassName(x.value, true) });
+                                });
+                            }
+                            return this.viewItems;
                         };
                         ViewEditor.prototype.generateViewClassName = function (value, isTemplate) {
                             if (isTemplate === void 0) { isTemplate = false; }
@@ -942,6 +963,102 @@ var DevExpress;
                         return TitleViewModel;
                     }(ChartElementCollectionItemBase));
                     Models.TitleViewModel = TitleViewModel;
+                    function assignTitleActions(titles) {
+                        var addTitle = function (model) {
+                            model["@Text"] = model["@Name"] = DevExpress.Analytics.Internal.getUniqueName(titles().map(function (x) { return x["name"](); }), Models.TitleViewModel.prefix);
+                            titles()["innerActions"][0].closePopover();
+                            titles.push(new Models.TitleViewModel(model, titles));
+                        };
+                        var actions = [
+                            {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-top_left",
+                                imageTemplateName: "dxrd-svg-titles-top_left",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Alignment": "Near" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-top_center",
+                                imageTemplateName: "dxrd-svg-titles-top_center",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Alignment": "Center" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-top_right",
+                                imageTemplateName: "dxrd-svg-titles-top_right",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Alignment": "Far" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-right_top_vertical",
+                                imageTemplateName: "dxrd-svg-titles-right_top_vertical",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Right", "@Alignment": "Near" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-right_center_vertical",
+                                imageTemplateName: "dxrd-svg-titles-right_center_vertical",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Right", "@Alignment": "Center" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-right_bottom_vertical",
+                                imageTemplateName: "dxrd-svg-titles-right_bottom_vertical",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Right", "@Alignment": "Far" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-bottom_left",
+                                imageTemplateName: "dxrd-svg-titles-bottom_left",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Bottom", "@Alignment": "Near" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-bottom_center",
+                                imageTemplateName: "dxrd-svg-titles-bottom_center",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Bottom", "@Alignment": "Center" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-bottom_right",
+                                imageTemplateName: "dxrd-svg-titles-bottom_right",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Bottom", "@Alignment": "Far" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-left_bottom_vertical",
+                                imageTemplateName: "dxrd-svg-titles-left_bottom_vertical",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Left", "@Alignment": "Near" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-left_center_vertical",
+                                imageTemplateName: "dxrd-svg-titles-left_center_vertical",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Left", "@Alignment": "Center" }); }
+                            }, {
+                                text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
+                                imageClassName: "dxrd-image-chart-title-left_top_vertical",
+                                imageTemplateName: "dxrd-svg-titles-left_top_vertical",
+                                disabled: ko.observable(false),
+                                visible: true,
+                                clickAction: function () { addTitle({ "@Dock": "Left", "@Alignment": "Far" }); }
+                            }
+                        ];
+                        titles()["innerActions"] = createInnerActionsWithPopover(DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'), "addtitles-action_" + DevExpress.Analytics.Internal.guid(), actions);
+                    }
+                    Models.assignTitleActions = assignTitleActions;
                     var AdditionalLegendViewModel = (function (_super) {
                         __extends(AdditionalLegendViewModel, _super);
                         function AdditionalLegendViewModel(model, parent, serializer) {
@@ -1110,94 +1227,7 @@ var DevExpress;
                                 });
                             }, undefined, "arrayChange"));
                             _this.dataContainer.series().forEach(function (series) { return _this._patchSeries(series); });
-                            var actions = [
-                                {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-top_left",
-                                    imageTemplateName: "dxrd-svg-titles-top_left",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Alignment": "Near" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-top_center",
-                                    imageTemplateName: "dxrd-svg-titles-top_center",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Alignment": "Center" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-top_right",
-                                    imageTemplateName: "dxrd-svg-titles-top_right",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Alignment": "Far" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-right_top_vertical",
-                                    imageTemplateName: "dxrd-svg-titles-right_top_vertical",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Right", "@Alignment": "Near" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-right_center_vertical",
-                                    imageTemplateName: "dxrd-svg-titles-right_center_vertical",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Right", "@Alignment": "Center" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-right_bottom_vertical",
-                                    imageTemplateName: "dxrd-svg-titles-right_bottom_vertical",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Right", "@Alignment": "Far" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-bottom_left",
-                                    imageTemplateName: "dxrd-svg-titles-bottom_left",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Bottom", "@Alignment": "Near" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-bottom_center",
-                                    imageTemplateName: "dxrd-svg-titles-bottom_center",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Bottom", "@Alignment": "Center" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-bottom_right",
-                                    imageTemplateName: "dxrd-svg-titles-bottom_right",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Bottom", "@Alignment": "Far" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-left_bottom_vertical",
-                                    imageTemplateName: "dxrd-svg-titles-left_bottom_vertical",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Left", "@Alignment": "Near" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-left_center_vertical",
-                                    imageTemplateName: "dxrd-svg-titles-left_center_vertical",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Left", "@Alignment": "Center" }); }
-                                }, {
-                                    text: DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'),
-                                    imageClassName: "dxrd-image-chart-title-left_top_vertical",
-                                    imageTemplateName: "dxrd-svg-titles-left_top_vertical",
-                                    disabled: ko.observable(false),
-                                    visible: true,
-                                    clickAction: function () { _this.addTitle({ "@Dock": "Left", "@Alignment": "Far" }); }
-                                }
-                            ];
-                            _this.titles()["innerActions"] = createInnerActionsWithPopover(DevExpress.Analytics.Utils.getLocalization("Add", 'ChartStringId.MenuItemAdd'), "addtitles-action", actions);
+                            assignTitleActions(_this.titles);
                             return _this;
                         }
                         ChartViewModel.from = function (model, serializer) {
@@ -1209,7 +1239,7 @@ var DevExpress;
                         ChartViewModel.prototype._patchView = function (view) {
                             var _this = this;
                             var info = view.getInfo();
-                            ["barDistance", "barDistanceFixed"].forEach(function (propertyName) {
+                            ["barDistance", "barDistanceFixed", "equalBarWidth"].forEach(function (propertyName) {
                                 if (info.filter(function (x) { return x.propertyName === propertyName; }).length > 0) {
                                     view[propertyName] = _this[propertyName];
                                 }
@@ -1236,11 +1266,6 @@ var DevExpress;
                                     this.diagram(DiagramViewModel.createDiagram(model, typeName, serializer));
                                 }
                             }
-                        };
-                        ChartViewModel.prototype.addTitle = function (model) {
-                            model["@Text"] = model["@Name"] = DevExpress.Analytics.Internal.getUniqueName(this.titles().map(function (x) { return x["name"](); }), Models.TitleViewModel.prefix);
-                            this.titles()["innerActions"][0].closePopover();
-                            this.titles.push(new Models.TitleViewModel(model, this.titles));
                         };
                         return ChartViewModel;
                     }(DevExpress.Analytics.Elements.SerializableModel));
@@ -1610,7 +1635,17 @@ var DevExpress;
                 };
                 var totalLabelInfo = [Internal.textColor, Internal.backColor, viewEnableAntialiasing, Internal.maxWidth, Internal.maxLineCount, Internal.textAlignment, Internal.textPattern, viewVisible, Internal.tag, Internal.font12, viewBorder1, viewFillStyle, shadow];
                 var totalLabel = { propertyName: "totalLabel", modelName: "TotalLabel", displayName: "Total Label", localizationId: "DevExpress.XtraCharts.PieSeriesView.TotalLabel", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: totalLabelInfo, };
-                var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Internal.tag, totalLabel];
+                var viewTitles = {
+                    propertyName: "titles",
+                    modelName: "Titles",
+                    array: true,
+                    from: function (model, serializer) {
+                        return deserializeModelArray(model, function (title, parent) { return new Models.TitleViewModel(title, parent, serializer); }, Models.TitleViewModel.prefix);
+                    },
+                    displayName: "Titles",
+                    localizationId: "DevExpress.XtraCharts.SimpleDiagramSeriesViewBase.Titles"
+                };
+                var nestedDoughnutSeriesViewinfo = [weight, innerIndent, group, holeRadiusPercent, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, viewTitles, Internal.tag, totalLabel];
                 var thickness2 = { propertyName: "thickness", modelName: "@Thickness", displayName: "Thickness", localizationId: "DevExpress.XtraCharts.LineStyle.Thickness", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1, editorOptions: { min: 1 } };
                 var lineStyleInfo1 = [thickness2, viewDashStyle, lineJoin, Internal.tag,];
                 var lineStyle2 = { propertyName: "lineStyle", modelName: "LineStyle", displayName: "Line Style", localizationId: "DevExpress.XtraCharts.SwiftPlotSeriesView.LineStyle", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: lineStyleInfo1, };
@@ -1619,12 +1654,12 @@ var DevExpress;
                 var holeRadiusPercent1 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.Funnel3DSeriesView.HoleRadiusPercent", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 90, editorOptions: { min: 0, max: 100 } };
                 var heightToWidthRatio1 = { propertyName: "heightToWidthRatio", modelName: "@HeightToWidthRatio", displayName: "Height to Width Ratio", localizationId: "DevExpress.XtraCharts.FunnelSeriesViewBase.HeightToWidthRatio", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 1 };
                 var pointDistance = { propertyName: "pointDistance", modelName: "@PointDistance", displayName: "Point Distance", localizationId: "DevExpress.XtraCharts.FunnelSeriesViewBase.PointDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0, editorOptions: { min: 0 } };
-                var funnel3DSeriesViewinfo = [holeRadiusPercent1, heightToWidthRatio1, pointDistance, Internal.tag,];
+                var funnel3DSeriesViewinfo = [holeRadiusPercent1, heightToWidthRatio1, pointDistance, viewTitles, Internal.tag];
                 var border5 = { propertyName: "border", modelName: "Border", displayName: "Border", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.Border", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: borderInfo, };
                 var fillStyle6 = { propertyName: "fillStyle", modelName: "FillStyle", displayName: "Fill Style", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.FillStyle", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, from: Series.FillStyle.from(fillStyleInfo, "PolygonGradientFillOptions"), toJsonObject: Series.FillStyle.toJson };
                 var alignToCenter = { propertyName: "alignToCenter", modelName: "@AlignToCenter", displayName: "Align to Center", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.AlignToCenter", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: false };
                 var heightToWidthRatioAuto = { propertyName: "heightToWidthRatioAuto", modelName: "@HeightToWidthRatioAuto", displayName: "Height to Width Ratio Auto", localizationId: "DevExpress.XtraCharts.FunnelSeriesView.HeightToWidthRatioAuto", from: DevExpress.Analytics.Utils.parseBool, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, defaultVal: true };
-                var funnelSeriesViewinfo = [border5, fillStyle6, alignToCenter, heightToWidthRatioAuto, heightToWidthRatio1, pointDistance, Internal.tag,];
+                var funnelSeriesViewinfo = [border5, fillStyle6, alignToCenter, heightToWidthRatioAuto, heightToWidthRatio1, pointDistance, viewTitles, Internal.tag,];
                 var scatterLineSeriesViewinfo = [viewLineStyle, lineMarkerOptions, viewMarkerVisibility, viewEnableAntialiasing, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var bubbleMarkerOptionsInfo = [kind, starPointCount, fillStyle1, viewBorderVisible, viewBorderColor, Internal.tag,];
                 var bubbleMarkerOptions = { propertyName: "bubbleMarkerOptions", modelName: "BubbleMarkerOptions", displayName: "Bubble Marker Options", localizationId: "DevExpress.XtraCharts.BubbleSeriesView.BubbleMarkerOptions", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: bubbleMarkerOptionsInfo, };
@@ -1669,9 +1704,9 @@ var DevExpress;
                 var sizeAsPercentage = { propertyName: "sizeAsPercentage", modelName: "@SizeAsPercentage", displayName: "Size As Percentage", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.SizeAsPercentage", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 100, editorOptions: { min: 0, max: 100 } };
                 var pieFillStyleInfo = [fillMode1, Internal.fillStyleOptionsSerialize, Internal.tag,];
                 var pieFillStyle = { propertyName: "pieFillStyle", modelName: "PieFillStyle", displayName: "Pie Fill Style", localizationId: "DevExpress.XtraCharts.Pie3DSeriesView.PieFillStyle", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: pieFillStyleInfo, };
-                var doughnut3DSeriesViewinfo = [holeRadiusPercent2, depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Internal.tag,];
+                var doughnut3DSeriesViewinfo = [holeRadiusPercent2, depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, viewTitles, Internal.tag,];
                 var holeRadiusPercent3 = { propertyName: "holeRadiusPercent", modelName: "@HoleRadiusPercent", displayName: "Hole Radius Percent", localizationId: "DevExpress.XtraCharts.DoughnutSeriesView.HoleRadiusPercent", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 60, editorOptions: { min: 0, max: 100 } };
-                var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Internal.tag, totalLabel];
+                var doughnutSeriesViewinfo = [holeRadiusPercent3, minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, viewTitles, Internal.tag, totalLabel];
                 var size2 = { propertyName: "size", modelName: "@Size", displayName: "Size", localizationId: "DevExpress.XtraCharts.SimpleMarker.Size", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 8, editorOptions: { min: 1 } };
                 var pointMarkerOptionsInfo = [size2, kind, starPointCount, fillStyle1, viewBorderVisible, viewBorderColor, Internal.tag,];
                 var pointMarkerOptions = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.RadarPointSeriesView.PointMarkerOptions", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
@@ -1729,8 +1764,8 @@ var DevExpress;
                 var lineSeriesViewinfo = [viewLineStyle, lineMarkerOptions, viewMarkerVisibility, viewEnableAntialiasing, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var manhattanBarSeriesViewinfo = [viewBarWidth, barDepth, barDepthAuto, fillStyle3, model, showFacet, colorEach2, aggregateFunction2, transparency2, color1, Internal.tag,];
                 var overlappedRangeBarSeriesViewinfo = [minValueMarker, maxValueMarker, minValueMarkerVisibility, maxValueMarkerVisibility, barWidth1, border3, fillStyle4, transparency5, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
-                var pie3DSeriesViewinfo = [depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, Internal.tag,];
-                var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, Internal.tag, totalLabel];
+                var pie3DSeriesViewinfo = [depth, sizeAsPercentage, pieFillStyle, explodedDistancePercentage, explodeMode, sweepDirection, viewTitles, Internal.tag,];
+                var pieSeriesViewinfo = [minAllowedSizePercentage, rotation, heightToWidthRatio, border4, fillStyle5, runtimeExploding, explodedDistancePercentage, explodeMode, sweepDirection, viewTitles, Internal.tag, totalLabel];
                 var pointMarkerOptions1 = { propertyName: "pointMarkerOptions", modelName: "PointMarkerOptions", displayName: "Point Marker Options", localizationId: "DevExpress.XtraCharts.PointSeriesView.PointMarkerOptions", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, info: pointMarkerOptionsInfo, };
                 var pointSeriesViewinfo = [pointMarkerOptions1, colorEach1, shadow, Internal.paneName, Internal.axisXName, Internal.axisYName, viewAggregateFunction, color1, Internal.tag,];
                 var barDistance6 = { propertyName: "barDistance", displayName: "Bar Distance", localizationId: "DevExpress.XtraCharts.SideBySideBarSeriesView.BarDistance", editor: DevExpress.Analytics.Widgets.editorTemplates.numeric, defaultVal: 0 };
@@ -1977,9 +2012,11 @@ var DevExpress;
                                 ko.unwrap(_this.valueDataMembers).dispose();
                             }
                             _this.viewType = ko.observable(_this.view().typeName);
+                            _this._adjustArgumentScaleType();
                             _this.viewType.subscribe(function (newType) {
                                 var newSerializer = serializer || new DevExpress.Analytics.Utils.ModelSerializer();
                                 _this.view(SeriesViewViewModel.from({ "@TypeNameSerializable": newType }, newSerializer)());
+                                _this._adjustArgumentScaleType();
                             });
                             _this._disposables.push(_this.view.subscribe(function (newView) {
                                 if (_this.viewType() !== newView.typeName) {
@@ -2002,6 +2039,9 @@ var DevExpress;
                                 if (newVal !== "Auto" && newVal !== "Qualitative")
                                     _this.argumentDataMember("");
                                 _this._actualArgumentScaleType(newVal == "Auto" ? ScaleType.Numerical : Series.ScaleTypeMap[newVal]);
+                            }));
+                            _this._disposables.push(_this["titles"] = ko.computed(function () {
+                                return _this.view() && _this.view()["titles"] && _this.view()["titles"]();
                             }));
                             _this._disposables.push(_this._actualArgumentScaleType.subscribe(function (newVal) {
                                 switch (newVal) {
@@ -2043,6 +2083,19 @@ var DevExpress;
                             }
                             this.valueDataMembers.peek().dispose();
                             this.valueDataMembers(new (viewTypesDataMembers[view.typeName] || DataMembers.CommonValueDataMembers)(this.valueDataMembers.peek().toString(), this.valueScaleType));
+                        };
+                        SeriesTemplateViewModel.prototype._isOnlyNumericArgumentScaleTypeSupported = function () {
+                            return onlyNumericArgumentSupportedSeriesViewTypes.indexOf(this.viewType()) > -1;
+                        };
+                        SeriesTemplateViewModel.prototype._adjustArgumentScaleType = function () {
+                            if (this._isOnlyNumericArgumentScaleTypeSupported())
+                                this.argumentScaleType("Numerical");
+                        };
+                        SeriesTemplateViewModel.prototype._isPropertyDisabled = function (name) {
+                            if (name === "argumentScaleType") {
+                                return this._isOnlyNumericArgumentScaleTypeSupported();
+                            }
+                            return false;
                         };
                         SeriesTemplateViewModel.prototype.isPropertyVisible = function (propertyName) {
                             switch (propertyName) {
@@ -2132,6 +2185,11 @@ var DevExpress;
                         "OverlappedGanttSeriesView": "RangeBarSeriesLabel",
                         "SideBySideGanttSeriesView": "RangeBarSeriesLabel"
                     };
+                    var onlyNumericArgumentSupportedSeriesViewTypes = [
+                        "PolarPointSeriesView",
+                        "PolarLineSeriesView",
+                        "PolarAreaSeriesView"
+                    ];
                     var SeriesLabelViewModel = (function (_super) {
                         __extends(SeriesLabelViewModel, _super);
                         function SeriesLabelViewModel(model, serializer) {
@@ -2160,12 +2218,25 @@ var DevExpress;
                             _this.valuesSerializable = ko.computed(function () {
                                 return _this.arrayValueDataMemberNames.map(function (name) { return _this[name]; });
                             });
+                            _this.argumentSerializableInfo = ko.computed(function () {
+                                var argumentScaleType = series.argumentScaleType();
+                                var editor = DevExpress.Analytics.Widgets.editorTemplates.text;
+                                if (argumentScaleType === "Numerical") {
+                                    editor = DevExpress.Analytics.Widgets.editorTemplates.numeric;
+                                }
+                                else if (argumentScaleType === "DateTime") {
+                                    editor = DevExpress.Analytics.Widgets.editorTemplates.date;
+                                }
+                                return $.extend(true, {}, Internal.argumentSerializable, { editor: editor });
+                            });
                             _this.getInfo = function () {
                                 var dataMember = _this.series && _this.series.valueDataMembers();
                                 if (!dataMember)
                                     return Internal.seriesPointSerializationsInfo;
                                 var valueDataMemberInfo = dataMember.getInfo().map(function (info) { return $.extend({}, info, { editor: _this.isDateType ? DevExpress.Analytics.Widgets.editorTemplates.date : DevExpress.Analytics.Widgets.editorTemplates.numeric }); });
-                                return Internal.seriesPointSerializationsInfo.concat(valueDataMemberInfo);
+                                var info = $.extend(true, [], Internal.seriesPointSerializationsInfo);
+                                info.splice(info.indexOf(info.filter(function (prop) { return prop.propertyName === "argumentSerializable"; })[0]), 1, _this.argumentSerializableInfo());
+                                return info.concat(valueDataMemberInfo);
                             };
                             return _this;
                         }
@@ -2176,7 +2247,31 @@ var DevExpress;
                             });
                         };
                         SeriesPointModel.createNew = function (series) {
-                            return new SeriesPointModel({}, series, new DevExpress.Analytics.Utils.ModelSerializer());
+                            return new SeriesPointModel(SeriesPointModel.getPointModelBySeries(series), series, new DevExpress.Analytics.Utils.ModelSerializer());
+                        };
+                        SeriesPointModel.getPointModelBySeries = function (series) {
+                            var value = SeriesPointModel.getDefaultValueByScaleType(series.valueScaleType());
+                            value = (value instanceof Date) ? DevExpress.Analytics.Internal.formatDate(value) : value.toString();
+                            for (var ind = 1; ind < series.valueDataMembers().arrayValueDataMemberNames.length; ind++) {
+                                value += (SeriesPointModel.separator + value);
+                            }
+                            var newModel = {
+                                "@ValuesSerializable": value
+                            };
+                            var argument = SeriesPointModel.getDefaultValueByScaleType(series.argumentScaleType());
+                            if (argument !== null && argument !== void 0) {
+                                newModel["@ArgumentSerializable"] = argument;
+                            }
+                            return newModel;
+                        };
+                        SeriesPointModel.getDefaultValueByScaleType = function (scaleType) {
+                            if (scaleType === "Numerical") {
+                                return 0;
+                            }
+                            else if (scaleType === "DateTime") {
+                                return new Date(new Date().setHours(0, 0, 0, 0));
+                            }
+                            return null;
                         };
                         SeriesPointModel.valueToJsonObject = function (value) {
                             var result = SeriesPointModel.getSerializationValue(value, serializeDate);
@@ -2195,7 +2290,15 @@ var DevExpress;
                             var _this = this;
                             var values = (value || "").split(SeriesPointModel.separator);
                             valueDataMember.arrayValueDataMemberNames.forEach(function (name, index) {
-                                var newValue = _this.isDateType ? parseDate(values[index] || defaultValue) : (values[index] || defaultValue);
+                                var newValue;
+                                if (_this.isDateType && values[index]) {
+                                    newValue = DevExpress.Analytics.Internal.parseDate(values[index] || defaultValue, false, "MM/dd/yyyy");
+                                    if (!newValue)
+                                        newValue = parseDate(values[index] || defaultValue);
+                                }
+                                else {
+                                    newValue = (values[index] || defaultValue);
+                                }
                                 if (valueDataMember[name])
                                     valueDataMember[name](newValue);
                                 else
@@ -2219,6 +2322,8 @@ var DevExpress;
                             var _this = this;
                             model["@TypeNameSerializable"] = model["@TypeNameSerializable"] || "SideBySideBarSeriesView";
                             _this = _super.call(this, model, serializer) || this;
+                            if (_this["titles"])
+                                Models.assignTitleActions(_this["titles"]);
                             _this._createMarkerDependences();
                             _this._createLinkOptionsDependences();
                             _this["isPropertyDisabled"] = function (propertyName) {
@@ -2286,6 +2391,26 @@ var DevExpress;
                         function SeriesViewModel(model, parent, serializer) {
                             var _this = _super.call(this, model, serializer, Internal.seriesSerializationsInfo) || this;
                             _this.isIncompatible = ko.observable(false);
+                            _this.getInfo = function () {
+                                var info = $.extend(true, [], Internal.seriesSerializationsInfo);
+                                var argumentScaleTypeInfo = info.filter(function (prop) { return prop.propertyName === "argumentScaleType"; })[0];
+                                argumentScaleTypeInfo.validatorOptions = {
+                                    validationRules: [{
+                                            type: "custom",
+                                            reevaluate: true,
+                                            validationCallback: function (params) {
+                                                var unconvertiblePoint = _this._getUnconvertiblePoint("argumentSerializable", _this.argumentScaleType(), params.value);
+                                                var stringFormat = DevExpress.Analytics.Utils.getLocalization("The type of the '{0}' point isn't compatible with the {1} scale.", "ChartStringId.MsgIncompatiblePointType");
+                                                var argumentValue = unconvertiblePoint && unconvertiblePoint.argumentSerializable();
+                                                if (argumentValue && (argumentValue instanceof Date))
+                                                    argumentValue = DevExpress.Analytics.Internal.formatDate(argumentValue);
+                                                params.rule.message = DevExpress.Analytics.Internal.formatUnicorn(stringFormat, (argumentValue !== null || argumentValue !== void 0) ? argumentValue : "", params.value);
+                                                return !unconvertiblePoint;
+                                            }
+                                        }]
+                                };
+                                return info;
+                            };
                             Axis.initCollectionItem(_this, parent)();
                             _this._disposables.push(_this["displayName"] = ko.pureComputed(function () {
                                 return _this.isIncompatible() ? DevExpress.Analytics.Utils.getLocalization("(incompatible)", "ChartStringId.IncompatibleSeriesView") + " " + _this["name"]() : _this["name"]();
@@ -2303,6 +2428,28 @@ var DevExpress;
                         };
                         SeriesViewModel.getClassName = function (typeName) {
                             return typeName.toLowerCase().split("seriesview")[0];
+                        };
+                        SeriesViewModel.prototype._getUnconvertiblePoint = function (propertyName, oldValue, newValue) {
+                            var filter = function (_) { return false; };
+                            if ((oldValue === "Numerical" && newValue === "DateTime") || (oldValue === "DateTime" && newValue === "Numerical")) {
+                                filter = function (point) { return point[propertyName]() !== null && point[propertyName]() !== void 0 && point[propertyName]() !== ""; };
+                            }
+                            if (oldValue === "Auto" || oldValue === "Qualitative")
+                                if (newValue === "Numerical") {
+                                    filter = function (point) {
+                                        var number = parseInt(point[propertyName]());
+                                        return isNaN(number) || (typeof number === "number" && JSON.stringify(number) !== point[propertyName]().toString());
+                                    };
+                                }
+                                else if (newValue === "DateTime") {
+                                    filter = function (point) {
+                                        var date = DevExpress.Analytics.Internal.parseDate(point[propertyName](), false, "MM/dd/yyyy");
+                                        if (!date)
+                                            date = parseDate(point[propertyName]());
+                                        return !date;
+                                    };
+                                }
+                            return this.points().filter(filter)[0] || null;
                         };
                         SeriesViewModel.prototype.updateByView = function (view) {
                             _super.prototype.updateByView.call(this, view);
@@ -2551,7 +2698,7 @@ var DevExpress;
                     "OverlappedGanttSeriesView": gantObject,
                     "SideBySideGanttSeriesView": gantObject
                 };
-                var sideBySideBarDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@SideBySideBarDistanceFixed", defaultVal: 1 }, sideBySideBarDistance = { propertyName: "barDistance", modelName: "@SideBySideBarDistance", defaultVal: 0.0 };
+                var sideBySideEqualBarWidth = { propertyName: "equalBarWidth", modelName: "@SideBySideEqualBarWidth", displayName: "Side By Side Equal Bar Width", defaultVal: true, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, from: DevExpress.Analytics.Utils.parseBool }, sideBySideBarDistanceFixed = { propertyName: "barDistanceFixed", modelName: "@SideBySideBarDistanceFixed", defaultVal: 1 }, sideBySideBarDistance = { propertyName: "barDistance", modelName: "@SideBySideBarDistance", defaultVal: 0.0 };
                 var seriesPointsSorting = {
                     propertyName: "seriesPointsSorting", modelName: "@SeriesPointsSorting", displayName: "Series Points Sorting", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [{ value: "None", displayValue: "None", localizationId: 'DevExpress.XtraReports.UI.MultiColumnMode.None' }, { value: "Ascending", displayValue: "Ascending", localizationId: 'DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending' }, { value: "Descending", displayValue: "Descending", localizationId: 'DevExpress.XtraReports.UI.XRColumnSortOrder.Descending' }],
                     localizationId: 'DevExpress.XtraCharts.SeriesBase.SeriesPointsSorting'
@@ -2559,7 +2706,10 @@ var DevExpress;
                     propertyName: "seriesPointsSortingKey", modelName: "@SeriesPointsSortingKey", displayName: "Series Points Sorting Key", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Argument", displayValue: "Argument", localizationId: 'DevExpress.XtraCharts.SeriesSelectionMode.Argument' }, { value: "Value_1", displayValue: "Value_1", localizationId: 'ChartStringId.WizValueLevelValue_1' }, { value: "Value_2", displayValue: "Value_2", localizationId: 'ChartStringId.WizValueLevelValue_2' }, { value: "Value_3", displayValue: "Value_3" }, { value: "Value_4", displayValue: "Value_4" }],
                     localizationId: 'DevExpress.XtraCharts.SeriesBase.SeriesPointsSortingKey'
                 }, legendTextPattern = { propertyName: "legendTextPattern", modelName: "@LegendTextPattern", displayName: "Legend Text Pattern", editor: DevExpress.Analytics.Widgets.editorTemplates.text, localizationId: 'DevExpress.XtraCharts.SeriesBase.LegendTextPattern' }, argumentScaleType = { propertyName: "argumentScaleType", modelName: "@ArgumentScaleType", displayName: "Argument Scale Type", defaultVal: "Auto", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: Internal.scaleTypeValues, localizationId: 'DevExpress.XtraCharts.SeriesBase.ArgumentScaleType' }, valueScaleType = {
-                    propertyName: "valueScaleType", modelName: "@ValueScaleType", displayName: "Value Scale Type", defaultVal: "Numerical", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Numerical", displayValue: "Numerical", localizationId: 'DevExpress.XtraCharts.ScaleType.Numerical' }, { value: "DateTime", displayValue: "DateTime", localizationId: 'DevExpress.XtraTreeList.Data.UnboundColumnType.DateTime' }],
+                    propertyName: "valueScaleType", modelName: "@ValueScaleType", displayName: "Value Scale Type", defaultVal: "Numerical", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [
+                        { value: "Numerical", displayValue: "Numerical", localizationId: 'DevExpress.XtraCharts.ScaleType.Numerical' },
+                        { value: "DateTime", displayValue: "DateTime", localizationId: 'DevExpress.XtraTreeList.Data.UnboundColumnType.DateTime' }
+                    ],
                     localizationId: 'DevExpress.XtraCharts.SeriesBase.ValueScaleType'
                 }, labelsVisibility = { propertyName: "labelsVisibility", modelName: "@LabelsVisibility", displayName: "Labels Visibility", defaultVal: "Default", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: Internal.defaultBooleanValues, localizationId: 'DevExpress.XtraCharts.SeriesBase.LabelsVisibility' }, argumentDataMember = { propertyName: "argumentDataMember", modelName: "@ArgumentDataMember", displayName: "Argument Data Member", defaultVal: "", editor: Internal.editorTemplates.valueDataMember, localizationId: 'DevExpress.XtraCharts.SeriesBase.ArgumentDataMember' }, valueDataMembersSerializable = { propertyName: "valueDataMembers", modelName: "@ValueDataMembersSerializable", displayName: "Value Data Members", defaultVal: "", editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor, from: Internal.DataMembers.CommonValueDataMembers.from, toJsonObject: Internal.DataMembers.CommonValueDataMembers.toJson, localizationId: 'DevExpress.XtraCharts.SeriesBase.ValueDataMembers' };
                 var enabled = { propertyName: "enabled", modelName: "@Enabled", displayName: "Enabled", defaultVal: false, editor: DevExpress.Analytics.Widgets.editorTemplates.bool, from: DevExpress.Analytics.Utils.parseBool, localizationId: 'DevExpress.XtraReports.UI.EditOptions.Enabled' }, mode = {
@@ -2619,8 +2769,8 @@ var DevExpress;
                     localizationId: 'DevExpress.XtraCharts.DataFilterCollection.ConjunctionMode'
                 };
                 var colorDataMember = { propertyName: "colorDataMember", displayName: "Color Data Member", defaultVal: "", modelName: "@ColorDataMember", editor: ko.bindingHandlers["displayNameExtender"] ? DevExpress.Analytics.Widgets.editorTemplates.field : Internal.editorTemplates.fieldChart, localizationId: 'DevExpress.XtraCharts.SeriesBase.ColorDataMember' };
-                var valuesSerializable = { propertyName: "valuesSerializable", modelName: "@ValuesSerializable", from: function (val) { return ko.observable(val); }, toJsonObject: Series.SeriesPointModel.valueToJsonObject }, argumentSerializable = { propertyName: "argumentSerializable", modelName: "@ArgumentSerializable", displayName: 'Argument', localizationId: 'DevExpress.XtraCharts.SeriesPoint.Argument', editor: DevExpress.Analytics.Widgets.editorTemplates.text }, colorSerializable = { propertyName: "colorSerializable", modelName: "@ColorSerializable", displayName: 'Color', localizationId: 'DevExpress.XtraCharts.SeriesPoint.Color', from: DevExpress.Analytics.Utils.colorFromString, toJsonObject: DevExpress.Analytics.Utils.colorToString, editor: DevExpress.Analytics.Widgets.editorTemplates.customColorEditor };
-                Internal.seriesPointSerializationsInfo = [argumentSerializable, valuesSerializable, colorSerializable];
+                Internal.valuesSerializable = { propertyName: "valuesSerializable", modelName: "@ValuesSerializable", from: function (val) { return ko.observable(val); }, toJsonObject: Series.SeriesPointModel.valueToJsonObject }, Internal.argumentSerializable = { propertyName: "argumentSerializable", modelName: "@ArgumentSerializable", displayName: 'Argument', localizationId: 'DevExpress.XtraCharts.SeriesPoint.Argument', editor: DevExpress.Analytics.Widgets.editorTemplates.text }, Internal.colorSerializable = { propertyName: "colorSerializable", modelName: "@ColorSerializable", displayName: 'Color', localizationId: 'DevExpress.XtraCharts.SeriesPoint.Color', from: DevExpress.Analytics.Utils.colorFromString, toJsonObject: DevExpress.Analytics.Utils.colorToString, editor: DevExpress.Analytics.Widgets.editorTemplates.customColorEditor };
+                Internal.seriesPointSerializationsInfo = [Internal.argumentSerializable, Internal.valuesSerializable, Internal.colorSerializable];
                 Internal.points = {
                     propertyName: "points", modelName: "Points", displayName: 'Points', localizationId: 'DevExpress.XtraCharts.Series.Points',
                     editor: Internal.editorTemplates.points, array: true
@@ -2713,7 +2863,7 @@ var DevExpress;
                 Internal.qualitativeSummaryOptions = { propertyName: "qualitativeSummaryOptions", modelName: "QualitativeSummaryOptions", displayName: "Qualitative Summary Options", localizationId: "DevExpress.XtraCharts.SeriesBase.QualitativeSummaryOptions", info: Series.Metadata.summaryOptionsSerializationInfoArray, from: Series.QualitativeSummaryOptionsModel.from, toJsonObject: Series.QualitativeSummaryOptionsModel.toJson, editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor };
                 Internal.numericSummaryOptions = { propertyName: "numericSummaryOptions", modelName: "NumericSummaryOptions", displayName: "Numeric Summary Options", localizationId: "DevExpress.XtraCharts.SeriesBase.NumericSummaryOptions", info: Series.Metadata.numericSummaryOptionsSerializationInfoArray, from: Series.NumericSummaryOptionsModel.from, toJsonObject: Series.NumericSummaryOptionsModel.toJson, editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor };
                 Internal.dateTimeSumaryOptions = { propertyName: "dateTimeSummaryOptions", modelName: "DateTimeSummaryOptions", displayName: "Date-Time Summary Options", localizationId: "DevExpress.XtraCharts.SeriesBase.DateTimeSummaryOptions", info: Series.Metadata.dateTimeSummaryOptionsSerializationInfoArray, from: Series.DateTimeSummaryOptionsModel.from, toJsonObject: Series.DateTimeSummaryOptionsModel.toJson, editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor };
-                Internal.seriesTemplateSerializationsInfo = [Internal.viewBindableSerializationInfo, Internal.view, argumentDataMember, valueDataMembersSerializable, colorDataMember, argumentScaleType, seriesPointsSorting, seriesPointsSortingKey, valueScaleType, Internal.checkableInLegend, Internal.checkedInLegend, Internal.showInLegend, Internal.legendName, Internal.legendText, legendTextPattern, labelsVisibility, dataFiltersConjunctionMode, Internal.qualitativeSummaryOptions, Internal.numericSummaryOptions, Internal.dateTimeSumaryOptions, dataFilters, Internal.seriesLabel, topNOptions, Internal.visible];
+                Internal.seriesTemplateSerializationsInfo = [Internal.viewBindableSerializationInfo, { propertyName: "titles", displayName: "Titles", localizationId: 'DevExpress.XtraReports.UI.XRChart.Titles' }, Internal.view, argumentDataMember, valueDataMembersSerializable, colorDataMember, argumentScaleType, seriesPointsSorting, seriesPointsSortingKey, valueScaleType, Internal.checkableInLegend, Internal.checkedInLegend, Internal.showInLegend, Internal.legendName, legendTextPattern, labelsVisibility, dataFiltersConjunctionMode, Internal.qualitativeSummaryOptions, Internal.numericSummaryOptions, Internal.dateTimeSumaryOptions, dataFilters, Internal.seriesLabel, topNOptions, Internal.visible];
                 Internal.seriesTemplate = { propertyName: "seriesTemplate", modelName: "SeriesTemplate", displayName: "Series Template", localizationId: 'DevExpress.XtraReports.UI.XRChart.SeriesTemplate', info: Internal.seriesTemplateSerializationsInfo, from: Series.SeriesTemplateViewModel.from, toJsonObject: Series.SeriesTemplateViewModel.toJson, editor: DevExpress.Analytics.Widgets.editorTemplates.objecteditor };
                 Internal.seriesSerializationsInfo = [Internal.name, Internal.points].concat(Internal.seriesTemplateSerializationsInfo);
                 Internal.seriesSerializable = { propertyName: "series", modelName: "SeriesSerializable", displayName: "Series", array: true, editor: Internal.editorTemplates.collection, localizationId: 'DevExpress.XtraReports.UI.XRChart.Series' };
@@ -2737,7 +2887,7 @@ var DevExpress;
                     propertyName: "paletteName", modelName: "@PaletteName", displayName: "Palette Name", defaultVal: "Default", editor: DevExpress.Analytics.Widgets.editorTemplates.combobox, valuesArray: [{ value: "Default", displayValue: "Default", localizationId: 'DevExpress.XtraReports.UI.WinControlPrintMode.Default' }, { value: "Nature Colors", displayValue: "Nature Colors", localizationId: 'ChartStringId.AppNatureColors' }, { value: "Pastel Kit", displayValue: "Pastel Kit", localizationId: 'ChartStringId.AppPastelKit' }, { value: "In A Fog", displayValue: "In A Fog", localizationId: 'ChartStringId.AppInAFog' }, { value: "Terracotta Pie", displayValue: "Terracotta Pie", localizationId: 'ChartStringId.PltTerracottaPie' }, { value: "Northern Lights", displayValue: "Northern Lights", localizationId: 'ChartStringId.PltNorthernLights' }, { value: "Chameleon", displayValue: "Chameleon", localizationId: 'ChartStringId.AppChameleon' }, { value: "The Trees", displayValue: "The Trees", localizationId: 'ChartStringId.PltTheTrees' }, { value: "Mixed", displayValue: "Mixed", localizationId: 'ChartStringId.PltMixed' }, { value: "Office", displayValue: "Office", localizationId: 'ChartStringId.PltOffice' }, { value: "Black and White", displayValue: "Black and White", localizationId: 'ChartStringId.PltBlackAndWhite' }, { value: "Grayscale", displayValue: "Grayscale", localizationId: 'ChartStringId.PltGrayscale' }, { value: "Apex", displayValue: "Apex", localizationId: 'ChartStringId.PltApex' }, { value: "Aspect", displayValue: "Aspect", localizationId: 'ChartStringId.PltAspect' }, { value: "Civic", displayValue: "Civic", localizationId: 'ChartStringId.PltCivic' }, { value: "Concourse", displayValue: "Concourse", localizationId: 'ChartStringId.PltConcourse' }, { value: "Equity", displayValue: "Equity", localizationId: 'ChartStringId.PltEquity' }, { value: "Flow", displayValue: "Flow", localizationId: 'ChartStringId.PltFlow' }, { value: "Foundry", displayValue: "Foundry", localizationId: 'ChartStringId.PltFoundry' }, { value: "Median", displayValue: "Median", localizationId: 'DevExpress.XtraReports.UI.SortingSummaryFunction.Median' }, { value: "Metro", displayValue: "Metro", localizationId: 'ChartStringId.PltMetro' }, { value: "Module", displayValue: "Module", localizationId: 'DevExpress.XtraReports.UI.XRBarCode.Module' }, { value: "Opulent", displayValue: "Opulent", localizationId: 'ChartStringId.PltOpulent' }, { value: "Oriel", displayValue: "Oriel", localizationId: 'ChartStringId.PltOriel' }, { value: "Origin", displayValue: "Origin", localizationId: 'ChartStringId.PltOrigin' }, { value: "Paper", displayValue: "Paper", localizationId: 'ChartStringId.PltPaper' }, { value: "Solstice", displayValue: "Solstice", localizationId: 'ChartStringId.PltSolstice' }, { value: "Technic", displayValue: "Technic", localizationId: 'ChartStringId.PltTechnic' }, { value: "Trek", displayValue: "Trek", localizationId: 'ChartStringId.PltTrek' }, { value: "Urban", displayValue: "Urban", localizationId: 'ChartStringId.PltUrban' }, { value: "Verve", displayValue: "Verve", localizationId: 'ChartStringId.PltVerve' }, { value: "Office2013", displayValue: "Office2013" }, { value: "Blue Warm", displayValue: "Blue Warm", localizationId: 'ChartStringId.PltBlueWarm' }, { value: "Blue", displayValue: "Blue", localizationId: 'ChartStringId.PltBlue' }, { value: "Blue II", displayValue: "Blue II", localizationId: 'ChartStringId.PltBlueII' }, { value: "Blue Green", displayValue: "Blue Green", localizationId: 'ChartStringId.PltBlueGreen' }, { value: "Green", displayValue: "Green", localizationId: 'ChartStringId.PltGreen' }, { value: "Green Yellow", displayValue: "Green Yellow", localizationId: 'ChartStringId.PltGreenYellow' }, { value: "Yellow", displayValue: "Yellow", localizationId: 'ChartStringId.PltYellow' }, { value: "Yellow Orange", displayValue: "Yellow Orange", localizationId: 'ChartStringId.PltYellowOrange' }, { value: "Orange", displayValue: "Orange", localizationId: 'ChartStringId.PltOrange' }, { value: "Orange Red", displayValue: "Orange Red", localizationId: 'ChartStringId.PltOrangeRed' }, { value: "Red Orange", displayValue: "Red Orange", localizationId: 'ChartStringId.PltRedOrange' }, { value: "Red", displayValue: "Red", localizationId: 'ChartStringId.PltRed' }, { value: "Red Violet", displayValue: "Red Violet", localizationId: 'ChartStringId.PltRedViolet' }, { value: "Violet", displayValue: "Violet", localizationId: 'ChartStringId.PltViolet' }, { value: "Violet II", displayValue: "Violet II", localizationId: 'ChartStringId.PltVioletII' }, { value: "Marquee", displayValue: "Marquee", localizationId: 'ChartStringId.PltMarquee' }, { value: "Slipstream", displayValue: "Slipstream", localizationId: 'ChartStringId.PltSlipstream' }],
                     localizationId: 'DevExpress.XtraReports.UI.XRChart.PaletteName'
                 };
-                Internal.chartSerializationsInfo = [Internal.appearanceName, Internal.paletteName, sideBySideBarDistanceFixed, sideBySideBarDistance, Internal.dataContainer, Internal.diagram, Internal.titles, Internal.legend, Internal.legends];
+                Internal.chartSerializationsInfo = [Internal.appearanceName, Internal.paletteName, sideBySideBarDistanceFixed, sideBySideEqualBarWidth, sideBySideBarDistance, Internal.dataContainer, Internal.diagram, Internal.titles, Internal.legend, Internal.legends];
                 Internal.chart = { propertyName: "chart", modelName: "Chart", displayName: "Chart", from: Internal.Models.ChartViewModel.from, toJsonObject: Internal.Models.ChartViewModel.toJson, localizationId: 'DevExpress.XtraReports.UI.XRChart' };
                 Internal.chartDataMember = { propertyName: "dataMember", displayName: "Data Member", defaultVal: "", editor: ko.bindingHandlers["displayNameExtender"] ? DevExpress.Analytics.Widgets.editorTemplates.dataMember : Internal.editorTemplates.dataMemberChart, localizationId: 'DevExpress.XtraReports.UI.XRSparkline.DataMember' };
                 Internal.chartSeriesDataMember = { propertyName: "seriesDataMember", displayName: "Series Data Member", defaultVal: "", editor: Internal.editorTemplates.fieldChart, localizationId: 'DevExpress.XtraReports.UI.XRChart.SeriesDataMember' };
@@ -2814,7 +2964,7 @@ var DevExpress;
                             }
                         };
                         series["isPropertyDisabled"] = function (name) {
-                            return _this.isSeriesPropertyDisabled(name);
+                            return series._isPropertyDisabled(name) || _this.isSeriesPropertyDisabled(name);
                         };
                         series.valueDataMembers()["getPath"] = function (propertyName) {
                             return _this.getPath("seriesDataMember");
@@ -2844,7 +2994,7 @@ var DevExpress;
                             return _this.getPath("seriesDataMember");
                         };
                         this.chart.dataContainer.seriesTemplate["isPropertyDisabled"] = function (name) {
-                            return _this.isSeriesTemplatePropertyDisabled(name);
+                            return _this.chart.dataContainer.seriesTemplate._isPropertyDisabled(name) || _this.isSeriesTemplatePropertyDisabled(name);
                         };
                         this.chart.dataContainer.seriesTemplate.valueDataMembers()["getPath"] = function (propertyName) {
                             return _this.getPath("seriesDataMember");
@@ -2971,9 +3121,11 @@ var DevExpress;
                         return null;
                     if (val instanceof Date)
                         return val;
-                    var date = DevExpress.Analytics.Internal.parseDate(val);
-                    if (!date) {
-                        date = DevExpress.Analytics.Internal.parseDate(val, false, "MM/dd/yyyy HH:mm:ss.SSS");
+                    var chartDateParts = val.split(".");
+                    var date = DevExpress.Analytics.Internal.parseDate(chartDateParts[0]);
+                    if ((chartDateParts.length > 1) && date && (chartDateParts[1].length === 3)) {
+                        var milliseconds = parseInt(chartDateParts[1]);
+                        milliseconds && date.setMilliseconds(milliseconds);
                     }
                     return date;
                 }
@@ -16329,10 +16481,12 @@ var DevExpress;
                         self.onOpening(args);
                         if (args.cancel)
                             return;
+                        this.disabled(true);
                         Internal.ReportStorageWeb.getReportByUrl(url).done(function (result) {
                             self.navigateByReports.addTab(result, ko.observable(url));
+                            self.disabled(false);
                             self.visible(false);
-                        });
+                        }).fail(function () { return self.disabled(false); });
                     };
                     return OpenReportDialog;
                 }(ReportDialogBase));
@@ -16393,11 +16547,9 @@ var DevExpress;
                         var self = this;
                         if (Internal.reportStorageWebIsRegister) {
                             var data = self.tab().context().report.serialize();
-                            var args = { report: self.tab().context().report, url: url, cancel: false };
+                            var args = { report: self.tab().context().report, url: url, cancel: false, dialog: this };
                             self.onSaving(args);
                             if (args.cancel) {
-                                self.tab().close && self.tab().close.reject();
-                                this.visible(false);
                                 return;
                             }
                             self.disabled(true);
@@ -16412,9 +16564,10 @@ var DevExpress;
                                     self.tab().close.resolve();
                                 }
                                 Internal.ReportStorageWeb.getUrls().done(function (result) { self.model()["urls"] && self.model()["urls"](result); });
-                            }).always(function () {
                                 self.disabled(false);
                                 self.visible(false);
+                            }).fail(function () {
+                                self.disabled(false);
                             });
                         }
                         else {
@@ -16492,12 +16645,16 @@ var DevExpress;
                                     self.tab().close && self.tab().close.reject();
                                     return;
                                 }
+                                this.disabled(true);
                                 Internal.ReportStorageWeb.setData(self.tab().context().report.serialize(), url)
                                     .done(function (jsonResult) {
                                     self.onSaved({ report: self.tab().context().report, url: url });
                                     self.tab().undoEngine.clearHistory();
-                                    self.tab().close.resolve();
+                                    self.tab().close && self.tab().close.resolve();
+                                    self.disabled(false);
                                     self.visible(false);
+                                }).fail(function () {
+                                    self.disabled(false);
                                 });
                             }
                             else {
@@ -24906,7 +25063,7 @@ var DevExpress;
                     SelectReportTypePage.prototype._addDataboundReportType = function () {
                         this.typeItems.splice(1, 0, new DevExpress.Analytics.Wizard.TypeItem("Table Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_TableReport", "databoundReport", "dxrd-svg-wizard-StandardReport", Wizard.ReportType.Databound));
                         if (this._options.showVertical) {
-                            this.typeItems.splice(2, 0, new DevExpress.Analytics.Wizard.TypeItem("Vertical Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_Vertical", "verticalReport", "dxrd-svg-wizard-VerticalReport", Wizard.ReportType.Vertical));
+                            this.typeItems.splice(2, 0, new DevExpress.Analytics.Wizard.TypeItem("Vertical Report", "ASPxReportsStringId.ReportDesigner_Wizard_SelectReportType_VerticalReport", "verticalReport", "dxrd-svg-wizard-VerticalReport", Wizard.ReportType.Vertical));
                         }
                     };
                     SelectReportTypePage.prototype.canNext = function () {
@@ -24931,7 +25088,7 @@ var DevExpress;
                     __extends(ChooseDataSourceTypePage, _super);
                     function ChooseDataSourceTypePage(dataSourceWizardOptions) {
                         var _this = _super.call(this, dataSourceWizardOptions) || this;
-                        _this.typeItems.push(new DevExpress.Analytics.Wizard.TypeItem("No Data", "ReportDesignerStringId.ReportWizard_ChooseDataSourceTypePage_DataSourceNoData_Name", "nodata", "dxrd-svg-wizard-NoDataSource", DevExpress.Analytics.Wizard.DataSourceType.NoData));
+                        _this.typeItems.push(new DevExpress.Analytics.Wizard.TypeItem("No Data", "DataAccessUIStringId.DSTypeNoData", "nodata", "dxrd-svg-wizard-NoDataSource", DevExpress.Analytics.Wizard.DataSourceType.NoData));
                         return _this;
                     }
                     return ChooseDataSourceTypePage;
@@ -24975,7 +25132,7 @@ var DevExpress;
                         create: function () {
                             return new ChooseDataSourceTypePage(dataSourceWizardOptions);
                         },
-                        description: DevExpress.Analytics.Utils.getLocalization("Select the data source type.", "AnalyticsCoreStringId.Wizard_SelectDataSourceType_Description"),
+                        description: DevExpress.Analytics.Utils.getLocalization("Select the data source type.", "DataAccessUIStringId.WizardPageChooseDSType"),
                         template: "dxrd-page-choose-datasource-type"
                     });
                 }
@@ -25344,7 +25501,7 @@ var DevExpress;
                             return new ChooseAvailableDataSourcePage(reportWizardOptions.dataSources, reportWizardOptions.jsonDataSourceAvailable || reportWizardOptions.sqlDataSourceAvailable);
                         },
                         template: "dxrd-page-selectitems",
-                        description: DevExpress.Analytics.Utils.getLocalization("Do you want to use an existing data source?", "ASPxReportsStringId.ReportDesigner_Wizard_UseExisting_DataSource")
+                        description: DevExpress.Analytics.Utils.getLocalization("Do you want to use an existing data source?", "AnalyticsCoreStringId.Wizard_UseExisting_DataSource")
                     });
                 }
                 Wizard._registerChooseAvailableDataSourcePage = _registerChooseAvailableDataSourcePage;
@@ -31055,7 +31212,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxcd-axisX-editor': '<div data-bind="dxSelectBox: { dataSource: $root.axisX, value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>',
     'dxcd-axisY-editor': '<div data-bind="dxSelectBox: { dataSource: $root.axisY, value: value, disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>',
     'dxcd-datasource': '<!-- ko with: generateOptions($root.chartDataSources, $root.getPopupContainer($element)) -->    <div data-bind="dxSelectBox: $data"></div>    <!-- /ko -->',
-    'dxcd-viewHeader': '<div data-bind="dxSelectBox: { dataSource: values, itemTemplate: \'stateItem\', valueExpr: \'value\', value: generateHeaderValue($root.undoEngine), displayExpr: \'displayValue\', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }">        <div class="lookupItem" data-options="dxTemplate:{ name:\'stateItem\' }">            <div style="display:inline-block; width: 24px; height: 24px;" data-bind="css: $parent.generateViewClassName(value), template: {name: $parent.generateViewClassName(value, true), if: !!$parent.generateViewClassName(value, true)}"> </div>            <div style="display:inline-block; vertical-align: super;" data-bind="text: displayValue"></div>        </div>    </div>',
+    'dxcd-viewHeader': '<div data-bind="dxSelectBox: { dataSource: generateViewItems(), itemTemplate: \'stateItem\', valueExpr: \'value\', value: generateHeaderValue($root.undoEngine), displayExpr: \'displayValue\', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }">        <div class="lookupItem" data-options="dxTemplate:{ name:\'stateItem\' }">            <div style="display:inline-block; width: 24px; height: 24px;" data-bind="css: className, template: {name: templateName, if: !!templateName }"> </div>            <div style="display:inline-block; vertical-align: super;" data-bind="text: displayValue"></div>        </div>    </div>',
     'dxcd-viewContent': '<div data-bind="dxPropertyGrid: { target: contentValue, level: level + 1, parentDisabled: disabled }"></div>',
     'dxcd-summaryfunction': '<div class="dx-editor" data-bind="visible: visible">        <div data-bind="dxCollectionEditor: options">        </div>    </div>',
     'dxcd-summaryFunction-content': '<div class="dxcd-summary-function-content">        <!-- ko with: value -->        <div class="dx-field dxd-back-primary">            <div class="dx-field-label dxd-text-primary" data-bind="styleunit: $parent.memberPadding">                <div class="propertygrid-editor-displayName" data-bind="text: $parent.getLocalization(\'Function\', \'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function\'), attr: { \'title\': $parent.getLocalization(\'Function\', \'DevExpress.XtraReports.UI.XRGroupSortingSummary.Function\') }"></div>            </div>            <div class="dx-field-value">                <div data-bind="dxSelectBox: { value: functionName, dataSource: $parent.availableItems() ,acceptCustomValue: true, disabled: $parent.disabled(), placeholder: $root.dx.Analytics.Internal.selectPlaceholder(), dropDownOptions: { container: $root.getPopupContainer($element) } }"></div>            </div>        </div>        <!-- ko foreach: args -->        <div class="dx-field dxd-back-primary" data-bind="css: $parents[1].actionsAreAvailable() ? \'dxcd-summaryfunction-arg\' : \'\'">            <div class="dx-field-label dxd-text-primary" data-bind="styleunit: $parents[1].memberPadding">                <!-- ko if: $parent.args().length === 1-->                <div class="propertygrid-editor-displayName" data-bind="text: $parents[1].getLocalization(\'Argument\', \'DevExpress.XtraCharts.SeriesSelectionMode.Argument\'), attr: { \'title\': $parents[1].getLocalization(\'Argument\', \'DevExpress.XtraCharts.SeriesSelectionMode.Argument\') }"></div>                <!-- /ko -->                <!-- ko if: $parent.args().length > 1-->                <div class="propertygrid-editor-displayName" data-bind="text: $parents[1].getLocalization(\'Argument\', \'DevExpress.XtraCharts.SeriesSelectionMode.Argument\') + ($index() + 1), attr: { \'title\': $parents[1].getLocalization(\'Argument\', \'DevExpress.XtraCharts.SeriesSelectionMode.Argument\') + ($index() + 1) }"></div>                <!-- /ko -->            </div>            <div class="dx-field-value">                <!-- ko if: $parents[1].actionsAreAvailable() -->                <div class="dxcd-summaryFunction-remove" data-bind="click: function(){ $parents[1].remove($index()) }">                    <div class="dxcd-summaryFunction-remove-icon dx-icon-dxrd-image-recycle-bin"><!-- ko template: \'dxrd-svg-operations-recycle_bin\'--><!-- /ko --></div>                </div>                <!-- /ko -->                <!-- ko template: { name: $parents[1].argumentTemplateName, data: { value: $data.value, path: $parents[1].path, treeListController: $parents[1].treeListController, disabled: $parents[1].disabled } } -->                <!-- /ko -->            </div>        </div>        <!-- /ko -->        <!-- ko if: $parent.actionsAreAvailable() -->        <div class="dx-field dxd-back-primary">            <div class="dx-field-label dxd-text-primary" style="width:auto" data-bind="styleunit: $parent.memberPadding">                <div class="propertygrid-editor-displayName dxrcd-summaryfunction-addnew dxd-hyperlink-color dxd-border-accented dxd-text-accented" data-bind="text: $parent.getLocalization(\'Add Argument\', \'ASPxReportsStringId.ReportDesigner_AddArgument\'), attr: { \'title\': $parent.getLocalization(\'Add New Item\', \'ASPxReportsStringId.ReportDesigner_AddNewItem\') }, click: function() { $parent.add(); }"></div>            </div>        </div>        <!-- /ko -->        <!-- /ko -->    </div>',
@@ -31135,7 +31292,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dxrd-scripts': '<div class="dxrd-scripts" data-bind="visible: editorVisible, template: \'dxrd-scripts-addon\'"></div>',
     'dxrd-navigation-panel-template': '<!-- ko ifnot: $root.isLoading() && tabs().length === 1-->    <!-- ko if: allowMDI -->    <!-- ko if: tabs().length > 0 -->    <!-- ko template: \'dxrd-navigation-panel-template-content\' -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->    <!-- ko ifnot: allowMDI -->    <!-- ko if: tabs().length > 1 -->    <!-- ko template: \'dxrd-navigation-panel-template-content\' -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->    <!-- /ko -->',
     'dxrd-navigation-panel-template-content': '<div class="dxrd-navigation-panel-wrapper" data-bind="style: { width: $root.surfaceSize() ? $root.surfaceSize() + \'px\' : \'auto\' }">        <div data-bind="dxTabs: { dataSource: tabs, selectedIndex: selectedIndex, showNavButtons: false }">            <div data-options="dxTemplate: { name: \'item\' }">                <!-- ko if: icon -->                <div class="dx-icon" data-bind="css: icon, event: { mousedown: function(e) { $parent.removeTab(e); } }"></div>                <!-- /ko -->                <div class="dx-tab-title-wrapper">                    <div class="dx-tab-title" data-bind="text: isDirty() ? displayName() + \'*\' : displayName(), title: displayName, style: { \'font-weight\': isDirty() ? \'bold\' : \'normal\' }"></div>                </div>            </div>        </div>    </div>',
-    'dxrd-report-dialog-template': '<div class="dxrd-reportdialog dx-editors dx-widget" data-bind="dxPopup: {            showTitle: true,            width: width,            height: height,            title: $root.getLocalization(title),            visible: visible,            disabled: disabled,            toolbarItems: buttons,            showCloseButton: true,            container: container($element),            position: { of: container($element) }}">        <!-- ko template: { name: template, data: model } -->        <!-- /ko -->    </div>',
+    'dxrd-report-dialog-template': '<div class="dxrd-reportdialog dx-editors dx-widget" data-bind="dxPopup: {            showTitle: true,            width: width,            height: height,            title: $root.getLocalization(title),            visible: visible,            disabled: disabled,            toolbarItems: buttons,            showCloseButton: true,            container: container($element),            position: { of: container($element) }}">        <!-- ko template: { name: template, data: model } -->        <!-- /ko -->        <!-- ko if: disabled -->        <div data-bind="dxLoadPanel: { visible:true }"></div>        <!-- /ko -->    </div>',
     'dxrd-report-dialog-converter-template': '<div class="dxrd-reportdialog dxrd-reportdialog-converter dx-editors dx-widget" data-bind="dxPopup: {            showTitle: true,            minWidth: 530,            height: 250,            width: \'auto\',            title: popupOptions.title,            visible: popupOptions.visible,            toolbarItems: popupOptions.buttons,            showCloseButton: true,            container: popupOptions.container($element),            position: { of: popupOptions.container($element) }}">        <div class="dxrd-reportdialog-converter-content">            <div class="dxrd-image-exlamation-icons" data-bind="template: \'dxrd-svg-wizard-warning\'"></div>            <div class="dxrd-reportdialog-content-text">                <div class="dxrd-reportdialog-content-confirm-message" data-bind="text: popupOptions.confirmMessage"></div>                <a class="dxrd-reportdialog-toggle-link dxd-hyperlink-color dxd-text-accented" data-bind="text: popupOptions.linkText, attr: {href: popupOptions.linkUrl, target: \'_blank\' }"></a>            </div>        </div>    </div>',
     'dxrd-savereport-dialog-content': '<div class="dxrd-reportdialog-content">        <div class="dx-fieldset">            <div class="dx-field dxd-back-primary">                <div data-bind="dxTextBox: { value: $data.reportName, height: 36, placeholder: reportNamePlaceholder(), valueChangeEvent: \'keyup\' }"></div>            </div>        </div>        <div class="dx-default-border-style dxd-border-secondary">            <div class="dxrd-reportdialog-urls" data-bind="dxList: { dataSource: urls, selectedItems: [], editEnabled: true, height: 200, editConfig: { selectionEnabled: true }, selectionMode: \'single\', onItemClick: function(e) { this.reportName(e.itemData.Value); }, activeStateEnabled: false, noDataText: $data.noDataText, nextButtonText: $root.getLocalization(\'More\', \'ASPxReportsStringId.List_More\') }">                <div data-options="dxTemplate : { name: \'item\' }">                    <div data-bind="text: $data.Value"></div>                </div>            </div>        </div>    </div>',
     'dxrd-savereport-dialog-content-light': '<div class="dxrd-reportdialog-easy-content" data-bind="text: saveText"></div>',

@@ -1,9 +1,9 @@
 <!--
 /**
 * DevExpress HTML/JS Analytics Core (templates.html)
-* Version: 19.1.8
-* Build date: 2019-11-18
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -1478,7 +1478,7 @@
 
 <script type="text/html" id="dx-string-array">
     <div class="dx-field">
-        <div class="dx-string-array-container dx-texteditor dx-multiline">
+        <div class="dx-string-array-container dx-texteditor dx-editor-outlined dx-multiline">
             <textarea class="dx-string-array-textarea dx-texteditor-input" data-bind="value: value, disable: disabled"></textarea>
         </div>
     </div>
@@ -2720,9 +2720,9 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (web-document-viewer.html)
-* Version: 19.1.8
-* Build date: 2019-11-19
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -3351,9 +3351,9 @@
 <!--
 /**
 * DevExpress HTML/JS Chart Designer (chart-designer.html)
-* Version: 19.1.8
-* Build date: 2019-11-19
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -3455,9 +3455,9 @@
 </script>
 
 <script type="text/html" id="dxcd-viewHeader">
-    <div data-bind="dxSelectBox: { dataSource: values, itemTemplate: 'stateItem', valueExpr: 'value', value: generateHeaderValue($root.undoEngine), displayExpr: 'displayValue', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }">
+    <div data-bind="dxSelectBox: { dataSource: generateViewItems(), itemTemplate: 'stateItem', valueExpr: 'value', value: generateHeaderValue($root.undoEngine), displayExpr: 'displayValue', disabled: disabled, dropDownOptions: { container: $root.getPopupContainer($element) } }">
         <div class="lookupItem" data-options="dxTemplate:{ name:'stateItem' }">
-            <div style="display:inline-block; width: 24px; height: 24px;" data-bind="css: $parent.generateViewClassName(value), template: {name: $parent.generateViewClassName(value, true), if: !!$parent.generateViewClassName(value, true)}"> </div>
+            <div style="display:inline-block; width: 24px; height: 24px;" data-bind="css: className, template: {name: templateName, if: !!templateName }"> </div>
             <div style="display:inline-block; vertical-align: super;" data-bind="text: displayValue"></div>
         </div>
     </div>
@@ -3553,9 +3553,9 @@
 <!--
 /**
 * DevExpress HTML/JS Reporting (report-designer.html)
-* Version: 19.1.8
-* Build date: 2019-11-19
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 -->
@@ -4860,6 +4860,9 @@
             position: { of: container($element) }
 }">
         <!-- ko template: { name: template, data: model } -->
+        <!-- /ko -->
+        <!-- ko if: disabled -->
+        <div data-bind="dxLoadPanel: { visible:true }"></div>
         <!-- /ko -->
     </div>
 </script>

@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Query Builder (dx-querybuilder.js)
-* Version: 19.1.8
-* Build date: 2019-11-18
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -2626,7 +2626,7 @@ var DevExpress;
                     create: function () {
                         return new ChooseDataSourceTypePage(dataSourceTypeOptions);
                     },
-                    description: Analytics.Utils.getLocalization("Select the data source type.", "AnalyticsCoreStringId.Wizard_SelectDataSourceType_Description"),
+                    description: Analytics.Utils.getLocalization("Select the data source type.", "DataAccessUIStringId.WizardPageChooseDSType"),
                     template: "dxrd-page-choose-datasource-type"
                 });
             }
@@ -5723,7 +5723,7 @@ var DevExpress;
                         var _this = _super.call(this, wizard) || this;
                         _this._isActivated = false;
                         _this.template = "dxrd-page-choose-datasource-type";
-                        _this.description = Analytics.Utils.getLocalization("Select the data source type.", "AnalyticsCoreStringId.Wizard_SelectDataSourceType_Description");
+                        _this.description = Analytics.Utils.getLocalization("Select the data source type.", "DataAccessUIStringId.WizardPageChooseDSType");
                         _this.selectedItem = ko.observable();
                         _this.itemClick = function (item) {
                             _this.selectedItem(item);

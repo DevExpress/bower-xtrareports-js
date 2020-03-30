@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (dx-reportdesigner.css)
-* Version: 19.1.8
-* Build date: 2019-11-19
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -70,6 +70,9 @@
 }
 .dxrd-designer-wrapper.dxcd-designer .dx-chart-left-panel .dxrd-right-panel .dxcd-chart-structure {
   height: 100%;
+}
+.dxrd-designer-wrapper.dxcd-designer .dx-chart-left-panel .dxrd-right-panel .dxcd-chart-structure .dx-treelist-item .dx-treelist-image-empty {
+  display: none;
 }
 .dxrd-designer-wrapper.dxcd-designer .propertygrid-editor-checkbox {
   left: 0;

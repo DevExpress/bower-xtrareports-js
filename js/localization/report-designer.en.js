@@ -1,7 +1,7 @@
 /**
 * DevExpress HTML/JS Reporting (report-designer.en.js)
-* Version: 19.1.7
-* Build date: 2019-11-15
+* Version: 19.1.9
+* Build date: 2020-01-28
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */

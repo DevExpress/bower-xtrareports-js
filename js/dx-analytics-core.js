@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Analytics Core (dx-analytics-core.js)
-* Version: 19.1.8
-* Build date: 2019-11-18
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -149,6 +149,23 @@ var DevExpress;
                     : toStringWithDelimiter(datePart, "/") + " " + timePart;
             }
             Utils.serializeDate = serializeDate;
+            function deserializeDate(dateTime) {
+                var dateTimeParts = dateTime.split(' ');
+                var dateArgs = dateTimeParts[0].split('-');
+                var timeArgs = [0, 0, 0];
+                if (dateTimeParts.length > 1) {
+                    dateArgs = dateTimeParts[0].split('/');
+                    dateArgs.splice(0, 0, dateArgs.splice(2, 1)[0]);
+                    timeArgs = dateTimeParts[1].split(':').map(function (x) { return parseInt(x); });
+                    if (timeArgs.length !== 3)
+                        return null;
+                }
+                if (dateArgs.length !== 3)
+                    return null;
+                dateArgs = dateArgs.map(function (x) { return parseInt(x); });
+                return new Date(dateArgs[0], dateArgs[1] - 1, dateArgs[2], timeArgs[0], timeArgs[1], timeArgs[2]);
+            }
+            Utils.deserializeDate = deserializeDate;
         })(Utils = Analytics.Utils || (Analytics.Utils = {}));
         (function (Internal) {
             function knockoutArrayWrapper(items) {
@@ -585,10 +602,7 @@ var DevExpress;
                 if (val) {
                     if (val instanceof Date)
                         return val;
-                    var date = DevExpress.localization["parseDate"](val, "MM/dd/yyyy HH:mm:ss");
-                    if (!date)
-                        date = DevExpress.localization["parseDate"](val, "yyyy-MM-dd");
-                    return date;
+                    return Utils.deserializeDate(val);
                 }
                 return null;
             }
@@ -2241,7 +2255,7 @@ DevExpress.Analytics.Widgets.Internal.SvgTemplatesEngine.addTemplates({
     'dx-numeric': '<div data-bind="dxNumberBox: getOptions({ value:value, showSpinButtons:true, disabled:disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
     'dx-number-editor': '<div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: { validationRules: validationRules || [] }"></div>',
     'dx-text': '<!-- ko if: $data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled }), dxValidator: getValidatorOptions($data.validatorOptions || { validationRules: validationRules || [] })"></div>    <!-- /ko -->    <!-- ko if: !$data.validationRules -->    <div data-bind="dxTextBox: getOptions({ value: value, disabled: disabled })"></div>    <!-- /ko -->',
-    'dx-string-array': '<div class="dx-field">        <div class="dx-string-array-container dx-texteditor dx-multiline">            <textarea class="dx-string-array-textarea dx-texteditor-input" data-bind="value: value, disable: disabled"></textarea>        </div>    </div>',
+    'dx-string-array': '<div class="dx-field">        <div class="dx-string-array-container dx-texteditor dx-editor-outlined dx-multiline">            <textarea class="dx-string-array-textarea dx-texteditor-input" data-bind="value: value, disable: disabled"></textarea>        </div>    </div>',
     'dx-propertieseditor': '<div data-bind="css: { \'dx-rtl\' : rtl }">        <div class="dx-editors">            <div class="dx-fieldset">                <!-- ko foreach: getEditors() -->                <!-- ko template: editorTemplate -->                <!-- /ko -->                <!-- /ko -->            </div>        </div>    </div>',
     'dx-objectEditorContent': '<!-- ko if: visible -->    <div data-bind="template: { name: \'dx-propertieseditor\', data: viewmodel }"></div>    <!-- /ko -->',
     'dx-collectioneditor': '<div class="dx-collectioneditor">        <div data-bind="dxdAccordion: { collapsed: collapsed, alwaysShow: alwaysShow }">            <div class="dx-collectioneditor-header dx-accordion-header">                <div class="dx-editor-header">                    <div class="dx-field">                        <!-- ko if: showButtons-->                        <div class="dx-collectioneditor-actions-wrapper">                            <!-- ko if: isVisibleButton(\'delete\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: remove, disabled: isDisabledButton(\'delete\'), icon: \'dxrd-svg-operations-remove\', iconClass: \'dx-image-remove\' }, attr: { title: getDisplayTextButton(\'delete\') }"></div>                            <!-- /ko -->                            <!-- ko if: isVisibleButton(\'add\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: add, disabled: isDisabledButton(\'add\'), icon: \'dxrd-svg-operations-add\', iconClass: \'dx-image-add\' }, attr: { title: getDisplayTextButton(\'add\') }"></div>                            <!-- /ko -->                            <div class="dx-collectioneditor-action-separator"></div>                            <!-- ko if: isVisibleButton(\'down\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: down, disabled: isDisabledButton(\'down\'), icon: \'dxrd-svg-operations-movedown\', iconClass: \'dx-image-movedown\' }, attr: { title: getDisplayTextButton(\'down\') }"></div>                            <!-- /ko -->                            <!-- ko if: isVisibleButton(\'up\') -->                            <div class="dx-collectioneditor-action" data-bind="dxButtonWithTemplate: { onClick: up, disabled: isDisabledButton(\'up\'), icon: \'dxrd-svg-operations-moveup\', iconClass: \'dx-image-moveup\' }, attr: { title: getDisplayTextButton(\'up\') }"></div>                            <!-- /ko -->                        </div>                        <!-- /ko -->                        <!-- ko if: displayName -->                        <div class="dx-collectioneditor-header-text dxd-text-primary" data-bind="styleunit: { \'paddingLeft\': padding }">                            <div class="propertygrid-editor-collapsed dx-collapsing-image" data-bind="template: \'dxrd-svg-collapsed\', css: { \'dx-image-expanded\': !collapsed() }"></div>                            <div class="dx-group-header-font dxd-text-primary" data-bind="text: displayName, attr: { title: displayName }"></div>                        </div>                        <!-- /ko -->                    </div>                </div>            </div>            <div class="dx-accordion-content">                <!-- ko if: values().length === 0 && showButtons -->                <div class="dx-collectioneditor-empty dxd-empty-area-placeholder-text-color dxd-text-info">                    <span class="dx-collectioneditor-empty-text" data-bind="text: getDisplayTextEmptyArray()"></span>                </div>                <!-- /ko -->                <!-- ko if: values().length !== 0 -->                <div class="dx-collectioneditor-items" data-bind="foreach: values">                    <div data-bind="with: $parent.createCollectionItemWrapper($parents[1], $index)">                        <div class="dx-collectioneditor-item-container dxd-button-back-color dxd-state-normal dxd-back-highlighted" data-bind="dxclick: $parents[1].select, css: { \'dxd-state-selected\' : $parents[1].selectedIndex() === $index() }">                            <div class="dx-collection-item"></div>                        </div>                    </div>                </div>                <!-- /ko -->            </div>        </div>    </div>',
@@ -4181,6 +4195,7 @@ var DevExpress;
                 function trimBrackets(value) {
                     return value.substring(value[0] === "[" ? 1 : 0, value[value.length - 1] === "]" ? value.length - 1 : value.length);
                 }
+                Internal.trimBrackets = trimBrackets;
             })(Internal = Widgets.Internal || (Widgets.Internal = {}));
         })(Widgets = Analytics.Widgets || (Analytics.Widgets = {}));
         (function (Criteria) {
@@ -6511,7 +6526,11 @@ var DevExpress;
                         return result + operatorTypeSuffix + aggregateSuffix;
                     };
                     FilterEditorSerializer.prototype.serializeOperandProperty = function (operandProperty) {
-                        return operandProperty.displayType;
+                        var value = operandProperty.displayType;
+                        if (value.length - Internal.trimBrackets(value).length === 2) {
+                            value = "[" + Internal.trimBrackets(value).replace(/\\/g, "\\").replace(/\]/g, "\\]") + "]";
+                        }
+                        return value;
                     };
                     FilterEditorSerializer.prototype.serializeOperandValue = function (operandValue) {
                         var result = operandValue.value;
@@ -10633,7 +10652,7 @@ var DevExpress;
                         return _super !== null && _super.apply(this, arguments) || this;
                     }
                     RequiredNullableEditor.prototype._getEditorValidationRules = function () {
-                        return (_super.prototype._getEditorValidationRules.call(this) || []).concat(this.editorOptions.showClearButton && ko.unwrap(this.editorOptions.showClearButton) ? [] : Internal.requiredValidationRules);
+                        return (_super.prototype._getEditorValidationRules.call(this) || []).concat(this.editorOptions && this.editorOptions.showClearButton && ko.unwrap(this.editorOptions.showClearButton) ? [] : Internal.requiredValidationRules);
                     };
                     return RequiredNullableEditor;
                 }(Widgets.Editor));
@@ -13884,7 +13903,8 @@ var DevExpress;
                 DevExpress.ui.notify({
                     message: msg,
                     type: type,
-                    position: { of: Internal.chooseBetterPositionOf(document.documentElement, containerElement), my: "bottom", at: "bottom", offset: "0 -10" },
+                    maxWidth: containerElement ? containerElement.clientWidth : undefined,
+                    position: { boundary: containerElement, collision: "fit", of: Internal.chooseBetterPositionOf(document.documentElement, containerElement), my: "bottom", at: "bottom", offset: "0 -10" },
                     container: containerElement,
                     closeOnOutsideClick: true,
                     closeOnSwipe: false,

@@ -1,8 +1,8 @@
 /**
 * DevExpress HTML/JS Reporting (dx-webdocumentviewer.js)
-* Version: 19.1.8
-* Build date: 2019-11-19
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Version: 19.1.9
+* Build date: 2020-01-27
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * License: https://www.devexpress.com/Support/EULAs/NetComponents.xml
 */
 
@@ -3214,8 +3214,8 @@ var DevExpress;
                     PreviewPage.prototype.clickToBrick = function (s, e) {
                         var target = $(e.currentTarget);
                         var offset = target.offset();
-                        var xPerc = (e.clientX - offset.left) / target.width() * 100;
-                        var yPerc = (e.clientY - offset.top) / target.height() * 100;
+                        var xPerc = (e.clientX - offset.left + window.scrollX) / target.width() * 100;
+                        var yPerc = (e.clientY - offset.top + window.scrollY) / target.height() * 100;
                         var bricks = s.bricks();
                         for (var i = 0; i < bricks.length; i++) {
                             if (parseFloat(bricks[i].topP) < yPerc && parseFloat(bricks[i].topP) + parseFloat(bricks[i].heightP) > yPerc
